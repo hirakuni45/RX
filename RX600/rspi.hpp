@@ -3,12 +3,12 @@
 /*!	@file
 	@brief	RX600 グループ・RSPI[abc] 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -453,7 +453,7 @@ namespace device {
 		F_PCLKA>  RSPI1;
 	typedef rspi_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
 		F_PCLKA>  RSPI2;
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef rspi_c_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		F_PCLKA>  RSPI0;
 #elif defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)

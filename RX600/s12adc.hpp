@@ -3,12 +3,11 @@
 /*!	@file
 	@brief	RX600 グループ・S12ADC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
 #include "common/device.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"

@@ -57,19 +57,19 @@ namespace {
 /// LED 接続ポートの定義
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 
 	static const uint32_t sdc_spi_speed_ = 30000000;
 #elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const uint32_t sdc_spi_speed_ = 30000000;
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef utils::rtc_io RTC;
 
 #ifdef GR_KAEDE
@@ -115,7 +115,7 @@ namespace {
 
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 
@@ -131,7 +131,7 @@ namespace {
 
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -154,7 +154,7 @@ namespace {
 
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -162,7 +162,7 @@ namespace {
 
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 

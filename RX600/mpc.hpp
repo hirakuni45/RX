@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ MPC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -281,7 +281,7 @@ namespace device {
 		static P66PFS_ P66PFS;
 		static P67PFS_ P67PFS;
 
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 		typedef pfsz_t<0x0008C170> P60PFS_;
 		typedef pfsz_t<0x0008C171> P61PFS_;
 		typedef pfsz_t<0x0008C172> P62PFS_;

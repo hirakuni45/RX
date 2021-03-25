@@ -51,7 +51,7 @@ namespace {
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
@@ -61,7 +61,7 @@ namespace {
 	#define MULTI
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
@@ -71,23 +71,30 @@ namespace {
 	#define MULTI
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
 	static const auto CAN0_PORT = device::port_map::option::FIRST;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	typedef device::CAN1 CAN0_CH;
 	static const auto CAN0_PORT = device::port_map::option::SECOND;
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
+	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+	typedef device::CAN0 CAN0_CH;
+	static const auto CAN0_PORT = device::port_map::option::FIRST;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義

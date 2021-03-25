@@ -7,7 +7,7 @@
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	sci_sample
+TARGET		=	can_sample
 
 DEVICE		=	R5F572TK
 
@@ -22,9 +22,10 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	SCI_sample/main.cpp
+PSOURCES	=	CAN_sample/main.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=
+USER_LIBS	=	m supc++
 
 LDSCRIPT	=	../../RX72T/$(DEVICE).ld
 

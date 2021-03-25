@@ -35,7 +35,7 @@ namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 
 	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
 	CMT			cmt_;
@@ -243,7 +243,7 @@ int main(int argc, char** argv)
 	{  // FT5206 touch screen controller
 		FT5206::reset<FT5206_RESET>();
 		uint8_t intr_lvl = 1;
-		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, FT5206_I2C::MODE::MASTER, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		}
 		if(!ft5206_.start()) {

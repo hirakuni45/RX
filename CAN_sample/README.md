@@ -15,6 +15,7 @@ The environment variable "MULTI" is enabled in "main.cpp".
 - RX64M/Makefile
 - RX71M/Makefile
 - RX66T/Makefile
+- RX72T/Makefile
 - RX72N/Makefile
 - README.md
 - READMEja.md
@@ -26,6 +27,7 @@ The environment variable "MULTI" is enabled in "main.cpp".
 - RX64M: 120MHz (12MHz)
 - RX71M: 240MHz (12MHz)
 - RX66T: 160MHz (10MHz)
+- RX72T: 192MHz (16MHz)
 - RX72N: 240MHz (16MHz) for 'RX72N Envision Kit'
 - Connect the LED to the specified port.
 - In the case of the RX72N Envision kit, it utilizes the blue LED on the board.
@@ -42,6 +44,7 @@ See the following sources for the ports to connect the CAN bus transceiver.
 |RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|
+|RX72T  |[RX72T/port_map.hpp](../RX72T/port_map.hpp)|FIRST|X|
 |RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
    
 For RX64M (port_map.hpp FIRST candidate)
@@ -77,7 +80,7 @@ For RX64M (port_map.hpp FIRST candidate)
 
 - Multi-channel support
    
-### In the case of the RX66T
+### In the case of the RX66T/RX72T
 
 - single channel
 

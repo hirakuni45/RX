@@ -3,9 +3,9 @@
 /*!	@file
 	@brief	RX72T グループ・ポート・マッピング (MTU) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
-			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8
+			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8, MTU9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -796,46 +796,6 @@ namespace device {
 			}
 			return ret;
 		}
-
-#if 0
-		static bool mtu8_(channel ch, bool ena, option opt) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = ena ? 0b000001 : 0;
-			switch(ch) {
-			///< PD4 (148)  MTIOC8B
-			///< PD3 (150)  MTIOC8D
-			case channel::B:
-				switch(opt) {
-				case option::FIRST:
-					PORTD::PMR.B4 = 0;
-					MPC::PD4PFS.PSEL = sel;
-					PORTD::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case channel::D:
-				switch(opt) {
-				case option::FIRST:
-					PORTD::PMR.B3 = 0;
-					MPC::PD3PFS.PSEL = sel;
-					PORTD::PMR.B3 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
-		}
-#endif
 
 	public:
 

@@ -13,6 +13,7 @@
 #include "common/renesas.hpp"
 #include "common/format.hpp"
 #include "common/delay.hpp"
+#include "common/i2c_base.hpp"
 
 namespace device {
 
@@ -23,20 +24,8 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class IICA>
-	class iica_io {
+	class iica_io : public i2c_base {
 	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  I2C の速度タイプ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class speed : uint8_t {
-			standard,	///< 100K b.p.s. (Standard mode)
-			fast,		///< 400K b.p.s. (Fast mode)
-			fast_plus,	///< 1M b.p.s. (Fast plus mode)
-		};
-
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  I2C エラー・タイプ
@@ -210,23 +199,23 @@ namespace device {
 			@param[in]	sadr	スレーブ・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		iica_io(uint8_t sadr = 0x00) : level_(0), sadr_(sadr), speed_(0), error_(error::none) { }
+		iica_io(uint8_t sadr = 0x00) noexcept : level_(0), sadr_(sadr), speed_(0), error_(error::none) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	動作開始
-			@param[in]	spd_type	速度タイプ（クロックが 40MHz）
-			@param[in]	level	割り込みレベル、０の場合ポーリング
-			@return 速度範囲エラーの場合「false」	
-		 */
+			@brief  I2C を有効にする
+			@param[in]	spd		スピード・タイプ
+			@param[in]	mode	動作モード
+			@param[in]	level	割り込みレベル（０の場合ポーリング）
+			@return エラーなら「false」
+		*/
 		//-----------------------------------------------------------------//
-		bool start(speed spd_type, uint8_t level = 0)
+		bool start(SPEED spd, MODE mode, uint8_t level = 0) noexcept
 		{
 			level_ = level;
 
 			power_mgr::turn(IICA::PERIPHERAL);
-
 			port_map::turn(IICA::PERIPHERAL);
 
 			IICA::ICCR1.ICE = 0;
@@ -240,24 +229,26 @@ namespace device {
 			IICA::SARL2 = 0x00;
 			IICA::SARU2 = 0x00;
 
-			switch(spd_type) {
-			case speed::standard:	///< 100K b.p.s. (Standard mode)
+			switch(spd) {
+			case SPEED::STANDARD:	///< 100K b.p.s. (Standard mode)
 				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b011) | IICA::ICMR1.BCWP.b();
 				IICA::ICBRH = 0b11100000 | 19;
 				IICA::ICBRL = 0b11100000 | 23;
 				break;
-			case speed::fast:		///< (50 clock) 400K b.p.s. (Fast mode)
+			case SPEED::FAST:		///< (50 clock) 400K b.p.s. (Fast mode)
 				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b001) | IICA::ICMR1.BCWP.b();
 				IICA::ICBRH = 0b11100000 | 11;
 				IICA::ICBRL = 0b11100000 | 25;
 				break;
-			case speed::fast_plus:	///< (40 clock) 1M b.p.s. (Fast plus mode)
+			case SPEED::FAST_PLUS:	///< (40 clock) 1M b.p.s. (Fast plus mode)
 				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b000) | IICA::ICMR1.BCWP.b();
 				IICA::ICBRH = 0b11100000 | 10;
 				IICA::ICBRL = 0b11100000 | 21;
 				break;
 			default:
 				error_ = error::start;
+				port_map::turn(IICA::PERIPHERAL, false);
+				power_mgr::turn(IICA::PERIPHERAL, false);
 				return false;
 			}
 
@@ -289,7 +280,7 @@ namespace device {
 			@return エラー・タイプ
 		 */
 		//-----------------------------------------------------------------//
-		error get_last_error() const { return error_; }
+		error get_last_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -298,7 +289,7 @@ namespace device {
 			@return 送信が完了なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		static bool get_send_state() { return intr_.send_id_ != intr_.send_id_back_; }
+		static bool get_send_state() noexcept { return intr_.send_id_ != intr_.send_id_back_; }
 
 
 		//-----------------------------------------------------------------//
@@ -307,7 +298,7 @@ namespace device {
 			@return 受信割り込みID
 		 */
 		//-----------------------------------------------------------------//
-		static bool get_recv_state() { return intr_.recv_id_ != intr_.recv_id_back_; }
+		static bool get_recv_state() noexcept { return intr_.recv_id_ != intr_.recv_id_back_; }
 
 
 		//-----------------------------------------------------------------//
@@ -320,7 +311,7 @@ namespace device {
 			@return 送信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool send(uint8_t adr, const uint8_t* src, uint16_t len, bool sync = true)
+		bool send(uint8_t adr, const uint8_t* src, uint16_t len, bool sync = true) noexcept
 		{
 			if(len == 0) return false;
 
@@ -398,7 +389,7 @@ namespace device {
 			@return 送信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool send(uint8_t adr, uint8_t val, const uint8_t* src, uint16_t len, bool sync = true)
+		bool send(uint8_t adr, uint8_t val, const uint8_t* src, uint16_t len, bool sync = true) noexcept
 		{
 			uint8_t tmp[len + 1];
 			tmp[0] = val;
@@ -416,7 +407,7 @@ namespace device {
 			@return 受信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool recv(uint8_t adr, uint8_t* dst, uint16_t len)
+		bool recv(uint8_t adr, uint8_t* dst, uint16_t len) noexcept
 		{
 			if(len == 0) return false;
 

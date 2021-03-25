@@ -36,7 +36,7 @@ namespace {
 
 	static const char* sys_msg_ = { "RX65N Envision Kit" };
 
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 
@@ -73,7 +73,7 @@ namespace {
 
 	static const char* sys_msg_ = { "RX72N Envision Kit" };
 
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 

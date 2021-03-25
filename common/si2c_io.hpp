@@ -2,17 +2,18 @@
 //=====================================================================//
 /*!	@file
 	@brief	ソフト制御 I2C テンプレートクラス @n
-			※ポート定義は、オープンドレイン指定が可能な事 @n
+			※ポートは、オープンドレイン指定が可能な事 @n
 			※速度指定は、正確ではなく目安程度 @n
 			※「FAST_PLUS」は選択出来ない、エラーとなる
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>
 #include "common/delay.hpp"
+#include "common/i2c_base.hpp"
 
 namespace device {
 
@@ -24,36 +25,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SDA, class SCL>
-	class si2c_io {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  I2C の速度タイプ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class SPEED : uint8_t {
-			STANDARD,	///< 100K b.p.s. (Standard mode)
-			FAST,		///< 400K b.p.s. (Fast mode)
-			FAST_PLUS,	///< 1M b.p.s. (Fast plus mode)
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  I2C のエラー
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ERROR : uint8_t {
-			NONE,		///< エラー無し
-			START,		///< スタート（初期化）
-			BUS_OPEN,	///< バス・オープン
-			ADDRESS,	///< アドレス転送
-			SEND_DATA,	///< 送信データ転送
-			RECV_DATA,	///< 受信データ転送
-			STOP,		///< ストップ・コンディション
-		};
-
-	private:
+	class si2c_io : public i2c_base {
 		uint8_t		clock_;
 		ERROR		error_;
 		uint16_t	busy_;
@@ -188,19 +160,20 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		si2c_io() : clock_(slow_clock_), error_(ERROR::NONE), busy_(200) { }
+		si2c_io() noexcept : clock_(slow_clock_), error_(ERROR::NONE), busy_(200) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  初期化
 			@param[in]	spd		スピード
+			@param[in]	mode	動作モード（現在は「master」のみ）
 			@param[in]	lvl		割り込みレベル（設定しても無効）
 			@param[in]	pullup	プルアップを有効にする場合「true」
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(SPEED spd, uint8_t lvl = 0, bool pullup = false)
+		bool start(SPEED spd, MODE mode, uint8_t lvl = 0, bool pullup = false) noexcept
 		{
 			SCL::OD = 1;
 			SDA::OD = 1;
@@ -212,11 +185,14 @@ namespace device {
 			SDA::DIR = 1;
 			SCL::P = 1;
 			SDA::P = 1;
-			if(spd == SPEED::STANDARD) {
+			switch(spd) {	
+			case SPEED::STANDARD:
 				set_standard();
-			} else if(spd == SPEED::FAST) {
+				break;
+			case SPEED::FAST:
 				set_fast();
-			} else {
+				break;
+			default:
 				error_ = ERROR::START;
 				return false;
 			}
@@ -230,7 +206,7 @@ namespace device {
 			@param[in]	clock	パルス５０％待ち時間（単位マイクロ秒）
 		*/
 		//-----------------------------------------------------------------//
-		void set_clock(uint8_t clock) { clock_ = clock; }
+		void set_clock(uint8_t clock) noexcept { clock_ = clock; }
 
 
 		//-----------------------------------------------------------------//
@@ -238,7 +214,7 @@ namespace device {
 			@brief  標準速度指定（maybe 100KBPS）
 		*/
 		//-----------------------------------------------------------------//
-		void set_standard() { clock_ = slow_clock_; }
+		void set_standard() noexcept { clock_ = slow_clock_; }
 
 
 		//-----------------------------------------------------------------//
@@ -246,7 +222,7 @@ namespace device {
 			@brief  高速指定（maybe 400KBPS）
 		*/
 		//-----------------------------------------------------------------//
-		void set_fast() { clock_ = fast_clock_; }
+		void set_fast() noexcept { clock_ = fast_clock_; }
 
 
 		//-----------------------------------------------------------------//
@@ -255,7 +231,7 @@ namespace device {
 			@param[in]	busy	待ち時間（単位マイクロ秒）
 		*/
 		//-----------------------------------------------------------------//
-		void set_busy(uint16_t busy) { busy_ = busy; }
+		void set_busy(uint16_t busy) noexcept { busy_ = busy; }
 
 
 		//-----------------------------------------------------------------//
@@ -264,7 +240,7 @@ namespace device {
 			@return エラー・タイプ
 		 */
 		//-----------------------------------------------------------------//
-		ERROR get_last_error() const { return error_; }
+		ERROR get_last_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -276,7 +252,7 @@ namespace device {
 			@return 失敗なら「false」が返る
 		*/
 		//-----------------------------------------------------------------//
-		bool recv(uint8_t address, uint8_t* dst, uint8_t num) {
+		bool recv(uint8_t address, uint8_t* dst, uint8_t num) noexcept {
 			start_();
 			write_((address << 1) | 1, false);
 			if(ack_()) {
@@ -310,7 +286,7 @@ namespace device {
 			@return 失敗なら「false」が返る
 		*/
 		//-----------------------------------------------------------------//
-		bool send(uint8_t address, const uint8_t* src, uint8_t num) {
+		bool send(uint8_t address, const uint8_t* src, uint8_t num) noexcept {
 			start_();
 			write_(address << 1, false);
 			if(ack_()) {
@@ -339,7 +315,8 @@ namespace device {
 			@return 失敗なら「false」が返る
 		*/
 		//-----------------------------------------------------------------//
-		bool send(uint8_t address, uint8_t first, const uint8_t* src, uint8_t num) {
+		bool send(uint8_t address, uint8_t first, const uint8_t* src, uint8_t num) noexcept
+		{
 			start_();
 			write_(address << 1, false);
 			if(ack_()) {

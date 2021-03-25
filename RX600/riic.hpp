@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T/RX66T/RX64M/RX71M/RX65N RIICa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -470,7 +470,7 @@ namespace device {
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI1, ICU::VECTOR_BL1::TEI1> RIIC1;
 	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR::RIIC_RXI2,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2> RIIC2;
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0> RIIC0;
 #endif

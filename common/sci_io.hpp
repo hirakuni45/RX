@@ -215,6 +215,10 @@ namespace device {
 			if(!power_mgr::turn(SCI::PERIPHERAL)) {
 				return false;
 			}
+			if(!port_map::turn(SCI::PERIPHERAL, true, PSEL)) {
+				power_mgr::turn(SCI::PERIPHERAL, false);
+				return false;
+			}
 
 			if(!icu_mgr::set_level(SCI::PERIPHERAL, 0)) {
 				return false;
@@ -226,8 +230,6 @@ namespace device {
 					SCI::SSR = 0x00;
 				}
 			}
-
-			port_map::turn(SCI::PERIPHERAL, true, PSEL);
 
 			// RS-484 半二重制御ポート
 			HCTL::DIR = 1;

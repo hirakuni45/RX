@@ -519,7 +519,6 @@ namespace device {
 
 			rw8_t<base + 26> SWINT2;
 			rw8_t<base + 27> SWINT;
-
 			rw8_t<base + 28> CMI0;
 			rw8_t<base + 29> CMI1;
 			rw8_t<base + 30> CMI2;

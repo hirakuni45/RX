@@ -75,7 +75,7 @@ namespace {
 	// GR-KAEDE の場合有効にする。
 //	#define GR_KAEDE
 
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 
 	#ifdef GR_KAEDE
 	static const char* system_str_ = { "RX64M GR-KAEDE" };
@@ -119,14 +119,14 @@ namespace {
 #elif defined(SIG_RX71M)
 
 	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 
 #elif defined(SIG_RX65N)
 
 	static const char* system_str_ = { "RX65N" };
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< 「０」でＯＮ
@@ -137,7 +137,7 @@ namespace {
 #elif defined(SIG_RX72N)
 
 	static const char* system_str_ = { "RX72N" };
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
@@ -440,7 +440,7 @@ int main(int argc, char** argv)
 #ifdef ENABLE_I2C_RTC
 	{  // I2C-RTC の開始
 		uint8_t intr_level = 0;
-		if(!i2c_.start(I2C::speed::fast, intr_level)) {
+		if(!i2c_.start(I2C::SPEED::FAST, I2C::MODE::MASTER, intr_level)) {
 			utils::format("IICA start error (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
 		}
 		// DS3231(RTC) の開始
