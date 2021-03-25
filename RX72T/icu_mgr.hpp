@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX72T グループ・割り込みマネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,12 +21,18 @@ namespace device {
 		@brief  割り込みマネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class icu_mgr {
+	template <class _>
+	class icu_mgr_ {
 
-		static utils::dispatch<ICU::VECTOR::GROUPBE0, 3>  GROUPBE0_dispatch_;
-		static utils::dispatch<ICU::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
-		static utils::dispatch<ICU::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
-		static utils::dispatch<ICU::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
+		typedef utils::dispatch<ICU::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_t;
+		typedef utils::dispatch<ICU::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_t;
+		typedef utils::dispatch<ICU::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_t;
+		typedef utils::dispatch<ICU::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_t;
+
+		static GROUPBE0_dispatch_t GROUPBE0_dispatch_;
+		static GROUPBL0_dispatch_t GROUPBL0_dispatch_;
+		static GROUPBL1_dispatch_t GROUPBL1_dispatch_;
+		static GROUPAL0_dispatch_t GROUPAL0_dispatch_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -75,6 +81,16 @@ namespace device {
 				ICU::IPR.CMI1 = lvl;
 				ICU::IER.CMI1 = ena;
 				break;
+			case ICU::VECTOR::CMI2:
+				ICU::IER.CMI2 = 0;
+				ICU::IPR.CMI2 = lvl;
+				ICU::IER.CMI2 = ena;
+				break;
+			case ICU::VECTOR::CMI3:
+				ICU::IER.CMI3 = 0;
+				ICU::IPR.CMI3 = lvl;
+				ICU::IER.CMI3 = ena;
+				break;
 
 			case ICU::VECTOR::GROUPBE0:
 				ICU::IER.GROUPBE0 = 0;
@@ -101,6 +117,16 @@ namespace device {
 			}
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みレベルを取得する
+			@param[in]	vec	割り込み要因
+			@return 割り込みレベル
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_level(ICU::VECTOR vec) noexcept { return ICU::IPR[vec]; }
 
 
 		//-----------------------------------------------------------------//
@@ -524,5 +550,52 @@ namespace device {
 			if(ret && ena) ICU::GENAL0 |= 1 << i;
 			return ret;
 		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み BE0 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_BE0 vec) noexcept {
+			return ICU::VECTOR::GROUPBE0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み BL0 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_BL0 vec) noexcept {
+			return ICU::VECTOR::GROUPBL0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み BL1 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_BL1 vec) noexcept {
+			return ICU::VECTOR::GROUPBL1;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み AL0 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_AL0 vec) noexcept {
+			return ICU::VECTOR::GROUPAL0;
+		}
 	};
+
+	typedef icu_mgr_<void> icu_mgr;
+
+	template <class _> typename icu_mgr_<_>::GROUPBE0_dispatch_t icu_mgr_<_>::GROUPBE0_dispatch_;
+	template <class _> typename icu_mgr_<_>::GROUPBL0_dispatch_t icu_mgr_<_>::GROUPBL0_dispatch_;
+	template <class _> typename icu_mgr_<_>::GROUPBL1_dispatch_t icu_mgr_<_>::GROUPBL1_dispatch_;
+	template <class _> typename icu_mgr_<_>::GROUPAL0_dispatch_t icu_mgr_<_>::GROUPAL0_dispatch_;
 }

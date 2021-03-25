@@ -566,8 +566,8 @@ namespace device {
 			rw8_t<base + 27> SWINT;
 			rw8_t<base + 28> CMI0;
 			rw8_t<base + 29> CMI1;
-			rw8_t<base + 30> CMWI0;
-			rw8_t<base + 31> CMWI1;
+			rw8_t<base + 30> CMI2;
+			rw8_t<base + 31> CMI3;
 
 			rw8_t<base + 34> D0FIFO0;	///< USB0
 			rw8_t<base + 35> D1FIFO0;	///< USB0
@@ -828,8 +828,8 @@ namespace device {
 			bit_rw_t<ier03, bitpos::B3>	SWINT;
 			bit_rw_t<ier03, bitpos::B4>	CMI0;
 			bit_rw_t<ier03, bitpos::B5>	CMI1;
-			bit_rw_t<ier03, bitpos::B6>	CMWI0;
-			bit_rw_t<ier03, bitpos::B7>	CMWI1;
+			bit_rw_t<ier03, bitpos::B6>	CMI2;
+			bit_rw_t<ier03, bitpos::B7>	CMI3;
 
 			typedef rw8_t<base + 0x04> ier04;
 			bit_rw_t<ier04, bitpos::B2>	D0FIFO0;	///< USB0
@@ -1068,8 +1068,8 @@ namespace device {
 			rw8_t<base + 3> SWINT;
 			rw8_t<base + 4> CMI0;
 			rw8_t<base + 5> CMI1;
-			rw8_t<base + 6> CMWI0;
-			rw8_t<base + 7> CMWI1;
+			rw8_t<base + 6> CMI2;
+			rw8_t<base + 7> CMI3;
 
 			rw8_t<base + 34> D0FIFO0;	///< USB0
 			rw8_t<base + 35> D1FIFO0;	///< USB0
