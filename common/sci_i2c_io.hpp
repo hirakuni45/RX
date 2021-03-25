@@ -14,6 +14,7 @@
 #include "common/renesas.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/vect.h"
+#include "common/i2c_base.hpp"
 
 /// F_PCLKB はボーレートパラメーター計算に必要で、設定が無いとエラーにします。
 #ifndef F_PCLKB
@@ -24,38 +25,30 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCI/I2C 送信、受信タスク型
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef void (*I2C_TASK)(); 
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
 		@brief  SCI/I2C 構造体
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct sci_i2c_t {
 
-		enum class task : uint8_t {
-			idle,
+		enum class TASK : uint8_t {
+			IDLE,
 
-			start_send,		// start send
-			send_data,		// send data
+			START_SEND,		// start send
+			SEND_DATA,		// send data
 
-			start_recv,		// start recv
-			recv_data_pre,	// recv data pre (first 1)
-			recv_data,		// recv data
+			START_RECV,		// start recv
+			RECV_DATA_PRE,	// recv data pre (first 1)
+			RECV_DATA,		// recv data
 
-			stop_recv,		// stop for recv
-			stop,			// stop condition
+			STOP_RECV,		// stop for recv
+			STOP,			// stop condition
 		};
 
 		uint8_t		adr_;
 		uint8_t*	dst_;
 		uint16_t	len_;
-		I2C_TASK	task_;
-		sci_i2c_t(uint8_t adr = 0) noexcept : adr_(adr), dst_(nullptr), len_(0), task_(nullptr)
+		i2c_base::FUNC_TYPE		func_;
+		sci_i2c_t(uint8_t adr = 0) noexcept : adr_(adr), dst_(nullptr), len_(0), func_(nullptr)
 			{ }
 	};
 	// I2C の最大コマンド受付数は（１６－１）個
@@ -72,38 +65,8 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST>
-	class sci_i2c_io {
+	class sci_i2c_io : public i2c_base {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  速度タイプ型 @n
-					※簡易 I2C では誤差が大きいので注意
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class SPEED {
-			_50K     =  50000,	///<  50K b.p.s.
-			STANDARD = 100000,	///< 100K b.p.s. (Standard mode)
-			_150K    = 150000,	///< 150K b.p.s.
-			_200K    = 200000,	///< 200K b.p.s.
-			_250K    = 250000,	///< 250K b.p.s.
-			_300K    = 300000,	///< 300K b.p.s.
-			_350K    = 350000,	///< 350K b.p.s.
-			FAST     = 400000,	///< 400K b.p.s. (Fast mode) 60MHz では、対応していません。
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  エラー型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ERROR : uint8_t {
-			NONE,		///< エラー無し
-			START,		///< Start コンディション・エラー
-			ACK,		///< ACK エラー
-			STOP,		///< Stop コンディション・エラー
-		};
 
 	private:
 		static RBF	recv_;
@@ -113,104 +76,139 @@ namespace device {
 		ERROR		error_;
 		uint16_t	i2c_loop_;
 
-		static volatile sci_i2c_t::task	task_;
+		static volatile sci_i2c_t::TASK	task_;
 		static volatile uint8_t	state_;
-		static uint16_t	trans_len_;
 		static I2C_BUFF	i2c_buff_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept { asm("nop"); }
+
+		void Print(sci_i2c_t::TASK task) const
+		{
+			switch(task) {
+			case sci_i2c_t::TASK::IDLE:
+				utils::format("IDLE");
+				break;
+			case sci_i2c_t::TASK::START_SEND:
+				utils::format("START_SEND 0b%07b, (%d)")
+					% static_cast<uint16_t>(i2c_buff_.get_at().adr_) % send_.length();
+				break;
+			case sci_i2c_t::TASK::SEND_DATA:
+				utils::format("SEND_DATA (%d)") % send_.length();
+				break;
+			case sci_i2c_t::TASK::START_RECV:
+				utils::format("START_RECV 0b%07b, (%d)")
+					% static_cast<uint16_t>(i2c_buff_.get_at().adr_) % recv_.length();
+				break;
+			case sci_i2c_t::TASK::RECV_DATA_PRE:
+				utils::format("RECV_DATA_PRE");
+				break;
+			case sci_i2c_t::TASK::RECV_DATA:
+				utils::format("RECV_DATA");
+				break;
+			case sci_i2c_t::TASK::STOP_RECV:
+				utils::format("STOP_RECV");
+				break;
+			case sci_i2c_t::TASK::STOP:
+				utils::format("STOP");
+				break;
+			default:
+				break;
+			}
+			utils::format("\n");
+		}
 
 
 		static void i2c_service_()
 		{
 			const auto& t = i2c_buff_.get_at();
 			switch(task_) {
-			case sci_i2c_t::task::idle:
+			case sci_i2c_t::TASK::IDLE:
 				break;
-
-			case sci_i2c_t::task::start_send:
+			case sci_i2c_t::TASK::START_SEND:
 				SCI::SCR.TEIE = 0;
-				trans_len_ = t.len_;
-				SCI::SCR.TIE = 1;
 				SCI::TDR = t.adr_ << 1;  // R/W = 0 (write)
-				task_ = sci_i2c_t::task::send_data;
-				break;
-			case sci_i2c_t::task::send_data:
-				if(trans_len_ == 0) {
+				if(send_.length() > 1) {
+					task_ = sci_i2c_t::TASK::SEND_DATA;
+					SCI::SIMR2.IICACKT = 1;
+					SCI::SCR.TIE = 1;
+				} else {
+					task_ = sci_i2c_t::TASK::STOP;
 					SCI::SCR.TEIE = 1;
+				}
+				break;
+			case sci_i2c_t::TASK::SEND_DATA:
+				if(send_.length() > 0) {
+					SCI::TDR = send_.get();
+				}
+				if(send_.length() == 0) {
 					SCI::SCR.TIE = 0;
-					task_ = sci_i2c_t::task::stop;
+					task_ = sci_i2c_t::TASK::STOP;
+					SCI::SCR.TEIE = 1;
 					break;
 				}
 				if(SCI::SISR.IICACKR()) {
-					SCI::SCR.TEIE = 1;
 					SCI::SCR.TIE = 0;
-					task_ = sci_i2c_t::task::stop;
+					task_ = sci_i2c_t::TASK::STOP;
 					state_ = static_cast<uint8_t>(ERROR::ACK);
+					SCI::SCR.TEIE = 1;
 					break;
 				}
-				SCI::TDR = send_.get();
-				--trans_len_;
 				break;
-
-			case sci_i2c_t::task::start_recv:
-				trans_len_ = t.len_;
-				SCI::SCR.TIE = 1;
+			case sci_i2c_t::TASK::START_RECV:
 				SCI::TDR = (t.adr_ << 1) | 1;  // R/W = 1 (read)
-				task_ = sci_i2c_t::task::recv_data_pre;
+				task_ = sci_i2c_t::TASK::RECV_DATA_PRE;
+				SCI::SCR.TIE = 1;
 				break;
 
-			case sci_i2c_t::task::recv_data_pre:
+			case sci_i2c_t::TASK::RECV_DATA_PRE:
 				if(SCI::SISR.IICACKR() != 0) {
-					SCI::SCR.TEIE = 1;
 					SCI::SCR.RIE = 0;
-					task_ = sci_i2c_t::task::stop;
+					task_ = sci_i2c_t::TASK::STOP;
 					state_ = static_cast<uint8_t>(ERROR::ACK);
+					SCI::SCR.TEIE = 1;
 				} else {
-					if(trans_len_ > 1) {
+					if(t.len_ > 1) {
 						SCI::SIMR2.IICACKT = 0;
 					} else {
 						SCI::SIMR2.IICACKT = 1;
 					}
-					SCI::SCR.RIE = 1;
 					SCI::TDR = 0xff;  // dummy data
-					task_ = sci_i2c_t::task::recv_data;
+					task_ = sci_i2c_t::TASK::RECV_DATA;
+					SCI::SCR.RIE = 1;
 				}
 				break;
-			case sci_i2c_t::task::recv_data:
-					if(trans_len_ == 1) {
+			case sci_i2c_t::TASK::RECV_DATA:
+					if(t.len_ == (recv_.length() + 1)) {
 						SCI::SIMR2.IICACKT = 1;
 					}
 					recv_.put(SCI::RDR());
-					--trans_len_;
 					SCI::TDR = 0xff;  // dummy data
-					if(trans_len_ == 0) {
-						SCI::SCR.TEIE = 1;
+					if(t.len_ == recv_.length()) {
 						SCI::SCR.RIE = 0;
-						task_ = sci_i2c_t::task::stop_recv;
+						task_ = sci_i2c_t::TASK::STOP_RECV;
+						SCI::SCR.TEIE = 1;
 					}
 				break;
-
-			case sci_i2c_t::task::stop_recv:
+			case sci_i2c_t::TASK::STOP_RECV:
 				{
 					uint8_t* p = t.dst_;
 					for(uint16_t i = 0; i < t.len_; ++i) {
 						*p++ = recv_.get();
 					}
 				}
-			case sci_i2c_t::task::stop:
-				if(t.task_ != nullptr) (*t.task_)();
+			case sci_i2c_t::TASK::STOP:
+				if(t.func_ != nullptr) t.func_();
 				i2c_buff_.get_go();
 				if(i2c_buff_.length() > 0) {
-					if(i2c_buff_.get_at().dst_ == nullptr) task_ = sci_i2c_t::task::start_send;
-					else task_ = sci_i2c_t::task::start_recv;
-					SCI::SCR.TEIE = 1;
+					if(i2c_buff_.get_at().dst_ == nullptr) task_ = sci_i2c_t::TASK::START_SEND;
+					else task_ = sci_i2c_t::TASK::START_RECV;
 					SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
 								 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
+					SCI::SCR.TEIE = 1;
 				} else {
+					task_ = sci_i2c_t::TASK::IDLE;
 					SCI::SCR.TEIE = 0;
-					task_ = sci_i2c_t::task::idle;
 				}
 				break;
 
@@ -240,7 +238,7 @@ namespace device {
 
 		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) noexcept
 		{
-			if(level_) {
+			if(level_ > 0) {
 				icu_mgr::set_task(rx_vec, recv_task_);
 				icu_mgr::set_task(tx_vec, send_task_);
 			}
@@ -283,6 +281,9 @@ namespace device {
 		}
 
 
+
+
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -305,19 +306,20 @@ namespace device {
 		/*!
 			@brief  I2C を有効にする
 			@param[in]	spd		スピード・タイプ
-			@param[in]	master	マスターモードの場合「true」（現在はマスターモードのみ実装）
+			@param[in]	mode	動作モード（マスターモードのみ）
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(SPEED spd, bool master = true, uint8_t level = 0) noexcept
+		bool start(SPEED spd, MODE mode, uint8_t level = 0) noexcept
 		{
 			// I2C オプションが無い場合エラー
 			if(PSEL == port_map::option::FIRST_I2C || PSEL == port_map::option::SECOND_I2C || PSEL == port_map::option::THIRD_I2C) {
 			} else {
 				return false;
 			}
-
+// 割り込み動作に不具合があるので、強制的にポーリングとする。
+level = 0;
 			uint32_t clk = static_cast<uint32_t>(spd);
 			uint32_t brr = F_PCLKB * 8 / clk;
 			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
@@ -355,10 +357,9 @@ namespace device {
 			SCI::SIMR1 = SCI::SIMR1.IICM.b() | SCI::SIMR1.IICDL.b(0b00000);
 			SCI::SIMR2 = SCI::SIMR2.IICACKT.b() | SCI::SIMR2.IICCSC.b() | SCI::SIMR2.IICINTM.b();
 			SCI::SPMR = 0x00;
-			SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
 
 			if(level_ > 0) {
-				task_ = sci_i2c_t::task::idle;
+				task_ = sci_i2c_t::TASK::IDLE;
 
 				// RXI, TXI の設定
 				set_vector_(SCI::RX_VEC, SCI::TX_VEC);
@@ -377,6 +378,7 @@ namespace device {
 					icu_mgr::install_group_task(SCI::TE_VEC, i2c_service_);
 				}
 			}
+			SCI::SCR = SCI::SCR.RE.b() | SCI::SCR.TE.b();
 
 			error_ = ERROR::NONE;
 
@@ -394,8 +396,27 @@ namespace device {
 		{
 			if(level_ == 0) return;
 
-			while(task_ != sci_i2c_t::task::idle) ;
-			if(state_ != 0) utils::format("State: %d\n") % static_cast<uint16_t>(state_);
+			utils::format("SCI-I2C Start sync...\n");
+			auto task = task_;
+			utils::format("Begin: ");
+			Print(task);
+			while(task_ != sci_i2c_t::TASK::IDLE) {
+				if(task != task_) {
+					utils::format("End: ");
+					Print(task);
+					task = task_;
+					utils::format("Begin: ");
+					Print(task);
+				}
+//				if(len != trans_len_) {
+//					utils::format("Trans: ");
+//					Print(task);
+//					len = trans_len_;
+//				}
+			}
+			if(state_ != 0) {
+				utils::format("State: %d\n") % static_cast<uint16_t>(state_);
+			}
 		}
 
 
@@ -405,11 +426,11 @@ namespace device {
 			@param[in]	adr		I2C アドレス（下位７ビット）
 			@param[in]	src		送信データ
 			@param[in]	len		送信長
-			@param[in]	task	送信終了タスク
+			@param[in]	func	送信終了タスク
 			@return 送信正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool send(uint8_t adr, const void* src, uint16_t len, I2C_TASK task = nullptr) noexcept
+		bool send(uint8_t adr, const void* src, uint16_t len, FUNC_TYPE func = nullptr) noexcept
 		{
 			if(src == nullptr || len == 0) return false;
 
@@ -448,7 +469,7 @@ namespace device {
 					error_ = ERROR::STOP;
 					return false;
 				}
-				if(task != nullptr) (*task)();
+				if(func != nullptr) func();
 				error_ = ERROR::NONE;
 			} else {
 				const uint8_t* p = static_cast<const uint8_t*>(src);
@@ -460,14 +481,14 @@ namespace device {
 				t.adr_ = adr;
 				t.dst_ = nullptr;
 				t.len_ = len;
-				t.task_ = task;
+				t.func_ = func;
 				i2c_buff_.put(t);
-				if(task_ == sci_i2c_t::task::idle) {
+				if(task_ == sci_i2c_t::TASK::IDLE) {
 					state_ = 0;
-					task_ = sci_i2c_t::task::start_send;
-					SCI::SCR.TEIE = 1;
+					task_ = sci_i2c_t::TASK::START_SEND;
 					SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
 								 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
+					SCI::SCR.TEIE = 1;
 				}
 			}
 			return true;
@@ -477,14 +498,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  データ受信
-			@param[in]	adr	I2C アドレス（下位７ビット）
-			@param[in]	dst	受信データ
-			@param[in]	len	受信長
-			@param[in]	task	送信終了タスク
+			@param[in]	adr		I2C アドレス（下位７ビット）
+			@param[in]	dst		受信データ
+			@param[in]	len		受信長
+			@param[in]	func	送信終了関数
 			@return 送信正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool recv(uint8_t adr, void* dst, uint16_t len, I2C_TASK task = nullptr) noexcept
+		bool recv(uint8_t adr, void* dst, uint16_t len, FUNC_TYPE func = nullptr) noexcept
 		{
 			if(dst == nullptr || len == 0) return false;
 
@@ -533,21 +554,21 @@ namespace device {
 					error_ = ERROR::STOP;
 					return false;
 				}
-				if(task != nullptr) (*task)();
+				if(func != nullptr) func();
 				error_ = ERROR::NONE;
 			} else {
 				sci_i2c_t t;
 				t.adr_ = adr;
 				t.dst_ = static_cast<uint8_t*>(dst);
 				t.len_ = len;
-				t.task_ = task;
+				t.func_ = func;
 				i2c_buff_.put(t);
-				if(task_ == sci_i2c_t::task::idle) {
+				if(task_ == sci_i2c_t::TASK::IDLE) {
 					state_ = 0;
-					task_ = sci_i2c_t::task::start_recv;
-					SCI::SCR.TEIE = 1;
+					task_ = sci_i2c_t::TASK::START_RECV;
 					SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
 								 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
+					SCI::SCR.TEIE = 1;
 				}
 			}
 			return true;
@@ -560,11 +581,9 @@ namespace device {
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
 		SBF sci_i2c_io<SCI, RBF, SBF, PSEL>::send_;
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
-		volatile sci_i2c_t::task sci_i2c_io<SCI, RBF, SBF, PSEL>::task_;
+		volatile sci_i2c_t::TASK sci_i2c_io<SCI, RBF, SBF, PSEL>::task_;
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
 		volatile uint8_t sci_i2c_io<SCI, RBF, SBF, PSEL>::state_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
-		uint16_t sci_i2c_io<SCI, RBF, SBF, PSEL>::trans_len_;
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
 		I2C_BUFF sci_i2c_io<SCI, RBF, SBF, PSEL>::i2c_buff_;
 }
