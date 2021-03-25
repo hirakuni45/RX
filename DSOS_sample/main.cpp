@@ -44,7 +44,7 @@ namespace {
 
 	static const char* sys_msg_ = { "RX65N Envision Kit" };
 
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 
@@ -68,7 +68,7 @@ namespace {
 
 	static const char* sys_msg_ = { "RX72N Envision Kit" };
 
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 
@@ -323,7 +323,7 @@ int main(int argc, char** argv)
 	{  // FT5206 touch screen controller
 		TOUCH::reset<FT5206_RESET>();
 		uint8_t intr_lvl = 1;
-		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, FT5206_I2C::MODE::MASTER, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		}
 		if(!touch_.start()) {
