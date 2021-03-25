@@ -40,7 +40,7 @@
 
 namespace {
 
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
 	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;
