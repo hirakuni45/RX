@@ -1714,4 +1714,15 @@ Wire Bus Line
 	4450 800  4450 2400
 Wire Bus Line
 	4450 4300 4450 5900
+$Comp
+L renesas:RX72T_144 U?
+U 1 1 6059AD6D
+P 8900 3850
+F 0 "U?" H 8900 4365 50  0000 C CNN
+F 1 "RX72T_144" H 8900 4274 50  0000 C CNN
+F 2 "Package_QFP:LQFP-144_20x20mm_P0.5mm" H 8950 1650 50  0001 C CNN
+F 3 "https://www.renesas.com/jp/ja/img/products/microcontrollers-microprocessors/rx/rx700/rx72t/r01ds0331ej0100-rx72t.pdf" H 9350 3850 50  0001 C CNN
+	1    8900 3850
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
