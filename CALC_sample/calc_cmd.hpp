@@ -85,7 +85,27 @@ namespace app {
 			const auto* cmd =  cmd_.get_command();
 			if(cmd[0] == 0) return;
 
-			if(arith_.analize(cmd)) {
+			if(strcmp(cmd, "help") == 0 || strcmp(cmd, "?") == 0) {
+				utils::format("  PI\n");
+				utils::format("  LOG2\n");
+				utils::format("  EULER\n");
+				utils::format("  ANS\n");
+				utils::format("  V[0-9]\n");
+				utils::format("  sin(x)\n");
+				utils::format("  cos(x)\n");
+				utils::format("  tan(x)\n");
+				utils::format("  asin(x)\n");
+				utils::format("  acos(x)\n");
+				utils::format("  atan(x)\n");
+				utils::format("  sqrt(x)\n");
+				utils::format("  log(x)\n");
+				utils::format("  ln(x)\n");
+				utils::format("  exp10(x)\n");
+				return;
+			}
+
+			bool str_sf = true;
+			if(arith_.analize(cmd, str_sf)) {
 
 				auto ans = arith_();
 				symbol_.set_value(SYMBOL::NAME::ANS, ans);
