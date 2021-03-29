@@ -59,6 +59,8 @@ namespace utils {
 
 		NVAL		value_;
 
+		bool		str_;
+
 
 		// 関数内パラメーターの取得
 		bool param_(char* dst, uint32_t len) noexcept
@@ -71,6 +73,26 @@ namespace utils {
 			}
 
 			return true;
+		}
+
+
+		void func_sub_(typename FUNC::NAME fc, NVAL& nval)
+		{
+			ch_ = *tx_++;
+			if(ch_ == '(') {
+				ch_ = *tx_++;
+				auto param = expression_();
+				if(ch_ == ')') {
+					ch_ = *tx_++;
+					if(!func_(fc, param, nval)) {
+						error_.set(error::func_fatal);
+					}
+				} else {
+					error_.set(error::fatal);
+				}
+			} else {
+				error_.set(error::func_fatal);
+			}
 		}
 
 
@@ -88,27 +110,37 @@ namespace utils {
 			}
 
 			NVAL nval;
+			if(str_) {  // 変数名、関数名が文字列の場合
+				if((ch_ >= '0' && ch_ <= '9') || ch_ == '(') {  // 数値のチェック
+
+				} else {
+					typename SYMBOL::NAME sc;
+					tx_ = symbol_.get_code(tx_ - 1, sc);
+					if(symbol_(sc, nval)) {
+						ch_ = *tx_++;
+						if(minus) { nval = -nval; }
+						return nval;
+					} else {
+						typename FUNC::NAME fc;
+						tx_ = func_.get_code(tx_ - 1, fc);
+						if(fc != FUNC::NAME::NONE) {
+							func_sub_(fc, nval);
+							if(minus) { nval = -nval; }
+							return nval;
+						}
+					}
+					error_.set(error::symbol_fatal);
+					if(minus) { nval = -nval; }
+					return nval;
+				}
+			}
 			if(static_cast<uint8_t>(ch_) >= 0x80) {  // symbol?, func?
 				if(static_cast<uint8_t>(ch_) >= 0xC0) {  // func ?
 					auto fc = static_cast<typename FUNC::NAME>(ch_);
-					ch_ = *tx_++;
-					if(ch_ == '(') {
-						ch_ = *tx_++;
-						auto param = expression_();
-						if(ch_ == ')') {
-							ch_ = *tx_++;
-							if(!func_(fc, param, nval)) {
-								error_.set(error::func_fatal);
-							}
-						} else {
-							error_.set(error::fatal);
-						}
-					} else {
-						error_.set(error::func_fatal);
-					}
+					func_sub_(fc, nval);
 				} else {  // to symbol
 					if(symbol_(static_cast<typename SYMBOL::NAME>(ch_), nval)) {
-						ch_ = *tx_++;	
+						ch_ = *tx_++;
 					} else {
 						error_.set(error::symbol_fatal);
 					}
@@ -284,24 +316,28 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		basic_arith(SYMBOL& symbol, FUNC& func) noexcept : symbol_(symbol), func_(func),
-			tx_(nullptr), ch_(0), error_(), value_()
+			tx_(nullptr), ch_(0), error_(), value_(), str_(false)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	解析を開始
+			@brief	解析を開始 @n
+					・高速化の為、シンボル名、関数名は修飾コードを使う。@n
+					・シンボル名、関数名を文字列として扱う場合、「str = true」とする。
 			@param[in]	text	解析テキスト
+			@param[in]	str		変数名、関数名を文字列とした扱う場合「true」
 			@return	文法にエラーがあった場合、「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool analize(const char* text) noexcept
+		bool analize(const char* text, bool str = false) noexcept
 		{
 			if(text == nullptr) {
 				error_.set(error::fatal);
 				return false;
 			}
 			tx_ = text;
+			str_ = str;
 
 			error_.clear();
 
