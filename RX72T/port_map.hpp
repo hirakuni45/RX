@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72T グループ・ポート・マッピング
+	@brief	RX72T グループ・ポート・マッピング @n
+			・RX72T の場合、メインストリームは100ピンと考え、100ピンを基準にしている。@n
+			・「候補」は、ピン番号が若い物から順に割り振っている。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -33,9 +35,9 @@ namespace device {
 			SECOND,		///< 第２候補 (XXX-B グループ)
 			THIRD,		///< 第３候補
 			FOURTH,		///< 第４候補
-			_5TH,		///< 第５候補
-			_6TH,		///< 第６候補
-			_7TH,		///< 第７候補
+			FIFTH,		///< 第５候補
+			SIXTH,		///< 第６候補
+			SEVENTH,	///< 第７候補
 			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
 			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
 			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
@@ -429,7 +431,7 @@ namespace device {
 				PORTF::PMR.B1 = enable;
 				PORTF::PMR.B0 = enable;
 				break;
-			case option::_5TH:
+			case option::FIFTH:
 			// PB7/SCK11 (39/144)
 			// PB6/RXD11 (40/144)
 			// PB5/TXD11 (41/144)
@@ -446,7 +448,7 @@ namespace device {
 				PORTB::PMR.B6 = enable;
 				PORTB::PMR.B5 = enable;
 				break;
-			case option::_6TH:
+			case option::SIXTH:
 			// PA7/RXD11 (52/144)
 			// PA6/TXD11 (53/144)
 			// PA2/SCK11 (57/144)
@@ -463,7 +465,7 @@ namespace device {
 				PORTA::PMR.B7 = enable;
 				PORTA::PMR.B6 = enable;
 				break;
-			case option::_7TH:
+			case option::SEVENTH:
 			// PC6/RXD11 (62/144)
 			// PC5/TXD11 (63/144)
 				sel = enable ? 0b001010 : 0;
@@ -505,38 +507,88 @@ namespace device {
 
 		static bool rspi0_(option opt, bool enable)
 		{
-			uint8_t sel = enable ? 0b01101 : 0;
+			uint8_t sel = enable ? 0b001101 : 0;
 			switch(opt) {
 
 			case option::FIRST:
+				// PD2/MOSIA  (28/144) (28/144)
+				// PD1/MISOA  (29/144) (29/144)
+				// PD0/RSPCKA (30/144) (30/144)
 				{
-					PORT2::PMR.B2 = 0;
-					PORT2::PMR.B3 = 0;
-					PORT2::PMR.B4 = 0;
-					MPC::P22PFS.PSEL = sel;  // P22/MISOA  (66/100)
-					MPC::P23PFS.PSEL = sel;  // P23/MOSIA  (65/100)
-					MPC::P24PFS.PSEL = sel;  // P24/RSPCKA (64/100)
-					PORT2::PMR.B2 = enable;
-					PORT2::PMR.B3 = enable;
-					PORT2::PMR.B4 = enable;
-				}
-				break;
-			case option::SECOND:
-				{   // PD2, PD1, PD0
 					PORTD::PMR.B2 = 0;
 					PORTD::PMR.B1 = 0;
 					PORTD::PMR.B0 = 0;
-					MPC::PD2PFS.PSEL = sel;  // PD2/MOSIA  (28/144)
-					MPC::PD1PFS.PSEL = sel;  // PD1/MISOA  (29/144)
-					MPC::PD0PFS.PSEL = sel;  // PD0/RSPCKA (30/144)
+					MPC::PD2PFS.PSEL = sel;
+					MPC::PD1PFS.PSEL = sel;
+					MPC::PD0PFS.PSEL = sel;
 					PORTD::PMR.B2 = enable;
 					PORTD::PMR.B1 = enable;
 					PORTD::PMR.B0 = enable;
 				}
 				break;
+			case option::SECOND:
+				// PB0/MOSIA  (35/100) (51/144)
+				// PA5/MISOA  (36/100) (54/144)
+				// PA4/RSPCKA (37/100) (55/144)
+				{
+					PORTB::PMR.B0 = 0;
+					PORTA::PMR.B5 = 0;
+					PORTA::PMR.B4 = 0;
+					MPC::PB0PFS.PSEL = sel;
+					MPC::PA5PFS.PSEL = sel;
+					MPC::PA4PFS.PSEL = sel;
+					PORTB::PMR.B0 = enable;
+					PORTA::PMR.B5 = enable;
+					PORTA::PMR.B4 = enable;
+				}
+				break;
 			case option::THIRD:
+				// P24/RSPCKA (65/100) (95/144)
+				// P23/MOSIA  (66/100) (96/144)
+				// P22/MISOA  (67/100) (97/144)
+				{
+					PORT2::PMR.B4 = 0;
+					PORT2::PMR.B3 = 0;
+					PORT2::PMR.B2 = 0;
+					MPC::P24PFS.PSEL = sel;
+					MPC::P23PFS.PSEL = sel;
+					MPC::P22PFS.PSEL = sel;
+					PORT2::PMR.B4 = enable;
+					PORT2::PMR.B3 = enable;
+					PORT2::PMR.B2 = enable;
+				}
 				break;
 			case option::FOURTH:
+				// P22/MISOA  (67/100) ( 97/100)
+				// P21/MOSIA  (68/100) (100/144)
+				// P20/RSPCKA (69/100) (101/144)
+				{
+					PORT2::PMR.B2 = 0;
+					PORT2::PMR.B1 = 0;
+					PORT2::PMR.B0 = 0;
+					MPC::P22PFS.PSEL = sel;
+					MPC::P21PFS.PSEL = sel;
+					MPC::P20PFS.PSEL = sel;
+					PORT2::PMR.B2 = enable;
+					PORT2::PMR.B1 = enable;
+					PORT2::PMR.B0 = enable;
+				}
+				break;
+			case option::FIFTH:
+				// PB3/RSPCKA (48/144)
+				// PB0/MOSIA  (51/144)
+				// PA5/MISOA  (54/144)
+				{
+					PORTD::PMR.B2 = 0;
+					PORTD::PMR.B1 = 0;
+					PORTD::PMR.B0 = 0;
+					MPC::PD2PFS.PSEL = sel;
+					MPC::PD1PFS.PSEL = sel;
+					MPC::PD0PFS.PSEL = sel;
+					PORTD::PMR.B2 = enable;
+					PORTD::PMR.B1 = enable;
+					PORTD::PMR.B0 = enable;
+				}
 				break;
 			default:
 				return false;
@@ -610,7 +662,7 @@ namespace device {
 				PORT2::PMR.B3 = enable;
 				PORT2::PMR.B2 = enable;
 				break;
-			case option::_5TH:
+			case option::FIFTH:
 				// PF3/CRX0 (31/144)
 				// PF2/CTX0 (32/144)
 				PORTF::PMR.B3 = 0;
@@ -620,7 +672,7 @@ namespace device {
 				PORTF::PMR.B3 = enable;
 				PORTF::PMR.B2 = enable;
 				break;
-			case option::_6TH:
+			case option::SIXTH:
 				// PA7/CRX0 (52/144)
 				// PA6/CTX0 (53/144)
 				PORTA::PMR.B7 = 0;
@@ -630,7 +682,7 @@ namespace device {
 				PORTA::PMR.B7 = enable;
 				PORTA::PMR.B6 = enable;
 				break;
-			case option::_7TH:
+			case option::SEVENTH:
 				// PC6/CRX0 (62/144)
 				// PC5/CTX0 (63/144)
 				PORTC::PMR.B6 = 0;
