@@ -45,6 +45,7 @@ Other microcontrollers use malloc/free memory allocation, so memory is allocated
 - [RX66T/Makefile](RX66T/Makefile)
 - [RX65N/Makefile](RX65N/Makefile)
 - [RX72N/Makefile](RX72N/Makefile)
+- [RX72T/Makefile](RX72T/Makefile)
    
 ---
 
