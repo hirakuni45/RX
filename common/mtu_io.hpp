@@ -72,7 +72,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU 制御クラス
-		@param[in]	MTU	MTU ユニット
+		@param[in]	MTUX	MTU ユニット
 		@param[in]	MTASK	メイン割り込みタスク
 		@param[in]	OTASK	オーバーフロー割り込みタスク
 		@param[in]	PSEL	入出力ポート選択
