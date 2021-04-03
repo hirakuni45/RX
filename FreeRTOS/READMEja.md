@@ -42,6 +42,7 @@ RX24T/Makefile の環境変数の設定で、このサイズを変更出来ま�
 - [RX66T/Makefile](RX66T/Makefile)
 - [RX65N/Makefile](RX65N/Makefile)
 - [RX72N/Makefile](RX72N/Makefile)
+- [RX72T/Makefile](RX72T/Makefile)
    
 ---
 ## カーネル修正箇所

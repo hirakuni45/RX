@@ -28,6 +28,7 @@ namespace utils {
 		*/
 		//=============================================================//
 		enum class NAME : uint8_t {
+			NONE = 0,		///< 未定義
 			SIN = 0xC0,		///< sin(x)
 			COS,			///< cos(x)
 			TAN,			///< tan(x)
@@ -130,6 +131,7 @@ namespace utils {
 		/*!
 			@brief  関数文字列の取得
 			@param[in]	name	関数名
+			@return 関数文字列
 		*/
 		//-------------------------------------------------------------//
 		const char* get_name(NAME name) const
@@ -144,11 +146,42 @@ namespace utils {
 			case NAME::SQRT: return "sqrt";
 			case NAME::LOG:  return "log";
 			case NAME::LN:   return "ln";
-			case NAME::EXP10: return "e10";
+			case NAME::EXP10: return "exp10";
 			default:
 				break;
 			}
 			return "";
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  関数名の取得
+			@param[in]	text	関数文字列
+			@param[out]	name	関数名型
+			@return 移動後のポインター
+		*/
+		//-------------------------------------------------------------//
+		const char* get_code(const char* text, NAME& name) const
+		{
+			if(text == nullptr) {
+				name = NAME::NONE;
+				return text;
+			}
+
+			if(strncmp(text, "sin", 3) == 0) { name = NAME::SIN; return text + 3; }
+			else if(strncmp(text, "cos", 3) == 0) { name = NAME::COS; return text + 3; }
+			else if(strncmp(text, "tan", 3) == 0) { name =  NAME::TAN; return text + 3; }
+			else if(strncmp(text, "asin", 4) == 0) { name = NAME::ASIN; return text + 4; }
+			else if(strncmp(text, "acos", 4) == 0) { name = NAME::ACOS; return text + 4; }
+			else if(strncmp(text, "atan", 4) == 0) { name = NAME::ATAN; return text + 4; }
+			else if(strncmp(text, "sqrt", 4) == 0) { name = NAME::SQRT; return text + 4; }
+			else if(strncmp(text, "log", 3) == 0) { name = NAME::LOG; return text + 3; }
+			else if(strncmp(text, "ln", 2) == 0) { name = NAME::LN; return text + 2; }
+			else if(strncmp(text, "exp10", 5) == 0) { name = NAME::EXP10; return text + 5; }
+
+			name = NAME::NONE;
+			return text;
 		}
 
 

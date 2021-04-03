@@ -33,6 +33,7 @@ namespace utils {
 		*/
 		//=============================================================//
 		enum class NAME : uint8_t {
+			NONE = 0,		///< 未定義
 			PI = 0x80,		///< PI
 			LOG2,			///< ２の自然対数
 			EULER,			///< Euler数（ネイピア数）
@@ -71,20 +72,55 @@ namespace utils {
 			case NAME::LOG2: return "LOG2";  ///< ２の自然対数
 			case NAME::EULER: return "е";   ///< オイラー数
 			case NAME::ANS:  return "ans";
-			case NAME::V0: return "Sm0";
-			case NAME::V1: return "Sm1";
-			case NAME::V2: return "Sm2";
-			case NAME::V3: return "Sm3";
-			case NAME::V4: return "Sm4";
-			case NAME::V5: return "Sm5";
-			case NAME::V6: return "Sm6";
-			case NAME::V7: return "Sm7";
-			case NAME::V8: return "Sm8";
-			case NAME::V9: return "Sm9";
+			case NAME::V0: return "V0";
+			case NAME::V1: return "V1";
+			case NAME::V2: return "V2";
+			case NAME::V3: return "V3";
+			case NAME::V4: return "V4";
+			case NAME::V5: return "V5";
+			case NAME::V6: return "V6";
+			case NAME::V7: return "V7";
+			case NAME::V8: return "V8";
+			case NAME::V9: return "V9";
 			default:
 				break;
 			}
 			return "";
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  関数名の取得
+			@param[in]	text	関数文字列
+			@param[out]	name	関数名型
+			@return 移動後のポインター
+		*/
+		//-------------------------------------------------------------//
+		const char* get_code(const char* text, NAME& name) const
+		{
+			if(text == nullptr) {
+				name = NAME::NONE;
+				return text;
+			}
+
+			if(strncmp(text, "PI", 2) == 0) { name = NAME::PI; return text + 2; }
+			else if(strncmp(text, "LOG2", 4) == 0) { name = NAME::LOG2; return text + 4; }
+			else if(strncmp(text, "EULER", 5) == 0) { name = NAME::EULER; return text + 5; }
+			else if(strncmp(text, "ANS", 3) == 0) { name = NAME::ANS; return text + 3; }
+			else if(strncmp(text, "V0", 2) == 0) { name = NAME::V0; return text + 2; }
+			else if(strncmp(text, "V1", 2) == 0) { name = NAME::V1; return text + 2; }
+			else if(strncmp(text, "V2", 2) == 0) { name = NAME::V2; return text + 2; }
+			else if(strncmp(text, "V3", 2) == 0) { name = NAME::V3; return text + 2; }
+			else if(strncmp(text, "V4", 2) == 0) { name = NAME::V4; return text + 2; }
+			else if(strncmp(text, "V5", 2) == 0) { name = NAME::V5; return text + 2; }
+			else if(strncmp(text, "V6", 2) == 0) { name = NAME::V6; return text + 2; }
+			else if(strncmp(text, "V7", 2) == 0) { name = NAME::V7; return text + 2; }
+			else if(strncmp(text, "V8", 2) == 0) { name = NAME::V8; return text + 2; }
+			else if(strncmp(text, "V9", 2) == 0) { name = NAME::V9; return text + 2; }
+
+			name = NAME::NONE;
+			return text;
 		}
 
 

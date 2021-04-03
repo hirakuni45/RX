@@ -71,6 +71,7 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
+	#define GRAPHICS
 
 #elif defined(SIG_RX72N)
 
@@ -105,6 +106,24 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x0000;
 
 	#define USE_SSIE
+	#define GRAPHICS
+
+#elif defined(SIG_RX72T)
+
+	static const char* sys_msg_ = { "RX72T" };
+
+	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+
+	static const uint32_t AUDIO_SAMPLE_RATE = 48'000;
+
+	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
+	// DMAC でループ転送できる最大数の２倍（1024）
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
 
 #endif
 
@@ -113,6 +132,7 @@ namespace {
 	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
 
+#ifdef GRAPHICS
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	static const graphics::pixel::TYPE PIX = graphics::pixel::TYPE::RGB565;
@@ -146,6 +166,7 @@ namespace {
 
 	typedef synth::synth_gui<RENDER, TOUCH> SYNTH_GUI;
 	SYNTH_GUI	synth_gui_(render_, touch_);
+#endif
 
 	// RX65N/RX72N Envision Kit の SDHI は、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDHI;
@@ -155,7 +176,7 @@ namespace {
 	SOUND_OUT	sound_out_(ZERO_LEVEL);
 
 	// シンセサイザー・コンテキスト
-	static const int32_t	SYNTH_SAMPLE_RATE = 48'000;
+	static const int32_t SYNTH_SAMPLE_RATE = 48'000;
 	RingBuffer	ring_buffer_;
 	SynthUnit	synth_unit_(ring_buffer_);
 	char		synth_color_name_[16 * 32];
