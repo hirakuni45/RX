@@ -72,6 +72,16 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA5 = f;
 				break;
 
+			case peripheral::GPTW0:
+			case peripheral::GPTW1:
+			case peripheral::GPTW2:
+			case peripheral::GPTW3:
+			case peripheral::GPTW4:
+			case peripheral::GPTW5:
+			case peripheral::GPTW6:
+			case peripheral::GPTW7:
+			case peripheral::GPTW8:
+			case peripheral::GPTW9:
 			case peripheral::HRPWM:
 				SYSTEM::MSTPCRA.MSTPA7 = f;
 				break;
@@ -176,6 +186,12 @@ namespace device {
 			case peripheral::SCI1:
 				SYSTEM::MSTPCRB.MSTPB30 = f;	// SCI1 のストップ状態解除
 				break;
+
+			case peripheral::ECCRAM:
+				SYSTEM::MSTPCRC.MSTPC6 = f;		// ECCRAM
+
+			case peripheral::CAC:
+				SYSTEM::MSTPCRC.MSTPC19 = f;	// CAC
 
 			case peripheral::SCI11:
 				SYSTEM::MSTPCRC.MSTPC24 = f;	// SCI11 のストップ状態解除

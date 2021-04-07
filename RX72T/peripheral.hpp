@@ -114,6 +114,8 @@ namespace device {
 
 		CRC,
 
+		ECCRAM,		/// ECC RAM (32K)
+
 		// 仮の仕様
 		IRQ0,
 		IRQ1,

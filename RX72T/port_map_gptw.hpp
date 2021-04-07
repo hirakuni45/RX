@@ -55,7 +55,12 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			/// 0A: P12(0), P71(0), PD2(1), PD7(0), PG1(1)
+			/// 0A:
+			/// P12[0] ( 3/144) (--/100)
+			/// P71[0] (78/144) (56/100)
+			/// PD2[1] (28/144) (23/100)
+			/// PD7[0] (23/144) (18/100)
+			/// PG1[1] (81/144) (--/100)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -93,7 +98,12 @@ namespace device {
 					break;
 				}
 				break;
-			/// 0B: P15(0), P74(0), PD1(1), PD6(0), PG2(1)
+			/// 0B:
+			/// P15[0] (144/144) (--/100)
+			/// P74[0] ( 75/144) (53/100)
+			/// PD1[1] ( 29/144) (--/100) (24/100)
+			/// PD6[0] ( 24/144) (19/100)
+			/// PG2[1] ( 81/144) (--/100)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -144,7 +154,12 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			/// 1A: P13(0), P72(0), PD0(1), PD5(0), PK2(1)
+			/// 1A:
+			/// P13[0] ( 2/144) (--/100)
+			/// P72[0] (77/144) (55/100)
+			/// PD0[1] (30/144) (--/100) (25/100) 
+			/// PD5[0] (25/144) (20/100)
+			/// PK2[1] (83/144) (--/100)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -182,7 +197,12 @@ namespace device {
 					break;
 				}
 				break;
-			/// 1B: P16(0), P75(0), PB7(0), PD4(0), PG0(1)
+			/// 1B:
+			/// P16[0] (143/144)
+			/// P75[0] ( 74/144)
+			/// PB7[0] ( 39/144)
+			/// PD4[0] ( 26/144)
+			/// PG0[1] ( 82/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -233,7 +253,12 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			/// 2A: P14(0), P73(0), PB6(0), PD3(0), PK0(1)
+			/// 2A:
+			/// P14[0] ( 1/144)
+			/// P73[0] (76/144)
+			/// PB6[0] (40/144)
+			/// PD3[0] (27/144)
+			/// PK0[1] (85/144)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -271,7 +296,12 @@ namespace device {
 					break;
 				}
 				break;
-			/// 2B: P17(0), P76(0), PB5(0), PD2(0), PK1(1)
+			/// 2B:
+			/// P17[0] (142/144)
+			/// P76[0] ( 73/144)
+			/// PB5[0] ( 41/144)
+			/// PD2[0] ( 28/144)
+			/// PK1[1] ( 84/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -322,7 +352,11 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			/// 3A: P32(0), PD1(0), PD7(1), PE5(0)
+			/// 3A:
+			/// P32[0] (87/144)
+			/// PD1[0] (29/144)
+			/// PD7[1] (23/144)
+			/// PE5[0] ( 5/144)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -354,7 +388,11 @@ namespace device {
 					break;
 				}
 				break;
-			/// 3B: P11(0), P33(0), PD0(0), PD6(1)
+			/// 3B:
+			/// P11[0] (140/144)
+			/// P33[0] ( 86/144)
+			/// PD0[0] ( 30/144)
+			/// PD6[1] ( 24/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -399,7 +437,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			/// 4A: P71, P95
+			/// 4A:
+			/// P71[1] (78/144)
+			/// P95[0] (67/144)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -419,7 +459,9 @@ namespace device {
 					break;
 				}
 				break;
-			/// 4B: P74, P92
+			/// 4B:
+			/// P74[1] (75/144)
+			/// P92[0] (70/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -452,7 +494,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			/// 5A: P72, P94
+			/// 5A:
+			/// P72[1] (77/144)
+			/// P94[0] (68/144)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -472,7 +516,9 @@ namespace device {
 					break;
 				}
 				break;
-			/// 5B: P75, P91
+			/// 5B:
+			/// P75[1] (74/144)
+			/// P91[0] (71/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -505,7 +551,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			/// 6A: P73, P93
+			/// 6A:
+			/// P73[1] (76/144)
+			/// P93[0] (69/144)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -525,7 +573,9 @@ namespace device {
 					break;
 				}
 				break;
-			/// 6B: P76, P90
+			/// 6B:
+			/// P76[1] (73/144)
+			/// P90[0] (72/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -558,7 +608,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 			switch(ch) {
-			/// 7A: P12, P95
+			/// 7A:
+			/// P12[1] ( 3/144)
+			/// P95[1] (67/144)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -576,7 +628,9 @@ namespace device {
 					break;
 				}
 				break;
-			/// 7B: P76, P90
+			/// 7B:
+			/// P76[1] (73/144)
+			/// P90[1] (72/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -607,7 +661,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 			switch(ch) {
-			/// 8A: P13, P94
+			/// 8A:
+			/// P13[1] ( 2/144)
+			/// P94[1] (68/144)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -625,7 +681,9 @@ namespace device {
 					break;
 				}
 				break;
-			/// 8B: P16, P91
+			/// 8B:
+			/// P16[1] (143/144)
+			/// P91[1] ( 71/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -655,7 +713,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 			switch(ch) {
-			/// 9A: P14, P93
+			/// 9A:
+			/// P14[1] ( 1/144)
+			/// P93[1] (69/144)
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -673,7 +733,9 @@ namespace device {
 					break;
 				}
 				break;
-			/// 9B: P17, P90
+			/// 9B:
+			/// P17[1] (142/144)
+			/// P90[1] ( 72/144)
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -717,7 +779,7 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(per) {
 			case peripheral::GPTW0:
 				ret = gptw0_(ch, ena, neg, opt);
@@ -750,7 +812,6 @@ namespace device {
 				ret = gptw9_(ch, ena, neg, opt);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 
@@ -760,4 +821,3 @@ namespace device {
 		}
 	};
 }
-
