@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX66T/RX72T GPTW 定義
+	@brief	RX72N/RX72M/RX66T/RX72T 汎用 PWM タイマ（GPTW）定義 @n
+			RX72N/RX72M: GPTW0 - GPTW3 @n
+			RX66T/RX72T: GPTW0 - GPTW9
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -65,7 +67,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>     STPWP;
 			bit_rw_t <io_, bitpos::B3>     CLRWP;
 			bit_rw_t <io_, bitpos::B4>     CMNWP;
-			bits_rw_t<io_, bitpos::B8, 8>  KEY;
+			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
 		};
 		typedef gtwp_t<base + 0x00> GTWP_;
 		static GTWP_ GTWP;
@@ -531,7 +533,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 5>   OAIOA;
+			bits_rw_t<io_, bitpos::B0, 5>   GTIOA;
 
 			bit_rw_t <io_, bitpos::B6>      OADFLT;
 			bit_rw_t <io_, bitpos::B7>      OAHLD;
@@ -541,7 +543,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B13>     NFAEN;
 			bits_rw_t<io_, bitpos::B14, 2>  NFCSA;
 
-			bits_rw_t<io_, bitpos::B16, 5>  OAIOB;
+			bits_rw_t<io_, bitpos::B16, 5>  GTIOB;
 
 			bit_rw_t <io_, bitpos::B22>     OBDFLT;
 			bit_rw_t <io_, bitpos::B23>     OBHLD;
@@ -1068,6 +1070,15 @@ namespace device {
 		};
 		typedef gtsecr_t<base + 0xD4> GTSECR_;
 		static GTSECR_ GTSECR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイマー・チャネルの取得
+			@return タイマー・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_channel() { return static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::GPTW0); }
 	};
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
@@ -1358,7 +1369,7 @@ namespace device {
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR;
 
-
+#if defined(SIG_RX72N) || defined(SIG_RX66T) || defined(SIG_RX72T) 
 	typedef gptw_t<0x000C2000, peripheral::GPTW0,
 		ICU::VECTOR_SELA::GTCIA0, ICU::VECTOR_SELA::GTCIB0, ICU::VECTOR_SELA::GTCIC0,
 		ICU::VECTOR_SELA::GTCID0, ICU::VECTOR_SELA::GDTE0,  ICU::VECTOR_SELA::GTCIE0,
@@ -1375,6 +1386,9 @@ namespace device {
 		ICU::VECTOR_SELA::GTCIA3, ICU::VECTOR_SELA::GTCIB3, ICU::VECTOR_SELA::GTCIC3,
 		ICU::VECTOR_SELA::GTCID3, ICU::VECTOR_SELA::GDTE3,  ICU::VECTOR_SELA::GTCIE3,
 		ICU::VECTOR_SELA::GTCIF3, ICU::VECTOR_SELA::GTCIV3, ICU::VECTOR_SELA::GTCIU3> GPTW3;
+#endif
+
+#if defined(SIG_RX66T) || defined(SIG_RX72T) 
 	typedef gptw_t<0x000C2400, peripheral::GPTW4,
 		ICU::VECTOR_SELA::GTCIA4, ICU::VECTOR_SELA::GTCIB4, ICU::VECTOR_SELA::GTCIC4,
 		ICU::VECTOR_SELA::GTCID4, ICU::VECTOR_SELA::GDTE4,  ICU::VECTOR_SELA::GTCIE4,
@@ -1399,4 +1413,5 @@ namespace device {
 		ICU::VECTOR_SELA::GTCIA9, ICU::VECTOR_SELA::GTCIB9, ICU::VECTOR_SELA::GTCIC9,
 		ICU::VECTOR_SELA::GTCID9, ICU::VECTOR_SELA::GDTE9,  ICU::VECTOR_SELA::GTCIE9,
 		ICU::VECTOR_SELA::GTCIF9, ICU::VECTOR_SELA::GTCIV9, ICU::VECTOR_SELA::GTCIU9> GPTW9;
+#endif
 }
