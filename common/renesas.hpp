@@ -83,7 +83,7 @@
 #include "RX600/mpc.hpp"
 #include "RX600/tpu.hpp"
 #include "RX600/ppg.hpp"
-#include "RX600/gpt.hpp"
+#include "RX600/gptw.hpp"
 #include "RX600/ppg.hpp"
 #include "RX600/cmtw.hpp"
 #include "RX600/can.hpp"
