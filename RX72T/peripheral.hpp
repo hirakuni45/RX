@@ -54,8 +54,8 @@ namespace device {
 		GPTW7,		///< GPTW7  汎用 PWM タイマ
 		GPTW8,		///< GPTW8  汎用 PWM タイマ
 		GPTW9,		///< GPTW9  汎用 PWM タイマ
-
 		HRPWM,		///< 高分解能 PWM 波形生成回路
+
 		POEG,		///< GPTW 用ポートアウトプットイネーブル (POEG)
 
 		TMR0,		///< 8 ビットタイマ０

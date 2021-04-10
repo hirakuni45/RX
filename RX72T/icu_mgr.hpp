@@ -151,7 +151,7 @@ namespace device {
 			@param[in]	sel		割り込み要因
 			@param[in]	task	割り込みタスク
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
-			@return 成功なら「true」
+			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA sel, utils::TASK task, uint8_t lvl) noexcept
