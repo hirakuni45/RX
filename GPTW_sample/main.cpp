@@ -3,26 +3,30 @@
     @brief  GPTW サンプル @n
 			RX64M, RX71M: @n
 					12MHz のベースクロックを使用する @n
-			　　　　P07 ピンにLEDを接続する @n
+					P07 ピンにLEDを接続する @n
 					SCI1 を使用する @n
 			RX65N (Renesas Envision kit RX65N): @n
 					12MHz のベースクロックを使用する @n
-			　　　　P70 に接続された LED を利用する @n
+					P70 に接続された LED を利用する @n
 					SCI9 を使用する @n
 			RX24T: @n
 					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
+					P00 ピンにLEDを接続する @n
 					SCI1 を使用する @n
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
+					P00 ピンにLEDを接続する @n
 					SCI1 を使用する @n
 			RX72N: (Renesas Envision kit RX72N) @n
 					16MHz のベースクロックを使用する @n
 					P40 ピンにLEDを接続する @n
 					SCI2 を使用する @n
+			RX72T: @n
+					16MHz のベースクロックを使用する @n
+					P01 ピンにLEDを接続する @n
+					SCI1 を使用する @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -38,6 +42,7 @@
 #include "common/input.hpp"
 
 #include "common/gptw_mgr.hpp"
+#include "common/hrpwm_mgr.hpp"
 
 namespace {
 
@@ -84,8 +89,6 @@ namespace {
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI		sci_;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
@@ -96,6 +99,9 @@ namespace {
 
 	typedef device::gptw_mgr<GPTW_CH> GPTW;
 	GPTW	gptw_;
+
+	typedef device::hrpwm_mgr<device::HRPWM> HRPWM;
+	HRPWM	hrpwm_;
 }
 
 
@@ -138,11 +144,8 @@ int main(int argc, char** argv)
 
 	{  // SCI の開始
 		uint8_t intr = 2;        // 割り込みレベル（０を指定すると、ポーリング動作になる）
-		uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
+		uint32_t baud = 115'200;  // ボーレート（任意の整数値を指定可能）
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
-// 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
-// sci_io.hpp PROTOCOL enum class のタイプを参照
-//		sci_.start(baud, intr, SCI::PROTOCOL::B8_E_1S);
 	}
 
 	auto clk = F_ICLK / 1'000'000;
@@ -172,6 +175,13 @@ int main(int argc, char** argv)
 			utils::format("GPTW0 start fail...\n");
 		}
 	}
+	{  // HRPWM の開始 (Enable: GPTW0, Disable: GPTW1, GPTW2, GPTW3)
+		if(hrpwm_.start(true, false, false, false)) {
+			utils::format("HRPWM start: \n");
+		} else {
+			utils::format("HRPWM start fail...\n");
+		}
+	}
 
 	cmd_.set_prompt("# ");
 
@@ -181,13 +191,18 @@ int main(int argc, char** argv)
 
 		if(cmd_.service()) {
 			uint32_t cmdn = cmd_.get_words();
-			uint32_t n = 0;
-			while(n < cmdn) {
-				char tmp[256];
-				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
-					utils::format("Param%d: '%s'\n") % n % tmp;
+			if(cmdn > 0) {
+				if(cmd_.cmp_word(0, "a") == 0) {
+
+				} else if(cmd_.cmp_word(0, "b") == 0) {
+
+				} else if(cmd_.cmp_word(0, "help") == 0) {
+
+				} else {
+					char tmp[256];
+					cmd_.get_word(0, tmp, sizeof(tmp));
+					utils::format("Command error: '%s'\n") % tmp;
 				}
-				++n;
 			}
 		}
 

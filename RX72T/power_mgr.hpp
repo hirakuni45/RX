@@ -23,14 +23,15 @@ namespace device {
 
 		struct pad_t {
 
-			uint8_t		cmt_;
+			uint16_t	cmt_;
+			uint16_t	gptw_;
 
-			pad_t() : cmt_(0) { }
+			pad_t() noexcept : cmt_(0), gptw_(0) { }
 		};
 
 		typedef utils::static_holder<pad_t> STH;
 
-		static void set_(bool f, uint8_t& pad, peripheral org, peripheral tgt)
+		static void set_(bool f, uint16_t& pad, peripheral org, peripheral tgt)
 		{
 			if(f) {
 				pad |= 1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org));
@@ -83,7 +84,8 @@ namespace device {
 			case peripheral::GPTW8:
 			case peripheral::GPTW9:
 			case peripheral::HRPWM:
-				SYSTEM::MSTPCRA.MSTPA7 = f;
+				set_(ena, STH::st.gptw_, peripheral::GPTW0, t);
+				SYSTEM::MSTPCRA.MSTPA7 = ((STH::st.gptw_ & 0b111'1111'1111) == 0);
 				break;
 
 			case peripheral::MTU0:

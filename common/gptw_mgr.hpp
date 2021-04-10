@@ -45,14 +45,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class OUTPUT : uint8_t {
-			PA,		///< チャネル A 正出力
-			PB,		///< チャネル B 正出力
-			NA,		///< チャネル A 逆出力
-			NB,		///< チャネル B 逆出力
-			PA_PB,	///< チャネル A, B 正出力
-			PA_NB,	///< チャネル A 正出力、B 逆出力
-			NA_PB,	///< チャネル A 逆出力、B 正出力
-			NA_NB,	///< チャネル A, B 逆出力
+			PA,		///< チャネル A 正出力 (PositiveA)
+			PB,		///< チャネル B 正出力 (PositiveB)
+			NA,		///< チャネル A 逆出力 (NegativeA)
+			NB,		///< チャネル B 逆出力 (NegativeB)
+			PA_PB,	///< チャネル A, B 正出力 (PositiveA, PositiveB)
+			PA_NB,	///< チャネル A 正出力、B 逆出力 (PositiveA, NegativeB)
+			NA_PB,	///< チャネル A 逆出力、B 正出力 (NegativeA, PositiveB)
+			NA_NB,	///< チャネル A, B 逆出力 (NegativeA, NegativeB)
 		};
 	};
 
@@ -61,17 +61,29 @@ namespace device {
 	/*!
 		@brief  GPTW マネージャー・クラス
 		@param[in]	GPTWX	GPTW[0-9] ユニット
+		@param[in]	CMTASK	コンペアマッチタスク型
 		@param[in]	PSEL	入出力ポート選択
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GPTWX, port_map_gptw::option PSEL = port_map_gptw::option::FIRST>
+	template <class GPTWX, class CMTASK = utils::null_task,
+		port_map_gptw::option PSEL = port_map_gptw::option::FIRST>
 	class gptw_mgr : public gptw_base {
 
 		// ※必要なら、実装する
 		void sleep_() { }
 
+		uint32_t	freq_;
 		uint32_t	base_;
 		uint8_t		ilvl_;
+		ICU::VECTOR	cm_vec_;
+
+		static CMTASK	cmtask_;
+
+		static INTERRUPT_FUNC void cmp_match_task_()
+		{
+			cmtask_();
+		}
+
 
 		void protect_enable_(bool ena = true) noexcept
 		{
@@ -84,7 +96,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		gptw_mgr() noexcept : base_(0), ilvl_(0)
+		gptw_mgr() noexcept : freq_(0), base_(0), ilvl_(0), cm_vec_(ICU::VECTOR::NONE)
 		{ }
 
 
@@ -99,6 +111,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(MODE mode, OUTPUT out, uint32_t freq, uint8_t ilvl = 0) noexcept
 		{
+			if(freq == 0) return false;
+
 			if(!power_mgr::turn(GPTWX::PERIPHERAL)) {
 				return false;
 			}
@@ -157,7 +171,12 @@ namespace device {
 				}
 			}
 
+			freq_ = freq;
 			auto n = F_PCLKC / freq;
+			if(n == 0) {
+				power_mgr::turn(GPTWX::PERIPHERAL, false);
+				return false;
+			}
 			uint8_t md = 0;
 			switch(mode) {
 			case MODE::PWM_S:
@@ -179,21 +198,22 @@ namespace device {
 				md = 0b110;
 				break;
 			}
+			base_ = n;
 
 			protect_enable_(false);
-			base_ = n;
 			GPTWX::GTPR = n - 1;
 
 			GPTWX::GTCR = GPTWX::GTCR.MD.b(md) | GPTWX::GTCR.CST.b();
 			GPTWX::GTIOR = GPTWX::GTIOR.OAE.b(outa) | GPTWX::GTIOR.OBE.b(outb)
 				| GPTWX::GTIOR.GTIOA.b(0b00110) | GPTWX::GTIOR.GTIOB.b(0b00110);
 
-		GPTWX::GTCCRA = n / 3;
-		GPTWX::GTCCRB = n * 2 / 3;
+		GPTWX::GTCCRA = base_ / 3;
+		GPTWX::GTCCRB = base_ * 2 / 3;
 
 			ilvl_ = ilvl;
 			if(ilvl > 0) {
-
+				cm_vec_ = icu_mgr::set_interrupt(GPTWX::GTCIV, cmp_match_task_, ilvl);
+				GPTWX::GTINTAD.GTINTPR = 0b01;
 			}
 
 			GPTWX::GTSTP = ~(1 << GPTWX::get_channel());  // 停止解除
@@ -212,6 +232,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync() noexcept
 		{
+			if(ilvl_ > 0) {
+
+			} else {
+
+			}
 		}
 
 
