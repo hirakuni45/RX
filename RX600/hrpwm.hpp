@@ -23,12 +23,12 @@ namespace device {
 
 		static const auto PERIPHERAL = per;	///< ペリフェラル型
 
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		/*!
 			@brief  HRPWM 動作制御レジスタ (HROCR)
 			@param[in]	base	ベースアドレス
 		*/
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		template <uint32_t base>
 		struct hrocr_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -44,12 +44,12 @@ namespace device {
 		static HROCR_ HROCR;
 
 
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		/*!
 			@brief  HRPWM 動作制御レジスタ 2 (HROCR2)
 			@param[in]	base	ベースアドレス
 		*/
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		template <uint32_t base>
 		struct hrocr2_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -72,12 +72,12 @@ namespace device {
 		static HROCR2_ HROCR2;
 
 
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		/*!
 			@brief  GTIOCnA 端子立ち上がりエッジ調整レジスタ (HRREARnA) (n = 0 ～ 3)
 			@param[in]	base	ベースアドレス
 		*/
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		template <uint32_t base>
 		struct hrrearna_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -98,12 +98,12 @@ namespace device {
 		static HRREAR3A_ HRREAR3A;
 
 
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		/*!
 			@brief  GTIOCnA 端子立ち下がりエッジ調整レジスタ (HRFEARnA) (n = 0 ～ 3)
 			@param[in]	base	ベースアドレス
 		*/
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		template <uint32_t base>
 		struct hrfearna_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -124,12 +124,12 @@ namespace device {
 		static HRFEAR3A_ HRFEAR3A;
 
 
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		/*!
 			@brief  GTIOCnB 端子立ち上がりエッジ調整レジスタ (HRREARnB) (n = 0 ～ 3)
 			@param[in]	base	ベースアドレス
 		*/
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		template <uint32_t base>
 		struct hrrearnb_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -150,12 +150,12 @@ namespace device {
 		static HRREAR3B_ HRREAR3B;
 
 
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		/*!
 			@brief  GTIOCnB 端子立ち下がりエッジ調整レジスタ (HRFEARnB) (n = 0 ～ 3)
 			@param[in]	base	ベースアドレス
 		*/
-		//-----------------------------------------------------------------//
+		//=================================================================//
 		template <uint32_t base>
 		struct hrfearnb_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -174,6 +174,41 @@ namespace device {
 		static HRFEAR2B_ HRFEAR2B;
 		typedef hrfearnb_t<0x000C2A26> HRFEAR3B_;
 		static HRFEAR3B_ HRFEAR3B;
+
+#if defined(SIG_RX72T)
+		//=================================================================//
+		/*!
+			@brief  HRPWM 動作クロック選択レジスタ (HRCKSR)
+			@param[in]	base	ベースアドレス
+		*/
+		//=================================================================//
+		template <uint32_t base>
+		struct hrcksr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>  HRCKSEL;
+		};
+		typedef hrcksr_t<0x000C2A70> HRCKSR_;
+		static HRCKSR_ HRCKSR;
+#endif
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  HRPWM 動作クロック選択レジスタ (HRCKSR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		static void set_base_clock()
+		{
+#if defined(SIG_RX72T)
+			HRCKSR.HRCKSEL = (F_PCLKC < 160'000'000) ? 0b00 : 0b01;
+#endif
+		}
 	};
 	template <peripheral per> typename hrpwm_t<per>::HROCR_ hrpwm_t<per>::HROCR;
 	template <peripheral per> typename hrpwm_t<per>::HROCR2_ hrpwm_t<per>::HROCR2;
@@ -193,7 +228,9 @@ namespace device {
 	template <peripheral per> typename hrpwm_t<per>::HRFEAR1B_ hrpwm_t<per>::HRFEAR1B;
 	template <peripheral per> typename hrpwm_t<per>::HRFEAR2B_ hrpwm_t<per>::HRFEAR2B;
 	template <peripheral per> typename hrpwm_t<per>::HRFEAR3B_ hrpwm_t<per>::HRFEAR3B;
-
+#if defined(SIG_RX72T)
+	template <peripheral per> typename hrpwm_t<per>::HRCKSR_ hrpwm_t<per>::HRCKSR;
+#endif
 
 	typedef hrpwm_t<peripheral::HRPWM> HRPWM;
 }
