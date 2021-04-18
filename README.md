@@ -70,12 +70,14 @@ In device I / O operation, a dedicated header is prepared using template class l
 |Directory/file|Contents|
 |-----------------------|----------------------------------------------|
 |all_project_build.sh   |All project builds (shell script)|
+|[/rxlib](./rxlib)      |zlib, png, mad, gmp, mpfr library|
 |[/RX600](./RX600)      |RX microcontroller common device definition class|
 |[/RX24T](./RX24T)      |Device definition class dedicated to RX24T, linker script|
 |[/RX64M](./RX64M)      |Device definition class dedicated to RX64M, linker script|
 |[/RX71M](./RX71M)      |Device definition class dedicated to RX71M, linker script|
 |[/RX65x](./RX65x)      |Device definition class dedicated to RX65(1N), linker script|
 |[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script|
+|[/RX72T](./RX72T)      |Device definition class dedicated to RX72T, linker script|
 |[/RX72N](./RX72N)      |Device definition class dedicated to RX72N, linker script|
 |[/FreeRTOS](./FreeRTOS)|FreeRTOS RX microcontroller compatible version and a simple sample|
 |[/ff14](./ff14)        |ChaN's fatfs source code and handler for RX microcontroller|
@@ -83,8 +85,6 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/chip](./chip)        |Device-specific control driver library for I2C, SPI, etc.|
 |[/graphics](./graphics)|Graphics drawing relation class|
 |[/sound](./sound)      |Sound, audio relationship class|
-|/r_net                 |Renesas T4 (TCP / UDP) library, C ++ handler, wrapper|
-|[/rxlib](./rxlib)      |zlib, png, mad, gmp, mpfr library|
 |[/rxprog](./rxprog)    |Program writing tool to RX microcontroller flash (Windows, OS-X, Linux compatible)|
 |[/FIRST_sample](./FIRST_sample)|LED flashing program for each platform|
 |[/SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
@@ -94,9 +94,11 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/SDCARD_sample](./SDCARD_sample)|For each platform, SD card operation sample|
 |[/SIDE_sample](./SIDE_sample)|Renesas RX65N/RX72N Envision Kit, Space Invaders emulator|
 |[/NESEMU_sample](./NESEMU_sample)|Renesas RX65N/RX72N Envision Kit, NES emulator|
+|[/GUI_sample](./GUI_sample)|GUI samples, Graphics User Interface (soft rendering, DRW2D engine)|
 |[/AUDIO_sample](./AUDIO_sample)|For each platform, MP3/WAV Audio player|
 |[/SYNTH_sample](./SYNTH_sample)|FM Sound Source Synthesizer and Emulato|
 |[/CALC_sample](./CALC_sample)|Generic Calculator Sample (gmp, mpfr library)|
+|[/DSOS_sample](./DSOS_sample)|Digital Storage Oscilloscope Sample|
 |[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   

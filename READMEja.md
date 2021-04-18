@@ -68,33 +68,35 @@ int main(int argc, char** argv)
 |ディレクトリ・ファイル|内容|
 |-----------------------|----------------------------------------------|
 |all_project_build.sh   |全てのプロジェクトをビルド(シェル・スクリプト)|
+|[/rxlib](./rxlib)      |zlib, png, mad, gmp, mpfr ライブラリ|
 |[/RX600](./RX600)      |RX マイコン共通デバイス定義クラス|
-|[/RX24T](./RX24T)      |RX24T 専用のデバイス定義クラス、リンカースクリプト|
-|[/RX64M](./RX64M)      |RX64M 専用のデバイス定義クラス、リンカースクリプト|
-|[/RX71M](./RX71M)      |RX71M 専用のデバイス定義クラス、リンカースクリプト|
-|[/RX72N](./RX72N)      |RX72N 専用のデバイス定義クラス、リンカースクリプト|
+|[/RX24T](./RX24T)      |RX24T 専用デバイス定義クラス、リンカースクリプト|
+|[/RX64M](./RX64M)      |RX64M 専用デバイス定義クラス、リンカースクリプト|
+|[/RX71M](./RX71M)      |RX71M 専用デバイス定義クラス、リンカースクリプト|
 |[/RX65x](./RX65x)      |RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
 |[/RX66T](./RX66T)      |RX66T 専用デバイス定義クラス、リンカースクリプト|
+|[/RX72T](./RX72T)      |RX72T 専用デバイス定義クラス、リンカースクリプト|
+|[/RX72N](./RX72N)      |RX72N 専用デバイス定義クラス、リンカースクリプト|
 |[/FreeRTOS](./FreeRTOS)|FreeRTOS の RX マイコン各種対応版と簡単なサンプル|
 |[/ff14](./ff14)        |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
 |[/common](./common)    |共有クラス、ヘッダーなど|
 |[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
-|[/graphics](./graphics)|グラフィックス描画関係クラス|
+|[/graphics](./graphics)|グラフィックス描画関係クラス、GUI Widget|
 |[/sound](./sound)      |サウンド、オーディオ関係クラス|
-|/r_net                 |ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー|
-|[/rxlib](./rxlib)      |zlib, png, mad, gmp, mpfr ライブラリ|
-|[/rxprog](./rxprog)    |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
+|[/rxprog](./rxprog)    |RX フラッシュ、プログラム書き込みツール（Windows、OS-X、Linux 対応）|
 |[/FIRST_sample](./FIRST_sample)|各プラットホーム対応、LED 点滅プログラム|
 |[/SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
-|[/CAN_sample](./CAN_sample)|RX64M/RX71M/RX66T/RX72N 対応 CAN サンプルプログラム|
+|[/CAN_sample](./CAN_sample)|CAN 通信サンプルプログラム|
 |[/FLASH_sample](./FLASH_sample)|各プラットホーム対応、内臓データフラッシュ操作サンプル|
-|[/RAYTRACER_sample](./RAYTRACER_sample)|各プラットホーム対応 レイトレーシング・ベンチマーク|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|レイトレーシング・ベンチマーク|
 |[/SDCARD_sample](./SDCARD_sample)|SD カードの動作サンプル|
 |[/SIDE_sample](./SIDE_sample)|ルネサス製 RX65N/RX72N Envision Kit, Space Invaders エミュレーター|
 |[/NESEMU_sample](./NESEMU_sample)|ルネサス製 RX65N/RX72N Envision Kit, NES エミュレーター|
-|[/AUDIO_sample](./AUDIO_sample)|MP3/WAV オーディオプレイヤー|
+|[/GUI_sample](./GUI_sample)|GUI サンプル、Graphics User Interface (ソフトレンダリング、DRW2D エンジン)|
+|[/AUDIO_sample](./AUDIO_sample)|MP3/WAV オーディオプレイヤー (FreeRTOS)|
 |[/SYNTH_sample](./SYNTH_sample)|FM 音源シンセサイザー・エミュレータ|
 |[/CALC_sample](./CALC_sample)|汎用電卓サンプル (gmp, mpfr ライブラリ)|
+|[/DSOS_sample](./DSOS_sample)|デジタルストレージオシロスコープサンプル|
 |[LICENSE](./LICENSE)   |ライセンス表記ファイル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
