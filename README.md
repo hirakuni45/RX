@@ -23,7 +23,7 @@ Project consists of Makefile, related header, source code, dedicated startup It 
 Space Invaders Emulator, NES Emulator, for RX65N/RX72N Envision kit   
 <img src="docs/AudioPlayer.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
 WAV/MP3 Audio Player, File selector, for RX65N/RX72N Envision kit   
-<img src="docs/CALC_sample.jpg" width="40%"> <img src="docs/SYNTH_sample.jpg" width="40%">   
+<img src="docs/calc_sample.jpg" width="40%"> <img src="docs/SYNTH_sample.jpg" width="40%">   
 functional calculator, DX7 Emulator   
 <a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'"></a>   
 YouTube: NES Emulator for RX65N Envision kit
