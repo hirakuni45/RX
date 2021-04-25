@@ -26,10 +26,10 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ポート・マッピング・オプション型
+			@brief  ポート・マッピング順番型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class option : uint8_t {
+		enum class ORDER : uint8_t {
 			BYPASS,		///< ポートマップの設定をバイパスする場合
 			FIRST,		///< 第１候補
 			SECOND,		///< 第２候補
@@ -45,7 +45,7 @@ namespace device {
 			@brief  タイマー系・チャネル型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,		///< MTUx A (MTIOCxA)
 			B,		///< MTUx B (MTIOCxB)
 			C,		///< MTUx C (MTIOCxC)
@@ -67,7 +67,7 @@ namespace device {
 					※タイマーのクロック系は、MTU 共通なので、識別子としてグループを使う
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class group : uint8_t {
+		enum class GROUP : uint8_t {
 			MTU0,	///< MTU0 系グループ
 			MTU1,	///< MTU1 系グループ
 			MTU2,	///< MTU2 系グループ
@@ -90,14 +90,14 @@ namespace device {
 
 
 #if 0
-		static bool mtu0_(channel ch, bool ena, option opt) noexcept
+		static bool mtu0_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
 			///< P34 ( 27)  MTIOC0A
 			///< PB3 ( 98)  MTIOC0A / MTIOC4A
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
 				case option::FIRST:
 					PORT3::PMR.B4 = 0;
@@ -117,7 +117,7 @@ namespace device {
 			///< P15 ( 50)  MTIOC0B / MTCLKB
 			///< P13 ( 52)  MTIOC0B
 			///< PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
 				case option::FIRST:
 					PORT1::PMR.B5 = 0;
@@ -141,7 +141,7 @@ namespace device {
 				break;
 			///< P32 ( 29)  MTIOC0C
 			///< PB1 (100)  MTIOC0C / MTIOC4C
-			case channel::C:
+			case CHANNEL::C:
 				switch(opt) {
 				case option::FIRST:
 					PORT3::PMR.B2 = 0;
@@ -160,7 +160,7 @@ namespace device {
 				break;
 			///< P33 ( 28)  MTIOC0D
 			///< PA3 (110)  MTIOC0D / MTCLKD
-			case channel::D:
+			case CHANNEL::D:
 				switch(opt) {
 				case option::FIRST:
 					PORT3::PMR.B3 = 0;
@@ -185,7 +185,7 @@ namespace device {
 		}
 
 
-		static bool mtu1_(channel ch, bool ena, option opt) noexcept
+		static bool mtu1_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -193,7 +193,7 @@ namespace device {
 			///< P20 ( 45)  MTIOC1A
 			///< P21 ( 44)  MTIOC1B / MTIOC4A
 			///< PB5 ( 96)  MTIOC2A / MTIOC1B
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -205,7 +205,7 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -230,7 +230,7 @@ namespace device {
 		}
 
 
-		static bool mtu2_(channel ch, bool ena, option opt) noexcept
+		static bool mtu2_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -238,7 +238,7 @@ namespace device {
 			///< P26 ( 37)  MTIOC2A
 			///< PB5 ( 96)  MTIOC2A / MTIOC1B
 			///< P27 ( 36)  MTIOC2B
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B6 = 0;
@@ -255,7 +255,7 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B7 = 0;
@@ -275,7 +275,7 @@ namespace device {
 		}
 
 
-		static bool mtu3_(channel ch, bool ena, option opt) noexcept
+		static bool mtu3_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -284,7 +284,7 @@ namespace device {
 			///< P14 ( 51)  MTIOC3A / MTCLKA
 			///< PC7 ( 76)  MTIOC3A / MTCLKB
 			///< PC1 ( 89)  MTIOC3A
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
 				case option::FIRST:
 					PORT1::PMR.B7 = 0;
@@ -315,7 +315,7 @@ namespace device {
 			///< PC5 ( 78)  MTIOC3B / MTCLKD
 			///< P80 ( 81)  MTIOC3B
 			///< PB7 ( 94)  MTIOC3B
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B2 = 0;
@@ -347,7 +347,7 @@ namespace device {
 			///< P16 ( 48)  MTIOC3C / MTIOC3D
 			///< PC6 ( 77)  MTIOC3C / MTCLKA
 			///< PC0 ( 91)  MTIOC3C
-			case channel::C:
+			case CHANNEL::C:
 				switch(opt) {
 				case option::FIRST:
 					PORTJ::PMR.B3 = 0;
@@ -384,7 +384,7 @@ namespace device {
 			///< PC4 ( 82)  MTIOC3D / MTCLKC
 			///< PB6 ( 95)  MTIOC3D
 			///< PE0 (135)  MTIOC3D
-			case channel::D:
+			case CHANNEL::D:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B3 = 0;
@@ -424,7 +424,7 @@ namespace device {
 		}
 
 
-		static bool mtu4_(channel ch, bool ena, option opt) noexcept
+		static bool mtu4_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -433,7 +433,7 @@ namespace device {
 			///< P82 ( 79)  MTIOC4A
 			///< PA0 (118)  MTIOC4A / MTIOC6D
 			///< PE2 (133)  MTIOC4A
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B4 = 0;
@@ -465,7 +465,7 @@ namespace device {
 			///< PC2 ( 86)  MTIOC4B
 			///< PE3 (132)  MTIOC4B
 			///< PD1 (156)  MTIOC4B
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
 				case option::FIRST:
 					PORT3::PMR.B0 = 0;
@@ -502,7 +502,7 @@ namespace device {
 			///< P83 ( 74)  MTIOC4C
 			///< PE5 (130)  MTIOC4C / MTIOC2B
 			///< PE1 (134)  MTIOC4C / MTIOC3B
-			case channel::C:
+			case CHANNEL::C:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B5 = 0;
@@ -540,7 +540,7 @@ namespace device {
 			///< PC3 ( 83)  MTIOC4D
 			///< PE4 (131)  MTIOC4D / MTIOC1A
 			///< PD2 (154)  MTIOC4D
-			case channel::D:
+			case CHANNEL::D:
 				switch(opt) {
 				case option::FIRST:
 					PORT3::PMR.B1 = 0;
@@ -585,7 +585,7 @@ namespace device {
 		}
 
 
-		static bool mtu5_(channel ch, bool ena, option opt) noexcept
+		static bool mtu5_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -593,7 +593,7 @@ namespace device {
 			///< P12 ( 53)  MTIC5U
 			///< PA4 (109)  MTIC5U / MTCLKA
 			///< PD7 (143)  MTIC5U
-			case channel::U:
+			case CHANNEL::U:
 				switch(opt) {
 				case option::FIRST:
 					PORT1::PMR.B2 = 0;
@@ -618,7 +618,7 @@ namespace device {
 			///< P11 ( 67)  MTIC5V
 			///< PA6 (107)  MTIC5V / MTCLKB
 			///< PD6 (145)  MTIC5V / MTIOC8A
-			case channel::V:
+			case CHANNEL::V:
 				switch(opt) {
 				case option::FIRST:
 					PORT1::PMR.B1 = 0;
@@ -643,7 +643,7 @@ namespace device {
 			///< P10 ( 68)  MTIC5W
 			///< PB0 (104)  MTIC5W
 			///< PD5 (147)  MTIC5W / MTIOC8C / MTCLKA
-			case channel::W:
+			case CHANNEL::W:
 				switch(opt) {
 				case option::FIRST:
 					PORT1::PMR.B0 = 0;
@@ -673,7 +673,7 @@ namespace device {
 		}
 
 
-		static bool mtu6_(channel ch, bool ena, option opt) noexcept
+		static bool mtu6_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -685,7 +685,7 @@ namespace device {
 			///< P85 ( 61)  MTIOC6C
 			///< PE6 (126)  MTIOC6C
 			///< P84 ( 62)  MTIOC6D
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
 				case option::FIRST:
 					PORTJ::PMR.B1 = 0;
@@ -702,7 +702,7 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
 				case option::FIRST:
 					PORTJ::PMR.B0 = 0;
@@ -719,7 +719,7 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::C:
+			case CHANNEL::C:
 				switch(opt) {
 				case option::FIRST:
 					PORT8::PMR.B5 = 0;
@@ -736,7 +736,7 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::D:
+			case CHANNEL::D:
 				switch(opt) {
 				case option::FIRST:
 					PORT8::PMR.B4 = 0;
@@ -756,7 +756,7 @@ namespace device {
 		}
 
 
-		static bool mtu7_(channel ch, bool ena, option opt) noexcept
+		static bool mtu7_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -764,7 +764,7 @@ namespace device {
 			///< PA2 (112)  MTIOC7A
 			///< P67 (120)  MTIOC7C
 			///< P66 (122)  MTIOC7D
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
 				case option::FIRST:
 					PORTA::PMR.B2 = 0;
@@ -776,7 +776,7 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::C:
+			case CHANNEL::C:
 				switch(opt) {
 				case option::FIRST:
 					PORT6::PMR.B7 = 0;
@@ -788,7 +788,7 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::D:
+			case CHANNEL::D:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -808,14 +808,14 @@ namespace device {
 		}
 
 
-		static bool mtu8_(channel ch, bool ena, option opt) noexcept
+		static bool mtu8_(CHANNEL ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
 			///< PD4 (148)  MTIOC8B
 			///< PD3 (150)  MTIOC8D
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
 				case option::FIRST:
 					PORTD::PMR.B4 = 0;
@@ -827,7 +827,7 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::D:
+			case CHANNEL::D:
 				switch(opt) {
 				case option::FIRST:
 					PORTD::PMR.B3 = 0;
@@ -859,7 +859,7 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, channel ch, bool ena = true, option opt = option::FIRST)
+		static bool turn(peripheral t, CHANNEL ch, bool ena = true, ORDER opt = ORDER::FIRST)
 			noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
@@ -871,22 +871,22 @@ namespace device {
 			case peripheral::MTU0:
 				sel = ena ? 0b00001 : 0;
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;  // MTIOC0A (32/100)
 					PORTB::PMR.B3 = ena;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					PORTB::PMR.B2 = 0;
 					MPC::PB2PFS.PSEL = sel;  // MTIOC0B (33/100)
 					PORTB::PMR.B2 = ena;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					PORTB::PMR.B1 = 0;
 					MPC::PB1PFS.PSEL = sel;  // MTIOC0C (34/100)
 					PORTB::PMR.B1 = ena;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					PORTB::PMR.B0 = 0;
 					MPC::PB0PFS.PSEL = sel;  // MTIOC0D (35/100)
 					PORTB::PMR.B0 = ena;
@@ -899,13 +899,13 @@ namespace device {
 
 			case peripheral::MTU1:
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					sel = ena ? 0b00001 : 0;
 					PORTA::PMR.B5 = 0;
 					MPC::PA5PFS.PSEL = sel;  // MTIOC1A (36/100)
 					PORTA::PMR.B5 = ena;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					sel = ena ? 0b00001 : 0;
 					PORTA::PMR.B4 = 0;
 					MPC::PA4PFS.PSEL = sel;  // MTIOC1B (37/100)
@@ -919,12 +919,12 @@ namespace device {
 
 			case peripheral::MTU2:
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					PORTA::PMR.B3 = 0;
 					MPC::PA3PFS.PSEL = sel;  // MTIOC2A (38/100)
 					PORTA::PMR.B3 = ena;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					PORTA::PMR.B2 = 0;
 					MPC::PA2PFS.PSEL = sel;  // MTIOC2B (39/100)
 					PORTA::PMR.B2 = ena;
@@ -937,22 +937,22 @@ namespace device {
 
 			case peripheral::MTU3:
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					PORT3::PMR.B3 = 0;
 					MPC::P33PFS.PSEL = sel;  // MTIOC3A (58/100)
 					PORT3::PMR.B3 = ena;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					PORT7::PMR.B1 = 0;
 					MPC::P71PFS.PSEL = sel;  // MTIOC3B (56/100)
 					PORT7::PMR.B1 = ena;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					PORT3::PMR.B2 = 0;
 					MPC::P32PFS.PSEL = sel;  // MTIOC3C (59/100)
 					PORT3::PMR.B2 = ena;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					PORT7::PMR.B4 = 0;
 					MPC::P74PFS.PSEL = sel;  // MTIOC3D (53/100)
 					PORT7::PMR.B4 = ena;
@@ -965,22 +965,22 @@ namespace device {
 
 			case peripheral::MTU4:
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					PORT7::PMR.B2 = 0;
 					MPC::P72PFS.PSEL = sel;  // MTIOC4A (55/100)
 					PORT7::PMR.B2 = ena;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					PORT7::PMR.B3 = 0;
 					MPC::P73PFS.PSEL = sel;  // MTIOC4B (54/100)
 					PORT7::PMR.B3 = ena;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					PORT7::PMR.B5 = 0;
 					MPC::P75PFS.PSEL = sel;  // MTIOC4C (52/100)
 					PORT7::PMR.B5 = ena;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					PORT7::PMR.B6 = 0;
 					MPC::P76PFS.PSEL = sel;  // MTIOC4D (51/100)
 					PORT7::PMR.B6 = ena;
@@ -993,33 +993,33 @@ namespace device {
 
 			case peripheral::MTU5:
 				switch(ch) {
-				case channel::U:
+				case CHANNEL::U:
 					PORT2::PMR.B4 = 0;
 					MPC::P24PFS.PSEL = sel;  // MTIOC5U (64/100)
 					PORT2::PMR.B4 = ena;
 					break;
-				case channel::V:
+				case CHANNEL::V:
 					PORT2::PMR.B3 = 0;
 					MPC::P23PFS.PSEL = sel;  // MTIOC5V (65/100)
 					PORT2::PMR.B3 = ena;
 					break;
-				case channel::W:
+				case CHANNEL::W:
 					PORT2::PMR.B2 = 0;
 					MPC::P22PFS.PSEL = sel;  // MTIOC5W (66/100)
 					PORT2::PMR.B2 = ena;
 					break;
 #if 0
-				case channel::U2:
+				case CHANNEL::U2:
 					PORT8::PMR.B2 = 0;
 					MPC::P82PFS.PSEL = sel;  // MTIOC5U (96/100)
 					PORT8::PMR.B2 = ena;
 					break;
-				case channel::V2:
+				case CHANNEL::V2:
 					PORT8::PMR.B1 = 0;
 					MPC::P81PFS.PSEL = sel;  // MTIOC5V (97/100)
 					PORT8::PMR.B1 = ena;
 					break;
-				case channel::W2:
+				case CHANNEL::W2:
 					PORT8::PMR.B0 = 0;
 					MPC::P80PFS.PSEL = sel;  // MTIOC5W (98/100)
 					PORT8::PMR.B0 = ena;
@@ -1033,22 +1033,22 @@ namespace device {
 
 			case peripheral::MTU6:
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					PORTA::PMR.B1 = 0;
 					MPC::PA1PFS.PSEL = sel;  // MTIOC6A (40/100)
 					PORTA::PMR.B1 = ena;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					PORT9::PMR.B5 = 0;
 					MPC::P95PFS.PSEL = sel;  // MTIOC6B (45/100)
 					PORT9::PMR.B5 = ena;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					PORTA::PMR.B0 = 0;
 					MPC::PA0PFS.PSEL = sel;  // MTIOC6C (41/100)
 					PORTA::PMR.B0 = ena;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					PORT9::PMR.B2 = 0;
 					MPC::P92PFS.PSEL = sel;  // MTIOC6D (48/100)
 					PORT9::PMR.B2 = ena;
@@ -1061,22 +1061,22 @@ namespace device {
 
 			case peripheral::MTU7:
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					PORT9::PMR.B4 = 0;
 					MPC::P94PFS.PSEL = sel;  // MTIOC7A (46/100)
 					PORT9::PMR.B4 = ena;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					PORT9::PMR.B3 = 0;
 					MPC::P93PFS.PSEL = sel;  // MTIOC7B (47/100)
 					PORT9::PMR.B3 = ena;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					PORT9::PMR.B1 = 0;
 					MPC::P91PFS.PSEL = sel;  // MTIOC7C (49/100)
 					PORT9::PMR.B1 = ena;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					PORT9::PMR.B0 = 0;
 					MPC::P90PFS.PSEL = sel;  // MTIOC7D (50/100)
 					PORT9::PMR.B0 = ena;
@@ -1089,22 +1089,22 @@ namespace device {
 
 			case peripheral::MTU9:
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					PORTD::PMR.B7 = 0;
 					MPC::PD7PFS.PSEL = sel;  // MTIOC9A (18/100)
 					PORTD::PMR.B7 = ena;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					PORTE::PMR.B0 = 0;
 					MPC::PE0PFS.PSEL = sel;  // MTIOC9B (17/100)
 					PORTE::PMR.B0 = ena;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					PORTD::PMR.B6 = 0;
 					MPC::PD6PFS.PSEL = sel;  // MTIOC9C (19/100)
 					PORTD::PMR.B6 = ena;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					PORTE::PMR.B1 = 0;
 					MPC::PE1PFS.PSEL = sel;  // MTIOC9D (16/100)
 					PORTE::PMR.B1 = ena;
@@ -1137,7 +1137,7 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, channel ch, bool ena = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, option opt = option::FIRST) noexcept
 		{
 			if(opt == option::BYPASS) return true;
 
@@ -1192,12 +1192,12 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_clock(group grp, channel ch, bool ena = true) noexcept
+		static bool turn_clock(GROUP grp, CHANNEL ch, bool ena = true) noexcept
 		{
 			bool ret = true;
 
 #if 0
-				case channel::CLK_AB:
+				case CHANNEL::CLK_AB:
 					sel = ena ? 0b00010 : 0;
 					if(opt == option::FIRST) {
 						PORT3::PMR.B3 = 0;
@@ -1218,7 +1218,7 @@ namespace device {
 					}
 					break;
 
-				case channel::CLK_A:
+				case CHANNEL::CLK_A:
 					sel = ena ? 0b00010 : 0;
 					if(opt == option::FIRST) {
 						PORT3::PMR.B3 = 0;
@@ -1238,7 +1238,7 @@ namespace device {
 						ret = false;
 					}
 					break;
-				case channel::CLK_CD:
+				case CHANNEL::CLK_CD:
 					sel = ena ? 0b00010 : 0;
 					if(opt == option::FIRST) {
 						PORT3::PMR.B1 = 0;

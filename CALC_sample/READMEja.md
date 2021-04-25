@@ -1,4 +1,4 @@
-Renesas RX65N/RX72N Envision Kit 電卓サンプル
+Renesas RX65N/RX72N Envision Kit 関数電卓サンプル
 =========
 
 <img src="../docs/calc_sample.jpg" width="50%">
@@ -24,13 +24,13 @@ Renesas RX65N/RX72N Envision Kit 電卓サンプル
  - RX71M/Makefile
  - RX66T/Makefile
  - RX72T/Makefile
- - RX65N/Makefile (LCD 対応)
- - RX72N/Makefile (LCD 対応)
+ - RX65N/Makefile (LCD GUI 対応)
+ - RX72N/Makefile (LCD GUI 対応)
    
 ### 利用ライブラリ
 
- - libgmp.a
- - libmpfr.a
+ - rxlib/lib/libgmp.a
+ - rxlib/lib/libmpfr.a
 
 ### 主な利用クラス
 
@@ -47,23 +47,25 @@ Renesas RX65N/RX72N Envision Kit 電卓サンプル
 
 |関数名|機能|
 |---|-------|
-|sin|サイン|
-|cos|コサイン|
-|tan|タンジェント|
-|asin|アークサイン|
-|acos|アークコサイン|
-|atan|アークタンジェント|
-|log|ログ(基数１０)|
-|ln|ログ|
+|sin|正弦（サイン）|
+|cos|余弦（コサイン）|
+|tan|正接（タンジェント）|
+|asin|逆正弦（アークサイン）|
+|acos|逆余弦（アークコサイン）|
+|atan|逆正接（アークタンジェント）|
+|log|基数 10 の対数関数|
+|ln|基数 e の対数関数|
 |x^y|X の Y 乗|
-|x^-1|X の -1 乗|
+|x^-1|X の -1 乗（逆数）|
 |x^2|二乗|
-|sqrt|ルート|
+|sqrt|平方根（ルート）|
 |exp|エクスポーネント１０|
 |π|円周率|
 |Deg|角度法、360|
-|Rad|角度法、２π|
+|Rad|角度法、2 π|
 |Grad|角度法、400|
+
+---
 
 ## 今後の予定
 

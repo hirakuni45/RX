@@ -141,7 +141,7 @@ namespace {
 			if(cmd_.get_word(1, tmp, sizeof(tmp))) {
 				int freq = 0;
 				if((utils::input("%d", tmp) % freq).status()) {
-					mtu_io_.set_freq(MTU_IO::mtu_type::channel::A, freq);
+					mtu_io_.set_freq(MTU_IO::mtu_type::CHANNEL::A, freq);
 					utils::format("Freq: %d [Hz]\n") % freq;
 				}
 			}
@@ -222,7 +222,7 @@ int main(int argc, char** argv)
 	{  // MTU0 の初期化
 		uint32_t frq = 96000;
 		uint8_t intr = 4;
-		auto ret = mtu_io_.start_normal(MTU_IO::mtu_type::channel::A, MTU_IO::OUTPUT::NONE, frq, intr);
+		auto ret = mtu_io_.start_normal(MTU_IO::mtu_type::CHANNEL::A, MTU_IO::OUTPUT::NONE, frq, intr);
 		if(!ret) {
 			utils::format("MTU0 Not start...\n");
 		}

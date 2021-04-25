@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,6 +19,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
 	struct flash_t {
+
+		static const auto DATA_SIZE = 8192;
+		static const uint32_t DATA_BLOCK_SIZE = 64;
+		static const auto ID_NUM = 4;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -367,10 +371,10 @@ namespace device {
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x007FC350> UIDR0_;
-		typedef rw32_t<0x007FC354> UIDR1_;
-		typedef rw32_t<0x007FC358> UIDR2_;
-		typedef rw32_t<0x007FC35C> UIDR3_;
+		typedef ro32_t<0x007FC350> UIDR0_;
+		typedef ro32_t<0x007FC354> UIDR1_;
+		typedef ro32_t<0x007FC358> UIDR2_;
+		typedef ro32_t<0x007FC35C> UIDR3_;
 		static UIDR0_ UIDR0;
 		static UIDR1_ UIDR1;
 		static UIDR2_ UIDR2;

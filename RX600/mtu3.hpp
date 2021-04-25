@@ -1294,10 +1294,10 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  クロックソース(MTU0)
+			@brief  クロックソース型(MTU0)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -1317,23 +1317,23 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  入出力チャネル(MTU0)
+			@brief  入出力チャネル型(MTU0)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
-			A,  ///< PB3 / MTIOC0A (LFQFP100:32)
-			B,  ///< PB2 / MTIOC0B (LFQFP100:33)
-			C,  ///< PB1 / MTIOC0C (LFQFP100:34)
-			D,  ///< PB0 / MTIOC0D (LFQFP100:35)
+		enum class CHANNEL : uint8_t {
+			A,
+			B,
+			C,
+			D,
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  割り込み要因(MTU0)
+			@brief  割り込み要因型(MTU0)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			C,		///< TGIC
@@ -1358,26 +1358,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートマッピングチャネルを取得
-			@param[in]	ch	チャネル
+			@brief  ポートマッピングチャネル型を取得
+			@param[in]	ch	チャネル型
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
-			case channel::C:
-				ret = port_map_mtu::channel::C;
+			case CHANNEL::C:
+				ret = port_map_mtu::CHANNEL::C;
 				break;
-			case channel::D:
-				ret = port_map_mtu::channel::D;
+			case CHANNEL::D:
+				ret = port_map_mtu::CHANNEL::D;
 				break;
 			default:
 				break;
@@ -1445,19 +1445,19 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					TIORH.IOB = val;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					TIORL.IOC = val;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					TIORL.IOD = val;
 					break;
 				default:
@@ -1473,19 +1473,19 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					return TIORL.IOC();
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					return TIORL.IOD();
 					break;
 				default:
@@ -1612,15 +1612,15 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA0;
-			case interrupt::B:   return INT::TGIB0;
-			case interrupt::C:   return INT::TGIC0;
-			case interrupt::D:   return INT::TGID0;
-			case interrupt::OVF: return INT::TCIV0;
-			case interrupt::E:   return INT::TGIE0;
-			case interrupt::F:   return INT::TGIF0;
+			case INTERRUPT::A:   return INT::TGIA0;
+			case INTERRUPT::B:   return INT::TGIB0;
+			case INTERRUPT::C:   return INT::TGIC0;
+			case INTERRUPT::D:   return INT::TGID0;
+			case INTERRUPT::OVF: return INT::TCIV0;
+			case INTERRUPT::E:   return INT::TGIE0;
+			case INTERRUPT::F:   return INT::TGIF0;
 			}
 			return INT::NONE;
 		}
@@ -1662,7 +1662,7 @@ namespace device {
 			@brief  クロックソース(MTU1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -1683,7 +1683,7 @@ namespace device {
 			@brief  入出力チャネル(MTU1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,  ///< MTIOC1A
 			B,  ///< MTIOC1B
 		};
@@ -1694,7 +1694,7 @@ namespace device {
 			@brief  割り込み要因(MTU1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			OVF,	///< TCIV オーバーフロー
@@ -1721,15 +1721,15 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
 			default:
 				break;
@@ -1809,13 +1809,13 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					TIORH.IOB = val;
 					break;
 				default:
@@ -1831,13 +1831,13 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
 				default:
@@ -1960,12 +1960,12 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA1;
-			case interrupt::B:   return INT::TGIB1;
-			case interrupt::OVF: return INT::TCIV1;
-			case interrupt::UDF: return INT::TCIU1;
+			case INTERRUPT::A:   return INT::TGIA1;
+			case INTERRUPT::B:   return INT::TGIB1;
+			case INTERRUPT::OVF: return INT::TCIV1;
+			case INTERRUPT::UDF: return INT::TCIU1;
 			}
 			return INT::NONE;
 		}
@@ -2005,7 +2005,7 @@ namespace device {
 			@brief  クロックソース(MTU2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -2026,7 +2026,7 @@ namespace device {
 			@brief  入出力チャネル(MTU2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,  ///< PA3 / MTIOC2A (LFQFP100:38)
 			B,  ///< PA2 / MTIOC2B (LFQFP100:39)
 		};
@@ -2037,7 +2037,7 @@ namespace device {
 			@brief  割り込み要因(MTU2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			OVF,	///< TCIV オーバーフロー
@@ -2064,15 +2064,15 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
 			default:
 				break;
@@ -2131,13 +2131,13 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					TIORH.IOB = val;
 					break;
 				default:
@@ -2153,13 +2153,13 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
 				default:
@@ -2232,12 +2232,12 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA2;
-			case interrupt::B:   return INT::TGIB2;
-			case interrupt::OVF: return INT::TCIV2;
-			case interrupt::UDF: return INT::TCIU2;
+			case INTERRUPT::A:   return INT::TGIA2;
+			case INTERRUPT::B:   return INT::TGIB2;
+			case INTERRUPT::OVF: return INT::TCIV2;
+			case INTERRUPT::UDF: return INT::TCIU2;
 			}
 			return INT::NONE;
 		}
@@ -2272,7 +2272,7 @@ namespace device {
 			@brief  クロックソース(MTU3)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -2292,7 +2292,7 @@ namespace device {
 			@brief  入出力チャネル(MTU3)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,  ///< P33 / MTIOC3A (LFQFP100:58)
 			B,  ///< P71 / MTIOC3B (LFQFP100:56)
 			C,  ///< P32 / MTIOC3C (LFQFP100:59)
@@ -2305,7 +2305,7 @@ namespace device {
 			@brief  割り込み要因(MTU3)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			C,		///< TGIC
@@ -2333,21 +2333,21 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
-			case channel::C:
-				ret = port_map_mtu::channel::C;
+			case CHANNEL::C:
+				ret = port_map_mtu::CHANNEL::C;
 				break;
-			case channel::D:
-				ret = port_map_mtu::channel::D;
+			case CHANNEL::D:
+				ret = port_map_mtu::CHANNEL::D;
 				break;
 			default:
 				break;
@@ -2415,20 +2415,20 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					MTU::TOERA.OE3B = 1;
 					TIORH.IOB = val;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					TIORL.IOC = val;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					MTU::TOERA.OE3D = 1;
 					TIORL.IOD = val;
 					break;
@@ -2445,19 +2445,19 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					return TIORL.IOC();
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					return TIORL.IOD();
 					break;
 				default:
@@ -2566,13 +2566,13 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA3;
-			case interrupt::B:   return INT::TGIB3;
-			case interrupt::C:   return INT::TGIC3;
-			case interrupt::D:   return INT::TGID3;
-			case interrupt::OVF: return INT::TCIV3;
+			case INTERRUPT::A:   return INT::TGIA3;
+			case INTERRUPT::B:   return INT::TGIB3;
+			case INTERRUPT::C:   return INT::TGIC3;
+			case INTERRUPT::D:   return INT::TGID3;
+			case INTERRUPT::OVF: return INT::TCIV3;
 			}
 			return INT::NONE;
 		}
@@ -2612,7 +2612,7 @@ namespace device {
 			@brief  クロックソース(MTU4)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -2632,7 +2632,7 @@ namespace device {
 			@brief  入出力チャネル(MTU4)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,  ///< P72 / MTIOC4A (LFQFP100:55)
 			B,  ///< P73 / MTIOC4B (LFQFP100:54)
 			C,  ///< P75 / MTIOC4C (LFQFP100:52)
@@ -2645,7 +2645,7 @@ namespace device {
 			@brief  割り込み要因(MTU4)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			C,		///< TGIC
@@ -2673,21 +2673,21 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
-			case channel::C:
-				ret = port_map_mtu::channel::C;
+			case CHANNEL::C:
+				ret = port_map_mtu::CHANNEL::C;
 				break;
-			case channel::D:
-				ret = port_map_mtu::channel::D;
+			case CHANNEL::D:
+				ret = port_map_mtu::CHANNEL::D;
 				break;
 			default:
 				break;
@@ -2755,22 +2755,22 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					MTU::TOERA.OE4A = 1;
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					MTU::TOERA.OE4B = 1;
 					TIORH.IOB = val;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					MTU::TOERA.OE4C = 1;
 					TIORL.IOC = val;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					MTU::TOERA.OE4D = 1;
 					TIORL.IOD = val;
 					break;
@@ -2787,19 +2787,19 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					return TIORL.IOC();
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					return TIORL.IOD();
 					break;
 				default:
@@ -2982,13 +2982,13 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA4;
-			case interrupt::B:   return INT::TGIB4;
-			case interrupt::C:   return INT::TGIC4;
-			case interrupt::D:   return INT::TGID4;
-			case interrupt::OVF: return INT::TCIV4;
+			case INTERRUPT::A:   return INT::TGIA4;
+			case INTERRUPT::B:   return INT::TGIB4;
+			case INTERRUPT::C:   return INT::TGIC4;
+			case INTERRUPT::D:   return INT::TGID4;
+			case INTERRUPT::OVF: return INT::TCIV4;
 			}
 			return INT::NONE;
 		}
@@ -3034,7 +3034,7 @@ namespace device {
 			@brief  クロックソース(MTU5)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -3053,7 +3053,7 @@ namespace device {
 			@brief  入出力チャネル(MTU5)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			U,   ///< P24 / MTIOC5U (LFQFP100:64)
 			V,   ///< P23 / MTIOC5V (LFQFP100:65)
 			W,   ///< P22 / MTIOC5W (LFQFP100:66)
@@ -3065,7 +3065,7 @@ namespace device {
 			@brief  割り込み要因(MTU5)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			U,		///< TGIU
 			V,		///< TGIV
 			W,		///< TGIW
@@ -3079,18 +3079,18 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::U:
-				ret = port_map_mtu::channel::U;
+			case CHANNEL::U:
+				ret = port_map_mtu::CHANNEL::U;
 				break;
-			case channel::V:
-				ret = port_map_mtu::channel::V;
+			case CHANNEL::V:
+				ret = port_map_mtu::CHANNEL::V;
 				break;
-			case channel::W:
-				ret = port_map_mtu::channel::W;
+			case CHANNEL::W:
+				ret = port_map_mtu::CHANNEL::W;
 				break;
 			default:
 				break;
@@ -3340,11 +3340,11 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::U:   return INT::TGIU5;
-			case interrupt::V:   return INT::TGIV5;
-			case interrupt::W:   return INT::TGIW5;
+			case INTERRUPT::U:   return INT::TGIU5;
+			case INTERRUPT::V:   return INT::TGIV5;
+			case INTERRUPT::W:   return INT::TGIW5;
 			}
 			return INT::NONE;
 		}
@@ -3384,7 +3384,7 @@ namespace device {
 			@brief  クロックソース(MTU6)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -3404,7 +3404,7 @@ namespace device {
 			@brief  入出力チャネル(MTU6)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,  ///< PA1 / MTIOC6A (LFQFP100:40)
 			B,  ///< P95 / MTIOC6B (LFQFP100:45)
 			C,  ///< PA0 / MTIOC6C (LFQFP100:41)
@@ -3417,7 +3417,7 @@ namespace device {
 			@brief  割り込み要因(MTU6)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			C,		///< TGIC
@@ -3445,21 +3445,21 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
-			case channel::C:
-				ret = port_map_mtu::channel::C;
+			case CHANNEL::C:
+				ret = port_map_mtu::CHANNEL::C;
 				break;
-			case channel::D:
-				ret = port_map_mtu::channel::D;
+			case CHANNEL::D:
+				ret = port_map_mtu::CHANNEL::D;
 				break;
 			default:
 				break;
@@ -3527,19 +3527,19 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					TIORH.IOB = val;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					TIORL.IOC = val;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					TIORL.IOD = val;
 					break;
 				default:
@@ -3555,19 +3555,19 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					return TIORL.IOC();
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					return TIORL.IOD();
 					break;
 				default:
@@ -3703,13 +3703,13 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA6;
-			case interrupt::B:   return INT::TGIB6;
-			case interrupt::C:   return INT::TGIC6;
-			case interrupt::D:   return INT::TGID6;
-			case interrupt::OVF: return INT::TCIV6;
+			case INTERRUPT::A:   return INT::TGIA6;
+			case INTERRUPT::B:   return INT::TGIB6;
+			case INTERRUPT::C:   return INT::TGIC6;
+			case INTERRUPT::D:   return INT::TGID6;
+			case INTERRUPT::OVF: return INT::TCIV6;
 			}
 			return INT::NONE;
 		}
@@ -3750,7 +3750,7 @@ namespace device {
 			@brief  クロックソース(MTU7)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -3770,7 +3770,7 @@ namespace device {
 			@brief  入出力チャネル(MTU7)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,  ///< P94 / MTIOC7A (LFQFP100:46)
 			B,  ///< P93 / MTIOC7B (LFQFP100:47)
 			C,  ///< P91 / MTIOC7C (LFQFP100:49)
@@ -3783,7 +3783,7 @@ namespace device {
 			@brief  割り込み要因(MTU7)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			C,		///< TGIC
@@ -3811,21 +3811,21 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
-			case channel::C:
-				ret = port_map_mtu::channel::C;
+			case CHANNEL::C:
+				ret = port_map_mtu::CHANNEL::C;
 				break;
-			case channel::D:
-				ret = port_map_mtu::channel::D;
+			case CHANNEL::D:
+				ret = port_map_mtu::CHANNEL::D;
 				break;
 			default:
 				break;
@@ -3893,19 +3893,19 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					TIORH.IOB = val;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					TIORL.IOC = val;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					TIORL.IOD = val;
 					break;
 				default:
@@ -3921,19 +3921,19 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					return TIORL.IOC();
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					return TIORL.IOD();
 					break;
 				default:
@@ -4116,13 +4116,13 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA7;
-			case interrupt::B:   return INT::TGIB7;
-			case interrupt::C:   return INT::TGIC7;
-			case interrupt::D:   return INT::TGID7;
-			case interrupt::OVF: return INT::TCIV7;
+			case INTERRUPT::A:   return INT::TGIA7;
+			case INTERRUPT::B:   return INT::TGIB7;
+			case INTERRUPT::C:   return INT::TGIC7;
+			case INTERRUPT::D:   return INT::TGID7;
+			case INTERRUPT::OVF: return INT::TCIV7;
 			}
 			return INT::NONE;
 		}
@@ -4168,7 +4168,7 @@ namespace device {
 			@brief  クロックソース(MTU8)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -4188,7 +4188,7 @@ namespace device {
 			@brief  入出力チャネル(MTU7)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,  ///< P94 / MTIOC7A (LFQFP100:46)
 			B,  ///< P93 / MTIOC7B (LFQFP100:47)
 			C,  ///< P91 / MTIOC7C (LFQFP100:49)
@@ -4201,7 +4201,7 @@ namespace device {
 			@brief  割り込み要因(MTU7)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			C,		///< TGIC
@@ -4229,21 +4229,21 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
-			case channel::C:
-				ret = port_map_mtu::channel::C;
+			case CHANNEL::C:
+				ret = port_map_mtu::CHANNEL::C;
 				break;
-			case channel::D:
-				ret = port_map_mtu::channel::D;
+			case CHANNEL::D:
+				ret = port_map_mtu::CHANNEL::D;
 				break;
 			default:
 				break;
@@ -4311,19 +4311,19 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					TIORH.IOB = val;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					TIORL.IOC = val;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					TIORL.IOD = val;
 					break;
 				default:
@@ -4339,19 +4339,19 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					return TIORL.IOC();
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					return TIORL.IOD();
 					break;
 				default:
@@ -4433,13 +4433,13 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA8;
-			case interrupt::B:   return INT::TGIB8;
-			case interrupt::C:   return INT::TGIC8;
-			case interrupt::D:   return INT::TGID8;
-			case interrupt::OVF: return INT::TCIV8;
+			case INTERRUPT::A:   return INT::TGIA8;
+			case INTERRUPT::B:   return INT::TGIB8;
+			case INTERRUPT::C:   return INT::TGIC8;
+			case INTERRUPT::D:   return INT::TGID8;
+			case INTERRUPT::OVF: return INT::TCIV8;
 			}
 			return INT::NONE;
 		}
@@ -4476,7 +4476,7 @@ namespace device {
 			@brief  クロックソース(MTU9)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class clock_source : uint8_t {
+		enum class CLOCK_SOURCE : uint8_t {
 			PCLKA      = 0b000000,	///< PCLKA / 1
 			PCLKA_4    = 0b000001,	///< PCLKA / 4
 			PCLKA_16   = 0b000010,	///< PCLKA / 16
@@ -4499,7 +4499,7 @@ namespace device {
 			@brief  入出力チャネル(MTU9)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,  ///< PD7 / MTIOC9A (LFQFP100:18)
 			B,  ///< PE0 / MTIOC9B (LFQFP100:17)
 			C,  ///< PD6 / MTIOC9C (LFQFP100:19)
@@ -4512,7 +4512,7 @@ namespace device {
 			@brief  割り込み要因(MTU9)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class interrupt : uint8_t {
+		enum class INTERRUPT : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
 			C,		///< TGIC
@@ -4542,21 +4542,21 @@ namespace device {
 			@return ポート・マッピング・チャネル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_port_map_channel(channel ch)
+		static auto get_port_map_channel(CHANNEL ch)
 		{
-			auto ret = port_map_mtu::channel::NONE;
+			auto ret = port_map_mtu::CHANNEL::NONE;
 			switch(ch) {
-			case channel::A:
-				ret = port_map_mtu::channel::A;
+			case CHANNEL::A:
+				ret = port_map_mtu::CHANNEL::A;
 				break;
-			case channel::B:
-				ret = port_map_mtu::channel::B;
+			case CHANNEL::B:
+				ret = port_map_mtu::CHANNEL::B;
 				break;
-			case channel::C:
-				ret = port_map_mtu::channel::C;
+			case CHANNEL::C:
+				ret = port_map_mtu::CHANNEL::C;
 				break;
-			case channel::D:
-				ret = port_map_mtu::channel::D;
+			case CHANNEL::D:
+				ret = port_map_mtu::CHANNEL::D;
 				break;
 			default:
 				break;
@@ -4624,19 +4624,19 @@ namespace device {
 				@param[in]	val	設定値
 			*/
 			//-------------------------------------------------------------//
-			bool set(channel ch, uint8_t val)
+			bool set(CHANNEL ch, uint8_t val)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					TIORH.IOA = val;
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					TIORH.IOB = val;
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					TIORL.IOC = val;
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					TIORL.IOD = val;
 					break;
 				default:
@@ -4652,19 +4652,19 @@ namespace device {
 				@param[in]	ch	チャネル
 			*/
 			//-------------------------------------------------------------//
-			uint8_t get(channel ch)
+			uint8_t get(CHANNEL ch)
 			{
 				switch(ch) {
-				case channel::A:
+				case CHANNEL::A:
 					return TIORH.IOA();
 					break;
-				case channel::B:
+				case CHANNEL::B:
 					return TIORH.IOB();
 					break;
-				case channel::C:
+				case CHANNEL::C:
 					return TIORL.IOC();
 					break;
-				case channel::D:
+				case CHANNEL::D:
 					return TIORL.IOD();
 					break;
 				default:
@@ -4782,15 +4782,15 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static INT get_vec(interrupt intr) {
+		static INT get_vec(INTERRUPT intr) {
 			switch(intr) {
-			case interrupt::A:   return INT::TGIA9;
-			case interrupt::B:   return INT::TGIB9;
-			case interrupt::C:   return INT::TGIC9;
-			case interrupt::D:   return INT::TGID9;
-			case interrupt::OVF: return INT::TCIV9;
-			case interrupt::E:   return INT::TGIE9;
-			case interrupt::F:   return INT::TGIF9;
+			case INTERRUPT::A:   return INT::TGIA9;
+			case INTERRUPT::B:   return INT::TGIB9;
+			case INTERRUPT::C:   return INT::TGIC9;
+			case INTERRUPT::D:   return INT::TGID9;
+			case INTERRUPT::OVF: return INT::TCIV9;
+			case INTERRUPT::E:   return INT::TGIE9;
+			case INTERRUPT::F:   return INT::TGIF9;
 			}
 			return INT::NONE;
 		}

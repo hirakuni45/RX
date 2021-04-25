@@ -42,6 +42,7 @@
 
 #ifdef USE_GUI
 #include "calc_gui.hpp"
+#include "calc_graph.hpp"
 #else
 #include "calc_cmd.hpp"
 #endif
@@ -109,6 +110,9 @@ namespace {
 #ifdef USE_GUI
 	typedef app::calc_gui GUI;
 	GUI		gui_;
+	typedef app::calc_graph GRAPH;
+	GRAPH	graph_;
+
 #else
 	typedef app::calc_cmd CMD;
 	CMD		cmd_;
@@ -218,6 +222,7 @@ int main(int argc, char** argv)
 	gui_.start();
 	gui_.setup_touch_panel();
 	gui_.setup();
+	graph_.start();
 #else
 	cmd_.start();
 #endif

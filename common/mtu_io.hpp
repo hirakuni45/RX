@@ -79,7 +79,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class MTUX, class MTASK = utils::null_task, class OTASK = utils::null_task,
-		port_map_mtu::option PSEL = port_map_mtu::option::FIRST>
+		port_map_mtu::ORDER PSEL = port_map_mtu::ORDER::FIRST>
 	class mtu_io : public mtu_base {
 	public:
 
@@ -113,7 +113,7 @@ namespace device {
 		static MTASK	mtask_;
 		static OTASK	otask_;
 
-		typename MTUX::channel	channel_;
+		typename MTUX::CHANNEL	channel_;
 
 		ICU::VECTOR		intr_vec_;
 
@@ -146,7 +146,7 @@ namespace device {
 
 		// ch: A, B, C, D (0 to 3)
 		// dv: 0 to 10
-		static void set_TCR_(typename MTUX::channel ch)
+		static void set_TCR_(typename MTUX::CHANNEL ch)
 		{
 			static const uint8_t ckt[] = {
 				0b000000,  // (0)  1/1
@@ -188,7 +188,7 @@ namespace device {
 		}
 
 
-		void set_output_type_(typename MTUX::channel ch, OUTPUT ot, uint32_t& match)
+		void set_output_type_(typename MTUX::CHANNEL ch, OUTPUT ot, uint32_t& match)
 		{
 			uint8_t ctd = 0;
 			switch(ot) {
@@ -228,7 +228,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_normal(typename MTUX::channel ch, OUTPUT out, uint32_t freq,
+		bool start_normal(typename MTUX::CHANNEL ch, OUTPUT out, uint32_t freq,
 			uint8_t lvl = 0) noexcept
 		{
 			if(MTUX::PERIPHERAL == peripheral::MTU5) {  // MTU5 は通常出力として利用不可
@@ -254,7 +254,7 @@ namespace device {
 			MTUX::TMDR1 = 0x00;  // 通常動作
 
 			if(lvl > 0) {
-				auto cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(ch));
+				auto cvec = MTUX::get_vec(static_cast<typename MTUX::INTERRUPT>(ch));
 				intr_vec_ = icu_mgr::set_interrupt(cvec, out_task_, lvl);
 				MTUX::TIER = (1 << static_cast<uint8_t>(ch)) | MTUX::TIER.TCIEV.b();
 			}
@@ -279,7 +279,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_freq(typename MTUX::channel ch, uint32_t freq) noexcept
+		static bool set_freq(typename MTUX::CHANNEL ch, uint32_t freq) noexcept
 		{
 			uint32_t match;
 			if(!make_clock_(freq, match)) {
@@ -345,12 +345,12 @@ namespace device {
 			@brief  ＰＷＭ出力開始（モード２）
 			@param[in]	ch		出力チャネル
 			@param[in]	ot		出力タイプ
-			@param[in]	freq		周期
+			@param[in]	freq	周期
 			@param[in]	level	割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm2(typename MTUX::channel ch, OUTPUT out, uint32_t freq,
+		bool start_pwm2(typename MTUX::CHANNEL ch, OUTPUT out, uint32_t freq,
 			uint8_t level = 0) noexcept
 		{
 			if(peripheral::MTU3 <= MTUX::PERIPHERAL && MTUX::PERIPHERAL <= peripheral::MTU7) {
@@ -420,7 +420,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool set_duty(typename MTUX::channel ch, uint16_t duty) noexcept
+		bool set_duty(typename MTUX::CHANNEL ch, uint16_t duty) noexcept
 		{
 			// 工事中
 			return true;
@@ -438,7 +438,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_capture(typename MTUX::channel ch, CAPTURE cap, uint8_t lvl) noexcept
+		bool start_capture(typename MTUX::CHANNEL ch, CAPTURE cap, uint8_t lvl) noexcept
 		{
 			if(lvl == 0) return false;
 
@@ -470,9 +470,9 @@ namespace device {
 			MTUX::TMDR1 = 0x00;  // 通常動作
 
 			if(lvl > 0) {
-				auto ovec = MTUX::get_vec(MTUX::interrupt::OVF);
+				auto ovec = MTUX::get_vec(MTUX::INTERRUPT::OVF);
 				icu_mgr::set_interrupt(ovec, ovf_task_, lvl);
-				auto cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(ch));
+				auto cvec = MTUX::get_vec(static_cast<typename MTUX::INTERRUPT>(ch));
 				icu_mgr::set_interrupt(cvec, cap_task_, lvl);
 				MTUX::TIER = (1 << static_cast<uint8_t>(ch)) | MTUX::TIER.TCIEV.b();
 			}
@@ -499,7 +499,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_count_phase(typename MTUX::channel ch, uint8_t level = 0) noexcept
+		bool start_count_phase(typename MTUX::CHANNEL ch, uint8_t level = 0) noexcept
 		{
 			// 工事中
 			if(peripheral::MTU1 == MTUX::PERIPHERAL || peripheral::MTU2 == MTUX::PERIPHERAL) {
@@ -621,10 +621,10 @@ namespace device {
 		static OTASK& at_ovfl_task() noexcept { return otask_; }
 	};
 
-	template <class MTUX, class MTASK, class OTASK, port_map_mtu::option PSEL>
+	template <class MTUX, class MTASK, class OTASK, port_map_mtu::ORDER PSEL>
 		typename mtu_io<MTUX, MTASK, OTASK, PSEL>::task_t mtu_io<MTUX, MTASK, OTASK, PSEL>::tt_;
-	template <class MTUX, class MTASK, class OTASK, port_map_mtu::option PSEL>
+	template <class MTUX, class MTASK, class OTASK, port_map_mtu::ORDER PSEL>
 		MTASK mtu_io<MTUX, MTASK, OTASK, PSEL>::mtask_;
-	template <class MTUX, class MTASK, class OTASK, port_map_mtu::option PSEL>
+	template <class MTUX, class MTASK, class OTASK, port_map_mtu::ORDER PSEL>
 		OTASK mtu_io<MTUX, MTASK, OTASK, PSEL>::otask_;
 }

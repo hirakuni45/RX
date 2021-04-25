@@ -14,6 +14,9 @@
 
 namespace device {
 
+/// ２２４ピンデバイスの場合有効にする（現在はオプションとする）
+// #define PIN_224
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  GPTW ポート・マッピング
@@ -55,14 +58,14 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b011110 : 0;
 			switch(ch) {
-            /// GTIOC0A (入出力)
-            ///       224 176 144 100
-            /// P23     ○   ○   ○   ○
-            /// P83     ○   ○   ○   ×
-            /// PA5     ○   ○   ○   ○
-            /// PD3     ○   ○   ○   ○
-            /// PE5     ○   ○   ○   ○
-            /// PH6     ○   ×   ×   ×
+			/// GTIOC0A (入出力)
+			///       224 176 144 100
+			/// P23     ○   ○   ○   ○
+			/// P83     ○   ○   ○   ×
+			/// PA5     ○   ○   ○   ○
+			/// PD3     ○   ○   ○   ○
+			/// PE5     ○   ○   ○   ○
+			/// PH6     ○   ×   ×   ×
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -90,7 +93,7 @@ namespace device {
 					MPC::PE5PFS.PSEL = sel;
 					PORTE::PMR.B5 = ena;
 					break;
-#if 0
+#if defined(PIN_224)
 				case option::SIXTH:
 					PORTH::PMR.B6 = 0;
 					MPC::PH6PFS.PSEL = sel;
@@ -102,14 +105,14 @@ namespace device {
 					break;
 				}
 				break;
-            /// GTIOC0B (入出力)
-            ///       224 176 144 100
-            /// P17     ○   ○   ○   ○
-            /// P81     ○   ○   ○   ×
-            /// PA0     ○   ○   ○   ○
-            /// PD2     ○   ○   ○   ○
-            /// PE2     ○   ○   ○   ○
-            /// PH7     ○   ×   ×   ×
+			/// GTIOC0B (入出力)
+			///       224 176 144 100
+			/// P17     ○   ○   ○   ○
+			/// P81     ○   ○   ○   ×
+			/// PA0     ○   ○   ○   ○
+			/// PD2     ○   ○   ○   ○
+			/// PE2     ○   ○   ○   ○
+			/// PH7     ○   ×   ×   ×
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -137,7 +140,7 @@ namespace device {
 					MPC::PE2PFS.PSEL = sel;
 					PORTE::PMR.B2 = ena;
 					break;
-#if 0
+#if defined(PIN_224)
 				case option::SIXTH:
 					PORTH::PMR.B6 = 0;
 					MPC::PH6PFS.PSEL = sel;
@@ -161,14 +164,14 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b011110 : 0;
 			switch(ch) {
-            /// GTIOC1A (入出力)
-            ///       224 176 144 100
-            /// P22     ○   ○   ○   ○
-            /// PA2     ○   ○   ○   ○
-            /// PC5     ○   ○   ○   ○
-            /// PD1     ○   ○   ○   ○
-            /// PE4     ○   ○   ○   ○
-            /// PK6     ○   ×   ×   ×
+			/// GTIOC1A (入出力)
+			///       224 176 144 100
+			/// P22     ○   ○   ○   ○
+			/// PA2     ○   ○   ○   ○
+			/// PC5     ○   ○   ○   ○
+			/// PD1     ○   ○   ○   ○
+			/// PE4     ○   ○   ○   ○
+			/// PK6     ○   ×   ×   ×
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -196,7 +199,7 @@ namespace device {
 					MPC::PE4PFS.PSEL = sel;
 					PORTE::PMR.B4 = ena;
 					break;
-#if 0
+#if defined(PIN_224)
 				case option::SIXTH:
 					PORTK::PMR.B6 = 0;
 					MPC::PK6PFS.PSEL = sel;
@@ -208,14 +211,14 @@ namespace device {
 					break;
 				}
 				break;
-            /// GTIOC1B (入出力)
-            ///       224 176 144 100
-            /// P67     ○   ○   ○   ×
-            /// P87     ○   ○   ○   ×
-            /// PC3     ○   ○   ○   ○
-            /// PD0     ○   ○   ○   ○
-            /// PE1     ○   ○   ○   ○
-            /// PK7     ○   ×   ×   ×
+			/// GTIOC1B (入出力)
+			///       224 176 144 100
+			/// P67     ○   ○   ○   ×
+			/// P87     ○   ○   ○   ×
+			/// PC3     ○   ○   ○   ○
+			/// PD0     ○   ○   ○   ○
+			/// PE1     ○   ○   ○   ○
+			/// PK7     ○   ×   ×   ×
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -243,7 +246,7 @@ namespace device {
 					MPC::PE1PFS.PSEL = sel;
 					PORTE::PMR.B1 = ena;
 					break;
-#if 0
+#if defined(PIN_224)
 				case option::SIXTH:
 					PORTK::PMR.B7 = 0;
 					MPC::PK7PFS.PSEL = sel;
@@ -268,13 +271,13 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b011110 : 0;
 			switch(ch) {
-            /// GTIOC2A (入出力)
-            ///       224 176 144 100
-            /// P21     ○   ○   ○   ○
-            /// P82     ○   ○   ○   ×
-            /// PA1     ○   ○   ○   ○
-            /// PE3     ○   ○   ○   ○
-            /// PL6     ○   ×   ×   ×
+			/// GTIOC2A (入出力)
+			///       224 176 144 100
+			/// P21     ○   ○   ○   ○
+			/// P82     ○   ○   ○   ×
+			/// PA1     ○   ○   ○   ○
+			/// PE3     ○   ○   ○   ○
+			/// PL6     ○   ×   ×   ×
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -297,7 +300,7 @@ namespace device {
 					MPC::PE3PFS.PSEL = sel;
 					PORTE::PMR.B3 = ena;
 					break;
-#if 0
+#if defined(PIN_224)
 				case option::FIFTH:
 					PORTL::PMR.B6 = 0;
 					MPC::PL6PFS.PSEL = sel;
@@ -309,13 +312,13 @@ namespace device {
 					break;
 				}
 				break;
-            /// GTIOC2B (入出力)
-            ///       224 176 144 100
-            /// P66     ○   ○   ○   ×
-            /// P86     ○   ○   ○   ×
-            /// PC2     ○   ○   ○   ○
-            /// PE0     ○   ○   ○   ○
-            /// PL7     ○   ×   ×   ×
+			/// GTIOC2B (入出力)
+			///       224 176 144 100
+			/// P66     ○   ○   ○   ×
+			/// P86     ○   ○   ○   ×
+			/// PC2     ○   ○   ○   ○
+			/// PE0     ○   ○   ○   ○
+			/// PL7     ○   ×   ×   ×
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -338,7 +341,7 @@ namespace device {
 					MPC::PE0PFS.PSEL = sel;
 					PORTE::PMR.B0 = ena;
 					break;
-#if 0
+#if defined(PIN_224)
 				case option::FIFTH:
 					PORTL::PMR.B7 = 0;
 					MPC::PL7PFS.PSEL = sel;
@@ -363,11 +366,11 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b011110 : 0;
 			switch(ch) {
-            /// GTIOC3A (入出力)
-            ///       224 176 144 100
-            /// PC7     ○   ○   ○   ○
-            /// PE7     ○   ○   ○   ○
-            /// PM6     ○   ×   ×   ×
+			/// GTIOC3A (入出力)
+			///       224 176 144 100
+			/// PC7     ○   ○   ○   ○
+			/// PE7     ○   ○   ○   ○
+			/// PM6     ○   ×   ×   ×
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -380,7 +383,7 @@ namespace device {
 					MPC::PE7PFS.PSEL = sel;
 					PORTE::PMR.B7 = ena;
 					break;
-#if 0
+#if defined(PIN_224)
 				case option::THIRD:
 					PORTM::PMR.B6 = 0;
 					MPC::PM6PFS.PSEL = sel;
@@ -392,11 +395,11 @@ namespace device {
 					break;
 				}
 				break;
-            /// GTIOC3B (入出力)
-            ///       224 176 144 100
-            /// PC6     ○   ○   ○   ○
-            /// PE6     ○   ○   ○   ○
-            /// PM7     ○   ×   ×   ×
+			/// GTIOC3B (入出力)
+			///       224 176 144 100
+			/// PC6     ○   ○   ○   ○
+			/// PE6     ○   ○   ○   ○
+			/// PM7     ○   ×   ×   ×
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -409,7 +412,7 @@ namespace device {
 					MPC::PE6PFS.PSEL = sel;
 					PORTE::PMR.B6 = ena;
 					break;
-#if 0
+#if defined(PIN_224)
 				case option::THIRD:
 					PORTM::PMR.B7 = 0;
 					MPC::PM7PFS.PSEL = sel;

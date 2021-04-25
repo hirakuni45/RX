@@ -3,9 +3,11 @@
 /*!	@file
 	@brief	RX72M グループ・ポート・マッピング (MTU) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
-			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8
+			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8 @n
+			ポート候補は、MPC の解説順番（ソートされた）による @n
+			※候補のポリシーが変わった為「候補型」を変更する。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,10 +28,10 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ポート・マッピング・オプション型
+			@brief  ポート・マッピング順番型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class option : uint8_t {
+		enum class ORDER : uint8_t {
 			BYPASS,		///< ポートマップの設定をバイパスする場合
 			FIRST,		///< 第１候補
 			SECOND,		///< 第２候補
@@ -45,7 +47,7 @@ namespace device {
 			@brief  タイマー系・チャネル型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,		///< MTUx A (MTIOCxA)
 			B,		///< MTUx B (MTIOCxB)
 			C,		///< MTUx C (MTIOCxC)
@@ -67,34 +69,37 @@ namespace device {
 					※タイマーのクロック系は、MTU 共通なので、識別子としてグループを使う
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class group : uint8_t {
-			MTU0,	///< MTU0 系グループ
-			MTU1,	///< MTU1 系グループ
-			MTU2,	///< MTU2 系グループ
-			MTU3,	///< MTU3 系グループ
-			MTU4,	///< MTU4 系グループ
-			MTU5,	///< MTU5 系グループ
-			MTU6,	///< MTU6 系グループ
-			MTU7,	///< MTU7 系グループ
+		enum class GROUP : uint8_t {
+			AREA0,	///< エリア０
+			AREA1,	///< エリア１
+			AREA2,	///< エリア２
+			AREA3,	///< エリア３
+			AREA4,	///< エリア４
+			AREA5,	///< 
+			AREA6,	///< 
+			AREA7,	///< 
 			NONE,	///< 無効なグループ
 		};
 
 	private:
-		static bool mtu0_(channel ch, bool ena, option opt) noexcept
+
+		static bool mtu0_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P34 ( 27)  MTIOC0A
-			///< PB3 ( 98)  MTIOC0A / MTIOC4A
-			case channel::A:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC0A (入出力)
+			///      224  176  144  100
+			/// P34    ○   27   25   16
+			/// PB3    ○   98   82   57
+			case CHANNEL::A:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT3::PMR.B4 = 0;
 					MPC::P34PFS.PSEL = sel;
 					PORT3::PMR.B4 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;
 					PORTB::PMR.B3 = ena;
@@ -104,22 +109,24 @@ namespace device {
 					break;
 				}
 				break;
-			///< P15 ( 50)  MTIOC0B / MTCLKB
-			///< P13 ( 52)  MTIOC0B
-			///< PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
-			case channel::B:
-				switch(opt) {
-				case option::FIRST:
-					PORT1::PMR.B5 = 0;
-					MPC::P15PFS.PSEL = sel;
-					PORT1::PMR.B5 = ena;
-					break;
-				case option::SECOND:
+			/// MTIOC0B (入出力)
+			///      224  176  144  100
+			/// P13    ○   52   44   33
+			/// P15    ○   50   42   31
+			/// PA1    ○  114   96   69
+			case CHANNEL::B:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT1::PMR.B3 = 0;
 					MPC::P13PFS.PSEL = sel;
 					PORT1::PMR.B3 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::SECOND:
+					PORT1::PMR.B5 = 0;
+					MPC::P15PFS.PSEL = sel;
+					PORT1::PMR.B5 = ena;
+					break;
+				case ORDER::THIRD:
 					PORTA::PMR.B1 = 0;
 					MPC::PA1PFS.PSEL = sel;
 					PORTA::PMR.B1 = ena;
@@ -129,16 +136,18 @@ namespace device {
 					break;
 				}
 				break;
-			///< P32 ( 29)  MTIOC0C
-			///< PB1 (100)  MTIOC0C / MTIOC4C
-			case channel::C:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC0C (入出力)
+			///      224  176  144  100
+			/// P32    ○   29   27   18
+			/// PB1    ○  100   84   59
+			case CHANNEL::C:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT3::PMR.B2 = 0;
 					MPC::P32PFS.PSEL = sel;
 					PORT3::PMR.B2 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B1 = 0;
 					MPC::PB1PFS.PSEL = sel;
 					PORTB::PMR.B1 = ena;
@@ -148,16 +157,18 @@ namespace device {
 					break;
 				}
 				break;
-			///< P33 ( 28)  MTIOC0D
-			///< PA3 (110)  MTIOC0D / MTCLKD
-			case channel::D:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC0D (入出力)
+			///       224 176 144 100
+			/// P33     ○  28  26  17
+			/// PA3     ○ 110  94  67
+			case CHANNEL::D:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT3::PMR.B3 = 0;
 					MPC::P33PFS.PSEL = sel;
 					PORT3::PMR.B3 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTA::PMR.B3 = 0;
 					MPC::PA3PFS.PSEL = sel;
 					PORTA::PMR.B3 = ena;
@@ -175,36 +186,45 @@ namespace device {
 		}
 
 
-		static bool mtu1_(channel ch, bool ena, option opt) noexcept
+		static bool mtu1_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P20 ( 45)  MTIOC1A
-			///< P21 ( 44)  MTIOC1B / MTIOC4A
-			///< PB5 ( 96)  MTIOC2A / MTIOC1B
-			case channel::A:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC1A (入出力)
+			///      224  176  144  100
+			/// P20    ○   45   37   28
+			/// PE4'   ○  131  107   74
+			case CHANNEL::A:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
-					MPC::P20PFS.PSEL = sel;
+					MPC::P20PFS.PSEL = ena ? 0b000001 : 0;
 					PORT2::PMR.B0 = ena;
 					break;
+				case ORDER::SECOND:
+					PORTE::PMR.B4 = 0;
+					MPC::PE4PFS.PSEL = ena ? 0b000010 : 0;
+					PORTE::PMR.B4 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			case channel::B:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC1B (入出力)
+			///       224 176 144 100
+			/// P21     ○  44  36  27
+			/// PB5'    ○  96  80  55
+			case CHANNEL::B:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
-					MPC::P21PFS.PSEL = sel;
+					MPC::P21PFS.PSEL = ena ? 0b000001 : 0;
 					PORT2::PMR.B1 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B5 = 0;
-					MPC::PB5PFS.PSEL = sel;
+					MPC::PB5PFS.PSEL = ena ? 0b000010 : 0;
 					PORTB::PMR.B5 = ena;
 					break;
 				default:
@@ -220,24 +240,24 @@ namespace device {
 		}
 
 
-		static bool mtu2_(channel ch, bool ena, option opt) noexcept
+		static bool mtu2_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P26 ( 37)  MTIOC2A
-			///< PB5 ( 96)  MTIOC2A / MTIOC1B
-			///< P27 ( 36)  MTIOC2B
-			case channel::A:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC2A (入出力)
+			///      224  176  144  100
+			/// P26    ○   37   31   22
+			/// PB5    ○   96   80   55
+			case CHANNEL::A:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT2::PMR.B6 = 0;
-					MPC::P26PFS.PSEL = sel;
+					MPC::P26PFS.PSEL = ena ? 0b000001 : 0;
 					PORT2::PMR.B6 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B5 = 0;
-					MPC::PB5PFS.PSEL = sel;
+					MPC::PB5PFS.PSEL = ena ? 0b000001 : 0;
 					PORTB::PMR.B5 = ena;
 					break;
 				default:
@@ -245,12 +265,21 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::B:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC2B (入出力)
+			///      224  176  144  100
+			/// P27    ○   36   30   21
+			/// PE5'   ○  130  106   73
+			case CHANNEL::B:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT2::PMR.B7 = 0;
-					MPC::P27PFS.PSEL = sel;
+					MPC::P27PFS.PSEL = ena ? 0b000001 : 0;
 					PORT2::PMR.B7 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTE::PMR.B5 = 0;
+					MPC::PE5PFS.PSEL = ena ? 0b000010 : 0;
+					PORTE::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
@@ -265,140 +294,165 @@ namespace device {
 		}
 
 
-		static bool mtu3_(channel ch, bool ena, option opt) noexcept
+		static bool mtu3_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P17 ( 46)  MTIOC3A / MTIOC3B / MTIOC4B
-			///< P14 ( 51)  MTIOC3A / MTCLKA
-			///< PC7 ( 76)  MTIOC3A / MTCLKB
-			///< PC1 ( 89)  MTIOC3A
-			case channel::A:
-				switch(opt) {
-				case option::FIRST:
-					PORT1::PMR.B7 = 0;
-					MPC::P17PFS.PSEL = sel;
-					PORT1::PMR.B7 = ena;
-					break;
-				case option::SECOND:
+			/// MTIOC3A (入出力)
+			///      224  176  144  100
+			/// P14    ○   51   43   32
+			/// P17    ○   46   38   29
+			/// PC1    ○   89   73   51
+			/// PC7    ○   76   60   45
+			case CHANNEL::A:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = sel;
+					MPC::P14PFS.PSEL = ena ? 0b000001 : 0;
 					PORT1::PMR.B4 = ena;
 					break;
-				case option::THIRD:
-					PORTC::PMR.B7 = 0;
-					MPC::PC7PFS.PSEL = sel;
-					PORTC::PMR.B7 = ena;
+				case ORDER::SECOND:
+					PORT1::PMR.B7 = 0;
+					MPC::P17PFS.PSEL = ena ? 0b000001 : 0;
+					PORT1::PMR.B7 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::THIRD:
 					PORTC::PMR.B1 = 0;
-					MPC::PC1PFS.PSEL = sel;
+					MPC::PC1PFS.PSEL = ena ? 0b000001 : 0;
 					PORTC::PMR.B1 = ena;
 					break;
+				case ORDER::FORCE:
+					PORTC::PMR.B7 = 0;
+					MPC::PC7PFS.PSEL = ena ? 0b000001 : 0;
+					PORTC::PMR.B7 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< P22 ( 43)  MTIOC3B / MTCLKC
-			///< PC5 ( 78)  MTIOC3B / MTCLKD
-			///< P80 ( 81)  MTIOC3B
-			///< PB7 ( 94)  MTIOC3B
-			case channel::B:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC3B (入出力)
+			///      224  176  144  100
+			/// P17'   ○   46   38   29
+			/// P22    ○   43   35   26
+			/// P80    ○   81   65    x
+			/// PB7    ○   94   78   53
+			/// PC5    ○   78   62   47
+			/// PE1''  ○  134  110   77
+			case CHANNEL::B:
+				switch(order) {
+				case ORDER::FIRST:
+					PORT1::PMR.B7 = 0;
+					MPC::P17PFS.PSEL = ena ? 0b000010 : 0;
+					PORT1::PMR.B7 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = sel;
+					MPC::P22PFS.PSEL = ena ? 0b000001 : 0;
 					PORT2::PMR.B2 = ena;
 					break;
-				case option::SECOND:
-					PORTC::PMR.B5 = 0;
-					MPC::PC5PFS.PSEL = sel;
-					PORTC::PMR.B5 = ena;
-					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORT8::PMR.B0 = 0;
-					MPC::P80PFS.PSEL = sel;
+					MPC::P80PFS.PSEL = ena ? 0b000001 : 0;
 					PORT8::PMR.B0 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::FORCE:
 					PORTB::PMR.B7 = 0;
-					MPC::PB7PFS.PSEL = sel;
+					MPC::PB7PFS.PSEL = ena ? 0b000001 : 0;
 					PORTB::PMR.B7 = ena;
 					break;
+				case ORDER::FIFTH:
+					PORTC::PMR.B5 = 0;
+					MPC::PC5PFS.PSEL = ena ? 0b000001 : 0;
+					PORTC::PMR.B5 = ena;
+					break;
+				case ORDER::SIXTH:
+					PORTE::PMR.B1 = 0;
+					MPC::PE1PFS.PSEL = ena ? 0b001000 : 0;
+					PORTE::PMR.B1 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< PJ3 ( 13)  MTIOC3C
-			///< P56 ( 64)  MTIOC3C
-			///< P16 ( 48)  MTIOC3C / MTIOC3D
-			///< PC6 ( 77)  MTIOC3C / MTCLKA
-			///< PC0 ( 91)  MTIOC3C
-			case channel::C:
-				switch(opt) {
-				case option::FIRST:
-					PORTJ::PMR.B3 = 0;
-					MPC::PJ3PFS.PSEL = sel;
-					PORTJ::PMR.B3 = ena;
-					break;
-				case option::SECOND:
-					PORT5::PMR.B6 = 0;
-					MPC::P56PFS.PSEL = sel;
-					PORT5::PMR.B6 = ena;
-					break;
-				case option::THIRD:
+			/// MTIOC3C (入出力)
+			///      224  176  144  100
+			/// P16    ○   48   40   30
+			/// P56    ○   64   50    x
+			/// PC0    ○   91   75   52
+			/// PC6    ○   77   61   46
+			/// PJ3    ○   13   13    4
+			case CHANNEL::C:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = sel;
+					MPC::P16PFS.PSEL = ena ? 0b000001 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::SECOND:
+					PORT5::PMR.B6 = 0;
+					MPC::P56PFS.PSEL = ena ? 0b000001 : 0;
+					PORT5::PMR.B6 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTC::PMR.B0 = 0;
+					MPC::PC0PFS.PSEL = ena ? 0b000001 : 0;
+					PORTC::PMR.B0 = ena;
+					break;
+				case ORDER::FORCE:
 					PORTC::PMR.B6 = 0;
-					MPC::PC6PFS.PSEL = sel;
+					MPC::PC6PFS.PSEL = ena ? 0b000001 : 0;
 					PORTC::PMR.B6 = ena;
 					break;
-				case option::FIFTH:
-					PORTC::PMR.B0 = 0;
-					MPC::PC0PFS.PSEL = sel;
-					PORTC::PMR.B0 = ena;
+				case ORDER::FIFTH:
+					PORTJ::PMR.B3 = 0;
+					MPC::PJ3PFS.PSEL = ena ? 0b000001 : 0;
+					PORTJ::PMR.B3 = ena;
 					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< P23 ( 42)  MTIOC3D / MTCLKD
-			///< P81 ( 80)  MTIOC3D
-			///< PC4 ( 82)  MTIOC3D / MTCLKC
-			///< PB6 ( 95)  MTIOC3D
-			///< PE0 (135)  MTIOC3D
-			case channel::D:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC3D (入出力)
+			///      224  176  144  100
+			/// P16    ○   48   40   30
+			/// P23    ○   42   34   25
+			/// P81    ○   80   64    x
+			/// PB6    ○   95   79   54
+			/// PC4    ○   82   66   48
+			/// PE0    ○  135  111   78
+			case CHANNEL::D:
+				switch(order) {
+				case ORDER::FIRST:
+					PORT1::PMR.B6 = 0;
+					MPC::P16PFS.PSEL = ena ? 0b000010 : 0;
+					PORT1::PMR.B6 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT2::PMR.B3 = 0;
-					MPC::P23PFS.PSEL = sel;
+					MPC::P23PFS.PSEL = ena ? 0b000001 : 0;
 					PORT2::PMR.B3 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::THIRD:
 					PORT8::PMR.B1 = 0;
-					MPC::P81PFS.PSEL = sel;
+					MPC::P81PFS.PSEL = ena ? 0b000001 : 0;
 					PORT8::PMR.B1 = ena;
 					break;
-				case option::THIRD:
-					PORTC::PMR.B4 = 0;
-					MPC::PC4PFS.PSEL = sel;
-					PORTC::PMR.B4 = ena;
-					break;
-				case option::FORCE:
+				case ORDER::FORCE:
 					PORTB::PMR.B6 = 0;
-					MPC::PB6PFS.PSEL = sel;
+					MPC::PB6PFS.PSEL = ena ? 0b000001 : 0;
 					PORTB::PMR.B6 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = ena ? 0b000001 : 0;
+					PORTC::PMR.B4 = ena;
+					break;
+				case ORDER::SIXTH:
 					PORTE::PMR.B0 = 0;
-					MPC::PE0PFS.PSEL = sel;
+					MPC::PE0PFS.PSEL = ena ? 0b001000 : 0;
 					PORTE::PMR.B0 = ena;
 					break;
 				default:
@@ -414,35 +468,48 @@ namespace device {
 		}
 
 
-		static bool mtu4_(channel ch, bool ena, option opt) noexcept
+		static bool mtu4_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P24 ( 40)  MTIOC4A / MTCLKA
-			///< P82 ( 79)  MTIOC4A
-			///< PA0 (118)  MTIOC4A / MTIOC6D
-			///< PE2 (133)  MTIOC4A
-			case channel::A:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC4A (入出力)
+			///      224  176  144  100
+			/// P21    ○
+			/// P24    ○
+			/// P82    ○
+			/// PA0    ○
+			/// PB3    ○
+			/// PE2    ○
+			case CHANNEL::A:
+				switch(order) {
+				case ORDER::FIRST:
+					PORT2::PMR.B1 = 0;
+					MPC::P21PFS.PSEL = ena ? 0b001000 : 0;
+					PORT2::PMR.B1 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = sel;
+					MPC::P24PFS.PSEL = ena ? 0b000001 : 0;
 					PORT2::PMR.B4 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::THIRD:
 					PORT8::PMR.B2 = 0;
-					MPC::P82PFS.PSEL = sel;
+					MPC::P82PFS.PSEL = ena ? 0b000001 : 0;
 					PORT8::PMR.B2 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::FORCE:
 					PORTA::PMR.B0 = 0;
-					MPC::PA0PFS.PSEL = sel;
+					MPC::PA0PFS.PSEL = ena ? 0b000001 : 0;
 					PORTA::PMR.B0 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::FIFTH:
+					PORTB::PMR.B3 = 0;
+					MPC::PB3PFS.PSEL = ena ? 0b000010 : 0;
+					PORTB::PMR.B3 = ena;
+					break;
+				case ORDER::SIXTH:
 					PORTE::PMR.B2 = 0;
-					MPC::PE2PFS.PSEL = sel;
+					MPC::PE2PFS.PSEL = ena ? 0b000001 : 0;
 					PORTE::PMR.B2 = ena;
 					break;
 				default:
@@ -450,117 +517,135 @@ namespace device {
 					break;
 				}
 				break;
-			///< P30 ( 33)  MTIOC4B
-			///< P54 ( 66)  MTIOC4B
-			///< PC2 ( 86)  MTIOC4B
-			///< PE3 (132)  MTIOC4B
-			///< PD1 (156)  MTIOC4B
-			case channel::B:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC4B (入出力)
+			///      224  176  144  100
+			/// P17    ○
+			/// P30    ○
+			/// P54    ○
+			/// PC2    ○
+			/// PD1    ○
+			/// PE3    ○
+			case CHANNEL::B:
+				switch(order) {
+				case ORDER::FIRST:
+					PORT1::PMR.B7 = 0;
+					MPC::P17PFS.PSEL = ena ? 0b001000 : 0;
+					PORT1::PMR.B7 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT3::PMR.B0 = 0;
-					MPC::P30PFS.PSEL = sel;
+					MPC::P30PFS.PSEL = ena ? 0b000001 : 0;
 					PORT3::PMR.B0 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::THIRD:
 					PORT5::PMR.B4 = 0;
-					MPC::P54PFS.PSEL = sel;
+					MPC::P54PFS.PSEL = ena ? 0b000001 : 0;
 					PORT5::PMR.B4 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::FORCE:
 					PORTC::PMR.B2 = 0;
-					MPC::PC2PFS.PSEL = sel;
+					MPC::PC2PFS.PSEL = ena ? 0b000001 : 0;
 					PORTC::PMR.B2 = ena;
 					break;
-				case option::FORCE:
-					PORTE::PMR.B3 = 0;
-					MPC::PE3PFS.PSEL = sel;
-					PORTE::PMR.B3 = ena;
-					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					PORTD::PMR.B1 = 0;
-					MPC::PD1PFS.PSEL = sel;
+					MPC::PD1PFS.PSEL = ena ? 0b000001 : 0;
 					PORTD::PMR.B1 = ena;
 					break;
+				case ORDER::SIXTH:
+					PORTE::PMR.B3 = 0;
+					MPC::PE3PFS.PSEL = ena ? 0b000001 : 0;
+					PORTE::PMR.B3 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< P25 ( 38)  MTIOC4C / MTCLKB
-			///< P87 ( 47)  MTIOC4C
-			///< P83 ( 74)  MTIOC4C
-			///< PE5 (130)  MTIOC4C / MTIOC2B
-			///< PE1 (134)  MTIOC4C / MTIOC3B
-			case channel::C:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC4C (入出力)
+			///      224  176  144  100
+			/// P25    ○   38   32   23
+			/// P83    ○   74   58    x
+			/// P87    ○   47   39    x
+			/// PB1    ○  100   84   59
+			/// PE1    ○  134  110   77
+			/// PE5    ○  130  106   73
+			case CHANNEL::C:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT2::PMR.B5 = 0;
-					MPC::P25PFS.PSEL = sel;
+					MPC::P25PFS.PSEL = ena ? 0b000001 : 0;
 					PORT2::PMR.B5 = ena;
 					break;
-				case option::SECOND:
-					PORT8::PMR.B7 = 0;
-					MPC::P87PFS.PSEL = sel;
-					PORT8::PMR.B7 = ena;
-					break;
-				case option::THIRD:
+				case ORDER::SECOND:
 					PORT8::PMR.B3 = 0;
-					MPC::P83PFS.PSEL = sel;
+					MPC::P83PFS.PSEL = ena ? 0b000001 : 0;
 					PORT8::PMR.B3 = ena;
 					break;
-				case option::FORCE:
-					PORTE::PMR.B5 = 0;
-					MPC::PE5PFS.PSEL = sel;
-					PORTE::PMR.B5 = ena;
+				case ORDER::THIRD:
+					PORT8::PMR.B7 = 0;
+					MPC::P87PFS.PSEL = ena ? 0b001000 : 0;
+					PORT8::PMR.B7 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FORCE:
+					PORTB::PMR.B1 = 0;
+					MPC::PB1PFS.PSEL = ena ? 0b000010 : 0;
+					PORTB::PMR.B1 = ena;
+					break;
+				case ORDER::FIFTH:
 					PORTE::PMR.B1 = 0;
-					MPC::PE1PFS.PSEL = sel;
+					MPC::PE1PFS.PSEL = ena ? 0b000001 : 0;
 					PORTE::PMR.B1 = ena;
+					break;
+				case ORDER::SIXTH:
+					PORTE::PMR.B5 = 0;
+					MPC::PE5PFS.PSEL = ena ? 0b000001 : 0;
+					PORTE::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< P31 ( 32)  MTIOC4D
-			///< P86 ( 49)  MTIOC4D
-			///< P55 ( 65)  MTIOC4D
-			///< PC3 ( 83)  MTIOC4D
-			///< PE4 (131)  MTIOC4D / MTIOC1A
-			///< PD2 (154)  MTIOC4D
-			case channel::D:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC4D (入出力)
+			///      224  176  144  100
+			/// P31    ○   32   28   19
+			/// P55    ○   65   51   39
+			/// P86    ○   49   41    x
+			/// PC3    ○   83   67   49
+			/// PD2    ○  154  124   84
+			/// PE4    ○  131  107   74
+			case CHANNEL::D:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT3::PMR.B1 = 0;
-					MPC::P31PFS.PSEL = sel;
+					MPC::P31PFS.PSEL = ena ? 0b000001 : 0;
 					PORT3::PMR.B1 = ena;
 					break;
-				case option::SECOND:
-					PORT8::PMR.B6 = 0;
-					MPC::P86PFS.PSEL = sel;
-					PORT8::PMR.B6 = ena;
-					break;
-				case option::THIRD:
+				case ORDER::SECOND:
 					PORT5::PMR.B5 = 0;
-					MPC::P55PFS.PSEL = sel;
+					MPC::P55PFS.PSEL = ena ? 0b000001 : 0;
 					PORT5::PMR.B5 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::THIRD:
+					PORT8::PMR.B6 = 0;
+					MPC::P86PFS.PSEL = ena ? 0b001000 : 0;
+					PORT8::PMR.B6 = ena;
+					break;
+				case ORDER::FORCE:
 					PORTC::PMR.B3 = 0;
-					MPC::PC3PFS.PSEL = sel;
+					MPC::PC3PFS.PSEL = ena ? 0b000001 : 0;
 					PORTC::PMR.B3 = ena;
 					break;
-				case option::FIFTH:
-					PORTE::PMR.B4 = 0;
-					MPC::PE4PFS.PSEL = sel;
-					PORTE::PMR.B4 = ena;
-					break;
-				case option::SIXTH:
+				case ORDER::FIFTH:
 					PORTD::PMR.B2 = 0;
-					MPC::PD2PFS.PSEL = sel;
+					MPC::PD2PFS.PSEL = ena ? 0b000001 : 0;
 					PORTD::PMR.B2 = ena;
+					break;
+				case ORDER::SIXTH:
+					PORTE::PMR.B4 = 0;
+					MPC::PE4PFS.PSEL = ena ? 0b000001 : 0;
+					PORTE::PMR.B4 = ena;
 					break;
 				default:
 					ret = false;
@@ -575,27 +660,29 @@ namespace device {
 		}
 
 
-		static bool mtu5_(channel ch, bool ena, option opt) noexcept
+		static bool mtu5_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P12 ( 53)  MTIC5U
-			///< PA4 (109)  MTIC5U / MTCLKA
-			///< PD7 (143)  MTIC5U
-			case channel::U:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC5U (入出力)
+			///      224  176  144  100
+			/// P12    ○   53   45    x
+			/// PA4    ○  109   92   66
+			/// PD7    ○  143  119   79
+			case CHANNEL::U:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT1::PMR.B2 = 0;
 					MPC::P12PFS.PSEL = sel;
 					PORT1::PMR.B2 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTA::PMR.B4 = 0;
 					MPC::PA4PFS.PSEL = sel;
 					PORTA::PMR.B4 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORTD::PMR.B7 = 0;
 					MPC::PD7PFS.PSEL = sel;
 					PORTD::PMR.B7 = ena;
@@ -605,22 +692,24 @@ namespace device {
 					break;
 				}
 				break;
-			///< P11 ( 67)  MTIC5V
-			///< PA6 (107)  MTIC5V / MTCLKB
-			///< PD6 (145)  MTIC5V / MTIOC8A
-			case channel::V:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC5V (入出力)
+			///      224  176  144  100
+			/// P11    ○   67    x    x
+			/// PA6    ○  107   89   64
+			/// PD6    ○  145  120   80
+			case CHANNEL::V:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT1::PMR.B1 = 0;
 					MPC::P11PFS.PSEL = sel;
 					PORT1::PMR.B1 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTA::PMR.B6 = 0;
 					MPC::PA6PFS.PSEL = sel;
 					PORTA::PMR.B6 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORTD::PMR.B6 = 0;
 					MPC::PD6PFS.PSEL = sel;
 					PORTD::PMR.B6 = ena;
@@ -630,22 +719,24 @@ namespace device {
 					break;
 				}
 				break;
-			///< P10 ( 68)  MTIC5W
-			///< PB0 (104)  MTIC5W
-			///< PD5 (147)  MTIC5W / MTIOC8C / MTCLKA
-			case channel::W:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC5W (入出力)
+			///      224  176  144  100
+			/// P10    ○   68    x    x
+			/// PB0    ○  104   87   61
+			/// PD5    ○  147  121   81
+			case CHANNEL::W:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT1::PMR.B0 = 0;
 					MPC::P10PFS.PSEL = sel;
 					PORT1::PMR.B0 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B0 = 0;
 					MPC::PB0PFS.PSEL = sel;
 					PORTB::PMR.B0 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORTD::PMR.B5 = 0;
 					MPC::PD5PFS.PSEL = sel;
 					PORTD::PMR.B5 = ena;
@@ -663,62 +754,66 @@ namespace device {
 		}
 
 
-		static bool mtu6_(channel ch, bool ena, option opt) noexcept
+		static bool mtu6_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< PJ1 ( 59)  MTIOC6A
-			///< PE7 (125)  MTIOC6A
-			///< PJ0 ( 60)  MTIOC6B
-			///< PA5 (108)  MTIOC6B
-			///< P85 ( 61)  MTIOC6C
-			///< PE6 (126)  MTIOC6C
-			///< P84 ( 62)  MTIOC6D
-			case channel::A:
-				switch(opt) {
-				case option::FIRST:
-//					PORTJ::PMR.B1 = 0;
-//					MPC::PJ1PFS.PSEL = sel;
-//					PORTJ::PMR.B1 = ena;
-					break;
-				case option::SECOND:
+			/// MTIOC6A (入出力)
+			///      224  176  144  100
+			/// PE7    ○  125  101   71
+			/// PJ1    ○   59    x    x
+			case CHANNEL::A:
+				switch(order) {
+				case ORDER::FIRST:
 					PORTE::PMR.B7 = 0;
-					MPC::PE7PFS.PSEL = sel;
+					MPC::PE7PFS.PSEL = ena ? 0b001000 : 0;
 					PORTE::PMR.B7 = ena;
 					break;
+				case ORDER::SECOND:
+					PORTJ::PMR.B1 = 0;
+					MPC::PJ1PFS.PSEL = ena ? 0b000001 : 0;
+					PORTJ::PMR.B1 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			case channel::B:
-				switch(opt) {
-				case option::FIRST:
-//					PORTJ::PMR.B0 = 0;
-//					MPC::PJ0PFS.PSEL = sel;
-//					PORTJ::PMR.B0 = ena;
-					break;
-				case option::SECOND:
+			/// MTIOC6B (入出力)
+			///      224  176  144  100
+			/// PA5    ○  108   90   65
+			/// PJ0    ○   60    x    x
+			case CHANNEL::B:
+				switch(order) {
+				case ORDER::FIRST:
 					PORTA::PMR.B5 = 0;
-					MPC::PA5PFS.PSEL = sel;
+					MPC::PA5PFS.PSEL = ena ? 0b001000 : 0;
 					PORTA::PMR.B5 = ena;
 					break;
+				case ORDER::SECOND:
+					PORTJ::PMR.B0 = 0;
+					MPC::PJ0PFS.PSEL = ena ? 0b000001 : 0;
+					PORTJ::PMR.B0 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			case channel::C:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC6C (入出力)
+			///      224  176  144  100
+			/// P85    ○   61    x    x
+			/// PE6    ○  126  102   72
+			case CHANNEL::C:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT8::PMR.B5 = 0;
-					MPC::P85PFS.PSEL = sel;
+					MPC::P85PFS.PSEL = ena ? 0b000001 : 0;
 					PORT8::PMR.B5 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTE::PMR.B6 = 0;
-					MPC::PE6PFS.PSEL = sel;
+					MPC::PE6PFS.PSEL = ena ? 0b001000 : 0;
 					PORTE::PMR.B6 = ena;
 					break;
 				default:
@@ -726,12 +821,21 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::D:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC6D (入出力)
+			///      224  176  144  100
+			/// P84    ○   62    x    x
+			/// PA0    ○  118   97   70
+			case CHANNEL::D:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT8::PMR.B4 = 0;
-					MPC::P84PFS.PSEL = sel;
+					MPC::P84PFS.PSEL = ena ? 0b000001 : 0;
 					PORT8::PMR.B4 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTA::PMR.B0 = 0;
+					MPC::PA0PFS.PSEL = ena ? 0b001000 : 0;
+					PORTA::PMR.B0 = ena;
 					break;
 				default:
 					ret = false;
@@ -746,19 +850,18 @@ namespace device {
 		}
 
 
-		static bool mtu7_(channel ch, bool ena, option opt) noexcept
+		static bool mtu7_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< PA2 (112)  MTIOC7A
-			///< P67 (120)  MTIOC7C
-			///< P66 (122)  MTIOC7D
-			case channel::A:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC7A (入出力)
+			///      224  176  144  100
+			/// PA2    ○
+			case CHANNEL::A:
+				switch(order) {
+				case ORDER::FIRST:
 					PORTA::PMR.B2 = 0;
-					MPC::PA2PFS.PSEL = sel;
+					MPC::PA2PFS.PSEL = ena ? 0b001000 : 0;
 					PORTA::PMR.B2 = ena;
 					break;
 				default:
@@ -766,23 +869,44 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::C:
-				switch(opt) {
-				case option::FIRST:
-//					PORT6::PMR.B7 = 0;
-//					MPC::P67PFS.PSEL = sel;
-//					PORT6::PMR.B7 = ena;
+			/// MTIOC7B (入出力)
+			///      224  176  144  100
+			/// PA1    ○
+			case CHANNEL::B:
+				switch(order) {
+				case ORDER::FIRST:
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = ena ? 0b001000 : 0;
+					PORTA::PMR.B1 = ena;
 					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			case channel::D:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC7C (入出力)
+			///      224  176  144  100
+			/// P67    ○
+			case CHANNEL::C:
+				switch(order) {
+				case ORDER::FIRST:
+					PORT6::PMR.B7 = 0;
+					MPC::P67PFS.PSEL = ena ? 0b001000 : 0;
+					PORT6::PMR.B7 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// MTIOC7D (入出力)
+			///      224  176  144  100
+			/// P66    ○
+			case CHANNEL::D:
+				switch(order) {
+				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
-					MPC::P21PFS.PSEL = sel;
+					MPC::P21PFS.PSEL = ena ? 0b001000 : 0;
 					PORT2::PMR.B1 = ena;
 					break;
 				default:
@@ -798,18 +922,33 @@ namespace device {
 		}
 
 
-		static bool mtu8_(channel ch, bool ena, option opt) noexcept
+		static bool mtu8_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< PD4 (148)  MTIOC8B
-			///< PD3 (150)  MTIOC8D
-			case channel::B:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC8A (入出力)
+			///      224  176  144  100
+			/// PD6    ○
+			case CHANNEL::A:
+				switch(order) {
+				case ORDER::FIRST:
+					PORTD::PMR.B6 = 0;
+					MPC::PD6PFS.PSEL = ena ? 0b001000 : 0;
+					PORTD::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// MTIOC8B (入出力)
+			///      224  176  144  100
+			/// PD4    ○
+			case CHANNEL::B:
+				switch(order) {
+				case ORDER::FIRST:
 					PORTD::PMR.B4 = 0;
-					MPC::PD4PFS.PSEL = sel;
+					MPC::PD4PFS.PSEL = ena ? 0b001000 : 0;
 					PORTD::PMR.B4 = ena;
 					break;
 				default:
@@ -817,11 +956,29 @@ namespace device {
 					break;
 				}
 				break;
-			case channel::D:
-				switch(opt) {
-				case option::FIRST:
+			/// MTIOC8C (入出力)
+			///      224  176  144  100
+			/// PD5    ○
+			case CHANNEL::C:
+				switch(order) {
+				case ORDER::FIRST:
+					PORTD::PMR.B5 = 0;
+					MPC::PD5PFS.PSEL = ena ? 0b001000 : 0;
+					PORTD::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// MTIOC8D (入出力)
+			///      224  176  144  100
+			/// PD3    ○
+			case CHANNEL::D:
+				switch(order) {
+				case ORDER::FIRST:
 					PORTD::PMR.B3 = 0;
-					MPC::PD3PFS.PSEL = sel;
+					MPC::PD3PFS.PSEL = ena ? 0b001000 : 0;
 					PORTD::PMR.B3 = ena;
 					break;
 				default:
@@ -844,13 +1001,13 @@ namespace device {
 			@param[in]	per	周辺機器タイプ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
-			@param[in]	opt	候補を選択する場合
+			@param[in]	order	候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, channel ch, bool ena = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER order = ORDER::FIRST) noexcept
 		{
-			if(opt == option::BYPASS) return true;
+			if(order == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -858,31 +1015,31 @@ namespace device {
 			bool ret = true;
 			switch(per) {
 			case peripheral::MTU0:
-				ret = mtu0_(ch, ena, opt);
+				ret = mtu0_(ch, ena, order);
 				break;
 			case peripheral::MTU1:
-				ret = mtu1_(ch, ena, opt);
+				ret = mtu1_(ch, ena, order);
 				break;
 			case peripheral::MTU2:
-				ret = mtu2_(ch, ena, opt);
+				ret = mtu2_(ch, ena, order);
 				break;
 			case peripheral::MTU3:
-				ret = mtu3_(ch, ena, opt);
+				ret = mtu3_(ch, ena, order);
 				break;
 			case peripheral::MTU4:
-				ret = mtu4_(ch, ena, opt);
+				ret = mtu4_(ch, ena, order);
 				break;
 			case peripheral::MTU5:
-				ret = mtu5_(ch, ena, opt);
+				ret = mtu5_(ch, ena, order);
 				break;
 			case peripheral::MTU6:
-				ret = mtu6_(ch, ena, opt);
+				ret = mtu6_(ch, ena, order);
 				break;
 			case peripheral::MTU7:
-				ret = mtu7_(ch, ena, opt);
+				ret = mtu7_(ch, ena, order);
 				break;
 			case peripheral::MTU8:
-				ret = mtu8_(ch, ena, opt);
+				ret = mtu8_(ch, ena, order);
 				break;
 
 			default:
@@ -905,9 +1062,152 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_clock(group grp, channel ch, bool ena = true) noexcept
+		static bool turn_clock(GROUP grp, CHANNEL ch, bool ena = true) noexcept
 		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			uint8_t sel = ena ? 0b000010 : 0;
 			bool ret = true;
+			switch(grp) {
+			/// P15 ( 50)  MTIOC0B / MTCLKB
+			/// PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
+			/// PA3 (110)  MTIOC0D / MTCLKD
+			case GROUP::AREA0:
+				switch(ch) {
+				case CHANNEL::CLK_B:
+					PORT1::PMR.B5 = 0;
+					MPC::P15PFS.PSEL = sel;
+					PORT1::PMR.B5 = ena;
+					break;
+				case CHANNEL::CLK_C:
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = sel;
+					PORTA::PMR.B1 = ena;
+					break;
+				case CHANNEL::CLK_D:
+					PORTA::PMR.B3 = 0;
+					MPC::PA3PFS.PSEL = sel;
+					PORTA::PMR.B3 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// P14 ( 51)  MTIOC3A / MTCLKA
+			/// PC7 ( 76)  MTIOC3A / MTCLKB
+			/// P22 ( 43)  MTIOC3B / MTCLKC
+			/// PC5 ( 78)  MTIOC3B / MTCLKD
+			case GROUP::AREA1:
+				switch(ch) {
+				case CHANNEL::CLK_A:
+					PORT1::PMR.B4 = 0;
+					MPC::P14PFS.PSEL = sel;
+					PORT1::PMR.B4 = ena;
+					break;
+				case CHANNEL::CLK_B:
+					PORTC::PMR.B7 = 0;
+					MPC::PC7PFS.PSEL = sel;
+					PORTC::PMR.B7 = ena;
+					break;
+				case CHANNEL::CLK_C:
+					PORT2::PMR.B2 = 0;
+					MPC::P22PFS.PSEL = sel;
+					PORT2::PMR.B2 = ena;
+					break;
+				case CHANNEL::CLK_D:
+					PORTC::PMR.B5 = 0;
+					MPC::PC5PFS.PSEL = sel;
+					PORTC::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PC6 ( 77)  MTIOC3C / MTCLKA
+			/// P23 ( 42)  MTIOC3D / MTCLKD
+			/// PC4 ( 82)  MTIOC3D / MTCLKC
+			case GROUP::AREA2:
+				switch(ch) {
+				case CHANNEL::CLK_A:
+					PORTC::PMR.B6 = 0;
+					MPC::PC6PFS.PSEL = sel;
+					PORTC::PMR.B6 = ena;
+					break;
+				case CHANNEL::CLK_C:
+					PORT2::PMR.B3 = 0;
+					MPC::P23PFS.PSEL = sel;
+					PORT2::PMR.B3 = ena;
+					break;
+				case CHANNEL::CLK_D:
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = sel;
+					PORTC::PMR.B4 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// P24 ( 40)  MTIOC4A / MTCLKA
+			/// P25 ( 38)  MTIOC4C / MTCLKB
+			case GROUP::AREA3:
+				switch(ch) {
+				case CHANNEL::CLK_A:
+					PORT2::PMR.B4 = 0;
+					MPC::P24PFS.PSEL = sel;
+					PORT2::PMR.B4 = ena;
+					break;
+				case CHANNEL::CLK_B:
+					PORT2::PMR.B5 = 0;
+					MPC::P25PFS.PSEL = sel;
+					PORT2::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PA4 (109)  MTIC5U / MTCLKA
+			/// PA6 (107)  MTIC5V / MTCLKB
+			case GROUP::AREA4:
+				switch(ch) {
+				case CHANNEL::CLK_A:
+					PORTA::PMR.B4 = 0;
+					MPC::PA4PFS.PSEL = sel;
+					PORTA::PMR.B4 = ena;
+					break;
+				case CHANNEL::CLK_B:
+					PORTA::PMR.B6 = 0;
+					MPC::PA6PFS.PSEL = sel;
+					PORTA::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PD5 (147)  MTIC5W / MTIOC8C / MTCLKA
+			case GROUP::AREA5:
+				switch(ch) {
+				case CHANNEL::CLK_A:
+					PORTD::PMR.B5 = 0;
+					MPC::PD5PFS.PSEL = sel;
+					PORTD::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return ret;
 		}

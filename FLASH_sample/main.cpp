@@ -13,11 +13,14 @@
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する @n
+			RX72T: @n
+					16MHz のベースクロックを使用する @n
+			　　　　P01 ピンにLEDを接続する @n
 			RX72N (Renesas Envision kit RX72N): @n
 					16MHz のベースクロックを使用する @n
 			　　　　P40 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -44,7 +47,7 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N" };
+	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
@@ -53,20 +56,26 @@ namespace {
 	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+	#define SINGLE
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
 	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
+	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N" };
+	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 #endif
 
-	typedef utils::fixed_fifo<char, 512> RXB;  ///< SCI/RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  ///< SCI/TX (SEND) バッファの定義
+	typedef utils::fixed_fifo<char, 256> RXB;  ///< SCI/RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 512> TXB;  ///< SCI/TX (SEND) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI			sci_;
@@ -79,6 +88,7 @@ namespace {
 
 	typedef device::flash_io FLASH_IO;
 	FLASH_IO	flash_io_;
+
 
 	void dump_(uint16_t org, uint16_t len)
 	{
@@ -169,7 +179,12 @@ namespace {
 							if(!(utils::input("%x", buff) % data).status()) {
 								break;
 							}
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72N)
+#ifdef SINGLE							
+							uint32_t inc = 1;
+							uint8_t tmp[1];
+							tmp[0] = data;
+							if(!flash_io_.write(org, tmp, 1)) {
+#else
 							uint32_t inc = 4;
 							uint8_t tmp[4];
 							tmp[3] = data;
@@ -177,16 +192,12 @@ namespace {
 							tmp[1] = data >> 16;
 							tmp[0] = data >> 24;
 							if(!flash_io_.write(org, tmp, 4)) {
-#elif defined(SIG_RX24T)
-							uint32_t inc = 1;
-							uint8_t tmp[1];
-							tmp[0] = data;
-							if(!flash_io_.write(org, tmp, 1)) {
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72N)
-								utils::format("Write error: %04X: %08X\n")
-#elif defined(SIG_RX24T)
+
+#ifdef SINGLE
 								utils::format("Write error: %04X: %02X\n")
+#else
+								utils::format("Write error: %04X: %08X\n")
 #endif
 									% static_cast<uint32_t>(org) % data;
 							}
@@ -200,16 +211,14 @@ namespace {
 				}
 			}
 		} else if(command_.cmp_word(0, "uid")) {
-#if defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72N)
-			utils::format("Unique ID0: %08X\n") % device::FLASH::UIDR0();
-			utils::format("Unique ID1: %08X\n") % device::FLASH::UIDR1();
-			utils::format("Unique ID2: %08X\n") % device::FLASH::UIDR2();
-#if defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX72N)
-			utils::format("Unique ID3: %08X\n") % device::FLASH::UIDR3();
-#endif
-#else
-			utils::format("Unique ID not define.\n");
-#endif
+			if(FLASH_IO::get_uid_num() == 0) {
+				utils::format("Unique ID not define.\n");
+			} else {
+				for(uint32_t i = 0; i < FLASH_IO::get_uid_num(); ++i) {
+					auto id = FLASH_IO::get_uid(i);
+					utils::format("Unique ID%d: %08X\n") % i % id;
+				}
+			}
 		} else if(command_.cmp_word(0, "?") || command_.cmp_word(0, "help")) {
 			utils::format("erase [bank] (erase 0 to %d)\n") % FLASH_IO::data_flash_bank;
 			utils::format("r[ead] org [end] (read)\n");
@@ -259,7 +268,8 @@ int main(int argc, char** argv)
 
 	{  // タイマー設定（100Hz）
 		uint8_t intr = 4;
-		cmt_.start(100, intr);
+		uint32_t freq = 100;
+		cmt_.start(freq, intr);
 	}
 
 	{  // SCI の開始
@@ -268,19 +278,19 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
+	{
+		auto clk = F_ICLK / 1'000'000;
+		utils::format("Start Data Flash sample for '%s' %u [MHz]\n") % system_str_ % clk;
+		auto fclk = F_FCLK / 1'000'000;
+		utils::format("Flash drive clock: %u [MHz]\n") % fclk;
+		utils::format("Data Flash size: %08X\n") % FLASH_IO::data_flash_size;
+	}
+
 	{  // DataFlash 開始
 		flash_io_.start();
 	}
 
 	command_.set_prompt("# ");
-
-	{
-		auto clk = F_ICLK / 1000000;
-		utils::format("Start Data Flash sample for '%s' %u [MHz]\n") % system_str_ % clk;
-		auto fclk = F_FCLK / 1000000;
-		utils::format("Flash drive clock: %u [MHz]\n") % fclk;
-		utils::format("Data Flash size: %08X\n") % FLASH_IO::data_flash_size;
-	}
 
 	LED::DIR = 1;
 	uint8_t cnt = 0;

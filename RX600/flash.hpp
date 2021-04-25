@@ -1,24 +1,30 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72N グループ・フラッシュ 定義
+	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72T/RX72N グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  フラッシュ・メモリー制御クラス
+		@param[in]	dsize	データフラッシュ容量
+		@param[in]	idnum	ID 数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
+	template <uint32_t dsize, uint32_t idnum>
 	struct flash_t {
+
+		static const auto DATA_SIZE = dsize;
+		static const uint32_t DATA_BLOCK_SIZE = 64;
+		static const auto ID_NUM = idnum;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -214,7 +220,7 @@ namespace device {
 		static FENTRYR_ FENTRYR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T) 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュプロテクトレジスタ（FPROTR）
@@ -259,7 +265,7 @@ namespace device {
 		static FSUINITR_ FSUINITR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ロックビットステータスレジスタ（FLKSTAT）
@@ -299,7 +305,7 @@ namespace device {
 		static FCMDR_ FCMDR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュ P/E ステータスレジスタ（FPESTAT）
@@ -366,7 +372,7 @@ namespace device {
 			typedef ro32_t<base> io_;
 			using io_::operator ();
 
-			bits_ro_t<io_, bitpos::B0, 17>  PSADR;
+			bits_ro_t<io_, bitpos::B0, 19>  PSADR;
 		};
 		typedef fpsaddr_t<0x007FE0D8> FPSADDR_;
 		static FPSADDR_ FPSADDR;
@@ -413,7 +419,7 @@ namespace device {
 		static FPCKAR_ FPCKAR;
 
 
-#if defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX72T)
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュアクセスウィンドウモニタレジスタ (FAWMON)
@@ -471,78 +477,72 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
-					※RX64M、RX71M には無い
+					※RX64M、RX71M には無いので仮想レジスタとしてダミーを定義
 		*/
 		//-----------------------------------------------------------------//
-#if defined(SIG_RX24T)
-		typedef ro32_t<0x007FC350> UIDR0_;
-		typedef ro32_t<0x007FC354> UIDR1_;
-		typedef ro32_t<0x007FC358> UIDR2_;
-		typedef ro32_t<0x007FC35C> UIDR3_;
-		static UIDR0_ UIDR0;
-		static UIDR1_ UIDR1;
-		static UIDR2_ UIDR2;
-		static UIDR3_ UIDR3;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+		typedef ro32_t<0xFFFFFFE8> UIDR0_;  ///< in VECTOR 
+		typedef ro32_t<0xFFFFFFEC> UIDR1_;  ///< in VECTOR 
+		typedef ro32_t<0xFFFFFFF0> UIDR2_;  ///< in VECTOR 
+		typedef ro32_t<0xFFFFFFF4> UIDR3_;  ///< in VECTOR 
 #elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		typedef ro32_t<0xFE7F7D90> UIDR0_;
 		typedef ro32_t<0xFE7F7D94> UIDR1_;
 		typedef ro32_t<0xFE7F7D98> UIDR2_;
 		typedef ro32_t<0xFE7F7D9C> UIDR3_;
-		static UIDR0_ UIDR0;
-		static UIDR1_ UIDR1;
-		static UIDR2_ UIDR2;
-		static UIDR3_ UIDR3;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 		typedef ro32_t<0x007FB174> UIDR0_;
 		typedef ro32_t<0x007FB1E4> UIDR1_;
 		typedef ro32_t<0x007FB1E8> UIDR2_;
+		typedef ro32_t<0xFFFFFFF4> UIDR3_;  ///< in VECTOR 
+#endif
 		static UIDR0_ UIDR0;
 		static UIDR1_ UIDR1;
 		static UIDR2_ UIDR2;
-#endif
+		static UIDR3_ UIDR3;
 	};
-	typedef flash_t<void> FLASH;
-
-	template <class _> typename flash_t<_>::FWEPROR_  flash_t<_>::FWEPROR;
-	template <class _> typename flash_t<_>::FASTAT_   flash_t<_>::FASTAT;
-	template <class _> typename flash_t<_>::FAEINT_   flash_t<_>::FAEINT;
-	template <class _> typename flash_t<_>::FRDYIE_   flash_t<_>::FRDYIE;
-	template <class _> typename flash_t<_>::FSADDR_   flash_t<_>::FSADDR;
-	template <class _> typename flash_t<_>::FEADDR_   flash_t<_>::FEADDR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FWEPROR_  flash_t<dsize, idnum>::FWEPROR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FASTAT_   flash_t<dsize, idnum>::FASTAT;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FAEINT_   flash_t<dsize, idnum>::FAEINT;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FRDYIE_   flash_t<dsize, idnum>::FRDYIE;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSADDR_   flash_t<dsize, idnum>::FSADDR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FEADDR_   flash_t<dsize, idnum>::FEADDR;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	template <class _> typename flash_t<_>::FCURAME_  flash_t<_>::FCURAME;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FCURAME_  flash_t<dsize, idnum>::FCURAME;
 #endif
-	template <class _> typename flash_t<_>::FSTATR_   flash_t<_>::FSTATR;
-	template <class _> typename flash_t<_>::FENTRYR_  flash_t<_>::FENTRYR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSTATR_   flash_t<dsize, idnum>::FSTATR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FENTRYR_  flash_t<dsize, idnum>::FENTRYR;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	template <class _> typename flash_t<_>::FPROTR_   flash_t<_>::FPROTR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPROTR_   flash_t<dsize, idnum>::FPROTR;
 #endif
-	template <class _> typename flash_t<_>::FSUINITR_ flash_t<_>::FSUINITR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSUINITR_ flash_t<dsize, idnum>::FSUINITR;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	template <class _> typename flash_t<_>::FLKSTAT_  flash_t<_>::FLKSTAT;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FLKSTAT_  flash_t<dsize, idnum>::FLKSTAT;
 #endif
-	template <class _> typename flash_t<_>::FCMDR_    flash_t<_>::FCMDR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FCMDR_    flash_t<dsize, idnum>::FCMDR;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	template <class _> typename flash_t<_>::FPESTAT_  flash_t<_>::FPESTAT;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPESTAT_  flash_t<dsize, idnum>::FPESTAT;
 #endif
-	template <class _> typename flash_t<_>::FBCCNT_   flash_t<_>::FBCCNT;
-	template <class _> typename flash_t<_>::FBCSTAT_  flash_t<_>::FBCSTAT;
-	template <class _> typename flash_t<_>::FPSADDR_  flash_t<_>::FPSADDR;
-	template <class _> typename flash_t<_>::FCPSR_    flash_t<_>::FCPSR;
-	template <class _> typename flash_t<_>::FPCKAR_   flash_t<_>::FPCKAR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FBCCNT_   flash_t<dsize, idnum>::FBCCNT;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FBCSTAT_  flash_t<dsize, idnum>::FBCSTAT;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPSADDR_  flash_t<dsize, idnum>::FPSADDR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FCPSR_    flash_t<dsize, idnum>::FCPSR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPCKAR_   flash_t<dsize, idnum>::FPCKAR;
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename flash_t<_>::FAWMON_   flash_t<_>::FAWMON;
-	template <class _> typename flash_t<_>::FSUACR_   flash_t<_>::FSUACR;
-	template <class _> typename flash_t<_>::EEPFCLK_  flash_t<_>::EEPFCLK;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FAWMON_   flash_t<dsize, idnum>::FAWMON;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSUACR_   flash_t<dsize, idnum>::FSUACR;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::EEPFCLK_  flash_t<dsize, idnum>::EEPFCLK;
 #endif
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR0_  flash_t<dsize, idnum>::UIDR0;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR1_  flash_t<dsize, idnum>::UIDR1;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR2_  flash_t<dsize, idnum>::UIDR2;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR3_  flash_t<dsize, idnum>::UIDR3;
+
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
+	typedef flash_t<65536, 0> FLASH;
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+	typedef flash_t<32768, 3> FLASH;
 #else
-	template <class _> typename flash_t<_>::UIDR0_  flash_t<_>::UIDR0;
-	template <class _> typename flash_t<_>::UIDR1_  flash_t<_>::UIDR1;
-	template <class _> typename flash_t<_>::UIDR2_  flash_t<_>::UIDR2;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
-#else
-	template <class _> typename flash_t<_>::UIDR3_  flash_t<_>::UIDR3;
+	typedef flash_t<32768, 4> FLASH;
 #endif
 }
