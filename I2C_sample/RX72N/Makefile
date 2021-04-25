@@ -24,7 +24,8 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	I2C_sample/main.cpp
+PSOURCES	=	I2C_sample/main.cpp \
+				common/stdapi.cpp
 
 USER_LIBS	=	supc++
 
