@@ -295,4 +295,6 @@ namespace device {
 			protect_enable_();			
 		}
 	};
+
+	template <class GPTWX, class CMTASK, typename port_map_gptw::option PSEL> CMTASK gptw_mgr<GPTWX, CMTASK, PSEL>::cmtask_;
 }

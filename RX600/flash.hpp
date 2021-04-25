@@ -476,6 +476,17 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  FACIコマンド発行領域 007E 0000h 4バイト
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x007E0000> FACI_CMD_AREA_;
+		static FACI_CMD_AREA_ FACI_CMD_AREA;		///< byte 書き込み
+		typedef rw16_t<0x007E0000> FACI_CMD_AREA16_;
+		static FACI_CMD_AREA16_ FACI_CMD_AREA16;	///< word(16) 書き込み
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
 					※RX64M、RX71M には無いので仮想レジスタとしてダミーを定義
 		*/
@@ -512,7 +523,7 @@ namespace device {
 #endif
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSTATR_   flash_t<dsize, idnum>::FSTATR;
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FENTRYR_  flash_t<dsize, idnum>::FENTRYR;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPROTR_   flash_t<dsize, idnum>::FPROTR;
 #endif
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSUINITR_ flash_t<dsize, idnum>::FSUINITR;
@@ -533,6 +544,10 @@ namespace device {
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSUACR_   flash_t<dsize, idnum>::FSUACR;
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::EEPFCLK_  flash_t<dsize, idnum>::EEPFCLK;
 #endif
+
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FACI_CMD_AREA_ flash_t<dsize, idnum>::FACI_CMD_AREA;
+	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FACI_CMD_AREA16_ flash_t<dsize, idnum>::FACI_CMD_AREA16;
+
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR0_  flash_t<dsize, idnum>::UIDR0;
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR1_  flash_t<dsize, idnum>::UIDR1;
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR2_  flash_t<dsize, idnum>::UIDR2;

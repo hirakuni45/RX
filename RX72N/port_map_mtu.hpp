@@ -474,12 +474,12 @@ namespace device {
 			switch(ch) {
 			/// MTIOC4A (入出力)
 			///      224  176  144  100
-			/// P21    ○
-			/// P24    ○
-			/// P82    ○
-			/// PA0    ○
-			/// PB3    ○
-			/// PE2    ○
+			/// P21    ○   44   36   27
+			/// P24    ○   40   33   24
+			/// P82    ○   79   63    x
+			/// PA0    ○  118   97   70
+			/// PB3    ○   98   82   57
+			/// PE2    ○  133  109   76
 			case CHANNEL::A:
 				switch(order) {
 				case ORDER::FIRST:
@@ -519,12 +519,12 @@ namespace device {
 				break;
 			/// MTIOC4B (入出力)
 			///      224  176  144  100
-			/// P17    ○
-			/// P30    ○
-			/// P54    ○
-			/// PC2    ○
-			/// PD1    ○
-			/// PE3    ○
+			/// P17    ○   46   38   29
+			/// P30    ○   33   29   20
+			/// P54    ○   66   52   40
+			/// PC2    ○   86   70   50
+			/// PD1    ○  156  125   85
+			/// PE3    ○  132  108   75
 			case CHANNEL::B:
 				switch(order) {
 				case ORDER::FIRST:
@@ -856,7 +856,7 @@ namespace device {
 			switch(ch) {
 			/// MTIOC7A (入出力)
 			///      224  176  144  100
-			/// PA2    ○
+			/// PA2    ○  112   95   68
 			case CHANNEL::A:
 				switch(order) {
 				case ORDER::FIRST:
@@ -871,7 +871,7 @@ namespace device {
 				break;
 			/// MTIOC7B (入出力)
 			///      224  176  144  100
-			/// PA1    ○
+			/// PA1    ○  114   96   69
 			case CHANNEL::B:
 				switch(order) {
 				case ORDER::FIRST:
@@ -886,7 +886,7 @@ namespace device {
 				break;
 			/// MTIOC7C (入出力)
 			///      224  176  144  100
-			/// P67    ○
+			/// P67    ○  120   98    x
 			case CHANNEL::C:
 				switch(order) {
 				case ORDER::FIRST:
@@ -901,7 +901,7 @@ namespace device {
 				break;
 			/// MTIOC7D (入出力)
 			///      224  176  144  100
-			/// P66    ○
+			/// P66    ○  122   99    x
 			case CHANNEL::D:
 				switch(order) {
 				case ORDER::FIRST:
@@ -928,7 +928,7 @@ namespace device {
 			switch(ch) {
 			/// MTIOC8A (入出力)
 			///      224  176  144  100
-			/// PD6    ○
+			/// PD6    ○  145  120   80
 			case CHANNEL::A:
 				switch(order) {
 				case ORDER::FIRST:
@@ -943,7 +943,7 @@ namespace device {
 				break;
 			/// MTIOC8B (入出力)
 			///      224  176  144  100
-			/// PD4    ○
+			/// PD4    ○  148  122   82
 			case CHANNEL::B:
 				switch(order) {
 				case ORDER::FIRST:
@@ -958,7 +958,7 @@ namespace device {
 				break;
 			/// MTIOC8C (入出力)
 			///      224  176  144  100
-			/// PD5    ○
+			/// PD5    ○  147  121   81
 			case CHANNEL::C:
 				switch(order) {
 				case ORDER::FIRST:
@@ -973,7 +973,7 @@ namespace device {
 				break;
 			/// MTIOC8D (入出力)
 			///      224  176  144  100
-			/// PD3    ○
+			/// PD3    ○  150  123   83
 			case CHANNEL::D:
 				switch(order) {
 				case ORDER::FIRST:
@@ -1053,6 +1053,7 @@ namespace device {
 		}
 
 
+// under constructions!
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマー系、クロックポート切り替え
@@ -1213,4 +1214,3 @@ namespace device {
 		}
 	};
 }
-

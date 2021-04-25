@@ -1807,17 +1807,28 @@ namespace device {
 			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Ah）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087700> PIBR0;
-		static pixr_t<0x00087701> PIBR1;
-		static pixr_t<0x00087702> PIBR2;
-		static pixr_t<0x00087703> PIBR3;
-		static pixr_t<0x00087704> PIBR4;
-		static pixr_t<0x00087705> PIBR5;
-		static pixr_t<0x00087706> PIBR6;
-		static pixr_t<0x00087707> PIBR7;
-		static pixr_t<0x00087708> PIBR8;
-		static pixr_t<0x00087709> PIBR9;
-		static pixr_t<0x0008770A> PIBRA;
+		typedef pixr_t<0x00087700> PIBR0_;
+		static PIBR0_ PIBR0;
+		typedef pixr_t<0x00087701> PIBR1_;
+		static PIBR1_ PIBR1;
+		typedef pixr_t<0x00087702> PIBR2_;
+		static PIBR2_ PIBR2;
+		typedef pixr_t<0x00087703> PIBR3_;
+		static PIBR3_ PIBR3;
+		typedef pixr_t<0x00087704> PIBR4_;
+		static PIBR4_ PIBR4;
+		typedef pixr_t<0x00087705> PIBR5_;
+		static PIBR5_ PIBR5;
+		typedef pixr_t<0x00087706> PIBR6_;
+		static PIBR6_ PIBR6;
+		typedef pixr_t<0x00087707> PIBR7_;
+		static PIBR7_ PIBR7;
+		typedef pixr_t<0x00087708> PIBR8_;
+		static PIBR8_ PIBR8;
+		typedef pixr_t<0x00087709> PIBR9_;
+		static PIBR9_ PIBR9;
+		typedef pixr_t<0x0008770A> PIBRA_;
+		static PIBRA_ PIBRA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2029,6 +2040,18 @@ namespace device {
 	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
 
 	template<class _> typename icu_t<_>::GCRBE0_ icu_t<_>::GCRBE0;
+
+	template<class _> typename icu_t<_>::PIBR0_ icu_t<_>::PIBR0;
+	template<class _> typename icu_t<_>::PIBR1_ icu_t<_>::PIBR1;
+	template<class _> typename icu_t<_>::PIBR2_ icu_t<_>::PIBR2;
+	template<class _> typename icu_t<_>::PIBR3_ icu_t<_>::PIBR3;
+	template<class _> typename icu_t<_>::PIBR4_ icu_t<_>::PIBR4;
+	template<class _> typename icu_t<_>::PIBR5_ icu_t<_>::PIBR5;
+	template<class _> typename icu_t<_>::PIBR6_ icu_t<_>::PIBR6;
+	template<class _> typename icu_t<_>::PIBR7_ icu_t<_>::PIBR7;
+	template<class _> typename icu_t<_>::PIBR8_ icu_t<_>::PIBR8;
+	template<class _> typename icu_t<_>::PIBR9_ icu_t<_>::PIBR9;
+	template<class _> typename icu_t<_>::PIBRA_ icu_t<_>::PIBRA;
 
 	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
 	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;

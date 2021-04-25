@@ -78,17 +78,11 @@ namespace device {
 
 		bool	trans_farm_;
 
-		/// FACIコマンド発行領域 007E 0000h 4バイト
-		typedef rw8_t<0x007E0000> FACI_CMD_AREA_;
-		static FACI_CMD_AREA_ FACI_CMD_AREA;		///< byte 書き込み
-		typedef rw16_t<0x007E0000> FACI_CMD_AREA16_;
-		static FACI_CMD_AREA16_ FACI_CMD_AREA16;	///< word(16) 書き込み
-
 		// return 「true」正常、「false」ロック状態
 		// 強制終了コマンド
 		bool turn_break_() const noexcept
 		{
-			FACI_CMD_AREA = 0xB3;
+			FLASH::FACI_CMD_AREA = 0xB3;
 
 			// break (4 bytes): FCLK 20MHz to 60MHz max 20us
 			//                  FCLK 4MHz max 32us
@@ -214,23 +208,23 @@ namespace device {
 #endif
 			device::FLASH::FSADDR = org;
 
-			FACI_CMD_AREA = 0xE8;
-			FACI_CMD_AREA = 0x02;
+			FLASH::FACI_CMD_AREA = 0xE8;
+			FLASH::FACI_CMD_AREA = 0x02;
 
 			const uint8_t* p = static_cast<const uint8_t*>(src);
-			FACI_CMD_AREA16 = (static_cast<uint16_t>(p[1]) << 8) | static_cast<uint16_t>(p[0]);
+			FLASH::FACI_CMD_AREA16 = (static_cast<uint16_t>(p[1]) << 8) | static_cast<uint16_t>(p[0]);
 
 			while(device::FLASH::FSTATR.DBFULL() != 0) {
 				asm("nop");
 			}
 
-			FACI_CMD_AREA16 = (static_cast<uint16_t>(p[3]) << 8) | static_cast<uint16_t>(p[2]);
+			FLASH::FACI_CMD_AREA16 = (static_cast<uint16_t>(p[3]) << 8) | static_cast<uint16_t>(p[2]);
 
 			while(device::FLASH::FSTATR.DBFULL() != 0) {
 				asm("nop");
 			}
 
-			FACI_CMD_AREA = 0xD0;
+			FLASH::FACI_CMD_AREA = 0xD0;
 
 
 			// write (4 bytes): FCLK 20MHz to 60MHz max 1.7ms
@@ -391,8 +385,8 @@ namespace device {
 			device::FLASH::FSADDR = org;
 			device::FLASH::FEADDR = org + len - 1;
 
-			FACI_CMD_AREA = 0x71;
-			FACI_CMD_AREA = 0xD0;
+			FLASH::FACI_CMD_AREA = 0x71;
+			FLASH::FACI_CMD_AREA = 0xD0;
 
 			// erase cheak (4 bytes): FCLK 20MHz to 60MHz max 30us
 			//                        FCLK 4MHz max 84us
@@ -445,8 +439,8 @@ namespace device {
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
 			device::FLASH::FSADDR = org;
 
-			FACI_CMD_AREA = 0x20;
-			FACI_CMD_AREA = 0xD0;
+			FLASH::FACI_CMD_AREA = 0x20;
+			FLASH::FACI_CMD_AREA = 0xD0;
 
 			// 64 bytes erase: FCLK 20MHz to 60MHz max 10ms
 			//                 FCLK 4MHz max 18ms
