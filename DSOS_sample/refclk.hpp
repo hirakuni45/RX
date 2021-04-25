@@ -28,11 +28,11 @@ namespace dsos {
 #if defined(SIG_RX65N)
 	// CN13 (1): PD1_AN109_IRQ1
 	typedef device::MTU4 MTU;
-	static const auto PSEL = device::port_map_mtu::option::FIFTH;
+	static const auto PSEL = device::port_map_mtu::ORDER::FIFTH;
 #elif defined(SIG_RX72N)
 	// Pmod2 (8): PD1_RESET
 	typedef device::MTU4 MTU;
-	static const auto PSEL = device::port_map_mtu::option::FIFTH;
+	static const auto PSEL = device::port_map_mtu::ORDER::FIFTH;
 #endif
 	typedef device::mtu_io<MTU, utils::null_task, utils::null_task, PSEL> MTU_IO;
 #else
@@ -63,7 +63,7 @@ namespace dsos {
 		{
 #ifndef GLFW_SIM
 			uint32_t freq = 10'000;
-			auto ret = mtu_io_.start_normal(MTU::channel::B, MTU_IO::OUTPUT::TOGGLE, freq);
+			auto ret = mtu_io_.start_normal(MTU::CHANNEL::B, MTU_IO::OUTPUT::TOGGLE, freq);
 			return ret;
 #else
 			return true;

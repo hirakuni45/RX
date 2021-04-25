@@ -95,7 +95,7 @@ namespace cnc {
 					if(acc_step_ > 0) {
 						frq_ += acc_;
 						--acc_step_;
-						MTU::set_freq(device::MTU0::channel::A, frq_);
+						MTU::set_freq(device::MTU0::CHANNEL::A, frq_);
 					} else if(lin_step_ > 0) {
 						--lin_step_;
 					} else {
@@ -103,7 +103,7 @@ namespace cnc {
 						if(frq_ < 100) {
 							frq_ = 100;
 						}
-						MTU::set_freq(device::MTU0::channel::A, frq_);
+						MTU::set_freq(device::MTU0::CHANNEL::A, frq_);
 					}
 				}
 				++count_;
@@ -467,7 +467,7 @@ namespace cnc {
 
 			// MTU3 をノーマルモードで起動、初期 100Hz
 			uint8_t intr = 4;
-			auto ch = device::MTU0::channel::A;
+			auto ch = device::MTU0::CHANNEL::A;
 			auto ot = MTU::OUTPUT::NONE;
 			auto f = mtu_.start_normal(ch, ot, 100, intr);
 
