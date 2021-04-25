@@ -1369,7 +1369,7 @@ namespace device {
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR;
 
-#if defined(SIG_RX72N) || defined(SIG_RX66T) || defined(SIG_RX72T) 
+#if defined(SIG_RX72N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) 
 	typedef gptw_t<0x000C2000, peripheral::GPTW0,
 		ICU::VECTOR_SELA::GTCIA0, ICU::VECTOR_SELA::GTCIB0, ICU::VECTOR_SELA::GTCIC0,
 		ICU::VECTOR_SELA::GTCID0, ICU::VECTOR_SELA::GDTE0,  ICU::VECTOR_SELA::GTCIE0,
