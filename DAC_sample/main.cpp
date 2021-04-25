@@ -155,7 +155,7 @@ namespace {
 				}
 			}
 		} else if(cmd_.cmp_word(0, "clear")) {
-			device::ICU::PIAR0.PIR0 = 0;
+//			device::ICU::PIAR0.PIR0 = 0;
 		} else if(cmd_.cmp_word(0, "?") || cmd_.cmp_word(0, "help")) {
 		} else {
 			const char* p = cmd_.get_command();

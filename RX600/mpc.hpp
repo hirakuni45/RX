@@ -952,7 +952,7 @@ namespace device {
 #endif
 	template<class _> typename mpc_t<_>::P66PFS_ mpc_t<_>::P66PFS;
 	template<class _> typename mpc_t<_>::P67PFS_ mpc_t<_>::P67PFS;
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	template<class _> typename mpc_t<_>::P60PFS_ mpc_t<_>::P60PFS;
 	template<class _> typename mpc_t<_>::P61PFS_ mpc_t<_>::P61PFS;
 	template<class _> typename mpc_t<_>::P62PFS_ mpc_t<_>::P62PFS;
