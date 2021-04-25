@@ -26,7 +26,8 @@ namespace utils {
 	template <class NVAL, class SYMBOL, class FUNC>
 	struct basic_arith {
 
-		static const uint32_t NUMBER_NUM = 50;  // 最大桁数
+		static const uint32_t NUMBER_NUM = 50;  ///< 最大桁数
+		static const uint32_t NEST_MAX   = 10;  ///< 最大ネスト
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -41,6 +42,7 @@ namespace utils {
 			octal_fatal,		///< ８進データの変換に関するエラー
 			hexdecimal_fatal,	///< １６進データの変換に関するエラー
 			num_fatal,			///< 数値の変換に関するエラー
+			nest_fatal,			///< 深度が制限を超えたエラー
 			symbol_fatal,		///< シンボルデータの変換に関するエラー
 			func_fatal,			///< 関数の変換に関するエラー
 		};
@@ -60,6 +62,8 @@ namespace utils {
 		NVAL		value_;
 
 		bool		str_;
+
+		uint32_t	nest_;
 
 
 		// 関数内パラメーターの取得
@@ -275,6 +279,10 @@ namespace utils {
 
 		NVAL expression_() noexcept
 		{
+			++nest_;
+			if(nest_ >= NEST_MAX) {
+				error_.set(error::nest_fatal);
+			}
 			NVAL v = term_();
 			while(error_() == 0) {
 				switch(ch_) {
@@ -316,7 +324,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		basic_arith(SYMBOL& symbol, FUNC& func) noexcept : symbol_(symbol), func_(func),
-			tx_(nullptr), ch_(0), error_(), value_(), str_(false)
+			tx_(nullptr), ch_(0), error_(), value_(), str_(false), nest_(0)
 		{ }
 
 
@@ -340,6 +348,7 @@ namespace utils {
 			str_ = str;
 
 			error_.clear();
+			nest_ = 0;
 
 			ch_ = *tx_++;
 			if(ch_ != 0) {

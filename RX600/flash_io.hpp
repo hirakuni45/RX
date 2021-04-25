@@ -1,16 +1,17 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65N/RX66T/RX72M/RX72N グループ FLASH 制御 @n
+	@brief	RX64M/RX71M/RX65N/RX66T/RX72T/RX72M/RX72N グループ FLASH 制御 @n
 			・データフラッシュ消去サイズ（６４バイト単位）
 			・データフラッシュ書き込みサイズ（４バイト単位）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstring>
+#include "common/renesas.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
@@ -21,16 +22,14 @@ namespace device {
 #  error "flash_io.hpp requires F_FCLK to be defined"
 #endif
 
-// #define FIO_DEBUG
+#define FIO_DEBUG
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  FLASH 制御クラス
-		@param[in]	DFSIZE	データ・フラッシュ・サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t DFSIZE>
-	class flash_io_t {
+	class flash_io {
 
 #ifdef FIO_DEBUG
 		typedef utils::format debug_format;
@@ -44,12 +43,12 @@ namespace device {
 			@brief  データ・フラッシュ構成 @n
 					RX64M/RX71M: ６４Ｋバイト、６４バイト、１０２４ブロック @n
 					RX651/RX65N: ３２Ｋバイト、６４バイト、５１２ブロック
-					RX66T:       ３２Ｋバイト、６４バイト、５１２ブロック
+					RX66T/RX72T: ３２Ｋバイト、６４バイト、５１２ブロック
 		*/
 		//-----------------------------------------------------------------//
-		static const uint32_t data_flash_block = 64;	///< データ・フラッシュのブロックサイズ
-		static const uint32_t data_flash_size  = DFSIZE;	///< データ・フラッシュの容量
-		static const uint32_t data_flash_bank  = DFSIZE / data_flash_block;	///< データ・フラッシュのバンク数
+		static const uint32_t data_flash_size  = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
+		static const uint32_t data_flash_block = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
+		static const uint32_t data_flash_bank  = FLASH::DATA_SIZE / data_flash_block;	///< データ・フラッシュのバンク数
 		static const uint32_t data_flash_word  = 4;		///< データ・フラッシュ書き込みワードサイズ
 
 
@@ -60,6 +59,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		enum class error : uint8_t {
 			NONE,		///< エラー無し
+			INIT,		///< 初期化エラー
 			ADDRESS,	///< アドレス・エラー
 			TIMEOUT,	///< タイム・アウト・エラー
 			LOCK,		///< ロック・エラー
@@ -86,7 +86,7 @@ namespace device {
 
 		// return 「true」正常、「false」ロック状態
 		// 強制終了コマンド
-		bool turn_break_() const
+		bool turn_break_() const noexcept
 		{
 			FACI_CMD_AREA = 0xB3;
 
@@ -114,7 +114,7 @@ namespace device {
 		}
 
 
-		void turn_rd_()
+		void turn_rd_() noexcept
 		{
 			uint32_t n = 5;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
@@ -135,14 +135,25 @@ namespace device {
 		}
 
 
-		void turn_pe_()
+		void turn_pe_() noexcept
 		{
+			uint32_t n = 100;  // 最大１００マイクロ秒待つ
+			while(device::FLASH::FSTATR.FRDY() == 0) {
+				utils::delay::micro_second(1);
+				--n;
+				if(n == 0) {
+					debug_format("FACI not ready...\n");
+					return;
+				}
+			} 
+
 			device::FLASH::FENTRYR = 0xAA80;
 
-			if(device::FLASH::FENTRYR() != 0x0080) {
+			if(device::FLASH::FENTRYR() == 0x0080) {
+				mode_ = mode::PE;
+			} else {
 				debug_format("FACI 'turn_pe_' fail\n");
 			}
-			mode_ = mode::PE;
 		}
 
 
@@ -150,7 +161,7 @@ namespace device {
 		/// FCUファームウェア格納領域 FEFF F000h～FEFF FFFFh 4Kバイト
 		/// FCURAM領域 007F 8000h～007F 8FFFh 4Kバイト
 		/// コンフィギュレーション設定領域 0012 0040h～0012 007Fh 64バイト
-		bool init_fcu_()
+		bool init_fcu_() noexcept
 		{
 			if(trans_farm_) return true;
 
@@ -176,7 +187,7 @@ namespace device {
 				*dst++ = *src++;
 			}
 			device::FLASH::FCURAME = 0xC400;
-#elif defined(SIG_RX72M) || defined(SIG_RX72N)
+#elif defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX72T)
 			device::FLASH::FSUINITR = 0x2D01;
 #endif
 
@@ -196,9 +207,9 @@ namespace device {
 
 		// 4 バイト書き込み
 		// org: align 4 bytes
-		bool write32_(const void* src, uint32_t org)
+		bool write32_(const void* src, uint32_t org) noexcept
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
 			device::FLASH::FPROTR = 0x5501;
 #endif
 			device::FLASH::FSADDR = org;
@@ -255,7 +266,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io_t() noexcept : error_(error::NONE), mode_(mode::NONE), trans_farm_(false) { }
+		flash_io() noexcept : error_(error::NONE), mode_(mode::NONE), trans_farm_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -264,7 +275,16 @@ namespace device {
 			@return エラー・ステータス
 		 */
 		//-----------------------------------------------------------------//
-		error get_last_error() const { return error_; }
+		error get_last_error() const noexcept { return error_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	エラー・ステータスを取得
+			@return エラー・ステータス
+		 */
+		//-----------------------------------------------------------------//
+		void reset_last_error() noexcept { error_ = error::NONE; }
 
 
 		//-----------------------------------------------------------------//
@@ -277,27 +297,29 @@ namespace device {
 		{
 			if(trans_farm_) return false;  // ファームが既に転送済み
 
-			device::FLASH::FWEPROR.FLWE = 1;
+			device::FLASH::FWEPROR.FLWE = 0b01;
 
+			// クロック速度の最適化
 			uint32_t clk = ((static_cast<uint32_t>(F_FCLK) / 500'000) + 1) >> 1;
 			if(clk > 60) {
 				clk = 60;
 			}
 			device::FLASH::FPCKAR = 0x1E00 | clk;
-#if defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 			device::FLASH::EEPFCLK = clk;
 #endif
-			init_fcu_();
+			auto state = init_fcu_();
+			if(!state) {
+				error_ = error::INIT;
+			}
 
-			error_ = error::NONE;
-
-			return true;
+			return state;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  読み出し
+			@brief  １バイトの読み出し
 			@param[in]	org	開始アドレス
 			@return データ
 		*/
@@ -312,8 +334,6 @@ namespace device {
 			if(mode_ != mode::RD) {
 				turn_rd_();
 			}
-
-			error_ = error::NONE;
 
 			return device::rd8_(0x00100000 + org);
 		}
@@ -343,8 +363,6 @@ namespace device {
 
 			const void* src = reinterpret_cast<const void*>(0x00100000 + org);
 			std::memcpy(dst, src, len);
-
-			error_ = error::NONE;
 
 			return true;
 		}
@@ -421,7 +439,7 @@ namespace device {
 				turn_pe_();
 			}
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
 			device::FLASH::FPROTR = 0x5501;  // ロックビットプロテクト無効
 #endif
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
@@ -434,7 +452,7 @@ namespace device {
 			//                 FCLK 4MHz max 18ms
 			// * 1.1
 			uint32_t cnt = 1100;
-			if(F_FCLK < 20000000) cnt = 1980;
+			if(F_FCLK < 20'000'000) cnt = 1980;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(10);
 				--cnt;
@@ -449,7 +467,6 @@ namespace device {
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
-				error_ = error::NONE;
 				return true;
 			} else {
 				error_ = error::LOCK;
@@ -484,7 +501,7 @@ namespace device {
 			@brief  書き込み @n
 					※仕様上、４バイト単位で書き込まれる。@n
 					※４バイト未満の場合は、０ｘＦＦが書き込まれる
-			@param[in]	org	開始オフセット
+			@param[in]	org	開始アドレス
 			@param[in]	src ソース
 			@param[in]	len	バイト数
 			@return エラーがあれば「false」
@@ -532,56 +549,45 @@ namespace device {
 				org += 4;
 			}
 
-			if(f) {
-				error_ = error::NONE;
-			}
-
 			return f;
 		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  プロセッサIDの取得
-			@param[in]	idx		プロセッサIDインデックス
-			@param[out]	id		固有のID
-			@return 取得が成功しない場合「false」
+			@brief  ユニーク ID 数を取得 @n
+					RX64M などユニーク ID をサポートしない場合は「０」が返る。
+			@return ユニーク ID 数
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool get_processor_id(uint32_t idx, uint32_t& id) noexcept
+		static uint32_t get_uid_num() noexcept
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			return false;
-#elif defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N) 
+			return FLASH::ID_NUM;
+		} 
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ユニーク ID の取得 @no
+					RX64M などユニーク ID をサポートしない場合、特定の ROM 領域を返す。 
+			@param[in]	idx		ID 番号（０～３）
+			@return ID 値
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static uint32_t get_uid(uint32_t idx) noexcept
+		{
 			switch(idx) {
 			case 0:
-				id = FLASH::UIDR0();
-				return true;
+				return FLASH::UIDR0();
 			case 1:
-				id = FLASH::UIDR1();
-				return true;
+				return FLASH::UIDR1();
 			case 2:
-				id = FLASH::UIDR2();
-				return true;
-#if !(defined(SIG_RX66T) || defined(SIG_RX72T))
+				return FLASH::UIDR2();
 			case 3:
-				id = FLASH::UIDR3();
-				return true;
-#endif
+				return FLASH::UIDR3();
 			default:
-				return false;
+				return 0;
 			}
-#endif
 		}
 	};
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef flash_io_t<65536> flash_io;
-#elif defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef flash_io_t<32768> flash_io;
-#endif
-
-	template <uint32_t DFSIZE> typename flash_io_t<DFSIZE>::FACI_CMD_AREA_
-		flash_io_t<DFSIZE>::FACI_CMD_AREA;
-	template <uint32_t DFSIZE> typename flash_io_t<DFSIZE>::FACI_CMD_AREA16_
-		flash_io_t<DFSIZE>::FACI_CMD_AREA16;
 }

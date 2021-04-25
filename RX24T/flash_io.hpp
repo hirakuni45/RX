@@ -260,5 +260,43 @@ namespace device {
 			}
 			return ret;
 		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ユニーク ID 数を取得 @n
+					RX64M などユニーク ID をサポートしない場合は「０」が返る。
+			@return ユニーク ID 数
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static uint32_t get_uid_num() noexcept
+		{
+			return FLASH::ID_NUM;
+		} 
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ユニーク ID の取得 @no
+					RX64M などユニーク ID をサポートしない場合、特定の ROM 領域を返す。 
+			@param[in]	idx		ID 番号（０～３）
+			@return ID 値
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static uint32_t get_uid(uint32_t idx) noexcept
+		{
+			switch(idx) {
+			case 0:
+				return FLASH::UIDR0();
+			case 1:
+				return FLASH::UIDR1();
+			case 2:
+				return FLASH::UIDR2();
+			case 3:
+				return FLASH::UIDR3();
+			default:
+				return 0;
+			}
+		}
 	};
 }

@@ -263,10 +263,10 @@ namespace device {
 			@brief  P6n 端子機能制御レジスタ（P6nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		typedef pfsy_t<0x0008C170> P60PFS_;
 		static P60PFS_ P60PFS;
-#if defined(SIG_RX72N)
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 		typedef pfsy_t<0x0008C171> P61PFS_;
 		typedef pfsy_t<0x0008C172> P62PFS_;
 		typedef pfsy_t<0x0008C173> P63PFS_;
@@ -525,7 +525,7 @@ namespace device {
 			@brief  PJn 端子機能制御レジスタ（PJnPFS）（n = 0 ～ 3, 5）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-#if defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		typedef pfsw_t<0x0008C1D0> PJ0PFS_;
 		static PJ0PFS_ PJ0PFS;
 		typedef pfsw_t<0x0008C1D1> PJ1PFS_;
@@ -539,7 +539,7 @@ namespace device {
 		static PJ5PFS_ PJ5PFS;
 
 
-#if defined(SIG_RX72N) || defined(SIG_RX72T)
+#if defined(SIG_RX72N) || defined(SIG_RX72T) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PKn 端子機能制御レジスタ (PKnPFS) (n = 0 ～ 7)
@@ -563,7 +563,7 @@ namespace device {
 		static PK7PFS_ PK7PFS;
 #endif
 
-#if defined(SIG_RX72N)
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	PLn 端子機能制御レジスタ (PLnPFS) (n = 0 ～ 7)
