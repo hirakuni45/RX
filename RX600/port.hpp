@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・ポート・レジスター定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -130,9 +130,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> B0;
 			bit_rw_t<io_, bitpos::B2> B2;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B3> B3;
-#endif
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
@@ -157,9 +155,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> B0;
 			bit_rw_t<io_, bitpos::B2> B2;
 			bit_rw_t<io_, bitpos::B4> B4;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B6> B6;
-#endif
 		};
 		typedef odr1_t<base + 1> ODR1_;
 		static ODR1_ ODR1;
@@ -204,7 +200,7 @@ namespace device {
 	template <uint32_t base> typename odr_ox_t<base>::ODR0_ ODR0;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
 	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
 	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
@@ -223,6 +219,33 @@ namespace device {
 	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
 	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
 	typedef port_t<0x0008C012, odr_oo_t<0x0008C0A4> > PORTJ;
+#elif defined(SIG_RX72M) || defined(SIG_RX72N)
+	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
+	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
+	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
+	typedef port_t<0x0008C003, odr_oo_t<0x0008C086> > PORT3;
+	typedef port_t<0x0008C004, odr_oo_t<0x0008C088> > PORT4;
+	typedef port_t<0x0008C005, odr_oo_t<0x0008C08A> > PORT5;
+	typedef port_t<0x0008C006, odr_oo_t<0x0008C08C> > PORT6;
+	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
+	typedef port_t<0x0008C008, odr_oo_t<0x0008C090> > PORT8;
+	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
+	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
+	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
+	typedef port_t<0x0008C00C, odr_oo_t<0x0008C098> > PORTC;
+	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
+	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
+	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
+	typedef port_t<0x0008C011, odr_oo_t<0x0008C0A2> > PORTH;
+
+	typedef port_t<0x0008C012, odr_oo_t<0x0008C0A4> > PORTJ;
+	typedef port_t<0x0008C013, odr_oo_t<0x0008C0A6> > PORTK;
+	typedef port_t<0x0008C014, odr_oo_t<0x0008C0A8> > PORTL;
+	typedef port_t<0x0008C015, odr_oo_t<0x0008C0AA> > PORTM;
+	typedef port_t<0x0008C016, odr_oo_t<0x0008C0AC> > PORTN;
+
+	typedef port_t<0x0008C017, odr_oo_t<0x0008C0AE> > PORTQ;
 #elif defined(SIG_RX63T)
 	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
 	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
