@@ -10,11 +10,6 @@
 //=========================================================================//
 #include "common/renesas.hpp"
 
-/// F_PCLKC タイマーのクロックが必要なので定義が無い場合エラーにします。
-#ifndef F_PCLKC
-#  error "gptw_mgr.hpp requires F_PCLKC to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -24,35 +19,41 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class gptw_base {
 	public:
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  動作モード
+			@brief  動作モード型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class MODE : uint8_t {
-			PWM_S,		///< のこぎり波 PWM
-			SINGLE,		///< ワンショット・パルス
-			PWM_T1,		///< 三角波 PWM 1（谷32ビット転送）
-			PWM_T2,		///< 三角波 PWM 2（山/谷32ビット転送）
-			PWM_T3,		///< 三角波 PWM 3（谷64ビット転送）
+			PWM_S_HL,		///< のこぎり波 PWM (AB: H --> L) 
+			PWM_S_LH,		///< のこぎり波 PWM (AB: L --> H)
+			PWM_S_HL_LH,	///< のこぎり波 PWM (A: H --> L, B: L --> H)
+			PWM_S_LH_HL,	///< のこぎり波 PWM (A: L --> H, B: H --> L)
+			SINGLE,			///< ワンショット・パルス
+			PWM_T1,			///< 三角波 PWM 1（谷32ビット転送）
+			PWM_T2,			///< 三角波 PWM 2（山/谷32ビット転送）
+			PWM_T3,			///< 三角波 PWM 3（谷64ビット転送）
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  出力設定
+			@brief  出力型 @n
+					※反転出力は、RX66T、RX72T の場合にのみ有効
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class OUTPUT : uint8_t {
-			PA,		///< チャネル A 正出力 (PositiveA)
-			PB,		///< チャネル B 正出力 (PositiveB)
-			NA,		///< チャネル A 逆出力 (NegativeA)
-			NB,		///< チャネル B 逆出力 (NegativeB)
-			PA_PB,	///< チャネル A, B 正出力 (PositiveA, PositiveB)
-			PA_NB,	///< チャネル A 正出力、B 逆出力 (PositiveA, NegativeB)
-			NA_PB,	///< チャネル A 逆出力、B 正出力 (NegativeA, PositiveB)
-			NA_NB,	///< チャネル A, B 逆出力 (NegativeA, NegativeB)
+		enum class  OUTPUT : uint8_t {
+			NONE,	///< 無効
+
+			A,		///< A を利用
+			B,		///< B を利用
+			AB,		///< AB
+
+			NA,		///< 反転 A を利用
+			NB,		///< 反転 B を利用
+			NA_B,	///< 反転 A, 正 B を利用
+			A_NB,	///< 正 A, 反転 B を利用
+			NA_NB,	///< 反転 A, 反転 B を利用
 		};
 	};
 
@@ -60,21 +61,23 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  GPTW マネージャー・クラス
-		@param[in]	GPTWX	GPTW[0-9] ユニット
+		@param[in]	GPTWn	GPTW[n] ユニット
 		@param[in]	CMTASK	コンペアマッチタスク型
-		@param[in]	PSEL	入出力ポート選択
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GPTWX, class CMTASK = utils::null_task,
-		port_map_gptw::option PSEL = port_map_gptw::option::FIRST>
-	class gptw_mgr : public gptw_base {
+	template <class GPTWn, class CMTASK = utils::null_task>
+		class gptw_mgr : public gptw_base {
+	public:
+		typedef GPTWn value_type;
 
+	private:
 		// ※必要なら、実装する
 		void sleep_() { }
 
 		uint32_t	freq_;
 		uint32_t	base_;
 		uint8_t		ilvl_;
+		bool		buffer_;
 		ICU::VECTOR	cm_vec_;
 
 		static CMTASK	cmtask_;
@@ -87,7 +90,7 @@ namespace device {
 
 		void protect_enable_(bool ena = true) noexcept
 		{
-			GPTWX::GTWP = GPTWX::GTWP.PRKEY.b(0xA5) | GPTWX::GTWP.WP.b(ena);
+			GPTWn::GTWP = GPTWn::GTWP.PRKEY.b(0xA5) | GPTWn::GTWP.WP.b(ena);
 		}
 
 	public:
@@ -96,7 +99,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		gptw_mgr() noexcept : freq_(0), base_(0), ilvl_(0), cm_vec_(ICU::VECTOR::NONE)
+		gptw_mgr() noexcept : freq_(0), base_(0), ilvl_(0), buffer_(false), cm_vec_(ICU::VECTOR::NONE)
 		{ }
 
 
@@ -104,83 +107,104 @@ namespace device {
 		/*!
 			@brief  開始
 			@param[in]	mode	動作モード
-			@param[in]	out		出力設定
+			@param[in]	out		出力型
 			@param[in]	freq	周期
+			@param[in]	ord_a	ポート候補Ａ
+			@param[in]	ord_b	ポート候補Ｂ
 			@param[in]	ilvl	割り込みレベル（0 なら割り込み無し）
+			@param[in]	buffer	バッファー動作を無効にする場合「false」
+			@return 設定が適正なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(MODE mode, OUTPUT out, uint32_t freq, uint8_t ilvl = 0) noexcept
+		bool start(MODE mode, OUTPUT out, uint32_t freq, typename port_map_gptw::ORDER ord_a, typename port_map_gptw::ORDER ord_b,
+			uint8_t ilvl = 0, bool buffer = true) noexcept
 		{
 			if(freq == 0) return false;
 
-			if(!power_mgr::turn(GPTWX::PERIPHERAL)) {
+			if(!power_mgr::turn(GPTWn::PERIPHERAL)) {
 				return false;
 			}
 
-			bool nega = false;
-			bool negb = false;
 			bool outa = false;
 			bool outb = false;
+			bool nega = false;
+			bool negb = false;
 			switch(out) {
-			case OUTPUT::PA:
+			case OUTPUT::NONE:
+				break;
+			case OUTPUT::A:
 				outa = true;
+				break;
+			case OUTPUT::B:
+				outb = true;
+				break;
+			case OUTPUT::AB:
+				outa = true;
+				outb = true;
 				break;
 			case OUTPUT::NA:
-				nega = true;
 				outa = true;
-				break;
-			case OUTPUT::PB:
-				outb = true;
+				nega = true;
 				break;
 			case OUTPUT::NB:
-				negb = true;
-				outb = true;
-				break;
-
-			case OUTPUT::PA_PB:
-				outa = true;
-				outb = true;
-				break;
-			case OUTPUT::PA_NB:
-				outa = true;
 				outb = true;
 				negb = true;
 				break;
-			case OUTPUT::NA_PB:
-				outa = true;
-				outb = true;
+			case OUTPUT::NA_B:
+				outa = outb = true;
 				nega = true;
+				break;
+			case OUTPUT::A_NB:
+				outa = outb = true;
+				negb = true;
 				break;
 			case OUTPUT::NA_NB:
-				outa = true;
-				outb = true;
-				nega = true;
-				negb = true;
+				outa = outb = true;
+				nega = negb = true;
 				break;
 			}
 			if(outa) {
-				if(!port_map_gptw::turn(GPTWX::PERIPHERAL, port_map_gptw::channel::A, true, nega, PSEL)) {
-					power_mgr::turn(GPTWX::PERIPHERAL, false);
+				if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, true, nega, ord_a)) {
+					power_mgr::turn(GPTWn::PERIPHERAL, false);
 					return false;
 				}
 			}
 			if(outb) {
-				if(!port_map_gptw::turn(GPTWX::PERIPHERAL, port_map_gptw::channel::B, true, negb, PSEL)) {
-					power_mgr::turn(GPTWX::PERIPHERAL, false);
+				if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, true, negb, ord_b)) {
+					power_mgr::turn(GPTWn::PERIPHERAL, false);
 					return false;
 				}
 			}
 
 			freq_ = freq;
-			auto n = F_PCLKC / freq;
+			auto n = GPTWn::PCLK / freq;
 			if(n == 0) {
-				power_mgr::turn(GPTWX::PERIPHERAL, false);
+				power_mgr::turn(GPTWn::PERIPHERAL, false);
 				return false;
 			}
 			uint8_t md = 0;
+			uint8_t sign_a = 0;
+			uint8_t sign_b = 0;
 			switch(mode) {
-			case MODE::PWM_S:
+			case MODE::PWM_S_HL:
 				md = 0b000;
+				sign_a = 0b01001;
+				sign_b = 0b01001;
+				break;
+			case MODE::PWM_S_LH:
+				md = 0b000;
+				sign_a = 0b00110;
+				sign_b = 0b00110;
+				break;
+			case MODE::PWM_S_HL_LH:
+				md = 0b000;
+				sign_a = 0b01001;
+				sign_b = 0b00110;
+				break;
+			case MODE::PWM_S_LH_HL:
+				md = 0b000;
+				sign_a = 0b00110;
+				sign_b = 0b01001;
 				break;
 			case MODE::SINGLE:
 				md = 0b001;
@@ -201,23 +225,24 @@ namespace device {
 			base_ = n;
 
 			protect_enable_(false);
-			GPTWX::GTPR = n - 1;
+			GPTWn::GTPR = n - 1;  // +1 が周期になるので１引く
 
-			GPTWX::GTCR = GPTWX::GTCR.MD.b(md) | GPTWX::GTCR.CST.b();
-			GPTWX::GTIOR = GPTWX::GTIOR.OAE.b(outa) | GPTWX::GTIOR.OBE.b(outb)
-				| GPTWX::GTIOR.GTIOA.b(0b00110) | GPTWX::GTIOR.GTIOB.b(0b00110);
-
-		GPTWX::GTCCRA = base_ / 3;
-		GPTWX::GTCCRB = base_ * 2 / 3;
+			buffer_ = buffer;
+			if(buffer) {
+				GPTWn::GTBER = GPTWn::GTBER.BD0.b(0) | GPTWn::GTBER.CCRA.b(0b01) | GPTWn::GTBER.CCRB.b(0b01);
+			}
+			GPTWn::GTCR  = GPTWn::GTCR.MD.b(md) | GPTWn::GTCR.CST.b();
+			GPTWn::GTIOR = GPTWn::GTIOR.OAE.b(outa) | GPTWn::GTIOR.OBE.b(outb)
+				| GPTWn::GTIOR.GTIOA.b(sign_a) | GPTWn::GTIOR.GTIOB.b(sign_b);
 
 			ilvl_ = ilvl;
 			if(ilvl > 0) {
-				cm_vec_ = icu_mgr::set_interrupt(GPTWX::GTCIV, cmp_match_task_, ilvl);
-				GPTWX::GTINTAD.GTINTPR = 0b01;
+				cm_vec_ = icu_mgr::set_interrupt(GPTWn::GTCIV, cmp_match_task_, ilvl);
+				GPTWn::GTINTAD.GTINTPR = 0b01;
 			}
 
-			GPTWX::GTSTP = ~(1 << GPTWX::get_channel());  // 停止解除
-			GPTWX::GTSTR =   1 << GPTWX::get_channel();   // 開始
+			GPTWn::GTSTP = ~(1 << GPTWn::CHANNEL_NO);  // 停止解除
+			GPTWn::GTSTR =   1 << GPTWn::CHANNEL_NO;   // 開始
 
 			protect_enable_();
 
@@ -242,6 +267,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  チャネルのコンペア・マッチ、リミットを取得
+			@return リミットを値
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_base() const noexcept { return base_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A チャネルのコンペア・マッチを設定
 			@param[in] value	設定値
 		*/
@@ -249,7 +283,11 @@ namespace device {
 		void set_a(uint32_t value) noexcept
 		{
 			protect_enable_(false);
-			GPTWX::GTCCRA = value;
+			if(buffer_) {
+				GPTWn::GTCCRC = value - 1;
+			} else {
+				GPTWn::GTCCRA = value - 1;
+			}
 			protect_enable_();
 		}
 
@@ -263,38 +301,54 @@ namespace device {
 		void set_b(uint32_t value) noexcept
 		{
 			protect_enable_(false);
-			GPTWX::GTCCRB = value;
+			if(buffer_) {
+				GPTWn::GTCCRE = value - 1;
+			} else {
+				GPTWn::GTCCRB = value - 1;
+			}
 			protect_enable_();
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A チャネルの DUTY を設定 (PWM 時)
+			@brief  A チャネルの DUTY を設定 (PWM 時) @n
+					※浮動小数点のレンジに注意する事
 			@param[in] value	設定値(0.0 to 1.0)
 		*/
 		//-----------------------------------------------------------------//
 		void set_duty_a(float value) noexcept
 		{
 			protect_enable_(false);
-			GPTWX::GTCCRA = static_cast<uint32_t>(value * static_cast<float>(base_) / static_cast<float>(base_));
+			auto n = static_cast<uint32_t>(value * static_cast<float>(base_)) - 1;
+			if(buffer_) {
+				GPTWn::GTCCRC = n;
+			} else {
+				GPTWn::GTCCRA = n;
+			}
 			protect_enable_();			
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  B チャネルの DUTY を設定 (PWM 時)
+			@brief  B チャネルの DUTY を設定 (PWM 時) @n
+					※浮動小数点のレンジに注意する事
 			@param[in] value	設定値(0.0 to 1.0)
 		*/
 		//-----------------------------------------------------------------//
 		void set_duty_b(float value) noexcept
 		{
 			protect_enable_(false);
-			GPTWX::GTCCRB = static_cast<uint32_t>(value * static_cast<float>(base_) / static_cast<float>(base_));
+			auto n = static_cast<uint32_t>(value * static_cast<float>(base_)) - 1;
+			if(buffer_) {
+				GPTWn::GTCCRE = n;
+			} else {
+				GPTWn::GTCCRB = n;
+			}
 			protect_enable_();			
 		}
 	};
 
-	template <class GPTWX, class CMTASK, typename port_map_gptw::option PSEL> CMTASK gptw_mgr<GPTWX, CMTASK, PSEL>::cmtask_;
+	template <class GPTWn, class CMTASK> CMTASK gptw_mgr<GPTWn, CMTASK>::cmtask_;
 }

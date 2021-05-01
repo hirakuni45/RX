@@ -72,17 +72,24 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N" };
+	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
-	typedef device::GPTW0 GPTW_CH;
+	/// PMOD Connector: PD0(CN6-7), PD1(CN6-8)
+	typedef device::GPTW1 GPTW_CH;
+	const auto ORDER_A = device::port_map_gptw::ORDER::FOURTH;
+	const auto ORDER_B = device::port_map_gptw::ORDER::FOURTH;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T" };
 	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::GPTW0 GPTW_CH;
+	const auto ORDER_A = device::port_map_gptw::ORDER::FIRST;
+	const auto ORDER_B = device::port_map_gptw::ORDER::FIRST;
+
+	#define USE_HRPWM
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
@@ -97,11 +104,16 @@ namespace {
 	typedef utils::command<256> CMD;
 	CMD 	cmd_;
 
-	typedef device::gptw_mgr<GPTW_CH> GPTW;
+	typedef device::gptw_mgr<GPTW_CH, utils::null_task> GPTW;
 	GPTW	gptw_;
 
+#ifdef USE_HRPWM
 	typedef device::hrpwm_mgr<device::HRPWM> HRPWM;
 	HRPWM	hrpwm_;
+#endif
+
+	float	duty_a_;
+	float	duty_b_;
 }
 
 
@@ -166,15 +178,19 @@ int main(int argc, char** argv)
 		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
-	{  // GPTW の開始
-		uint32_t freq = 100'000;
-		// PA_PB: A チャネル正、B チャネル正 出力
-		if(gptw_.start(GPTW::MODE::PWM_S, GPTW::OUTPUT::PA_PB, freq)) {
-			utils::format("GPTW0 start: freq: %u\n") % freq;
+	{  // GPTW の開始 (PWM / AB 出力)
+		uint32_t freq = 100'000;  // 100KHz
+		if(gptw_.start(GPTW::MODE::PWM_S_HL, GPTW::OUTPUT::AB, freq, ORDER_A, ORDER_B)) {
+			utils::format("GPTW%d start: freq: %u [Hz]\n") % GPTW::value_type::CHANNEL_NO % freq;
+			duty_a_ = 0.33f;
+			gptw_.set_duty_a(duty_a_);
+			duty_b_ = 0.66f;
+			gptw_.set_duty_b(duty_b_);
 		} else {
-			utils::format("GPTW0 start fail...\n");
+			utils::format("GPTW%d start fail...\n") % GPTW::value_type::CHANNEL_NO;
 		}
 	}
+#ifdef USE_HRPWM
 	{  // HRPWM の開始 (Enable: GPTW0, Disable: GPTW1, GPTW2, GPTW3)
 		if(hrpwm_.start(true, false, false, false)) {
 			utils::format("HRPWM start: \n");
@@ -182,6 +198,7 @@ int main(int argc, char** argv)
 			utils::format("HRPWM start fail...\n");
 		}
 	}
+#endif
 
 	cmd_.set_prompt("# ");
 
@@ -192,12 +209,30 @@ int main(int argc, char** argv)
 		if(cmd_.service()) {
 			uint32_t cmdn = cmd_.get_words();
 			if(cmdn > 0) {
-				if(cmd_.cmp_word(0, "a") == 0) {
-
-				} else if(cmd_.cmp_word(0, "b") == 0) {
-
-				} else if(cmd_.cmp_word(0, "help") == 0) {
-
+				if(cmd_.cmp_word(0, "a")) {
+					if(cmdn >= 2) {
+						char tmp[64];
+						cmd_.get_word(1, tmp, sizeof(tmp));
+						if((utils::input("%f", tmp) % duty_a_).status()) {
+							gptw_.set_duty_a(duty_a_);
+						}
+					} else {
+						utils::format("A: duty: %4.3f\n") % duty_a_;
+					}
+				} else if(cmd_.cmp_word(0, "b")) {
+					if(cmdn >= 2) {
+						char tmp[64];
+						cmd_.get_word(1, tmp, sizeof(tmp));
+						if((utils::input("%f", tmp) % duty_b_).status()) {
+							gptw_.set_duty_b(duty_b_);
+						}
+					} else {
+						utils::format("B: duty: %4.3f\n") % duty_b_;
+					}
+				} else if(cmd_.cmp_word(0, "help")) {
+					utils::format("    a [duty]     list duty A [set duty A]\n");
+					utils::format("    b [duty]     list duty B [set duty B]\n");
+					utils::format("    help\n");
 				} else {
 					char tmp[256];
 					cmd_.get_word(0, tmp, sizeof(tmp));

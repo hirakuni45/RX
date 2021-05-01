@@ -1,15 +1,17 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72T Makefile
+#   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
 TARGET		=	gptw_sample
 
-DEVICE		=	R5F572TK
+DEVICE		=	R5F572NN
+
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
@@ -26,12 +28,12 @@ PSOURCES	=	GPTW_sample/main.cpp
 
 USER_LIBS	=	supc++ m
 
-LDSCRIPT	=	../../RX72T/$(DEVICE).ld
+LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72T \
-				F_ICLK=192000000 \
-				F_PCLKA=96000000 F_PCLKB=48000000 F_PCLKC=192000000 F_PCLKD=48000000 \
-				F_FCLK=48000000 F_BCLK=48000000
+USER_DEFS	=	SIG_RX72N \
+				F_ICLK=240000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
@@ -64,9 +66,11 @@ else
   endif
 endif
 
-INC_SYS     =   /rxlib/include $(LOCAL_PATH)/include
+INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../
+INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+
+LIB_ROOT	=	../../RX600/drw2d
 
 AS_OPT		=
 
@@ -200,6 +204,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX72T --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

@@ -522,6 +522,29 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  PHn 端子機能制御レジスタ（PHnPFS）（n = 0 ～ 7）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef pfsw_t<0x0008C1C8> PH0PFS_;
+		typedef pfsw_t<0x0008C1C9> PH1PFS_;
+		typedef pfsw_t<0x0008C1CA> PH2PFS_;
+		typedef pfsw_t<0x0008C1CB> PH3PFS_;
+		typedef pfsw_t<0x0008C1CC> PH4PFS_;
+		typedef pfsw_t<0x0008C1CD> PH5PFS_;
+		typedef pfsw_t<0x0008C1CE> PH6PFS_;
+		typedef pfsw_t<0x0008C1CF> PH7PFS_;
+		static PH0PFS_ PH0PFS;
+		static PH1PFS_ PH1PFS;
+		static PH2PFS_ PH2PFS;
+		static PH3PFS_ PH3PFS;
+		static PH4PFS_ PH4PFS;
+		static PH5PFS_ PH5PFS;
+		static PH6PFS_ PH6PFS;
+		static PH7PFS_ PH7PFS;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  PJn 端子機能制御レジスタ（PJnPFS）（n = 0 ～ 3, 5）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1046,6 +1069,15 @@ namespace device {
 	template<class _> typename mpc_t<_>::PG5PFS_ mpc_t<_>::PG5PFS;
 	template<class _> typename mpc_t<_>::PG6PFS_ mpc_t<_>::PG6PFS;
 	template<class _> typename mpc_t<_>::PG7PFS_ mpc_t<_>::PG7PFS;
+
+	template<class _> typename mpc_t<_>::PH0PFS_ mpc_t<_>::PH0PFS;
+	template<class _> typename mpc_t<_>::PH1PFS_ mpc_t<_>::PH1PFS;
+	template<class _> typename mpc_t<_>::PH2PFS_ mpc_t<_>::PH2PFS;
+	template<class _> typename mpc_t<_>::PH3PFS_ mpc_t<_>::PH3PFS;
+	template<class _> typename mpc_t<_>::PH4PFS_ mpc_t<_>::PH4PFS;
+	template<class _> typename mpc_t<_>::PH5PFS_ mpc_t<_>::PH5PFS;
+	template<class _> typename mpc_t<_>::PH6PFS_ mpc_t<_>::PH6PFS;
+	template<class _> typename mpc_t<_>::PH7PFS_ mpc_t<_>::PH7PFS;
 
 #if defined(SIG_RX65N) || defined(SIG_RX72N)
 	template<class _> typename mpc_t<_>::PJ0PFS_ mpc_t<_>::PJ0PFS;
