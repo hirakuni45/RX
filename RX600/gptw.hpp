@@ -37,6 +37,7 @@ namespace device {
 	struct gptw_t {
 
 		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto CHANNEL_NO = static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::GPTW0);	///< チャネル番号
 		static const auto GTCIA = gtcia;	///< GTCIAn 割り込みベクタ
 		static const auto GTCIB = gtcib;	///< GTCIBn 割り込みベクタ
 		static const auto GTCIC = gtcic;	///< GTCICn 割り込みベクタ
@@ -46,6 +47,12 @@ namespace device {
 		static const auto GTCIF = gtcif;	///< GTCIFn 割り込みベクタ
 		static const auto GTCIU = gtciu;	///< GTCIUn 割り込みベクタ
 		static const auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
+
+#if defined(SIG_RX66T) || defined(SIG_RX72T)
+		static const uint32_t PCLK = F_PCLKC;	///< カウント基準クロック
+#else
+		static const uint32_t PCLK = F_PCLKA;	///< カウント基準クロック
+#endif
 
 
 		//-----------------------------------------------------------------//
@@ -716,10 +723,10 @@ namespace device {
 		static GTCCRB_ GTCCRB;
 		typedef rw32_t<base + 0x54>  GTCCRC_;
 		static GTCCRC_ GTCCRC;
-		typedef rw32_t<base + 0x58>  GTCCRD_;
-		static GTCCRD_ GTCCRD;
-		typedef rw32_t<base + 0x5C>  GTCCRE_;
+		typedef rw32_t<base + 0x58>  GTCCRE_;
 		static GTCCRE_ GTCCRE;
+		typedef rw32_t<base + 0x5C>  GTCCRD_;
+		static GTCCRD_ GTCCRD;
 		typedef rw32_t<base + 0x60>  GTCCRF_;
 		static GTCCRF_ GTCCRF;
 
@@ -1070,15 +1077,6 @@ namespace device {
 		};
 		typedef gtsecr_t<base + 0xD4> GTSECR_;
 		static GTSECR_ GTSECR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	タイマー・チャネルの取得
-			@return タイマー・チャネル
-		*/
-		//-----------------------------------------------------------------//
-		static uint8_t get_channel() { return static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::GPTW0); }
 	};
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
