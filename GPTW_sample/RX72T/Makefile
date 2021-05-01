@@ -24,7 +24,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	GPTW_sample/main.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++ m
 
 LDSCRIPT	=	../../RX72T/$(DEVICE).ld
 
