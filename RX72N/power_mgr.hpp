@@ -28,9 +28,10 @@ namespace device {
 			uint16_t	tpu_;
 			uint16_t	tmr_;
 			uint16_t	mtu_;
+			uint16_t	gptw_;
 			uint16_t	dmac_;
 
-			pad_t() : cmt_(0), tpu_(0), tmr_(0), mtu_(0), dmac_(0) { }
+			pad_t() : cmt_(0), tpu_(0), tmr_(0), mtu_(0), gptw_(0), dmac_(0) { }
 		};
 
 		typedef utils::static_holder<pad_t> STH;
@@ -80,10 +81,6 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA5 = ((STH::st.tmr_ & 0b0011) == 0);
 				break;
 
-//			case peripheral::GPTW_POE:
-//				SYSTEM::MSTPCRA.MSTPA7 = f;
-//				break;
-
 			case peripheral::MTU0:
 			case peripheral::MTU1:
 			case peripheral::MTU2:
@@ -94,6 +91,15 @@ namespace device {
 			case peripheral::MTU7:
 				set_(ena, STH::st.mtu_, peripheral::MTU0, t);
 				SYSTEM::MSTPCRA.MSTPA9 = (STH::st.mtu_ == 0);
+				break;
+
+			case peripheral::POE:
+			case peripheral::GPTW0:
+			case peripheral::GPTW1:
+			case peripheral::GPTW2:
+			case peripheral::GPTW3:
+				set_(ena, STH::st.gptw_, peripheral::POE, t);
+				SYSTEM::MSTPCRA.MSTPA7 = (STH::st.gptw_ == 0);
 				break;
 
 			case peripheral::PPG1:

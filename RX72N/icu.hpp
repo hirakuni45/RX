@@ -1829,25 +1829,39 @@ namespace device {
 		static PIBR9_ PIBR9;
 		typedef pixr_t<0x0008770A> PIBRA_;
 		static PIBRA_ PIBRA;
+		typedef pixr_t<0x0008770B> PIBRB_;
+		static PIBRB_ PIBRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
+			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh, Ch）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087900> PIAR0;
-		static pixr_t<0x00087901> PIAR1;
-		static pixr_t<0x00087902> PIAR2;
-		static pixr_t<0x00087903> PIAR3;
-		static pixr_t<0x00087904> PIAR4;
-		static pixr_t<0x00087905> PIAR5;
-		static pixr_t<0x00087906> PIAR6;
-		static pixr_t<0x00087907> PIAR7;
-		static pixr_t<0x00087908> PIAR8;
-		static pixr_t<0x00087909> PIAR9;
-		static pixr_t<0x0008790A> PIARA;
-		static pixr_t<0x0008790B> PIARB;
+		typedef pixr_t<0x00087900> PIAR0_;
+		static PIAR0_ PIAR0;
+		typedef pixr_t<0x00087901> PIAR1_;
+		static PIAR1_ PIAR1;
+		typedef pixr_t<0x00087902> PIAR2_;
+		static PIAR2_ PIAR2;
+		typedef pixr_t<0x00087903> PIAR3_;
+		static PIAR3_ PIAR3;
+		typedef pixr_t<0x00087904> PIAR4_;
+		static PIAR4_ PIAR4;
+		typedef pixr_t<0x00087905> PIAR5_;
+		static PIAR5_ PIAR5;
+		typedef pixr_t<0x00087906> PIAR6_;
+		static PIAR6_ PIAR6;
+		typedef pixr_t<0x00087907> PIAR7_;
+		static PIAR7_ PIAR7;
+		typedef pixr_t<0x00087908> PIAR8_;
+		static PIAR8_ PIAR8;
+		typedef pixr_t<0x00087909> PIAR9_;
+		static PIAR9_ PIAR9;
+		typedef pixr_t<0x0008790A> PIARA_;
+		static PIARA_ PIARA;
+		typedef pixr_t<0x0008790C> PIARC_;
+		static PIARC_ PIARC;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1952,6 +1966,7 @@ namespace device {
 		static rw8_t<0x000877CF> SLIBR207;
 #endif
 
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
@@ -2052,6 +2067,20 @@ namespace device {
 	template<class _> typename icu_t<_>::PIBR8_ icu_t<_>::PIBR8;
 	template<class _> typename icu_t<_>::PIBR9_ icu_t<_>::PIBR9;
 	template<class _> typename icu_t<_>::PIBRA_ icu_t<_>::PIBRA;
+	template<class _> typename icu_t<_>::PIBRB_ icu_t<_>::PIBRB;
+
+	template<class _> typename icu_t<_>::PIAR0_ icu_t<_>::PIAR0;
+	template<class _> typename icu_t<_>::PIAR1_ icu_t<_>::PIAR1;
+	template<class _> typename icu_t<_>::PIAR2_ icu_t<_>::PIAR2;
+	template<class _> typename icu_t<_>::PIAR3_ icu_t<_>::PIAR3;
+	template<class _> typename icu_t<_>::PIAR4_ icu_t<_>::PIAR4;
+	template<class _> typename icu_t<_>::PIAR5_ icu_t<_>::PIAR5;
+	template<class _> typename icu_t<_>::PIAR6_ icu_t<_>::PIAR6;
+	template<class _> typename icu_t<_>::PIAR7_ icu_t<_>::PIAR7;
+	template<class _> typename icu_t<_>::PIAR8_ icu_t<_>::PIAR8;
+	template<class _> typename icu_t<_>::PIAR9_ icu_t<_>::PIAR9;
+	template<class _> typename icu_t<_>::PIARA_ icu_t<_>::PIARA;
+	template<class _> typename icu_t<_>::PIARC_ icu_t<_>::PIARC;
 
 	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
 	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
