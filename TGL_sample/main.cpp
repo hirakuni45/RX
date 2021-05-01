@@ -33,12 +33,12 @@ namespace {
 	FONT		font_(afont_, kfont_);
 
 #if defined(SIG_RX72N)
-	/// for RX72N Envision Kit
+/// for RX72N Envision Kit
+	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 	typedef device::SCI2 SCI_CH;
-	static const char* system_str_ = { "RX72N Envision Kit" };
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x0080'0000);
