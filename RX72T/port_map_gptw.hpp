@@ -24,10 +24,10 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ポート・マッピング・オプション型
+			@brief  ポート・マッピング・オーダー型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class option : uint8_t {
+		enum class ORDER : uint8_t {
 			BYPASS,		///< ポートマップの設定をバイパスする場合
 			FIRST,		///< 第１候補
 			SECOND,		///< 第２候補
@@ -44,13 +44,13 @@ namespace device {
 			@brief  GPTW チャネル型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
+		enum class CHANNEL : uint8_t {
 			A,		///< GPTWx A (GTIOCxA)
 			B,		///< GPTWx B (GTIOCxB)
 		};
 
 	private:
-		static bool gptw0_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw0_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel;
@@ -61,33 +61,33 @@ namespace device {
 			/// PD2[1] (28/144) (23/100)
 			/// PD7[0] (23/144) (18/100)
 			/// PG1[1] (81/144) (--/100)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT1::PMR.B2 = 0;
 					MPC::P12PFS.PSEL = sel;
 					PORT1::PMR.B2 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT7::PMR.B1 = 0;
 					MPC::P71PFS.PSEL = sel;
 					PORT7::PMR.B1 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTD::PMR.B2 = 0;
 					MPC::PD2PFS.PSEL = sel;
 					PORTD::PMR.B2 = ena;
 					break;
-				case option::FOURTH:
+				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTD::PMR.B7 = 0;
 					MPC::PD7PFS.PSEL = sel;
 					PORTD::PMR.B7 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTG::PMR.B1 = 0;
 					MPC::PG1PFS.PSEL = sel;
@@ -104,33 +104,33 @@ namespace device {
 			/// PD1[1] ( 29/144) (--/100) (24/100)
 			/// PD6[0] ( 24/144) (19/100)
 			/// PG2[1] ( 81/144) (--/100)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT1::PMR.B5 = 0;
 					MPC::P15PFS.PSEL = sel;
 					PORT1::PMR.B5 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT7::PMR.B4 = 0;
 					MPC::P74PFS.PSEL = sel;
 					PORT7::PMR.B4 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTD::PMR.B1 = 0;
 					MPC::PD1PFS.PSEL = sel;
 					PORTD::PMR.B1 = ena;
 					break;
-				case option::FOURTH:
+				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTD::PMR.B6 = 0;
 					MPC::PD6PFS.PSEL = sel;
 					PORTD::PMR.B6 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTG::PMR.B2 = 0;
 					MPC::PG2PFS.PSEL = sel;
@@ -149,7 +149,7 @@ namespace device {
 		}
 
 
-		static bool gptw1_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw1_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel;
@@ -160,33 +160,33 @@ namespace device {
 			/// PD0[1] (30/144) (--/100) (25/100) 
 			/// PD5[0] (25/144) (20/100)
 			/// PK2[1] (83/144) (--/100)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT1::PMR.B3 = 0;
 					MPC::P13PFS.PSEL = sel;
 					PORT1::PMR.B3 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT7::PMR.B2 = 0;
 					MPC::P72PFS.PSEL = sel;
 					PORT7::PMR.B2 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTD::PMR.B0 = 0;
 					MPC::PD0PFS.PSEL = sel;
 					PORTD::PMR.B0 = ena;
 					break;
-				case option::FOURTH:
+				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTD::PMR.B5 = 0;
 					MPC::PD5PFS.PSEL = sel;
 					PORTD::PMR.B5 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTK::PMR.B2 = 0;
 					MPC::PK2PFS.PSEL = sel;
@@ -203,33 +203,33 @@ namespace device {
 			/// PB7[0] ( 39/144)
 			/// PD4[0] ( 26/144)
 			/// PG0[1] ( 82/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT1::PMR.B6 = 0;
 					MPC::P16PFS.PSEL = sel;
 					PORT1::PMR.B6 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT7::PMR.B5 = 0;
 					MPC::P75PFS.PSEL = sel;
 					PORT7::PMR.B5 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTB::PMR.B7 = 0;
 					MPC::PB7PFS.PSEL = sel;
 					PORTB::PMR.B7 = ena;
 					break;
-				case option::FOURTH:
+				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTD::PMR.B4 = 0;
 					MPC::PD4PFS.PSEL = sel;
 					PORTD::PMR.B4 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTG::PMR.B0 = 0;
 					MPC::PG0PFS.PSEL = sel;
@@ -248,7 +248,7 @@ namespace device {
 		}
 
 
-		static bool gptw2_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw2_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel;
@@ -259,33 +259,33 @@ namespace device {
 			/// PB6[0] (40/144)
 			/// PD3[0] (27/144)
 			/// PK0[1] (85/144)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT1::PMR.B4 = 0;
 					MPC::P14PFS.PSEL = sel;
 					PORT1::PMR.B4 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT7::PMR.B3 = 0;
 					MPC::P73PFS.PSEL = sel;
 					PORT7::PMR.B3 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT8::PMR.B6 = 0;
 					MPC::P86PFS.PSEL = sel;
 					PORT8::PMR.B6 = ena;
 					break;
-				case option::FOURTH:
+				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTD::PMR.B3 = 0;
 					MPC::PD3PFS.PSEL = sel;
 					PORTD::PMR.B3 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTK::PMR.B0 = 0;
 					MPC::PK0PFS.PSEL = sel;
@@ -302,33 +302,33 @@ namespace device {
 			/// PB5[0] ( 41/144)
 			/// PD2[0] ( 28/144)
 			/// PK1[1] ( 84/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT1::PMR.B7 = 0;
 					MPC::P17PFS.PSEL = sel;
 					PORT1::PMR.B7 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT7::PMR.B6 = 0;
 					MPC::P76PFS.PSEL = sel;
 					PORT7::PMR.B6 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTB::PMR.B5 = 0;
 					MPC::PB5PFS.PSEL = sel;
 					PORTB::PMR.B5 = ena;
 					break;
-				case option::FOURTH:
+				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTD::PMR.B2 = 0;
 					MPC::PD2PFS.PSEL = sel;
 					PORTD::PMR.B2 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTK::PMR.B1 = 0;
 					MPC::PK1PFS.PSEL = sel;
@@ -347,7 +347,7 @@ namespace device {
 		}
 
 
-		static bool gptw3_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw3_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel;
@@ -357,27 +357,27 @@ namespace device {
 			/// PD1[0] (29/144)
 			/// PD7[1] (23/144)
 			/// PE5[0] ( 5/144)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT3::PMR.B2 = 0;
 					MPC::P32PFS.PSEL = sel;
 					PORT3::PMR.B2 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTD::PMR.B1 = 0;
 					MPC::PD1PFS.PSEL = sel;
 					PORTD::PMR.B1 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTD::PMR.B7 = 0;
 					MPC::PD7PFS.PSEL = sel;
 					PORTD::PMR.B7 = ena;
 					break;
-				case option::FOURTH:
+				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTE::PMR.B5 = 0;
 					MPC::PE5PFS.PSEL = sel;
@@ -393,27 +393,27 @@ namespace device {
 			/// P33[0] ( 86/144)
 			/// PD0[0] ( 30/144)
 			/// PD6[1] ( 24/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT1::PMR.B1 = 0;
 					MPC::P11PFS.PSEL = sel;
 					PORT1::PMR.B1 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT3::PMR.B3 = 0;
 					MPC::P33PFS.PSEL = sel;
 					PORT3::PMR.B3 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORTD::PMR.B0 = 0;
 					MPC::PD0PFS.PSEL = sel;
 					PORTD::PMR.B0 = ena;
 					break;
-				case option::FOURTH:
+				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORTD::PMR.B6 = 0;
 					MPC::PD6PFS.PSEL = sel;
@@ -432,7 +432,7 @@ namespace device {
 		}
 
 
-		static bool gptw4_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw4_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel;
@@ -440,15 +440,15 @@ namespace device {
 			/// 4A:
 			/// P71[1] (78/144)
 			/// P95[0] (67/144)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORT7::PMR.B1 = 0;
 					MPC::P71PFS.PSEL = sel;
 					PORT7::PMR.B1 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT9::PMR.B5 = 0;
 					MPC::P95PFS.PSEL = sel;
@@ -462,15 +462,15 @@ namespace device {
 			/// 4B:
 			/// P74[1] (75/144)
 			/// P92[0] (70/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORT7::PMR.B4 = 0;
 					MPC::P74PFS.PSEL = sel;
 					PORT7::PMR.B4 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT9::PMR.B2 = 0;
 					MPC::P92PFS.PSEL = sel;
@@ -489,7 +489,7 @@ namespace device {
 		}
 
 
-		static bool gptw5_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw5_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel;
@@ -497,15 +497,15 @@ namespace device {
 			/// 5A:
 			/// P72[1] (77/144)
 			/// P94[0] (68/144)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORT7::PMR.B2 = 0;
 					MPC::P72PFS.PSEL = sel;
 					PORT7::PMR.B2 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT9::PMR.B4 = 0;
 					MPC::P94PFS.PSEL = sel;
@@ -519,15 +519,15 @@ namespace device {
 			/// 5B:
 			/// P75[1] (74/144)
 			/// P91[0] (71/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORT7::PMR.B5 = 0;
 					MPC::P75PFS.PSEL = sel;
 					PORT7::PMR.B5 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT9::PMR.B1 = 0;
 					MPC::P91PFS.PSEL = sel;
@@ -546,7 +546,7 @@ namespace device {
 		}
 
 
-		static bool gptw6_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw6_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel;
@@ -554,15 +554,15 @@ namespace device {
 			/// 6A:
 			/// P73[1] (76/144)
 			/// P93[0] (69/144)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORT7::PMR.B3 = 0;
 					MPC::P73PFS.PSEL = sel;
 					PORT7::PMR.B3 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT9::PMR.B3 = 0;
 					MPC::P93PFS.PSEL = sel;
@@ -576,15 +576,15 @@ namespace device {
 			/// 6B:
 			/// P76[1] (73/144)
 			/// P90[0] (72/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
 					PORT7::PMR.B6 = 0;
 					MPC::P76PFS.PSEL = sel;
 					PORT7::PMR.B6 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
 					PORT9::PMR.B0 = 0;
 					MPC::P90PFS.PSEL = sel;
@@ -603,7 +603,7 @@ namespace device {
 		}
 
 
-		static bool gptw7_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw7_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
@@ -611,14 +611,14 @@ namespace device {
 			/// 7A:
 			/// P12[1] ( 3/144)
 			/// P95[1] (67/144)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT1::PMR.B2 = 0;
 					MPC::P12PFS.PSEL = sel;
 					PORT1::PMR.B2 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT9::PMR.B5 = 0;
 					MPC::P95PFS.PSEL = sel;
 					PORT9::PMR.B5 = ena;
@@ -631,14 +631,14 @@ namespace device {
 			/// 7B:
 			/// P76[1] (73/144)
 			/// P90[1] (72/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT7::PMR.B6 = 0;
 					MPC::P76PFS.PSEL = sel;
 					PORT7::PMR.B6 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT9::PMR.B0 = 0;
 					MPC::P90PFS.PSEL = sel;
 					PORT9::PMR.B0 = ena;
@@ -656,7 +656,7 @@ namespace device {
 		}
 
 
-		static bool gptw8_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw8_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
@@ -664,14 +664,14 @@ namespace device {
 			/// 8A:
 			/// P13[1] ( 2/144)
 			/// P94[1] (68/144)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT1::PMR.B3 = 0;
 					MPC::P13PFS.PSEL = sel;
 					PORT1::PMR.B3 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT9::PMR.B4 = 0;
 					MPC::P94PFS.PSEL = sel;
 					PORT9::PMR.B4 = ena;
@@ -684,14 +684,14 @@ namespace device {
 			/// 8B:
 			/// P16[1] (143/144)
 			/// P91[1] ( 71/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
 					MPC::P16PFS.PSEL = sel;
 					PORT1::PMR.B6 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT9::PMR.B1 = 0;
 					MPC::P91PFS.PSEL = sel;
 					PORT9::PMR.B1 = ena;
@@ -708,7 +708,7 @@ namespace device {
 		}
 
 
-		static bool gptw9_(channel ch, bool ena, bool neg, option opt) noexcept
+		static bool gptw9_(CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b010111 : 0b010101) : 0;
@@ -716,14 +716,14 @@ namespace device {
 			/// 9A:
 			/// P14[1] ( 1/144)
 			/// P93[1] (69/144)
-			case channel::A:
+			case CHANNEL::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
 					MPC::P14PFS.PSEL = sel;
 					PORT1::PMR.B4 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT9::PMR.B3 = 0;
 					MPC::P93PFS.PSEL = sel;
 					PORT9::PMR.B3 = ena;
@@ -736,14 +736,14 @@ namespace device {
 			/// 9B:
 			/// P17[1] (142/144)
 			/// P90[1] ( 72/144)
-			case channel::B:
+			case CHANNEL::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
 					MPC::P17PFS.PSEL = sel;
 					PORT1::PMR.B7 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT9::PMR.B0 = 0;
 					MPC::P90PFS.PSEL = sel;
 					PORT9::PMR.B0 = ena;
@@ -772,9 +772,9 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, channel ch, bool ena = true, bool neg = false, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, bool neg = false, ORDER opt = ORDER::FIRST) noexcept
 		{
-			if(opt == option::BYPASS) return true;
+			if(opt == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
