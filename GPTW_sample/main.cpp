@@ -71,6 +71,9 @@ namespace {
 	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+	typedef device::GPTW0 GPTW_CH;
+	const auto ORDER_A = device::port_map_gptw::ORDER::FIRST;
+	const auto ORDER_B = device::port_map_gptw::ORDER::FIRST;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
@@ -213,8 +216,14 @@ int main(int argc, char** argv)
 					if(cmdn >= 2) {
 						char tmp[64];
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						if((utils::input("%f", tmp) % duty_a_).status()) {
-							gptw_.set_duty_a(duty_a_);
+						float v = 0.0f;
+						if((utils::input("%f", tmp) % v).status()) {
+							if(v >= 0.0f && v <= 1.0f) {
+								duty_a_ = v;
+								gptw_.set_duty_a(duty_a_);
+							} else {
+								utils::format("A: Over range: %4.3f\n") % v;
+							}
 						}
 					} else {
 						utils::format("A: duty: %4.3f\n") % duty_a_;
@@ -223,15 +232,21 @@ int main(int argc, char** argv)
 					if(cmdn >= 2) {
 						char tmp[64];
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						if((utils::input("%f", tmp) % duty_b_).status()) {
-							gptw_.set_duty_b(duty_b_);
+						float v = 0.0f;
+						if((utils::input("%f", tmp) % v).status()) {
+							if(v >= 0.0f && v <= 1.0f) {
+								duty_b_ = v;
+								gptw_.set_duty_b(duty_b_);
+							} else {
+								utils::format("B: Over range: %4.3f\n") % v;
+							}
 						}
 					} else {
 						utils::format("B: duty: %4.3f\n") % duty_b_;
 					}
 				} else if(cmd_.cmp_word(0, "help")) {
-					utils::format("    a [duty]     list duty A [set duty A]\n");
-					utils::format("    b [duty]     list duty B [set duty B]\n");
+					utils::format("    a [duty]     list duty A [set duty A (0 to 1.0)]\n");
+					utils::format("    b [duty]     list duty B [set duty B (0 to 1.0)]\n");
 					utils::format("    help\n");
 				} else {
 					char tmp[256];
