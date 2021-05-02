@@ -299,6 +299,9 @@ namespace device {
 	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
 	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
 	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
+	typedef port_t<0x0008C011, odr_oo_t<0x0008C0A2> > PORTH;
+	
+	typedef port_t<0x0008C013, odr_oo_t<0x0008C0A6> > PORTK;
 #elif defined(SIG_RX72T)
 	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
 	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;

@@ -562,7 +562,7 @@ namespace device {
 		static PJ5PFS_ PJ5PFS;
 
 
-#if defined(SIG_RX72N) || defined(SIG_RX72T) || defined(SIG_RX72M)
+#if defined(SIG_RX72N) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX66T)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PKn 端子機能制御レジスタ (PKnPFS) (n = 0 ～ 7)
@@ -1087,7 +1087,7 @@ namespace device {
 	template<class _> typename mpc_t<_>::PJ3PFS_ mpc_t<_>::PJ3PFS;
 	template<class _> typename mpc_t<_>::PJ5PFS_ mpc_t<_>::PJ5PFS;
 
-#if defined(SIG_RX72N) || defined(SIG_RX72T)
+#if defined(SIG_RX72N) || defined(SIG_RX72T) || defined(SIG_RX66T)
 	template<class _> typename mpc_t<_>::PK0PFS_ mpc_t<_>::PK0PFS;
 	template<class _> typename mpc_t<_>::PK1PFS_ mpc_t<_>::PK1PFS;
 	template<class _> typename mpc_t<_>::PK2PFS_ mpc_t<_>::PK2PFS;
