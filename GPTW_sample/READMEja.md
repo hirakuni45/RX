@@ -15,13 +15,14 @@ Renesas RX66T, RX72T, RX72N 汎用 PWM タイマー（GPTW）サンプル
 - 外部接続のシリアルターミナルからコマンドを受け付け、デューティーを設定出来ます。
 - デューティーの設定は、バッファー動作を行っています。（標準動作）
 - スタートすると、初期値、３３％、６６％の波形を出力します。
-- RX72T と RX72N では、利用出来る GPTW のチャネル数が異なります。
-- RX72T と RX72N では、GPTW のベースクロックが異なります。（内部で自動で計算されますが、分解能は異なります）
+- RX66T/RX72T と RX72N では、利用出来る GPTW のチャネル数が異なります。
+- RX66T/RX72T と RX72N では、GPTW のベースクロックが異なります。（内部で自動で計算されますが、分解能は異なります）
 
 ---
 
 ## プロジェクト・リスト
  - main.cpp
+ - RX66T/Makefile
  - RX72T/Makefile
  - RX72N/Makefile
 
@@ -34,15 +35,19 @@ Renesas RX66T, RX72T, RX72N 汎用 PWM タイマー（GPTW）サンプル
    
 GPT チャネル、ポートの候補を変更する事で、他のポートに出力する事が出来ます。
    
+### RX66T ボードの場合
+- GPT0 の GTIOC0A (P12) ORDER::FIRST
+- GPT0 の GTIOC0B (P15) ORDER::FIRST
+   
+### RX72T ボードの場合
+- GPT0 の GTIOC0A (P12) ORDER::FIRST
+- GPT0 の GTIOC0B (P15) ORDER::FIRST
+   
 ### RX72N Envision kit
 - GPT1 の GTIOC1A (PD1) ORDER::FOURTH
 - GPT1 の GTIOC1B (PD0) ORDER::FOURTH
 - PMod コネクタ CN6-7(PD0)、CN6-8(PD1) から出力します。
-
-### RX72T ボードの場合
-- GPT0 の GTIOC0A (P12) ORDER::FIRST
-- GPT0 の GTIOC0B (P15) ORDER::FIRST
-
+   
 ---
 
 ## コマンド
