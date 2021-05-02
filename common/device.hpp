@@ -70,6 +70,7 @@
 #include "RX66T/icu_mgr.hpp"
 #include "RX66T/port_map.hpp"
 #include "RX66T/port_map_mtu.hpp"
+#include "RX66T/port_map_gptw.hpp"
 
 #elif defined(SIG_RX72T)
 #include "RX72T/peripheral.hpp"
