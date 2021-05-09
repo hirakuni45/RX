@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -32,7 +32,6 @@ namespace device {
 			FRDYI   = 23,   ///< FCU
 
 			SWINT   = 27,   ///< ICU
-
 			CMI0    = 28,   ///< CMT0
 			CMI1    = 29,   ///< CMT1
 			CMI2    = 30,   ///< CMT2
@@ -49,7 +48,23 @@ namespace device {
 			SPTI0   = 46,	///< RSPI0
 			SPII0   = 47,	///< RSPI0
 
+			GTCIA0  = 48,	///< GPT0
+			GTCIB0  = 49,
+			GTCIC0  = 50,
+			GTCID0  = 51,
+			GDTE0   = 52,
+			GTCIE0  = 53,
+			GTCIF0  = 54,
+			GTCIV0  = 55,
+			GTCIU0  = 56,
+
 			DOPCF   = 57,	///< DOC
+
+			COMFRXINT = 59,	///< RSCAN
+			RXFINT    = 60,
+			TXINT     = 61,
+			CHERRINT  = 62,
+			GLERRINT  = 63,
 
 			IRQ0    = 64,	///< ICU
 			IRQ1    = 65,
@@ -63,18 +78,23 @@ namespace device {
 			LVD1    = 88,   ///< LVD
 			LVD2    = 89,   ///< LVD
 
-			S12ADI  = 102,  ///< S12ADI
-			GBADI   = 103,  ///< S12AD
-			GCADI   = 104,  ///< S12AD
+			GTCIA1  = 98,	///< GPT1
+			GTCIB1  = 99,
+			GTCIC1  = 100,
+			GTCID1  = 101,
+
+			S12ADI  = 102,  ///< S12AD
+			GBADI   = 103,
+			GCADI   = 104,
 			S12ADI1 = 105,  ///< S12ADI1
-			GBADI1  = 106,  ///< S12AD1
-			GCADI1  = 107,  ///< S12AD1
+			GBADI1  = 106,
+			GCADI1  = 107,
 			CMPC0   = 108,  ///< CMPC0
 			CMPC1   = 109,  ///< CMPC1
 			CMPC2   = 110,  ///< CMPC2
 			S12ADI2 = 111,  ///< S12AD2
-			GBADI2  = 112,  ///< S12AD2
-			GCADI2  = 113,  ///< S12AD2
+			GBADI2  = 112,
+			GCADI2  = 113,
 
 			TGIA0   = 114,  ///< MTU0
 			TGIB0   = 115,  ///< MTU0
@@ -163,6 +183,23 @@ namespace device {
 			CMIB7   = 196,	///< TMR7: CMIB7
 			OVI7    = 197,	///< TMR7: OVI7
 
+			GDTE1   = 202,	///< GPT1
+			GTCIE1  = 203,
+			GTCIF1  = 204,
+			GTCIV1  = 205,
+			GTCIU1  = 206,
+			GTCIA2  = 207,	///< GPT2
+			GTCIB2  = 208,
+			GTCIC2  = 209,
+			GTCID2  = 210,
+			GDTE2   = 211,
+			GTCIE2  = 212,
+			GTCIF2  = 213,
+			GTCIV2  = 214,
+			GTCIU2  = 215,
+			GTCIA3  = 216,  ///< GPT3
+			GTCIB3  = 217,
+
 			ERI1    = 218,  ///< SCI1
 			RXI1    = 219,  ///< SCI1
 			TXI1    = 220,  ///< SCI1
@@ -175,6 +212,14 @@ namespace device {
 			RXI6    = 227,  ///< SCI6
 			TXI6    = 228,  ///< SCI6
 			TEI6    = 229,  ///< SCI6
+
+			GTCIC3  = 238, 	///< GPT3
+			GTCID3  = 239,
+			GDTE3   = 240,
+			GTCIE3  = 241,
+			GTCIF3  = 242,
+			GTCIV3  = 243,
+			GTCIU3  = 244,
 
 			RIIC_EEI0 = 246,  ///< RIIC0
 			RIIC_RXI0 = 247,  ///< RIIC0
@@ -203,17 +248,61 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
 		struct ir_t {
-			rw8_t<base + 27> SWINT;
+			rw8_t<base + 16> BUSERR;
 
+			rw8_t<base + 23> FRDYI;
+
+			rw8_t<base + 27> SWINT;
 			rw8_t<base + 28> CMI0;
 			rw8_t<base + 29> CMI1;
 			rw8_t<base + 30> CMI2;
 			rw8_t<base + 31> CMI3;
+			rw8_t<base + 32> FERRF;
+			rw8_t<base + 33> MENDF;
+			rw8_t<base + 34> OVFF;
+
+			rw8_t<base + 40> ETGIN;
+			rw8_t<base + 41> ETGIP;
 
 			rw8_t<base + 44> SPEI0;
 			rw8_t<base + 45> SPRI0;
 			rw8_t<base + 46> SPTI0;
 			rw8_t<base + 47> SPII0;
+
+			rw8_t<base + 48> GTCIA0;
+			rw8_t<base + 49> GTCIB0;
+			rw8_t<base + 50> GTCIC0;
+			rw8_t<base + 51> GTCID0;
+			rw8_t<base + 52> GDTE0;
+			rw8_t<base + 53> GTCIE0;
+			rw8_t<base + 54> GTCIF0;
+			rw8_t<base + 55> GTCIV0;
+			rw8_t<base + 56> GTCIU0;
+
+			rw8_t<base + 57> DOPCF;
+
+			rw8_t<base + 59> COMFRXINT;
+			rw8_t<base + 60> RXFINT;
+			rw8_t<base + 61> TXINT;
+			rw8_t<base + 62> CHERRINT;
+			rw8_t<base + 63> GLERRINT;
+
+			rw8_t<base + 64> IRQ0;
+			rw8_t<base + 65> IRQ1;
+			rw8_t<base + 66> IRQ2;
+			rw8_t<base + 67> IRQ3;
+			rw8_t<base + 68> IRQ4;
+			rw8_t<base + 69> IRQ5;
+			rw8_t<base + 70> IRQ6;
+			rw8_t<base + 71> IRQ7;
+
+			rw8_t<base + 88> LVD1;
+			rw8_t<base + 89> LVD2;
+
+			rw8_t<base + 98>  GTCIA1;
+			rw8_t<base + 99>  GTCIB1;
+			rw8_t<base + 100> GTCIC1;
+			rw8_t<base + 101> GTCID1;
 
 			rw8_t<base + 102> S12ADI;
 			rw8_t<base + 103> GBADI;
@@ -288,6 +377,8 @@ namespace device {
 			rw8_t<base + 171> OEI4;
 			rw8_t<base + 172> OEI5;
 
+			rw8_t<base + 173> CMPC3;
+
 			rw8_t<base + 174> CMIA0;
 			rw8_t<base + 175> CMIB0;
 			rw8_t<base + 176> OVI0;
@@ -313,6 +404,25 @@ namespace device {
 			rw8_t<base + 196> CMIB7;
 			rw8_t<base + 197> OVI7;
 
+			rw8_t<base + 202> GDTE1;
+			rw8_t<base + 203> GTCIE1;
+			rw8_t<base + 204> GTCIF1;
+			rw8_t<base + 205> GTCIV1;
+			rw8_t<base + 206> GTCIU1;
+
+			rw8_t<base + 207> GTCIA2;
+			rw8_t<base + 208> GTCIB2;
+			rw8_t<base + 209> GTCIC2;
+			rw8_t<base + 210> GTCID2;
+			rw8_t<base + 211> GDTE2;
+			rw8_t<base + 212> GTCIE2;
+			rw8_t<base + 213> GTCIF2;
+			rw8_t<base + 214> GTCIV2;
+			rw8_t<base + 215> GTCIU2;
+
+			rw8_t<base + 216> GTCIA3;
+			rw8_t<base + 217> GTCIB3;
+
 			rw8_t<base + 218> ERI1;
 			rw8_t<base + 219> RXI1;
 			rw8_t<base + 220> TXI1;
@@ -328,10 +438,19 @@ namespace device {
 			rw8_t<base + 228> TXI6;
 			rw8_t<base + 229> TEI6;
 
+			rw8_t<base + 238> GTCIC3;
+			rw8_t<base + 239> GTCID3;
+			rw8_t<base + 240> GDTE3;
+			rw8_t<base + 241> GTCIE3;
+			rw8_t<base + 242> GTCIF3;
+			rw8_t<base + 243> GTCIV3;
+			rw8_t<base + 244> GTCIU3;
+
 			rw8_t<base + 246> RIIC_EEI0;
 			rw8_t<base + 247> RIIC_RXI0;
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
+
 
 			//-------------------------------------------------------------//
 			/*!
@@ -366,11 +485,39 @@ namespace device {
 			bit_rw_t<ier03, bitpos::B6>	CMI2;
 			bit_rw_t<ier03, bitpos::B7>	CMI3;
 
+			typedef rw8_t<base + 0x04> ier04;
+			bit_rw_t<ier04, bitpos::B0>	FERRF;
+			bit_rw_t<ier04, bitpos::B1>	MENDF;
+			bit_rw_t<ier04, bitpos::B3>	OVFF;
+
 			typedef rw8_t<base + 0x05> ier05;
-			bit_rw_t<ier03, bitpos::B4>	SPEI0;
-			bit_rw_t<ier03, bitpos::B5>	SPRI0;
-			bit_rw_t<ier03, bitpos::B6>	SPTI0;
-			bit_rw_t<ier03, bitpos::B7>	SPII0;
+			bit_rw_t<ier05, bitpos::B0>	ETGIN;
+			bit_rw_t<ier05, bitpos::B1>	ETGIP;
+
+			bit_rw_t<ier05, bitpos::B4>	SPEI0;
+			bit_rw_t<ier05, bitpos::B5>	SPRI0;
+			bit_rw_t<ier05, bitpos::B6>	SPTI0;
+			bit_rw_t<ier05, bitpos::B7>	SPII0;
+
+			typedef rw8_t<base + 0x06> ier06;
+			bit_rw_t<ier06, bitpos::B0>	GTCIA0;
+			bit_rw_t<ier06, bitpos::B1>	GTCIB0;
+			bit_rw_t<ier06, bitpos::B2>	GTCIC0;
+			bit_rw_t<ier06, bitpos::B3>	GTCID0;
+			bit_rw_t<ier06, bitpos::B4>	GDTE0;
+			bit_rw_t<ier06, bitpos::B5>	GTCIE0;
+			bit_rw_t<ier06, bitpos::B6>	GTCIF0;
+			bit_rw_t<ier06, bitpos::B7>	GTCIV0;
+			typedef rw8_t<base + 0x06> ier07;
+			bit_rw_t<ier07, bitpos::B0>	GTCIU0;
+
+			bit_rw_t<ier07, bitpos::B1>	DOPCF;
+
+			bit_rw_t<ier07, bitpos::B3>	COMFRXINT;
+			bit_rw_t<ier07, bitpos::B4>	RXFINT;
+			bit_rw_t<ier07, bitpos::B5>	TXINT;
+			bit_rw_t<ier07, bitpos::B6>	CHERRINT;
+			bit_rw_t<ier07, bitpos::B7>	GLERRINT;
 
 			typedef rw8_t<base + 0x08> ier08;
 			bit_rw_t<ier08, bitpos::B0>	IRQ0;
@@ -382,38 +529,47 @@ namespace device {
 			bit_rw_t<ier08, bitpos::B6>	IRQ6;
 			bit_rw_t<ier08, bitpos::B7>	IRQ7;
 
-			typedef rw8_t<base + 0x0C> ier0c;
-			bit_rw_t<ier0c, bitpos::B6>	S12ADI;
-			bit_rw_t<ier0c, bitpos::B7>	GBADI;
-			typedef rw8_t<base + 0x0D> ier0d;
-			bit_rw_t<ier0d, bitpos::B0>	GCADI;
-			bit_rw_t<ier0d, bitpos::B1>	S12ADI1;
-			bit_rw_t<ier0d, bitpos::B2>	GBADI1;
-			bit_rw_t<ier0d, bitpos::B3>	GCADI1;
-			bit_rw_t<ier0d, bitpos::B4>	CMPC0;
-			bit_rw_t<ier0d, bitpos::B5>	CMPC1;
-			bit_rw_t<ier0d, bitpos::B6>	CMPC2;
-			bit_rw_t<ier0d, bitpos::B7>	S12ADI2;
-			typedef rw8_t<base + 0x0E> ier0e;
-			bit_rw_t<ier0e, bitpos::B0>	GBADI2;
-			bit_rw_t<ier0e, bitpos::B1>	GCADI2;
+			typedef rw8_t<base + 0x0B> ier0B;
+			bit_rw_t<ier0B, bitpos::B0>	LVD1;
+			bit_rw_t<ier0B, bitpos::B1>	LVD2;
 
-			bit_rw_t<ier0e, bitpos::B2>	TGIA0;
-			bit_rw_t<ier0e, bitpos::B3>	TGIB0;
-			bit_rw_t<ier0e, bitpos::B4>	TGIC0;
-			bit_rw_t<ier0e, bitpos::B5>	TGID0;
-			bit_rw_t<ier0e, bitpos::B6>	TCIV0;
-			bit_rw_t<ier0e, bitpos::B7>	TGIE0;
-			typedef rw8_t<base + 0x0F> ier0f;
-			bit_rw_t<ier0f, bitpos::B0>	TGIF0;
-			bit_rw_t<ier0f, bitpos::B1>	TGIA1;
-			bit_rw_t<ier0f, bitpos::B2>	TGIB1;
-			bit_rw_t<ier0f, bitpos::B3>	TCIV1;
-			bit_rw_t<ier0f, bitpos::B4>	TCIU1;
+			typedef rw8_t<base + 0x0C> ier0C;
+			bit_rw_t<ier0C, bitpos::B2>	GTCIA1;
+			bit_rw_t<ier0C, bitpos::B3>	GTCIB1;
+			bit_rw_t<ier0C, bitpos::B4>	GTCIC1;
+			bit_rw_t<ier0C, bitpos::B5>	GTCID1;
 
-			bit_rw_t<ier0f, bitpos::B5>	TGIA2;
-			bit_rw_t<ier0f, bitpos::B6>	TGIB2;
-			bit_rw_t<ier0f, bitpos::B7>	TCIV2;
+			bit_rw_t<ier0C, bitpos::B6>	S12ADI;
+			bit_rw_t<ier0C, bitpos::B7>	GBADI;
+			typedef rw8_t<base + 0x0D> ier0D;
+			bit_rw_t<ier0D, bitpos::B0>	GCADI;
+			bit_rw_t<ier0D, bitpos::B1>	S12ADI1;
+			bit_rw_t<ier0D, bitpos::B2>	GBADI1;
+			bit_rw_t<ier0D, bitpos::B3>	GCADI1;
+			bit_rw_t<ier0D, bitpos::B4>	CMPC0;
+			bit_rw_t<ier0D, bitpos::B5>	CMPC1;
+			bit_rw_t<ier0D, bitpos::B6>	CMPC2;
+			bit_rw_t<ier0D, bitpos::B7>	S12ADI2;
+			typedef rw8_t<base + 0x0E> ier0E;
+			bit_rw_t<ier0E, bitpos::B0>	GBADI2;
+			bit_rw_t<ier0E, bitpos::B1>	GCADI2;
+
+			bit_rw_t<ier0E, bitpos::B2>	TGIA0;
+			bit_rw_t<ier0E, bitpos::B3>	TGIB0;
+			bit_rw_t<ier0E, bitpos::B4>	TGIC0;
+			bit_rw_t<ier0E, bitpos::B5>	TGID0;
+			bit_rw_t<ier0E, bitpos::B6>	TCIV0;
+			bit_rw_t<ier0E, bitpos::B7>	TGIE0;
+			typedef rw8_t<base + 0x0F> ier0F;
+			bit_rw_t<ier0F, bitpos::B0>	TGIF0;
+			bit_rw_t<ier0F, bitpos::B1>	TGIA1;
+			bit_rw_t<ier0F, bitpos::B2>	TGIB1;
+			bit_rw_t<ier0F, bitpos::B3>	TCIV1;
+			bit_rw_t<ier0F, bitpos::B4>	TCIU1;
+
+			bit_rw_t<ier0F, bitpos::B5>	TGIA2;
+			bit_rw_t<ier0F, bitpos::B6>	TGIB2;
+			bit_rw_t<ier0F, bitpos::B7>	TCIV2;
 			typedef rw8_t<base + 0x10> ier10;
 			bit_rw_t<ier10, bitpos::B0>	TCIU2;
 			bit_rw_t<ier10, bitpos::B1>	TGIA3;
@@ -458,6 +614,8 @@ namespace device {
 			bit_rw_t<ier15, bitpos::B3>	OEI4;
 			bit_rw_t<ier15, bitpos::B4>	OEI5;
 
+			bit_rw_t<ier15, bitpos::B5>	CMPC3;
+
 			bit_rw_t<ier15, bitpos::B6>	CMIA0;
 			bit_rw_t<ier15, bitpos::B7>	CMIB0;
 			typedef rw8_t<base + 0x16> ier16;
@@ -486,27 +644,57 @@ namespace device {
 			bit_rw_t<ier18, bitpos::B4>	CMIB7;
 			bit_rw_t<ier18, bitpos::B5>	OVI7;
 
-			typedef rw8_t<base + 0x1B> ier1b;
-			bit_rw_t<ier1b, bitpos::B2>	ERI1;
-			bit_rw_t<ier1b, bitpos::B3>	RXI1;
-			bit_rw_t<ier1b, bitpos::B4>	TXI1;
-			bit_rw_t<ier1b, bitpos::B5>	TEI1;
-			bit_rw_t<ier1b, bitpos::B6>	ERI5;
-			bit_rw_t<ier1b, bitpos::B7>	RXI5;
-			typedef rw8_t<base + 0x1C> ier1c;
-			bit_rw_t<ier1c, bitpos::B0>	TXI5;
-			bit_rw_t<ier1c, bitpos::B1>	TEI5;
-			bit_rw_t<ier1c, bitpos::B2>	ERI6;
-			bit_rw_t<ier1c, bitpos::B3>	RXI6;
-			bit_rw_t<ier1c, bitpos::B4>	TXI6;
-			bit_rw_t<ier1c, bitpos::B5>	TEI6;
+			typedef rw8_t<base + 0x19> ier19;
+			bit_rw_t<ier19, bitpos::B2>	GDTE1;
+			bit_rw_t<ier19, bitpos::B3>	GTCIE1;
+			bit_rw_t<ier19, bitpos::B4>	GTCIF1;
+			bit_rw_t<ier19, bitpos::B5>	GTCIV1;
+			bit_rw_t<ier19, bitpos::B6>	GTCIU1;
 
-			typedef rw8_t<base + 0x1E> ier1e;
-			bit_rw_t<ier1e, bitpos::B6>	RIIC_EEI0;
-			bit_rw_t<ier1e, bitpos::B7>	RIIC_RXI0;
-			typedef rw8_t<base + 0x1F> ier1f;
-			bit_rw_t<ier1f, bitpos::B0>	RIIC_TXI0;
-			bit_rw_t<ier1f, bitpos::B1>	RIIC_TEI0;
+			bit_rw_t<ier19, bitpos::B7>	GTCIA2;
+			typedef rw8_t<base + 0x1A> ier1A;
+			bit_rw_t<ier1A, bitpos::B0>	GTCIB2;
+			bit_rw_t<ier1A, bitpos::B1>	GTCIC2;
+			bit_rw_t<ier1A, bitpos::B2>	GTCID2;
+			bit_rw_t<ier1A, bitpos::B3>	GDTE2;
+			bit_rw_t<ier1A, bitpos::B4>	GTCIE2;
+			bit_rw_t<ier1A, bitpos::B5>	GTCIF2;
+			bit_rw_t<ier1A, bitpos::B6>	GTCIV2;
+			bit_rw_t<ier1A, bitpos::B7>	GTCIU2;
+
+			typedef rw8_t<base + 0x1B> ier1B;
+			bit_rw_t<ier1B, bitpos::B0>	GTCIA3;
+			bit_rw_t<ier1B, bitpos::B1>	GTCIB3;
+
+			bit_rw_t<ier1B, bitpos::B2>	ERI1;
+			bit_rw_t<ier1B, bitpos::B3>	RXI1;
+			bit_rw_t<ier1B, bitpos::B4>	TXI1;
+			bit_rw_t<ier1B, bitpos::B5>	TEI1;
+			bit_rw_t<ier1B, bitpos::B6>	ERI5;
+			bit_rw_t<ier1B, bitpos::B7>	RXI5;
+			typedef rw8_t<base + 0x1C> ier1C;
+			bit_rw_t<ier1C, bitpos::B0>	TXI5;
+			bit_rw_t<ier1C, bitpos::B1>	TEI5;
+			bit_rw_t<ier1C, bitpos::B2>	ERI6;
+			bit_rw_t<ier1C, bitpos::B3>	RXI6;
+			bit_rw_t<ier1C, bitpos::B4>	TXI6;
+			bit_rw_t<ier1C, bitpos::B5>	TEI6;
+
+			typedef rw8_t<base + 0x1D> ier1D;
+			bit_rw_t<ier1D, bitpos::B6>	GTCIC3;
+			bit_rw_t<ier1D, bitpos::B7>	GTCID3;
+			typedef rw8_t<base + 0x1E> ier1E;
+			bit_rw_t<ier1E, bitpos::B0>	GDTE3;
+			bit_rw_t<ier1E, bitpos::B1>	GTCIE3;
+			bit_rw_t<ier1E, bitpos::B2>	GTCIF3;
+			bit_rw_t<ier1E, bitpos::B3>	GTCIV3;
+			bit_rw_t<ier1E, bitpos::B4>	GTCIU3;
+
+			bit_rw_t<ier1E, bitpos::B6>	RIIC_EEI0;
+			bit_rw_t<ier1E, bitpos::B7>	RIIC_RXI0;
+			typedef rw8_t<base + 0x1F> ier1F;
+			bit_rw_t<ier1F, bitpos::B0>	RIIC_TXI0;
+			bit_rw_t<ier1F, bitpos::B1>	RIIC_TEI0;
 		};
 		typedef ier_t<0x00087200> IER_;
 		static IER_ IER;
@@ -521,6 +709,10 @@ namespace device {
 		template <uint32_t base>
 		struct ipr_t {
 
+			rw8_t<base + 0  > BUSERR;
+
+			rw8_t<base + 2  > FRDYI;
+
 			rw8_t<base + 3  > SWINT;
 
 			rw8_t<base + 4  > CMI0;
@@ -528,7 +720,52 @@ namespace device {
 			rw8_t<base + 6  > CMI2;
 			rw8_t<base + 7  > CMI3;
 
-			rw8_t<base + 44 > RSPI0;
+			rw8_t<base + 32 > FERRF;
+			rw8_t<base + 33 > MENDF;
+			rw8_t<base + 34 > OVFF;
+
+			rw8_t<base + 40 > ETGIN;
+			rw8_t<base + 41 > ETGIP;
+
+			rw8_t<base + 44 > SPEI0;
+			rw8_t<base + 44 > SPRI0;
+			rw8_t<base + 44 > SPTI0;
+			rw8_t<base + 44 > SPII0;
+
+			rw8_t<base + 48 > GTCIA0;
+			rw8_t<base + 49 > GTCIB0;
+			rw8_t<base + 50 > GTCIC0;
+			rw8_t<base + 51 > GTCID0;
+			rw8_t<base + 52 > GDTE0;
+			rw8_t<base + 53 > GTCIE0;
+			rw8_t<base + 54 > GTCIF0;
+			rw8_t<base + 55 > GTCIV0;
+			rw8_t<base + 56 > GTCIU0;
+
+			rw8_t<base + 57 > DOPCF;
+
+			rw8_t<base + 59 > COMFRXINT;
+			rw8_t<base + 60 > RXFINT;
+			rw8_t<base + 61 > TXINT;
+			rw8_t<base + 62 > CHERRINT;
+			rw8_t<base + 63 > GLERRINT;
+
+			rw8_t<base + 64 > IRQ0;
+			rw8_t<base + 65 > IRQ1;
+			rw8_t<base + 66 > IRQ2;
+			rw8_t<base + 67 > IRQ3;
+			rw8_t<base + 68 > IRQ4;
+			rw8_t<base + 69 > IRQ5;
+			rw8_t<base + 70 > IRQ6;
+			rw8_t<base + 71 > IRQ7;
+
+			rw8_t<base + 88 > LVD1;
+			rw8_t<base + 89 > LVD2;
+
+			rw8_t<base + 98 > GTCIA1;
+			rw8_t<base + 99 > GTCIB1;
+			rw8_t<base + 100> GTCIC1;
+			rw8_t<base + 101> GTCID1;
 
 			rw8_t<base + 102> S12ADI;   ///< S12AD
 			rw8_t<base + 103> GBADI;
@@ -543,32 +780,59 @@ namespace device {
 			rw8_t<base + 112> GBADI2;
 			rw8_t<base + 113> GCADI2;
 
-			rw8_t<base + 114> MTU0_ABCD;	///< MTU0
-			rw8_t<base + 118> MTU0_VEF;		///< MTU0
+			rw8_t<base + 114> TGIA0;	///< MTU0
+			rw8_t<base + 114> TGIB0;	///< MTU0
+			rw8_t<base + 114> TGIC0;	///< MTU0
+			rw8_t<base + 114> TGID0;	///< MTU0
+			rw8_t<base + 118> TCIV0;	///< MTU0
+			rw8_t<base + 118> TGIE0;	///< MTU0
+			rw8_t<base + 118> TGIF0;	///< MTU0
 
-			rw8_t<base + 121> MTU1_AB;		///< MTU1
-			rw8_t<base + 123> MTU1_VU;		///< MTU1
+			rw8_t<base + 121> TGIA1;	///< MTU1
+			rw8_t<base + 121> TGIB1;	///< MTU1
+			rw8_t<base + 123> TCIV1;	///< MTU1
+			rw8_t<base + 123> TCIU1;	///< MTU1
 
-			rw8_t<base + 125> MTU2_AB;		///< MTU2
-			rw8_t<base + 127> MTU2_VU;		///< MTU2
+			rw8_t<base + 125> TGIA2;	///< MTU2
+			rw8_t<base + 125> TGIB2;	///< MTU2
+			rw8_t<base + 127> TCIV2;	///< MTU2
+			rw8_t<base + 127> TCIU2;	///< MTU2
 
-			rw8_t<base + 129> MTU3_ABCD;	///< MTU3
-			rw8_t<base + 133> MTU3_V;		///< MTU3
+			rw8_t<base + 129> TGIA3;	///< MTU3
+			rw8_t<base + 129> TGIB3;	///< MTU3
+			rw8_t<base + 129> TGIC3;	///< MTU3
+			rw8_t<base + 129> TGID3;	///< MTU3
+			rw8_t<base + 133> TCIV3;	///< MTU3
 
-			rw8_t<base + 134> MTU4_ABCD;	///< MTU4
-			rw8_t<base + 138> MTU4_V;		///< MTU4
+			rw8_t<base + 134> TGIA4;	///< MTU4
+			rw8_t<base + 134> TGIB4;	///< MTU4
+			rw8_t<base + 134> TGIC4;	///< MTU4
+			rw8_t<base + 134> TGID4;	///< MTU4
+			rw8_t<base + 138> TCIV4;	///< MTU4
 
-			rw8_t<base + 139> MTU5_UVW;		///< MTU5
+			rw8_t<base + 139> TGIU5;	///< MTU5
+			rw8_t<base + 139> TGIV5;	///< MTU5
+			rw8_t<base + 139> TGIW5;	///< MTU5
 
-			rw8_t<base + 142> MTU6_ABCD;	///< MTU6
-			rw8_t<base + 146> MTU6_V;		///< MTU6
+			rw8_t<base + 142> TGIA6;	///< MTU6
+			rw8_t<base + 142> TGIB6;	///< MTU6
+			rw8_t<base + 142> TGIC6;	///< MTU6
+			rw8_t<base + 142> TGID6;	///< MTU6
+			rw8_t<base + 146> TCIV6;	///< MTU6
 
-			rw8_t<base + 149> MTU7_AB;		///< MTU7
-			rw8_t<base + 151> MTU7_CD;		///< MTU7
-			rw8_t<base + 153> MTU7_V;		///< MTU7
+			rw8_t<base + 149> TGIA7;	///< MTU7
+			rw8_t<base + 149> TGIB7;	///< MTU7
+			rw8_t<base + 151> TGIC7;	///< MTU7
+			rw8_t<base + 151> TGID7;	///< MTU7
+			rw8_t<base + 153> TCIV7;	///< MTU7
 
-			rw8_t<base + 159> MTU9_ABCD;	///< MTU9
-			rw8_t<base + 163> MTU9_VEF;		///< MTU9
+			rw8_t<base + 159> TGIA9;	///< MTU9
+			rw8_t<base + 159> TGIB9;	///< MTU9
+			rw8_t<base + 159> TGIC9;	///< MTU9
+			rw8_t<base + 159> TGID9;	///< MTU9
+			rw8_t<base + 163> TCIV9;	///< MTU9
+			rw8_t<base + 163> TGIE9;	///< MTU9
+			rw8_t<base + 163> TGIF9;	///< MTU9
 
 			rw8_t<base + 168> OEI1;		///< POE
 			rw8_t<base + 169> OEI2;		///< POE
@@ -576,23 +840,80 @@ namespace device {
 			rw8_t<base + 171> OEI4;		///< POE
 			rw8_t<base + 172> OEI5;		///< POE
 
-			rw8_t<base + 174> TMR0;		///< TMR0
-			rw8_t<base + 177> TMR1;		///< TMR1
-			rw8_t<base + 180> TMR2;		///< TMR2
-			rw8_t<base + 183> TMR3;		///< TMR3
-			rw8_t<base + 186> TMR4;		///< TMR4
-			rw8_t<base + 189> TMR5;		///< TMR5
-			rw8_t<base + 192> TMR6;		///< TMR6
-			rw8_t<base + 195> TMR7;		///< TMR7
+			rw8_t<base + 173> CMPC3;	///< CMPC3
 
-			rw8_t<base + 218> SCI1;		///< SCI1
-			rw8_t<base + 222> SCI5;		///< SCI5
-			rw8_t<base + 226> SCI6;		///< SCI6
+			rw8_t<base + 174> CMIA0;	///< TMR0
+			rw8_t<base + 174> CMIB0;	///< TMR0
+			rw8_t<base + 174> OVI0;		///< TMR0
+			rw8_t<base + 177> CMIA1;	///< TMR1
+			rw8_t<base + 177> CMIB1;	///< TMR1
+			rw8_t<base + 177> OVI1;		///< TMR1
+			rw8_t<base + 180> CMIA2;	///< TMR2
+			rw8_t<base + 180> CMIB2;	///< TMR2
+			rw8_t<base + 180> OVI2;		///< TMR2
+			rw8_t<base + 183> CMIA3;	///< TMR3
+			rw8_t<base + 183> CMIB3;	///< TMR3
+			rw8_t<base + 183> OVI3;		///< TMR3
+			rw8_t<base + 186> CMIA4;	///< TMR4
+			rw8_t<base + 186> CMIB4;	///< TMR4
+			rw8_t<base + 186> OVI4;		///< TMR4
+			rw8_t<base + 189> CMIA5;	///< TMR5
+			rw8_t<base + 189> CMIB5;	///< TMR5
+			rw8_t<base + 189> OVI5;		///< TMR5
+			rw8_t<base + 192> CMIA6;	///< TMR6
+			rw8_t<base + 192> CMIB6;	///< TMR6
+			rw8_t<base + 192> OVI6;		///< TMR6
+			rw8_t<base + 195> CMIA7;	///< TMR7
+			rw8_t<base + 195> CMIB7;	///< TMR7
+			rw8_t<base + 195> OVI7;		///< TMR7
+
+			rw8_t<base + 202> GDTE1;	///< GPT1
+			rw8_t<base + 203> GTCIE1;	///< GPT1
+			rw8_t<base + 204> GTCIF1;	///< GPT1
+			rw8_t<base + 205> GTCIV1;	///< GPT1
+			rw8_t<base + 206> GTCIU1;	///< GPT1
+
+			rw8_t<base + 207> GTCIA2;	///< GPT2
+			rw8_t<base + 208> GTCIB2;	///< GPT2
+			rw8_t<base + 209> GTCIC2;	///< GPT2
+			rw8_t<base + 210> GTCID2;	///< GPT2
+			rw8_t<base + 211> GDTE2;	///< GPT2
+			rw8_t<base + 212> GTCIE2;	///< GPT2
+			rw8_t<base + 213> GTCIF2;	///< GPT2
+			rw8_t<base + 214> GTCIV2;	///< GPT2
+			rw8_t<base + 215> GTCIU2;	///< GPT2
+
+			rw8_t<base + 216> GTCIA3;	///< GPT3
+			rw8_t<base + 217> GTCIB3;	///< GPT3
+
+			rw8_t<base + 218> ERI1;		///< SCI1
+			rw8_t<base + 218> RXI1;		///< SCI1
+			rw8_t<base + 218> TXI1;		///< SCI1
+			rw8_t<base + 218> TEI1;		///< SCI1
+
+			rw8_t<base + 222> ERI5;		///< SCI5
+			rw8_t<base + 222> RXI5;		///< SCI5
+			rw8_t<base + 222> TXI5;		///< SCI5
+			rw8_t<base + 222> TEI5;		///< SCI5
+
+			rw8_t<base + 226> ERI6;		///< SCI6
+			rw8_t<base + 226> RXI6;		///< SCI6
+			rw8_t<base + 226> TXI6;		///< SCI6
+			rw8_t<base + 226> TEI6;		///< SCI6
+
+			rw8_t<base + 238> GTCIC3;	///< GPT3
+			rw8_t<base + 239> GTCID3;	///< GPT3
+			rw8_t<base + 240> GDTE3;	///< GPT3
+			rw8_t<base + 241> GTCIE3;	///< GPT3
+			rw8_t<base + 242> GTCIF3;	///< GPT3
+			rw8_t<base + 243> GTCIV3;	///< GPT3
+			rw8_t<base + 244> GTCIU3;	///< GPT3
 
 			rw8_t<base + 246> RIIC_EEI0;  	///< RIIC0
 			rw8_t<base + 247> RIIC_RXI0;
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
+
 
 			//-------------------------------------------------------------//
 			/*!

@@ -1079,7 +1079,7 @@ namespace device {
 			bit_rw_t<ier0B, bitpos::B7>	IWUNI;		///< IWDT
 
 			typedef rw8_t<base + 0x0C> ier0C;
-			bit_rw_t<ier0C, bitpos::B0>	WUIN;		///< WDT
+			bit_rw_t<ier0C, bitpos::B0>	WUNI;		///< WDT
 			bit_rw_t<ier0C, bitpos::B1>	PCDFI;		///< PDC
 			bit_rw_t<ier0C, bitpos::B2>	RXI7;		///< SCI7 Rx
 			bit_rw_t<ier0C, bitpos::B3>	TXI7;		///< SCI7 Tx

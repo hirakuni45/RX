@@ -640,6 +640,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
 		struct ir_t {
+
+			rw8_t<base + 16> BUSERR;
+
+			rw8_t<base + 18> RAMERR;
+
+			rw8_t<base + 21> FEFERR;
+
 			rw8_t<base + 26> SWINT2;
 			rw8_t<base + 27> SWINT;
 
@@ -651,7 +658,17 @@ namespace device {
 			rw8_t<base + 34> D0FIFO0;		///< USB0
 			rw8_t<base + 35> D1FIFO0;		///< USB0
 
+			rw8_t<base + 38> SPRI0;			///< RSPI0
+			rw8_t<base + 39> SPTI0;			///< RSPI0
+			rw8_t<base + 40> SPRI1;			///< RSPI1
+			rw8_t<base + 41> SPTI1;			///< RSPI1
+
+			rw8_t<base + 42> SPRI;			///< QSPI
+			rw8_t<base + 43> SPTI;			///< QSPI
+
 			rw8_t<base + 44> SBFAI;			///< SDHI
+
+			rw8_t<base + 45> MBFAI;			///< MMCIF
 
 			rw8_t<base + 52> RIIC_RXI0;
 			rw8_t<base + 53> RIIC_TXI0;
@@ -692,7 +709,18 @@ namespace device {
 			rw8_t<base + 86> RXI6;
 			rw8_t<base + 87> TXI6;
 
+			rw8_t<base + 88> LVD1;
+			rw8_t<base + 89> LVD2;
+
 			rw8_t<base + 90> USBR0;
+
+			rw8_t<base + 92> ALM;
+			rw8_t<base + 93> PRD;
+
+			rw8_t<base + 95> IWUNI;
+			rw8_t<base + 96> WUNI;
+
+			rw8_t<base + 97> PCDFI;
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
@@ -704,10 +732,16 @@ namespace device {
 			rw8_t<base + 105> TXI10;
 
 			rw8_t<base + 106> GROUPBE0;
+			rw8_t<base + 107> GROUPBL2;
+
+			rw8_t<base + 108> SPRI2;
+			rw8_t<base + 109> SPTI2;
+
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
+
 			rw8_t<base + 114> RXI11;
 			rw8_t<base + 115> TXI11;
 
@@ -819,7 +853,11 @@ namespace device {
 		struct ier_t {
 			typedef rw8_t<base + 0x02> ier02;
 			bit_rw_t<ier02, bitpos::B0>	BUSERR;
+
+			bit_rw_t<ier02, bitpos::B2>	RAMERR;
+
 			bit_rw_t<ier02, bitpos::B5>	FIFERR;
+
 			bit_rw_t<ier02, bitpos::B7>	FRDYI;
 
 			typedef rw8_t<base + 0x03> ier03;
@@ -831,13 +869,24 @@ namespace device {
 			bit_rw_t<ier03, bitpos::B7>	CMWI1;
 
 			typedef rw8_t<base + 0x04> ier04;
-			bit_rw_t<ier04, bitpos::B2>	D0FIOFO0;
-			bit_rw_t<ier04, bitpos::B3>	D1FIOFO0;
+			bit_rw_t<ier04, bitpos::B2>	D0FIFO0;
+			bit_rw_t<ier04, bitpos::B3>	D1FIFO0;
+
+			bit_rw_t<ier04, bitpos::B6>	SPRI0;
+			bit_rw_t<ier04, bitpos::B7>	SPTI0;
 
 			typedef rw8_t<base + 0x05> ier05;
+			bit_rw_t<ier05, bitpos::B0>	SPRI1;
+			bit_rw_t<ier05, bitpos::B1>	SPTI1;
+			bit_rw_t<ier05, bitpos::B2>	SPRI;
+			bit_rw_t<ier05, bitpos::B3>	SPTI;
 			bit_rw_t<ier05, bitpos::B4>	SBFAI;
 
 			typedef rw8_t<base + 0x06> ier06;
+			bit_rw_t<ier06, bitpos::B0>	MBFAI;
+
+			bit_rw_t<ier06, bitpos::B2>	RIIC_RXI1;
+			bit_rw_t<ier06, bitpos::B3>	RIIC_TXI1;
 			bit_rw_t<ier06, bitpos::B4>	RIIC_RXI0;
 			bit_rw_t<ier06, bitpos::B5>	RIIC_TXI0;
 			bit_rw_t<ier06, bitpos::B6>	RIIC_RXI2;
@@ -882,9 +931,18 @@ namespace device {
 			bit_rw_t<ier0A, bitpos::B7>	TXI6;
 
 			typedef rw8_t<base + 0x0B> ier0B;
+			bit_rw_t<ier0B, bitpos::B0>	LVD1;
+			bit_rw_t<ier0B, bitpos::B1>	LVD2;
 			bit_rw_t<ier0B, bitpos::B2>	USBR0;
 
+			bit_rw_t<ier0B, bitpos::B4>	ALM;
+			bit_rw_t<ier0B, bitpos::B5>	PRD;
+
+			bit_rw_t<ier0B, bitpos::B2>	IWUNI;
+
 			typedef rw8_t<base + 0x0C> ier0C;
+			bit_rw_t<ier0C, bitpos::B0>	WUNI;
+			bit_rw_t<ier0C, bitpos::B1>	PCDFI;
 			bit_rw_t<ier0C, bitpos::B2>	RXI7;
 			bit_rw_t<ier0C, bitpos::B3>	TXI7;
 			bit_rw_t<ier0C, bitpos::B4>	RXI8;
@@ -898,6 +956,10 @@ namespace device {
 
 			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;
 			bit_rw_t<ier0D, bitpos::B3>	GROUPBL2;
+
+			bit_rw_t<ier0D, bitpos::B4>	SPRI2;
+			bit_rw_t<ier0D, bitpos::B5>	SPTI2;
+
 			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;
 			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;
 
@@ -916,6 +978,10 @@ namespace device {
 			bit_rw_t<ier0F, bitpos::B2> DMAC2I;
 			bit_rw_t<ier0F, bitpos::B3> DMAC3I;
 			bit_rw_t<ier0F, bitpos::B4> DMAC74I;
+
+			bit_rw_t<ier0F, bitpos::B5> OSTDI;
+			bit_rw_t<ier0F, bitpos::B6> EXDMAC0I;
+			bit_rw_t<ier0F, bitpos::B7> EXDMAC1I;
 
 			typedef rw8_t<base + 0x10> ier10;
 			bit_rw_t<ier10, bitpos::B0> INTB128;
@@ -1032,6 +1098,12 @@ namespace device {
 		struct ipr_t {
 			rw8_t<base + 0> BUSERR;
 
+			rw8_t<base + 0> RAMERR;
+
+			rw8_t<base + 1> FIFERR;
+
+			rw8_t<base + 2> FRDYI;
+
 			rw8_t<base + 3> SWINT2;
 			rw8_t<base + 3> SWINT;
 
@@ -1043,8 +1115,19 @@ namespace device {
 			rw8_t<base + 34> D0FIFO0;		///< USB0
 			rw8_t<base + 35> D1FIFO0;		///< USB0
 
+			rw8_t<base + 38> SPRI0;			///< RSPI0
+			rw8_t<base + 39> SPTI0;			///< RSPI0
+			rw8_t<base + 40> SPRI1;			///< RSPI1
+			rw8_t<base + 41> SPTI1;			///< RSPI1
+			rw8_t<base + 42> SPRI;			///< QSPI
+			rw8_t<base + 43> SPTI;			///< QSPI
+
 			rw8_t<base + 44> SBFAI;			///< SDHI
 
+			rw8_t<base + 45> MBFAI;			///< MMCIF
+
+			rw8_t<base + 50> RIIC_RXI1;
+			rw8_t<base + 51> RIIC_TXI1;
 			rw8_t<base + 52> RIIC_RXI0;
 			rw8_t<base + 53> RIIC_TXI0;
 			rw8_t<base + 54> RIIC_RXI2;
@@ -1085,6 +1168,19 @@ namespace device {
 			rw8_t<base + 86> RXI6;
 			rw8_t<base + 87> TXI6;
 
+			rw8_t<base + 88> LVD1;
+			rw8_t<base + 89> LVD2;
+
+			rw8_t<base + 90> USBR0;
+
+			rw8_t<base + 92> ALM;
+			rw8_t<base + 93> PRD;
+
+			rw8_t<base + 95> IWUNI;
+			rw8_t<base + 96> WUNI;
+
+			rw8_t<base + 97> PCDFI;
+
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
 			rw8_t<base + 100> RXI8;
@@ -1096,6 +1192,9 @@ namespace device {
 
 			rw8_t<base + 106> GROUPBE0;
 			rw8_t<base + 107> GROUPBL2;
+
+			rw8_t<base + 108> SPRI2;
+			rw8_t<base + 109> SPTI2;
 
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
@@ -1111,6 +1210,11 @@ namespace device {
 			rw8_t<base + 122> DMAC2I;
 			rw8_t<base + 123> DMAC3I;
 			rw8_t<base + 124> DMAC74I;
+
+			rw8_t<base + 125> OSTDI;
+
+			rw8_t<base + 126> EXDMAC0I;
+			rw8_t<base + 127> EXDMAC1I;
 
 			rw8_t<base + 128> INTB128;
 			rw8_t<base + 129> INTB129;
