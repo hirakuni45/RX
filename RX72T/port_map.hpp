@@ -626,17 +626,17 @@ namespace device {
 		/// CAN0 ポート候補（順番は、MPC の解説に準拠）
 		static bool can0_(option opt, bool enable)
 		{
-			uint8_t sel = enable ? 0b10000 : 0;
+			uint8_t sel = enable ? 0b010000 : 0;
 			switch(opt) {
 			case option::FIRST:
-				// P23/CTX0 (96/144) (66/100)
 				// P22/CRX0 (97/144) (67/100)
-				PORT2::PMR.B3 = 0;
+				// P23/CTX0 (96/144) (66/100)
 				PORT2::PMR.B2 = 0;
-				MPC::P23PFS.PSEL = sel;
+				PORT2::PMR.B3 = 0;
 				MPC::P22PFS.PSEL = sel;
-				PORT2::PMR.B3 = enable;
+				MPC::P23PFS.PSEL = sel;
 				PORT2::PMR.B2 = enable;
+				PORT2::PMR.B3 = enable;
 				break;
 			case option::SECOND:
 				// PA1/CRX0 (58/144) (40/100)
