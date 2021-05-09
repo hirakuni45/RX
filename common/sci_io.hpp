@@ -137,16 +137,17 @@ namespace device {
 		}
 
 
-		void set_intr_() noexcept
+		void set_intr_(uint8_t level) noexcept
 		{
-			if(level_) {
+			if(level > 0) {
 				icu_mgr::set_task(SCI::RX_VEC, recv_task_);
 				icu_mgr::set_task(SCI::TX_VEC, send_task_);
 			} else {
 				icu_mgr::set_task(SCI::RX_VEC, nullptr);
 				icu_mgr::set_task(SCI::TX_VEC, nullptr);
 			}
-			icu_mgr::set_level(SCI::PERIPHERAL, level_);
+			icu_mgr::set_level(SCI::RX_VEC, level);
+			icu_mgr::set_level(SCI::TX_VEC, level);
 		}
 
 	public:
@@ -220,9 +221,8 @@ namespace device {
 				return false;
 			}
 
-			if(!icu_mgr::set_level(SCI::PERIPHERAL, 0)) {
-				return false;
-			}
+			set_intr_(0);
+
 			SCI::SCR = 0x00;			// TE, RE disable.
 			{
 				auto tmp = SCI::SSR();
@@ -252,7 +252,7 @@ namespace device {
 			++mddr;
 			mddr >>= 1;
 
-			set_intr_();
+			set_intr_(level_);
 
 			bool stop = 0;
 			bool pm = 0;
@@ -382,8 +382,7 @@ namespace device {
 			if(auto_crlf_ && ch == '\n') {
 				putch('\r');
 			}
-
-			if(level_) {
+			if(level_ > 0) {
 				volatile bool b = SCI::SSR.ORER();
 				if(b) {
 					SCI::SSR.ORER = 0;
@@ -419,9 +418,9 @@ namespace device {
 			@return	入力文字数
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t recv_length()  noexcept
+		uint32_t recv_length() noexcept
 		{
-			if(level_) {
+			if(level_ > 0) {
 				return recv_.length();
 			} else {
 				if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
@@ -453,7 +452,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		char getch() noexcept
 		{
-			if(level_) {
+			if(level_ > 0) {
 				while(recv_.length() == 0) sleep_();
 				return recv_.get();
 			} else {

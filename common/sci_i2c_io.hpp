@@ -363,7 +363,8 @@ level = 0;
 
 				// RXI, TXI の設定
 				set_vector_(SCI::RX_VEC, SCI::TX_VEC);
-				icu_mgr::set_level(SCI::PERIPHERAL, level_);
+				icu_mgr::set_level(SCI::RX_VEC, level_);
+				icu_mgr::set_level(SCI::TX_VEC, level_);
 
 				// TEIx (STI interrupt)
 				auto grp = ICU::get_group_vector(SCI::TE_VEC);
