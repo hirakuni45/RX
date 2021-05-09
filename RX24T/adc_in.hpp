@@ -93,9 +93,9 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		void scan() {
-			if(level_) {
+			if(level_ > 0) {
 				set_interrupt_task(adi_task_, static_cast<uint32_t>(ADCU::get_vec()));
-				icu_mgr::set_level(ADCU::get_peripheral(), level_);
+				icu_mgr::set_level(ADCU::get_vec(), level_);
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b() | ADCU::ADCSR.ADIE.b();
 			} else {
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b();

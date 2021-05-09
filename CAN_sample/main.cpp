@@ -14,9 +14,13 @@
 			RX72N: (Renesas Envision kit RX72N) @n
 					16MHz のベースクロックを使用する @n
 					P40 ピンにLEDを接続する @n
-					SCI2 を使用する
+					SCI2 を使用する @n
+			RX72T: @n
+					16MHz のベースクロックを使用する @n
+					P01 ピンにLEDを接続する @n
+					SCI1 を使用する。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -43,8 +47,6 @@
 // #include <set>
 #endif
 
-// #define LEGACY
-
 namespace {
 
 	static const uint32_t can_cmd_ver_ = 89;
@@ -68,7 +70,7 @@ namespace {
 	typedef device::CAN1 CAN1_CH;
 	static const auto CAN0_PORT = device::port_map::option::FIRST;
 	static const auto CAN1_PORT = device::port_map::option::FIRST;
-	#define MULTI
+//	#define MULTI
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
 	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
@@ -114,7 +116,7 @@ namespace {
 	// CAN 受信バッファの定義
 	typedef utils::fixed_fifo<device::can_frame, 256> CAN_RXB;
 	// CAN 送信バッファの定義
-	typedef utils::fixed_fifo<device::can_frame, 128> CAN_TXB;
+	typedef utils::fixed_fifo<device::can_frame, 256> CAN_TXB;
 
 	typedef device::can_io<CAN0_CH, CAN_RXB, CAN_TXB, CAN0_PORT> CAN0;
 	CAN0	can0_;
@@ -144,6 +146,7 @@ namespace {
 //	typedef std::unordered_set<uint32_t> VALID;
 //	typedef const boost::unordered_set<uint32_t> VALID;
 	VALID	valid_{ 0x123, 0x200, 0x300, 0xaaa, 15, 21, 33 };
+	bool	ena_valid_ = true;
 #endif
 
 	bool get_cmd_id_(uint32_t i, uint32_t& id)
@@ -246,224 +249,6 @@ namespace {
 	}
 
 
-#ifdef LEGACY
-
-	// 低レベル操作系
-
-	void reset_(uint32_t idx)
-	{
-#ifdef MULTI
-		if(cur_ch_ == 0) {
-			can0_.reset_mb(idx);
-		} else if(cur_ch_ == 1) {
-			can1_.reset_mb(idx);
-		}
-#else
-		can0_.reset_mb(idx);
-#endif
-	}
-
-
-	void recv_(uint32_t idx)
-	{
-#ifdef MULTI
-		if(cur_ch_ == 0) {
-			can0_.recv_mb(idx);
-		} else if(cur_ch_ == 1) {
-			can1_.recv_mb(idx);
-		}
-#else
-		can0_.recv_mb(idx);
-#endif
-	}
-
-
-	void send_(uint32_t idx)
-	{
-#ifdef MULTI
-		if(cur_ch_ == 0) {
-			can0_.send_mb(idx);
-		} else if(cur_ch_ == 1) {
-			can1_.send_mb(idx);
-		}
-#else
-		can0_.send_mb(idx);
-#endif
-	}
-
-
-	void command_()
-	{
-		if(!cmd_.service()) {
-			return;
-		}
-
-		auto cmdn = cmd_.get_words();
-
-		bool error = false;
-		if(cmdn == 0) {
-
-		} else if(cmd_.cmp_word(0, "id")) { // set current ID
-			if(cmdn >= 2) {
-				int32_t val;
-				if(!cmd_.get_integer(1, val, false)) {
-					error = true;
-				} else {
-					cur_id_ = val;
-					if(cur_id_ >= 0x800) {
-						ext_id_ = true;
-					}
-				}
-			} else {
-				utils::format("ID: 0x%X (%d)\n") % cur_id_ % cur_id_;
-			}
-#ifdef MULTI
-		} else if(cmd_.cmp_word(0, "ch")) { // set current channel
-			if(cmdn >= 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				if(!(utils::input("%a", tmp) % cur_ch_).status()) {
-					error = true;
-				}
-			} else {
-				utils::format("Current device CAN%d\n") % cur_ch_;
-			}
-#endif			
-		} else if(cmd_.cmp_word(0, "ext")) { // ext-id mode
-			ext_id_ = true;
-		} else if(cmd_.cmp_word(0, "std")) { // std-id mode
-			ext_id_ = false;
-		} else if(cmd_.cmp_word(0, "reset")) { // reset MB
-			if(cmdn == 2) {
-				int32_t val;
-				if(!cmd_.get_integer(1, val, false)) {
-					error = true;
-				} else {
-					reset_(val);
-				}
-			} else {
-				error = true;
-			}
-		} else if(cmd_.cmp_word(0, "recv")) { // recv
-			if(cmdn == 2) {
-				int32_t val;
-				if(!cmd_.get_integer(1, val, false)) {
-					error = true;
-				} else {
-					recv_(val);
-				}
-			} else {
-				error = true;
-			}
-		} else if(cmd_.cmp_word(0, "send")) { // send data
-			if(cmdn == 2) {
-				int32_t val;
-				if(!cmd_.get_integer(1, val, false)) {
-					error = true;
-				} else {
-					send_(val);
-				}
-			} else {
-				error = true;
-			}
-		} else if(cmd_.cmp_word(0, "stat")) { // stat
-			if(cmdn == 2) {
-				int32_t val;
-				if(!cmd_.get_integer(1, val, false)) {
-					error = true;
-				} else {
-					stat_(val);
-				}
-			} else {
-				error = true;
-			}
-		} else if(cmd_.cmp_word(0, "data")) { // set frame data
-			if(cmdn < 2) {
-				error = true;
-			} else {
-				int32_t idx;
-				if(!cmd_.get_integer(1, idx, false)) {
-					error = true;
-				} else {
-					CAN::frame f;
-					f.id = cur_id_;
-					f.ide = ext_id_;
-					f.ts = 0;
-					if(cmdn > 2) {  // data frame
-						f.rtr = 0;
-						f.dlc = cmdn - 2;
-						for(uint32_t i = 2; i < cmdn; ++i) {
-							char tmp[64];
-							cmd_.get_word(i, tmp, sizeof(tmp));
-							uint32_t val;
-							if(!(utils::input("%a", tmp) % val).status()) {
-								error = true;
-								break;
-							} else {
-								f.data[i - 2] = val;
-							}
-						}
-					} else {  // リモートフレーム
-						f.rtr = 1;
-						f.dlc = 0;
-					}
-					if(!error) {
-#ifdef MULTI
-						if(cur_ch_ == 0) {
-							can0_.set_mb(idx, f);
-						} else if(cur_ch_ == 1) {
-							can1_.set_mb(idx, f);
-						}
-#else
-						can0_.set_mb(idx, f);
-#endif
-					}
-				}
-			}
-		} else if(cmd_.cmp_word(0, "list")) { // get frame, list frame
-			if(cmdn >= 2) {
-				int32_t val;
-				if(!cmd_.get_integer(1, val, false)) {
-					error = true;
-				} else {
-					list_(val);
-				}				
-			}
-		} else if(cmd_.cmp_word(0, "state")) { // report state
-			utils::format("CAN0: Recv error: %u, Send error: %u\n")
-				% static_cast<uint16_t>(can0_.get_recv_error_count())
-				% static_cast<uint16_t>(can0_.get_send_error_count());
-#ifdef MULTI
-			utils::format("CAN1: Recv error: %u, Send error: %u\n")
-				% static_cast<uint16_t>(can1_.get_recv_error_count())
-				% static_cast<uint16_t>(can1_.get_send_error_count());
-#endif
-		} else if(cmd_.cmp_word(0, "help")) { // help
-#ifdef MULTI
-			utils::format("    ch CH-no               set current CAN channel (CH-no: 0, 1)\n");
-#endif
-			utils::format("    id number              set current ID number\n");
-			utils::format("    ext                    set ext-id mode\n");
-			utils::format("    std                    set std-id mode\n");
-			utils::format("    data MB-no [byte ...]  set frame data (MB-no: 0 to 31)\n");
-			utils::format("    reset MB-no            reset MB (MB-no: 0 to 31)\n");
-			utils::format("    send MB-no             send frame (MB-no: 0 to 31)\n");
-			utils::format("    recv MB-no             recv frame (MB-no: 0 to 31)\n");
-			utils::format("    state                  report CAN state\n");
-			utils::format("    stat MB-no             stat mail-box (MB-no: 0 to 31)\n");
-			utils::format("    list MB-no             list mail-box (MB-no: 0 to 31)\n");
-			utils::format("    help                   command list (this)\n");
-		} else {
-			char tmp[64];
-			cmd_.get_word(0, tmp, sizeof(tmp));
-			utils::format("Command error: '%s'\n") % tmp;
-		}
-		if(error) {
-			utils::format("Parameter error...\n");
-		}
-	}
-#else
-
 	// 高位コマンド操作系（標準）
 	void command_()
 	{
@@ -491,6 +276,24 @@ namespace {
 			} else {
 				utils::format("Current device CAN%d\n") % cur_ch_;
 			}
+#endif
+#ifdef VALID_FILTER
+		} else if(cmd_.cmp_word(0, "valid")) { // valid ID disable/enable
+			if(cmdn >= 2) {
+				if(cmd_.cmp_word(1, "0")) {
+					ena_valid_ = false;
+				} else if(cmd_.cmp_word(1, "0")) {
+					ena_valid_ = true;
+				}
+			} else {
+				utils::format("Valid ID filter: %d\n") % static_cast<int>(ena_valid_);
+			}
+		} else if(cmd_.cmp_word(0, "valist")) { // list valid ID
+			utils::format("Valid filter ID: ");
+			for(auto n : valid_) {
+				utils::format("%d, ") % n;
+			}
+			utils::format("\n");
 #endif
 		} else if(cmd_.cmp_word(0, "ext")) { // ext-id mode
 			ext_id_ = true;
@@ -580,6 +383,10 @@ namespace {
 #ifdef MULTI
 			utils::format("    ch CH-no               set current CAN channel (CH-no: 0, 1)\n");
 #endif
+#ifdef VALID_FILTER
+			utils::format("    valid [0/1]            valid ID-filter 0:disable/1:enable\n");
+			utils::format("    valist                 list valid filter IDs\n");
+#endif
 			utils::format("    ext                    set ext-id mode\n");
 			utils::format("    std                    set std-id mode\n");
 			utils::format("    send CAN-ID [data...]  send data frame\n");
@@ -590,6 +397,8 @@ namespace {
 			utils::format("    dump CAN-ID            dump frame data\n");
 			utils::format("    send_loop NUM [-rtr]   random ID, random DATA, send loop (RTR)\n");
 			utils::format("    help                   command list (this)\n");
+			utils::format("\n");
+			utils::format("  Input number: nnn decimal, xnnn hexa-decimal, bnnn binary\n");
 		} else {
 			char tmp[64];
 			cmd_.get_word(0, tmp, sizeof(tmp));
@@ -600,7 +409,6 @@ namespace {
 			utils::format("Parameter error...\n");
 		}
 	}
-#endif
 }
 
 
@@ -693,29 +501,24 @@ int main(int argc, char** argv)
 
 		command_();
 
-#if 0
-		while(can0_.get_recv_num() > 0) {
-			auto frm = can0_.get_recv_frame();
-			utils::format("\nCAN0:\n");
-			CAN::list(frm, "  ");
-		}
-#endif
 		analize_.service();
 
 #ifdef MULTI
 		while(can1_.get_recv_num() > 0) {
 			auto frm = can1_.get_recv_frame();
 #ifdef VALID_FILTER
-			if(valid_.find(frm.get_id()) != valid_.end()) {
-#else
-			{
-#endif
-				utils::format("\nCAN1:\n");
-				CAN::list(frm, "  ");
+			if(ena_valid_) {
+				if(valid_.find(frm.get_id()) != valid_.end()) {
+					utils::format("\nCAN1:\n");
+					CAN::list(frm, "  ");
+				}
 			}
+#else
+			utils::format("\nCAN1:\n");
+			CAN::list(frm, "  ");
+#endif
 		}
 #endif
-
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
