@@ -255,18 +255,17 @@ namespace device {
 ///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
 			if(level_ > 0) {
-				icu_mgr::set_task(IICA::EE_VEC, event_task_);
-				icu_mgr::set_task(IICA::RX_VEC, recv_task_);
-				icu_mgr::set_task(IICA::TX_VEC, send_task_);
-				icu_mgr::set_task(IICA::TE_VEC, tend_task_);
+				icu_mgr::set_interrupt(IICA::EE_VEC, event_task_, level_);
+				icu_mgr::set_interrupt(IICA::RX_VEC, recv_task_,  level_);
+				icu_mgr::set_interrupt(IICA::TX_VEC, send_task_,  level_);
+				icu_mgr::set_interrupt(IICA::TE_VEC, tend_task_,  level_);
 			} else {
-				icu_mgr::set_task(IICA::EE_VEC, nullptr);
-				icu_mgr::set_task(IICA::RX_VEC, nullptr);
-				icu_mgr::set_task(IICA::TX_VEC, nullptr);
-				icu_mgr::set_task(IICA::TE_VEC, nullptr);
+				icu_mgr::set_interrupt(IICA::EE_VEC, nullptr, level_);
+				icu_mgr::set_interrupt(IICA::RX_VEC, nullptr, level_);
+				icu_mgr::set_interrupt(IICA::TX_VEC, nullptr, level_);
+				icu_mgr::set_interrupt(IICA::TE_VEC, nullptr, level_);
 			}
 			IICA::ICIER = 0x00;
-			icu_mgr::set_level(IICA::PERIPHERAL, level_);
 
 			IICA::ICCR1.IICRST = 0;
 

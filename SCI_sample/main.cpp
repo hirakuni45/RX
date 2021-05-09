@@ -160,8 +160,8 @@ int main(int argc, char** argv)
 
 	uint8_t cnt = 0;
 	while(1) {
-		cmt_.sync();
 
+		cmt_.sync();
 		if(cmd_.service()) {
 			uint32_t cmdn = cmd_.get_words();
 			uint32_t n = 0;

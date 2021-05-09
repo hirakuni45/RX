@@ -363,7 +363,7 @@ namespace fatfs {
 			} else {
 				set_interrupt_task(nullptr, static_cast<uint32_t>(SDHI::SBFA_VEC));
 			}
-			device::icu_mgr::set_level(SDHI::PERIPHERAL, intr_lvl_);
+			device::icu_mgr::set_level(SDHI::SBFA_VEC, intr_lvl_);
 
 			start_ = true;
 		}

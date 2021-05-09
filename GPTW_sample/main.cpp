@@ -95,6 +95,9 @@ namespace {
 	#define USE_HRPWM
 #endif
 
+	// 位相計数モードの実験を行う場合有効にする
+	#define INPUT_PHASE
+
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
@@ -110,13 +113,17 @@ namespace {
 	typedef device::gptw_mgr<GPTW_CH, utils::null_task> GPTW;
 	GPTW	gptw_;
 
+#ifndef INPUT_PHASE
 #ifdef USE_HRPWM
 	typedef device::hrpwm_mgr<device::HRPWM> HRPWM;
 	HRPWM	hrpwm_;
 #endif
+#endif
 
 	float	duty_a_;
 	float	duty_b_;
+
+	int32_t	phase_cnt_;
 }
 
 
@@ -181,7 +188,17 @@ int main(int argc, char** argv)
 		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
-	{  // GPTW の開始 (PWM / AB 出力)
+	{  // GPTW の開始
+#ifdef INPUT_PHASE
+		// input phase A/B
+		if(gptw_.start_input_phase(GPTW::MODE::PHASE, ORDER_A, ORDER_B)) {
+			utils::format("GPTW%d start: input phase\n") % GPTW::value_type::CHANNEL_NO;
+			phase_cnt_ = gptw_.get_cnt();
+		} else {
+			utils::format("GPTW%d start fail...\n") % GPTW::value_type::CHANNEL_NO;
+		}
+#else
+		//  PWM / AB 出力、割り込みは使わない、バッファー動作
 		uint32_t freq = 100'000;  // 100KHz
 		if(gptw_.start(GPTW::MODE::PWM_S_HL, GPTW::OUTPUT::AB, freq, ORDER_A, ORDER_B)) {
 			utils::format("GPTW%d start: freq: %u [Hz]\n") % GPTW::value_type::CHANNEL_NO % freq;
@@ -192,7 +209,10 @@ int main(int argc, char** argv)
 		} else {
 			utils::format("GPTW%d start fail...\n") % GPTW::value_type::CHANNEL_NO;
 		}
+#endif
 	}
+
+#ifndef INPUT_PHASE
 #ifdef USE_HRPWM
 	{  // HRPWM の開始 (Enable: GPTW0, Disable: GPTW1, GPTW2, GPTW3)
 		if(hrpwm_.start(true, false, false, false)) {
@@ -202,13 +222,23 @@ int main(int argc, char** argv)
 		}
 	}
 #endif
+#endif
 
+#ifndef INPUT_PHASE
 	cmd_.set_prompt("# ");
+#endif
 
 	uint8_t cnt = 0;
 	while(1) {
 		cmt_.sync();
 
+#ifdef INPUT_PHASE
+		auto v = gptw_.get_cnt();
+		if(v != phase_cnt_) {
+			phase_cnt_ = v;
+			utils::format("%d\n") % phase_cnt_;
+		}
+#else
 		if(cmd_.service()) {
 			uint32_t cmdn = cmd_.get_words();
 			if(cmdn > 0) {
@@ -255,6 +285,7 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+#endif
 
 		++cnt;
 		if(cnt >= 50) {

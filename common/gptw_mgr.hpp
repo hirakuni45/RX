@@ -33,6 +33,11 @@ namespace device {
 			PWM_T1,			///< 三角波 PWM 1（谷32ビット転送）
 			PWM_T2,			///< 三角波 PWM 2（山/谷32ビット転送）
 			PWM_T3,			///< 三角波 PWM 3（谷64ビット転送）
+
+			PHASE,			///< 位相計数（モード１）A/B 相入力（エンコーダー入力）
+			PHASE_P,		///< 位相計数（モード２）A:Positive, B:Directional
+			PHASE_N,		///< 位相計数（モード２）A:Nagative, B:Directional
+			PHASE_PN,		///< 位相計数（モード２）A:Positive/Nagative, B:Directional
 		};
 
 
@@ -62,29 +67,30 @@ namespace device {
 	/*!
 		@brief  GPTW マネージャー・クラス
 		@param[in]	GPTWn	GPTW[n] ユニット
-		@param[in]	CMTASK	コンペアマッチタスク型
+		@param[in]	ITASK	割り込みタスク型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GPTWn, class CMTASK = utils::null_task>
+	template <class GPTWn, class ITASK = utils::null_task>
 		class gptw_mgr : public gptw_base {
 	public:
 		typedef GPTWn value_type;
 
 	private:
-		// ※必要なら、実装する
-		void sleep_() { }
-
 		uint32_t	freq_;
 		uint32_t	base_;
 		uint8_t		ilvl_;
+		port_map_gptw::ORDER	ord_a_;
+		port_map_gptw::ORDER	ord_b_;
 		bool		buffer_;
+		bool		used_;
+
 		ICU::VECTOR	cm_vec_;
 
-		static CMTASK	cmtask_;
+		static ITASK	itask_;
 
-		static INTERRUPT_FUNC void cmp_match_task_()
+		static INTERRUPT_FUNC void intr_task_()
 		{
-			cmtask_();
+			itask_();
 		}
 
 
@@ -99,27 +105,36 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		gptw_mgr() noexcept : freq_(0), base_(0), ilvl_(0), buffer_(false), cm_vec_(ICU::VECTOR::NONE)
+		gptw_mgr() noexcept : freq_(0), base_(0), ilvl_(0),
+			ord_a_(port_map_gptw::ORDER::BYPASS), ord_b_(port_map_gptw::ORDER::BYPASS),
+			buffer_(false), used_(false),
+			cm_vec_(ICU::VECTOR::NONE)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  開始
+			@brief  基本動作開始
 			@param[in]	mode	動作モード
 			@param[in]	out		出力型
 			@param[in]	freq	周期
 			@param[in]	ord_a	ポート候補Ａ
 			@param[in]	ord_b	ポート候補Ｂ
 			@param[in]	ilvl	割り込みレベル（0 なら割り込み無し）
+			@param[in]	idiv	割り込みを間引く回数（1 to 7）
 			@param[in]	buffer	バッファー動作を無効にする場合「false」
 			@return 設定が適正なら「true」
 		*/
 		//-----------------------------------------------------------------//
 		bool start(MODE mode, OUTPUT out, uint32_t freq, typename port_map_gptw::ORDER ord_a, typename port_map_gptw::ORDER ord_b,
-			uint8_t ilvl = 0, bool buffer = true) noexcept
+			uint8_t ilvl = 0, uint8_t idiv = 0, bool buffer = true) noexcept
 		{
-			if(freq == 0) return false;
+			if(freq == 0) {
+				return false;
+			}
+			if(idiv > 7) {
+				return false;
+			}
 
 			if(!power_mgr::turn(GPTWn::PERIPHERAL)) {
 				return false;
@@ -175,6 +190,8 @@ namespace device {
 					return false;
 				}
 			}
+			ord_a_ = ord_a;
+			ord_b_ = ord_b;
 
 			freq_ = freq;
 			auto n = GPTWn::PCLK / freq;
@@ -221,32 +238,148 @@ namespace device {
 				n /= 2;
 				md = 0b110;
 				break;
+			default:
+				power_mgr::turn(GPTWn::PERIPHERAL, false);
+				return false;
 			}
 			base_ = n;
 
 			protect_enable_(false);
+
+			GPTWn::GTUPSR = 0;
+			GPTWn::GTDNSR = 0;
+
 			GPTWn::GTPR = n - 1;  // +1 が周期になるので１引く
 
 			buffer_ = buffer;
 			if(buffer) {
 				GPTWn::GTBER = GPTWn::GTBER.BD0.b(0) | GPTWn::GTBER.CCRA.b(0b01) | GPTWn::GTBER.CCRB.b(0b01);
 			}
-			GPTWn::GTCR  = GPTWn::GTCR.MD.b(md) | GPTWn::GTCR.CST.b();
+			GPTWn::GTCR  = GPTWn::GTCR.MD.b(md);
 			GPTWn::GTIOR = GPTWn::GTIOR.OAE.b(outa) | GPTWn::GTIOR.OBE.b(outb)
 				| GPTWn::GTIOR.GTIOA.b(sign_a) | GPTWn::GTIOR.GTIOB.b(sign_b);
 
 			ilvl_ = ilvl;
-			if(ilvl > 0) {
-				cm_vec_ = icu_mgr::set_interrupt(GPTWn::GTCIV, cmp_match_task_, ilvl);
+			if(ilvl > 0) {  // GTPR のオーバーフローによる割り込み (V)
+				if(idiv != 0) {  // 割り込み間引きカウント（１～７）
+					GPTWn::GTITC = GPTWn::GTITC.IVTC.b(0b01) | GPTWn::GTITC.IVTT.b(idiv);
+				}
+				cm_vec_ = icu_mgr::set_interrupt(GPTWn::GTCIV, intr_task_, ilvl);
 				GPTWn::GTINTAD.GTINTPR = 0b01;
 			}
 
-			GPTWn::GTSTP = ~(1 << GPTWn::CHANNEL_NO);  // 停止解除
-			GPTWn::GTSTR =   1 << GPTWn::CHANNEL_NO;   // 開始
+			GPTWn::GTCR.CST = 1;
 
 			protect_enable_();
 
+			used_ = true;
+
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  位相計数開始
+			@param[in]	mode	位相計数モード
+			@param[in]	ord_a	ポート候補Ａ
+			@param[in]	ord_b	ポート候補Ｂ
+			@return 設定が適正なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start_input_phase(MODE mode, typename port_map_gptw::ORDER ord_a, typename port_map_gptw::ORDER ord_b) noexcept
+		{
+			uint32_t gtupsr = 0;
+			uint32_t gtdnsr = 0;
+			switch(mode) {
+			case MODE::PHASE:
+				gtupsr = 0x0000'6900;
+				gtdnsr = 0x0000'9600;
+				break;
+			case MODE::PHASE_P:
+				gtupsr = 0x0000'0200;
+				gtdnsr = 0x0000'0100;
+				break;
+			case MODE::PHASE_N:
+				gtupsr = 0x0000'0800;
+				gtdnsr = 0x0000'0400;
+				break;
+			case MODE::PHASE_PN:
+				gtupsr = 0x0000'0A00;
+				gtdnsr = 0x0000'0500;
+				break;
+			default:
+				return false;
+			}
+
+			if(!power_mgr::turn(GPTWn::PERIPHERAL)) {
+				return false;
+			}
+
+			bool nega = false;
+			bool negb = false;
+			if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, true, nega, ord_a)) {
+				power_mgr::turn(GPTWn::PERIPHERAL, false);
+				return false;
+			}
+			if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, true, negb, ord_b)) {
+				power_mgr::turn(GPTWn::PERIPHERAL, false);
+				return false;
+			}
+			ord_a_ = ord_a;
+			ord_b_ = ord_b;
+
+			protect_enable_(false);
+
+			GPTWn::GTCR = 0;
+			GPTWn::GTIOR = 0;
+
+			GPTWn::GTCNT = 0;
+			GPTWn::GTUPSR = gtupsr;
+			GPTWn::GTDNSR = gtdnsr;
+
+			GPTWn::GTCR.CST = 1;
+
+			protect_enable_();
+
+			used_ = true;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	廃棄
+		*/
+		//-----------------------------------------------------------------//
+		void destroy() noexcept
+		{
+			if(!used_) return;
+
+			protect_enable_(false);
+
+			GPTWn::GTCR.CST = 0;
+
+			if(ilvl_ > 0) {
+				GPTWn::GTINTAD.GTINTPR = 0;
+				ilvl_ = 0;
+				icu_mgr::set_interrupt(GPTWn::GTCIV, nullptr, ilvl_);
+			}
+
+			GPTWn::GTCR  = 0;
+			GPTWn::GTIOR = 0;
+			GPTWn::GTUPSR = 0;
+			GPTWn::GTDNSR = 0;
+
+			protect_enable_();
+
+			port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, false, false, ord_a_);
+			port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, false, false, ord_b_);
+
+			power_mgr::turn(GPTWn::PERIPHERAL, false);
+
+			used_ = false;
 		}
 
 
@@ -263,6 +396,15 @@ namespace device {
 
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  カウンタ値を取得（位相計数モード用）
+			@return GTCNT レジスタ値を取得
+		*/
+		//-----------------------------------------------------------------//
+		int32_t get_cnt() const noexcept { return static_cast<int32_t>(GPTWn::GTCNT()); }
 
 
 		//-----------------------------------------------------------------//
@@ -350,5 +492,5 @@ namespace device {
 		}
 	};
 
-	template <class GPTWn, class CMTASK> CMTASK gptw_mgr<GPTWn, CMTASK>::cmtask_;
+	template <class GPTWn, class ITASK> ITASK gptw_mgr<GPTWn, ITASK>::itask_;
 }

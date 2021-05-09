@@ -1,29 +1,24 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ・ICUA 定義
+	@brief	RX72T グループ・ICUC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "RX600/icu_utils.hpp"
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-#else  
-#  error "icu.hpp requires SIG_RX64M or SIG_RX71M to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  割り込みコントローラ（ICUA）
+		@brief  割り込みコントローラ（ICUC）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	struct icu_t {
+	template<class _>
+	struct icuc_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -31,334 +26,290 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR : uint8_t {
+			NONE    = 0,	///< none 
 
-			NONE         = 0,   ///< ベクター０
+			BUSERR  = 16,   ///< BSC
 
-			BUSERR       = 16,  ///< BSC
+			RAMERR  = 18,	///< RAM
 
-			RAMERR       = 18,  ///< RAM
+			FIFERR  = 21,   ///< FCU
 
-			FIFERR       = 21,  ///< FCU
+			FRDYI   = 23,   ///< FCU
 
-			FRDYI        = 23,  ///< FCU
+			SWINT2  = 26,   ///< ICU
+			SWINT   = 27,   ///< ICU
 
-			SWINT2       = 26,  ///< ICU
-			SWINT        = 27,  ///< ICU
+			CMI0    = 28,   ///< CMT0
+			CMI1    = 29,   ///< CMT1
+			CMI2    = 30,   ///< CMT2
+			CMI3    = 31,   ///< CMT3
 
-			CMI0         = 28,  ///< CMT0
-			CMI1         = 29,  ///< CMT1
-			CMWI0        = 30,  ///< CMTW0
-			CMWI1        = 31,  ///< CMTW1
+			D0FIFO0 = 34,   ///< USB0
+ 			D1FIFO0 = 35,   ///< USB0
 
-			D0FIFO2      = 32,  ///< USBA
-			D1FIFO2      = 33,
-			D0FIFO0      = 34,  ///< USB0
-			D1FIFO0      = 35,
+			SPRI0   = 38,   ///< RSPI0
+			SPTI0   = 39,   ///< RSPI0
 
-			SPRI0        = 38,  ///< RSPI0
-			SPTI0        = 39,
-#if defined(SIG_RX71M)
-			SPRI1        = 40,  ///< RSPI1
-			SPTI1        = 41,
-#endif
-			SPRI         = 42,  ///< QSPI
-			SPTI         = 43,
+			RIIC_RXI0 = 52,   ///< RIIC0
+			RIIC_TXI0 = 53,   ///< RIIC0
 
-			SBFAI        = 44,  ///< SDHI
+			RXI1    = 60,	///< SCI1
+			TXI1    = 61,	///< SCI1
 
-			MBFAI        = 45,  ///< MMCIF
-			SSITXI0      = 46,  ///< SSI0 シリアルサウンドインタフェース
-			SSIRXI0      = 47,
-			SSIRTI1      = 48,  ///< SSI1 シリアルサウンドインタフェース
+			IRQ0    = 64,   ///< ICU
+			IRQ1    = 65,
+			IRQ2    = 66,
+			IRQ3    = 67,
+			IRQ4    = 68,
+			IRQ5    = 69,
+			IRQ6    = 70,
+			IRQ7    = 71,
+			IRQ8    = 72,
+			IRQ9    = 73,
+			IRQ10   = 74,
+			IRQ11   = 75,
+			IRQ12   = 76,
+			IRQ13   = 77,
+			IRQ14   = 78,
+			IRQ15   = 79,
 
-			IDEI         = 50,  ///< SRC
-			ODFI         = 51,
-			RIIC_RXI0    = 52,  ///< RIIC0
-			RIIC_TXI0    = 53,
-			RIIC_RXI2    = 54,  ///< RIIC2
-			RIIC_TXI2    = 55,
+			RXI5	= 84,	///< SCI5
+			TXI5	= 85,	///< SCI5
+			RXI6	= 86,	///< SCI6
+			TXI6	= 87,	///< SCI6
 
-			RXI0         = 58,  ///< SCI0
-			TXI0         = 59,
-			RXI1         = 60,  ///< SCI1
-			TXI1         = 61,
-			RXI2         = 62,  ///< SCI2
-			TXI2         = 63, 
+			LVD1    = 88,   ///< LVD1
+			LVD2    = 89,   ///< LVD2
 
-			IRQ0         = 64,  ///< ICU
-			IRQ1         = 65,
-			IRQ2         = 66,
-			IRQ3         = 67,
-			IRQ4         = 68,
-			IRQ5         = 69,
-			IRQ6         = 70,
-			IRQ7         = 71,
-			IRQ8         = 72,
-			IRQ9         = 73,
-			IRQ10        = 74,
-			IRQ11        = 75,
-			IRQ12        = 76,
-			IRQ13        = 77,
-			IRQ14        = 78,
-			IRQ15        = 79,
+			USBR0	= 90,	///< USB0
 
-			RXI3         = 80,  ///< SCI3
-			TXI3         = 81,
-			RXI4         = 82,  ///< SCI4
-			TXI4         = 83,
-			RXI5         = 84,  ///< SCI5
-			TXI5         = 85,
-			RXI6         = 86,  ///< SCI6
-			TXI6         = 87,
+			IWUNI   = 95,   // IWDT
+			WUNI	= 96,	// WDT
 
-			LVD1         = 88,  ///< LVD1
-			LVD2         = 89,  ///< LVD2
+			RXI8	= 100,	///< SCI8
+			TXI8	= 101,	///< SCI8
+			RXI9	= 102,	///< SCI9
+			TXI9	= 103,	///< SCI9
 
-			USBR0        = 90,  ///< USB0
+			GROUPBE0 = 106,	///< ICU
 
-			ALM          = 92,  ///< RTC
-			PRD          = 93,
-			USBAR        = 94,  ///< USBA
+			GROUPBL0 = 110,	///< ICU
+			GROUPBL1 = 111,	///< ICU
+			GROUPAL0 = 112,	///< ICU
 
-			IWUNI        = 95,  ///< IWDT
-			WUNI         = 96,  ///< WDT
-			PCDFI        = 97,  ///< PDC
+			RXI11	= 114,	///< SCI11
+			TXI11	= 115,	///< SCI11
+			RXI12	= 116,	///< SCI12
+			TXI12	= 117,	///< SCI12
 
-			RXI7         = 98,  ///< SCI7
-			TXI7         = 99,
-			RXIF8        = 100, ///< SCIFA8
-			TXIF8        = 101,
-			RXIF9        = 102, ///< SCIFA9
-			TXIF9        = 103,
-			RXIF10       = 104, ///< SCIFA10
-			TXIF10       = 105,
+			DMAC0I  = 120,	///< DMAC
+			DMAC1I  = 121,	///< DMAC
+			DMAC2I  = 122,	///< DMAC
+			DMAC3I  = 123,	///< DMAC
+			DMAC74I = 124,	///< DMAC
 
-			GROUPBE0     = 106,  ///< ICU
+			OSTDI   = 125,	///< OST
 
-			GROUPBL0	 = 110,  ///< ICU
-			GROUPBL1	 = 111,  ///< ICU
-			GROUPAL0	 = 112,  ///< ICU
-			GROUPAL1	 = 113,  ///< ICU
-			RXIF11  	 = 114,  ///< SCIFA11
-			TXIF11   	 = 115,
-			RXI12   	 = 116,  ///< SCI12
-			TXI12   	 = 117,
+			S12ADI    = 128,  ///< S12AD
+			S12GBADI  = 129,  ///< S12AD
+			S12GCADI  = 130,  ///< S12AD
 
-			DMAC0I  	 = 120,  ///< DMAC
-			DMAC1I  	 = 121,
-			DMAC2I  	 = 122,
-			DMAC3I  	 = 123,
-			DMAC74I 	 = 124,
+			S12ADI1   = 132,  ///< S12AD1
+			S12GBADI1 = 133,  ///< S12AD1
+			S12GCADI1 = 134,  ///< S12AD1
 
-			OSTDI    	 = 125,  ///< OST
+			S12ADI2   = 136,  ///< S12AD2
+			S12GBADI2 = 137,  ///< S12AD2
+			S12GCADI2 = 138,  ///< S12AD2
 
-			EXDMAC0I 	 = 126,  ///< EXDMAC
-			EXDMAC1I 	 = 127,
+			CMIA0   = 146,	///< TMR0: CMIA0
+			CMIB0   = 147,	///< TMR0: CMIB0
+			OVI0    = 148,	///< TMR0: OVI0
+			CMIA1   = 149,	///< TMR1: CMIA1
+			CMIB1   = 150,	///< TMR1: CMIB1
+			OVI1    = 151,	///< TMR1: OVI1
+			CMIA2   = 152,	///< TMR2: CMIA2
+			CMIB2   = 153,	///< TMR2: CMIB2
+			OVI2    = 154,	///< TMR2: OVI2
+			CMIA3   = 155,	///< TMR3: CMIA3
+			CMIB3   = 156,	///< TMR3: CMIB3
+			OVI3    = 157,	///< TMR3: OVI3
+			CMIA4   = 158,	///< TMR4: CMIA4
+			CMIB4   = 159,	///< TMR4: CMIB4
+			OVI4    = 160,	///< TMR4: OVI4
+			CMIA5   = 161,	///< TMR5: CMIA5
+			CMIB5   = 162,	///< TMR5: CMIB5
+			OVI5    = 163,	///< TMR5: OVI5
+			CMIA6   = 164,	///< TMR6: CMIA6
+			CMIB6   = 165,	///< TMR6: CMIB6
+			OVI6    = 166,	///< TMR6: OVI6
+			CMIA7   = 167,	///< TMR7: CMIA7
+			CMIB7   = 168,	///< TMR7: CMIB7
+			OVI7    = 169,	///< TMR7: OVI7
 
-			INTB128  	 = 128,
-			INTB129,
-			INTB130,
-			INTB131,
-			INTB132,
-			INTB133,
-			INTB134,
-			INTB135,
-			INTB136,
-			INTB137,
-			INTB138,
-			INTB139,
-			INTB140,
-			INTB141,
-			INTB142,
-			INTB143,
-			INTB144,
-			INTB145,
-			INTB146,
-			INTB147,
-			INTB148,
-			INTB149,
-			INTB150,
-			INTB151,
-			INTB152,
-			INTB153,
-			INTB154,
-			INTB155,
-			INTB156,
-			INTB157,
-			INTB158,
-			INTB159,
-			INTB160,
-			INTB161,
-			INTB162,
-			INTB163,
-			INTB164,
-			INTB165,
-			INTB166,
-			INTB167,
-			INTB168,
-			INTB169,
-			INTB170,
-			INTB171,
-			INTB172,
-			INTB173,
-			INTB174,
-			INTB175,
-			INTB176,
-			INTB177,
-			INTB178,
-			INTB179,
-			INTB180,
-			INTB181,
-			INTB182,
-			INTB183,
-			INTB184,
-			INTB185,
-			INTB186,
-			INTB187,
-			INTB188,
-			INTB189,
-			INTB190,
-			INTB191,
-			INTB192,
-			INTB193,
-			INTB194,
-			INTB195,
-			INTB196,
-			INTB197,
-			INTB198,
-			INTB199,
-			INTB200,
-			INTB201,
-			INTB202,
-			INTB203,
-			INTB204,
-			INTB205,
-			INTB206,
-			INTB207,
+			RXF0    = 170,	///< CAN0
+			TXF0    = 171,	///< CAN0
+			RXM0    = 172,	///< CAN0
+			TXM0    = 173,	///< CAN0
 
-			INTA208  = 208,
-			INTA209,
-			INTA210,
-			INTA211,
-			INTA212,
-			INTA213,
-			INTA214,
-			INTA215,
-			INTA216,
-			INTA217,
-			INTA218,
-			INTA219,
-			INTA220,
-			INTA221,
-			INTA222,
-			INTA223,
-			INTA224,
-			INTA225,
-			INTA226,
-			INTA227,
-			INTA228,
-			INTA229,
-			INTA230,
-			INTA231,
-			INTA232,
-			INTA233,
-			INTA234,
-			INTA235,
-			INTA236,
-			INTA237,
-			INTA238,
-			INTA239,
-			INTA240,
-			INTA241,
-			INTA242,
-			INTA243,
-			INTA244,
-			INTA245,
-			INTA246,
-			INTA247,
-			INTA248,
-			INTA249,
-			INTA250,
-			INTA251,
-			INTA252,
-			INTA253,
-			INTA254,
-			INTA255,
+			USBI0	= 174,	///< USB0
+
+			ELSR18I = 175,	///< ELC
+			ELSR19I = 176,	///< ELC
+
+			RD		= 177,	///< TSIP-Lite
+			WR		= 178,	///< TSIP-Lite
+			ERR		= 179,	///< TSIP-Lite
+
+			CMPC0	= 180,	///< CMPC0
+			CMPC1	= 181,	///< CMPC1
+			CMPC2	= 182,	///< CMPC2
+			CMPC3	= 183,	///< CMPC3
+			CMPC4	= 184,	///< CMPC4
+			CMPC5	= 185,	///< CMPC5
+
+			INTA208 = 208,	///< PERIA
+			INTA209 = 209,	///< PERIA
+			INTA210 = 210,	///< PERIA
+			INTA211 = 211,	///< PERIA
+			INTA212 = 212,	///< PERIA
+			INTA213 = 213,	///< PERIA
+			INTA214 = 214,	///< PERIA
+			INTA215 = 215,	///< PERIA
+			INTA216 = 216,	///< PERIA
+			INTA217 = 217,	///< PERIA
+			INTA218 = 218,	///< PERIA
+			INTA219 = 219,	///< PERIA
+			INTA220 = 220,	///< PERIA
+			INTA221 = 221,	///< PERIA
+			INTA222 = 222,	///< PERIA
+			INTA223 = 223,	///< PERIA
+			INTA224 = 224,	///< PERIA
+			INTA225 = 225,	///< PERIA
+			INTA226 = 226,	///< PERIA
+			INTA227 = 227,	///< PERIA
+			INTA228 = 228,	///< PERIA
+			INTA229 = 229,	///< PERIA
+			INTA230 = 230,	///< PERIA
+			INTA231 = 231,	///< PERIA
+			INTA232 = 232,	///< PERIA
+			INTA233 = 233,	///< PERIA
+			INTA234 = 234,	///< PERIA
+			INTA235 = 235,	///< PERIA
+			INTA236 = 236,	///< PERIA
+			INTA237 = 237,	///< PERIA
+			INTA238 = 238,	///< PERIA
+			INTA239 = 239,	///< PERIA
+			INTA240 = 240,	///< PERIA
+			INTA241 = 241,	///< PERIA
+			INTA242 = 242,	///< PERIA
+			INTA243 = 243,	///< PERIA
+			INTA244 = 244,	///< PERIA
+			INTA245 = 245,	///< PERIA
+			INTA246 = 246,	///< PERIA
+			INTA247 = 247,	///< PERIA
+			INTA248 = 248,	///< PERIA
+			INTA249 = 249,	///< PERIA
+			INTA250 = 250,	///< PERIA
+			INTA251 = 251,	///< PERIA
+			INTA252 = 252,	///< PERIA
+			INTA253 = 253,	///< PERIA
+			INTA254 = 254,	///< PERIA
+			INTA255 = 255	///< PERIA
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込みＢ要因・ベクター・インデックス
+			@brief  GROUPIE0・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_SELB : uint8_t {
-			NONE = 0,	///< なし
+		enum class VECTOR_IE0 : uint8_t {
+			DPFPUEX,	///< 倍精度浮動少数点例外
+		};
 
-			CMI2 = 1,	///< CMT2
-			CMI3 = 2,	///< CMT3
 
-			CMIA0 = 3,	///< TMR0 (TCORA のコンペアマッチ)
-			CMIB0,		///< TMR0 (TCORB のコンペアマッチ)
-			OVI0,		///< TMR0 (TCNT のオーバフロー)
-			CMIA1,		///< TMR1 (TCORA のコンペアマッチ)
-			CMIB1,		///< TMR1 (TCORB のコンペアマッチ)
-			OVI1,		///< TMR1 (TCNT のオーバフロー)
-			CMIA2,		///< TMR2 (TCORA のコンペアマッチ)
-			CMIB2,		///< TMR2 (TCORB のコンペアマッチ)
-			OVI2,		///< TMR2 (TCNT のオーバフロー)
-			CMIA3,		///< TMR3 (TCORA のコンペアマッチ)
-			CMIB3,		///< TMR3 (TCORB のコンペアマッチ)
-			OVI3,		///< TMR3 (TCNT のオーバフロー)
-			TGI0A,		///< TPU0 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI0B,		///< TPU0 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI0C,		///< TPU0 (TGRC のインプットキャプチャ / コンペアマッチ)
-			TGI0D,		///< TPU0 (TGRD のインプットキャプチャ / コンペアマッチ)
-			TGI0V,		///< TPU0 (TCNT のオーバフロー)
-			TGI1A,		///< TPU1 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI1B,		///< TPU1 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI1V,		///< TPU1 (TCNT のオーバフロー)
-			TGI1U,		///< TPU1 (TCNT のアンダーフロー)
-			TGI2A,		///< TPU2 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI2B,		///< TPU2 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI2V,		///< TPU2 (TCNT のオーバフロー)
-			TGI2U,		///< TPU2 (TCNT のアンダーフロー)
-			TGI3A,		///< TPU3 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI3B,		///< TPU3 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI3C,		///< TPU3 (TGRC のインプットキャプチャ / コンペアマッチ)
-			TGI3D,		///< TPU3 (TGRD のインプットキャプチャ / コンペアマッチ)
-			TGI3V,		///< TPU3 (TCNT のオーバフロー)
-			TGI4A,		///< TPU4 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI4B,		///< TPU4 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI4V,		///< TPU4 (TCNT のオーバフロー)
-			TGI4U,		///< TPU4 (TCNT のアンダーフロー)
-			TGI5A,		///< TPU5 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI5B,		///< TPU5 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI5V,		///< TPU5 (TCNT のオーバフロー)
-			TGI5U,		///< TPU5 (TCNT のアンダーフロー)
-			IC0I0,		///< CMTW0 (CMWICR0 レジスタのインプットキャプチャ入力)
-			IC1I0,		///< CMTW0 (CMWICR1 レジスタのインプットキャプチャ入力)
-			OC0I0,		///< CMTW0 (CMWOCR0 レジスタのアウトプットコンペア出力)
-			OC1I0,		///< CMTW0 (CMWOCR1 レジスタのアウトプットコンペア出力)
-			IC0I1,		///< CMTW1 (CMWICR0 レジスタのインプットキャプチャ入力)
-			IC1I1,		///< CMTW1 (CMWICR1 レジスタのインプットキャプチャ入力)
-			OC0I1,		///< CMTW1 (CMWOCR0 レジスタのアウトプットコンペア出力)
-			OC1I1,		///< CMTW1 (CMWOCR1 レジスタのアウトプットコンペア出力)
-			CUP,		///< RTC (桁上げ割り込み)
-			RXF0 = 50,	///< CAN0（受信 FIFO 割り込み）
-			TXF0 = 51,	///< CAN0（送信 FIFO 割り込み）
-			RXM0 = 52,	///< CAN0（メールボックス０～３１メッセージ受信完了）
-			TXM0 = 53,	///< CAN0（メールボックス０～３１メッセージ送信完了）
-			RXF1 = 54,	///< CAN1（受信 FIFO 割り込み）
-			TXF1 = 55,	///< CAN1（送信 FIFO 割り込み）
-			RXM1 = 56,	///< CAN1（メールボックス０～３１メッセージ受信完了）
-			TXM1 = 57,	///< CAN1（メールボックス０～３１メッセージ送信完了）
-			RXF2 = 58,	///< CAN2（受信 FIFO 割り込み）
-			TXF2 = 59,	///< CAN2（送信 FIFO 割り込み）
-			RXM2 = 60,	///< CAN2（メールボックス０～３１メッセージ受信完了）
-			TXM2 = 61,	///< CAN2（メールボックス０～３１メッセージ送信完了）
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPBE0・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_BE0 : uint8_t {
+			ERS0,	///< CAN0 / ERS0
+		};
 
-			USBI0 = 62,	///< USB0（１５要因のステータス割り込み） 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPBL0・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_BL0 : uint8_t {
+			TEI1 = 2,		///< SCI1 / TEI1（送信完了）
+			ERI1,			///< SCI1 / ERI1（受信エラー）
+
+			TEI5 = 10,		///< SCI5 / TEI5（送信完了）
+			ERI5,			///< SCI5 / ERI5（受信エラー）
+			TEI6,			///< SCI6 / TEI6（送信完了）
+			ERI6,			///< SCI6 / ERI6（受信エラー）
+
+			TEI12   = 16,	///< SCI12 / TEI12（送信完了）
+			ERI12,			///< SCI12 / ERI12（受信エラー）
+			SCIX0,			///< SCI12 / SCIX0
+			SCIX1,			///< SCI12 / SCIX1
+			SCIX2,			///< SCI12 / SCIX2
+			SCIX3,			///< SCI12 / SCIX3
+
+			FERRI   = 26,	///< CAC / FERRI
+			MENDI,			///< CAC / MENDI
+			OVFI,			///< CAC / OVFI
+			DOPCI,			///< DOC / DOPCI
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPBL1・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_BL1 : uint8_t {
+			POEGGAI,		///< POEG (group A)
+			POEGGBI,		///< POEG (group B)
+			POEGGCI,		///< POEG (group C)
+			POEGGDI,		///< POEG (group C)
+
+			OEI5 = 8,		///< POE / OEI5
+			OEI1,			///< POE / OEI1
+			OEI2,			///< POE / OEI2
+			OEI3,			///< POE / OEI3
+			OEI4,			///< POE / OEI4
+			TEI0,			///< RIIC0 / TEI0
+			EEI0,			///< RIIC0 / EEI0
+
+			S12CMPAI2 = 18,	///< S12AD2 / S12CMPAI2
+			S12CMPBI2,		///< S12AD2 / S12CMPBI2
+			S12CMPAI,		///< S12AD / S12CMPAI
+			S12CMPBI,		///< S12AD / S12CMPBI
+			S12CMPAI1,		///< S12AD1 / S12CMPAI1
+			S12CMPBI1,		///< S12AD1 / S12CMPBI1
+			TEI8,			///< SCI8 / TEI8
+			ERI8,			///< SCI8 / ERI8
+			TEI9,			///< SCI9 / TEI9
+			ERI9,			///< SCI9 / ERI9
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPAL0・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_AL0 : uint8_t {
+			TEI11 = 12,		///< SCI11 / TEI11
+			ERI11,			///< SCI11 / ERI11
+
+			SPII0 = 16,		///< RSPI0 / SPII0
+			SPEI0,			///< RSPI0 / SPEI0
 		};
 
 
@@ -414,147 +365,141 @@ namespace device {
 			TGIB7,		///< MTU7（TGRBのインプットキャプチャ /コンペアマッチ）
 			TGIC7,		///< MTU7（TGRCのインプットキャプチャ /コンペアマッチ）
 			TGID7,		///< MTU7（TGRDのインプットキャプチャ /コンペアマッチ）
-			TCIV7,		///< MTU7（TCNTのオーバフロー /アンダフロー（相補PWMモード時のみ））
+			TCIV7,		///< MTU7（TCNTのオーバフロー /アンダフロー (相補PWMモード時のみ))
 
 			TGIA8 = 41,	///< MTU8（TGRAのインプットキャプチャ /コンペアマッチ）
 			TGIB8,		///< MTU8（TGRBのインプットキャプチャ /コンペアマッチ）
 			TGIC8,		///< MTU8（TGRCのインプットキャプチャ /コンペアマッチ）
 			TGID8,		///< MTU8（TGRDのインプットキャプチャ /コンペアマッチ）
 			TCIV8,		///< MTU8（TCNTのオーバフロー）
+
+			TGIA9 = 47,	///< MTU9（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB9,		///< MTU9（TGRBのインプットキャプチャ /コンペアマッチ）
+			TGIC9,		///< MTU9（TGRCのインプットキャプチャ /コンペアマッチ）
+			TGID9,		///< MTU9（TGRDのインプットキャプチャ /コンペアマッチ）
+			TGIV9,		///< MTU9（TCNTのオーバフロー）
+			TGIE9,		///< MTU9 (TGREのコンペアマッチ)
+			TGIF9,		///< MTU9 (TGRFのコンペアマッチ)
+
+			GTCIA0 = 56,///< GPTW0 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB0,		///< GPTW0 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC0,		///< GPTW0 (GTCCRC レジスタのコンペアマッチ)
+			GTCID0,		///< GPTW0 (GTCCRD レジスタのコンペアマッチ)
+			GDTE0,		///< GPTW0 (デッドタイムエラー)
+			GTCIE0,		///< GPTW0 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF0,		///< GPTW0 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV0,		///< GPTW0 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU0,		///< GPTW0 (GTCNT カウンタのアンダフロー)
+
+			GTCIA1 = 65,///< GPTW1 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB1,		///< GPTW1 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC1,		///< GPTW1 (GTCCRC レジスタのコンペアマッチ)
+			GTCID1,		///< GPTW1 (GTCCRD レジスタのコンペアマッチ)
+			GDTE1,		///< GPTW1 (デッドタイムエラー)
+			GTCIE1,		///< GPTW1 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF1,		///< GPTW1 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV1,		///< GPTW1 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU1,		///< GPTW1 (GTCNT カウンタのアンダフロー)
+
+			GTCIA2 = 74,///< GPTW2 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB2,		///< GPTW2 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC2,		///< GPTW2 (GTCCRC レジスタのコンペアマッチ)
+			GTCID2,		///< GPTW2 (GTCCRD レジスタのコンペアマッチ)
+			GDTE2,		///< GPTW2 (デッドタイムエラー)
+			GTCIE2,		///< GPTW2 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF2,		///< GPTW2 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV2,		///< GPTW2 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU2,		///< GPTW2 (GTCNT カウンタのアンダフロー)
+
+			GTCIA3 = 83,///< GPTW3 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB3,		///< GPTW3 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC3,		///< GPTW3 (GTCCRC レジスタのコンペアマッチ)
+			GTCID3,		///< GPTW3 (GTCCRD レジスタのコンペアマッチ)
+			GDTE3,		///< GPTW3 (デッドタイムエラー)
+			GTCIE3,		///< GPTW3 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF3,		///< GPTW3 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV3,		///< GPTW3 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU3,		///< GPTW3 (GTCNT カウンタのアンダフロー)
+
+			GTCIA4 = 92,///< GPTW4 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB4,		///< GPTW4 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC4,		///< GPTW4 (GTCCRC レジスタのコンペアマッチ)
+			GTCID4,		///< GPTW4 (GTCCRD レジスタのコンペアマッチ)
+			GDTE4,		///< GPTW4 (デッドタイムエラー)
+			GTCIE4,		///< GPTW4 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF4,		///< GPTW4 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV4,		///< GPTW4 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU4,		///< GPTW4 (GTCNT カウンタのアンダフロー)
+
+			GTCIA5 =101,///< GPTW5 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB5,		///< GPTW5 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC5,		///< GPTW5 (GTCCRC レジスタのコンペアマッチ)
+			GTCID5,		///< GPTW5 (GTCCRD レジスタのコンペアマッチ)
+			GDTE5,		///< GPTW5 (デッドタイムエラー)
+			GTCIE5,		///< GPTW5 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF5,		///< GPTW5 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV5,		///< GPTW5 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU5,		///< GPTW5 (GTCNT カウンタのアンダフロー)
+
+			GTCIA6 =110,///< GPTW6 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB6,		///< GPTW6 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC6,		///< GPTW6 (GTCCRC レジスタのコンペアマッチ)
+			GTCID6,		///< GPTW6 (GTCCRD レジスタのコンペアマッチ)
+			GDTE6,		///< GPTW6 (デッドタイムエラー)
+			GTCIE6,		///< GPTW6 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF6,		///< GPTW6 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV6,		///< GPTW6 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU6,		///< GPTW6 (GTCNT カウンタのアンダフロー)
+
+			GTCIA7 =119,///< GPTW7 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB7,		///< GPTW7 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC7,		///< GPTW7 (GTCCRC レジスタのコンペアマッチ)
+			GTCID7,		///< GPTW7 (GTCCRD レジスタのコンペアマッチ)
+			GDTE7,		///< GPTW7 (デッドタイムエラー)
+			GTCIE7,		///< GPTW7 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF7,		///< GPTW7 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV7,		///< GPTW7 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU7,		///< GPTW7 (GTCNT カウンタのアンダフロー)
+
+			GTCIA8 =128,///< GPTW8 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB8,		///< GPTW8 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC8,		///< GPTW8 (GTCCRC レジスタのコンペアマッチ)
+			GTCID8,		///< GPTW8 (GTCCRD レジスタのコンペアマッチ)
+			GDTE8,		///< GPTW8 (デッドタイムエラー)
+			GTCIE8,		///< GPTW8 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF8,		///< GPTW8 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV8,		///< GPTW8 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU8,		///< GPTW8 (GTCNT カウンタのアンダフロー)
+
+			GTCIA9 =137,///< GPTW9 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB9,		///< GPTW9 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC9,		///< GPTW9 (GTCCRC レジスタのコンペアマッチ)
+			GTCID9,		///< GPTW9 (GTCCRD レジスタのコンペアマッチ)
+			GDTE9,		///< GPTW9 (デッドタイムエラー)
+			GTCIE9,		///< GPTW9 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF9,		///< GPTW9 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV9,		///< GPTW9 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU9,		///< GPTW9 (GTCNT カウンタのアンダフロー)
+
+			NONE2 = 255,///< 割り込み選択なし
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBE0・ベクター・インデックス
+			@brief  グループベクター IE0 の取得
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BE0 : uint8_t {
-			ERS0,	///< CAN0 / ERS0
-			ERS1,	///< CAN1 / ERS1
-			ERS2	///< CAN2 / ERS2
-		};
+		static VECTOR get_group_vector(VECTOR_IE0 ivec) noexcept {
+			return VECTOR::GROUPIE0;
+		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL0・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL0 : uint8_t {
-			TEI0,	///< SCI0 / TEI0（送信完了）
-			ERI0,	///< SCI0 / ERI0（受信エラー）
-			TEI1,	///< SCI1 / TEI1（送信完了）
-			ERI1,	///< SCI1 / ERI1（受信エラー）
-			TEI2,	///< SCI2 / TEI2（送信完了）
-			ERI2,	///< SCI2 / ERI2（受信エラー）
-			TEI3,	///< SCI3 / TEI3（送信完了）
-			ERI3,	///< SCI3 / ERI3（受信エラー）
-			TEI4,	///< SCI4 / TEI4（送信完了）
-			ERI4,	///< SCI4 / ERI4（受信エラー）
-			TEI5,	///< SCI5 / TEI5（送信完了）
-			ERI5,	///< SCI5 / ERI5（受信エラー）
-			TEI6,	///< SCI6 / TEI6（送信完了）
-			ERI6,	///< SCI6 / ERI6（受信エラー）
-			TEI7,	///< SCI7 / TEI7（送信完了）
-			ERI7,	///< SCI7 / ERI7（受信エラー）
-			TEI12,	///< SCI12 / TEI12（送信完了）
-			ERI12,	///< SCI12 / ERI12（受信エラー）
-			SCIX0,	///< SCI12 / SCIX0
-			SCIX1,	///< SCI12 / SCIX1
-			SCIX2,	///< SCI12 / SCIX2
-			SCIX3,	///< SCI12 / SCIX3
-
-			QSPSSLI = 24,	///< QSPI / QSPSSLI
-
-			FERRI = 26,		///< CAC / FERRI
-			MENDI,			///< CAC / MENDI
-			OVFI,			///< CAC / OVFI
-			DOPCI,			///< DOC / DOPCI
-			PCFEI,			///< PDC / PCFEI
-			PCERI			///< PDC / PCERI
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  GROUPBL1・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL1 : uint8_t {
-			OVFI = 0,		///< SRC / OVFI
-			UDFI,			///< SRC / UDFI
-			CEFI,			///< SRC / CEFI
-			CDETI = 3,		///< SDHI / CDETI
-			CACI,			///< SDHI / CACI
-			SDACI,			///< SDHI / SDACI
-			CDETIO,			///< MMCIF / CDETIO
-			ERRIO,			///< MMCIF / ERRIO
-			ACCIO,			///< MMCIF / ACCIO
-			OEI1,			///< POE3 / OEI1
-			OEI2,			///< POE3 / OEI2
-			OEI3,			///< POE3 / OEI3
-			OEI4,			///< POE3 / OEI4
-			TEI0,			///< RIIC0 / TEI0
-			EEI0,			///< RIIC0 / EEI0
-			TEI2,			///< RIIC2 / TEI2
-			EEI2,			///< RIIC2 / EEI2
-			SSIF0,			///< SSI0 / SSIF0
-			SSIF1,			///< SSI1 / SSIF1
-
-			S12CMPAI = 20,	///< S12AD / S12CMPAI
-			S12CMPAI1 = 22,	///< S12AD1 / S12CMPAI1
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  GROUPAL0・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_AL0 : uint8_t {
-			TEIF8 = 0,		///< SCIFA8 / TEIF8
-			ERIF8,			///< SCIFA8 / ERIF8
-			BRIF8,			///< SCIFA8 / BRIF8
-			DRIF8,			///< SCIFA8 / DRIF8
-			TEIF9,			///< SCIFA9 / TEIF9
-			ERIF9,			///< SCIFA9 / ERIF9
-			BRIF9,			///< SCIFA9 / BRIF9
-			DRIF9,			///< SCIFA9 / DRIF9
-
-			TEIF10 = 8,		///< SCIFA10 / TEIF10
-			ERIF10,			///< SCIFA10 / ERIF10
-			BRIF10,			///< SCIFA10 / BRIF10
-			DRIF10,			///< SCIFA10 / DRIF10
-			TEIF11,			///< SCIFA11 / TEIF11
-			ERIF11,			///< SCIFA11 / ERIF11
-			BRIF11,			///< SCIFA11 / BRIF11
-			DRIF11,			///< SCIFA11 / DRIF11
-
-			SPII0 = 16,		///< RSPI0 / SPII0
-			SPEI0,			///< RSPI0 / SPEI0
-			SPII1,			///< RSPI1 / SPII1
-			SPEI1,			///< RSPI1 / SPEI1
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  GROUPAL1・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_AL1 : uint8_t {
-			MINT = 0,		///< EPTPC / MINT
-			PINT,			///< PTPEDMAC / PINT
-
-			EINT0 = 4,		///< EDMAC0/EINT0
-			EINT1 = 5,		///< EDMAC1/EINT1
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター BL0 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -566,7 +511,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター BL1 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -578,7 +523,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター BE0 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -590,25 +535,13 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター AL0 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static VECTOR get_group_vector(VECTOR_AL0 ivec) noexcept {
 			return VECTOR::GROUPAL0;
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  グループベクターの取得
-			@param[in]	VEC		グループベクター型
-			@return グループベクター
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static VECTOR get_group_vector(VECTOR_AL1 ivec) noexcept {
-			return VECTOR::GROUPAL1;
 		}
 
 
@@ -622,7 +555,7 @@ namespace device {
 		struct ir_t {
 
 			rw8_t<base + 16> BUSERR;
-
+			rw8_t<base + 17> GROUPIE0;
 			rw8_t<base + 18> RAMERR;
 
 			rw8_t<base + 21> FIFERR;
@@ -633,40 +566,31 @@ namespace device {
 			rw8_t<base + 27> SWINT;
 			rw8_t<base + 28> CMI0;
 			rw8_t<base + 29> CMI1;
-			rw8_t<base + 30> CMWI0;
-			rw8_t<base + 31> CMWI1;
-			rw8_t<base + 32> D0FIFO2;	///< USBA
-			rw8_t<base + 33> D1FIFO2;
-			rw8_t<base + 34> D0FIFO0;	///< USB0
-			rw8_t<base + 35> D1FIFO0;
+			rw8_t<base + 30> CMI2;
+			rw8_t<base + 31> CMI3;
 
-			rw8_t<base + 38> SPRI0;		///< RSPI0
-			rw8_t<base + 39> SPTI0;
-#if defined(SIG_RX71M)
-			rw8_t<base + 40> SPRI1;		///< RSPI1
-			rw8_t<base + 41> SPTI1;
-#endif
-			rw8_t<base + 42> SPRI;		///< QSPI
-			rw8_t<base + 43> SPTI;
+			rw8_t<base + 34> D0FIFO0;	///< USB0
+			rw8_t<base + 35> D1FIFO0;	///< USB0
+
+			rw8_t<base + 38> SPRI0;		///< RSPI0 Rx
+			rw8_t<base + 39> SPTI0;		///< RSPI0 Tx
+			rw8_t<base + 40> SPRI1;		///< RSPI1 Rx
+			rw8_t<base + 41> SPTI1;		///< RSPI1 Tx
+			rw8_t<base + 42> SPRI;		///< QSPI Rx
+			rw8_t<base + 43> SPTI;		///< QSPI Tx
 			rw8_t<base + 44> SBFAI;		///< SDHI
 			rw8_t<base + 45> MBFAI;		///< MMCIF
-			rw8_t<base + 46> SSITXI0;	///< SSI0
-			rw8_t<base + 47> SSIRXI0;
-			rw8_t<base + 48> SSIRTI1;	///< SSI1
+			rw8_t<base + 46> SSITXI0;	///< SSIE0 Tx
+			rw8_t<base + 47> SSIRXI0;	///< SSIE0 Rx
+			rw8_t<base + 48> SSIRTI1;	///< SSIE1 Rx/Tx
 
-			rw8_t<base + 50> IDEI;		///< SRC
-			rw8_t<base + 51> ODFI;
-			rw8_t<base + 52> RIIC_RXI0;	///< RIIC0
-			rw8_t<base + 53> RIIC_TXI0;
-			rw8_t<base + 54> RIIC_RXI2;	///< RIIC2
-			rw8_t<base + 55> RIIC_TXI2;
+			rw8_t<base + 52> RIIC_RXI0;	///< RIIC0 Rx
+			rw8_t<base + 53> RIIC_TXI0;	///< RIIC0 Tx
 
-			rw8_t<base + 58> RXI0;		///< SCI0
-			rw8_t<base + 59> TXI0;
-			rw8_t<base + 60> RXI1;		///< SCI1
-			rw8_t<base + 61> TXI1;
-			rw8_t<base + 62> RXI2;		///< SCI2
-			rw8_t<base + 63> TXI2;
+			rw8_t<base + 60> RXI1;		///< SCI1 Rx
+			rw8_t<base + 61> TXI1;		///< SCI1 Tx
+			rw8_t<base + 62> RXI2;		///< SCI2 Rx
+			rw8_t<base + 63> TXI2;		///< SCI2 Tx
 
 			rw8_t<base + 64> IRQ0;
 			rw8_t<base + 65> IRQ1;
@@ -684,109 +608,61 @@ namespace device {
 			rw8_t<base + 77> IRQ13;
 			rw8_t<base + 78> IRQ14;
 			rw8_t<base + 79> IRQ15;
-			rw8_t<base + 80> RXI3;		///< SCI3
-			rw8_t<base + 81> TXI3;
-			rw8_t<base + 82> RXI4;		///< SCI4
-			rw8_t<base + 83> TXI4;
-			rw8_t<base + 84> RXI5;		///< SCI5
-			rw8_t<base + 85> TXI5;
-			rw8_t<base + 86> RXI6;		///< SCI6
-			rw8_t<base + 87> TXI6;
+			rw8_t<base + 80> RXI3;		///< SCI3 Rx
+			rw8_t<base + 81> TXI3;		///< SCI3 Tx
+			rw8_t<base + 82> RXI4;		///< SCI4 Rx
+			rw8_t<base + 83> TXI4;		///< SCI4 Tx
+			rw8_t<base + 84> RXI5;		///< SCI5 Rx
+			rw8_t<base + 85> TXI5;		///< SCI5 Tx
+			rw8_t<base + 86> RXI6;		///< SCI6 Rx
+			rw8_t<base + 87> TXI6;		///< SCI6 Tx
 			rw8_t<base + 88> LVD1;		///< LVD1
 			rw8_t<base + 89> LVD2;		///< LVD2
 			rw8_t<base + 90> USBR0;		///< USB0
 
 			rw8_t<base + 92> ALM;		///< RTC
-			rw8_t<base + 93> PRD;
-			rw8_t<base + 94> USBAR;		///< USBA
-			rw8_t<base + 95> IWUNI;		///< IWDT
-			rw8_t<base + 96> WUNI;		///< WDT
-			rw8_t<base + 97> PCDFI;		///< PDC
-			rw8_t<base + 98> RXI7;		///< SCI7
-			rw8_t<base + 99> TXI7;
-			rw8_t<base + 100> RXIF8;	///< SCIFA8
-			rw8_t<base + 101> TXIF8;
-			rw8_t<base + 102> RXIF9;	///< SCIFA9
-			rw8_t<base + 103> TXIF9;
-			rw8_t<base + 104> RXIF10;	///< SCIFA10
-			rw8_t<base + 105> TXIF10;
-			rw8_t<base + 106> GROUPBE0;
+			rw8_t<base + 93> PRD;		///< RTC
 
-			rw8_t<base + 110> GROUPBL0;
-			rw8_t<base + 111> GROUPBL1;
-			rw8_t<base + 112> GROUPAL0;
-			rw8_t<base + 113> GROUPAL1;
-			rw8_t<base + 114> RXIF11;	///< SCIFA11
-			rw8_t<base + 115> TXIF11;
-			rw8_t<base + 116> RXI12;	///< SCI12
-			rw8_t<base + 117> TXI12;
+			rw8_t<base + 95> IWUNI;		///< IWDT
+			rw8_t<base + 96> WUNI;		///< IWDT
+			rw8_t<base + 97> PCDFI;		///< PDC
+			rw8_t<base + 98> RXI7;		///< SCI7 Rx
+			rw8_t<base + 99> TXI7;		///< SCI7 Tx
+			rw8_t<base + 100> RXI8;		///< SCI8 Rx
+			rw8_t<base + 101> TXI8;		///< SCI8 Tx
+			rw8_t<base + 102> RXI9;		///< SCI9 Rx
+			rw8_t<base + 103> TXI9;		///< SCI9 Tx
+			rw8_t<base + 104> RXI10;	///< SCI10 Rx
+			rw8_t<base + 105> TXI10;	///< SCI10 Tx
+			rw8_t<base + 106> GROUPBE0;	///< ICU
+			rw8_t<base + 107> GROUPBL2;	///< ICU
+			rw8_t<base + 108> SPRI2;	///< RSPI2 Rx
+			rw8_t<base + 109> SPTI2;	///< RSPI2 Tx
+			rw8_t<base + 110> GROUPBL0;	///< ICU
+			rw8_t<base + 111> GROUPBL1;	///< ICU
+			rw8_t<base + 112> GROUPAL0;	///< ICU
+			rw8_t<base + 113> GROUPAL1;	///< ICU
+			rw8_t<base + 114> RXI11;	///< SCI11 Rx
+			rw8_t<base + 115> TXI11;	///< SCI11 Tx
+			rw8_t<base + 116> RXI12;	///< SCI12 Rx
+			rw8_t<base + 117> TXI12;	///< SCI12 Tx
 
 			rw8_t<base + 120> DMAC0I;	///< DMAC
-			rw8_t<base + 121> DMAC1I;
-			rw8_t<base + 122> DMAC2I;
-			rw8_t<base + 123> DMAC3I;
-			rw8_t<base + 124> DMAC74I;
+			rw8_t<base + 121> DMAC1I;	///< DMAC
+			rw8_t<base + 122> DMAC2I;	///< DMAC
+			rw8_t<base + 123> DMAC3I;	///< DMAC
+			rw8_t<base + 124> DMAC74I;	///< DMAC
 			rw8_t<base + 125> OSTDI;	///< OST
 			rw8_t<base + 126> EXDMAC0I;	///< EXDMAC
-			rw8_t<base + 127> EXDMAC1I;
-			rw8_t<base + 128> INTB128;
-			rw8_t<base + 129> INTB129;
-			rw8_t<base + 130> INTB130;
-			rw8_t<base + 131> INTB131;
-			rw8_t<base + 132> INTB132;
-			rw8_t<base + 133> INTB133;
-			rw8_t<base + 134> INTB134;
-			rw8_t<base + 135> INTB135;
-			rw8_t<base + 136> INTB136;
-			rw8_t<base + 137> INTB137;
-			rw8_t<base + 138> INTB138;
-			rw8_t<base + 139> INTB139;
-			rw8_t<base + 140> INTB140;
-			rw8_t<base + 141> INTB141;
-			rw8_t<base + 142> INTB142;
-			rw8_t<base + 143> INTB143;
-			rw8_t<base + 144> INTB144;
-			rw8_t<base + 145> INTB145;
-			rw8_t<base + 146> INTB146;
-			rw8_t<base + 147> INTB147;
-			rw8_t<base + 148> INTB148;
-			rw8_t<base + 149> INTB149;
-			rw8_t<base + 150> INTB150;
-			rw8_t<base + 151> INTB151;
-			rw8_t<base + 152> INTB152;
-			rw8_t<base + 153> INTB153;
-			rw8_t<base + 154> INTB154;
-			rw8_t<base + 155> INTB155;
-			rw8_t<base + 156> INTB156;
-			rw8_t<base + 157> INTB157;
-			rw8_t<base + 158> INTB158;
-			rw8_t<base + 159> INTB159;
-			rw8_t<base + 160> INTB160;
-			rw8_t<base + 161> INTB161;
-			rw8_t<base + 162> INTB162;
-			rw8_t<base + 163> INTB163;
-			rw8_t<base + 164> INTB164;
-			rw8_t<base + 165> INTB165;
-			rw8_t<base + 166> INTB166;
-			rw8_t<base + 167> INTB167;
-			rw8_t<base + 168> INTB168;
-			rw8_t<base + 169> INTB169;
-			rw8_t<base + 170> INTB170;
-			rw8_t<base + 171> INTB171;
-			rw8_t<base + 172> INTB172;
-			rw8_t<base + 173> INTB173;
-			rw8_t<base + 174> INTB174;
-			rw8_t<base + 175> INTB175;
-			rw8_t<base + 176> INTB176;
-			rw8_t<base + 177> INTB177;
-			rw8_t<base + 178> INTB178;
-			rw8_t<base + 179> INTB179;
-			rw8_t<base + 180> INTB180;
-			rw8_t<base + 181> INTB181;
-			rw8_t<base + 182> INTB182;
-			rw8_t<base + 183> INTB183;
-			rw8_t<base + 184> INTB184;
-			rw8_t<base + 185> INTB185;
+			rw8_t<base + 127> EXDMAC1I;	///< EXDMAC
+
+			rw8_t<base + 170> RXF0I;	///< CAN0
+			rw8_t<base + 171> TXF0I;	///< CAN0
+			rw8_t<base + 172> RXM0I;	///< CAN0
+			rw8_t<base + 173> TXM0I;	///< CAN0
+
+			rw8_t<base + 174> USBI0;
+
 			rw8_t<base + 186> INTB186;
 			rw8_t<base + 187> INTB187;
 			rw8_t<base + 188> INTB188;
@@ -884,7 +760,7 @@ namespace device {
 		struct ier_t {
 			typedef rw8_t<base + 0x02> ier02;
 			bit_rw_t<ier02, bitpos::B0>	BUSERR;
-
+			bit_rw_t<ier02, bitpos::B1>	GROUPIE0;
 			bit_rw_t<ier02, bitpos::B2>	RAMERR;
 
 			bit_rw_t<ier02, bitpos::B5>	FIFERR;
@@ -894,48 +770,27 @@ namespace device {
 			typedef rw8_t<base + 0x03> ier03;
 			bit_rw_t<ier03, bitpos::B2>	SWINT2;
 			bit_rw_t<ier03, bitpos::B3>	SWINT;
-			bit_rw_t<ier03, bitpos::B4>	CMI0;		///< CMT0
-			bit_rw_t<ier03, bitpos::B5>	CMI1;		///< CMT1
-			bit_rw_t<ier03, bitpos::B6>	CMWI0;		///< CMTW0
-			bit_rw_t<ier03, bitpos::B7>	CMWI1;		///< CMTW1
+			bit_rw_t<ier03, bitpos::B4>	CMI0;
+			bit_rw_t<ier03, bitpos::B5>	CMI1;
+			bit_rw_t<ier03, bitpos::B6>	CMI2;
+			bit_rw_t<ier03, bitpos::B7>	CMI3;
+
 			typedef rw8_t<base + 0x04> ier04;
-			bit_rw_t<ier04, bitpos::B0>	D0FIFO2;	///< USBA
-			bit_rw_t<ier04, bitpos::B1>	D1FIFO2;
 			bit_rw_t<ier04, bitpos::B2>	D0FIFO0;	///< USB0
-			bit_rw_t<ier04, bitpos::B3>	D1FIFO0;
+			bit_rw_t<ier04, bitpos::B3>	D1FIFO0;	///< USB0
 
-			bit_rw_t<ier04, bitpos::B6>	SPRI0;		///< RSPI0
-			bit_rw_t<ier04, bitpos::B7>	SPTI0;
-
-			typedef rw8_t<base + 0x05> ier05;
-#if defined(SIG_RX71M)
-			bit_rw_t<ier05, bitpos::B0>	SPRI1;		///< RSPI1
-			bit_rw_t<ier05, bitpos::B1>	SPTI1;
-#endif
-			bit_rw_t<ier05, bitpos::B2>	SPRI;		///< QSPI
-			bit_rw_t<ier05, bitpos::B3>	SPTI;
-			bit_rw_t<ier05, bitpos::B4>	SBFAI;		///< SDHI
-			bit_rw_t<ier05, bitpos::B5>	MBFAI;		///< MMCIF
-			bit_rw_t<ier05, bitpos::B6>	SSITXI0;	///< SSI0
-			bit_rw_t<ier05, bitpos::B7>	SSIRXI0;
+			bit_rw_t<ier04, bitpos::B6>	SPRI0;		///< RSPI0 Rx
+			bit_rw_t<ier04, bitpos::B7>	SPTI0;		///< RSPI0 Tx
 
 			typedef rw8_t<base + 0x06> ier06;
-			bit_rw_t<ier06, bitpos::B0>	SSIRTI1;	///< SSI1
-
-			bit_rw_t<ier06, bitpos::B2>	IDEI;		///< SRC
-			bit_rw_t<ier06, bitpos::B3>	ODFI;
-			bit_rw_t<ier06, bitpos::B4>	RIIC_RXI0;	///< RIIC0
-			bit_rw_t<ier06, bitpos::B5>	RIIC_TXI0;
-			bit_rw_t<ier06, bitpos::B6>	RIIC_RXI2;	///< RIIC2
-			bit_rw_t<ier06, bitpos::B7>	RIIC_TXI2;
+			bit_rw_t<ier06, bitpos::B4>	RIIC_RXI0;	///< RIIC0 Rx
+			bit_rw_t<ier06, bitpos::B5>	RIIC_TXI0;	///< RIIC0 Tx
 
 			typedef rw8_t<base + 0x07> ier07;
-			bit_rw_t<ier07, bitpos::B2>	RXI0;		///< SCI0
-			bit_rw_t<ier07, bitpos::B3>	TXI0;
-			bit_rw_t<ier07, bitpos::B4>	RXI1;		///< SCI1
-			bit_rw_t<ier07, bitpos::B5>	TXI1;
-			bit_rw_t<ier07, bitpos::B6>	RXI2;		///< SCI2
-			bit_rw_t<ier07, bitpos::B7>	TXI2;
+			bit_rw_t<ier07, bitpos::B4>	RXI1;		///< SCI1 Rx
+			bit_rw_t<ier07, bitpos::B5>	TXI1;		///< SCI1 Tx
+			bit_rw_t<ier07, bitpos::B6>	RXI2;		///< SCI2 Rx
+			bit_rw_t<ier07, bitpos::B7>	TXI2;		///< SCI2 Tx
 
 			typedef rw8_t<base + 0x08> ier08;
 			bit_rw_t<ier08, bitpos::B0>	IRQ0;
@@ -958,14 +813,14 @@ namespace device {
 			bit_rw_t<ier09, bitpos::B7>	IRQ15;
 
 			typedef rw8_t<base + 0x0A> ier0A;
-			bit_rw_t<ier0A, bitpos::B0>	RXI3;		///< SCI3
-			bit_rw_t<ier0A, bitpos::B1>	TXI3;
-			bit_rw_t<ier0A, bitpos::B2>	RXI4;		///< SCI4
-			bit_rw_t<ier0A, bitpos::B3>	TXI4;
-			bit_rw_t<ier0A, bitpos::B4>	RXI5;		///< SCI5
-			bit_rw_t<ier0A, bitpos::B5>	TXI5;
-			bit_rw_t<ier0A, bitpos::B6>	RXI6;		///< SCI6
-			bit_rw_t<ier0A, bitpos::B7>	TXI6;
+			bit_rw_t<ier0A, bitpos::B0>	RXI3;		///< SCI3 Rx
+			bit_rw_t<ier0A, bitpos::B1>	TXI3;		///< SCI3 Tx
+			bit_rw_t<ier0A, bitpos::B2>	RXI4;		///< SCI4 Rx
+			bit_rw_t<ier0A, bitpos::B3>	TXI4;		///< SCI4 Tx
+			bit_rw_t<ier0A, bitpos::B4>	RXI5;		///< SCI5 Rx
+			bit_rw_t<ier0A, bitpos::B5>	TXI5;		///< SCI5 Tx
+			bit_rw_t<ier0A, bitpos::B6>	RXI6;		///< SCI6 Rx
+			bit_rw_t<ier0A, bitpos::B7>	TXI6;		///< SCI6 Tx
 
 			typedef rw8_t<base + 0x0B> ier0B;
 			bit_rw_t<ier0B, bitpos::B0>	LVD1;		///< LVD1
@@ -973,56 +828,53 @@ namespace device {
 			bit_rw_t<ier0B, bitpos::B2>	USBR0;		///< USB0
 
 			bit_rw_t<ier0B, bitpos::B4>	ALM;		///< RTC
-			bit_rw_t<ier0B, bitpos::B5>	PRD;
-			bit_rw_t<ier0B, bitpos::B6>	USBAR;		///< USBA
+			bit_rw_t<ier0B, bitpos::B5>	PRD;		///< RTC
+
 			bit_rw_t<ier0B, bitpos::B7>	IWUNI;		///< IWDT
 
 			typedef rw8_t<base + 0x0C> ier0C;
-			bit_rw_t<ier0C, bitpos::B0>	WUNI;		///< WDT
+			bit_rw_t<ier0C, bitpos::B0>	WUIN;		///< WDT
 			bit_rw_t<ier0C, bitpos::B1>	PCDFI;		///< PDC
-			bit_rw_t<ier0C, bitpos::B2>	RXI7;		///< SCI7
-			bit_rw_t<ier0C, bitpos::B3>	TXI7;
-			bit_rw_t<ier0C, bitpos::B4>	RXIF8;		///< SCIFA8
-			bit_rw_t<ier0C, bitpos::B5>	TXIF8;
-			bit_rw_t<ier0C, bitpos::B6>	RXIF9;		///< SCIFA9
-			bit_rw_t<ier0C, bitpos::B7>	TXIF9;
+			bit_rw_t<ier0C, bitpos::B2>	RXI7;		///< SCI7 Rx
+			bit_rw_t<ier0C, bitpos::B3>	TXI7;		///< SCI7 Tx
+			bit_rw_t<ier0C, bitpos::B4>	RXI8;		///< SCI8 Rx
+			bit_rw_t<ier0C, bitpos::B5>	TXI8;		///< SCI8 Tx
+			bit_rw_t<ier0C, bitpos::B6>	RXI9;		///< SCI9 Rx
+			bit_rw_t<ier0C, bitpos::B7>	TXI9;		///< SCI9 Tx
 
 			typedef rw8_t<base + 0x0D> ier0D;
-			bit_rw_t<ier0D, bitpos::B0>	RXIF10;		///< SCIFA10
-			bit_rw_t<ier0D, bitpos::B1>	TXIF10;
-			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;
-
-			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;
-			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;
+			bit_rw_t<ier0D, bitpos::B0>	RXI10;		///< SCI10 Rx
+			bit_rw_t<ier0D, bitpos::B1>	TXI10;		///< SCI10 Tx
+			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;	///< ICU
+			bit_rw_t<ier0D, bitpos::B3>	GROUPBL2;	///< ICU
+			bit_rw_t<ier0D, bitpos::B4>	SPRI2;		///< RSPI2 Rx
+			bit_rw_t<ier0D, bitpos::B5>	SPTI2;		///< RSPI2 Tx
+			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;	///< ICU
+			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;	///< ICU
 
 			typedef rw8_t<base + 0x0E> ier0E;
-			bit_rw_t<ier0E, bitpos::B0>	GROUPAL0;
-			bit_rw_t<ier0E, bitpos::B1> GROUPAL1;
-			bit_rw_t<ier0E, bitpos::B2>	RXIF11;		///< SCIFA11
-			bit_rw_t<ier0E, bitpos::B3>	TXIF11;
-
-			bit_rw_t<ier0E, bitpos::B4> RXI12;		///< SCI12
-			bit_rw_t<ier0E, bitpos::B5> TXI12;
+			bit_rw_t<ier0E, bitpos::B0>	GROUPAL0;	///< ICU
+			bit_rw_t<ier0E, bitpos::B1> GROUPAL1;	///< ICU
+			bit_rw_t<ier0E, bitpos::B2>	RXI11;		///< SCI11 Rx
+			bit_rw_t<ier0E, bitpos::B3>	TXI11;		///< SCI11 Tx
+			bit_rw_t<ier0E, bitpos::B4> RXI12;		///< SCI12 Rx
+			bit_rw_t<ier0E, bitpos::B5> TXI12;		///< SCI12 Tx
 
 			typedef rw8_t<base + 0x0F> ier0F;
 			bit_rw_t<ier0F, bitpos::B0> DMAC0I;		///< DMAC
-			bit_rw_t<ier0F, bitpos::B1> DMAC1I;
-			bit_rw_t<ier0F, bitpos::B2> DMAC2I;
-			bit_rw_t<ier0F, bitpos::B3> DMAC3I;
-			bit_rw_t<ier0F, bitpos::B4> DMAC74I;
+			bit_rw_t<ier0F, bitpos::B1> DMAC1I;		///< DMAC
+			bit_rw_t<ier0F, bitpos::B2> DMAC2I;		///< DMAC
+			bit_rw_t<ier0F, bitpos::B3> DMAC3I;		///< DMAC
+			bit_rw_t<ier0F, bitpos::B4> DMAC74I;	///< DMAC
 			bit_rw_t<ier0F, bitpos::B5> OSTDI;		///< OST
 			bit_rw_t<ier0F, bitpos::B6> EXDMAC0I;	///< EXDMAC
-			bit_rw_t<ier0F, bitpos::B7> EXDMAC1I;
+			bit_rw_t<ier0F, bitpos::B7> EXDMAC1I;	///< EXDMAC
 
-			typedef rw8_t<base + 0x10> ier10;
-			bit_rw_t<ier10, bitpos::B0> INTB128;
-			bit_rw_t<ier10, bitpos::B1> INTB129;
-			bit_rw_t<ier10, bitpos::B2> INTB130;
-			bit_rw_t<ier10, bitpos::B3> INTB131;
-			bit_rw_t<ier10, bitpos::B4> INTB132;
-			bit_rw_t<ier10, bitpos::B5> INTB133;
-			bit_rw_t<ier10, bitpos::B6> INTB134;
-			bit_rw_t<ier10, bitpos::B7> INTB135;
+			typedef rw8_t<base + 0x15> ier15;
+			bit_rw_t<ier15, bitpos::B2> RXF0;		///< CAN0
+			bit_rw_t<ier15, bitpos::B3> TXF0;		///< CAN0
+			bit_rw_t<ier15, bitpos::B4> RXM0;		///< CAN0
+			bit_rw_t<ier15, bitpos::B5> TXM0;		///< CAN0
 
 			typedef rw8_t<base + 0x1A> ier1A;
 			bit_rw_t<ier1A, bitpos::B0> INTA208;
@@ -1127,54 +979,32 @@ namespace device {
 		template <uint32_t base>
 		struct ipr_t {
 			rw8_t<base + 0> BUSERR;
-
+			rw8_t<base + 0> GROUPIE0;
 			rw8_t<base + 0> RAMERR;
 
 			rw8_t<base + 1> FIFERR;
-
 			rw8_t<base + 2> FRDYI;
 
 			rw8_t<base + 3> SWINT2;
 			rw8_t<base + 3> SWINT;
+			rw8_t<base + 4> CMI0;
+			rw8_t<base + 5> CMI1;
+			rw8_t<base + 6> CMI2;
+			rw8_t<base + 7> CMI3;
 
-			rw8_t<base + 4> CMI0;			///< CMT0
-			rw8_t<base + 5> CMI1;			///< CMT1
-			rw8_t<base + 6> CMWI0;			///< CMTW0
-			rw8_t<base + 7> CMWI1;			///< CMTW1
+			rw8_t<base + 34> D0FIFO0;	///< USB0
+			rw8_t<base + 35> D1FIFO0;	///< USB0
 
-			rw8_t<base + 32> D0FIFO2;		///< USBA
-			rw8_t<base + 33> D1FIFO2;
-			rw8_t<base + 34> D0FIFO0;		///< USB0
-			rw8_t<base + 35> D1FIFO0;
+			rw8_t<base + 38> SPRI0;		///< RSPI0 Rx
+			rw8_t<base + 39> SPTI0;		///< RSPI0 Tx
 
-			rw8_t<base + 38> SPRI0;			///< RSPI0
-			rw8_t<base + 39> SPTI0;
-#if defined(SIG_RX71M)
-			rw8_t<base + 40> SPRI1;			///< RSPI1
-			rw8_t<base + 41> SPTI1;
-#endif
-			rw8_t<base + 42> SPRI;			///< QSPI
-			rw8_t<base + 43> SPTI;
-			rw8_t<base + 44> SBFAI;			///< SDHI
-			rw8_t<base + 45> MBFAI;			///< MMCIF
-			rw8_t<base + 46> SSITXI0;		///< SSI0
-			rw8_t<base + 47> SSIRXI0;
-			rw8_t<base + 48> SSIRTI1;		///< SSI1
+			rw8_t<base + 52> RIIC_RXI0;	///< RIIC0 Rx
+			rw8_t<base + 53> RIIC_TXI0;	///< RIIC0 Tx
 
-			rw8_t<base + 50> IDEI;			///< SRC
-			rw8_t<base + 51> ODFI;
-			rw8_t<base + 52> RIIC_RXI0;		///< RIIC0
-			rw8_t<base + 53> RIIC_TXI0;
-			rw8_t<base + 54> RIIC_RXI2;		///< RIIC2
-			rw8_t<base + 55> RIIC_TXI2;
-
-			rw8_t<base + 58> RXI0;			///< SCI0
-			rw8_t<base + 59> TXI0;
-			rw8_t<base + 60> RXI1;			///< SCI1
-			rw8_t<base + 61> TXI1;
-			rw8_t<base + 62> RXI2;			///< SCI2
-			rw8_t<base + 63> TXI2;
-
+			rw8_t<base + 60> RXI1;		///< SCI1 Rx
+			rw8_t<base + 61> TXI1;		///< SCI1 Tx
+			rw8_t<base + 62> RXI2;		///< SCI2 Rx
+			rw8_t<base + 63> TXI2;		///< SCI2 Tx
 			rw8_t<base + 64> IRQ0;
 			rw8_t<base + 65> IRQ1;
 			rw8_t<base + 66> IRQ2;
@@ -1183,7 +1013,6 @@ namespace device {
 			rw8_t<base + 69> IRQ5;
 			rw8_t<base + 70> IRQ6;
 			rw8_t<base + 71> IRQ7;
-
 			rw8_t<base + 72> IRQ8;
 			rw8_t<base + 73> IRQ9;
 			rw8_t<base + 74> IRQ10;
@@ -1192,76 +1021,60 @@ namespace device {
 			rw8_t<base + 77> IRQ13;
 			rw8_t<base + 78> IRQ14;
 			rw8_t<base + 79> IRQ15;
+			rw8_t<base + 80> RXI3;		///< SCI3 Rx
+			rw8_t<base + 81> TXI3;		///< SCI3 Tx
+			rw8_t<base + 82> RXI4;		///< SCI4 Rx
+			rw8_t<base + 83> TXI4;		///< SCI4 Tx
+			rw8_t<base + 84> RXI5;		///< SCI5 Rx
+			rw8_t<base + 85> TXI5;		///< SCI5 Tx
+			rw8_t<base + 86> RXI6;		///< SCI6 Rx
+			rw8_t<base + 87> TXI6;		///< SCI6 Tx
+			rw8_t<base + 88> LVD1;		///< LVD1
+			rw8_t<base + 89> LVD2;		///< LVD2
+			rw8_t<base + 89> USBR0;		///< USB0
 
-			rw8_t<base + 80> RXI3;			///< SCI3
-			rw8_t<base + 81> TXI3;
-			rw8_t<base + 82> RXI4;			///< SCI4
-			rw8_t<base + 83> TXI4;
-			rw8_t<base + 84> RXI5;			///< SCI5
-			rw8_t<base + 85> TXI5;
-			rw8_t<base + 86> RXI6;			///< SCI6
-			rw8_t<base + 87> TXI6;
-			rw8_t<base + 88> LVD1;			///< LVD1
-			rw8_t<base + 89> LVD2;			///< LVD2
-			rw8_t<base + 90> USBR0;			///< USB0
+			rw8_t<base + 92> ALM;		///< RTC
+			rw8_t<base + 93> PRD;		///< RTC
 
-			rw8_t<base + 92> ALM;			///< RTC
-			rw8_t<base + 93> PRD;
-			rw8_t<base + 94> USBAR;			///< USBA
-			rw8_t<base + 95> IWUNI;			///< IWDT
-			rw8_t<base + 96> WUNI;			///< WDT
-			rw8_t<base + 97> PCDFI;			///< PDC
-			rw8_t<base + 98> RXI7;			///< SCI7
-			rw8_t<base + 99> TXI7;
-			rw8_t<base + 100> RXIF8;		///< SCIFA8
-			rw8_t<base + 101> TXIF8;
-			rw8_t<base + 102> RXIF9;		///< SCIFA9
-			rw8_t<base + 103> TXIF9;
-			rw8_t<base + 104> RXIF10;		///< SCIFA10
-			rw8_t<base + 105> TXIF10;
-			rw8_t<base + 106> GROUPBE0;
+			rw8_t<base + 95> IWUNI;		///< IWDT
+			rw8_t<base + 96> WUNI;		///< WDT
+			rw8_t<base + 97> PCDFI;		///< PDC
+			rw8_t<base + 98> RXI7;		///< SCI7 Rx
+			rw8_t<base + 99> TXI7;		///< SCI7 Tx
+			rw8_t<base + 100> RXI8;		///< SCI8 Rx
+			rw8_t<base + 101> TXI8;		///< SCI8 Tx
+			rw8_t<base + 102> RXI9;		///< SCI9 Rx
+			rw8_t<base + 103> TXI9;		///< SCI9 Tx
+			rw8_t<base + 104> RXI10;	///< SCI10 Rx
+			rw8_t<base + 105> TXI10;	///< SCI10 Tx
+			rw8_t<base + 106> GROUPBE0;	///< ICU
+			rw8_t<base + 107> GROUPBL2;	///< ICU
+			rw8_t<base + 108> SPRI2;	///< RSPI2 Rx
+			rw8_t<base + 109> SPTI2;	///< RSPI2 Tx
+			rw8_t<base + 110> GROUPBL0;	///< ICU
+			rw8_t<base + 111> GROUPBL1;	///< ICU
+			rw8_t<base + 112> GROUPAL0;	///< ICU
+			rw8_t<base + 113> GROUPAL1;	///< ICU
+			rw8_t<base + 114> RXI11;	///< SCI11 Rx
+			rw8_t<base + 115> TXI11;	///< SCI11 Tx
+			rw8_t<base + 116> RXI12;	///< SCI12 Rx
+			rw8_t<base + 117> TXI12;	///< SCI12 Tx
 
-			rw8_t<base + 110> GROUPBL0;
-			rw8_t<base + 111> GROUPBL1;
-			rw8_t<base + 112> GROUPAL0;
-			rw8_t<base + 113> GROUPAL1;
-			rw8_t<base + 114> RXIF11;		///< SCIFA11
-			rw8_t<base + 115> TXIF11;
-			rw8_t<base + 116> RXI12;		///< SCI12
-			rw8_t<base + 117> TXI12;
+			rw8_t<base + 120> DMAC0I;	///< DMAC
+			rw8_t<base + 121> DMAC1I;	///< DMAC
+			rw8_t<base + 122> DMAC2I;	///< DMAC
+			rw8_t<base + 123> DMAC3I;	///< DMAC
+			rw8_t<base + 124> DMAC74I;	///< DMAC
+			rw8_t<base + 125> OSTDI;	///< OST
+			rw8_t<base + 126> EXDMAC0I;	///< EXDMAC
+			rw8_t<base + 127> EXDMAC1I;	///< EXDMAC
 
-			rw8_t<base + 120> DMAC0I;		///< DMAC
-			rw8_t<base + 121> DMAC1I;
-			rw8_t<base + 122> DMAC2I;
-			rw8_t<base + 123> DMAC3I;
-			rw8_t<base + 124> DMAC74I;
-			rw8_t<base + 125> OSTDI;		///< OST
-			rw8_t<base + 126> EXDMAC0I;		///< EXDMAC
-			rw8_t<base + 127> EXDMAC1I;
+			rw8_t<base + 170> RXF0;		///< CAN0
+			rw8_t<base + 170> TXF0;		///< CAN0 (share)
+			rw8_t<base + 170> RXM0;		///< CAN0 (share)
+			rw8_t<base + 170> TXM0;		///< CAN0 (share)
 
-			rw8_t<base + 128> INTB128;
-			rw8_t<base + 129> INTB129;
-			rw8_t<base + 130> INTB130;
-			rw8_t<base + 131> INTB131;
-			rw8_t<base + 132> INTB132;
-			rw8_t<base + 133> INTB133;
-			rw8_t<base + 134> INTB134;
-			rw8_t<base + 135> INTB135;
-			rw8_t<base + 136> INTB136;
-			rw8_t<base + 137> INTB137;
-			rw8_t<base + 138> INTB138;
-			rw8_t<base + 139> INTB139;
-			rw8_t<base + 140> INTB140;
-			rw8_t<base + 141> INTB141;
-			rw8_t<base + 142> INTB142;
-			rw8_t<base + 143> INTB143;
-			rw8_t<base + 144> INTB144;
-			rw8_t<base + 145> INTB145;
-			rw8_t<base + 146> INTB146;
-			rw8_t<base + 147> INTB147;
-			rw8_t<base + 148> INTB148;
-			rw8_t<base + 149> INTB149;
-			rw8_t<base + 150> INTB150;
+			rw8_t<base + 174> USBI0;
 
 			rw8_t<base + 208> INTA208;
 			rw8_t<base + 209> INTA209;
@@ -1316,12 +1129,12 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	vec		割り込みベクター
 				@return IR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (VECTOR idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(idx));
+			volatile uint8_t& operator [] (VECTOR vec) {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
 		typedef ipr_t<0x00087300> IPR_;
@@ -1709,141 +1522,48 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Ah）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087700> PIBR0;
-		static pixr_t<0x00087701> PIBR1;
-		static pixr_t<0x00087702> PIBR2;
-		static pixr_t<0x00087703> PIBR3;
-		static pixr_t<0x00087704> PIBR4;
-		static pixr_t<0x00087705> PIBR5;
-		static pixr_t<0x00087706> PIBR6;
-		static pixr_t<0x00087707> PIBR7;
-		static pixr_t<0x00087708> PIBR8;
-		static pixr_t<0x00087709> PIBR9;
-		static pixr_t<0x0008770A> PIBRA;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
 			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087900> PIAR0;
-		static pixr_t<0x00087901> PIAR1;
-		static pixr_t<0x00087902> PIAR2;
-		static pixr_t<0x00087903> PIAR3;
-		static pixr_t<0x00087904> PIAR4;
-		static pixr_t<0x00087905> PIAR5;
-		static pixr_t<0x00087906> PIAR6;
-		static pixr_t<0x00087907> PIAR7;
-		static pixr_t<0x00087908> PIAR8;
-		static pixr_t<0x00087909> PIAR9;
-		static pixr_t<0x0008790A> PIARA;
-		static pixr_t<0x0008790B> PIARB;
+		typedef pixr_t<0x00087900> PIAR0_;
+		static PIAR0_ PIAR0;
+		typedef pixr_t<0x00087901> PIAR1_;
+		static PIAR1_ PIAR1;
+		typedef pixr_t<0x00087902> PIAR2_;
+		static PIAR2_ PIAR2;
+		typedef pixr_t<0x00087903> PIAR3_;
+		static PIAR3_ PIAR3;
+		typedef pixr_t<0x00087904> PIAR4_;
+		static PIAR4_ PIAR4;
+		typedef pixr_t<0x00087905> PIAR5_;
+		static PIAR5_ PIAR5;
+		typedef pixr_t<0x00087906> PIAR6_;
+		static PIAR6_ PIAR6;
+		typedef pixr_t<0x00087907> PIAR7_;
+		static PIAR7_ PIAR7;
+		typedef pixr_t<0x00087908> PIAR8_;
+		static PIAR8_ PIAR8;
+		typedef pixr_t<0x00087909> PIAR9_;
+		static PIAR9_ PIAR9;
+		typedef pixr_t<0x0008790A> PIARA_;
+		static PIARA_ PIARA;
+		typedef pixr_t<0x0008790B> PIARB_;
+		static PIARB_ PIARB;
+		typedef pixr_t<0x0008790C> PIARC_;
+		static PIARC_ PIARC;
+		typedef pixr_t<0x0008790D> PIARD_;
+		static PIARD_ PIARD;
+		typedef pixr_t<0x0008790E> PIARE_;
+		static PIARE_ PIARE;
+		typedef pixr_t<0x0008790F> PIARF_;
+		static PIARF_ PIARF;
+		typedef pixr_t<0x00087910> PIAR10_;
+		static PIAR10_ PIAR10;
+		typedef pixr_t<0x00087911> PIAR11_;
+		static PIAR11_ PIAR11;
+		typedef pixr_t<0x00087912> PIAR12_;
+		static PIAR12_ PIAR12;
 
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み B 要因選択レジスタ Xn（SLIBXRn）（n = 128 ～ 143）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x00087700, VECTOR, VECTOR_SELB> SLIBR_;
-		static SLIBR_ SLIBR;
-#if 0
-		typedef rw8_t<0x00087780> SLIBXR128_;
-		static SLIBXR128_ SLIBXR128;
-		static rw8_t<0x00087781> SLIBXR129;
-		static rw8_t<0x00087782> SLIBXR130;
-		static rw8_t<0x00087783> SLIBXR131;
-		static rw8_t<0x00087784> SLIBXR132;
-		static rw8_t<0x00087785> SLIBXR133;
-		static rw8_t<0x00087786> SLIBXR134;
-		static rw8_t<0x00087787> SLIBXR135;
-		static rw8_t<0x00087788> SLIBXR136;
-		static rw8_t<0x00087789> SLIBXR137;
-		static rw8_t<0x0008778A> SLIBXR138;
-		static rw8_t<0x0008778B> SLIBXR139;
-		static rw8_t<0x0008778C> SLIBXR140;
-		static rw8_t<0x0008778D> SLIBXR141;
-		static rw8_t<0x0008778E> SLIBXR142;
-		static rw8_t<0x0008778F> SLIBXR143;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み B 要因選択レジスタ n（SLIBRn）（n = 144 ～ 207）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x00087790> SLIBR144;
-		static rw8_t<0x00087791> SLIBR145;
-		static rw8_t<0x00087792> SLIBR146;
-		static rw8_t<0x00087793> SLIBR147;
-		static rw8_t<0x00087794> SLIBR148;
-		static rw8_t<0x00087795> SLIBR149;
-		static rw8_t<0x00087796> SLIBR150;
-		static rw8_t<0x00087797> SLIBR151;
-		static rw8_t<0x00087798> SLIBR152;
-		static rw8_t<0x00087799> SLIBR153;
-		static rw8_t<0x0008779A> SLIBR154;
-		static rw8_t<0x0008779B> SLIBR155;
-		static rw8_t<0x0008779C> SLIBR156;
-		static rw8_t<0x0008779D> SLIBR157;
-		static rw8_t<0x0008779E> SLIBR158;
-		static rw8_t<0x0008779F> SLIBR159;
-
-		static rw8_t<0x000877A0> SLIBR160;
-		static rw8_t<0x000877A1> SLIBR161;
-		static rw8_t<0x000877A2> SLIBR162;
-		static rw8_t<0x000877A3> SLIBR163;
-		static rw8_t<0x000877A4> SLIBR164;
-		static rw8_t<0x000877A5> SLIBR165;
-		static rw8_t<0x000877A6> SLIBR166;
-		static rw8_t<0x000877A7> SLIBR167;
-		static rw8_t<0x000877A8> SLIBR168;
-		static rw8_t<0x000877A9> SLIBR169;
-		static rw8_t<0x000877AA> SLIBR170;
-		static rw8_t<0x000877AB> SLIBR171;
-		static rw8_t<0x000877AC> SLIBR172;
-		static rw8_t<0x000877AD> SLIBR173;
-		static rw8_t<0x000877AE> SLIBR174;
-		static rw8_t<0x000877AF> SLIBR175;
-
-		static rw8_t<0x000877B0> SLIBR176;
-		static rw8_t<0x000877B1> SLIBR177;
-		static rw8_t<0x000877B2> SLIBR178;
-		static rw8_t<0x000877B3> SLIBR179;
-		static rw8_t<0x000877B4> SLIBR180;
-		static rw8_t<0x000877B5> SLIBR181;
-		static rw8_t<0x000877B6> SLIBR182;
-		static rw8_t<0x000877B7> SLIBR183;
-		static rw8_t<0x000877B8> SLIBR184;
-		static rw8_t<0x000877B9> SLIBR185;
-		static rw8_t<0x000877BA> SLIBR186;
-		static rw8_t<0x000877BB> SLIBR187;
-		static rw8_t<0x000877BC> SLIBR188;
-		static rw8_t<0x000877BD> SLIBR189;
-		static rw8_t<0x000877BE> SLIBR190;
-		static rw8_t<0x000877BF> SLIBR191;
-
-		static rw8_t<0x000877C0> SLIBR192;
-		static rw8_t<0x000877C1> SLIBR193;
-		static rw8_t<0x000877C2> SLIBR194;
-		static rw8_t<0x000877C3> SLIBR195;
-		static rw8_t<0x000877C4> SLIBR196;
-		static rw8_t<0x000877C5> SLIBR197;
-		static rw8_t<0x000877C6> SLIBR198;
-		static rw8_t<0x000877C7> SLIBR199;
-		static rw8_t<0x000877C8> SLIBR200;
-		static rw8_t<0x000877C9> SLIBR201;
-		static rw8_t<0x000877CA> SLIBR202;
-		static rw8_t<0x000877CB> SLIBR203;
-		static rw8_t<0x000877CC> SLIBR204;
-		static rw8_t<0x000877CD> SLIBR205;
-		static rw8_t<0x000877CE> SLIBR206;
-		static rw8_t<0x000877CF> SLIBR207;
-#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1905,35 +1625,54 @@ namespace device {
 		static rw8_t<0x000879FF> SLIAR255;
 #endif
 	};
-	typedef icu_t<void> ICU;
+	typedef icuc_t<void> ICU;
 
-	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
-	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
-	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
+	template<class _> typename icuc_t<_>::IR_ icuc_t<_>::IR;
+	template<class _> typename icuc_t<_>::IER_ icuc_t<_>::IER;
+	template<class _> typename icuc_t<_>::IPR_ icuc_t<_>::IPR;
 
-	template<class _> typename icu_t<_>::DMRSR0_ icu_t<_>::DMRSR0;
-	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
-	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
-	template<class _> typename icu_t<_>::DMRSR3_ icu_t<_>::DMRSR3;
-	template<class _> typename icu_t<_>::DMRSR4_ icu_t<_>::DMRSR4;
-	template<class _> typename icu_t<_>::DMRSR5_ icu_t<_>::DMRSR5;
-	template<class _> typename icu_t<_>::DMRSR6_ icu_t<_>::DMRSR6;
-	template<class _> typename icu_t<_>::DMRSR7_ icu_t<_>::DMRSR7;
+	template<class _> typename icuc_t<_>::DMRSR0_ icuc_t<_>::DMRSR0;
+	template<class _> typename icuc_t<_>::DMRSR1_ icuc_t<_>::DMRSR1;
+	template<class _> typename icuc_t<_>::DMRSR2_ icuc_t<_>::DMRSR2;
+	template<class _> typename icuc_t<_>::DMRSR3_ icuc_t<_>::DMRSR3;
+	template<class _> typename icuc_t<_>::DMRSR4_ icuc_t<_>::DMRSR4;
+	template<class _> typename icuc_t<_>::DMRSR5_ icuc_t<_>::DMRSR5;
+	template<class _> typename icuc_t<_>::DMRSR6_ icuc_t<_>::DMRSR6;
+	template<class _> typename icuc_t<_>::DMRSR7_ icuc_t<_>::DMRSR7;
 
-	template<class _> typename icu_t<_>::GRPBE0_ icu_t<_>::GRPBE0;
-	template<class _> typename icu_t<_>::GRPBL0_ icu_t<_>::GRPBL0;
-	template<class _> typename icu_t<_>::GRPBL1_ icu_t<_>::GRPBL1;
-	template<class _> typename icu_t<_>::GRPAL0_ icu_t<_>::GRPAL0;
-	template<class _> typename icu_t<_>::GRPAL1_ icu_t<_>::GRPAL1;
+	template<class _> typename icuc_t<_>::GRPBE0_ icuc_t<_>::GRPBE0;
+	template<class _> typename icuc_t<_>::GRPBL0_ icuc_t<_>::GRPBL0;
+	template<class _> typename icuc_t<_>::GRPBL1_ icuc_t<_>::GRPBL1;
+	template<class _> typename icuc_t<_>::GRPAL0_ icuc_t<_>::GRPAL0;
+	template<class _> typename icuc_t<_>::GRPAL1_ icuc_t<_>::GRPAL1;
 
-	template<class _> typename icu_t<_>::GENBE0_ icu_t<_>::GENBE0;
-	template<class _> typename icu_t<_>::GENBL0_ icu_t<_>::GENBL0;
-	template<class _> typename icu_t<_>::GENBL1_ icu_t<_>::GENBL1;
-	template<class _> typename icu_t<_>::GENAL0_ icu_t<_>::GENAL0;
-	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
+	template<class _> typename icuc_t<_>::GENBE0_ icuc_t<_>::GENBE0;
+	template<class _> typename icuc_t<_>::GENBL0_ icuc_t<_>::GENBL0;
+	template<class _> typename icuc_t<_>::GENBL1_ icuc_t<_>::GENBL1;
+	template<class _> typename icuc_t<_>::GENAL0_ icuc_t<_>::GENAL0;
+	template<class _> typename icuc_t<_>::GENAL1_ icuc_t<_>::GENAL1;
 
-	template<class _> typename icu_t<_>::GCRBE0_ icu_t<_>::GCRBE0;
+	template<class _> typename icuc_t<_>::GCRBE0_ icuc_t<_>::GCRBE0;
 
-	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
-	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
+	template<class _> typename icuc_t<_>::PIAR0_ icuc_t<_>::PIAR0;
+	template<class _> typename icuc_t<_>::PIAR1_ icuc_t<_>::PIAR1;
+	template<class _> typename icuc_t<_>::PIAR2_ icuc_t<_>::PIAR2;
+	template<class _> typename icuc_t<_>::PIAR3_ icuc_t<_>::PIAR3;
+	template<class _> typename icuc_t<_>::PIAR4_ icuc_t<_>::PIAR4;
+	template<class _> typename icuc_t<_>::PIAR5_ icuc_t<_>::PIAR5;
+	template<class _> typename icuc_t<_>::PIAR6_ icuc_t<_>::PIAR6;
+	template<class _> typename icuc_t<_>::PIAR7_ icuc_t<_>::PIAR7;
+	template<class _> typename icuc_t<_>::PIAR8_ icuc_t<_>::PIAR8;
+	template<class _> typename icuc_t<_>::PIAR9_ icuc_t<_>::PIAR9;
+	template<class _> typename icuc_t<_>::PIARA_ icuc_t<_>::PIARA;
+	template<class _> typename icuc_t<_>::PIARB_ icuc_t<_>::PIARB;
+	template<class _> typename icuc_t<_>::PIARC_ icuc_t<_>::PIARC;
+	template<class _> typename icuc_t<_>::PIARD_ icuc_t<_>::PIARD;
+	template<class _> typename icuc_t<_>::PIARE_ icuc_t<_>::PIARE;
+	template<class _> typename icuc_t<_>::PIARF_ icuc_t<_>::PIARF;
+	template<class _> typename icuc_t<_>::PIAR10_ icuc_t<_>::PIAR10;
+	template<class _> typename icuc_t<_>::PIAR11_ icuc_t<_>::PIAR11;
+	template<class _> typename icuc_t<_>::PIAR12_ icuc_t<_>::PIAR12;
+
+	template<class _> typename icuc_t<_>::SLIAR_ icuc_t<_>::SLIAR;
 }

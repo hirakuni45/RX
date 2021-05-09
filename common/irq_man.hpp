@@ -97,7 +97,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint8_t lvl, edge egt, port_map::option opt)
 		{
-			icu_mgr::set_level(PER, 0);
+			auto vd = static_cast<uint32_t>(PER) - static_cast<uint32_t>(peripheral::IRQ0);
+			auto vec = static_cast<ICU::VECTOR>(static_cast<uint32_t>(ICU::VECTOR::IRQ0) + vd);
+
+			icu_mgr::set_level(vec, 0);
 
 			if(!port_map::turn(PER, true, opt)) {
 				return false;
@@ -134,13 +137,12 @@ namespace device {
 				return false;
 			}
 
-			uint32_t vec = static_cast<uint32_t>(ICU::VECTOR::IRQ0);
-			vec += static_cast<uint32_t>(PER) - static_cast<uint32_t>(peripheral::IRQ0);
-			icu_mgr::set_task(static_cast<ICU::VECTOR>(vec), irq_task_);
+			
+			icu_mgr::set_task(vec, irq_task_);
 
 			level_ = lvl;
 
-			icu_mgr::set_level(PER, level_);
+			icu_mgr::set_level(vec, level_);
 
 			return true;
 		}

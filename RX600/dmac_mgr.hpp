@@ -58,7 +58,7 @@ namespace device {
 			} else {
 				set_interrupt_task(nullptr, static_cast<uint32_t>(vec));
 			}
-			icu_mgr::set_level(DMAC::PERIPHERAL, level_);
+			icu_mgr::set_level(DMAC::IVEC, level_);
 		}
 
 

@@ -19,15 +19,15 @@ namespace device {
 		@brief  汎用 PWM タイマ・クラス
 		@param[in]	base	ベースアドレス
 		@param[in]	peri	ペリフェラル型
-		@param[in]	gtcia	GTCIAn 割り込みベクタ
-		@param[in]	gtcib	GTCIBn 割り込みベクタ
-		@param[in]	gtcic	GTCICn 割り込みベクタ
-		@param[in]	gtcid	GTCIDn 割り込みベクタ
-		@param[in]	gdte	GDTEn  割り込みベクタ
-		@param[in]	gtcie	GTCIEn 割り込みベクタ
-		@param[in]	gtcif	GTCIFn 割り込みベクタ
-		@param[in]	gtciu	GTCIUn 割り込みベクタ
-		@param[in]	gtciv	GTCIVn 割り込みベクタ
+		@param[in]	gtcia	GTCIAn GTCCRAレジスタのインプットキャプチャ /コンペアマッチ
+		@param[in]	gtcib	GTCIBn GTCCRBレジスタのインプットキャプチャ /コンペアマッチ
+		@param[in]	gtcic	GTCICn GTCCRCレジスタのコンペアマッチ
+		@param[in]	gtcid	GTCIDn GTCCRDレジスタのコンペアマッチ
+		@param[in]	gdte	GDTEn  デッドタイムエラー
+		@param[in]	gtcie	GTCIEn GTCCREレジスタのコンペアマッチ
+		@param[in]	gtcif	GTCIFn GTCCRFレジスタのコンペアマッチ
+		@param[in]	gtciu	GTCIUn GTCNTカウンタのアンダフロー
+		@param[in]	gtciv	GTCIVn GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
@@ -50,7 +50,7 @@ namespace device {
 
 #if defined(SIG_RX66T) || defined(SIG_RX72T)
 		static const uint32_t PCLK = F_PCLKC;	///< カウント基準クロック
-#else
+#elif defined(SIG_RX72N) || defined(SIG_RX72M)
 		static const uint32_t PCLK = F_PCLKA;	///< カウント基準クロック
 #endif
 
