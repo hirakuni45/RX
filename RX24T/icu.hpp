@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ICU 定義基底クラス
+		@brief  RX24T 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
@@ -22,11 +22,12 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  通常ベクター型
+			@brief  通常割り込みベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR : uint8_t {
-			NONE    = 0,	///< none 
+			NONE    = 0,	///< none
+
 			BUSERR  = 16,   ///< BSC
 
 			FRDYI   = 23,   ///< FCU
@@ -36,6 +37,7 @@ namespace device {
 			CMI1    = 29,   ///< CMT1
 			CMI2    = 30,   ///< CMT2
 			CMI3    = 31,   ///< CMT3
+
 			FERRF   = 32,	///< CAC
 			MENDF   = 33,	///< CAC
 			OVFF    = 34,	///< CAC
@@ -243,7 +245,8 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  IR レジスタ
+			@brief  IR レジスタ・クラス
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -455,12 +458,12 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	vec		割り込みベクター型
 				@return IR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (VECTOR idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(idx));
+			volatile uint8_t& operator [] (VECTOR vec) noexcept {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
 		typedef ir_t<0x00087000> IR_;
@@ -469,7 +472,8 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  IER レジスタ
+			@brief  IER レジスタ・クラス
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -695,6 +699,41 @@ namespace device {
 			typedef rw8_t<base + 0x1F> ier1F;
 			bit_rw_t<ier1F, bitpos::B0>	RIIC_TXI0;
 			bit_rw_t<ier1F, bitpos::B1>	RIIC_TEI0;
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  許可、不許可
+				@param[in]	vec		割り込みベクター型
+				@param[in]	ena		許可／不許可
+			*/
+			//-------------------------------------------------------------//
+			void enable(VECTOR vec, bool ena) noexcept
+			{
+				auto idx = static_cast<uint8_t>(vec);
+				auto tmp = rd8_(base + (idx >> 3));
+				if(ena) {
+					tmp |=   1 << (idx & 7);
+				} else {
+					tmp &= ~(1 << (idx & 7));
+				}
+				wr8_(base + (idx >> 3), tmp);
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  許可状態を取得
+				@param[in]	vec		割り込みベクター型
+				@return 許可状態（許可の場合「true」）
+			*/
+			//-------------------------------------------------------------//
+			bool get(VECTOR vec) const noexcept
+			{
+				auto idx = static_cast<uint8_t>(vec);
+				auto tmp = rd8_(base + (idx >> 3));
+				return tmp & (1 << (idx & 7));
+			}
 		};
 		typedef ier_t<0x00087200> IER_;
 		static IER_ IER;
@@ -702,8 +741,9 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  IPR レジスタ @n
+			@brief  IPR レジスタ・クラス @n
 					全て、下位４ビットが有効
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -918,12 +958,169 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	idx		インデックス（０～２５５）
-				@return IR レジスターの参照
+				@param[in]	vec		標準割り込みベクター型
+				@return IPR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (VECTOR idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(idx));
+			volatile uint8_t& operator [] (VECTOR vec) {
+				uint32_t idx = 0;
+				switch(vec) {
+				case VECTOR::BUSERR: idx = 0; break;
+				case VECTOR::FRDYI:  idx = 2; break;
+				case VECTOR::SWINT:  idx = 3; break;
+				case VECTOR::CMI0:   idx = 4; break;
+				case VECTOR::CMI1:   idx = 5; break;
+				case VECTOR::CMI2:   idx = 6; break;
+				case VECTOR::CMI3:   idx = 7; break;
+				case VECTOR::SPEI0:
+				case VECTOR::SPRI0:
+				case VECTOR::SPTI0:
+				case VECTOR::SPII0:
+					idx = 44;
+					break;
+				case VECTOR::TGIA0:
+				case VECTOR::TGIB0:
+				case VECTOR::TGIC0:
+				case VECTOR::TGID0:
+					idx = 114;
+					break;
+				case VECTOR::TCIV0:
+				case VECTOR::TGIE0:
+				case VECTOR::TGIF0:
+					idx = 118;
+					break;
+				case VECTOR::TGIA1:
+				case VECTOR::TGIB1:
+					idx = 121;
+					break;
+				case VECTOR::TCIV1:
+				case VECTOR::TCIU1:
+					idx = 123;
+					break;
+				case VECTOR::TGIA2:
+				case VECTOR::TGIB2:
+					idx = 125;
+					break;
+				case VECTOR::TCIV2:
+				case VECTOR::TCIU2:
+					idx = 127;
+					break;
+				case VECTOR::TGIA3:
+				case VECTOR::TGIB3:
+				case VECTOR::TGIC3:
+				case VECTOR::TGID3:
+					idx = 129;
+					break;
+				case VECTOR::TCIV3:
+					idx = 133;
+					break;
+				case VECTOR::TGIA4:
+				case VECTOR::TGIB4:
+				case VECTOR::TGIC4:
+				case VECTOR::TGID4:
+					idx = 134;
+					break;
+				case VECTOR::TCIV4:
+					idx = 138;
+					break;
+				case VECTOR::TGIU5:
+				case VECTOR::TGIV5:
+				case VECTOR::TGIW5:
+					idx = 139;
+					break;
+				case VECTOR::TGIA6:
+				case VECTOR::TGIB6:
+				case VECTOR::TGIC6:
+				case VECTOR::TGID6:
+					idx = 142;
+					break;
+				case VECTOR::TCIV6:
+					idx = 146;
+					break;
+				case VECTOR::TGIA7:
+				case VECTOR::TGIB7:
+					idx = 149;
+					break;
+				case VECTOR::TGIC7:
+				case VECTOR::TGID7:
+					idx = 151;
+					break;
+				case VECTOR::TCIV7:
+					idx = 153;
+					break;
+				case VECTOR::TGIA9:
+				case VECTOR::TGIB9:
+				case VECTOR::TGIC9:
+				case VECTOR::TGID9:
+					idx = 159;
+					break;
+				case VECTOR::TCIV9:
+				case VECTOR::TGIE9:
+				case VECTOR::TGIF9:
+					idx = 163;
+					break;
+				case VECTOR::CMIA0:
+				case VECTOR::CMIB0:
+				case VECTOR::OVI0:
+					idx = 174;
+					break;
+				case VECTOR::CMIA1:
+				case VECTOR::CMIB1:
+				case VECTOR::OVI1:
+					idx = 177;
+					break;
+				case VECTOR::CMIA2:
+				case VECTOR::CMIB2:
+				case VECTOR::OVI2:
+					idx = 180;
+					break;
+				case VECTOR::CMIA3:
+				case VECTOR::CMIB3:
+				case VECTOR::OVI3:
+					idx = 183;
+					break;
+				case VECTOR::CMIA4:
+				case VECTOR::CMIB4:
+				case VECTOR::OVI4:
+					idx = 186;
+					break;
+				case VECTOR::CMIA5:
+				case VECTOR::CMIB5:
+				case VECTOR::OVI5:
+					idx = 189;
+					break;
+				case VECTOR::CMIA6:
+				case VECTOR::CMIB6:
+				case VECTOR::OVI6:
+					idx = 192;
+					break;
+				case VECTOR::CMIA7:
+				case VECTOR::CMIB7:
+				case VECTOR::OVI7:
+					idx = 195;
+					break;
+				case VECTOR::ERI1:
+				case VECTOR::RXI1:
+				case VECTOR::TXI1:
+				case VECTOR::TEI1:
+					idx = 218;
+					break;
+				case VECTOR::ERI5:
+				case VECTOR::RXI5:
+				case VECTOR::TXI5:
+				case VECTOR::TEI5:
+					idx = 222;
+					break;
+				case VECTOR::ERI6:
+				case VECTOR::RXI6:
+				case VECTOR::TXI6:
+				case VECTOR::TEI6:
+					idx = 226;
+					break;
+
+				default: idx = static_cast<uint32_t>(vec); break;
+				}
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
 		typedef ipr_t<0x00087300> IPR_;
