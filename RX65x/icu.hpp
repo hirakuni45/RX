@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX651/RX65N グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ICUA 定義基底クラス
+		@brief  RX651/RX65N 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class _>
@@ -23,61 +23,61 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ベクター・インデックス
+			@brief  通常割り込みベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR : uint8_t {
-			NONE         = 0,   ///< ベクター０
+			NONE         = 0,		///< ベクター０
 
-			BUSERR       = 16,  ///< BSC
+			BUSERR       = 16,		///< BSC
 
-			RAMERR       = 18,  ///< RAM
+			RAMERR       = 18,		///< RAM
 
-			FIFERR       = 21,  ///< FCU
+			FIFERR       = 21,		///< FCU
 
-			FRDYI        = 23,  ///< FCU
+			FRDYI        = 23,		///< FCU
 
-			SWINT2       = 26,  // ICU
-			SWINT        = 27,  // ICU
+			SWINT2       = 26,		///< ICU
+			SWINT        = 27,		///< ICU
 
-			CMI0         = 28,  // CMT0
-			CMI1         = 29,  // CMT1
-			CMWI0        = 30,  // CMTW0
-			CMWI1        = 31,  // CMTW1
+			CMI0         = 28,		///< CMT0
+			CMI1         = 29,		///< CMT1
+			CMWI0        = 30,		///< CMTW0
+			CMWI1        = 31,		///< CMTW1
 
-			D0FIFO2      = 32,  // USBA
-			D1FIFO2      = 33,  // USBA
+			D0FIFO2      = 32,		///< USBA
+			D1FIFO2      = 33,		///< USBA
 
-			D0FIFO0      = 34,  // USB0
-			D1FIFO0      = 35,  // USB0
+			D0FIFO0      = 34,		///< USB0
+			D1FIFO0      = 35,		///< USB0
 
-			SPRI0        = 38,  // RSPI0
-			SPTI0        = 39,  // RSPI0
-			SPRI1        = 40,  // RSPI1
-			SPTI1        = 41,  // RSPI1
+			SPRI0        = 38,		///< RSPI0
+			SPTI0        = 39,		///< RSPI0
+			SPRI1        = 40,		///< RSPI1
+			SPTI1        = 41,		///< RSPI1
 
-			SPRI         = 42,  // QSPI
-			SPTI         = 43,  // QSPI
+			SPRI         = 42,		///< QSPI
+			SPTI         = 43,		///< QSPI
 
-			SBFAI        = 44,  // SDHI
+			SBFAI        = 44,		///< SDHI
 
-			MBFAI        = 45,  // MMCIF
+			MBFAI        = 45,		///< MMCIF
 
-			RIIC_RXI1    = 50,	// RIIC1 RXI
-			RIIC_TXI1    = 51,	// RIIC1 TXI
-			RIIC_RXI0    = 52,  // RIIC0 RXI
-			RIIC_TXI0    = 53,	// RIIC0 TXI
-			RIIC_RXI2    = 54,  // RIIC2 RXI
-			RIIC_TXI2    = 55,	// RIIC2 TXI
+			RIIC_RXI1    = 50,		///< RIIC1 RXI
+			RIIC_TXI1    = 51,		///< RIIC1 TXI
+			RIIC_RXI0    = 52,		///< RIIC0 RXI
+			RIIC_TXI0    = 53,		///< RIIC0 TXI
+			RIIC_RXI2    = 54,		///< RIIC2 RXI
+			RIIC_TXI2    = 55,		///< RIIC2 TXI
 
-			RXI0         = 58,  // SCI0
+			RXI0         = 58,		///< SCI0
 			TXI0         = 59,
-			RXI1         = 60,  // SCI1
+			RXI1         = 60,		///< SCI1
 			TXI1         = 61,
-			RXI2         = 62,  // SCI2
+			RXI2         = 62,		///< SCI2
 			TXI2         = 63, 
 
-			IRQ0         = 64,  // ICU
+			IRQ0         = 64,		///< ICU
 			IRQ1         = 65,
 			IRQ2         = 66,
 			IRQ3         = 67,
@@ -94,64 +94,64 @@ namespace device {
 			IRQ14        = 78,
 			IRQ15        = 79,
 
-			RXI3         = 80,  // SCI3
+			RXI3         = 80,		///< SCI3
 			TXI3         = 81,
-			RXI4         = 82,  // SCI4
+			RXI4         = 82,		///< SCI4
 			TXI4         = 83,
-			RXI5         = 84,  // SCI5
+			RXI5         = 84,		///< SCI5
 			TXI5         = 85,
-			RXI6         = 86,  // SCI6
+			RXI6         = 86,		///< SCI6
 			TXI6         = 87,
 
-			LVD1         = 88,  // LVD1
-			LVD2         = 89,  // LVD2
+			LVD1         = 88,		///< LVD1
+			LVD2         = 89,		///< LVD2
 
-			USBR0        = 90,  // USB0
+			USBR0        = 90,		///< USB0
 
-			ALM          = 92,  // RTC
+			ALM          = 92,		///< RTC
 			PRD          = 93,
 
-			IWUNI        = 95,  // IWDT
+			IWUNI        = 95,		///< IWDT
 
-			WUNI         = 96,  // WDT
+			WUNI         = 96,		///< WDT
 
-			PCDFI        = 97,  // PDC
+			PCDFI        = 97,		///< PDC
 
-			RXI7         = 98,  // SCI7
+			RXI7         = 98,		///< SCI7
 			TXI7         = 99,
-			RXI8         = 100, // SCI8
+			RXI8         = 100,		///< SCI8
 			TXI8         = 101,
-			RXI9         = 102, // SCI9
+			RXI9         = 102,		///< SCI9
 			TXI9         = 103,
-			RXI10        = 104, // SCI10
+			RXI10        = 104,		///< SCI10
 			TXI10        = 105,
 
-			GROUPBE0     = 106,  // ICU
+			GROUPBE0     = 106,		///< ICU
 			GROUPBL2     = 107,
 
-			SPRI2        = 108,
-			SPTI2        = 109,
+			SPRI2        = 108,		///< RSPI2 R
+			SPTI2        = 109,		///< RSPI2 T
 
-			GROUPBL0	 = 110,  // ICU
-			GROUPBL1	 = 111,  // ICU
-			GROUPAL0	 = 112,  // ICU
-			GROUPAL1	 = 113,  // ICU
-			RXI11   	 = 114,  // SCI11
+			GROUPBL0	 = 110,		///< ICU
+			GROUPBL1	 = 111,		///< ICU
+			GROUPAL0	 = 112,		///< ICU
+			GROUPAL1	 = 113,		///< ICU
+			RXI11   	 = 114,		///< SCI11
 			TXI11   	 = 115,
 
-			RXI12   	 = 116,  // SCI12
+			RXI12   	 = 116,		///< SCI12
 			TXI12   	 = 117,
 
-			DMAC0I  	 = 120,  // DMAC
-			DMAC1I  	 = 121,
-			DMAC2I  	 = 122,
-			DMAC3I  	 = 123,
-			DMAC74I 	 = 124,
+			DMAC0I  	 = 120,		///< DMAC 0
+			DMAC1I  	 = 121,		///< DMAC 1
+			DMAC2I  	 = 122,		///< DMAC 2
+			DMAC3I  	 = 123,		///< DMAC 3
+			DMAC74I 	 = 124,		///< DMAC 4,5,6,7
 
-			OSTDI    	 = 125,  // OST
+			OSTDI    	 = 125,		///< OST
 
-			EXDMAC0I 	 = 126,  // EXDMAC
-			EXDMAC1I 	 = 127,
+			EXDMAC0I 	 = 126,		///< EXDMAC 0
+			EXDMAC1I 	 = 127,		///< EXDMAC 1
 
 			INTB128  	 = 128,
 			INTB129,
@@ -287,7 +287,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込みＢ要因・ベクター・インデックス
+			@brief  選択型割り込みＢ要因・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_SELB : uint8_t {
@@ -371,7 +371,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込みＡ要因・ベクター・インデックス
+			@brief  選択型割り込みＡ要因・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_SELA : uint8_t {
@@ -433,7 +433,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBE0・ベクター・インデックス
+			@brief  GROUPBE0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 : uint8_t {
@@ -444,7 +444,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL0・ベクター・インデックス
+			@brief  GROUPBL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL0 : uint8_t {
@@ -484,7 +484,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL1・ベクター・インデックス
+			@brief  GROUPBL1・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL1 : uint8_t {
@@ -518,7 +518,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL2・ベクター・インデックス
+			@brief  GROUPBL2・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL2 : uint8_t {
@@ -528,7 +528,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPAL0・ベクター・インデックス
+			@brief  GROUPAL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL0 : uint8_t {
@@ -547,7 +547,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPAL1・ベクター・インデックス
+			@brief  GROUPAL1・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL1 : uint8_t {
@@ -562,7 +562,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター BL0 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -574,7 +574,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター BL1 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -586,7 +586,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター BL2 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -598,7 +598,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター BE0 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -610,7 +610,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター AL0 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -622,7 +622,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得
+			@brief  グループベクター AL1 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
 		*/
@@ -1293,12 +1293,27 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	idx		インデックス（０～２５５）
-				@return IR レジスターの参照
+				@param[in]	vec		標準割り込みベクター型
+				@return IPR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (VECTOR idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(idx));
+			volatile uint8_t& operator [] (VECTOR vec) noexcept {
+				uint32_t idx = 0;
+				switch(vec) {
+				case VECTOR::BUSERR: idx = 0; break;
+				case VECTOR::RAMERR: idx = 0; break;
+				case VECTOR::FIFERR: idx = 1; break;
+				case VECTOR::FRDYI:  idx = 2; break;
+				case VECTOR::SWINT2: idx = 3; break;
+				case VECTOR::SWINT:  idx = 3; break;
+				case VECTOR::CMI0:   idx = 4; break;
+				case VECTOR::CMI1:   idx = 5; break;
+				case VECTOR::CMWI0:  idx = 6; break;
+				case VECTOR::CMWI1:  idx = 7; break;
+
+				default: idx = static_cast<uint32_t>(vec); break;
+				}
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
 		typedef ipr_t<0x00087300> IPR_;

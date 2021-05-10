@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  割り込みコントローラ（ICUC）
+		@brief  RX66T/RX72T 割り込みコントローラ・テンプレート・クラス（ICUC）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
@@ -23,254 +23,254 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ベクター・インデックス
+			@brief  通常割り込みベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR : uint8_t {
-			NONE    = 0,	///< none 
+			NONE      = 0,		///< none 
 
-			BUSERR  = 16,   ///< BSC
+			BUSERR    = 16,		///< BSC
 
-			RAMERR  = 18,	///< RAM
+			RAMERR    = 18,		///< RAM
 
-			FIFERR  = 21,   ///< FCU
+			FIFERR    = 21,		///< FCU
 
-			FRDYI   = 23,   ///< FCU
+			FRDYI     = 23,		///< FCU
 
-			SWINT2  = 26,   ///< ICU
-			SWINT   = 27,   ///< ICU
+			SWINT2    = 26,		///< ICU
+			SWINT     = 27,		///< ICU
 
-			CMI0    = 28,   ///< CMT0
-			CMI1    = 29,   ///< CMT1
-			CMI2    = 30,   ///< CMT2
-			CMI3    = 31,   ///< CMT3
+			CMI0      = 28,		///< CMT0
+			CMI1      = 29,		///< CMT1
+			CMI2      = 30,		///< CMT2
+			CMI3      = 31,		///< CMT3
 
-			D0FIFO0 = 34,   ///< USB0
- 			D1FIFO0 = 35,   ///< USB0
+			D0FIFO0   = 34,		///< USB0 0
+ 			D1FIFO0   = 35,		///< USB0 1
 
-			SPRI0   = 38,   ///< RSPI0
-			SPTI0   = 39,   ///< RSPI0
+			SPRI0     = 38,		///< RSPI0 R
+			SPTI0     = 39,		///< RSPI0 T
 
-			RIIC_RXI0 = 52,	///< RIIC0
-			RIIC_TXI0 = 53,	///< RIIC0
+			RIIC_RXI0 = 52,		///< RIIC0 RX
+			RIIC_TXI0 = 53,		///< RIIC0 TX
 
-			RXI1    = 60,	///< SCI1
-			TXI1    = 61,	///< SCI1
+			RXI1      = 60,		///< SCI1 RX
+			TXI1      = 61,		///< SCI1 TX
 
-			IRQ0    = 64,   ///< ICU
-			IRQ1    = 65,
-			IRQ2    = 66,
-			IRQ3    = 67,
-			IRQ4    = 68,
-			IRQ5    = 69,
-			IRQ6    = 70,
-			IRQ7    = 71,
-			IRQ8    = 72,
-			IRQ9    = 73,
-			IRQ10   = 74,
-			IRQ11   = 75,
-			IRQ12   = 76,
-			IRQ13   = 77,
-			IRQ14   = 78,
-			IRQ15   = 79,
+			IRQ0      = 64,		///< ICU
+			IRQ1      = 65,
+			IRQ2      = 66,
+			IRQ3      = 67,
+			IRQ4      = 68,
+			IRQ5      = 69,
+			IRQ6      = 70,
+			IRQ7      = 71,
+			IRQ8      = 72,
+			IRQ9      = 73,
+			IRQ10     = 74,
+			IRQ11     = 75,
+			IRQ12     = 76,
+			IRQ13     = 77,
+			IRQ14     = 78,
+			IRQ15     = 79,
 
-			RXI5	= 84,	///< SCI5
-			TXI5	= 85,	///< SCI5
-			RXI6	= 86,	///< SCI6
-			TXI6	= 87,	///< SCI6
+			RXI5      = 84,		///< SCI5 RX
+			TXI5      = 85,		///< SCI5 TX
+			RXI6	  = 86,		///< SCI6 RX
+			TXI6	  = 87,		///< SCI6 TX
 
-			LVD1    = 88,   ///< LVD1
-			LVD2    = 89,   ///< LVD2
+			LVD1      = 88,		///< LVD1
+			LVD2      = 89,		///< LVD2
 
-			USBR0	= 90,	///< USB0
+			USBR0	  = 90,		///< USB0
 
-			IWUNI   = 95,   ///< IWDT
-			WUNI	= 96,	///< WDT
+			IWUNI     = 95,		///< IWDT
+			WUNI	  = 96,		///< WDT
 
-			RXI8	= 100,	///< SCI8
-			TXI8	= 101,	///< SCI8
-			RXI9	= 102,	///< SCI9
-			TXI9	= 103,	///< SCI9
+			RXI8	  = 100,	///< SCI8 RX
+			TXI8	  = 101,	///< SCI8 TX
+			RXI9	  = 102,	///< SCI9 RX
+			TXI9	  = 103,	///< SCI9 TX
 
-			GROUPBE0 = 106,	///< ICU
+			GROUPBE0  = 106,	///< ICU
 
-			GROUPBL0 = 110,	///< ICU
-			GROUPBL1 = 111,	///< ICU
-			GROUPAL0 = 112,	///< ICU
+			GROUPBL0  = 110,	///< ICU
+			GROUPBL1  = 111,	///< ICU
+			GROUPAL0  = 112,	///< ICU
 
-			RXI11	= 114,	///< SCI11
-			TXI11	= 115,	///< SCI11
-			RXI12	= 116,	///< SCI12
-			TXI12	= 117,	///< SCI12
+			RXI11	  = 114,	///< SCI11 RX
+			TXI11	  = 115,	///< SCI11 TX
+			RXI12	  = 116,	///< SCI12 RX
+			TXI12	  = 117,	///< SCI12 TX
 
-			DMAC0I  = 120,	///< DMAC
-			DMAC1I  = 121,	///< DMAC
-			DMAC2I  = 122,	///< DMAC
-			DMAC3I  = 123,	///< DMAC
-			DMAC74I = 124,	///< DMAC
+			DMAC0I    = 120,	///< DMAC 0
+			DMAC1I    = 121,	///< DMAC 1
+			DMAC2I    = 122,	///< DMAC 2
+			DMAC3I    = 123,	///< DMAC 3
+			DMAC74I   = 124,	///< DMAC 4,5,6,7
 
-			OSTDI   = 125,	///< OST
+			OSTDI     = 125,	///< OST
 
-			S12ADI    = 128,  ///< S12AD
-			S12GBADI  = 129,  ///< S12AD
-			S12GCADI  = 130,  ///< S12AD
+			S12ADI    = 128,	///< S12AD
+			S12GBADI  = 129,	///< S12AD
+			S12GCADI  = 130,	///< S12AD
 
-			S12ADI1   = 132,  ///< S12AD1
-			S12GBADI1 = 133,  ///< S12AD1
-			S12GCADI1 = 134,  ///< S12AD1
+			S12ADI1   = 132,	///< S12AD1
+			S12GBADI1 = 133,	///< S12AD1
+			S12GCADI1 = 134,	///< S12AD1
 
-			S12ADI2   = 136,  ///< S12AD2
-			S12GBADI2 = 137,  ///< S12AD2
-			S12GCADI2 = 138,  ///< S12AD2
+			S12ADI2   = 136,	///< S12AD2
+			S12GBADI2 = 137,	///< S12AD2
+			S12GCADI2 = 138,	///< S12AD2
 
-			CMIA0   = 146,	///< TMR0: CMIA0
-			CMIB0   = 147,	///< TMR0: CMIB0
-			OVI0    = 148,	///< TMR0: OVI0
-			CMIA1   = 149,	///< TMR1: CMIA1
-			CMIB1   = 150,	///< TMR1: CMIB1
-			OVI1    = 151,	///< TMR1: OVI1
-			CMIA2   = 152,	///< TMR2: CMIA2
-			CMIB2   = 153,	///< TMR2: CMIB2
-			OVI2    = 154,	///< TMR2: OVI2
-			CMIA3   = 155,	///< TMR3: CMIA3
-			CMIB3   = 156,	///< TMR3: CMIB3
-			OVI3    = 157,	///< TMR3: OVI3
-			CMIA4   = 158,	///< TMR4: CMIA4
-			CMIB4   = 159,	///< TMR4: CMIB4
-			OVI4    = 160,	///< TMR4: OVI4
-			CMIA5   = 161,	///< TMR5: CMIA5
-			CMIB5   = 162,	///< TMR5: CMIB5
-			OVI5    = 163,	///< TMR5: OVI5
-			CMIA6   = 164,	///< TMR6: CMIA6
-			CMIB6   = 165,	///< TMR6: CMIB6
-			OVI6    = 166,	///< TMR6: OVI6
-			CMIA7   = 167,	///< TMR7: CMIA7
-			CMIB7   = 168,	///< TMR7: CMIB7
-			OVI7    = 169,	///< TMR7: OVI7
+			CMIA0     = 146,	///< TMR0: CMIA0
+			CMIB0     = 147,	///< TMR0: CMIB0
+			OVI0      = 148,	///< TMR0: OVI0
+			CMIA1     = 149,	///< TMR1: CMIA1
+			CMIB1     = 150,	///< TMR1: CMIB1
+			OVI1      = 151,	///< TMR1: OVI1
+			CMIA2     = 152,	///< TMR2: CMIA2
+			CMIB2     = 153,	///< TMR2: CMIB2
+			OVI2      = 154,	///< TMR2: OVI2
+			CMIA3     = 155,	///< TMR3: CMIA3
+			CMIB3     = 156,	///< TMR3: CMIB3
+			OVI3      = 157,	///< TMR3: OVI3
+			CMIA4     = 158,	///< TMR4: CMIA4
+			CMIB4     = 159,	///< TMR4: CMIB4
+			OVI4      = 160,	///< TMR4: OVI4
+			CMIA5     = 161,	///< TMR5: CMIA5
+			CMIB5     = 162,	///< TMR5: CMIB5
+			OVI5      = 163,	///< TMR5: OVI5
+			CMIA6     = 164,	///< TMR6: CMIA6
+			CMIB6     = 165,	///< TMR6: CMIB6
+			OVI6      = 166,	///< TMR6: OVI6
+			CMIA7     = 167,	///< TMR7: CMIA7
+			CMIB7     = 168,	///< TMR7: CMIB7
+			OVI7      = 169,	///< TMR7: OVI7
 
-			RXF0    = 170,	///< CAN0
-			TXF0    = 171,	///< CAN0
-			RXM0    = 172,	///< CAN0
-			TXM0    = 173,	///< CAN0
+			RXF0      = 170,	///< CAN0 RXF
+			TXF0      = 171,	///< CAN0 TXF
+			RXM0      = 172,	///< CAN0 RXM
+			TXM0      = 173,	///< CAN0 TXM
 
-			USBI0	= 174,	///< USB0
+			USBI0	  = 174,	///< USB0
 
-			ELSR18I = 175,	///< ELC
-			ELSR19I = 176,	///< ELC
+			ELSR18I   = 175,	///< ELC
+			ELSR19I   = 176,	///< ELC
 
-			RD		= 177,	///< TSIP-Lite
-			WR		= 178,	///< TSIP-Lite
-			ERR		= 179,	///< TSIP-Lite
+			RD		  = 177,	///< TSIP-Lite
+			WR		  = 178,	///< TSIP-Lite
+			ERR		  = 179,	///< TSIP-Lite
 
-			CMPC0	= 180,	///< CMPC0
-			CMPC1	= 181,	///< CMPC1
-			CMPC2	= 182,	///< CMPC2
-			CMPC3	= 183,	///< CMPC3
-			CMPC4	= 184,	///< CMPC4
-			CMPC5	= 185,	///< CMPC5
+			CMPC0	  = 180,	///< CMPC0
+			CMPC1	  = 181,	///< CMPC1
+			CMPC2	  = 182,	///< CMPC2
+			CMPC3	  = 183,	///< CMPC3
+			CMPC4	  = 184,	///< CMPC4
+			CMPC5	  = 185,	///< CMPC5
 
-			INTA208 = 208,	///< PERIA
-			INTA209 = 209,	///< PERIA
-			INTA210 = 210,	///< PERIA
-			INTA211 = 211,	///< PERIA
-			INTA212 = 212,	///< PERIA
-			INTA213 = 213,	///< PERIA
-			INTA214 = 214,	///< PERIA
-			INTA215 = 215,	///< PERIA
-			INTA216 = 216,	///< PERIA
-			INTA217 = 217,	///< PERIA
-			INTA218 = 218,	///< PERIA
-			INTA219 = 219,	///< PERIA
-			INTA220 = 220,	///< PERIA
-			INTA221 = 221,	///< PERIA
-			INTA222 = 222,	///< PERIA
-			INTA223 = 223,	///< PERIA
-			INTA224 = 224,	///< PERIA
-			INTA225 = 225,	///< PERIA
-			INTA226 = 226,	///< PERIA
-			INTA227 = 227,	///< PERIA
-			INTA228 = 228,	///< PERIA
-			INTA229 = 229,	///< PERIA
-			INTA230 = 230,	///< PERIA
-			INTA231 = 231,	///< PERIA
-			INTA232 = 232,	///< PERIA
-			INTA233 = 233,	///< PERIA
-			INTA234 = 234,	///< PERIA
-			INTA235 = 235,	///< PERIA
-			INTA236 = 236,	///< PERIA
-			INTA237 = 237,	///< PERIA
-			INTA238 = 238,	///< PERIA
-			INTA239 = 239,	///< PERIA
-			INTA240 = 240,	///< PERIA
-			INTA241 = 241,	///< PERIA
-			INTA242 = 242,	///< PERIA
-			INTA243 = 243,	///< PERIA
-			INTA244 = 244,	///< PERIA
-			INTA245 = 245,	///< PERIA
-			INTA246 = 246,	///< PERIA
-			INTA247 = 247,	///< PERIA
-			INTA248 = 248,	///< PERIA
-			INTA249 = 249,	///< PERIA
-			INTA250 = 250,	///< PERIA
-			INTA251 = 251,	///< PERIA
-			INTA252 = 252,	///< PERIA
-			INTA253 = 253,	///< PERIA
-			INTA254 = 254,	///< PERIA
-			INTA255 = 255	///< PERIA
+			INTA208   = 208,	///< PERIA
+			INTA209   = 209,	///< PERIA
+			INTA210   = 210,	///< PERIA
+			INTA211   = 211,	///< PERIA
+			INTA212   = 212,	///< PERIA
+			INTA213   = 213,	///< PERIA
+			INTA214   = 214,	///< PERIA
+			INTA215   = 215,	///< PERIA
+			INTA216   = 216,	///< PERIA
+			INTA217   = 217,	///< PERIA
+			INTA218   = 218,	///< PERIA
+			INTA219   = 219,	///< PERIA
+			INTA220   = 220,	///< PERIA
+			INTA221   = 221,	///< PERIA
+			INTA222   = 222,	///< PERIA
+			INTA223   = 223,	///< PERIA
+			INTA224   = 224,	///< PERIA
+			INTA225   = 225,	///< PERIA
+			INTA226   = 226,	///< PERIA
+			INTA227   = 227,	///< PERIA
+			INTA228   = 228,	///< PERIA
+			INTA229   = 229,	///< PERIA
+			INTA230   = 230,	///< PERIA
+			INTA231   = 231,	///< PERIA
+			INTA232   = 232,	///< PERIA
+			INTA233   = 233,	///< PERIA
+			INTA234   = 234,	///< PERIA
+			INTA235   = 235,	///< PERIA
+			INTA236   = 236,	///< PERIA
+			INTA237   = 237,	///< PERIA
+			INTA238   = 238,	///< PERIA
+			INTA239   = 239,	///< PERIA
+			INTA240   = 240,	///< PERIA
+			INTA241   = 241,	///< PERIA
+			INTA242   = 242,	///< PERIA
+			INTA243   = 243,	///< PERIA
+			INTA244   = 244,	///< PERIA
+			INTA245   = 245,	///< PERIA
+			INTA246   = 246,	///< PERIA
+			INTA247   = 247,	///< PERIA
+			INTA248   = 248,	///< PERIA
+			INTA249   = 249,	///< PERIA
+			INTA250   = 250,	///< PERIA
+			INTA251   = 251,	///< PERIA
+			INTA252   = 252,	///< PERIA
+			INTA253   = 253,	///< PERIA
+			INTA254   = 254,	///< PERIA
+			INTA255   = 255		///< PERIA
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPIE0・ベクター・インデックス
+			@brief  GROUPIE0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_IE0 : uint8_t {
-			DPFPUEX,	///< 倍精度浮動少数点例外
+			DPFPUEX,		///< 倍精度浮動少数点例外
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBE0・ベクター・インデックス
+			@brief  GROUPBE0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 : uint8_t {
-			ERS0,	///< CAN0 / ERS0
+			ERS0,			///< CAN0 / ERS0
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL0・ベクター・インデックス
+			@brief  GROUPBL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL0 : uint8_t {
-			TEI1 = 2,	///< SCI1 / TEI1（送信完了）
-			ERI1,		///< SCI1 / ERI1（受信エラー）
+			TEI1 = 2,		///< SCI1 / TEI1（送信完了）
+			ERI1,			///< SCI1 / ERI1（受信エラー）
 
-			TEI5 = 10,	///< SCI5 / TEI5（送信完了）
-			ERI5,		///< SCI5 / ERI5（受信エラー）
-			TEI6,		///< SCI6 / TEI6（送信完了）
-			ERI6,		///< SCI6 / ERI6（受信エラー）
+			TEI5 = 10,		///< SCI5 / TEI5（送信完了）
+			ERI5,			///< SCI5 / ERI5（受信エラー）
+			TEI6,			///< SCI6 / TEI6（送信完了）
+			ERI6,			///< SCI6 / ERI6（受信エラー）
 
-			TEI12 = 16,	///< SCI12 / TEI12（送信完了）
-			ERI12,		///< SCI12 / ERI12（受信エラー）
-			SCIX0,		///< SCI12 / SCIX0
-			SCIX1,		///< SCI12 / SCIX1
-			SCIX2,		///< SCI12 / SCIX2
-			SCIX3,		///< SCI12 / SCIX3
+			TEI12 = 16,		///< SCI12 / TEI12（送信完了）
+			ERI12,			///< SCI12 / ERI12（受信エラー）
+			SCIX0,			///< SCI12 / SCIX0
+			SCIX1,			///< SCI12 / SCIX1
+			SCIX2,			///< SCI12 / SCIX2
+			SCIX3,			///< SCI12 / SCIX3
 
-			FERRI = 26,	///< CAC / FERRI
-			MENDI,		///< CAC / MENDI
-			OVFI,		///< CAC / OVFI
-			DOPCI,		///< DOC / DOPCI
+			FERRI = 26,		///< CAC / FERRI
+			MENDI,			///< CAC / MENDI
+			OVFI,			///< CAC / OVFI
+			DOPCI,			///< DOC / DOPCI
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL1・ベクター・インデックス
+			@brief  GROUPBL1・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL1 : uint8_t {
@@ -302,7 +302,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPAL0・ベクター・インデックス
+			@brief  GROUPAL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL0 : uint8_t {
@@ -316,7 +316,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込みＡ要因・ベクター・インデックス
+			@brief  選択型割り込みＡ要因・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_SELA : uint8_t {
@@ -548,7 +548,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  IR レジスタ
+			@brief  IR レジスタ・クラス
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -744,7 +744,7 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	vec		割り込みベクター
+				@param[in]	vec		割り込みベクター型
 				@return IR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
@@ -758,7 +758,8 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  IER レジスタ
+			@brief  IER レジスタ・クラス
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -978,9 +979,8 @@ namespace device {
 
 			//-------------------------------------------------------------//
 			/*!
-				@brief  許可、不許可 @n
-						※選択型割り込み用
-				@param[in]	vec		割り込みベクター
+				@brief  許可、不許可
+				@param[in]	vec		割り込みベクター型
 				@param[in]	ena		許可／不許可
 			*/
 			//-------------------------------------------------------------//
@@ -999,9 +999,8 @@ namespace device {
 
 			//-------------------------------------------------------------//
 			/*!
-				@brief  許可状態を取得 @n
-						※選択型割り込み用
-				@param[in]	vec		割り込みベクター
+				@brief  許可状態を取得
+				@param[in]	vec		割り込みベクター型
 				@return 許可状態（許可の場合「true」）
 			*/
 			//-------------------------------------------------------------//
@@ -1073,7 +1072,7 @@ namespace device {
 			rw8_t<base + 87> TXI6;		///< SCI6 Tx
 			rw8_t<base + 88> LVD1;		///< LVD1
 			rw8_t<base + 89> LVD2;		///< LVD2
-			rw8_t<base + 89> USBR0;		///< USB0
+			rw8_t<base + 90> USBR0;		///< USB0
 
 			rw8_t<base + 95> IWUNI;		///< IWDT
 			rw8_t<base + 96> WUNI;		///< WDT
@@ -1211,14 +1210,74 @@ namespace device {
 
 			//-------------------------------------------------------------//
 			/*!
-				@brief  []オペレータ @n
-						※選択型割り込み用
-				@param[in]	vec		割り込みベクター
-				@return IR レジスターの参照
+				@brief  []オペレータ
+				@param[in]	vec		標準割り込みベクター型
+				@return IPR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
 			volatile uint8_t& operator [] (VECTOR vec) {
-				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
+				uint32_t idx = 0;
+				switch(vec) {
+				case VECTOR::BUSERR: idx = 0; break;
+				case VECTOR::RAMERR: idx = 0; break;
+				case VECTOR::FIFERR: idx = 1; break;
+				case VECTOR::FRDYI:  idx = 2; break;
+				case VECTOR::SWINT2: idx = 3; break;
+				case VECTOR::SWINT:  idx = 3; break;
+				case VECTOR::CMI0:   idx = 4; break;
+				case VECTOR::CMI1:   idx = 5; break;
+				case VECTOR::CMI2:   idx = 6; break;
+				case VECTOR::CMI3:   idx = 7; break;
+
+				case VECTOR::CMIA0:
+				case VECTOR::CMIB0:
+				case VECTOR::OVI0:
+					idx = static_cast<uint32_t>(VECTOR::CMIA0);
+					break;
+				case VECTOR::CMIA1:
+				case VECTOR::CMIB1:
+				case VECTOR::OVI1:
+					idx = static_cast<uint32_t>(VECTOR::CMIA1);
+					break;
+				case VECTOR::CMIA2:
+				case VECTOR::CMIB2:
+				case VECTOR::OVI2:
+					idx = static_cast<uint32_t>(VECTOR::CMIA2);
+					break;
+				case VECTOR::CMIA3:
+				case VECTOR::CMIB3:
+				case VECTOR::OVI3:
+					idx = static_cast<uint32_t>(VECTOR::CMIA3);
+					break;
+				case VECTOR::CMIA4:
+				case VECTOR::CMIB4:
+				case VECTOR::OVI4:
+					idx = static_cast<uint32_t>(VECTOR::CMIA4);
+					break;
+				case VECTOR::CMIA5:
+				case VECTOR::CMIB5:
+				case VECTOR::OVI5:
+					idx = static_cast<uint32_t>(VECTOR::CMIA5);
+					break;
+				case VECTOR::CMIA6:
+				case VECTOR::CMIB6:
+				case VECTOR::OVI6:
+					idx = static_cast<uint32_t>(VECTOR::CMIA6);
+					break;
+				case VECTOR::CMIA7:
+				case VECTOR::CMIB7:
+				case VECTOR::OVI7:
+					idx = static_cast<uint32_t>(VECTOR::CMIA7);
+					break;
+				case VECTOR::RXF0:
+				case VECTOR::TXF0:
+				case VECTOR::RXM0:
+				case VECTOR::TXM0:
+					idx = static_cast<uint32_t>(VECTOR::RXF0);
+					break;
+				default: idx = static_cast<uint32_t>(vec); break;
+				}
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
 		typedef ipr_t<0x00087300> IPR_;
@@ -1656,58 +1715,6 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef icu_utils::slixr_t<0x00087900, VECTOR, VECTOR_SELA> SLIAR_;
 		static SLIAR_ SLIAR;
-#if 0
-		static rw8_t<0x000879D0> SLIAR208;
-		static rw8_t<0x000879D1> SLIAR209;
-		static rw8_t<0x000879D2> SLIAR210;
-		static rw8_t<0x000879D3> SLIAR211;
-		static rw8_t<0x000879D4> SLIAR212;
-		static rw8_t<0x000879D5> SLIAR213;
-		static rw8_t<0x000879D6> SLIAR214;
-		static rw8_t<0x000879D7> SLIAR215;
-		static rw8_t<0x000879D8> SLIAR216;
-		static rw8_t<0x000879D9> SLIAR217;
-		static rw8_t<0x000879DA> SLIAR218;
-		static rw8_t<0x000879DB> SLIAR219;
-		static rw8_t<0x000879DC> SLIAR220;
-		static rw8_t<0x000879DD> SLIAR221;
-		static rw8_t<0x000879DE> SLIAR222;
-		static rw8_t<0x000879DF> SLIAR223;
-
-		static rw8_t<0x000879E0> SLIAR224;
-		static rw8_t<0x000879E1> SLIAR225;
-		static rw8_t<0x000879E2> SLIAR226;
-		static rw8_t<0x000879E3> SLIAR227;
-		static rw8_t<0x000879E4> SLIAR228;
-		static rw8_t<0x000879E5> SLIAR229;
-		static rw8_t<0x000879E6> SLIAR230;
-		static rw8_t<0x000879E7> SLIAR231;
-		static rw8_t<0x000879E8> SLIAR232;
-		static rw8_t<0x000879E9> SLIAR233;
-		static rw8_t<0x000879EA> SLIAR234;
-		static rw8_t<0x000879EB> SLIAR235;
-		static rw8_t<0x000879EC> SLIAR236;
-		static rw8_t<0x000879ED> SLIAR237;
-		static rw8_t<0x000879EE> SLIAR238;
-		static rw8_t<0x000879EF> SLIAR239;
-
-		static rw8_t<0x000879F0> SLIAR240;
-		static rw8_t<0x000879F1> SLIAR241;
-		static rw8_t<0x000879F2> SLIAR242;
-		static rw8_t<0x000879F3> SLIAR243;
-		static rw8_t<0x000879F4> SLIAR244;
-		static rw8_t<0x000879F5> SLIAR245;
-		static rw8_t<0x000879F6> SLIAR246;
-		static rw8_t<0x000879F7> SLIAR247;
-		static rw8_t<0x000879F8> SLIAR248;
-		static rw8_t<0x000879F9> SLIAR249;
-		static rw8_t<0x000879FA> SLIAR250;
-		static rw8_t<0x000879FB> SLIAR251;
-		static rw8_t<0x000879FC> SLIAR252;
-		static rw8_t<0x000879FD> SLIAR253;
-		static rw8_t<0x000879FE> SLIAR254;
-		static rw8_t<0x000879FF> SLIAR255;
-#endif
 	};
 	typedef icuc_t<void> ICU;
 

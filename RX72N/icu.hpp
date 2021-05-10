@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX66N/RX72N グループ・ICUD 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  割り込みコントローラ（ICUD）
+		@brief  RX66N/RX72N 割り込みコントローラ・テンプレート・クラス（ICUD）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
@@ -22,7 +22,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ベクター・インデックス
+			@brief  通常割り込みベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR : uint8_t {
@@ -271,7 +271,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPIE0・ベクター・インデックス
+			@brief  GROUPIE0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_IE0 : uint8_t {
@@ -281,7 +281,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBE0・ベクター・インデックス
+			@brief  GROUPBE0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 : uint8_t {
@@ -293,7 +293,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL0・ベクター・インデックス
+			@brief  GROUPBL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL0 : uint8_t {
@@ -332,7 +332,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL1・ベクター・インデックス
+			@brief  GROUPBL1・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL1 : uint8_t {
@@ -365,7 +365,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPBL2・ベクター・インデックス
+			@brief  GROUPBL2・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL2 : uint8_t {
@@ -378,7 +378,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPAL0・ベクター・インデックス
+			@brief  GROUPAL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL0 : uint8_t {
@@ -407,7 +407,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUPAL1・ベクター・インデックス
+			@brief  GROUPAL1・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL1 : uint8_t {
@@ -426,7 +426,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込みＡ要因・ベクター・インデックス
+			@brief  選択型割り込みＡ要因・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_SELA : uint8_t {
@@ -535,7 +535,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込みＢ要因・ベクター・インデックス
+			@brief  選択型割り込みＢ要因・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_SELB : uint8_t {
@@ -967,7 +967,7 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	vec		割り込みベクター
+				@param[in]	vec		通常割り込みベクター型
 				@return IR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
@@ -1186,7 +1186,7 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  許可、不許可
-				@param[in]	vec		割り込みベクター
+				@param[in]	vec		通常割り込みベクター型
 				@param[in]	ena		許可／不許可
 			*/
 			//-------------------------------------------------------------//
@@ -1206,7 +1206,7 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  許可状態を取得
-				@param[in]	vec		割り込みベクター
+				@param[in]	vec		通常割り込みベクター型
 				@return 許可状態（許可の場合「true」）
 			*/
 			//-------------------------------------------------------------//
@@ -1411,12 +1411,27 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	vec		割り込みベクター
-				@return IR レジスターの参照
+				@param[in]	vec		標準割り込みベクター型
+				@return IPR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (VECTOR vec) {
-				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
+			volatile uint8_t& operator [] (VECTOR vec) noexcept {
+				uint32_t idx = 0;
+				switch(vec) {
+				case VECTOR::BUSERR: idx = 0; break;
+				case VECTOR::RAMERR: idx = 0; break;
+				case VECTOR::FIFERR: idx = 1; break;
+				case VECTOR::FRDYI:  idx = 2; break;
+				case VECTOR::SWINT2: idx = 3; break;
+				case VECTOR::SWINT:  idx = 3; break;
+				case VECTOR::CMI0:   idx = 4; break;
+				case VECTOR::CMI1:   idx = 5; break;
+				case VECTOR::CMWI0:  idx = 6; break;
+				case VECTOR::CMWI1:  idx = 7; break;
+
+				default: idx = static_cast<uint32_t>(vec); break;
+				}
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
 		typedef ipr_t<0x00087300> IPR_;
