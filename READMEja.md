@@ -6,13 +6,14 @@ Renesas RX Microcontroller
 
 ## 概要
 
- これはルネサス RX マイコンと、そのコンパイラである rx-elf-gcc,g++ によるプログラムです。   
+ これはルネサス RX マイコンと、そのコンパイラである rx-elf-gcc,g++ によるプログラムです。  
+ ※現在、Renesas GNU-RX gcc 8.3.0 をメインに使って開発しています。    
    
  現在は、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
  複数の環境で、開発が出来るようになっています。   
- - 現在サポートされ、動作確認済みデバイスは RX24T、RX66T, RX64M、RX71M, RX65N, RX72T, RX72N となっており、   
+ - 現在サポートされ、動作確認済みデバイスは RX24T、RX66T, RX72T、RX64M、RX71M, RX65N, RX72N となっており、   
  デバイスクラスを日々拡張しています。
- - 今後のサポート予定として、RX72T、RX72M があります。
+ - 今後のサポート予定として、RX72M があります。
  - ディレクトリー構成など日々アップデートしています。
  - RX62N(RX621), RX63T は、現在はサポートしていません。(legacy フォルダーにあります。) 
    
@@ -87,6 +88,7 @@ int main(int argc, char** argv)
 |[/FIRST_sample](./FIRST_sample)|各プラットホーム対応、LED 点滅プログラム|
 |[/SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
 |[/CAN_sample](./CAN_sample)|CAN 通信サンプルプログラム|
+|[/GPTW_sample](./GPTW_sample)|GPTW PWM サンプルプログラム|
 |[/FLASH_sample](./FLASH_sample)|各プラットホーム対応、内臓データフラッシュ操作サンプル|
 |[/RAYTRACER_sample](./RAYTRACER_sample)|レイトレーシング・ベンチマーク|
 |[/SDCARD_sample](./SDCARD_sample)|SD カードの動作サンプル|
@@ -105,7 +107,7 @@ int main(int argc, char** argv)
 
 ## Renesas GNU-RX のインストールと機能紹介
    
-以前の KPIT による GNU ツールチェインのサポートに代わり、[GNU Tools](https://gcc-renesas.com/ja/) が新たに、RX マイコン用 GNU ツールを提供しています。   
+以前の KPIT による GNU ツールチェインのサポートに代わり、[Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/) が新たに、RX マイコン用 GNU ツールを提供しています。   
    
 RX マイコン用 最新（2020/07 現在）GNU ツールチェインとして、   
  - binutils-2.24

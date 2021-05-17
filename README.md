@@ -7,13 +7,14 @@ Renesas RX Microcontroller
 ## Overview
    
 This is a program by Renesas RX microcontroller and its compiler rx-elf-gcc, g++.   
-   
+I am currently using Renesas GNU-RX gcc 8.3.0 as my main development tool.   
+
 Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
 Development is now possible in multiple environments.   
    
-- Currently supported and tested devices are RX24T, RX66T, RX64M, RX65N, RX71M, RX72T, RX72N.   
+- Currently supported and tested devices are RX24T, RX66T, RX72T, RX64M, RX65N, RX71M, RX72N.   
 I extend the device class daily.
-- The RX72T and RX72M are scheduled to be supported in the future.
+- The RX72M are scheduled to be supported in the future.
 - I update it daily including directory configuration.   
 - The RX62N(RX621) and RX63T are not currently supported. (It's in the LEGACY folder.)
    
@@ -88,7 +89,8 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/rxprog](./rxprog)    |Program writing tool to RX microcontroller flash (Windows, OS-X, Linux compatible)|
 |[/FIRST_sample](./FIRST_sample)|LED flashing program for each platform|
 |[/SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
-|[/CAN_sample](./CAN_sample)|RX64M/RX71M/RX66T/RX72N CAN sample program|
+|[/CAN_sample](./CAN_sample)|CAN sample program|
+|[/GPTW_sample](./GPTW_sample)|GPTW PWM sample program|
 |[/FLASH_sample](./FLASH_sample)|Built-in data flash operation sample for each platform|
 |[/RAYTRACER_sample](./RAYTRACER_sample)|For each platform, Ray tracing benchmark|
 |[/SDCARD_sample](./SDCARD_sample)|For each platform, SD card operation sample|
@@ -107,7 +109,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 
 ## Installation and features of Renesas GNU-RX
    
-The former KPIT support for the GNU toolchain has been replaced by [GNU Tools]( https://gcc-renesas.com/) has added a new GNU tools.      
+The former KPIT support for the GNU toolchain has been replaced by [Open Source Tools for Renesas](https://llvm-gcc-renesas.com/en/) has added a new GNU tools.      
    
 As the latest (as of July 2020) GNU toolchain for RX microcontrollers,   
  - binutils-2.24
