@@ -191,7 +191,7 @@ int main(int argc, char** argv)
 	{  // GPTW の開始
 #ifdef INPUT_PHASE
 		// input phase A/B
-		if(gptw_.start_input_phase(GPTW::MODE::PHASE, ORDER_A, ORDER_B)) {
+		if(gptw_.start(GPTW::PHASE_MODE::AB_ENC, ORDER_A, ORDER_B)) {
 			utils::format("GPTW%d start: input phase\n") % GPTW::value_type::CHANNEL_NO;
 			phase_cnt_ = gptw_.get_cnt();
 		} else {
