@@ -77,8 +77,8 @@ CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
 AS_DEFS		=	-misa=v3
-CC_DEFS		=	-misa=v3
-CP_DEFS		=	-misa=v3
+CC_DEFS		=	-misa=v3 -mtfu=intrinsic,mathlib
+CP_DEFS		=	-misa=v3 -mtfu=intrinsic,mathlib
 endif
 
 # Include path for each environment
