@@ -33,11 +33,19 @@ namespace device {
 			PWM_T1,			///< 三角波 PWM 1（谷32ビット転送）
 			PWM_T2,			///< 三角波 PWM 2（山/谷32ビット転送）
 			PWM_T3,			///< 三角波 PWM 3（谷64ビット転送）
+		};
 
-			PHASE,			///< 位相計数（モード１）A/B 相入力（エンコーダー入力）
-			PHASE_P,		///< 位相計数（モード２）A:Positive, B:Directional
-			PHASE_N,		///< 位相計数（モード２）A:Nagative, B:Directional
-			PHASE_PN,		///< 位相計数（モード２）A:Positive/Nagative, B:Directional
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  位相計数型モード型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class PHASE_MODE : uint8_t {
+			AB_ENC,			///< 位相計数（モード１）A/B 相入力（エンコーダー入力）
+			A_POS_B_DIR,	///< 位相計数（モード２）A:Positive, B:Directional
+			A_NEG_B_DIR,	///< 位相計数（モード２）A:Nagative, B:Directional
+			A_TRG_B_DIR,	///< 位相計数（モード２）A:Positive/Nagative, B:Directional
 		};
 
 
@@ -48,17 +56,17 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class  OUTPUT : uint8_t {
-			NONE,	///< 無効
+			NONE,	///< 無効（出力を使用しない）
 
-			A,		///< A を利用
-			B,		///< B を利用
-			AB,		///< AB
+			A,		///< A を利用（GTIOCxA）
+			B,		///< B を利用（GTIOCxB）
+			AB,		///< AB（GTIOCxA, GTIOCxB）
 
-			NA,		///< 反転 A を利用
-			NB,		///< 反転 B を利用
-			NA_B,	///< 反転 A, 正 B を利用
-			A_NB,	///< 正 A, 反転 B を利用
-			NA_NB,	///< 反転 A, 反転 B を利用
+			NA,		///< 反転 A を利用（GTIOCxA#）
+			NB,		///< 反転 B を利用（GTIOCxB#）
+			NA_B,	///< 反転 A, 正 B を利用（GTIOCxA#, GTIOCxB）
+			A_NB,	///< 正 A, 反転 B を利用（GTIOCxA,  GTIOCxB#）
+			NA_NB,	///< 反転 A, 反転 B を利用（GTIOCxA#, GTIOCxB#）
 		};
 	};
 
@@ -115,9 +123,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  基本動作開始
-			@param[in]	mode	動作モード
+			@param[in]	mode	動作モード型
 			@param[in]	out		出力型
-			@param[in]	freq	周期
+			@param[in]	freq	周期（０はエラー）
 			@param[in]	ord_a	ポート候補Ａ
 			@param[in]	ord_b	ポート候補Ｂ
 			@param[in]	ilvl	割り込みレベル（0 なら割り込み無し）
@@ -280,36 +288,61 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  インプットキャプチャ開始
+			@param[in]	ord		ポート候補
+			@param[in]	ilvl	割り込みレベル
+			@return 設定が適正なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(typename port_map_gptw::ORDER ord, uint8_t ilvl = 0) noexcept
+		{
+
+
+
+
+			if(!power_mgr::turn(GPTWn::PERIPHERAL)) {
+				return false;
+			}
+
+
+
+
+			used_ = true;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  位相計数開始
-			@param[in]	mode	位相計数モード
+			@param[in]	mode	位相計数モード型
 			@param[in]	ord_a	ポート候補Ａ
 			@param[in]	ord_b	ポート候補Ｂ
 			@return 設定が適正なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_input_phase(MODE mode, typename port_map_gptw::ORDER ord_a, typename port_map_gptw::ORDER ord_b) noexcept
+		bool start(PHASE_MODE mode, typename port_map_gptw::ORDER ord_a, typename port_map_gptw::ORDER ord_b) noexcept
 		{
 			uint32_t gtupsr = 0;
 			uint32_t gtdnsr = 0;
 			switch(mode) {
-			case MODE::PHASE:
+			case PHASE_MODE::AB_ENC:
 				gtupsr = 0x0000'6900;
 				gtdnsr = 0x0000'9600;
 				break;
-			case MODE::PHASE_P:
+			case PHASE_MODE::A_POS_B_DIR:
 				gtupsr = 0x0000'0200;
 				gtdnsr = 0x0000'0100;
 				break;
-			case MODE::PHASE_N:
+			case PHASE_MODE::A_NEG_B_DIR:
 				gtupsr = 0x0000'0800;
 				gtdnsr = 0x0000'0400;
 				break;
-			case MODE::PHASE_PN:
+			case PHASE_MODE::A_TRG_B_DIR:
 				gtupsr = 0x0000'0A00;
 				gtdnsr = 0x0000'0500;
 				break;
-			default:
-				return false;
 			}
 
 			if(!power_mgr::turn(GPTWn::PERIPHERAL)) {

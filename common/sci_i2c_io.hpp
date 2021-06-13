@@ -34,14 +34,15 @@ namespace device {
 			IDLE,
 
 			START_SEND,		// start send
+			SEND_FIRST,		// send 1st
 			SEND_DATA,		// send data
+			STOP_SEND,		// stop condition
 
 			START_RECV,		// start recv
 			RECV_DATA_PRE,	// recv data pre (first 1)
 			RECV_DATA,		// recv data
-
 			STOP_RECV,		// stop for recv
-			STOP,			// stop condition
+
 		};
 
 		uint8_t		adr_;
@@ -109,8 +110,8 @@ namespace device {
 			case sci_i2c_t::TASK::STOP_RECV:
 				utils::format("STOP_RECV");
 				break;
-			case sci_i2c_t::TASK::STOP:
-				utils::format("STOP");
+			case sci_i2c_t::TASK::STOP_SEND:
+				utils::format("STOP_SEND");
 				break;
 			default:
 				break;
@@ -126,35 +127,48 @@ namespace device {
 			case sci_i2c_t::TASK::IDLE:
 				break;
 			case sci_i2c_t::TASK::START_SEND:
-				SCI::SCR.TEIE = 0;
+				SCI::SIMR3 = SCI::SIMR3.IICSTIF.b(0) |
+							 SCI::SIMR3.IICSCLS.b(0b00) | SCI::SIMR3.IICSDAS.b(0b00);				
 				SCI::TDR = t.adr_ << 1;  // R/W = 0 (write)
-				if(send_.length() > 1) {
-					task_ = sci_i2c_t::TASK::SEND_DATA;
-					SCI::SIMR2.IICACKT = 1;
-					SCI::SCR.TIE = 1;
+				task_ = sci_i2c_t::TASK::SEND_FIRST;
+				break;
+			case sci_i2c_t::TASK::SEND_FIRST:
+				if(SCI::SISR.IICACKR()) {
+					if(send_.length() > 0) {
+						SCI::TDR = send_.get();
+						task_ = sci_i2c_t::TASK::SEND_DATA;
+						break;
+					} else {
+						SCI::SIMR3 = SCI::SIMR3.IICSTPREQ.b(1) |
+								 SCI::SIMR3.IICSCLS.b(0b00) | SCI::SIMR3.IICSDAS.b(0b00);
+						task_ = sci_i2c_t::TASK::STOP_SEND;
+					}
 				} else {
-					task_ = sci_i2c_t::TASK::STOP;
-					SCI::SCR.TEIE = 1;
+					SCI::SIMR3 = SCI::SIMR3.IICSTPREQ.b(1) |
+								 SCI::SIMR3.IICSCLS.b(0b00) | SCI::SIMR3.IICSDAS.b(0b00);
+					task_ = sci_i2c_t::TASK::STOP_SEND;
 				}
 				break;
 			case sci_i2c_t::TASK::SEND_DATA:
 				if(send_.length() > 0) {
 					SCI::TDR = send_.get();
-				}
-				if(send_.length() == 0) {
-					SCI::SCR.TIE = 0;
-					task_ = sci_i2c_t::TASK::STOP;
-					SCI::SCR.TEIE = 1;
-					break;
-				}
-				if(SCI::SISR.IICACKR()) {
-					SCI::SCR.TIE = 0;
-					task_ = sci_i2c_t::TASK::STOP;
-					state_ = static_cast<uint8_t>(ERROR::ACK);
-					SCI::SCR.TEIE = 1;
-					break;
+				} else {
+					SCI::SIMR3 = SCI::SIMR3.IICSTPREQ.b(1) |
+								 SCI::SIMR3.IICSCLS.b(0b00) | SCI::SIMR3.IICSDAS.b(0b00);
+					task_ = sci_i2c_t::TASK::STOP_SEND;
 				}
 				break;
+			case sci_i2c_t::TASK::STOP_SEND:
+				if(t.func_ != nullptr) t.func_();
+				i2c_buff_.get_go();
+				SCI::SIMR3 = SCI::SIMR3.IICSTIF.b(0) |
+							 SCI::SIMR3.IICSCLS.b(0b11) | SCI::SIMR3.IICSDAS.b(0b11);
+				task_ = sci_i2c_t::TASK::IDLE;
+				SCI::SCR.TEIE = 0;
+				SCI::SCR.TIE = 0;
+				break;
+
+
 			case sci_i2c_t::TASK::START_RECV:
 				SCI::TDR = (t.adr_ << 1) | 1;  // R/W = 1 (read)
 				task_ = sci_i2c_t::TASK::RECV_DATA_PRE;
@@ -164,7 +178,7 @@ namespace device {
 			case sci_i2c_t::TASK::RECV_DATA_PRE:
 				if(SCI::SISR.IICACKR() != 0) {
 					SCI::SCR.RIE = 0;
-					task_ = sci_i2c_t::TASK::STOP;
+					task_ = sci_i2c_t::TASK::STOP_RECV;
 					state_ = static_cast<uint8_t>(ERROR::ACK);
 					SCI::SCR.TEIE = 1;
 				} else {
@@ -197,20 +211,6 @@ namespace device {
 						*p++ = recv_.get();
 					}
 				}
-			case sci_i2c_t::TASK::STOP:
-				if(t.func_ != nullptr) t.func_();
-				i2c_buff_.get_go();
-				if(i2c_buff_.length() > 0) {
-					if(i2c_buff_.get_at().dst_ == nullptr) task_ = sci_i2c_t::TASK::START_SEND;
-					else task_ = sci_i2c_t::TASK::START_RECV;
-					SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
-								 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
-					SCI::SCR.TEIE = 1;
-				} else {
-					task_ = sci_i2c_t::TASK::IDLE;
-					SCI::SCR.TEIE = 0;
-				}
-				break;
 
 			default:
 				break;
@@ -233,15 +233,6 @@ namespace device {
 		static INTERRUPT_FUNC void i2c_condition_task_()
 		{
 			i2c_service_();
-		}
-
-
-		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) noexcept
-		{
-			if(level_ > 0) {
-				icu_mgr::set_task(rx_vec, recv_task_);
-				icu_mgr::set_task(tx_vec, send_task_);
-			}
 		}
 
 
@@ -281,9 +272,6 @@ namespace device {
 		}
 
 
-
-
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -319,7 +307,7 @@ namespace device {
 				return false;
 			}
 // 割り込み動作に不具合があるので、強制的にポーリングとする。
-level = 0;
+// level = 0;
 			uint32_t clk = static_cast<uint32_t>(spd);
 			uint32_t brr = F_PCLKB * 8 / clk;
 			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
@@ -362,21 +350,21 @@ level = 0;
 				task_ = sci_i2c_t::TASK::IDLE;
 
 				// RXI, TXI の設定
-				set_vector_(SCI::RX_VEC, SCI::TX_VEC);
-				icu_mgr::set_level(SCI::RX_VEC, level_);
-				icu_mgr::set_level(SCI::TX_VEC, level_);
+				icu_mgr::set_interrupt(SCI::RX_VEC, recv_task_, level_);
+				icu_mgr::set_interrupt(SCI::TX_VEC, send_task_, level_);
 
 				// TEIx (STI interrupt)
 				auto grp = ICU::get_group_vector(SCI::TE_VEC);
-				if(grp == ICU::VECTOR::NONE) {
+				if(grp == ICU::VECTOR::NONE) {  // NONE が返ると通常割り込み
 					// 通常ベクターの場合、割り込み関数を登録、
 					// tev がグループベクターの場合にコンパイルエラーになるので回避
-					icu_mgr::set_level(static_cast<ICU::VECTOR>(SCI::TE_VEC), level_);
 					icu_mgr::set_task(static_cast<ICU::VECTOR>(SCI::TE_VEC), i2c_condition_task_);
+					icu_mgr::set_level(static_cast<ICU::VECTOR>(SCI::TE_VEC), level_);
 				} else {
 					// グループベクターの場合、通常関数を登録
 					icu_mgr::set_level(grp, level_);
 					icu_mgr::install_group_task(SCI::TE_VEC, i2c_service_);
+					utils::format("install group vector for TE (LVL:%d)\n") % static_cast<uint16_t>(level_);
 				}
 			}
 			SCI::SCR = SCI::SCR.RE.b() | SCI::SCR.TE.b();
@@ -409,11 +397,6 @@ level = 0;
 					utils::format("Begin: ");
 					Print(task);
 				}
-//				if(len != trans_len_) {
-//					utils::format("Trans: ");
-//					Print(task);
-//					len = trans_len_;
-//				}
 			}
 			if(state_ != 0) {
 				utils::format("State: %d\n") % static_cast<uint16_t>(state_);
@@ -435,7 +418,7 @@ level = 0;
 		{
 			if(src == nullptr || len == 0) return false;
 
-			if(level_ == 0) {
+			if(level_ == 0) {  // ポーリング動作時
 				if(!i2c_start_()) {
 					error_ = ERROR::START;
 					i2c_stop_();
@@ -472,7 +455,7 @@ level = 0;
 				}
 				if(func != nullptr) func();
 				error_ = ERROR::NONE;
-			} else {
+			} else {  // 割り込み動作時
 				const uint8_t* p = static_cast<const uint8_t*>(src);
 				for(uint32_t i = 0; i < len; ++i) {
 					send_.put(*p);
@@ -489,6 +472,7 @@ level = 0;
 					task_ = sci_i2c_t::TASK::START_SEND;
 					SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
 								 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
+					SCI::SCR.TIE = 1;
 					SCI::SCR.TEIE = 1;
 				}
 			}
@@ -502,7 +486,7 @@ level = 0;
 			@param[in]	adr		I2C アドレス（下位７ビット）
 			@param[in]	dst		受信データ
 			@param[in]	len		受信長
-			@param[in]	func	送信終了関数
+			@param[in]	func	受信終了関数
 			@return 送信正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
@@ -510,7 +494,7 @@ level = 0;
 		{
 			if(dst == nullptr || len == 0) return false;
 
-			if(level_ == 0) {
+			if(level_ == 0) {  // ポーリング動作
 				if(!i2c_start_()) {
 					error_ = ERROR::START;
 					i2c_stop_();
