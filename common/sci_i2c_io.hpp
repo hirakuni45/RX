@@ -307,7 +307,7 @@ namespace device {
 				return false;
 			}
 // 割り込み動作に不具合があるので、強制的にポーリングとする。
-// level = 0;
+level = 0;
 			uint32_t clk = static_cast<uint32_t>(spd);
 			uint32_t brr = F_PCLKB * 8 / clk;
 			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
