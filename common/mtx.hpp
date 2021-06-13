@@ -15,7 +15,7 @@ namespace mtx {
 
 	static inline void deg_sin_cos_(float deg, float& si, float& co) noexcept
 	{
-#ifdef SIG_RX72N
+#if defined(__TFU)
 		__builtin_rx_sincosf(deg  * vtx::deg2rad_f_, &si, &co);
 #else
 		si = std::sin(deg * vtx::deg2rad_f_);

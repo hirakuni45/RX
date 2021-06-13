@@ -132,6 +132,9 @@ namespace device {
 			// ROM キャッシュを有効（標準）
 			device::SYSTEM::ROMCE = 1;
 #endif
+#if defined(__TFU)
+			__init_tfu();
+#endif
 		}
 
 
