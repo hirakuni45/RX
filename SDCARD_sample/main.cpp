@@ -131,7 +131,7 @@ namespace {
 	typedef device::SCI9 SCI_CH;
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< 「０」でＯＮ
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
 	SDC		sdc_;
 
 #elif defined(SIG_RX72N)
@@ -142,7 +142,7 @@ namespace {
 	typedef device::SCI2 SCI_CH;
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
 	SDC		sdc_;
 
 #endif

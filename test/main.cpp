@@ -33,7 +33,8 @@
 
 // #ifdef TFU
 // #define OUT_TPU
-#define OUT_MTU
+// #define OUT_MTU
+#define SCI_I2C
 
 #ifdef OUT_TPU
 #include "common/tpu_io.hpp"
@@ -41,6 +42,11 @@
 
 #ifdef OUT_MTU
 #include "common/mtu_io.hpp"
+#endif
+
+#ifdef SCI_I2C
+#include "common/sci_i2c_io.hpp"
+#include "chip/FT5206.hpp"
 #endif
 
 #if 0
@@ -58,35 +64,35 @@ extern "C" {
 namespace {
 
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
-#elif defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	static const char* system_str_ = { "RX65N" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
-#elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX72N" };
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
-	static const char* system_str_ = { "RX72N" };
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
@@ -105,10 +111,21 @@ namespace {
 
 #ifdef OUT_MTU
 	typedef device::MTU4 MTU;
-	static const auto PSEL = device::port_map_mtu::option::FIFTH;
+	static const auto PSEL = device::port_map_mtu::ORDER::FIFTH;
 	typedef device::mtu_io<MTU, utils::null_task, utils::null_task, PSEL> MTU_IO;
 	MTU_IO	mtu_io_;
 //	typedef device::PORT<device::PORTD, device::bitpos::B1> PD1;
+#endif
+
+#ifdef SCI_I2C
+	// RX72N Envision kit touch panel
+	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+	typedef utils::fixed_fifo<uint8_t, 64> RB64;
+	typedef utils::fixed_fifo<uint8_t, 64> SB64;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
+	FT5206_I2C	ft5206_i2c_;
+	typedef chip::FT5206<FT5206_I2C> TOUCH;
+	TOUCH	touch_(ft5206_i2c_);
 #endif
 
 	typedef utils::command<256> CMD;
@@ -219,7 +236,28 @@ int main(int argc, char** argv)
 	}
 #endif
 
+#ifdef SCI_I2C
+	{  // FT5206 touch screen controller
+		TOUCH::reset<FT5206_RESET>();
+		uint8_t intr_lvl = 1;
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, FT5206_I2C::MODE::MASTER, intr_lvl)) {
+			utils::format("FT5206 I2C Start Fail...\n");
+		}
+		if(!touch_.start()) {
+			utils::format("FT5206 Start Fail...\n");
+		}
+	}
+#endif
+
 	cmd_.set_prompt("# ");
+
+
+	if(0) {
+		float a = 1.999999f;
+		// printf("Value: %5.4f\n", (double)a);
+		utils::format("Value: %8.7f\n") % a;
+	}
+
 
 	uint8_t cnt = 0;
 	while(1) {
@@ -267,6 +305,15 @@ int main(int argc, char** argv)
 		}
 #endif
 
+#ifdef SCI_I2C
+touch_.update();
+		{
+			auto num = touch_.get_touch_num();
+			if(num > 0) {
+				utils::format("Touch num: %d\n") % num;
+			}
+		}
+#endif
 //		PD1::P = cnt & 1;
 
 		++cnt;

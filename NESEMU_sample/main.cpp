@@ -121,7 +121,7 @@ namespace {
 	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
 
 	// RX65N/RX72N Envision Kit の SDHI は、候補３になっている
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDHI;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDHI;
 	SDHI		sdh_;
 
 	// サウンド出力コンテキスト

@@ -29,7 +29,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCIF, class RECV_BUFF, class SEND_BUFF,
-		port_map::option PSEL = port_map::option::FIRST>
+		port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class scif_io {
 
 		static RECV_BUFF recv_;
@@ -393,10 +393,10 @@ brr = 1;
 		}
 	};
 
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
+	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::ORDER PSEL>
 		RECV_BUFF scif_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::recv_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
+	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::ORDER PSEL>
 		SEND_BUFF scif_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::send_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
+	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::ORDER PSEL>
 		volatile bool scif_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::send_stall_;
 }

@@ -103,7 +103,7 @@ namespace {
 	// タッチセンサー「RESET」制御ポート
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 	// タッチセンサー I2C ポート設定
-	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 	#define TOUCH_I2C
 #endif
 
@@ -112,7 +112,7 @@ namespace {
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 // SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
+//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 	SCI		sci_;
 
 #ifdef TOUCH_I2C

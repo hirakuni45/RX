@@ -25,7 +25,7 @@ namespace device {
 		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class QSPI, port_map::option PSEL = port_map::option::FIRST>
+	template <class QSPI, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class qspi_io {
 	public:
 

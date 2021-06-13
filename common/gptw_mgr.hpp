@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・汎用 PWM タイマー（GPTW）マネージャー
+	@brief	RX グループ・汎用 GPTW タイマー・マネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n

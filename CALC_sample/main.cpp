@@ -68,7 +68,7 @@ namespace {
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
     typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
     // RX65N Envision Kit の SDHI ポートは、候補３で指定できる
-    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
     SDC		sdc_;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N" };
@@ -79,7 +79,7 @@ namespace {
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
     // RX72N Envision Kit の SDHI ポートは、候補３で指定できる
-    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
     SDC		sdc_;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };

@@ -784,6 +784,9 @@ namespace device {
 					break;
 				case ORDER::FIFTH:
 					break;
+				default:
+					ret = false;
+					break;
 				}
 				break;
 			case CHANNEL::RB:

@@ -60,7 +60,7 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
-		device::port_map::option::THIRD> SDHI;
+		device::port_map::ORDER::THIRD> SDHI;
 
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
@@ -98,7 +98,7 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;
 	// RX72N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
-		device::port_map::option::THIRD> SDHI;
+		device::port_map::ORDER::THIRD> SDHI;
 
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// SSIE の FIFO サイズの２倍以上（256）

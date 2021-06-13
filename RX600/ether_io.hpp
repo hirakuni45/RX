@@ -119,7 +119,7 @@ namespace device {
 		@param[in]	RXDN	受信バッファ数（標準４）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHRC, class EDMAC, class PHY, port_map::option PSEL, uint32_t TXDN = 4, uint32_t RXDN = 4>
+	template <class ETHRC, class EDMAC, class PHY, port_map::ORDER PSEL, uint32_t TXDN = 4, uint32_t RXDN = 4>
 	class ether_io {
 	public:
 		static const int EMAC_BUFSIZE = 1536;	///< イーサーネット・バッファ最大値
@@ -1250,10 +1250,10 @@ namespace device {
 		}
 	};
 
-	template <class ETHRC, class EDMAC, class PHY, port_map::option PSEL, uint32_t TXDN, uint32_t RXDN>
+	template <class ETHRC, class EDMAC, class PHY, port_map::ORDER PSEL, uint32_t TXDN, uint32_t RXDN>
 		volatile void* ether_io<ETHRC, EDMAC, PHY, PSEL, TXDN, RXDN>::intr_task_ = nullptr;
 
-	template <class ETHRC, class EDMAC, class PHY, port_map::option PSEL, uint32_t TXDN, uint32_t RXDN>
+	template <class ETHRC, class EDMAC, class PHY, port_map::ORDER PSEL, uint32_t TXDN, uint32_t RXDN>
 		volatile bool ether_io<ETHRC, EDMAC, PHY, PSEL, TXDN, RXDN>::mpd_flag_ = false;
 
 }

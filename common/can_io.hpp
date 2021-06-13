@@ -114,7 +114,7 @@ namespace device {
 		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class CAN, class RBF, class TBF, port_map::option PSEL = port_map::option::FIRST>
+	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class can_io : public can_io_def {
 	public:
 
@@ -719,8 +719,8 @@ namespace device {
 		}
 	};
 
-	template <class CAN, class RBF, class TBF, port_map::option PSEL>
+	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL>
 		RBF can_io<CAN, RBF, TBF, PSEL>::rbf_;
-	template <class CAN, class RBF, class TBF, port_map::option PSEL>
+	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL>
 		TBF can_io<CAN, RBF, TBF, PSEL>::tbf_;
 }

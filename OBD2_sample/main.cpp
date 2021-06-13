@@ -56,8 +56,8 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
 	typedef device::CAN1 CAN1_CH;
-	static const auto CAN0_PORT = device::port_map::option::FIRST;
-	static const auto CAN1_PORT = device::port_map::option::FIRST;
+	static const auto CAN0_PORT = device::port_map::ORDER::FIRST;
+	static const auto CAN1_PORT = device::port_map::ORDER::FIRST;
 	#define MULTI
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
@@ -66,8 +66,8 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
 	typedef device::CAN1 CAN1_CH;
-	static const auto CAN0_PORT = device::port_map::option::FIRST;
-	static const auto CAN1_PORT = device::port_map::option::FIRST;
+	static const auto CAN0_PORT = device::port_map::ORDER::FIRST;
+	static const auto CAN1_PORT = device::port_map::ORDER::FIRST;
 	#define MULTI
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
@@ -80,14 +80,14 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
-	static const auto CAN0_PORT = device::port_map::option::FIRST;
+	static const auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	typedef device::CAN1 CAN0_CH;
-	static const auto CAN0_PORT = device::port_map::option::SECOND;
+	static const auto CAN0_PORT = device::port_map::ORDER::SECOND;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
