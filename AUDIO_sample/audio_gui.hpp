@@ -53,7 +53,7 @@ namespace app {
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 		static const uint32_t LCD_ORG = 0x0000'0100;
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
-		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
+		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 #ifdef USE_FAMIPAD
 		// Famicon PAD (CMOS 4021B Shift Register)
 		// 電源は、微小なので、接続を簡単に行う為、ポート出力を電源として利用
@@ -70,7 +70,7 @@ namespace app {
 		typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 		static const uint32_t LCD_ORG = 0x0080'0000;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
-		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 #ifdef USE_FAMIPAD
 		// Famicon PAD (CMOS 4021B Shift Register)
 		// RX72N では、Pmod1 に接続する。
