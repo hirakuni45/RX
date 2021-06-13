@@ -95,7 +95,7 @@ namespace device {
 			@param[in]	opt		ポート選択権
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t lvl, edge egt, port_map::option opt)
+		bool start(uint8_t lvl, edge egt, port_map::ORDER opt)
 		{
 			auto vd = static_cast<uint32_t>(PER) - static_cast<uint32_t>(peripheral::IRQ0);
 			auto vec = static_cast<ICU::VECTOR>(static_cast<uint32_t>(ICU::VECTOR::IRQ0) + vd);

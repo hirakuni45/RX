@@ -63,7 +63,7 @@ namespace {
 	// タッチセンサー「RESET」制御ポート
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 	// タッチセンサー I2C ポート設定
-	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
@@ -98,7 +98,7 @@ namespace {
 	// タッチセンサー「RESET」制御ポート
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 	// タッチセンサー I2C ポート設定
-	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（2048）
 	// SSIE の FIFO サイズの２倍以上（256）
@@ -169,7 +169,7 @@ namespace {
 #endif
 
 	// RX65N/RX72N Envision Kit の SDHI は、候補３になっている
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDHI;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDHI;
 	SDHI		sdh_;
 
 	// サウンド出力コンテキスト
