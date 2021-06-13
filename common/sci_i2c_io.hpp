@@ -65,7 +65,7 @@ namespace device {
 		@param[in]	PSEL	ポート選択
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST>
+	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class sci_i2c_io : public i2c_base {
 	public:
 
@@ -302,7 +302,7 @@ namespace device {
 		bool start(SPEED spd, MODE mode, uint8_t level = 0) noexcept
 		{
 			// I2C オプションが無い場合エラー
-			if(PSEL == port_map::option::FIRST_I2C || PSEL == port_map::option::SECOND_I2C || PSEL == port_map::option::THIRD_I2C) {
+			if(PSEL == port_map::ORDER::FIRST_I2C || PSEL == port_map::ORDER::SECOND_I2C || PSEL == port_map::ORDER::THIRD_I2C) {
 			} else {
 				return false;
 			}
@@ -561,14 +561,14 @@ namespace device {
 	};
 
 	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
 		RBF sci_i2c_io<SCI, RBF, SBF, PSEL>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
 		SBF sci_i2c_io<SCI, RBF, SBF, PSEL>::send_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
 		volatile sci_i2c_t::TASK sci_i2c_io<SCI, RBF, SBF, PSEL>::task_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
 		volatile uint8_t sci_i2c_io<SCI, RBF, SBF, PSEL>::state_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
 		I2C_BUFF sci_i2c_io<SCI, RBF, SBF, PSEL>::i2c_buff_;
 }

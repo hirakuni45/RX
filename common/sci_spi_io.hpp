@@ -28,7 +28,7 @@ namespace device {
 		@param[in]	PSEL	ポート選択
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST>
+	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class sci_spi_io {
 
 		static RBF	recv_;
@@ -232,8 +232,8 @@ namespace device {
 	};
 
 	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
 		RBF sci_spi_io<SCI, RBF, SBF, PSEL>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
 		SBF sci_spi_io<SCI, RBF, SBF, PSEL>::send_;
 }

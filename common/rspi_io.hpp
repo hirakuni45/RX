@@ -20,7 +20,7 @@ namespace device {
 		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RSPI, port_map::option PSEL = port_map::option::FIRST>
+	template <class RSPI, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class rspi_io {
 	public:
 

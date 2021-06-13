@@ -53,7 +53,7 @@ namespace device {
 		@param[in]	HCTL	半二重通信制御ポート（for RS-485）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST, class HCTL = NULL_PORT>
+	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, class HCTL = NULL_PORT>
 	class sci_io {
 	public:
 		typedef SCI sci_type;
@@ -479,14 +479,14 @@ namespace device {
 	};
 
 	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
 		RBF sci_io<SCI, RBF, SBF, PSEL, HCTL>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
 		SBF sci_io<SCI, RBF, SBF, PSEL, HCTL>::send_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
 		bool sci_io<SCI, RBF, SBF, PSEL, HCTL>::soft_flow_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
 		volatile bool sci_io<SCI, RBF, SBF, PSEL, HCTL>::stop_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
 		volatile uint16_t sci_io<SCI, RBF, SBF, PSEL, HCTL>::errc_;
 }
