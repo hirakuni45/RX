@@ -39,7 +39,7 @@ namespace {
 	SCI			sci_;
 
 	// QSPI B グループ
-//	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+//	typedef device::qspi_io<device::QSPI, device::port_map::ORDER::SECOND> QSPI;
 //	QSPI		qspi_;
 
 	typedef utils::command<256> CMD;

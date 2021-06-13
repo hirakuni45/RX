@@ -55,7 +55,7 @@ namespace {
 #ifdef USE_SDHI
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
-		device::port_map::option::THIRD> SDHI;
+		device::port_map::ORDER::THIRD> SDHI;
 	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
@@ -104,7 +104,7 @@ namespace {
 	typedef utils::fixed_fifo<uint8_t, 64> RB6;
 	typedef utils::fixed_fifo<uint8_t, 64> SB6;
 	typedef device::sci_i2c_io<device::SCI6, RB6, SB6,
-		device::port_map::option::FIRST_I2C> FT5206_I2C;
+		device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 
 	FT5206_I2C	ft5206_i2c_;
 	typedef chip::FT5206<FT5206_I2C> FT5206;

@@ -24,10 +24,10 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ポート・マッピング・オプション型
+			@brief  ポート・マッピング・オーダー型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class option : uint8_t {
+		enum class ORDER : uint8_t {
 			BYPASS,		///< ポートマップの設定をバイパスする場合
 			FIRST,		///< 第１候補
 			SECOND,		///< 第２候補
@@ -197,11 +197,11 @@ namespace device {
 		}
 
 
-		static bool sub_can_(option opt, bool enable)
+		static bool sub_can_(ORDER opt, bool enable)
 		{
 			uint8_t sel = enable ? 0b10000 : 0;
 			switch(opt) {
-			case option::FIRST:
+			case ORDER::FIRST:
 				// PE0/CRX0 (22/144) (17/100)
 				// PD7/CTX0 (23/144) (18/100)
 				PORTE::PMR.B0 = 0;
@@ -211,7 +211,7 @@ namespace device {
 				PORTE::PMR.B0 = enable;
 				PORTD::PMR.B7 = enable;
 				break;
-			case option::SECOND:
+			case ORDER::SECOND:
 				// PB6/CRX0 (40/144) (27/100)
 				// PB5/CTX0 (41/144) (28/100)
 				PORTB::PMR.B6 = 0;
@@ -221,7 +221,7 @@ namespace device {
 				PORTB::PMR.B6 = enable;
 				PORTB::PMR.B5 = enable;
 				break;
-			case option::THIRD:
+			case ORDER::THIRD:
 				// PA1/CRX0 (58/144) (40/100)
 				// PA0/CTX0 (59/144) (41/100)
 				PORTA::PMR.B1 = 0;
@@ -231,7 +231,7 @@ namespace device {
 				PORTA::PMR.B1 = enable;
 				PORTA::PMR.B0 = enable;
 				break;
-			case option::FOURTH:
+			case ORDER::FOURTH:
 				// P23/CTX0 (96/144) (66/100)
 				// P22/CRX0 (97/144) (67/100)
 				PORT2::PMR.B3 = 0;
@@ -241,7 +241,7 @@ namespace device {
 				PORT2::PMR.B3 = enable;
 				PORT2::PMR.B2 = enable;
 				break;
-			case option::_5TH:
+			case ORDER::_5TH:
 				// PF3/CRX0 (31/144)
 				// PF2/CTX0 (32/144)
 				PORTF::PMR.B3 = 0;
@@ -251,7 +251,7 @@ namespace device {
 				PORTF::PMR.B3 = enable;
 				PORTF::PMR.B2 = enable;
 				break;
-			case option::_6TH:
+			case ORDER::_6TH:
 				// PA7/CRX0 (52/144)
 				// PA6/CTX0 (53/144)
 				PORTA::PMR.B7 = 0;
@@ -261,7 +261,7 @@ namespace device {
 				PORTA::PMR.B7 = enable;
 				PORTA::PMR.B6 = enable;
 				break;
-			case option::_7TH:
+			case ORDER::_7TH:
 				// PC6/CRX0 (62/144)
 				// PC5/CTX0 (63/144)
 				PORTC::PMR.B6 = 0;
@@ -287,9 +287,9 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral per, bool ena = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, bool ena = true, ORDER opt = ORDER::FIRST) noexcept
 		{
-			if(opt == option::BYPASS) return false;
+			if(opt == ORDER::BYPASS) return false;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -297,9 +297,9 @@ namespace device {
 			bool ret = false;
 			if(per == peripheral::CAN0) {
 				ret = sub_can_(opt, ena);
-			} else if(opt == option::FIRST) {
+			} else if(opt == ORDER::FIRST) {
 				ret = sub_1st_(per, ena);
-			} else if(opt == option::SECOND) {
+			} else if(opt == ORDER::SECOND) {
 				ret = sub_2nd_(per, ena);
 			}
 
@@ -319,7 +319,7 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, channel ch, bool ena = true, option opt = option::FIRST)
+		static bool turn(peripheral t, channel ch, bool ena = true, ORDER opt = ORDER::FIRST)
 			noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
@@ -367,12 +367,12 @@ namespace device {
 					break;
 				case channel::CLK_AB:
 					sel = ena ? 0b00010 : 0;
-					if(opt == option::FIRST) {
+					if(opt == ORDER::FIRST) {
 						MPC::P33PFS.PSEL = sel;
 						PORT3::PMR.B3 = ena;
 						MPC::P32PFS.PSEL = sel;
 						PORT3::PMR.B2 = ena;
-					} else if(opt == option::SECOND) {
+					} else if(opt == ORDER::SECOND) {
 						MPC::P21PFS.PSEL = sel;
 						PORT2::PMR.B1 = ena;
 						MPC::P20PFS.PSEL = sel;
@@ -399,12 +399,12 @@ namespace device {
 					break;
 				case channel::CLK_AB:
 					sel = ena ? 0b00010 : 0;
-					if(opt == option::FIRST) {
+					if(opt == ORDER::FIRST) {
 						MPC::P33PFS.PSEL = sel;  // 
 						PORT3::PMR.B3 = ena;
 						MPC::P32PFS.PSEL = sel;
 						PORT3::PMR.B2 = ena;
-					} else if(opt == option::SECOND) {
+					} else if(opt == ORDER::SECOND) {
 						MPC::P21PFS.PSEL = sel;
 						PORT2::PMR.B1 = ena;
 						MPC::P20PFS.PSEL = sel;
@@ -415,17 +415,17 @@ namespace device {
 					break;
 				case channel::CLK_CD:
 					sel = ena ? 0b00010 : 0;
-					if(opt == option::FIRST) {
+					if(opt == ORDER::FIRST) {
 						MPC::P31PFS.PSEL = sel;
 						PORT3::PMR.B1 = ena;
 						MPC::P30PFS.PSEL = sel;
 						PORT3::PMR.B0 = ena;
-					} else if(opt == option::SECOND) {
+					} else if(opt == ORDER::SECOND) {
 						MPC::P11PFS.PSEL = sel;
 						PORT1::PMR.B1 = ena;
 						MPC::P10PFS.PSEL = sel;
 						PORT1::PMR.B0 = ena;
-					} else if(opt == option::THIRD) {
+					} else if(opt == ORDER::THIRD) {
 						MPC::PE4PFS.PSEL = sel;
 						PORTE::PMR.B4 = ena;
 						MPC::PE3PFS.PSEL = sel;

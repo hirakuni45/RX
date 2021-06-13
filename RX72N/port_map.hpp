@@ -25,10 +25,10 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ポート・マッピング・オプション型
+			@brief  ポート・マッピング・オーダー型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class option : uint8_t {
+		enum class ORDER : uint8_t {
 			BYPASS,		///< ポートマップの設定をバイパスする場合
 			FIRST,		///< 第１候補 (XXX-A グループ)
 			SECOND,		///< 第２候補 (XXX-B グループ)
@@ -61,14 +61,14 @@ namespace device {
 
 	private:
 
-		static bool sub_1st_(peripheral t, bool enable, option opt)
+		static bool sub_1st_(peripheral t, bool enable, ORDER opt)
 		{
 			bool ret = true;
 
 			bool i2c = false;
 			bool spi = false;
-			if(opt == option::FIRST_I2C) i2c = true;
-			else if(opt == option::FIRST_SPI) spi = true;
+			if(opt == ORDER::FIRST_I2C) i2c = true;
+			else if(opt == ORDER::FIRST_SPI) spi = true;
 
 			switch(t) {
 			case peripheral::USB0:
@@ -741,14 +741,14 @@ namespace device {
 		}
 
 
-		static bool sub_2nd_(peripheral t, bool enable, option opt)
+		static bool sub_2nd_(peripheral t, bool enable, ORDER opt)
 		{
 			bool ret = true;
 
 			bool i2c = false;
 			bool spi = false;
-			if(opt == option::SECOND_I2C) i2c = true;
-			else if(opt == option::SECOND_SPI) spi = true;
+			if(opt == ORDER::SECOND_I2C) i2c = true;
+			else if(opt == ORDER::SECOND_SPI) spi = true;
 
 			switch(t) {
 			case peripheral::SCI0:
@@ -926,14 +926,14 @@ namespace device {
 		}
 
 
-		static bool sub_3rd_(peripheral t, bool enable, option opt)
+		static bool sub_3rd_(peripheral t, bool enable, ORDER opt)
 		{
 			bool ret = true;
 
 			bool i2c = false;
 			bool spi = false;
-			if(opt == option::THIRD_I2C) i2c = true;
-			else if(opt == option::THIRD_SPI) spi = true;
+			if(opt == ORDER::THIRD_I2C) i2c = true;
+			else if(opt == ORDER::THIRD_SPI) spi = true;
 
 			switch(t) {
 			case peripheral::SCI6:
@@ -1105,17 +1105,17 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_sdhi(sdhi_situation sit, option opt = option::FIRST) noexcept
+		static bool turn_sdhi(sdhi_situation sit, ORDER opt = ORDER::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = 0;
 			switch(opt) {
-			case option::FIRST:
+			case ORDER::FIRST:
 				ret = sdhi_1st_(sit);
 				break;
-			case option::THIRD:
+			case ORDER::THIRD:
 				ret = sdhi_3rd_(sit);
 				break;
 			default:
@@ -1134,14 +1134,14 @@ namespace device {
 			@return SDHI クロック・ポートの状態
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool probe_sdhi_clock(option opt) noexcept
+		static bool probe_sdhi_clock(ORDER opt) noexcept
 		{
 			bool ret = 0;
 			switch(opt) {
-			case option::FIRST:
+			case ORDER::FIRST:
 				ret = PORT7::PIDR.B7();
 				break;
-			case option::THIRD:
+			case ORDER::THIRD:
 				ret = PORT2::PIDR.B1();
 				break;
 			default:
@@ -1160,28 +1160,28 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, bool ena = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, bool ena = true, ORDER opt = ORDER::FIRST) noexcept
 		{
-			if(opt == option::BYPASS) return false;
+			if(opt == ORDER::BYPASS) return false;
 
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
 			switch(opt) {
-			case option::FIRST:
-			case option::FIRST_I2C:
-			case option::FIRST_SPI:
+			case ORDER::FIRST:
+			case ORDER::FIRST_I2C:
+			case ORDER::FIRST_SPI:
 				ret = sub_1st_(per, ena, opt);
 				break;
-			case option::SECOND:
-			case option::SECOND_I2C:
-			case option::SECOND_SPI:
+			case ORDER::SECOND:
+			case ORDER::SECOND_I2C:
+			case ORDER::SECOND_SPI:
 				ret = sub_2nd_(per, ena, opt);
 				break;
-			case option::THIRD:
-			case option::THIRD_I2C:
-			case option::THIRD_SPI:
+			case ORDER::THIRD:
+			case ORDER::THIRD_I2C:
+			case ORDER::THIRD_SPI:
 				ret = sub_3rd_(per, ena, opt);
 				break;
 			default:

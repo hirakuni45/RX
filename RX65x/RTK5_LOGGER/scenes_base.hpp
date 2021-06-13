@@ -92,7 +92,7 @@ namespace app {
 		typedef utils::fixed_fifo<uint8_t, 64> RECV6_BUFF;
 		typedef utils::fixed_fifo<uint8_t, 64> SEND6_BUFF;
 		typedef device::sci_i2c_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
-				device::port_map::option::FIRST_I2C> FT5206_I2C;
+				device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 #endif
 		// FT5206 touch device
 		typedef chip::FT5206<FT5206_I2C> TOUCH;
@@ -111,7 +111,7 @@ namespace app {
 #ifdef USE_SDHI
 		// RX65N Envision Kit の SDHI ポートは、候補３になっている
 		typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
-			device::port_map::option::THIRD> SDHI;
+			device::port_map::ORDER::THIRD> SDHI;
 #else
 		// Soft SDC 用　SPI 定義（SPI）
 		typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
@@ -213,7 +213,7 @@ namespace app {
 		// GPS 専用シリアル定義
 		typedef utils::fixed_fifo<char, 2048>  G_REB;
 		typedef utils::fixed_fifo<char, 512> G_SEB;
-		typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::option::SECOND> GPS_S;
+		typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::ORDER::SECOND> GPS_S;
 
 		typedef utils::nmea_dec<GPS_S> NMEA;
 

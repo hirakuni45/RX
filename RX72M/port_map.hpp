@@ -28,7 +28,7 @@ namespace device {
 			@brief  ポート・マッピング・オプション型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class option : uint8_t {
+		enum class ORDER : uint8_t {
 			FIRST,		///< 第１候補 (XXX-A グループ)
 			SECOND,		///< 第２候補 (XXX-B グループ)
 			THIRD,		///< 第３候補 (XXX-C グループ)
@@ -81,14 +81,14 @@ namespace device {
 
 	private:
 
-		static bool sub_1st_(peripheral t, bool enable, option opt)
+		static bool sub_1st_(peripheral t, bool enable, ORDER opt)
 		{
 			bool ret = true;
 
 			bool i2c = false;
 			bool spi = false;
-			if(opt == option::FIRST_I2C || opt == option::SECOND_I2C) i2c = true;
-			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
+			if(opt == ORDER::FIRST_I2C || opt == ORDER::SECOND_I2C) i2c = true;
+			else if(opt == ORDER::FIRST_SPI || opt == ORDER::SECOND_SPI) spi = true;
 
 			switch(t) {
 			case peripheral::USB0:
@@ -711,14 +711,14 @@ namespace device {
 		}
 
 
-		static bool sub_2nd_(peripheral t, bool enable, option opt)
+		static bool sub_2nd_(peripheral t, bool enable, ORDER opt)
 		{
 			bool ret = true;
 
 			bool i2c = false;
 			bool spi = false;
-			if(opt == option::FIRST_I2C || opt == option::SECOND_I2C) i2c = true;
-			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
+			if(opt == ORDER::FIRST_I2C || opt == ORDER::SECOND_I2C) i2c = true;
+			else if(opt == ORDER::FIRST_SPI || opt == ORDER::SECOND_SPI) spi = true;
 
 			switch(t) {
 			case peripheral::SCI0:
@@ -1060,17 +1060,17 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_sdhi(sdhi_situation sit, option opt = option::FIRST) noexcept
+		static bool turn_sdhi(sdhi_situation sit, ORDER opt = ORDER::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = 0;
 			switch(opt) {
-			case option::FIRST:
+			case ORDER::FIRST:
 				ret = sdhi_1st_(sit);
 				break;
-			case option::THIRD:
+			case ORDER::THIRD:
 				ret = sdhi_3rd_(sit);
 				break;
 			default:
@@ -1089,14 +1089,14 @@ namespace device {
 			@return SDHI クロック・ポートの状態
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool probe_sdhi_clock(option opt) noexcept
+		static bool probe_sdhi_clock(ORDER opt) noexcept
 		{
 			bool ret = 0;
 			switch(opt) {
-			case option::FIRST:
+			case ORDER::FIRST:
 				ret = PORT7::PIDR.B7();
 				break;
-			case option::THIRD:
+			case ORDER::THIRD:
 				ret = PORT2::PIDR.B1();
 				break;
 			default:
@@ -1115,21 +1115,21 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, bool ena = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, bool ena = true, ORDER opt = ORDER::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
 			switch(opt) {
-			case option::FIRST:
-			case option::FIRST_I2C:
-			case option::FIRST_SPI:
+			case ORDER::FIRST:
+			case ORDER::FIRST_I2C:
+			case ORDER::FIRST_SPI:
 				ret = sub_1st_(per, ena, opt);
 				break;
-			case option::SECOND:
-			case option::SECOND_I2C:
-			case option::SECOND_SPI:
+			case ORDER::SECOND:
+			case ORDER::SECOND_I2C:
+			case ORDER::SECOND_SPI:
 				ret = sub_2nd_(per, ena, opt);
 				break;
 			default:
@@ -1152,7 +1152,7 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, channel ch, bool ena = true, option opt = option::FIRST)
+		static bool turn(peripheral per, channel ch, bool ena = true, ORDER opt = ORDER::FIRST)
 			noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
@@ -1200,12 +1200,12 @@ namespace device {
 					break;
 				case channel::CLK_AB:
 					sel = ena ? 0b00010 : 0;
-					if(opt == option::FIRST) {
+					if(opt == ORDER::FIRST) {
 						MPC::P33PFS.PSEL = sel;
 						PORT3::PMR.B3 = ena;
 						MPC::P32PFS.PSEL = sel;
 						PORT3::PMR.B2 = ena;
-					} else if(opt == option::SECOND) {
+					} else if(opt == ORDER::SECOND) {
 						MPC::P21PFS.PSEL = sel;
 						PORT2::PMR.B1 = ena;
 						MPC::P20PFS.PSEL = sel;
@@ -1232,12 +1232,12 @@ namespace device {
 					break;
 				case channel::CLK_AB:
 					sel = ena ? 0b00010 : 0;
-					if(opt == option::FIRST) {
+					if(opt == ORDER::FIRST) {
 						MPC::P33PFS.PSEL = sel;  // 
 						PORT3::PMR.B3 = ena;
 						MPC::P32PFS.PSEL = sel;
 						PORT3::PMR.B2 = ena;
-					} else if(opt == option::SECOND) {
+					} else if(opt == ORDER::SECOND) {
 						MPC::P21PFS.PSEL = sel;
 						PORT2::PMR.B1 = ena;
 						MPC::P20PFS.PSEL = sel;
@@ -1248,17 +1248,17 @@ namespace device {
 					break;
 				case channel::CLK_CD:
 					sel = ena ? 0b00010 : 0;
-					if(opt == option::FIRST) {
+					if(opt == ORDER::FIRST) {
 						MPC::P31PFS.PSEL = sel;
 						PORT3::PMR.B1 = ena;
 						MPC::P30PFS.PSEL = sel;
 						PORT3::PMR.B0 = ena;
-					} else if(opt == option::SECOND) {
+					} else if(opt == ORDER::SECOND) {
 						MPC::P11PFS.PSEL = sel;
 						PORT1::PMR.B1 = ena;
 						MPC::P10PFS.PSEL = sel;
 						PORT1::PMR.B0 = ena;
-					} else if(opt == option::THIRD) {
+					} else if(opt == ORDER::THIRD) {
 						MPC::PE4PFS.PSEL = sel;
 						PORTE::PMR.B4 = ena;
 						MPC::PE3PFS.PSEL = sel;
