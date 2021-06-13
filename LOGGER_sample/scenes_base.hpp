@@ -76,7 +76,7 @@ namespace app {
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 		static const uint32_t LCD_ORG = 0x0000'0100;
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
-        typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
+        typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 #elif defined(SIG_RX72N)
 		typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 
@@ -84,7 +84,7 @@ namespace app {
         typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
         static const uint32_t LCD_ORG = 0x0080'0000;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
-        typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+        typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 #endif
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
@@ -199,7 +199,7 @@ namespace app {
 		// GPS 専用シリアル定義
 		typedef utils::fixed_fifo<char, 2048>  G_REB;
 		typedef utils::fixed_fifo<char, 512> G_SEB;
-		typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::option::SECOND> GPS_S;
+		typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::ORDER::SECOND> GPS_S;
 
 		typedef utils::nmea_dec<GPS_S> NMEA;
 

@@ -40,7 +40,7 @@ namespace fatfs {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SDHI, class POW, class WPRT = device::NULL_PORT,
-		device::port_map::option PSEL = device::port_map::option::FIRST>
+		device::port_map::ORDER PSEL = device::port_map::ORDER::FIRST>
 	class sdhi_io {
 
 //		typedef utils::format debug_format;
@@ -994,6 +994,6 @@ namespace fatfs {
 	};
 
 	// テンプレート関数、実態の定義
-	template <class SDHI, class POW, class WPRT, device::port_map::option PSEL>
+	template <class SDHI, class POW, class WPRT, device::port_map::ORDER PSEL>
 		volatile uint32_t sdhi_io<SDHI, POW, WPRT, PSEL>::i_count_ = 0;
 }

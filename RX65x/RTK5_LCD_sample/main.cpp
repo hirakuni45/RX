@@ -72,7 +72,7 @@ namespace {
 
 #ifdef USE_SDHI
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
-		device::port_map::option::THIRD> SDHI;
+		device::port_map::ORDER::THIRD> SDHI;
 	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
@@ -127,7 +127,7 @@ namespace {
 	typedef utils::fixed_fifo<uint8_t, 64> RECV6_BUFF;
 	typedef utils::fixed_fifo<uint8_t, 64> SEND6_BUFF;
 	typedef device::sci_i2c_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
-			device::port_map::option::FIRST_I2C> FT5206_I2C;
+			device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 #endif
 	FT5206_I2C	ft5206_i2c_;
 	typedef chip::FT5206<FT5206_I2C> FT5206;
@@ -149,7 +149,7 @@ namespace {
 	TGL			tgl_(render_);
 
 	// QSPI B グループ
-//	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+//	typedef device::qspi_io<device::QSPI, device::port_map::ORDER::SECOND> QSPI;
 //	QSPI		qspi_;
 
 	typedef utils::command<256> CMD;

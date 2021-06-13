@@ -49,14 +49,14 @@ namespace {
 	// SDHI 関係定義（RX65N Envision Kit の SDHI ポートは、候補３で指定できる）
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
     typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
-    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
 
 	// GLCDC 関係定義
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	static const uint32_t LCD_ORG = 0x0000'0100;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
-	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 
 #elif defined(SIG_RX72N)
 	/// RX72N Envision Kit
@@ -68,14 +68,14 @@ namespace {
 	// SDHI 関係定義（RX72N Envision Kit の SDHI ポートは、候補３で指定できる）
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
-    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
 
 	// GLCDC 関係定義
 	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 	static const uint32_t LCD_ORG = 0x0080'0000;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
-	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 
 #endif
 

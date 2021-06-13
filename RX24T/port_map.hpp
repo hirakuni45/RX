@@ -25,10 +25,10 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ポート・マッピング・オプション型
+			@brief  ポート・マッピング・オーダー型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class option : uint8_t {
+		enum class ORDER : uint8_t {
 			BYPASS,		///< ポートマップの設定をバイパスする場合
 			FIRST,		///< 第１候補 (XXX-A グループ)
 			SECOND,		///< 第２候補 (XXX-B グループ)
@@ -209,17 +209,17 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, bool f = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral t, bool f = true, ORDER opt = ORDER::FIRST) noexcept
 		{
-			if(opt == option::BYPASS) return false;
+			if(opt == ORDER::BYPASS) return false;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
-			if(opt == option::FIRST) {
+			if(opt == ORDER::FIRST) {
 				ret = sub_1st_(t, f);
-			} else if(opt == option::SECOND) {
+			} else if(opt == ORDER::SECOND) {
 				ret = sub_2nd_(t, f);
 			}
 

@@ -52,7 +52,7 @@ namespace {
 	// Ethernet PHY device
     typedef chip::phy_base<ETHERC, chip::phy_device::LAN8720, chip::phy_interface::RMII> PHY;
 	// Ethernet MAC device
-    typedef device::ether_io<ETHERC, EDMAC, PHY, device::port_map::option::FIRST_RMII> ETHD;
+    typedef device::ether_io<ETHERC, EDMAC, PHY, device::port_map::ORDER::FIRST_RMII> ETHD;
 #elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M" };
 	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
@@ -171,7 +171,7 @@ extern "C" {
 		cycle of the idle task.  It must *NOT* attempt to block.  In this case the
 		idle task just queries the amount of FreeRTOS heap that remains.  See the
 		memory management section on the http://www.FreeRTOS.org web site for memory
-		management options.  If there is a lot of heap memory free then the
+		management ORDERs.  If there is a lot of heap memory free then the
 		configTOTAL_HEAP_SIZE value in FreeRTOSConfig.h can be reduced to free up
 		RAM. */
 ///		xFreeHeapSpace = xPortGetFreeHeapSize();
@@ -245,9 +245,9 @@ extern "C" {
 	}
 
 #if 0
-	/* DHCP has an option for clients to register their hostname.  It doesn't
+	/* DHCP has an ORDER for clients to register their hostname.  It doesn't
 	 * have much use, except that a device can be found in a router along with its
-	 * name. If this option is used the callback below must be provided by the
+	 * name. If this ORDER is used the callback below must be provided by the
 	 * application writer to return a const string, denoting the device's name. */
 	/* Typically this function is defined in a user module. */
 	const char* pcApplicationHostnameHook( void )

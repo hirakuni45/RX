@@ -37,7 +37,7 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< '0'でＯＮ
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	// RX65N Envision Kit の SDHI ポートは、候補３で指定できる。
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
 #elif defined(SIG_RX72N)
 	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
@@ -45,7 +45,7 @@ namespace {
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;  ///< '1'でＯＮ
 	typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
 	// RX72N Envision Kit の SDHI ポートは、候補３で指定できる
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
 #endif
 	typedef device::sci_io<SCI_CH, REB, SEB> SCI;
 	SCI			sci_;
@@ -53,7 +53,7 @@ namespace {
 	SDC			sdc_;
 
 	// QSPI B グループ
-//	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+//	typedef device::qspi_io<device::QSPI, device::port_map::ORDER::SECOND> QSPI;
 //	QSPI		qspi_;
 
 	typedef utils::command<256> CMD;
