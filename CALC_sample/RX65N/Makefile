@@ -37,10 +37,7 @@ USER_LIBS	=	supc++ mpfr gmp drw2d
 
 LDSCRIPT	=	../../RX65x/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX65N \
-				F_ICLK=120000000 \
-				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
-				F_FCLK=60000000 F_BCLK=120000000
+USER_DEFS	=	SIG_RX65N
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
