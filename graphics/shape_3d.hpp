@@ -77,6 +77,40 @@ namespace graphics {
   	    	}
 	    }
 
+#if 0
+		void create_dome_vertex_(const vtx::fvtx& rad, uint32_t div)
+		{
+			divide_ = div;
+			radius_ = rad;
+
+			uint32_t qd = div / 4;
+			vertices_.resize(div * qd + 1);
+			vertices_.clear();
+
+			float a = 0.0f;
+			float b = 0.0f;
+			float d = vtx::get_pi<float>() * 2.0f / static_cast<float>(div);
+			for(uint32_t j = 0; j <= qd; ++j) {
+				for(uint32_t i = 0; i < div; ++i) {
+					vertex v;
+					v.position.x = std::cos(a) * std::cos(b) * rad.x;
+					v.position.y = std::sin(a) * std::cos(b) * rad.y;
+					v.position.z = std::sin(b) * rad.z;
+					v.normal = vtx::normalize(v.position);
+					vtx::fpos uv(std::cos(a), std::sin(a));
+					uv *= static_cast<float>(qd - j) / static_cast<float>(qd);
+					uv += vtx::fpos(1.0f);
+					v.uv = uv * 0.5f;
+					vertices_.push_back(v);
+					if(j == qd) {
+						break;
+					}
+					a += d;
+				}
+				b += d;
+			}
+		}
+#endif
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -109,5 +143,31 @@ namespace graphics {
         {
             draw_box_(size, PTYPE::LINE_LOOP);
         }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	塗りつぶされた球の描画
+            @param[in] rad		半径
+            @param[in] div		分割数（最小８）
+		*/
+		//-----------------------------------------------------------------//
+		void SolidSphere(const vtx::fvtx& rad, uint32_t div)
+		{
+			if(rad.x <= 0.0f || rad.y <= 0.0f || rad.z <= 0.0f) return;
+
+			if(div < 8) div = 8;
+#if 0
+			create_dome_vertex_(rad, div);
+			for(uint32_t i = div; i < vertices_.size(); ++i) {
+				auto v = vertices_[i];
+				v.position.z = -v.position.z;
+				v.normal = vtx::normalize(v.position);
+				vertices_.push_back(v);
+			}
+			make_triangle_sphere_();
+			gen_glbuffer_();
+#endif
+		}
     };
 }
