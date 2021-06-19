@@ -43,7 +43,6 @@ namespace {
 
 	static const char* sys_msg_ = { "RX65N Envision Kit" };
 
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 
@@ -77,7 +76,6 @@ namespace {
 
 	static const char* sys_msg_ = { "RX72N Envision Kit" };
 
-	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 
@@ -112,7 +110,6 @@ namespace {
 
 	static const char* sys_msg_ = { "RX72T" };
 
-	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -126,6 +123,7 @@ namespace {
 	#define USE_DAC
 
 #endif
+	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 256> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 512> SEND_BUFF;
@@ -446,7 +444,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
 		static const uint8_t sci_level = 2;
