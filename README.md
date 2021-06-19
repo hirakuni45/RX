@@ -460,8 +460,7 @@ There is no need to make complicated settings if you set "second candidate" or "
 #include "common/format.hpp"
 
 namespace {
-    typedef device::system_io<12000000> SYSTEM_IO;  // External connection crystal is 12MHz
-
+    typedef device::system_io<> SYSTEM_IO;  // see RXxxx/clock_profile.hpp
 //  Use SCI9
     typedef device::SCI9 SCI_CH;
 
@@ -490,7 +489,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-    SYSTEM_IO::setup_system_clock();
+    SYSTEM_IO::boost_master_clock();
 
     {  // Start SCI
        uint8_t intr = 2;        // Interrupt level
