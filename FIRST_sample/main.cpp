@@ -32,43 +32,33 @@
 
 namespace {
 
-/// ベースクリスタルの定義
 /// LED 接続ポートの定義
 #if defined(SIG_RX71M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX72M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX72N)
-	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-#elif defined(SIG_RX63T)
-	typedef device::system_io<12'000'000, 96'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORTB, device::bitpos::B7> LED;
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX72T)
-	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 #endif
+// クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
+	typedef device::system_io<> SYSTEM_IO;
 }
 
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 
