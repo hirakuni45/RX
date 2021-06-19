@@ -537,17 +537,16 @@ C++ での実装は、それらに対する一つの回答です、また、コ�
    
 ---
    
-☆以下は C++ 的 LED を点滅するプログラム例です。   
-(1) マイコン接続のクリスタルは 12MHz   
+☆以下は C++ 的 LED を点滅するプログラム例です。      
+(1) マイコンのクロック設定は、RXxxx/clock_profile.hpp を参照。
 (2) LED の接続ポートは、PORT0、B7   
-(3) 点滅間隔は 0.25 秒   
-※マイコンの動作速度は、Makefile で設定   
+(3) 点滅間隔は 0.25 秒      
 ※他、シリアル通信、ＳＤカードアクセスなど豊富なサンプルがあります。   
 ```C++
 #include "common/renesas.hpp"
 
 namespace {
-    typedef device::system_io<12000000> SYSTEM_IO;
+    typedef device::system_io<> SYSTEM_IO;
     typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 }
 
@@ -555,7 +554,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-    SYSTEM_IO::setup_system_clock();
+    SYSTEM_IO::boost_master_clock();
 
     LED::DIR = 1;
     while(1) {
