@@ -30,7 +30,7 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	typedef device::system_io<> SYSTEM_IO;
 
 	// debug serial port
 	typedef utils::fixed_fifo<char, 512>  REB;
@@ -226,7 +226,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
 		uint8_t intr = 2;

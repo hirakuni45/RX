@@ -40,7 +40,7 @@
 
 namespace {
 
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	typedef device::system_io<> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
 	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;
@@ -348,7 +348,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定
 		uint8_t intr = 4;

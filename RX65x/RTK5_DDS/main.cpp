@@ -35,7 +35,7 @@ namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	typedef device::system_io<> SYSTEM_IO;
 
 	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
 	CMT			cmt_;
@@ -209,7 +209,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
 		static const uint8_t sci_level = 2;
