@@ -37,7 +37,7 @@ Due to its functionality, it does not require difficult or complicated settings 
 #include "common/renesas.hpp"
 
 namespace {
-    typedef device::system_io<12000000> SYSTEM_IO;  // External connection crystal is 12MHz
+    typedef device::system_io<> SYSTEM_IO;  // see RXxxx/clock_profile.hpp
     typedef device::PORT<device::PORT0, device::bitpos::B7> LED;  // LED connection port
 }
 
@@ -45,7 +45,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-    SYSTEM_IO::setup_system_clock();
+    SYSTEM_IO::boost_master_clock();
 
     LED::OUTPUT();
     while(1) {
