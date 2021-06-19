@@ -28,8 +28,7 @@ USER_LIBS	=
 
 LDSCRIPT	=	../../RX24T/$(DEVICE).ld
 
-USER_DEFS   =   SIG_RX24T F_ICLK=80000000 F_PCLKA=80000000 \
-				F_PCLKB=40000000 F_PCLKD=40000000 F_FCLK=20000000
+USER_DEFS   =   SIG_RX24T
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
