@@ -12,11 +12,6 @@
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
 
-/// F_PCLKB は周期パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCLKB
-#  error "tpu_io.hpp requires F_PCLKB to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -110,7 +105,7 @@ namespace device {
 			rate_ = freq;
 			level_ = level;
 
-			uint32_t cmt = F_PCLKB / freq;
+			uint32_t cmt = device::clock_profile::PCLKB / freq;
 			uint8_t shift = 0;
 			while(cmt > 65536) {
 				cmt >>= 2;
@@ -338,7 +333,7 @@ namespace device {
 				default:
 					break;
 				}
-				uint32_t rate = (static_cast<uint32_t>(F_PCLKB) >> shift_) / (cmn + 1);
+				uint32_t rate = (device::clock_profile::PCLKB >> shift_) / (cmn + 1);
 				return rate;
 			} else {
 				return rate_;

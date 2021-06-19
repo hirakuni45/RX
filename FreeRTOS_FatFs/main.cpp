@@ -57,19 +57,16 @@ namespace {
 /// LED 接続ポートの定義
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 
 	static const uint32_t sdc_spi_speed_ = 30000000;
 #elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const uint32_t sdc_spi_speed_ = 30000000;
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef utils::rtc_io RTC;
 
 #ifdef GR_KAEDE
@@ -115,7 +112,6 @@ namespace {
 
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 
@@ -131,7 +127,6 @@ namespace {
 
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
-	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -154,7 +149,6 @@ namespace {
 
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
-	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -162,7 +156,6 @@ namespace {
 
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 
@@ -174,6 +167,7 @@ namespace {
 
 	static const uint32_t sdc_spi_speed_ = 30000000;
 #endif
+	typedef device::system_io<> SYSTEM_IO;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;
@@ -692,7 +686,7 @@ int main(int argc, char** argv)
 	device::PORTC::PODR.B3 = 1;
 #endif
 
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 	LED::P = 0;		// Off
@@ -741,7 +735,7 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	auto clk = F_ICLK / 1000000;
+	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("\nStart FreeRTOS FatFs sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	{

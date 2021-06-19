@@ -265,16 +265,16 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool start() noexcept
 		{
-utils::format("Pass 0\n");
+// utils::format("Pass 0\n");
 			uint8_t tmp[3];
 			tmp[0] = static_cast<uint8_t>(REG::ID_G_LIB_VERSION_H);
 			if(!i2c_.send(FT5206_ADR, tmp, 1)) {
 				utils::format("Send fail\n");
 				return false;
 			}
-utils::format("Pass 1\n");
+// utils::format("Pass 1\n");
 			i2c_.sync();
-utils::format("Pass 2\n");
+// utils::format("Pass 2\n");
 			tmp[0] = 0xff;
 			tmp[1] = 0xff;
 			tmp[2] = 0xff;
@@ -282,9 +282,9 @@ utils::format("Pass 2\n");
 				utils::format("Recv fail\n");
 				return false;
 			}
-utils::format("Pass 3\n");
+// utils::format("Pass 3\n");
 			i2c_.sync();
-utils::format("Pass 4\n");
+// utils::format("Pass 4\n");
 			version_ = (static_cast<uint16_t>(tmp[0]) << 8) | tmp[1];
 			chip_ = tmp[2];
 

@@ -11,11 +11,6 @@
 #include "common/device.hpp"
 #include "common/vect.h"
 
-/// F_PCLKD は変換パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCLKD
-#  error "adc_in.hpp requires F_PCLKD to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -75,7 +70,7 @@ namespace device {
 			level_ = level;
 
 			// 基本変換時間（１マイクロ秒）＋マージン
-			uint32_t n = F_PCLKD / 1000000 + 10;
+			uint32_t n = clock_profile::PCLKD / 1000000 + 10;
 			if(n > 255) return false;
 
 			power_mgr::turn(ADCU::get_peripheral());

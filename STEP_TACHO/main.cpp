@@ -18,7 +18,7 @@
 
 namespace {
 
-	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
+	typedef device::system_io<> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
 	uint32_t adc_cnt_;
@@ -61,7 +61,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 

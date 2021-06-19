@@ -35,7 +35,6 @@ namespace {
 #if defined(SIG_RX72N)
 /// for RX72N Envision Kit
 	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 	typedef device::SCI2 SCI_CH;
@@ -58,6 +57,7 @@ namespace {
 	typedef graphics::shape_3d<TGL> SHAPE;
 	SHAPE		shape_(tgl_);
 #endif
+	typedef device::system_io<> SYSTEM_IO;
 
 	typedef graphics::def_color DEF_COLOR;
 
@@ -130,7 +130,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
 		uint8_t intr_lvl = 2;

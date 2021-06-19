@@ -54,7 +54,7 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	typedef device::system_io<> SYSTEM_IO;
 
 	static const uint32_t CMT_FREQ = 1000;  ///< 計測用タイマー分解能
 	typedef device::cmt_mgr<device::CMT0> CMT;
@@ -355,7 +355,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // 計測タイマー設定 (1000Hz)
 		uint8_t cmt_irq_level = 4;

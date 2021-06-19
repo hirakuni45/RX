@@ -15,10 +15,6 @@
 #include "common/vect.h"
 #include "common/format.hpp"
 
-#ifndef F_PCLKB
-#  error "can_io.hpp requires F_PCLKB to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -210,7 +206,7 @@ namespace device {
 			// より大きい値で適合した値を選択
 			uint32_t tq = 25;
 			while(1) {
-				if((F_PCLKB % (static_cast<uint32_t>(speed) * tq)) == 0) {
+				if((device::clock_profile::PCLKB % (static_cast<uint32_t>(speed) * tq)) == 0) {
 					break;
 				}
 				tq--;
@@ -231,7 +227,7 @@ namespace device {
 			}
 
 			// 動作クロックの設定
-			uint32_t brp = F_PCLKB / (static_cast<uint32_t>(speed) * tq);
+			uint32_t brp = device::clock_profile::PCLKB / (static_cast<uint32_t>(speed) * tq);
 			uint32_t tseg1 = 16;
 			uint32_t tseg2 = 8;
 			uint32_t sjw = 4;  // とりあえず固定
@@ -472,7 +468,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_speed() const noexcept {
-			return F_PCLKB
+			return device::clock_profile::PCLKB
 				/ (get_bcr_brp() * (1 + get_bcr_tseg1() + get_bcr_tseg2()));
 		}
 

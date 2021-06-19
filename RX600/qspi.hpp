@@ -29,7 +29,7 @@ namespace device {
 		static const auto TX_VEC = txv;			///< 受信割り込みベクター
 		static const auto RX_VEC = rxv;			///< 送信割り込みベクター
 		static const auto SSL_VEC = sslv;		///< 送信終了割り込みベクター
-		static const uint32_t PCLK = F_PCLKB;	///< PCLK 周波数
+		static const uint32_t PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

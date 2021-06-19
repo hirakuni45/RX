@@ -11,8 +11,8 @@ TARGET		=	can_sample
 
 DEVICE		=	R5F566TE
 
-# BUILD		=	release
-BUILD		=	debug
+BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -29,10 +29,7 @@ USER_LIBS	=	m supc++
 
 LDSCRIPT	=	../../RX66T/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX66T \
-				F_ICLK=160000000 \
-				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
-				F_FCLK=40000000 F_BCLK=40000000
+USER_DEFS	=	SIG_RX66T
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)

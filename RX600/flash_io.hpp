@@ -17,11 +17,6 @@
 
 namespace device {
 
-/// F_FCLK は変換パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_FCLK
-#  error "flash_io.hpp requires F_FCLK to be defined"
-#endif
-
 #define FIO_DEBUG
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -88,7 +83,7 @@ namespace device {
 			//                  FCLK 4MHz max 32us
 			// * 1.1
 			uint32_t cnt = 22;
-			if(F_FCLK < 20000000) cnt = 36;
+			if(clock_profile::FCLK < 20000000) cnt = 36;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
 				--cnt;
@@ -231,7 +226,7 @@ namespace device {
 			//                  FCLK 4MHz max 3.8ms
 			// * 1.1
 			uint32_t cnt = 1870;
-			if(F_FCLK < 20000000) cnt = 4180;
+			if(clock_profile::FCLK < 20000000) cnt = 4180;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
 				--cnt;
@@ -294,7 +289,7 @@ namespace device {
 			device::FLASH::FWEPROR.FLWE = 0b01;
 
 			// クロック速度の最適化
-			uint32_t clk = ((static_cast<uint32_t>(F_FCLK) / 500'000) + 1) >> 1;
+			uint32_t clk = ((static_cast<uint32_t>(clock_profile::FCLK) / 500'000) + 1) >> 1;
 			if(clk > 60) {
 				clk = 60;
 			}
@@ -392,7 +387,7 @@ namespace device {
 			//                        FCLK 4MHz max 84us
 			// * 1.1
 			uint32_t cnt = 33 * 64 / 4;
-			if(F_FCLK < 20000000) cnt = 93 * 64 / 4;
+			if(clock_profile::FCLK < 20000000) cnt = 93 * 64 / 4;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
 				--cnt;
@@ -446,7 +441,7 @@ namespace device {
 			//                 FCLK 4MHz max 18ms
 			// * 1.1
 			uint32_t cnt = 1100;
-			if(F_FCLK < 20'000'000) cnt = 1980;
+			if(device::clock_profile::FCLK < 20'000'000) cnt = 1980;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(10);
 				--cnt;

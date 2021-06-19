@@ -29,10 +29,7 @@ USER_LIBS	=	m supc++
 
 LDSCRIPT	=	../../RX72T/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72T \
-				F_ICLK=192000000 \
-				F_PCLKA=96000000 F_PCLKB=48000000 F_PCLKC=192000000 F_PCLKD=48000000 \
-				F_FCLK=48000000 F_BCLK=48000000
+USER_DEFS	=	SIG_RX72T
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)

@@ -11,11 +11,6 @@
 //=====================================================================//
 #include "common/delay.hpp"
 
-/// F_ICLK はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_ICLK
-#  error "spi_io.hpp requires F_ICLK to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -62,7 +57,7 @@ namespace device {
 
 		void setup_delay_(uint32_t speed)
 		{
-			uint32_t n = F_ICLK / speed;
+			uint32_t n = device::clock_profile::ICLK / speed;
 			if(n > 511) n = 511;
 			delay_ = n / 4;  // ハーフクロック幅の補正（かなり大雑把）
 // utils::format("SPI: %d\n") % delay_;

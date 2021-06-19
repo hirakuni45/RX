@@ -16,11 +16,6 @@
 #include "common/vect.h"
 #include "common/i2c_base.hpp"
 
-/// F_PCLKB はボーレートパラメーター計算に必要で、設定が無いとエラーにします。
-#ifndef F_PCLKB
-#  error "sci_i2c_io.hpp requires F_PCLKB to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -309,7 +304,7 @@ namespace device {
 // 割り込み動作に不具合があるので、強制的にポーリングとする。
 level = 0;
 			uint32_t clk = static_cast<uint32_t>(spd);
-			uint32_t brr = F_PCLKB * 8 / clk;
+			uint32_t brr = SCI::PCLK * 8 / clk;
 			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
 			brr >>= 8;
 			if(brr >= 256 || brr <= 1) {

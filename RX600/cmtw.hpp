@@ -30,7 +30,7 @@ namespace device {
 
 		static const auto PERIPHERAL = per;		///< ペリフェラル型
 		static const auto IVEC = ivec;			///< 割り込みベクター
-		static const uint32_t PCLK = F_PCLKB;	///< PCLK 周波数
+		static const uint32_t PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

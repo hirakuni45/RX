@@ -11,6 +11,7 @@
 #include "common/io_utils.hpp"
 
 #if defined(SIG_RX24T)
+#include "RX24T/clock_profile.hpp"
 #include "RX24T/peripheral.hpp"
 #include "RX24T/system.hpp"
 #include "RX24T/power_mgr.hpp"
@@ -24,7 +25,18 @@
 #include "RX62x/icu.hpp"
 #include "RX62x/icu_mgr.hpp"
 
-#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+#elif defined(SIG_RX64M)
+#include "RX64M/clock_profile.hpp"
+#include "RX600/peripheral.hpp"
+#include "RX600/system.hpp"
+#include "RX600/power_mgr.hpp"
+#include "RX600/icu.hpp"
+#include "RX600/icu_mgr.hpp"
+#include "RX600/port_map.hpp"
+#include "RX600/port_map_mtu.hpp"
+
+#elif defined(SIG_RX71M)
+#include "RX71M/clock_profile.hpp"
 #include "RX600/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX600/power_mgr.hpp"
@@ -34,6 +46,7 @@
 #include "RX600/port_map_mtu.hpp"
 
 #elif defined(SIG_RX72M)
+#include "RX72M/clock_profile.hpp"
 #include "RX72M/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX72M/power_mgr.hpp"
@@ -43,6 +56,7 @@
 #include "RX72M/port_map_mtu.hpp"
 
 #elif defined(SIG_RX72N)
+#include "RX72N/clock_profile.hpp"
 #include "RX72N/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX72N/power_mgr.hpp"
@@ -54,6 +68,7 @@
 #include "RX72N/port_map_tpu.hpp"
 
 #elif defined(SIG_RX65N)
+#include "RX65x/clock_profile.hpp"
 #include "RX65x/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX65x/power_mgr.hpp"
@@ -63,6 +78,7 @@
 #include "RX65x/port_map_mtu.hpp"
 
 #elif defined(SIG_RX66T)
+#include "RX66T/clock_profile.hpp"
 #include "RX66T/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX66T/power_mgr.hpp"
@@ -73,6 +89,7 @@
 #include "RX66T/port_map_gptw.hpp"
 
 #elif defined(SIG_RX72T)
+#include "RX72T/clock_profile.hpp"
 #include "RX72T/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX72T/power_mgr.hpp"

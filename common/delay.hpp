@@ -8,14 +8,10 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <cstdint>
+#include "common/device.hpp"
 #ifdef RTOS
 #include "FreeRTOS.h"
 #include "task.h"
-#endif
-
-#ifndef F_ICLK
-#  error "delay.hpp requires F_ICLK to be defined"
 #endif
 
 namespace utils {
@@ -54,31 +50,31 @@ namespace utils {
 		{
 			while(us > 0) {
 #if defined(SIG_RX64M) || defined(SIG_RX63T) || defined(SIG_RX71M) || defined(SIG_RX72M)
-				for(uint32_t n = 0; n < (F_ICLK / 4285714); ++n) {
+				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 4285714); ++n) {
 					asm("nop");
 				}
 #elif defined(SIG_RX65N)
-				for(uint32_t n = 0; n < (F_ICLK / 4444444); ++n) {
+				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 4444444); ++n) {
 					asm("nop");
 				}
 #elif defined(SIG_RX24T)
-				for(uint32_t n = 0; n < (F_ICLK / 4444444); ++n) {
+				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 4444444); ++n) {
 					asm("nop");
 				}
 #elif defined(SIG_RX66T)
-				for(uint32_t n = 0; n < (F_ICLK / 3346666); ++n) {
+				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 3346666); ++n) {
 					asm("nop");
 				}
 #elif defined(SIG_RX72T)
 				// 192MHz: 250KHz: (63) 3008239 -> 253.304KHz
 				// 192MHz: 250KHz: (64) 3000000 -> 249.357KHz
-				for(uint32_t n = 0; n < (F_ICLK / 3000000); ++n) {
+				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 3000000); ++n) {
 					asm("nop");
 				}
 #elif defined(SIG_RX72N)
 				// 240MHz: 78 : 20uS->50.763KHz
 				// 240MHz: 79 : 20uS->50.127KHz
-				for(uint32_t n = 0; n < (F_ICLK / 3037974); ++n) {
+				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 3037974); ++n) {
 					asm("nop");
 				}
 #else

@@ -38,7 +38,6 @@ namespace {
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
@@ -57,7 +56,6 @@ namespace {
 
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
@@ -77,7 +75,6 @@ namespace {
 #elif defined(SIG_RX65N)
 	/// for RX65N Envision Kit
 	static const char* system_str_ = { "RX65N" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 	typedef device::SCI9 SCI_CH;
@@ -97,7 +94,6 @@ namespace {
 
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
-	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
@@ -114,7 +110,6 @@ namespace {
 
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
-	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
@@ -132,7 +127,6 @@ namespace {
 #elif defined(SIG_RX72N)
 	/// for RX72N Envision Kit
 	static const char* system_str_ = { "RX72N" };
-	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 	typedef device::SCI2 SCI_CH;
@@ -150,7 +144,6 @@ namespace {
 
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T" };
-	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
@@ -166,7 +159,8 @@ namespace {
 	TFT         tft_;
 
 #endif
-
+// クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
+	typedef device::system_io<> SYSTEM_IO;
 
 
 
@@ -329,7 +323,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
 		uint8_t intr_lvl = 2;

@@ -206,7 +206,7 @@ namespace device {
 		static void set_base_clock()
 		{
 #if defined(SIG_RX72T)
-			HRCKSR.HRCKSEL = (F_PCLKC < 160'000'000) ? 0b00 : 0b01;
+			HRCKSR.HRCKSEL = (clock_profile::PCLKC < 160'000'000) ? 0b00 : 0b01;
 #endif
 		}
 	};

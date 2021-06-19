@@ -18,7 +18,7 @@
 
 namespace {
 
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
@@ -178,7 +178,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	LED::DIR = 1;
 	LED::P = 0;
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
-	auto clk = F_ICLK / 1000000;
+	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("Start DS3231 (I2C) sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	{  // IICA(I2C) の開始

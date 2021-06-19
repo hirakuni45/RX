@@ -437,31 +437,31 @@ namespace device {
 
 #if defined(SIG_RX24T)
 	typedef rspi_t<0x00088380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		F_PCLKB>  RSPI0;
+		clock_profile::PCLKB>  RSPI0;
 #elif defined(SIG_RX64M)
 	typedef rspi_t<0x000D0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		F_PCLKA>  RSPI;
+		clock_profile::PCLKA>  RSPI;
 #elif defined(SIG_RX71M)
 	typedef rspi_t<0x000D0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		F_PCLKA>  RSPI;
+		clock_profile::PCLKA>  RSPI;
 	typedef rspi_t<0x000D0120, peripheral::RSPI2, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		F_PCLKA>  RSPI2;
+		clock_profile::PCLKA>  RSPI2;
 #elif defined(SIG_RX65N)
 	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		F_PCLKA>  RSPI0;
+		clock_profile::PCLKA>  RSPI0;
 	typedef rspi_t<0x000D0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
-		F_PCLKA>  RSPI1;
+		clock_profile::PCLKA>  RSPI1;
 	typedef rspi_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
-		F_PCLKA>  RSPI2;
+		clock_profile::PCLKA>  RSPI2;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef rspi_c_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		F_PCLKA>  RSPI0;
+		clock_profile::PCLKA>  RSPI0;
 #elif defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
 	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		F_PCLKA>  RSPI0;
+		clock_profile::PCLKA>  RSPI0;
 	typedef rspi_t<0x000D0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
-		F_PCLKA>  RSPI1;
+		clock_profile::PCLKA>  RSPI1;
 	typedef rspi_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
-		F_PCLKA>  RSPI2;
+		clock_profile::PCLKA>  RSPI2;
 #endif
 }

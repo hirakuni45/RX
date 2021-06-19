@@ -10,11 +10,7 @@
 //=====================================================================//
 #include "RX24T/system.hpp"
 #include "RX24T/flash.hpp"
-
-#if defined(F_ICLK) && defined(F_PCLKA) && defined(F_PCLKB) && defined(F_PCLKD) && defined(F_FCLK)
-#else  
-#  error "system_io.hpp requires F_[IF]CLK and F_PCLK[ABD] to be defined"
-#endif
+#include "RX24T/clock_profile.hpp"
 
 #ifndef SIG_RX24T
 #  error "system_io.hpp: Not available on not RX24T"
@@ -31,14 +27,13 @@ namespace device {
 								※クリスタル利用は「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BASE_CLOCK = 10'000'000, uint32_t INTR_CLOCK = 80'000'000,
-		bool EXT_CLOCK = false>
+	template <bool EXT_CLOCK = false>
 	struct system_io {
 
 		static uint8_t clock_div_(uint32_t clk) noexcept
 		{
 			uint8_t div = 0;
-			while(clk < INTR_CLOCK) {
+			while(clk < clock_profile::PLL_BASE) {
 				++div;
 				clk <<= 1;
 			}
@@ -48,18 +43,18 @@ namespace device {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief  システム・クロックの設定
+			@brief  マスター・クロックのブースト
 			@return エラーなら「false」
 		*/
 		//-------------------------------------------------------------//
-		static bool setup_system_clock()
+		static bool boost_master_clock()
 		{
 			device::SYSTEM::PRCR = 0xA500 | 0b0111;	// クロック、低消費電力、関係書き込み許可
 
 			// メモリーの WAIT 設定
-			if(F_ICLK > 64000000) {
+			if(clock_profile::ICLK > 64000000) {
 				device::SYSTEM::MEMWAIT = 0b10; // 64MHz 以上 wait 設定
-			} else if(F_ICLK > 32000000) {
+			} else if(clock_profile::ICLK > 32000000) {
 				device::SYSTEM::MEMWAIT = 0b01; // 32MHz 以上 64MHz 以下 wait 設定 
 			} else {
 				device::SYSTEM::MEMWAIT = 0b00; // wait 無し
@@ -71,14 +66,14 @@ namespace device {
 
 			device::SYSTEM::MOSCWTCR = 9;	// 4ms wait
 			// メインクロック・ドライブ能力設定、内部発信
-			bool xtal = BASE_CLOCK >= 10000000;
+			bool xtal = clock_profile::BASE >= 10000000;
 			device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV21.b(xtal)
 				| device::SYSTEM::MOFCR.MOSEL.b(EXT_CLOCK);
 			device::SYSTEM::MOSCCR.MOSTP = 0;  // メインクロック発振器動作
 			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
 			// Min: (x4.0) 0b000111, Max: (x15.5) 0b111110
-			uint32_t n = INTR_CLOCK * 2 / BASE_CLOCK;
+			uint32_t n = clock_profile::PLL_BASE * 2 / clock_profile::BASE;
 			if(n < 8) n = 8;
 			else if(n > 31) n = 31;
 			device::SYSTEM::PLLCR.STC = n - 1;
@@ -86,11 +81,11 @@ namespace device {
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
-			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(F_FCLK))
-								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(F_ICLK))
-								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(F_PCLKA))
-								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(F_PCLKB))
-								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(F_PCLKD));
+			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
+								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
+								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
+								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
+								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択
 
@@ -107,25 +102,12 @@ namespace device {
 
 	//-------------------------------------------------------------//
 	/*!
-		@brief  SCI マスタークロック取得
-		@param[in]	per		ペリフェラル型
-		@return SCI マスタークロック
-	*/
-	//-------------------------------------------------------------//
-	inline uint32_t get_sci_master_clock(peripheral per) noexcept
-	{
-		return F_PCLKB;
-	}
-
-
-	//-------------------------------------------------------------//
-	/*!
 		@brief  MTU マスタークロック取得
 		@return MTU マスタークロック
 	*/
 	//-------------------------------------------------------------//
 	inline uint32_t get_mtu_master_clock() noexcept
 	{
-		return F_PCLKA;
+		return clock_profile::PCLKA;
 	}
 }

@@ -11,11 +11,6 @@
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
-/// F_PCLKB は速度パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCLKB
-#  error "qspi_io.hpp requires F_PCLKB to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

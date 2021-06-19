@@ -24,7 +24,7 @@ namespace {
 
 	static const int MAIN_VERSION = 85;
 
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	typedef device::system_io<> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	static const char* system_str_ = { "RX71M" };
 
@@ -394,7 +394,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	LED::DIR = 1;
 
@@ -412,7 +412,7 @@ int main(int argc, char** argv)
 		sci_.start(115200, intr_level);
 	}
 
-	auto clk = F_ICLK / 1000000;
+	auto clk = device::clock_profile::ICLK / 1000000;
 	utils::format("Start TCP/UDP Net sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	cmd_.set_prompt("# ");
