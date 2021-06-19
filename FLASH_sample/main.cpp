@@ -273,9 +273,9 @@ int main(int argc, char** argv)
 	}
 
 	{
-		auto clk = F_ICLK / 1'000'000;
+		auto clk = device::clock_profile::ICLK / 1'000'000;
 		utils::format("Start Data Flash sample for '%s' %u [MHz]\n") % system_str_ % clk;
-		auto fclk = F_FCLK / 1'000'000;
+		auto fclk = device::clock_profile::FCLK / 1'000'000;
 		utils::format("Flash drive clock: %u [MHz]\n") % fclk;
 		utils::format("Data Flash size: %08X\n") % FLASH_IO::data_flash_size;
 	}

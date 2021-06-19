@@ -453,7 +453,7 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
-	auto clk = F_ICLK / 1000000;
+	auto clk = device::clock_profile::ICLK / 1000000;
 	utils::format("Start CAN sample for '%s' %d[MHz]\n") % system_str_ % clk;
 	utils::format("CAN command version: %d.%02d\n") % (can_cmd_ver_ / 100) % (can_cmd_ver_ % 100);
 

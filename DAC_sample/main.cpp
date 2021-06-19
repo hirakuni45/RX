@@ -237,7 +237,7 @@ int main(int argc, char** argv)
 	cmd_.set_prompt("# ");
 
 	{
-		auto clk = F_ICLK / 1000000;
+		auto clk = device::clock_profile::ICLK / 1000000;
 		utils::format("Start D/A sample for '%s' %u [MHz]\n") % system_str_ % clk;
 	}
 

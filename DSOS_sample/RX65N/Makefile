@@ -44,7 +44,7 @@ USER_LIBS	=	m supc++ drw2d
 
 LDSCRIPT	=	../../$(ROOT_DEV_)/$(DEVICE).ld
 
-USER_DEFS	=	SIG_$(ROOT_DEV)
+USER_DEFS	=	SIG_$(ROOT_DEV) \
 				FAT_FS FAT_FS_NUM=4
 
 # rx-elf-gcc compiler version check

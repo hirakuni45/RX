@@ -44,7 +44,6 @@ namespace {
 /// LED 接続ポートの定義
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
     typedef device::ETHERC0 ETHERC;      // Ethernet Controller
@@ -55,12 +54,10 @@ namespace {
     typedef device::ether_io<ETHERC, EDMAC, PHY, device::port_map::ORDER::FIRST_RMII> ETHD;
 #elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
 
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 #ifdef GR_KAEDE
 	static const char* system_str_ = { "GR-KAEDE" };
 	typedef device::PORT<device::PORTC, device::bitpos::B1> LED;
@@ -73,15 +70,14 @@ namespace {
 #endif
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 #endif
+	typedef device::system_io<> SYSTEM_IO;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
@@ -350,7 +346,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 	LED::P = 1;		// Off
@@ -369,7 +365,7 @@ int main(int argc, char** argv)
 	    mrand_.seed(0x1234);
 	}
 
-	auto clk = F_ICLK / 1000000;
+	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("Start FreeRTOS %s + TCP, sample for '%s' %d[MHz]\n")
 		% tskKERNEL_VERSION_NUMBER % system_str_ % clk;
 

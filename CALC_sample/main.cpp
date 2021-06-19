@@ -203,7 +203,7 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
-	auto clk = F_ICLK / 1000000;
+	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("Start CALC sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	LED::DIR = 1;
