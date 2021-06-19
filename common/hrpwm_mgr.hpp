@@ -71,7 +71,7 @@ namespace device {
 
             HRPWMX::HROCR.HRRST = 0;
 
-            auto m = F_ICLK / F_PCLKC;
+            auto m = device::clock_profile::ICLK / device::clock_profile::PCLKC;
             if(m == 0) m = 1;
             utils::delay::loop(12 * m);  // PCLKC, 12 cycle
 
