@@ -1284,6 +1284,7 @@ namespace device {
 	template<class _> typename system_t<_>::SOSCWTCR_ system_t<_>::SOSCWTCR;
 #endif
 	template<class _> typename system_t<_>::MOFCR_ system_t<_>::MOFCR;
+	template<class _> typename system_t<_>::HOCOPCR_ system_t<_>::HOCOPCR;
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
 	template<class _> typename system_t<_>::CKOCR_ system_t<_>::CKOCR;

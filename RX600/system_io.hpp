@@ -164,7 +164,7 @@ namespace device {
 			if(OSC_TYPE_ == OSC_TYPE::XTAL || OSC_TYPE_ == OSC_TYPE::EXT) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 				device::SYSTEM::HOCOCR.HCSTP = 1;  ///< 高速オンチップオシレータ停止
-				device::SYSTEM::HOCOPCR.HOCOPCNT = 0;  ///< 高速オンチップオシレーター電源 OFF
+				device::SYSTEM::HOCOPCR.HOCOPCNT = 1;  ///< 高速オンチップオシレーター電源 OFF
 			}
 
 			// クロック関係書き込み不許可
