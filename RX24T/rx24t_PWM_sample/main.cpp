@@ -17,6 +17,8 @@
 
 namespace {
 
+	typedef device::system_io<> SYSTEM_IO;
+
 	device::cmt_mgr<device::CMT0>  cmt_;
 
 	typedef utils::fixed_fifo<char, 128> BUFFER;
@@ -49,9 +51,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	// 10MHz X-Tal, 80MHz
-	typedef device::system_io<10000000> SYSTEM_IO;
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	// SCI 設定
 	static const uint8_t sci_level = 2;
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 	}
 
 	utils::format("RX24T MTU3 PWM sample: base clock: %4.2f [MHz]\n")
-		% (static_cast<float>(F_PCLKA) * 1e-6);
+		% (static_cast<float>(device::clock_profile::PCLKA) * 1e-6);
 	utils::format("  PB3/MTIOC0A (32): Left\n");
 	utils::format("  PA5/MTIOC1A (36): Right\n");
 

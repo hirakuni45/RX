@@ -27,7 +27,7 @@ namespace {
 
 	static const uint16_t VERSION = 40;
 
-    typedef device::system_io<10000000> SYSTEM_IO;
+    typedef device::system_io<> SYSTEM_IO;
 
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
@@ -82,7 +82,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	// タイマー設定（１００Ｈｚ）
 	{

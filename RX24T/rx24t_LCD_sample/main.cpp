@@ -40,7 +40,7 @@
 namespace {
 
 	// 外部 10MHz クリスタル
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<> SYSTEM_IO;
 
 	// LED インジケーター
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -150,7 +150,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SYSTEM_IO::setup_system_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	// タイマー設定（100Hz）
 	{
