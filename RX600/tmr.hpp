@@ -30,7 +30,7 @@ namespace device {
 		static const auto CMIA_VEC = cmia;		///< CMIA 割り込みベクタ
 		static const auto CMIB_VEC = cmib;		///< CMIB 割り込みベクタ
 		static const auto OVI_VEC  = ovi;		///< OVI 割り込みベクタ
-		static const uint32_t PCLK = F_PCLKB;	///< PCLK 周波数
+		static const uint32_t PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//-----------------------------------------------------------------//
 		/*!

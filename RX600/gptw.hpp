@@ -49,9 +49,9 @@ namespace device {
 		static const auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
 
 #if defined(SIG_RX66T) || defined(SIG_RX72T)
-		static const uint32_t PCLK = F_PCLKC;	///< カウント基準クロック
+		static const uint32_t PCLK = clock_profile::PCLKC;	///< カウント基準クロック
 #elif defined(SIG_RX72N) || defined(SIG_RX72M)
-		static const uint32_t PCLK = F_PCLKA;	///< カウント基準クロック
+		static const uint32_t PCLK = clock_profile::PCLKA;	///< カウント基準クロック
 #endif
 
 

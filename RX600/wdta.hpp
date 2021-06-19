@@ -112,5 +112,5 @@ namespace device {
 		typename wdta_t<base, ivec, pclk>::WDTRCR_ wdta_t<base, ivec, pclk>::WDTRCR;
 
 
-	typedef wdta_t<0x00088020, ICU::VECTOR::WUNI, F_PCLKB> WDT;
+	typedef wdta_t<0x00088020, ICU::VECTOR::WUNI, clock_profile::PCLKB> WDT;
 }

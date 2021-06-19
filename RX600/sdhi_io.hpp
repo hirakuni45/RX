@@ -16,11 +16,6 @@
 #include "common/format.hpp"
 // #include "common/memmgr.hpp"
 
-/// F_PCLKB はクロック速度計算などで必要で、設定が無いとエラーにします。
-#ifndef F_PCLKB
-#  error "sdhi_io.hpp requires F_PCLKB to be defined"
-#endif
-
 /// byte_order.h のインクルードをしているかチェック
 #if defined(LITTLE_ENDIAN)
 #elif defined(BIG_ENDIAN)
@@ -189,7 +184,7 @@ namespace fatfs {
 			if(div == 0) div = 2;
 			else if(div == 0xff) div = 1; 
 			else div <<= 2;
-			auto frq = F_PCLKB / div / 1000;
+			auto frq = device::clock_profile::PCLKB / div / 1000;
 			char ch = 'K';
 			if(frq >= 1000) {
 				ch = 'M';

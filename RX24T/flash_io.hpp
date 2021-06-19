@@ -13,11 +13,6 @@
 
 namespace device {
 
-/// F_FCLK は変換パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_FCLK
-#  error "flash_io.hpp requires F_FCLK to be defined"
-#endif
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  FLASH 制御クラス
@@ -71,7 +66,7 @@ namespace device {
 				device::FLASH::FPMCR = ~0x50;
 				device::FLASH::FPMCR =  0x50;
 			}
-			uint8_t frq = F_FCLK / 1000000;
+			uint8_t frq = clock_profile::FCLK / 1000000;
 			if(frq > 32) frq = 32;
 			device::FLASH::FISR.PCKA = frq - 1;
 		}
