@@ -4,7 +4,6 @@
 	@brief	RX64M/RX71M/RX651/RX65N/RX66T/RX72T/RX72N/RX72M グループ・システム制御 @n
 			※RX24T は構成が大きく異なるので、RX24T/system_io.hpp に分離しています。@n
 			※ USB を使う場合：96MHz, 144MHz, 192MHz, 240MHz のいづれか @n
-			※ 通常ベースクロックは、12MHz、24MHz を使います。@n
 			RX72x 系では、内部 PLL 回路が追加され、Ethernet などに必要な 25MHz を得る為 @n
 			16MHz を使います。@n
 			(16MHz x 12.5 -> 200MHz, 16MHz x 15 -> 240MHz)
@@ -33,7 +32,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発信器タイプ @n
-					HOCO を使う場合、同時に、BASE_CLOCK_ に周波数を設定します。
+					HOCO を使う場合、同時に、BASE_CLOCK_ に周波数（16,18,20 MHz）を設定します。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class OSC_TYPE {
@@ -52,9 +51,6 @@ namespace device {
 				外部クリスタルを微妙な周波数にする場合、その整数倍にしなければなりません。 @n
 				RX71M はスーパーバイザモードでの変更が必要なので、「start.s」内で行う。 @n
 				RX71M の場合、アセンブラにオプション「--defsym MEMWAIT=1」を渡す。
-		@param[in]	BASE_CLOCK_	ベース・クロック周波数
-		@param[in]	INTR_CLOCK	内臓クロック周波数 @n
-								※USB を使う場合、「INTR_CLOCK」は48の倍数である事
 		@param[in]	OSC_TYPE	発信器タイプを設定（通常、XTAL）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -98,16 +94,15 @@ namespace device {
 				device::SYSTEM::MOSCCR.MOSTP = 1;		// メインクロック発振器停止
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MOSEL.b();
 			} else if(OSC_TYPE_ == OSC_TYPE::HOCO) {  // 高速オンチップオシレータ
-				device::SYSTEM::MOSCCR.MOSTP = 1;
-				device::SYSTEM::HOCOCR = device::SYSTEM::HOCOCR.HCSTP.b(1);  // 停止
 				uint8_t frq;
 				if(clock_profile::BASE == 16'000'000) frq = 0b00;
 				else if(clock_profile::BASE == 18'000'000) frq = 0b01;
 				else if(clock_profile::BASE == 20'000'000) frq = 0b10;
 				else frq = 0b00;
 				device::SYSTEM::HOCOCR2.HCFRQ = frq;
-				device::SYSTEM::HOCOCR = device::SYSTEM::HOCOCR.HCSTP.b(0);  // 動作
-				while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) { asm("nop"); }
+				device::SYSTEM::HOCOCR.HCSTP = 0;  // 動作
+				while(device::SYSTEM::OSCOVFSR.HCOVF() == 0) { asm("nop"); }
+				device::SYSTEM::PLLCR.PLLSRCSEL = 1;
 			} else {
 				device::SYSTEM::PRCR = 0xA500;
 				return;
@@ -155,16 +150,14 @@ namespace device {
 				}
 			}
 
-			if(OSC_TYPE_ == OSC_TYPE::HOCO) {
-				device::SYSTEM::PLLCR.PLLSRCSEL = 1;
-			}
-
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
 
 			if(OSC_TYPE_ == OSC_TYPE::XTAL || OSC_TYPE_ == OSC_TYPE::EXT) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 				device::SYSTEM::HOCOCR.HCSTP = 1;  ///< 高速オンチップオシレータ停止
 				device::SYSTEM::HOCOPCR.HOCOPCNT = 1;  ///< 高速オンチップオシレーター電源 OFF
+			} else if(OSC_TYPE_ == OSC_TYPE::HOCO) {
+				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 			}
 
 			// クロック関係書き込み不許可
