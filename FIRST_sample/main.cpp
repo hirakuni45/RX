@@ -52,6 +52,8 @@ namespace {
 #endif
 // クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
 	typedef device::system_io<> SYSTEM_IO;
+// 内蔵、高速発信器の利用
+//	typedef device::system_io<device::system_base::OSC_TYPE::HOCO> SYSTEM_IO;
 }
 
 int main(int argc, char** argv);
