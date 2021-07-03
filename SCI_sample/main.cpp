@@ -78,7 +78,7 @@ namespace {
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 // SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
+//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 	SCI		sci_;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
