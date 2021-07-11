@@ -538,7 +538,7 @@ namespace app {
 			pot_(vtx::srect(LOC_X(3), LOC_Y(3), BTN_W, BTN_H), "）"),
 
 			setup_   (vtx::srect(LOC_X(0), LOC_Y(2), BTN_W, BTN_H), "＠"),
-			sym_     (vtx::srect(LOC_X(1), LOC_Y(0), BTN_W, BTN_H), "Sm0"),
+			sym_     (vtx::srect(LOC_X(1), LOC_Y(0), BTN_W, BTN_H), "V0"),
 			sym_in_  (vtx::srect(LOC_X(1), LOC_Y(1), BTN_W, BTN_H), "Min"),
 			sym_out_ (vtx::srect(LOC_X(1), LOC_Y(2), BTN_W, BTN_H), "Rcl"),
 
