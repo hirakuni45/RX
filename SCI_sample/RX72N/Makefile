@@ -11,7 +11,7 @@ TARGET		=	sci_sample
 
 DEVICE		=	R5F572NN
 
-FATFS_VER	=	ff13c/source
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
@@ -26,7 +26,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	SCI_sample/main.cpp
 
-USER_LIBS	=	supc++
+USER_LIBS	=
 
 LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
