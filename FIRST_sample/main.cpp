@@ -4,19 +4,16 @@
 			RX64M, RX71M, RX72M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
-			RX65N (Renesas Envision kit RX65N): @n
+			RX65N (Renesas RX65N Envision kit): @n
 					12MHz のベースクロックを使用する @n
 			　　　　P70 に接続された LED を利用する @n
-			RX63T @n
-					12MHz のベースクロックを使用する @n
-					PB7 に接続された LED を利用する @n
 			RX24T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する @n
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する
-			RX72N: @n
+			RX72N (Renesas RX72N Envision Kit): @n
 					16MHz のベースクロックを使用する @n
 					P40 ピンにLEDを接続する @n
 			RX72T: @n
