@@ -13,6 +13,7 @@
 #include "RX65x/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
+#include "RX600/port_map_order.hpp"
 
 namespace device {
 
@@ -21,24 +22,8 @@ namespace device {
 		@brief  ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map_mtu {
+	class port_map_mtu : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ポート・マッピング順番型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ORDER : uint8_t {
-			BYPASS,		///< ポートマップの設定をバイパスする場合
-			FIRST,		///< 第１候補
-			SECOND,		///< 第２候補
-			THIRD,		///< 第３候補
-			FORCE,		///< 第４候補
-			FIFTH,		///< 第５候補
-			SIXTH,		///< 第６候補
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -304,7 +289,7 @@ namespace device {
 					MPC::PC7PFS.PSEL = sel;
 					PORTC::PMR.B7 = ena;
 					break;
-				case ORDER::FORCE:
+				case ORDER::FOURTH:
 					PORTC::PMR.B1 = 0;
 					MPC::PC1PFS.PSEL = sel;
 					PORTC::PMR.B1 = ena;
@@ -337,7 +322,7 @@ namespace device {
 					MPC::P80PFS.PSEL = sel;
 					PORT8::PMR.B0 = ena;
 					break;
-				case ORDER::FORCE:
+				case ORDER::FOURTH:
 					PORTB::PMR.B7 = 0;
 					MPC::PB7PFS.PSEL = sel;
 					PORTB::PMR.B7 = ena;
@@ -379,7 +364,7 @@ namespace device {
 					MPC::P16PFS.PSEL = sel;
 					PORT1::PMR.B6 = ena;
 					break;
-				case ORDER::FORCE:
+				case ORDER::FOURTH:
 					PORTC::PMR.B6 = 0;
 					MPC::PC6PFS.PSEL = sel;
 					PORTC::PMR.B6 = ena;
@@ -417,7 +402,7 @@ namespace device {
 					MPC::PC4PFS.PSEL = sel;
 					PORTC::PMR.B4 = ena;
 					break;
-				case ORDER::FORCE:
+				case ORDER::FOURTH:
 					PORTB::PMR.B6 = 0;
 					MPC::PB6PFS.PSEL = sel;
 					PORTB::PMR.B6 = ena;
@@ -468,7 +453,7 @@ namespace device {
 					MPC::PA0PFS.PSEL = sel;
 					PORTA::PMR.B0 = ena;
 					break;
-				case ORDER::FORCE:
+				case ORDER::FOURTH:
 					PORTE::PMR.B2 = 0;
 					MPC::PE2PFS.PSEL = sel;
 					PORTE::PMR.B2 = ena;
@@ -511,7 +496,7 @@ namespace device {
 					MPC::PC2PFS.PSEL = sel;
 					PORTC::PMR.B2 = ena;
 					break;
-				case ORDER::FORCE:
+				case ORDER::FOURTH:
 					PORTE::PMR.B3 = 0;
 					MPC::PE3PFS.PSEL = sel;
 					PORTE::PMR.B3 = ena;
@@ -554,7 +539,7 @@ namespace device {
 					MPC::P83PFS.PSEL = sel;
 					PORT8::PMR.B3 = ena;
 					break;
-				case ORDER::FORCE:
+				case ORDER::FOURTH:
 					PORTE::PMR.B5 = 0;
 					MPC::PE5PFS.PSEL = sel;
 					PORTE::PMR.B5 = ena;
@@ -597,7 +582,7 @@ namespace device {
 					MPC::P55PFS.PSEL = sel;
 					PORT5::PMR.B5 = ena;
 					break;
-				case ORDER::FORCE:
+				case ORDER::FOURTH:
 					PORTC::PMR.B3 = 0;
 					MPC::PC3PFS.PSEL = sel;
 					PORTC::PMR.B3 = ena;

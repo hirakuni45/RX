@@ -13,6 +13,7 @@
 #include "RX24T/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX24T/mpc.hpp"
+#include "RX600/port_map_order.hpp"
 
 namespace device {
 
@@ -21,24 +22,8 @@ namespace device {
 		@brief  ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map_mtu {
+	class port_map_mtu : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ポート・マッピング順番型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ORDER : uint8_t {
-			BYPASS,		///< ポートマップの設定をバイパスする場合
-			FIRST,		///< 第１候補
-			SECOND,		///< 第２候補
-			THIRD,		///< 第３候補
-			FORCE,		///< 第４候補
-			FIFTH,		///< 第５候補
-			SIXTH,		///< 第６候補
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
