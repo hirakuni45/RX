@@ -12,7 +12,7 @@
 
 /// RTC モジュールが無いデバイスでエラーとする
 #if defined(SIG_RX24T) || defined(SIG_RX66T)
-#  error "rtc.hpp: This module does not exist"
+  #error "rtc.hpp: This module does not exist"
 #endif
 
 namespace device {

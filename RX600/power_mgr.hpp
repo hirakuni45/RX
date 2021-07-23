@@ -15,7 +15,7 @@
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 #else  
-#  error "power_mgr.hpp requires SIG_RX64M or SIG_RX71M to be defined"
+  #error "power_mgr.hpp requires SIG_RX64M or SIG_RX71M to be defined"
 #endif
 
 namespace device {

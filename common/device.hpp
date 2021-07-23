@@ -3,14 +3,19 @@
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
 
-#if defined(SIG_RX24T)
+#if defined(SIG_RX62N)
+#include "RX62x/system.hpp"
+#include "RX62x/icu.hpp"
+#include "RX62x/icu_mgr.hpp"
+
+#elif defined(SIG_RX24T)
 #include "RX24T/clock_profile.hpp"
 #include "RX24T/peripheral.hpp"
 #include "RX24T/system.hpp"
@@ -20,11 +25,6 @@
 #include "RX24T/port_map.hpp"
 #include "RX24T/port_map_mtu.hpp"
 #include "RX600/rx_dsp_inst.h"
-
-#elif defined(SIG_RX62N)
-#include "RX62x/system.hpp"
-#include "RX62x/icu.hpp"
-#include "RX62x/icu_mgr.hpp"
 
 #elif defined(SIG_RX64M)
 #include "RX64M/clock_profile.hpp"
@@ -108,5 +108,5 @@
 #include "RX600/rx_dsp_inst.h"
 
 #else
-#  error "device.hpp: Requires SIG_XXX to be defined"
+  #error "device.hpp: Requires SIG_XXX to be defined"
 #endif
