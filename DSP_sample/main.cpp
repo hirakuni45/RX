@@ -84,8 +84,36 @@ namespace {
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
 
-	typedef utils::command<256> CMD;
-	CMD 	cmd_;
+	const uint32_t PARAM_SIZE = 1024;
+	int32_t	parama_[PARAM_SIZE];
+	int32_t	paramb_[PARAM_SIZE];
+
+	int32_t dsp_opr_(uint32_t loop)
+	{
+#ifdef __RXV3__
+		__mvtacgu_a0(0);
+#endif
+		__mvtachi_a0(0);
+		__mvtaclo_a0(0);
+		for(uint32_t i = 0; i < loop; ++i) {
+			auto a = parama_[i % PARAM_SIZE];
+			auto b = paramb_[i % PARAM_SIZE];
+			__emaca_a0(a, b);
+		}
+		return __mvfaclo_s0_a0();
+	}
+
+
+	int32_t cpu_opr_(uint32_t loop)
+	{
+		int32_t sum = 0;
+		for(uint32_t i = 0; i < loop; ++i) {
+			auto a = parama_[i % PARAM_SIZE];
+			auto b = paramb_[i % PARAM_SIZE];
+			sum += a * b;
+		}
+		return sum;
+	}
 }
 
 
@@ -121,9 +149,9 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
-	{  // タイマー設定（100Hz）
+	{  // タイマー設定（1000Hz）
 		uint8_t intr = 4;
-		cmt_.start(100, intr);
+		cmt_.start(1000, intr);
 	}
 
 	{  // SCI の開始
@@ -150,41 +178,37 @@ int main(int argc, char** argv)
 		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
-	cmd_.set_prompt("# ");
+	cmt_.sync();
 
-	{
-		__mvtacgu_a0(0);
-		__mvtachi_a0(0);
-		__mvtaclo_a0(0);
-		int32_t a = -100;
-		int32_t b = 777;
-		__emaca_a0(a, b);
-		__emaca_a0(a, b);
-		auto ans = __mvfaclo_s0_a0();
-		utils::format("emaca: %d * %d -> %d\n") % a % b % ans;
+	for(uint32_t i = 0; i < PARAM_SIZE; ++i) {
+		parama_[i] = rand() & 0x8fffffff;
+		paramb_[i] = rand() & 0x8fffffff;
 	}
 
-	uint8_t cnt = 0;
-	while(1) {
+	uint32_t loop = 50000000;
+	{
+		auto st = cmt_.get_counter();
+		auto a = dsp_opr_(loop);
+		auto et = cmt_.get_counter();
+		utils::format("DSP %d loops: ans = %d, (%u [ms])\n") % loop % a % (et - st); 
+	}
 
+	{
+		auto st = cmt_.get_counter();
+		auto a = cpu_opr_(loop);
+		auto et = cmt_.get_counter();
+		utils::format("CPU %d loops: ans = %d, (%u [ms])\n") % loop % a % (et - st); 
+	}
+
+	uint16_t cnt = 0;
+	while(1) {
 		cmt_.sync();
-		if(cmd_.service()) {
-			uint32_t cmdn = cmd_.get_words();
-			uint32_t n = 0;
-			while(n < cmdn) {
-				char tmp[256];
-				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
-					utils::format("Param%d: '%s'\n") % n % tmp;
-				}
-				++n;
-			}
-		}
 
 		++cnt;
-		if(cnt >= 50) {
+		if(cnt >= (50 * 10)) {
 			cnt = 0;
 		}
-		if(cnt < 25) {
+		if(cnt < (25 * 10)) {
 			LED::P = 0;
 		} else {
 			LED::P = 1;
