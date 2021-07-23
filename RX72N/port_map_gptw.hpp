@@ -11,6 +11,7 @@
 #include "RX72N/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
+#include "RX600/port_map_order.hpp"
 
 namespace device {
 
@@ -19,25 +20,8 @@ namespace device {
 		@brief  GPTW ポート・マッピング
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map_gptw {
+	class port_map_gptw : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ポート・マッピング・オーダー型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ORDER : uint8_t {
-			BYPASS,		///< ポートマップの設定をバイパスする場合
-			FIRST,		///< 第１候補
-			SECOND,		///< 第２候補
-			THIRD,		///< 第３候補
-			FOURTH,		///< 第４候補
-			FIFTH,		///< 第５候補
-			SIXTH,		///< 第６候補
-			SEVENTH,	///< 第７候補
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

@@ -13,6 +13,7 @@
 #include "RX72N/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
+#include "RX600/port_map_order.hpp"
 
 namespace device {
 
@@ -21,24 +22,8 @@ namespace device {
 		@brief  ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map_tpu {
+	class port_map_tpu : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ポート・マッピング・オプション型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class option : uint8_t {
-			BYPASS,		///< ポートマップの設定をバイパスする場合
-			FIRST,		///< 第１候補
-			SECOND,		///< 第２候補
-			THIRD,		///< 第３候補
-			FORCE,		///< 第４候補
-			FIFTH,		///< 第５候補
-			SIXTH,		///< 第６候補
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -110,7 +95,7 @@ namespace device {
 /// PA1 (113)  TIOCB0
 /// PA0 (118)  TIOCA0
 
-		static bool tpu0_(channel ch, bool ena, option opt) noexcept
+		static bool tpu0_(channel ch, bool ena, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -118,12 +103,12 @@ namespace device {
 
 			case channel::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT3::PMR.B4 = 0;
 					MPC::P34PFS.PSEL = sel;
 					PORT3::PMR.B4 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;
 					PORTB::PMR.B3 = ena;
@@ -136,17 +121,17 @@ namespace device {
 
 			case channel::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
 					MPC::P15PFS.PSEL = sel;
 					PORT1::PMR.B5 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT1::PMR.B3 = 0;
 					MPC::P13PFS.PSEL = sel;
 					PORT1::PMR.B3 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORTA::PMR.B1 = 0;
 					MPC::PA1PFS.PSEL = sel;
 					PORTA::PMR.B1 = ena;
@@ -159,12 +144,12 @@ namespace device {
 
 			case channel::C:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT3::PMR.B2 = 0;
 					MPC::P32PFS.PSEL = sel;
 					PORT3::PMR.B2 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B1 = 0;
 					MPC::PB1PFS.PSEL = sel;
 					PORTB::PMR.B1 = ena;
@@ -177,12 +162,12 @@ namespace device {
 
 			case channel::D:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT3::PMR.B3 = 0;
 					MPC::P33PFS.PSEL = sel;
 					PORT3::PMR.B3 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTA::PMR.B3 = 0;
 					MPC::PA3PFS.PSEL = sel;
 					PORTA::PMR.B3 = ena;
@@ -200,7 +185,7 @@ namespace device {
 		}
 
 
-		static bool tpu1_(channel ch, bool ena, option opt) noexcept
+		static bool tpu1_(channel ch, bool ena, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -208,12 +193,12 @@ namespace device {
 
 			case channel::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
 					MPC::P20PFS.PSEL = sel;
 					PORT2::PMR.B0 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTE::PMR.B4 = 0;
 					MPC::PE4PFS.PSEL = sel;
 					PORTE::PMR.B4 = ena;
@@ -226,12 +211,12 @@ namespace device {
 
 			case channel::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
 					MPC::P21PFS.PSEL = sel;
 					PORT2::PMR.B1 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B5 = 0;
 					MPC::PB5PFS.PSEL = sel;
 					PORTB::PMR.B5 = ena;
@@ -249,7 +234,7 @@ namespace device {
 		}
 
 
-		static bool tpu2_(channel ch, bool ena, option opt) noexcept
+		static bool tpu2_(channel ch, bool ena, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -257,12 +242,12 @@ namespace device {
 
 			case channel::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT2::PMR.B6 = 0;
 					MPC::P26PFS.PSEL = sel;
 					PORT2::PMR.B6 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B5 = 0;
 					MPC::PB5PFS.PSEL = sel;
 					PORTB::PMR.B5 = ena;
@@ -275,12 +260,12 @@ namespace device {
 
 			case channel::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT2::PMR.B7 = 0;
 					MPC::P27PFS.PSEL = sel;
 					PORT2::PMR.B7 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTE::PMR.B5 = 0;
 					MPC::PE5PFS.PSEL = sel;
 					PORTE::PMR.B5 = ena;
@@ -298,7 +283,7 @@ namespace device {
 		}
 
 
-		static bool tpu3_(channel ch, bool ena, option opt) noexcept
+		static bool tpu3_(channel ch, bool ena, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
@@ -306,22 +291,22 @@ namespace device {
 
 			case channel::A:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
 					MPC::P17PFS.PSEL = sel;
 					PORT1::PMR.B7 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT1::PMR.B4 = 0;
 					MPC::P14PFS.PSEL = sel;
 					PORT1::PMR.B4 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORTC::PMR.B7 = 0;
 					MPC::PC7PFS.PSEL = sel;
 					PORTC::PMR.B7 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::FOURTH:
 					PORTC::PMR.B1 = 0;
 					MPC::PC1PFS.PSEL = sel;
 					PORTC::PMR.B1 = ena;
@@ -334,32 +319,32 @@ namespace device {
 
 			case channel::B:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT2::PMR.B2 = 0;
 					MPC::P22PFS.PSEL = sel;
 					PORT2::PMR.B2 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORTC::PMR.B5 = 0;
 					MPC::PC5PFS.PSEL = sel;
 					PORTC::PMR.B5 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORT8::PMR.B0 = 0;
 					MPC::P80PFS.PSEL = sel;
 					PORT8::PMR.B0 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::FOURTH:
 					PORTB::PMR.B7 = 0;
 					MPC::PB7PFS.PSEL = sel;
 					PORTB::PMR.B7 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					PORT1::PMR.B7 = 0;
 					MPC::P17PFS.PSEL = sel;
 					PORT1::PMR.B7 = ena;
 					break;
-				case option::SIXTH:
+				case ORDER::SIXTH:
 					PORTE::PMR.B1 = 0;
 					MPC::PE1PFS.PSEL = sel;
 					PORTE::PMR.B1 = ena;
@@ -372,27 +357,27 @@ namespace device {
 
 			case channel::C:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORTJ::PMR.B3 = 0;
 					MPC::PJ3PFS.PSEL = sel;
 					PORTJ::PMR.B3 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT5::PMR.B6 = 0;
 					MPC::P56PFS.PSEL = sel;
 					PORT5::PMR.B6 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORT1::PMR.B6 = 0;
 					MPC::P16PFS.PSEL = sel;
 					PORT1::PMR.B6 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::FOURTH:
 					PORTC::PMR.B6 = 0;
 					MPC::PC6PFS.PSEL = sel;
 					PORTC::PMR.B6 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					PORTC::PMR.B0 = 0;
 					MPC::PC0PFS.PSEL = sel;
 					PORTC::PMR.B0 = ena;
@@ -405,27 +390,27 @@ namespace device {
 
 			case channel::D:
 				switch(opt) {
-				case option::FIRST:
+				case ORDER::FIRST:
 					PORT2::PMR.B3 = 0;
 					MPC::P23PFS.PSEL = sel;
 					PORT2::PMR.B3 = ena;
 					break;
-				case option::SECOND:
+				case ORDER::SECOND:
 					PORT8::PMR.B1 = 0;
 					MPC::P81PFS.PSEL = sel;
 					PORT8::PMR.B1 = ena;
 					break;
-				case option::THIRD:
+				case ORDER::THIRD:
 					PORTC::PMR.B4 = 0;
 					MPC::PC4PFS.PSEL = sel;
 					PORTC::PMR.B4 = ena;
 					break;
-				case option::FORCE:
+				case ORDER::FOURTH:
 					PORTB::PMR.B6 = 0;
 					MPC::PB6PFS.PSEL = sel;
 					PORTB::PMR.B6 = ena;
 					break;
-				case option::FIFTH:
+				case ORDER::FIFTH:
 					PORTE::PMR.B0 = 0;
 					MPC::PE0PFS.PSEL = sel;
 					PORTE::PMR.B0 = ena;
@@ -454,9 +439,9 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, channel ch, bool ena = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, channel ch, bool ena = true, ORDER opt = ORDER::FIRST) noexcept
 		{
-			if(opt == option::BYPASS) return true;
+			if(opt == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可

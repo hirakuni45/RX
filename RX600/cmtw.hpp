@@ -12,7 +12,7 @@
 
 /// cmtw モジュールが無いデバイスでエラーとする
 #if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
-#  error "cmtw.hpp: This module does not exist"
+  #error "cmtw.hpp: This module does not exist"
 #endif
 
 namespace device {

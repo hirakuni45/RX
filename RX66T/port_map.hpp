@@ -11,6 +11,7 @@
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
 #include "RX66T/peripheral.hpp"
+#include "RX600/port_map_order.hpp"
 
 namespace device {
 
@@ -19,31 +20,8 @@ namespace device {
 		@brief  ポート・マッピング・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map {
+	class port_map : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ポート・マッピング・オーダー型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ORDER : uint8_t {
-			BYPASS,		///< ポートマップの設定をバイパスする場合
-			FIRST,		///< 第１候補
-			SECOND,		///< 第２候補
-			THIRD,		///< 第３候補
-			FOURTH,		///< 第４候補
-			_5TH,		///< 第５候補
-			_6TH,		///< 第６候補
-			_7TH,		///< 第７候補
-			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
-			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
-			THIRD_I2C,	///< SCI ポートを簡易 I2C として使う場合、第３候補
-			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
-			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
-			THIRD_SPI,	///< SCI ポートを簡易 SPI として使う場合、第３候補
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -241,7 +219,7 @@ namespace device {
 				PORT2::PMR.B3 = enable;
 				PORT2::PMR.B2 = enable;
 				break;
-			case ORDER::_5TH:
+			case ORDER::FIFTH:
 				// PF3/CRX0 (31/144)
 				// PF2/CTX0 (32/144)
 				PORTF::PMR.B3 = 0;
@@ -251,7 +229,7 @@ namespace device {
 				PORTF::PMR.B3 = enable;
 				PORTF::PMR.B2 = enable;
 				break;
-			case ORDER::_6TH:
+			case ORDER::SIXTH:
 				// PA7/CRX0 (52/144)
 				// PA6/CTX0 (53/144)
 				PORTA::PMR.B7 = 0;
@@ -261,7 +239,7 @@ namespace device {
 				PORTA::PMR.B7 = enable;
 				PORTA::PMR.B6 = enable;
 				break;
-			case ORDER::_7TH:
+			case ORDER::SEVENTH:
 				// PC6/CRX0 (62/144)
 				// PC5/CTX0 (63/144)
 				PORTC::PMR.B6 = 0;

@@ -1,17 +1,15 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72N Makefile
+#   @brief  RX66T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	sci_sample
+TARGET		=	dsp_sample
 
-DEVICE		=	R5F572NN
-
-FATFS_VER	=	ff14/source
+DEVICE		=	R5F566TE
 
 BUILD		=	release
 # BUILD		=	debug
@@ -24,13 +22,13 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	SCI_sample/main.cpp
+PSOURCES	=	DSP_sample/main.cpp
 
 USER_LIBS	=
 
-LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+LDSCRIPT	=	../../RX66T/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72N
+USER_DEFS	=	SIG_RX66T
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
@@ -63,11 +61,9 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS		=
 
-INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
-
-LIB_ROOT	=	../../RX600/drw2d
+INC_APP		=	. ../ ../../
 
 AS_OPT		=
 
@@ -201,6 +197,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX66T --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

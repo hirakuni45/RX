@@ -20,7 +20,7 @@
 #if defined(LITTLE_ENDIAN)
 #elif defined(BIG_ENDIAN)
 #else
-#  error "sdhi_io.hpp requires {LITTLE/BIG}_ENDIAN to be defined"
+  #error "sdhi_io.hpp requires {LITTLE/BIG}_ENDIAN to be defined"
 #endif
 
 namespace fatfs {

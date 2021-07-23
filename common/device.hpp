@@ -3,14 +3,19 @@
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
 
-#if defined(SIG_RX24T)
+#if defined(SIG_RX62N)
+#include "RX62x/system.hpp"
+#include "RX62x/icu.hpp"
+#include "RX62x/icu_mgr.hpp"
+
+#elif defined(SIG_RX24T)
 #include "RX24T/clock_profile.hpp"
 #include "RX24T/peripheral.hpp"
 #include "RX24T/system.hpp"
@@ -19,11 +24,7 @@
 #include "RX24T/icu_mgr.hpp"
 #include "RX24T/port_map.hpp"
 #include "RX24T/port_map_mtu.hpp"
-
-#elif defined(SIG_RX62N)
-#include "RX62x/system.hpp"
-#include "RX62x/icu.hpp"
-#include "RX62x/icu_mgr.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX64M)
 #include "RX64M/clock_profile.hpp"
@@ -34,6 +35,7 @@
 #include "RX600/icu_mgr.hpp"
 #include "RX600/port_map.hpp"
 #include "RX600/port_map_mtu.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX71M)
 #include "RX71M/clock_profile.hpp"
@@ -44,6 +46,7 @@
 #include "RX600/icu_mgr.hpp"
 #include "RX600/port_map.hpp"
 #include "RX600/port_map_mtu.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72M)
 #include "RX72M/clock_profile.hpp"
@@ -54,6 +57,7 @@
 #include "RX72M/icu_mgr.hpp"
 #include "RX72M/port_map.hpp"
 #include "RX72M/port_map_mtu.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72N)
 #include "RX72N/clock_profile.hpp"
@@ -66,6 +70,7 @@
 #include "RX72N/port_map_mtu.hpp"
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX65N)
 #include "RX65x/clock_profile.hpp"
@@ -76,6 +81,7 @@
 #include "RX65x/icu_mgr.hpp"
 #include "RX65x/port_map.hpp"
 #include "RX65x/port_map_mtu.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX66T)
 #include "RX66T/clock_profile.hpp"
@@ -87,6 +93,7 @@
 #include "RX66T/port_map.hpp"
 #include "RX66T/port_map_mtu.hpp"
 #include "RX66T/port_map_gptw.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72T)
 #include "RX72T/clock_profile.hpp"
@@ -98,7 +105,8 @@
 #include "RX72T/port_map.hpp"
 #include "RX72T/port_map_mtu.hpp"
 #include "RX72T/port_map_gptw.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #else
-#  error "device.hpp: Requires SIG_XXX to be defined"
+  #error "device.hpp: Requires SIG_XXX to be defined"
 #endif

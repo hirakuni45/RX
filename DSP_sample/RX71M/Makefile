@@ -1,17 +1,15 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72N Makefile
+#   @brief  RX71M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	sci_sample
+TARGET		=	dsp_sample
 
-DEVICE		=	R5F572NN
-
-FATFS_VER	=	ff14/source
+DEVICE		=	R5F571ML
 
 BUILD		=	release
 # BUILD		=	debug
@@ -24,13 +22,13 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	SCI_sample/main.cpp
+PSOURCES	=	DSP_sample/main.cpp
 
 USER_LIBS	=
 
-LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+LDSCRIPT	=	../../RX71M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72N
+USER_DEFS	=	SIG_RX71M
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
@@ -41,9 +39,9 @@ AS_DEFS		=	-mcpu=rx600
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
-AS_DEFS		=	-misa=v3
-CC_DEFS		=	-misa=v3
-CP_DEFS		=	-misa=v3
+AS_DEFS		=	-misa=v2
+CC_DEFS		=	-misa=v2
+CP_DEFS		=	-misa=v2
 endif
 
 # Include path for each environment
@@ -65,11 +63,9 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+INC_APP		=	. ../ ../../
 
-LIB_ROOT	=	../../RX600/drw2d
-
-AS_OPT		=
+AS_OPT		=	--defsym MEMWAIT=1
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

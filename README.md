@@ -142,6 +142,27 @@ Features in Renesas GNU-RX 8.3.0：
 - RX72N Built-in trigonometric function unit (TFU) support
 
 ---
+
+The difference between CC-RX:   
+In terms of compiler optimization, CC-RX seems to be superior to GNU-RX in the CoreMark benchmark.   
+It's hard to imagine why such a big difference would occur, but if you know the internal structure of the CPU, you might be able to achieve it...   
+   
+|Compiler|RX core|CoreMark (MHz)|Rate|
+|---------|------|--------------|---|
+|CC-RX (V3.02)|RX72N|5.21|1|
+|GNU-RX (8.3.x)|RX72N|3.59|0.69|
+|||||
+|CC-RX (V3.02)|RX65N|4.37|1|
+|GNU-RX (8.3.x)|RX65N|3.22|0.74|
+   
+The above values are quite exciting, but when running actual applications, we do not feel such a big difference in sensory perception.   
+- The big difference seems to occur in the case of applications that use a lot of instructions that require a relatively large number of CPU cycles, such as multiplication and division.   
+- For applications that use a lot of floating point instructions, GNU-RX may be faster.
+   
+No matter how good CC-RX is, it's not worth the cost for hobbyists, and if it doesn't support C++11, it's not practical to use.   
+In addition, the above benchmarks are based on CoreMark, so you need to evaluate it with actual applications to know what it really is.   
+   
+---
 ## RX Development environment preparation (Windows、MSYS2)
    
  - On Windows, install the MSYS2 environment in advance.   

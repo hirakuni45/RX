@@ -7,7 +7,7 @@
 				https://github.com/hirakuni45/glfw_app/blob/master/LICENSE
 */
 //=====================================================================//
-#include "utils/vtx.hpp"
+#include "common/vtx.hpp"
 
 namespace vtx {
 

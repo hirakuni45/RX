@@ -1,74 +1,77 @@
-Renesas RX24T, RX64M, RX65N, RX71M, RX66T, RX72T, RX72N LED 点滅サンプル
+Renesas RX24T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
 =========
-
+   
+[Japanese](READMEja.md)
+   
 ## 概要
 RX マイコンを使った LED 点滅のサンプルプログラム
+   
+- マスタークロックのブースト
+- LED の点滅
    
 ## プロジェクト・リスト
 - main.cpp
 - RX24T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
-- RX65N/Makefile
+- RX65N/Makefile (for RX65N Envision Kit)
 - RX66T/Makefile
+- RX72N/Makefile (for RX72N Envision Kit)
 - RX72T/Makefile
-- RX72N/Makefile
    
-## ハードウェアーの準備
-- ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
-- Makefile で、各モジュール別の設定周波数を宣言している。
-- RX24T:  80MHz (10MHz)
-- RX64M: 120MHz (12MHz)
-- RX71M: 240MHz (12MHz)
-- RX65N: 120MHz (12MHz)
-- RX66T: 160MHz (10MHz)
-- RX72T: 192MHz (16MHz)
-- RX72N: 240MHz (16MHz)
-   
-- LED を指定のポートに接続する。
+## ハードウェアーの準備（全般）
+ - 各マイコンの、クリスタル周波数、各モジュールの周波数は、RXxxx/clock_profile.hpp を参照して下さい。
+ - インジケーター LED を指定のポートに接続する。
    
 ```
 #if defined(SIG_RX71M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-#elif defined(SIG_RX72M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-#elif defined(SIG_RX72N)
-	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX64M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX65N" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-#elif defined(SIG_RX63T)
-	typedef device::system_io<12'000'000, 96'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORTB, device::bitpos::B7> LED;
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX24T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX66T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+#elif defined(SIG_RX72N)
+	static const char* system_str_ = { "RX72N" };
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 #elif defined(SIG_RX72T)
-	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 #endif
+// クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
+	typedef device::system_io<> SYSTEM_IO;
+// 内蔵、高速発信器の利用
+//	typedef device::system_io<device::system_base::OSC_TYPE::HOCO> SYSTEM_IO;
 ```
-- RX65N Envision kit の場合は、ボード上の青色 LED を利用する。
-- RX72N Envision kit の場合は、ボード上の青色 LED を利用する。
+
+ - Envision kit RX65N の場合、インジケーター LED はボード上の青色 LED を利用する。
+ - Envision kit RX72N の場合、インジケーター LED はボード上の青色 LED を利用する。
+   
+## マスタークロックのブースト
+- main 関数に動作が移行したら、内部インストラクションクロックを最大速度にブーストします。
+- 内部デバイス用クロックも設定します。（RXxxx/clock_profile.hpp に設定があります）
+   
+```
+    SYSTEM_IO::boost_master_clock();
+```
    
 ## リソースの準備
 - 特に無し
    
 ## ビルド方法
 - 各プラットホームディレクトリーに移動、make する。
-- led_sample.mot ファイルを書き込む。
+- led_sample.mot ファイルをマイコンに書き込む。
    
 ## 動作
-- LED が 0.25 秒間隔で点滅する。
+- LED が 0.25 秒間隔で点滅する。（ソフトウェアーによる遅延ループなので正確ではありません）
     
 ## 備考
 - このプロジェクトが基本で最低限の設定などが含まれます、新しいプロジェクトを始める場合の参考にして下さい。   
