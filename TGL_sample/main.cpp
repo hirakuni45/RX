@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  RX24T/RX64M/RX71M/RX65N/RX66T/RX72N RayTracer サンプル
+    @brief  RX72N TinyGL サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -21,9 +21,6 @@
 #include "graphics/shape_3d.hpp"
 
 namespace {
-
-	typedef device::cmt_mgr<device::CMT0> CMT;
-	CMT			cmt_;
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont_null KFONT;
@@ -96,12 +93,6 @@ namespace {
 
 extern "C" {
 
-	uint32_t millis(void)
-	{
-		return cmt_.get_counter();
-	}
-
-
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -135,11 +126,6 @@ int main(int argc, char** argv)
 	{  // SCI 設定
 		uint8_t intr_lvl = 2;
 		sci_.start(115200, intr_lvl);
-	}
-
-	{  // 時間計測タイマー（1000Hz）
-		uint8_t intr_lvl = 4;
-		cmt_.start(1000, intr_lvl);
 	}
 
 	utils::format("\r%s Start for TinyGL: %u, %u\n") % system_str_ % LCD_X % LCD_Y;
