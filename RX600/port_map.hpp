@@ -12,10 +12,11 @@
 #include "RX600/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
+#include "RX600/port_map_order.hpp"
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 #else  
-#  error "port_map.hpp requires SIG_RX64M or SIG_RX71M to be defined"
+  #error "port_map.hpp requires SIG_RX64M or SIG_RX71M to be defined"
 #endif
 
 namespace device {
@@ -25,34 +26,8 @@ namespace device {
 		@brief  ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map {
+	class port_map : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ポート・マッピング・オーダー型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ORDER : uint8_t {
-			BYPASS,		///< ポートマップの設定をバイパスする場合
-			FIRST,		///< 第１候補 (XXX-A グループ)
-			SECOND,		///< 第２候補 (XXX-B グループ)
-			THIRD,		///< 第３候補 (XXX-C グループ)
-			FORCE,		///< 第４候補 (XXX-D グループ)
-			LOCAL0,		///< 独自の特殊な設定０
-			LOCAL1,		///< 独自の特殊な設定１
-			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
-			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
-			THIRD_I2C,	///< SCI ポートを簡易 I2C として使う場合、第３候補
-			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
-			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
-			THIRD_SPI,	///< SCI ポートを簡易 SPI として使う場合、第３候補
-			FIRST_MII,	///< ETHERC MII 接続、第１候補
-			SECOND_MII,	///< ETHERC MII 接続、第２候補
-			FIRST_RMII,	///< ETHERC RMII 接続、第１候補
-			SECOND_RMII,///< ETHERC RMII 接続、第２候補
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -722,50 +697,6 @@ namespace device {
 					PORTD::PMR.B4 = 0;
 					MPC::PD4PFS.PSEL = sel;  // QSSL-B   (PD4 LQFP176: 142)
 					PORTD::PMR.B4 = enable;
-				}
-				break;
-
-			case peripheral::ETHERC0:  // (ETHERCA) only RMII mode, not use link status interrupt
-				{
-					uint8_t  mii = enable ? 0b010001 : 0;
-					uint8_t rmii = enable ? 0b010010 : 0;
-
-///					PORT7::PMR.B3 = 0;
-					PORT7::PMR.B2 = 0;
-					PORT7::PMR.B1 = 0;
-///					MPC::P73PFS.PSEL = mii;   // ET0_WOL  (144LQFP: 77)
-					MPC::P72PFS.PSEL = mii;   // ET0_MDC  (144LQFP: 85)
-					MPC::P71PFS.PSEL = mii;   // ET0_MDIO (144LQFP: 86)
-///					PORT7::PMR.B3 = enable;
-					PORT7::PMR.B2 = enable;
-					PORT7::PMR.B1 = enable;
-
-					PORTB::PMR.B7 = 0;
-					PORTB::PMR.B6 = 0;
-					PORTB::PMR.B5 = 0;
-					PORTB::PMR.B4 = 0;
-					PORTB::PMR.B3 = 0;
-					PORTB::PMR.B2 = 0;
-					PORTB::PMR.B1 = 0;
-					PORTB::PMR.B0 = 0;
-					MPC::PB7PFS.PSEL = rmii;  // RMII0_CRS_DV (144LQFP: 78)
-					MPC::PB6PFS.PSEL = rmii;  // RMII0_TXD1   (144LQFP: 79)
-					MPC::PB5PFS.PSEL = rmii;  // RMII0_TXD0   (144LQFP: 80)
-					MPC::PB4PFS.PSEL = rmii;  // RMII0_TXD_EN (144LQFP: 81)
-					MPC::PB3PFS.PSEL = rmii;  // RMII0_RX_ER  (144LQFP: 82)
-					MPC::PB2PFS.PSEL = rmii;  // REF50CK0     (144LQFP: 83)
-					MPC::PB1PFS.PSEL = rmii;  // RMII0_RXD0   (144LQFP: 84)
-					MPC::PB0PFS.PSEL = rmii;  // RMII0_RXD1   (144LQFP: 87)
-					PORTB::PMR.B7 = enable;
-					PORTB::PMR.B6 = enable;
-					PORTB::PMR.B5 = enable;
-					PORTB::PMR.B4 = enable;
-					PORTB::PMR.B3 = enable;
-					PORTB::PMR.B2 = enable;
-					PORTB::PMR.B1 = enable;
-					PORTB::PMR.B0 = enable;
-
-					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
 				}
 				break;
 

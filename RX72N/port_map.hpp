@@ -12,6 +12,7 @@
 #include "RX72N/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
+#include "RX600/port_map_order.hpp"
 
 namespace device {
 
@@ -20,30 +21,8 @@ namespace device {
 		@brief  ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map {
+	class port_map : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ポート・マッピング・オーダー型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ORDER : uint8_t {
-			BYPASS,		///< ポートマップの設定をバイパスする場合
-			FIRST,		///< 第１候補 (XXX-A グループ)
-			SECOND,		///< 第２候補 (XXX-B グループ)
-			THIRD,		///< 第３候補 (XXX-C グループ)
-			FORCE,		///< 第４候補 (XXX-D グループ)
-			LOCAL0,		///< 独自の特殊な設定０
-			LOCAL1,		///< 独自の特殊な設定１
-			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
-			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
-			THIRD_I2C,	///< SCI ポートを簡易 I2C として使う場合、第３候補
-			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
-			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
-			THIRD_SPI,	///< SCI ポートを簡易 SPI として使う場合、第３候補
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
