@@ -12,6 +12,7 @@
 #include <functional>
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
+#include "ff14/source/ff.h"
 
 namespace utils {
 
