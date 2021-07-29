@@ -42,6 +42,14 @@
 #include "common/iica_io.hpp"
 #include "chip/DS3231.hpp"
 
+#include "graphics/font8x16.hpp"
+#include "graphics/kfont.hpp"
+#include "graphics/graphics.hpp"
+#include "graphics/filer.hpp"
+
+#include "common/sci_i2c_io.hpp"
+#include "chip/FT5206.hpp"
+
 namespace {
 
 #if defined(SIG_RX24T)
@@ -121,7 +129,7 @@ namespace {
 
 #elif defined(SIG_RX65N)
 
-	static const char* system_str_ = { "RX65N" };
+	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< 「０」でＯＮ
@@ -129,9 +137,22 @@ namespace {
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
 	SDC		sdc_;
 
+	#define TOUCH_FILER
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
+	static const auto PIX = graphics::pixel::TYPE::RGB565;
+	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+	static const uint32_t LCD_ORG = 0x0000'0100;
+
+	typedef utils::fixed_fifo<uint8_t, 64> RB64;
+	typedef utils::fixed_fifo<uint8_t, 64> SB64;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
+
 #elif defined(SIG_RX72N)
 
-	static const char* system_str_ = { "RX72N" };
+	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
@@ -139,6 +160,18 @@ namespace {
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
 	SDC		sdc_;
 
+	#define TOUCH_FILER
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
+	static const auto PIX = graphics::pixel::TYPE::RGB565;
+	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
+	static const uint32_t LCD_ORG = 0x0080'0000;
+
+	typedef utils::fixed_fifo<uint8_t, 64> RB64;
+	typedef utils::fixed_fifo<uint8_t, 64> SB64;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 #endif
 	typedef device::system_io<> SYSTEM_IO;
 
@@ -210,6 +243,39 @@ namespace {
 #ifdef ENABLE_I2C_RTC
 	I2C		i2c_;
 	RTC		rtc_(i2c_);
+#endif
+
+#ifdef TOUCH_FILER
+	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
+
+	typedef graphics::font8x16 AFONT;
+// 	for cash into SD card /kfont16.bin
+//	typedef graphics::kfont<16, 16, 64> KFONT;
+	typedef graphics::kfont<16, 16> KFONT;
+	typedef graphics::font<AFONT, KFONT> FONT;
+
+	// ハードウェアレンダラー
+//	typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
+	// ソフトウェアーレンダラー
+	typedef graphics::render<GLCDC, FONT> RENDER;
+	// 標準カラーインスタンス
+	typedef graphics::def_color DEF_COLOR;
+
+	GLCDC	glcdc_(nullptr, reinterpret_cast<void*>(LCD_ORG));
+	AFONT	afont_;
+	KFONT	kfont_;
+	FONT	font_(afont_, kfont_);
+	RENDER	render_(glcdc_, font_);
+
+	// ファイラー定義
+	typedef gui::filer_base FILER_BASE;
+	typedef gui::filer<RENDER> FILER;
+	FILER	filer_(render_, true);  // ３本タッチオープンを有効にする場合第二引数「true」
+
+	// タッチパネル定義
+	FT5206_I2C	ft5206_i2c_;
+	typedef chip::FT5206<FT5206_I2C> TOUCH;
+	TOUCH	touch_(ft5206_i2c_);
 #endif
 
 	bool write_test_(const char* fname, uint32_t size)
@@ -426,6 +492,49 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
+	auto clk = device::clock_profile::ICLK / 1'000'000;
+	utils::format("Start SD-CARD Access sample for '%s' %d[MHz]\n") % system_str_ % clk;
+
+#ifdef TOUCH_FILER
+	{  // GLCDC の初期化
+		LCD_DISP::DIR  = 1;
+		LCD_LIGHT::DIR = 1;
+		LCD_DISP::P  = 0;  // DISP Disable
+		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
+		if(glcdc_.start()) {
+			utils::format("Start GLCDC\n");
+			LCD_DISP::P  = 1;  // DISP Enable
+			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
+			if(!glcdc_.control(GLCDC::CONTROL_CMD::START_DISPLAY)) {
+				utils::format("GLCDC ctrl fail...\n");
+			}
+		} else {
+			utils::format("GLCDC Fail\n");
+		}
+	}
+
+	{  // レンダラー初期化
+		auto ver = render_.get_version();
+		utils::format("DRW2D Version: %04X\n") % ver;
+		if(render_.start()) {
+			utils::format("Start DRW2D\n");
+		} else {
+			utils::format("DRW2D Fail\n");
+		}
+	}
+
+	{  // FT5206 touch screen controller
+		TOUCH::reset<FT5206_RESET>();
+		uint8_t intr_lvl = 1;
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, FT5206_I2C::MODE::MASTER, intr_lvl)) {
+			utils::format("FT5206 I2C Start Fail...\n");
+		}
+		if(!touch_.start()) {
+			utils::format("FT5206 Start Fail...\n");
+		}
+	}
+#endif
+
 #ifdef ENABLE_RTC
 	{  // RTC の開始
 		rtc_.start();
@@ -445,19 +554,36 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	auto clk = device::clock_profile::ICLK / 1'000'000;
-	utils::format("Start SD-CARD Access sample for '%s' %d[MHz]\n") % system_str_ % clk;
-
 	cmd_.set_prompt("# ");
 
 	LED::DIR = 1;
 
 	uint8_t cnt = 0;
 	while(1) {
+
+		bool mount = sdc_.service();
+
+#ifdef TOUCH_FILER
+		render_.sync_frame();
+		touch_.update();
+		{
+			uint32_t ctrl = 0;
+			if(mount) {
+				FILER_BASE::set(FILER_BASE::ctrl::MOUNT, ctrl);
+			}
+			auto tnum = touch_.get_touch_num();
+			const auto& t = touch_.get_touch_pos(0);
+			filer_.set_touch(tnum, t.pos); 
+			char tmp[256];
+			tmp[0] = 0;
+			auto fst = filer_.update(ctrl, tmp, sizeof(tmp));
+			if(fst == FILER_BASE::status::FILE) {
+				utils::format("Select file: '%s'\n") % tmp;
+			}
+		}
+#else
 		cmt_.at_task().sync_100hz();
-
-		sdc_.service();
-
+#endif
 		command_();
 
 		++cnt;
