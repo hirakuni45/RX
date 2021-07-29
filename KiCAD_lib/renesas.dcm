@@ -25,6 +25,18 @@ D Renesas RX72M LFQFP 176
 K RENESAS RX RX72M MCU
 $ENDCMP
 #
+$CMP RX72T_100
+D Renesas RX72T LFQFP 100 with PGA pseudo-differential input and USB
+K RENESAS RX RX72T
+F https://www.renesas.com/jp/ja/img/products/microcontrollers-microprocessors/rx/rx700/rx72t/r01ds0331ej0100-rx72t.pdf
+$ENDCMP
+#
+$CMP RX72T_100_PGA_USB
+D Renesas RX72T LFQFP 100 with PGA pseudo-differential input and USB
+K RENESAS RX RX72T
+F https://www.renesas.com/jp/ja/img/products/microcontrollers-microprocessors/rx/rx700/rx72t/r01ds0331ej0100-rx72t.pdf
+$ENDCMP
+#
 $CMP RX72T_144
 D Renesas RX72T LFQFP 144
 K RENESAS RX
