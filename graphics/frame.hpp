@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	フレーム表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,7 +21,7 @@ namespace gui {
 
 		typedef frame value_type;
 
-		static const int16_t round_radius = 6;  // round radius
+		static const int16_t round_radius = 6;  ///< round radius
 
 	private:
 

@@ -15,14 +15,15 @@
 |font8x16.cpp|8x16 ASCII フォントリソース|
 |kfont.hpp|漢字フォントクラス|
 |kfont16.cpp|16x16 漢字フォントリソース|
+|kfont16.bin|16x16 感じフォントバイナリー|
 |font.hpp|フォント|
 |color.hpp|カラー定義|
 |color.cpp|カラー定義リソース|
 |graphics.hpp|2D 描画クラス|
 |monograph.hpp|2D ビットマップ描画クラス|
 |filer.hpp|ファイル選択クラス|
+|simple_dialog.hpp|シンプルなダイアログ（モーダルフレーム）|
 |root_menu.hpp|ルートメニュークラス|
-|dialog.hpp|ダイアログクラス|
 |term.hpp|ターミナルクラス|
 |img.hpp|イメージ定義クラス|
 |img_in.hpp|画像定義|
@@ -35,11 +36,13 @@
 |picojpeg_in.hpp|picoJPEG ローダー|
 |scaling.hpp|スケーリングパイプクラス|
 |glmatrix.hpp|OpenGL マトリックスクラス|
-|tgl.hpp|TinyGL(OpenGL) クラス|
+|tgl.hpp|TinyGL(Tiny OpenGL) クラス|
+|shape_3d.hpp|3D シェープ（簡単なモデル）|
 |widget_director.hpp|Widget ディレクター|
-|widget.hpp|Widget ウィジェット基本クラス|
+|widget.hpp|Widget 基本クラス|
 |group.hpp|Widget グループ|
 |frame.hpp|Widget フレーム|
+|dialog.hpp|Widget ダイアログ|
 |box.hpp|Widget ボックス|
 |text.hpp|Widget テキスト|
 |textbox.hpp|Widget テキスト・ボックス|
@@ -49,6 +52,7 @@
 |slider.hpp|Widget スライダー|
 |menu.hpp|Widget メニュー|
 |spinbox.hpp|Widget スピンボックス|
+|dialog.hpp|ダイアログクラス|
    
 ---
 
@@ -66,7 +70,7 @@
 - 「展開」を行うファンクタをテンプレートで指定する構成（省メモリ）
 - 「スケーリング」クラスを経由する事で、拡大、縮小が可能
 
-## 簡易ダイアログ
+## 簡易ダイアログ simple_dialog.hpp
 
 - 単独で、ダイアログを表示する事が出来る。
 - メッセージを表示し、タッチで消える、簡単なポリシー
@@ -80,6 +84,11 @@
 - リソースの消費を抑えた設計
 - 描画を最適化させる為の仕組み
 
+## TinyGL (Tiny OpenGL)
+
+- OpenGL ライクな API を持った３Ｄグラフィックスライブラリ
+- リアルタイム表示を行う為には、ダブルバッファが必要
+- OpenGL と互換性のある行列演算と API (glmatrix.hpp)
 
 ---
    
