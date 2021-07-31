@@ -18,6 +18,7 @@ SD カード・アクセス、サンプルプログラム
 - SD カードから読み出し、時間計測 (read)
 - exFAT 有効にする事で 64GB 以上の SD カードに対応
 - ハードウェアー RTC がサポートされない場合、ソフトウェアー RTC のサポート
+- RX65N/RX72N Envision Kit の場合、LCD にファイラーを起動可能（タッチ操作）
 
 ### SPI モード：
 
@@ -88,12 +89,17 @@ SD カードの各ピン配置と機能
 
 ---
 
-### RX72N (SDHI) for RX72N Envision Kit
+### RX72N Envision Kit (SDHI)
 
 ボードに実装済のマイクロSDソケットを使います。
 
 <img src="../docs/RX72N_MicroSD.jpg" width="40%">
-
+   
+電源制御 IC はアクティブ High であるので、電源制御ポートの typedef は以下のようになります。
+   
+```
+typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
+```
 ---
 
 ### RX24T (RSPI-A)
@@ -109,7 +115,7 @@ SD カードの各ピン配置と機能
 
 ---
 
-### RX65N (SDHI) for RX65N Envision Kit
+### RX65N Envision Kit (SDHI)
 
 RX65N Envision Kit は SD カードソケットと、電源制御 IC が未実装である為、実装する必要があります。   
 SD カードソケットは、入手が困難で、購入出来てもコストが高いので、秋月電子で購入が可能なマイクロ SD 基板を流用します。   
@@ -128,7 +134,13 @@ SD カードソケットは、入手が困難で、購入出来てもコスト�
 ![RTK5_MicroSD_PSW.jpg](../docs/RTK5_MicroSD_PSW.jpg)
 
 <img src="../docs/RTK5_SD_Circuit.png" width="75%">
-
+   
+電源制御 IC はアクティブ Low であるので、電源制御ポートの typedef は以下のようになります。
+   
+```
+typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< 「０」でＯＮ
+```
+   
 - ゲート用プルアップチップ抵抗「R35 10K」も取り付けます。(CN1 と書かれたシルクの上です)
 - ライトプロテクトは利用していません。
 - SD カードの制御信号や、バスはプルアップされており、電源制御からプルアップ電圧の供給を受けています。
@@ -139,7 +151,7 @@ SD カードソケットは、入手が困難で、購入出来てもコスト�
 - クロック信号だけ、プルアップ抵抗が省略されていますが、パターンはあります。
 - RX72N Envision Kit では、プルアップ抵抗も実装されています。
 - より高いクロックでは、インピーダンスマッチングの為、プルアップ抵抗が必要のようです。
-
+   
 ---
 
 ### RX64M (Soft SPI)

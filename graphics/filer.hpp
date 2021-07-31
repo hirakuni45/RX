@@ -3,9 +3,25 @@
 /*!	@file
 	@brief	ファイル選択ユーティリティー @n
 			ファイルを選択を行う GUI を提供する。@n
-			スイッチによる操作と、タッチパネルによる操作をサポートする。
+			スイッチによる操作と、タッチパネルによる操作をサポートする。 @n
+			共通： @n
+			・SD カードがマウントされたら、「MOUNT」ビットを有効にする。 @n
+			スイッチによる制御： @n
+			・「OPEN」でファイラーが開く @n
+			・「UP,DOWN」でスクロール @n
+			・「BACK」ディレクトリーを戻る @n
+			・「SELECT」ファイル選択（ファイラーは自動で閉じる） @n
+			・「INFO」ファイル情報の表示 @n
+			・「CLOSE」ファイラーを閉じる @n
+			タッチ操作方法： @n
+			・コンストラクターの第二引数を「true」にすると、３本タッチでオープンする。 @n
+			・ファイラー起動中、３本タッチでクローズ（true の場合） @n
+			・ファイラーがオープンしたら、上下にドラッグでスクロール @n
+			・右にドラッグでファイル選択（フォーカスされているファイル） @n
+			・ディレクトリー選択した場合、ディレクトリー移動 @n
+			・左にドラッグでディレクトリーを一つ手前に戻る
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -43,7 +59,7 @@ namespace gui {
 		/*!
 			@brief	制御データ構築
 			@param[in]	pos		ファイラー制御型
-			@param[in]	ctrl	制御データ（参照）
+			@param[out]	ctrl	制御データ（参照）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static void set(ctrl pos, uint32_t& ctrl) noexcept
@@ -99,12 +115,11 @@ namespace gui {
 		struct rdr_st {
 			int16_t		vofs_;
 			int16_t		vpos_;
-			int16_t		hmax_;
 			int16_t		sel_pos_;
 			uint16_t	num_;
 			int16_t		match_;
 
-			rdr_st() noexcept : vofs_(0), vpos_(0), hmax_(0),
+			rdr_st() noexcept : vofs_(0), vpos_(0),
 				sel_pos_(0), num_(0), match_(-1)
 			{ }
 		};
@@ -162,7 +177,6 @@ namespace gui {
 					rdr_.set_fore_color(DEF_COLOR::White);
 				}
 				auto w = rdr_.draw_text(vtx::spos(SPC + 8, t.vpos_), name);
-				if(t.hmax_ < w) t.hmax_ = w;
 			}
 			t.vpos_ += FLN;
 			++t.num_;
@@ -185,7 +199,7 @@ namespace gui {
 		{
 			int16_t h = RDR::font_type::height + 2;
 			int16_t y = pos * h;
-			rdr_.frame(vtx::srect(0, y, rdr_st_.hmax_ + 3, h + 1));
+			rdr_.frame(vtx::srect(0, y, RDR::glc_type::width - 1, h + 1));
 		}
 
 

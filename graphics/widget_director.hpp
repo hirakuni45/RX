@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Widget ディレクター
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -62,6 +62,7 @@ namespace gui {
 		WIDGETS		widgets_;
 
 		// ipass 自分を含めない場合「false」
+		// 「子」のリストを作成
 		uint32_t create_childs_(widget* w, widget_t** list, uint32_t max, bool ipass)
 		{
 			uint16_t idx = 0;
@@ -79,6 +80,24 @@ namespace gui {
 				}
 			}
 			return idx;
+		}
+
+		// 領域に含まれる widget に描画を設定
+		// return: 描画数（widget 単位）
+		uint32_t redraw_overlap_widget_(widget* area)
+		{
+			uint32_t cnt = 0;
+			for(auto& t : widgets_) {
+				if(t.w_ == nullptr) continue;
+				if(t.w_->get_state() == widget::STATE::STALL) continue;
+				if(t.w_ == area) continue;  // 自分は評価しない
+				if(t.w_->get_parents() != nullptr) continue;  // 子は評価しない
+				if(area->get_location().is_overlap(t.w_->get_location())) {
+					t.w_.draw_ = true;
+					++cnt;
+				}
+			}
+			return cnt;
 		}
 
 	public:

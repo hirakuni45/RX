@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Widget クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -66,9 +66,9 @@ namespace gui {
 			vtx::spos	position_;	///< タッチしている絶対位置
 			vtx::spos	relative_;	///< タッチしている相対位置
 			vtx::spos	expand_;	///< フォーカス拡張領域
-			bool		positive_;	///< タッチした瞬間
-			bool		level_;		///< タッチしている状態
-			bool		negative_;	///< 離した瞬間
+			bool		positive_;	///< タッチした瞬間「true」になる
+			bool		level_;		///< タッチしている間「true」になる
+			bool		negative_;	///< 離した瞬間「true」になる
 			touch_state(const vtx::spos& fexp = vtx::spos(4)) noexcept :
 				position_(-1), expand_(fexp),
 				positive_(false), level_(false), negative_(false) { }
@@ -81,9 +81,9 @@ namespace gui {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class H_ALIGNMENT : uint8_t {
-			LEFT,	///< 左
+			LEFT,	///< 左寄せ
 			CENTER,	///< 中央
-			RIGHT,	///< 右
+			RIGHT,	///< 右寄せ
 		};
 
 
@@ -93,9 +93,9 @@ namespace gui {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class V_ALIGNMENT : uint8_t {
-			TOP,	///< 上
+			TOP,	///< 上寄せ
 			CENTER,	///< 中央
-			BOTTOM,	///< 下
+			BOTTOM,	///< 下寄せ
 		};
 
 	private:
@@ -106,7 +106,7 @@ namespace gui {
 		vtx::srect	location_;	///< 位置とサイズ
 
 		const char*	title_;		///< タイトル
-		const void*	mobj_;		///< モーションオブジェクト	
+		const void*	mobj_;		///< モーションオブジェクト（ビットマップ表示）
 
 		graphics::share_color	base_color_;	///< GUI 基本色
 		graphics::share_color	font_color_;	///< フォント基本色
@@ -128,8 +128,7 @@ namespace gui {
 			@param[in]	fexp	フォーカス拡張領域
 		*/
 		//-----------------------------------------------------------------//
-		widget(const vtx::srect& loc = vtx::srect(0), const char* title = nullptr, const vtx::spos& fexp = vtx::spos(0))
-			noexcept :
+		widget(const vtx::srect& loc = vtx::srect(0), const char* title = nullptr, const vtx::spos& fexp = vtx::spos(0)) noexcept :
 			parents_(nullptr), next_(nullptr),
 			location_(loc), title_(title), mobj_(nullptr),
 			base_color_(graphics::def_color::White), font_color_(graphics::def_color::White),
@@ -162,7 +161,7 @@ namespace gui {
 					GUI が有効になった場合に実行される
 		*/
 		//-----------------------------------------------------------------//
-		virtual void init()  = 0;
+		virtual void init() = 0;
 
 
 		//-----------------------------------------------------------------//

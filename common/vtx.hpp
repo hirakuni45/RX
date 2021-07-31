@@ -967,6 +967,15 @@ namespace vtx {
 		T end_x() const { return org.x + size.x; }
 		T end_y() const { return org.y + size.y; }
 
+		// 自分の領域に他の領域が重なるか？
+		bool is_overlap(const rectangle& r) const {
+			if(is_focus(r.org)) return true;
+			if(is_focus(r.end())) return true;
+			if(r.is_focus(org)) return true;
+			if(r.is_focus(end())) return true;
+   			return false;
+		}
+
 		// クリップ領域の構築
 		bool clip(const rectangle& r) {
 			vertex2<T> e = end();
