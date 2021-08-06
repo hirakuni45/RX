@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 7
+Sheet 3 8
 Title ""
 Date ""
 Rev ""
@@ -59,7 +59,7 @@ Wire Wire Line
 Wire Wire Line
 	4050 3150 5250 3150
 Wire Wire Line
-	4050 3350 6350 3350
+	4050 3350 5850 3350
 Wire Wire Line
 	4050 3650 4400 3650
 Wire Wire Line
@@ -71,9 +71,9 @@ TMS
 Text HLabel 6350 2950 2    50   Output ~ 0
 TRSTn
 Text HLabel 6350 3050 2    50   Output ~ 0
-TDI
+TDI_RXD1
 Text HLabel 6350 3150 2    50   Input ~ 0
-TDO
+TDO_TXD1
 Text HLabel 6350 3350 2    50   BiDi ~ 0
 RESn
 Text HLabel 6350 3650 2    50   BiDi ~ 0
@@ -140,14 +140,10 @@ Wire Wire Line
 	5250 2400 5250 3150
 Connection ~ 5250 3150
 Wire Wire Line
-	5250 3150 6350 3150
-Wire Wire Line
 	4050 2950 4800 2950
 Wire Wire Line
 	4950 2400 4950 3050
 Connection ~ 4950 3050
-Wire Wire Line
-	4950 3050 6350 3050
 $Comp
 L akizuki:R R?
 U 1 1 6115A2FE
@@ -171,8 +167,6 @@ Wire Wire Line
 Wire Wire Line
 	4650 1900 4650 2100
 Wire Wire Line
-	4650 1900 4800 1900
-Wire Wire Line
 	4950 1900 4950 2100
 Connection ~ 4650 1900
 Wire Wire Line
@@ -194,19 +188,16 @@ F 3 "" H 4800 4600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4800 1900 4800 1600
-Connection ~ 4800 1900
-Wire Wire Line
-	4800 1900 4950 1900
+	4350 1900 4350 1600
 $Comp
 L power:+3.3V #PWR?
 U 1 1 6115C288
-P 4800 1600
-F 0 "#PWR?" H 4800 1450 50  0001 C CNN
-F 1 "+3.3V" H 4815 1773 50  0000 C CNN
-F 2 "" H 4800 1600 50  0001 C CNN
-F 3 "" H 4800 1600 50  0001 C CNN
-	1    4800 1600
+P 4350 1600
+F 0 "#PWR?" H 4350 1450 50  0001 C CNN
+F 1 "+3.3V" H 4365 1773 50  0000 C CNN
+F 2 "" H 4350 1600 50  0001 C CNN
+F 3 "" H 4350 1600 50  0001 C CNN
+	1    4350 1600
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -402,4 +393,94 @@ F 3 "" H 2850 2500 50  0001 C CNN
 	1    2850 2500
 	1    0    0    -1  
 $EndComp
+$Comp
+L akizuki:R R?
+U 1 1 6105AAF8
+P 5850 2250
+F 0 "R?" V 5804 2320 50  0000 L CNN
+F 1 "4.7K" V 5895 2320 50  0000 L CNN
+F 2 "" H 5850 2180 50  0000 C CNN
+F 3 "" V 5850 2250 50  0000 C CNN
+	1    5850 2250
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5250 1900 5850 1900
+Wire Wire Line
+	5850 1900 5850 2100
+Connection ~ 5250 1900
+Wire Wire Line
+	5850 2400 5850 3350
+Connection ~ 5850 3350
+Wire Wire Line
+	5850 3350 6350 3350
+NoConn ~ 4050 3550
+Connection ~ 4350 1900
+Wire Wire Line
+	4650 1900 4950 1900
+$Comp
+L Connector_Generic:Conn_02x03_Odd_Even J?
+U 1 1 610B9F31
+P 7650 4750
+F 0 "J?" H 7700 5067 50  0000 C CNN
+F 1 "SCI1" H 7700 4976 50  0000 C CNN
+F 2 "" H 7650 4750 50  0001 C CNN
+F 3 "~" H 7650 4750 50  0001 C CNN
+	1    7650 4750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7450 4650 6000 4650
+Wire Wire Line
+	7950 4650 8050 4650
+Wire Wire Line
+	8050 4650 8050 4300
+Wire Wire Line
+	8050 4300 6100 4300
+Wire Wire Line
+	5250 3150 6000 3150
+Wire Wire Line
+	4950 3050 6100 3050
+Wire Wire Line
+	6000 4650 6000 3150
+Connection ~ 6000 3150
+Wire Wire Line
+	6000 3150 6350 3150
+Wire Wire Line
+	6100 4300 6100 3050
+Connection ~ 6100 3050
+Wire Wire Line
+	6100 3050 6350 3050
+Wire Wire Line
+	7050 4750 7050 5250
+Wire Wire Line
+	7050 4750 7450 4750
+$Comp
+L power:GND #PWR?
+U 1 1 610C36BA
+P 7050 5250
+F 0 "#PWR?" H 7050 5000 50  0001 C CNN
+F 1 "GND" H 7055 5077 50  0000 C CNN
+F 2 "" H 7050 5250 50  0001 C CNN
+F 3 "" H 7050 5250 50  0001 C CNN
+	1    7050 5250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7950 4750 8500 4750
+Wire Wire Line
+	8500 4750 8500 4000
+$Comp
+L power:+3.3V #PWR?
+U 1 1 610C5A0D
+P 8500 4000
+F 0 "#PWR?" H 8500 3850 50  0001 C CNN
+F 1 "+3.3V" H 8515 4173 50  0000 C CNN
+F 2 "" H 8500 4000 50  0001 C CNN
+F 3 "" H 8500 4000 50  0001 C CNN
+	1    8500 4000
+	1    0    0    -1  
+$EndComp
+NoConn ~ 7950 4850
+NoConn ~ 7450 4850
 $EndSCHEMATC
