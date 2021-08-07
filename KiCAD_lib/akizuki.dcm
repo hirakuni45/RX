@@ -30,6 +30,11 @@ $CMP MAU106
 D １Ｗ級絶縁型ＤＣ－ＤＣコンバーター（±５Ｖ１００ｍＡ）
 $ENDCMP
 #
+$CMP MAX3485
+D 3.3V, 10Mbps Half-Duplex RS-485/RS-422 Transceivers
+K RS-485 RS-422 Half
+$ENDCMP
+#
 $CMP MR
 D Flat Chip Resistors
 $ENDCMP
