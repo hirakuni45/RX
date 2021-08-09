@@ -18,6 +18,15 @@ K LED Boost Driver
 F https://www.onsemi.jp/pub/Collateral/CAT4238-D.PDF
 $ENDCMP
 #
+$CMP CRYSTAL
+D HC49 SMD Hand
+$ENDCMP
+#
+$CMP CRYSTAL4
+D Miniature Size Low Profile SMD
+K SMD CRYSTAL
+$ENDCMP
+#
 $CMP DMG3415U
 D Pch MOSFET
 $ENDCMP
