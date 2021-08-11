@@ -20,7 +20,7 @@ U 1 1 61D476EA
 P 4200 2700
 F 0 "U1" H 4200 3087 60  0000 C CNN
 F 1 "NJU7223DL1-33" H 4200 2981 60  0000 C CNN
-F 2 "TO_SOT_Packages_SMD:TO-252-2" H 4200 2700 60  0001 C CNN
+F 2 "Package_TO_SOT_SMD:TO-252-2" H 4200 2700 60  0001 C CNN
 F 3 "http://akizukidenshi.com/download/ds/njr/NJU7223_j.pdf" H 4200 2700 60  0001 C CNN
 	1    4200 2700
 	1    0    0    -1  
@@ -66,32 +66,6 @@ F 1 "GND" H 4805 2827 50  0000 C CNN
 F 2 "" H 4800 3000 50  0001 C CNN
 F 3 "" H 4800 3000 50  0001 C CNN
 	1    4800 3000
-	1    0    0    -1  
-$EndComp
-$Comp
-L rx72t_100_pga_usb-rescue:C-POL-akizuki C1
-U 1 1 61D48DB7
-P 3000 2950
-AR Path="/61D48DB7" Ref="C1"  Part="1" 
-AR Path="/610674D7/61D48DB7" Ref="C1"  Part="1" 
-F 0 "C1" H 3083 3003 60  0000 L CNN
-F 1 "47uF" H 3083 2897 60  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" V 3000 2950 60  0001 C CNN
-F 3 "" V 3000 2950 60  0001 C CNN
-	1    3000 2950
-	1    0    0    -1  
-$EndComp
-$Comp
-L rx72t_100_pga_usb-rescue:C-POL-akizuki C6
-U 1 1 61D497D6
-P 5000 2950
-AR Path="/61D497D6" Ref="C6"  Part="1" 
-AR Path="/610674D7/61D497D6" Ref="C6"  Part="1" 
-F 0 "C6" H 5083 3003 60  0000 L CNN
-F 1 "47uF" H 5083 2897 60  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" V 5000 2950 60  0001 C CNN
-F 3 "" V 5000 2950 60  0001 C CNN
-	1    5000 2950
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -165,28 +139,6 @@ F 1 "GND" H 3005 3327 50  0000 C CNN
 F 2 "" H 3000 3500 50  0001 C CNN
 F 3 "" H 3000 3500 50  0001 C CNN
 	1    3000 3500
-	1    0    0    -1  
-$EndComp
-$Comp
-L akizuki:FB FB1
-U 1 1 61D4CD52
-P 6550 2600
-F 0 "FB1" H 6550 2825 50  0000 C CNN
-F 1 "FB" H 6550 2734 50  0000 C CNN
-F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" H 6700 2600 50  0001 C CNN
-F 3 "" H 6700 2600 50  0001 C CNN
-	1    6550 2600
-	1    0    0    -1  
-$EndComp
-$Comp
-L akizuki:FB FB2
-U 1 1 61D4D09A
-P 6550 3300
-F 0 "FB2" H 6550 3525 50  0000 C CNN
-F 1 "FB" H 6550 3434 50  0000 C CNN
-F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" H 6700 3300 50  0001 C CNN
-F 3 "" H 6700 3300 50  0001 C CNN
-	1    6550 3300
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -265,17 +217,6 @@ Wire Wire Line
 	6900 2600 7400 2600
 Connection ~ 6900 2600
 Connection ~ 7400 2600
-$Comp
-L akizuki:Diode D2
-U 1 1 61D52979
-P 4200 2050
-F 0 "D2" V 4422 2050 60  0000 C CNN
-F 1 "1A" V 4316 2050 60  0000 C CNN
-F 2 "Diode_SMD:D_SOD-123F" V 4100 2050 60  0001 C CNN
-F 3 "" V 4195 2015 60  0001 C CNN
-	1    4200 2050
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
 	4050 2050 3500 2050
 Wire Wire Line
@@ -396,32 +337,6 @@ F 3 "" V 4800 4600 60  0001 C CNN
 	1    4800 4600
 	1    0    0    -1  
 $EndComp
-$Comp
-L rx72t_100_pga_usb-rescue:C-POL-akizuki C4
-U 1 1 621163E2
-P 3600 4600
-AR Path="/621163E2" Ref="C4"  Part="1" 
-AR Path="/610674D7/621163E2" Ref="C4"  Part="1" 
-F 0 "C4" H 3683 4653 60  0000 L CNN
-F 1 "10uF" H 3683 4547 60  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 3600 4600 60  0001 C CNN
-F 3 "" V 3600 4600 60  0001 C CNN
-	1    3600 4600
-	1    0    0    -1  
-$EndComp
-$Comp
-L rx72t_100_pga_usb-rescue:C-POL-akizuki C7
-U 1 1 6211688B
-P 5150 4600
-AR Path="/6211688B" Ref="C7"  Part="1" 
-AR Path="/610674D7/6211688B" Ref="C7"  Part="1" 
-F 0 "C7" H 5233 4653 60  0000 L CNN
-F 1 "10uF" H 5233 4547 60  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 5150 4600 60  0001 C CNN
-F 3 "" V 5150 4600 60  0001 C CNN
-	1    5150 4600
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	5950 4700 5850 4700
 Wire Wire Line
@@ -467,17 +382,6 @@ Wire Wire Line
 Wire Wire Line
 	4250 4850 4800 4850
 Connection ~ 4800 4850
-$Comp
-L akizuki:Shotkey D1
-U 1 1 6212494A
-P 2850 4300
-F 0 "D1" V 2623 4300 60  0000 C CNN
-F 1 "1A" V 2729 4300 60  0000 C CNN
-F 2 "Diode_SMD:D_SOD-123F" V 2950 4300 60  0001 C CNN
-F 3 "" V 2845 4265 60  0001 C CNN
-	1    2850 4300
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	2700 4300 2500 4300
 $Comp
@@ -522,6 +426,127 @@ F 1 "GND" H 8505 3127 50  0000 C CNN
 F 2 "" H 8500 3300 50  0001 C CNN
 F 3 "" H 8500 3300 50  0001 C CNN
 	1    8500 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:FB FB1
+U 1 1 61192BBD
+P 6550 2600
+F 0 "FB1" H 6550 2807 50  0000 C CNN
+F 1 "FB" H 6550 2716 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 6700 2600 50  0001 C CNN
+F 3 "" H 6700 2600 50  0001 C CNN
+	1    6550 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:FB FB2
+U 1 1 61192EB6
+P 6550 3300
+F 0 "FB2" H 6550 3507 50  0000 C CNN
+F 1 "FB" H 6550 3416 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 6700 3300 50  0001 C CNN
+F 3 "" H 6700 3300 50  0001 C CNN
+	1    6550 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x02 J29
+U 1 1 6116A819
+P 2000 2600
+F 0 "J29" H 2080 2592 50  0000 L CNN
+F 1 "5VIN" H 2080 2501 50  0000 L CNN
+F 2 "Connector_JST:JST_EH_B2B-EH-A_1x02_P2.50mm_Vertical" H 2000 2600 50  0001 C CNN
+F 3 "~" H 2000 2600 50  0001 C CNN
+	1    2000 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR094
+U 1 1 6116AF49
+P 1800 2600
+F 0 "#PWR094" H 1800 2450 50  0001 C CNN
+F 1 "+5V" H 1815 2773 50  0000 C CNN
+F 2 "" H 1800 2600 50  0001 C CNN
+F 3 "" H 1800 2600 50  0001 C CNN
+	1    1800 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR095
+U 1 1 6116B544
+P 1800 2700
+F 0 "#PWR095" H 1800 2450 50  0001 C CNN
+F 1 "GND" H 1805 2527 50  0000 C CNN
+F 2 "" H 1800 2700 50  0001 C CNN
+F 3 "" H 1800 2700 50  0001 C CNN
+	1    1800 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:Diode D2
+U 1 1 611F960D
+P 4200 2050
+F 0 "D2" V 4422 2050 60  0000 C CNN
+F 1 "1A" V 4316 2050 60  0000 C CNN
+F 2 "Diode_SMD:D_SOD-123F" V 4100 2050 60  0001 C CNN
+F 3 "" V 4195 2015 60  0001 C CNN
+	1    4200 2050
+	0    -1   -1   0   
+$EndComp
+$Comp
+L akizuki:Shotkey D1
+U 1 1 611FA2EA
+P 2850 4300
+F 0 "D1" V 2623 4300 60  0000 C CNN
+F 1 "1A" V 2729 4300 60  0000 C CNN
+F 2 "Diode_SMD:D_SOD-123F" V 2845 4265 60  0001 C CNN
+F 3 "" V 2845 4265 60  0001 C CNN
+	1    2850 4300
+	0    1    1    0   
+$EndComp
+$Comp
+L akizuki:C-POL C1
+U 1 1 6114FE78
+P 3000 2950
+F 0 "C1" H 3083 3003 60  0000 L CNN
+F 1 "47uF" H 3083 2897 60  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D4.0mm_P2.00mm" V 3000 2950 60  0001 C CNN
+F 3 "" V 3000 2950 60  0001 C CNN
+	1    3000 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:C-POL C6
+U 1 1 6115051A
+P 5000 2950
+F 0 "C6" H 5083 3003 60  0000 L CNN
+F 1 "47uF" H 5083 2897 60  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D4.0mm_P2.00mm" V 5000 2950 60  0001 C CNN
+F 3 "" V 5000 2950 60  0001 C CNN
+	1    5000 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:C-POL C4
+U 1 1 61150B9C
+P 3600 4600
+F 0 "C4" H 3683 4653 60  0000 L CNN
+F 1 "10uF" H 3683 4547 60  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D4.0mm_P2.00mm" V 3600 4600 60  0001 C CNN
+F 3 "" V 3600 4600 60  0001 C CNN
+	1    3600 4600
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:C-POL C7
+U 1 1 61151243
+P 5150 4600
+F 0 "C7" H 5233 4653 60  0000 L CNN
+F 1 "10uF" H 5233 4547 60  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D4.0mm_P2.00mm" V 5150 4600 60  0001 C CNN
+F 3 "" V 5150 4600 60  0001 C CNN
+	1    5150 4600
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC

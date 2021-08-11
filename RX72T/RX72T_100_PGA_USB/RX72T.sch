@@ -278,17 +278,6 @@ F 3 "" V 9850 1350 60  0001 C CNN
 	1    9850 1350
 	1    0    0    -1  
 $EndComp
-$Comp
-L rx72t_100_pga_usb-rescue:CP-akizuki C30
-U 1 1 610767BA
-P 10250 1350
-F 0 "C30" H 10333 1403 60  0000 L CNN
-F 1 "47uF" H 10333 1297 60  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" V 10250 1350 60  0001 C CNN
-F 3 "" V 10250 1350 60  0001 C CNN
-	1    10250 1350
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	8800 1200 8800 1050
 Wire Wire Line
@@ -392,17 +381,6 @@ F 3 "" V 10200 5650 60  0001 C CNN
 	1    10200 5650
 	1    0    0    -1  
 $EndComp
-$Comp
-L rx72t_100_pga_usb-rescue:CP-akizuki C31
-U 1 1 6108BB24
-P 10600 5650
-F 0 "C31" H 10683 5703 60  0000 L CNN
-F 1 "47uF" H 10683 5597 60  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" V 10600 5650 60  0001 C CNN
-F 3 "" V 10600 5650 60  0001 C CNN
-	1    10600 5650
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	9400 5500 9400 5350
 Wire Wire Line
@@ -469,7 +447,7 @@ U 1 1 610CB66A
 P 5450 6050
 F 0 "X1" V 5193 6050 60  0000 C CNN
 F 1 "16MHz" V 5299 6050 60  0000 C CNN
-F 2 "Crystal:Crystal_SMD_HC49-SD_HandSoldering" V 5450 6050 60  0001 C CNN
+F 2 "Crystal:Crystal_SMD_HC49-SD" V 5450 6050 60  0001 C CNN
 F 3 "" V 5450 6050 60  0001 C CNN
 	1    5450 6050
 	0    1    1    0   
@@ -770,4 +748,26 @@ Text HLabel 6300 3700 0    50   BiDi ~ 0
 PA4_TXD8
 Text HLabel 6300 3800 0    50   BiDi ~ 0
 PA5_RXD8
+$Comp
+L akizuki:C-POL C30
+U 1 1 61155962
+P 10250 1350
+F 0 "C30" H 10333 1403 60  0000 L CNN
+F 1 "47uF" H 10333 1297 60  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 10250 1350 60  0001 C CNN
+F 3 "" V 10250 1350 60  0001 C CNN
+	1    10250 1350
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:C-POL C31
+U 1 1 611570C0
+P 10600 5650
+F 0 "C31" H 10683 5703 60  0000 L CNN
+F 1 "47uF" H 10683 5597 60  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 10600 5650 60  0001 C CNN
+F 3 "" V 10600 5650 60  0001 C CNN
+	1    10600 5650
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

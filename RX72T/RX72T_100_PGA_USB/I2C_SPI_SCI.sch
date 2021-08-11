@@ -412,14 +412,7 @@ Wire Wire Line
 Wire Wire Line
 	6000 3250 6250 3250
 Wire Wire Line
-	5500 3850 5900 3850
-Wire Wire Line
-	7000 3850 7000 3250
-Wire Wire Line
 	7000 3250 6750 3250
-Wire Wire Line
-	7000 3850 7500 3850
-Connection ~ 7000 3850
 Wire Wire Line
 	6000 3950 7600 3950
 Connection ~ 6000 3950
@@ -429,8 +422,6 @@ Text HLabel 5500 4250 0    50   BiDi ~ 0
 P32
 Text HLabel 5500 4350 0    50   BiDi ~ 0
 P33
-Wire Wire Line
-	7500 3850 7500 3150
 Wire Wire Line
 	7500 3150 8000 3150
 Wire Wire Line
@@ -592,13 +583,6 @@ F 3 "" H 6450 6050 50  0001 C CNN
 	1    6450 5600
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	5900 5300 5900 3850
-Wire Wire Line
-	5900 5300 6100 5300
-Connection ~ 5900 3850
-Wire Wire Line
-	5900 3850 7000 3850
 Wire Wire Line
 	5800 3950 5800 5900
 Wire Wire Line
@@ -763,4 +747,36 @@ F 3 "" H 4600 5400 50  0001 C CNN
 	1    4600 5400
 	1    0    0    -1  
 $EndComp
+$Comp
+L Connector_Generic:Conn_01x03 J28
+U 1 1 61134EFA
+P 7350 4600
+F 0 "J28" H 7430 4642 50  0000 L CNN
+F 1 "SER/RS-485" H 7430 4551 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 7350 4600 50  0001 C CNN
+F 3 "~" H 7350 4600 50  0001 C CNN
+	1    7350 4600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7150 4600 5900 4600
+Wire Wire Line
+	5900 4600 5900 3850
+Wire Wire Line
+	5900 3850 5500 3850
+Wire Wire Line
+	6100 5300 6000 5300
+Wire Wire Line
+	6000 5300 6000 4700
+Wire Wire Line
+	6000 4700 7150 4700
+Wire Wire Line
+	7150 4500 7000 4500
+Wire Wire Line
+	7000 4500 7000 3250
+Wire Wire Line
+	7000 3250 7500 3250
+Wire Wire Line
+	7500 3250 7500 3150
+Connection ~ 7000 3250
 $EndSCHEMATC

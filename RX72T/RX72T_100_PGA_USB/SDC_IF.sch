@@ -105,8 +105,8 @@ AR Path="/620C3280" Ref="C13"  Part="1"
 AR Path="/61067568/620C3280" Ref="C13"  Part="1" 
 F 0 "C13" H 7083 1603 60  0000 L CNN
 F 1 "10uF" H 7083 1497 60  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 7000 1550 60  0000 C CNN
-F 3 "" V 7000 1550 60  0000 C CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 7000 1550 60  0001 C CNN
+F 3 "" V 7000 1550 60  0001 C CNN
 	1    7000 1550
 	1    0    0    -1  
 $EndComp
