@@ -1446,6 +1446,9 @@ Wire Wire Line
 	5650 1600 5150 1600
 Wire Wire Line
 	5150 1600 5150 2950
+Connection ~ 5150 2950
+Wire Wire Line
+	5150 2950 5650 2950
 Wire Wire Line
 	850  1250 1350 1250
 Wire Wire Line
@@ -1484,7 +1487,48 @@ Wire Bus Line
 	2650 1200 2650 3550
 Wire Bus Line
 	2650 4000 2650 6000
-Connection ~ 5150 2950
-Wire Wire Line
-	5150 2950 5650 2950
+$Comp
+L akizuki:Hole H1
+U 1 1 611A8923
+P 7350 950
+F 0 "H1" H 7379 1018 50  0000 L CNN
+F 1 "Hole" H 7379 927 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 7350 900 50  0001 C CNN
+F 3 "" H 7350 900 50  0001 C CNN
+	1    7350 950 
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:Hole H2
+U 1 1 611A8C8B
+P 7350 1300
+F 0 "H2" H 7379 1368 50  0000 L CNN
+F 1 "Hole" H 7379 1277 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 7350 1250 50  0001 C CNN
+F 3 "" H 7350 1250 50  0001 C CNN
+	1    7350 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:Hole H3
+U 1 1 611A9048
+P 7900 950
+F 0 "H3" H 7929 1018 50  0000 L CNN
+F 1 "Hole" H 7929 927 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 7900 900 50  0001 C CNN
+F 3 "" H 7900 900 50  0001 C CNN
+	1    7900 950 
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:Hole H4
+U 1 1 611A9395
+P 7900 1300
+F 0 "H4" H 7929 1368 50  0000 L CNN
+F 1 "Hole" H 7929 1277 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 7900 1250 50  0001 C CNN
+F 3 "" H 7900 1250 50  0001 C CNN
+	1    7900 1300
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
