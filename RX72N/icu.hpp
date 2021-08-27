@@ -1650,17 +1650,22 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ BE0 割り込み要求レジスタ（GRPBE0）@n
+			@brief  グループ IE0 割り込み要求レジスタ（GRPIE0）@n
+					グループ BE0 割り込み要求レジスタ（GRPBE0）@n
 					グループ BL0/1 割り込み要求レジスタ（GRPBL0/GRPBL1）@n
 					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef grp_t<0x000875B0> GRPIE0_;
+		static GRPIE0_ GRPIE0;
 		typedef grp_t<0x00087600> GRPBE0_;
 		static GRPBE0_ GRPBE0;
 		typedef grp_t<0x00087630> GRPBL0_;
 		static GRPBL0_ GRPBL0;
 		typedef grp_t<0x00087634> GRPBL1_;
 		static GRPBL1_ GRPBL1;
+		typedef grp_t<0x00087638> GRPBL2_;
+		static GRPBL2_ GRPBL2;
 		typedef grp_t<0x00087830> GRPAL0_;
 		static GRPAL0_ GRPAL0;
 		typedef grp_t<0x00087834> GRPAL1_;
@@ -1726,12 +1731,16 @@ namespace device {
 					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef gen_t<0x000875B4> GENIE0_;
+		static GENIE0_ GENIE0;
 		typedef gen_t<0x00087640> GENBE0_;
 		static GENBE0_ GENBE0;
 		typedef gen_t<0x00087670> GENBL0_;
 		static GENBL0_ GENBL0;
 		typedef gen_t<0x00087674> GENBL1_;
 		static GENBL1_ GENBL1;
+		typedef gen_t<0x00087678> GENBL2_;
+		static GENBL2_ GENBL2;
 		typedef gen_t<0x00087870> GENAL0_;
 		static GENAL0_ GENAL0;
 		typedef gen_t<0x00087874> GENAL1_;
@@ -1740,12 +1749,12 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
+			@brief  グループ 割り込みクリアレジスタ
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct gcrbe0_t : public rw32_t<base> {
+		struct gcr_t : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1788,7 +1797,17 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30> CLR30;
 			bit_rw_t <io_, bitpos::B31> CLR31;
 		};
-		typedef gcrbe0_t<0x00087680> GCRBE0_;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ IE0 割り込みクリアレジスタ（GCRIE0）@n
+					グループ BE0 割り込みクリアレジスタ（GCRBE0）@n
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef gcr_t<0x000875B8> GCRIE0_;
+		static GCRIE0_ GCRIE0;
+		typedef gcr_t<0x00087680> GCRBE0_;
 		static GCRBE0_ GCRBE0;
 
 
@@ -2057,18 +2076,23 @@ namespace device {
 	template<class _> typename icu_t<_>::DMRSR6_ icu_t<_>::DMRSR6;
 	template<class _> typename icu_t<_>::DMRSR7_ icu_t<_>::DMRSR7;
 
+	template<class _> typename icu_t<_>::GRPIE0_ icu_t<_>::GRPIE0;
 	template<class _> typename icu_t<_>::GRPBE0_ icu_t<_>::GRPBE0;
 	template<class _> typename icu_t<_>::GRPBL0_ icu_t<_>::GRPBL0;
 	template<class _> typename icu_t<_>::GRPBL1_ icu_t<_>::GRPBL1;
+	template<class _> typename icu_t<_>::GRPBL2_ icu_t<_>::GRPBL2;
 	template<class _> typename icu_t<_>::GRPAL0_ icu_t<_>::GRPAL0;
 	template<class _> typename icu_t<_>::GRPAL1_ icu_t<_>::GRPAL1;
 
+	template<class _> typename icu_t<_>::GENIE0_ icu_t<_>::GENIE0;
 	template<class _> typename icu_t<_>::GENBE0_ icu_t<_>::GENBE0;
 	template<class _> typename icu_t<_>::GENBL0_ icu_t<_>::GENBL0;
 	template<class _> typename icu_t<_>::GENBL1_ icu_t<_>::GENBL1;
+	template<class _> typename icu_t<_>::GENBL2_ icu_t<_>::GENBL2;
 	template<class _> typename icu_t<_>::GENAL0_ icu_t<_>::GENAL0;
 	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
 
+	template<class _> typename icu_t<_>::GCRIE0_ icu_t<_>::GCRIE0;
 	template<class _> typename icu_t<_>::GCRBE0_ icu_t<_>::GCRBE0;
 
 	template<class _> typename icu_t<_>::PIBR0_ icu_t<_>::PIBR0;
