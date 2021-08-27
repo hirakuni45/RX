@@ -73,7 +73,7 @@ namespace device {
 		};
 		static intr_t	intr_;
 
-		static INTERRUPT_FUNC void event_task_()
+		static void event_ntask_()
 		{
 			switch(intr_.event_) {
 			case event::NONE:
@@ -104,7 +104,9 @@ namespace device {
 			}
 		}
 
-		static INTERRUPT_FUNC void recv_task_()
+		static INTERRUPT_FUNC void event_itask_() { event_ntask_(); }
+
+		static INTERRUPT_FUNC void recv_itask_()
 		{
 			if(intr_.dst_ == nullptr || intr_.len_ == 0) {
 				IICA::ICIER.RIE = 0;
@@ -125,7 +127,7 @@ namespace device {
 			}
 		}
 
-		static INTERRUPT_FUNC void send_task_()
+		static INTERRUPT_FUNC void send_itask_()
 		{
 			if(intr_.firstb_) {
 				IICA::ICDRT = intr_.firstb_;
@@ -149,7 +151,7 @@ namespace device {
 		}
 
 
-		static INTERRUPT_FUNC void tend_task_()
+		static void tend_ntask_()
 		{
 			IICA::ICSR2.STOP = 0;
 			IICA::ICCR2.SP = 1;
@@ -158,6 +160,7 @@ namespace device {
 			IICA::ICIER.SPIE = 1;
 		}
 
+		static INTERRUPT_FUNC void tend_itask_() { tend_ntask_(); }
 
 		static uint32_t intr_vec_(ICU::VECTOR v) { return static_cast<uint32_t>(v); }
 
@@ -255,14 +258,22 @@ namespace device {
 ///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
 			if(level_ > 0) {
-				icu_mgr::set_interrupt(IICA::EE_VEC, event_task_, level_);
-				icu_mgr::set_interrupt(IICA::RX_VEC, recv_task_,  level_);
-				icu_mgr::set_interrupt(IICA::TX_VEC, send_task_,  level_);
-				icu_mgr::set_interrupt(IICA::TE_VEC, tend_task_,  level_);
+				icu_mgr::set_interrupt(IICA::RX_VEC, recv_itask_,  level_);
+				icu_mgr::set_interrupt(IICA::TX_VEC, send_itask_,  level_);
+				if(icu_mgr::get_group_vector(IICA::EE_VEC) == ICU::VECTOR::NONE) {
+					icu_mgr::set_interrupt(IICA::EE_VEC, event_itask_, level_);
+				} else {
+					icu_mgr::set_interrupt(IICA::EE_VEC, event_ntask_, level_);	// グループ割り込みの場合、通常の関数を登録
+				}
+				if(icu_mgr::get_group_vector(IICA::TE_VEC) == ICU::VECTOR::NONE) {
+					icu_mgr::set_interrupt(IICA::TE_VEC, tend_itask_, level_);
+				} else {
+					icu_mgr::set_interrupt(IICA::TE_VEC, tend_ntask_, level_);  // グループ割り込みの場合、通常の関数を登録
+				}
 			} else {
-				icu_mgr::set_interrupt(IICA::EE_VEC, nullptr, level_);
 				icu_mgr::set_interrupt(IICA::RX_VEC, nullptr, level_);
 				icu_mgr::set_interrupt(IICA::TX_VEC, nullptr, level_);
+				icu_mgr::set_interrupt(IICA::EE_VEC, nullptr, level_);
 				icu_mgr::set_interrupt(IICA::TE_VEC, nullptr, level_);
 			}
 			IICA::ICIER = 0x00;
