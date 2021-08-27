@@ -68,10 +68,23 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, utils::TASK task, uint8_t lvl) noexcept {
+		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, utils::TASK task, uint8_t lvl) noexcept
+		{
 			set_task(vec, task);
 			set_level(vec, lvl);
 			return vec;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込みに対するベクタを返すダミー
+			@return グループベクターでは無いので「NONE]を返す。
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR vec) noexcept
+		{
+			return ICU::VECTOR::NONE;
 		}
 
 

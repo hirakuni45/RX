@@ -155,13 +155,14 @@ IRQ0, IPR レジスタのアクセス例：
 |[port_map_gptw.hpp](port_map_gptw.hpp?ts=4)|GPTW マップ定義|
 |[port_map_mtu.hpp](port_map_mtu.hpp?ts=4)|MTU マップ定義|
 |[power_mgr.hpp](power_mgr.hpp?ts=4)|電源マネージャー|
+|[RX72T PGA,USB 100](RX72T_100_PGA_USB)|評価基板プロジェクト|
    
 ---
 
 ## 標準的なクロックソース
 
 - RX72T の最大周波数は 200MHz ですが、USB を使う前提だと、192MHz (8MHzx24) で動作させる事になります。
-- 上記二種類の場合に都合が良いクリスタルは 16MHz となります。
+- 上記二種類の場合に都合が良いクリスタルは 8MHz 又は、16MHz となります。
 - 標準的なクロックプロファイルは、200MHz となります。
 - USB を使う場合、Makefile 「USER_DEFS」に、「USE_USB」を追加して下さい。（192MHz のクロックプロファイルが選択）
 - main 関数の先頭で、「device::boost_master_clock()」を呼び出す事で、最大速度になります。
@@ -171,6 +172,33 @@ IRQ0, IPR レジスタのアクセス例：
     SYSTEM_IO::boost_master_clock();
 ```
 
+---
+
+## RX72T PGA,USB 100 評価ボード
+
+<img src="../docs/RX72T_PCB_fin.png" width="75%">
+
+RX72T は、コストが低く、それでも超高性能なマイコンです。   
+それを手軽に確認する目的で、評価用ボードを作成しています。   
+   
+- 120mm X 80mm 基板サイズ（両面）
+- RX72T PGA,USB 100 ピン、デバイスを採用
+- CAN サポート(12V 電源入力をサポート)
+- RSPI サポート
+- IICA(I2C) サポート
+- RSPI 接続 SD カードインターフェース
+- 複数のシリアルポート
+- RS-485 インターフェース
+- 3.3V 電源レギュレーター
+- USB マスター動作、USB クライアント動作（切り替え）
+- D/A 出力（２チャネル）
+- シリアルブートモードサポート
+- Renesas E1/E1 Lite エミュレーターインターフェース
+- 16MHz クリスタル
+
+プロジェクトは KiCAD で作成してあり、回路図、トラック、関連部品、専用フットプリントなど一式用意してあります。   
+KiCAD のバージョンは 5.1.4 を使っています。   
+   
 -----
    
 License
