@@ -254,7 +254,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_BE0 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBE0));
+			set_task(ICU::VECTOR::GROUPBE0, group_be0_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPBE0_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENBE0 |= 1 << i;
@@ -274,7 +274,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_BL0 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_bl0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBL0));
+			set_task(ICU::VECTOR::GROUPBL0, group_bl0_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPBL0_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENBL0 |= 1 << i;
@@ -294,7 +294,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_BL1 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_bl1_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBL1));
+			set_task(ICU::VECTOR::GROUPBL1, group_bl1_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPBL1_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENBL1 |= 1 << i;
@@ -314,7 +314,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_AL0 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_al0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPAL0));
+			set_task(ICU::VECTOR::GROUPAL0, group_al0_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPAL0_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENAL0 |= 1 << i;
@@ -358,6 +358,90 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static ICU::VECTOR get_group_vector(ICU::VECTOR_AL0 vec) noexcept {
+			return ICU::VECTOR::GROUPAL0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（グループ BE0）
+			@param[in]	sel		割り込み要因
+			@param[in]	task	割り込みタスク @n
+								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
+			@param[in]	lvl		割り込みレベル @n
+								※グループ割り込みレベルが、設定レベルより高い場合に設定される。
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_BE0 sel, utils::TASK task, uint8_t lvl) noexcept
+		{
+			install_group_task(sel, task);
+			if(get_level(ICU::VECTOR::GROUPBE0) < lvl) {
+				set_level(ICU::VECTOR::GROUPBE0, lvl);
+			}
+			return ICU::VECTOR::GROUPBE0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（グループ BL0）
+			@param[in]	sel		割り込み要因
+			@param[in]	task	割り込みタスク @n
+								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
+			@param[in]	lvl		割り込みレベル @n
+								※グループ割り込みレベルが、設定レベルより高い場合に設定される。
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL0 sel, utils::TASK task, uint8_t lvl) noexcept
+		{
+			install_group_task(sel, task);
+			if(get_level(ICU::VECTOR::GROUPBL0) < lvl) {
+				set_level(ICU::VECTOR::GROUPBL0, lvl);
+			}
+			return ICU::VECTOR::GROUPBL0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（グループ BL1）
+			@param[in]	sel		割り込み要因
+			@param[in]	task	割り込みタスク @n
+								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
+			@param[in]	lvl		割り込みレベル @n
+								※グループ割り込みレベルが、設定レベルより高い場合に設定される。
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL1 sel, utils::TASK task, uint8_t lvl) noexcept
+		{
+			install_group_task(sel, task);
+			if(get_level(ICU::VECTOR::GROUPBL1) < lvl) {
+				set_level(ICU::VECTOR::GROUPBL1, lvl);
+			}
+			return ICU::VECTOR::GROUPBL1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（グループ AL0）
+			@param[in]	sel		割り込み要因
+			@param[in]	task	割り込みタスク @n
+								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
+			@param[in]	lvl		割り込みレベル @n
+								※グループ割り込みレベルが、設定レベルより高い場合に設定される。
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_AL0 sel, utils::TASK task, uint8_t lvl) noexcept
+		{
+			install_group_task(sel, task);
+			if(get_level(ICU::VECTOR::GROUPAL0) < lvl) {
+				set_level(ICU::VECTOR::GROUPAL0, lvl);
+			}
 			return ICU::VECTOR::GROUPAL0;
 		}
 	};
