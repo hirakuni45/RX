@@ -30,10 +30,13 @@ LIB_ROOT    =   ../../rxlib/lib
 
 INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
+PROG_VERIFY = --verify
+
 ifeq ($(RX_DEF),SIG_RX24T)
   RX_CPU = RX24T
   RX_OPT = v2
   LDSCRIPT	=	../../RX24T/$(DEVICE).ld
+  PROG_VERIFY =
 endif
 
 ifeq ($(RX_DEF),SIG_RX64M)
@@ -89,7 +92,7 @@ endif
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
 # Renesas GNU-RX (8.3.0) compiler 
-ifeq ($(TARGET_ISA_TEXT), )
+ifeq ($(TARGET_ISA_TEXT),)
   # for gcc-7.5.0 current gcc source build
   AS_DEFS		=	-mcpu=rx600
   CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
@@ -123,7 +126,9 @@ SIZE		=	rx-elf-size
 AFLAGS		=	$(AS_OPT) $(AS_DEFS)
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
 PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
-FLAGS		=	$(AS_OPT) $(AS_DEFS) $(CC_OPT) $(CP_OPT) $(OPTIMIZE) $(CC_DEFS) $(CP_DEFS) $(DEFS)
+FLAGS		= $(AS_OPT) $(AS_DEFS) $(CC_OPT) $(CP_OPT) $(OPTIMIZE) $(CC_DEFS) $(CP_DEFS) $(DEFS)
+
+FLAGS_CMP := $(shell cat $(TARGET).opt)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
@@ -138,10 +143,8 @@ DOBJECTS =	$(addprefix $(BUILD)/,$(patsubst %.c,%.o,$(CSOURCES))) \
 
 DEPENDS =   $(patsubst %.o,%.d, $(DOBJECTS))
 
-# ifeq ($(ECHO),)
-
 # all, clean: optional make command
-.PHONY: all clean clean_depend run
+.PHONY: all clean clean_depend run text
 .SUFFIXES :
 .SUFFIXES : .hpp .s .h .c .cpp .d .o
 
@@ -176,24 +179,23 @@ $(BUILD)/%.d: %.cpp
 	[ -s $@ ] || rm -f $@
 
 clean:
-	rm -rf $(BUILD) $(TARGET).elf $(TARGET).mot $(TARGET).lst $(TARGET).map $(TARGET).opt
+	rm -rf $(BUILD) $(TARGET).elf $(TARGET).mot $(TARGET).lst $(TARGET).map $(TARGET).opt $(TARGET).tmp
 
 clean_depend:
 	rm -f $(DEPENDS)
 
-lst:  $(TARGET).lst
+lst: $(TARGET).lst
 
 %.lst: %.elf
 	$(OBJDUMP) -h -S $< > $@
 
 # Rules for building the .text rom images
 
-text: mot lst opt
+text: mot lst
 
-bin: $(TARGET).bin
-mot: $(TARGET).mot
 lst: $(TARGET).lst
-opt: $(TARGET).opt
+mot: $(TARGET).mot
+bin: $(TARGET).bin
 
 %.lst: %.elf
 	$(OBJDUMP) -h -S $< > $@
@@ -204,21 +206,17 @@ opt: $(TARGET).opt
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
 
-%.opt: %.elf
-	@echo $(FLAGS) > $(TARGET).opt
+# $(TARGET).opt: $(TARGET).elf
+#ifeq ($(FLAGS),$(FLAGS_CMP))
+#	@echo "eq..."
+#else
+#	@echo $(FLAGS) > $(TARGET).opt
+#	@echo "not eq..."
+#	@echo $(FLAGS)
+#	@echo $(FLAGS_CMP)
+#endif
 
-# tarball:
-# tar cfvz $(subst .elf,,$(TARGET))_$(shell date +%Y%m%d%H).tgz \
-#	*.[hc]pp Makefile ../common/*/*.[hc]pp ../common/*/*.[hc]
-
-# bin_zip:
-#	$(LK) $(LFLAGS) $(LIBS) $(OBJECTS) $(ICON_OBJ) $(LIBN) -o $(TARGET) 
-#	rm -f $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip
-#	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.elf
-
+# Serial Flash write 
 run:
-ifeq ($(RX_DEF),SIG_RX24T)
-	rx_prog -d $(RX_CPU) --progress --erase --write $(TARGET).mot
-else
-	rx_prog -d $(RX_CPU) --progress --erase --write --verify $(TARGET).mot
-endif
+	$(MAKE)
+	rx_prog -d $(RX_CPU) --progress --erase --write $(PROG_VERIFY) $(TARGET).mot
