@@ -11,7 +11,7 @@ TARGET		=	led_sample
 
 DEVICE		=	R5F572TK
 
-RX_DEF		=	SIG_RX72T	
+RX_DEF		=	SIG_RX72T
 
 BUILD		=	release
 # BUILD		=	debug
