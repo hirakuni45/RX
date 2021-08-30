@@ -55,6 +55,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX65N)
   LIB_ROOT += ../../RX600/drw2d
   INC_APP +=  ../../RX600/drw2d/inc/tes
+  USER_LIBS += drw2d
   RX_CPU = RX65N
   RX_OPT = v2
   LDSCRIPT	=	../../RX65x/$(DEVICE).ld
@@ -74,7 +75,8 @@ endif
 
 ifeq ($(RX_DEF),SIG_RX72N)
   LIB_ROOT += ../../RX600/drw2d
-  INC_APP +=  ../../RX600/drw2d/inc/tes
+  INC_APP +=  ../../RX600/drw2d/inc/tes 
+  USER_LIBS += drw2d
   RX_CPU = RX72N
   RX_OPT = v3
   LDSCRIPT	=	../../RX72N/$(DEVICE).ld
@@ -83,6 +85,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX72M)
   LIB_ROOT += ../../RX600/drw2d
   INC_APP +=  ../../RX600/drw2d/inc/tes
+  USER_LIBS += drw2d
   RX_CPU = RX72M
   RX_OPT = v3
   LDSCRIPT	=	../../RX72M/$(DEVICE).ld
@@ -128,7 +131,7 @@ CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
 PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
 FLAGS		= $(AS_OPT) $(AS_DEFS) $(CC_OPT) $(CP_OPT) $(OPTIMIZE) $(CC_DEFS) $(CP_DEFS) $(DEFS)
 
-FLAGS_CMP := $(shell cat $(TARGET).opt)
+# FLAGS_CMP := $(shell cat $(TARGET).opt)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
@@ -179,7 +182,7 @@ $(BUILD)/%.d: %.cpp
 	[ -s $@ ] || rm -f $@
 
 clean:
-	rm -rf $(BUILD) $(TARGET).elf $(TARGET).mot $(TARGET).lst $(TARGET).map $(TARGET).opt $(TARGET).tmp
+	rm -rf $(BUILD) $(TARGET).elf $(TARGET).mot $(TARGET).lst $(TARGET).map
 
 clean_depend:
 	rm -f $(DEPENDS)
