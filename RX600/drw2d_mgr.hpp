@@ -88,8 +88,12 @@ namespace device {
 		}
 
 
-		void setup_()
+		void setup_(bool texture)
 		{
+			if(texture) {
+				d2_setfillmode(d2_, d2_fm_texture);
+				return;
+			}
 			if(!set_fore_color_) {
 				d2_setcolor(d2_, 0, fore_color_.rgba8.rgba);
 				set_fore_color_ = true;
@@ -476,7 +480,7 @@ namespace device {
         //-----------------------------------------------------------------//
         bool line_h(int16_t y, int16_t x, int16_t w) noexcept
 		{
-			setup_();
+			setup_(false);
 			setup_stipple_(vtx::spos(128, 0));
 			last_error_ = d2_renderline(d2_, x << 4, y << 4, (x + w - 1) << 4, y << 4,
 				pen_size_, d2_le_exclude_none);
@@ -495,7 +499,7 @@ namespace device {
         //-----------------------------------------------------------------//
         bool line_v(int16_t x, int16_t y, int16_t h) noexcept
 		{
-			setup_();
+			setup_(false);
 			setup_stipple_(vtx::spos(0, 128));
 			last_error_ = d2_renderline(d2_, x << 4, y << 4, x << 4, (y + h - 1) << 4,
 				pen_size_, d2_le_exclude_none);
@@ -512,7 +516,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool fill_box(const vtx::srect& rect) noexcept
 		{
-			setup_();
+			setup_(false);
 			last_error_ = d2_renderbox(d2_, rect.org.x << 4, rect.org.y << 4,
 				rect.size.x << 4, rect.size.y << 4);
 			return last_error_ == D2_OK;
@@ -543,7 +547,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool line_d(const vtx::spos& org, const vtx::spos& end) noexcept
 		{
-			setup_();
+			setup_(false);
 			// setup_stipple_();
 			last_error_ = d2_renderline(d2_, org.x, org.y, end.x, end.y,
 				pen_size_, d2_le_exclude_none);
@@ -561,7 +565,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool line(const vtx::spos& org, const vtx::spos& end) noexcept
 		{
-			setup_();
+			setup_(false);
 			// setup_stipple_();
 			last_error_ = d2_renderline(d2_, org.x << 4, org.y << 4, end.x << 4, end.y << 4,
 				pen_size_, d2_le_exclude_none);
@@ -578,9 +582,9 @@ namespace device {
 			@return エラー無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool triangle_d(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2) noexcept
+		bool triangle_d(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2, bool texture = false) noexcept
 		{
-			setup_();
+			setup_(texture);
 			last_error_ = d2_rendertri(d2_, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y,
 				d2_le_exclude_none);
 			return last_error_ == D2_OK;
@@ -597,9 +601,9 @@ namespace device {
 			@return エラー無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool quad_d(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2, const vtx::spos& p3) noexcept
+		bool quad_d(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2, const vtx::spos& p3, bool texture = false) noexcept
 		{
-			setup_();
+			setup_(texture);
 			last_error_ = d2_renderquad(d2_, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y,
 				d2_le_exclude_none);
 			return last_error_ == D2_OK;
@@ -671,7 +675,7 @@ namespace device {
             }
             auto cen = rect.org + rad;
 			auto len = rect.size - (rad * 2);
-			setup_();
+			setup_(false);
 			auto yo = rect.org.y;
 			auto yl = len.y;
 			if(up) {
@@ -714,7 +718,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool circle(const vtx::spos& cen, int16_t rad, int16_t w = 1) noexcept
 		{
-			setup_();
+			setup_(false);
 			last_error_ = d2_rendercircle(d2_, cen.x << 4, cen.y << 4, rad << 4, w << 4);
 			return last_error_ == D2_OK;
 		}
@@ -730,7 +734,7 @@ namespace device {
         //-----------------------------------------------------------------//
         bool fill_circle(const vtx::spos& cen, int16_t rad) noexcept
 		{
-			setup_();
+			setup_(false);
 			last_error_ = d2_rendercircle(d2_, cen.x << 4, cen.y << 4, rad << 4, 0);
 			return last_error_ == D2_OK;
 		}
@@ -1022,6 +1026,27 @@ namespace device {
 				}
 			}
 			return p.x;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	テクスチャーの設定
+			@param[in]	image	画像データ
+			@param[in]	size	画像サイズ
+			@param[in]	form	画像フォーマット
+		*/
+		//-----------------------------------------------------------------//
+		void set_texture(const void* image, const vtx::spos& size, uint32_t form)
+		{
+			d2_settexture(d2_, image, size.x, size.x, size.y, form);
+
+			d2_settexturemode(d2_, d2_tm_wrapu | d2_tm_wrapv | d2_tm_filter);
+
+			d2_point x = 0;
+			d2_point y = 0;
+			d2_settexturemapping(d2_, x, y, 0, 0, 65536 / 64, 0, 0, 65536 / 64);
+
 		}
 
 
