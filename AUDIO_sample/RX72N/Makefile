@@ -56,7 +56,8 @@ INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
 				../../FreeRTOS/Source/portable/GCC/RX600v2
 
-AS_OPT		=
+# for FreeRTOS option
+AS_OPT		=	--defsym NOT_USER=1
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
