@@ -5,9 +5,9 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 8
-Title ""
-Date ""
-Rev ""
+Title "RX72T PGA, USB, 100"
+Date "2021-08-19"
+Rev "0002"
 Comp ""
 Comment1 ""
 Comment2 ""
@@ -487,7 +487,7 @@ P23
 Text Label 2750 4300 0    50   ~ 0
 P24
 Text Label 2750 4400 0    50   ~ 0
-P25
+P27
 Text Label 2750 4600 0    50   ~ 0
 P60
 Text Label 2750 4700 0    50   ~ 0
@@ -597,7 +597,7 @@ P23
 Text Label 1100 4300 0    50   ~ 0
 P24
 Text Label 1950 4300 0    50   ~ 0
-P25
+P27
 Text Label 1100 4500 0    50   ~ 0
 P70
 Text Label 1950 4500 0    50   ~ 0
@@ -1449,44 +1449,6 @@ Wire Wire Line
 Connection ~ 5150 2950
 Wire Wire Line
 	5150 2950 5650 2950
-Wire Wire Line
-	850  1250 1350 1250
-Wire Wire Line
-	850  2450 1350 2450
-Wire Wire Line
-	1850 2450 2400 2450
-Wire Wire Line
-	1850 1250 2400 1250
-Wire Wire Line
-	1850 2650 2300 2650
-Wire Wire Line
-	1900 1450 2300 1450
-Wire Bus Line
-	6900 3050 6900 3950
-Wire Bus Line
-	6900 5100 6900 5450
-Wire Bus Line
-	8100 5100 8100 5450
-Wire Bus Line
-	8100 4050 8100 4700
-Wire Bus Line
-	6900 4050 6900 4700
-Wire Bus Line
-	2200 4100 2200 6000
-Wire Bus Line
-	6500 4600 6500 5450
-Wire Bus Line
-	1000 1150 1000 3550
-Wire Bus Line
-	2200 1150 2200 3550
-Wire Bus Line
-	1000 4100 1000 6000
-Wire Bus Line
-	4600 3950 4600 5000
-Wire Bus Line
-	2650 1200 2650 3550
-Wire Bus Line
-	2650 4000 2650 6000
 $Comp
 L akizuki:Hole H1
 U 1 1 611A8923
@@ -1531,4 +1493,42 @@ F 3 "" H 7900 1250 50  0001 C CNN
 	1    7900 1300
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	850  1250 1350 1250
+Wire Wire Line
+	850  2450 1350 2450
+Wire Wire Line
+	1850 2450 2400 2450
+Wire Wire Line
+	1850 1250 2400 1250
+Wire Wire Line
+	1850 2650 2300 2650
+Wire Wire Line
+	1900 1450 2300 1450
+Wire Bus Line
+	6900 3050 6900 3950
+Wire Bus Line
+	6900 5100 6900 5450
+Wire Bus Line
+	8100 5100 8100 5450
+Wire Bus Line
+	8100 4050 8100 4700
+Wire Bus Line
+	6900 4050 6900 4700
+Wire Bus Line
+	2200 4100 2200 6000
+Wire Bus Line
+	6500 4600 6500 5450
+Wire Bus Line
+	1000 1150 1000 3550
+Wire Bus Line
+	2200 1150 2200 3550
+Wire Bus Line
+	1000 4100 1000 6000
+Wire Bus Line
+	4600 3950 4600 5000
+Wire Bus Line
+	2650 1200 2650 3550
+Wire Bus Line
+	2650 4000 2650 6000
 $EndSCHEMATC
