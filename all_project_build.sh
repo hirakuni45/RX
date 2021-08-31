@@ -42,7 +42,9 @@ if [[ $1 = "clean" ]]; then
 	for file in `ls -d *`;
 	do
 	    if [ ${file} = "legacy" ]; then
-		echo "${YELLO}Legacy project: pass..." "${NOCOLOR}"
+		  echo "${YELLO}Legacy project: pass..." "${NOCOLOR}"
+		elif [ ${file} = "common" ]; then
+		  echo "${YELLO}common: pass..." "${NOCOLOR}"
 	    elif [ -e "${file}/Makefile" ]; then
 		make_clean "" "${file}"
 	    elif [ -d "${file}" ]; then
@@ -85,8 +87,10 @@ do
 done
 for file in `ls -d *`;
 do
-    	if [ ${file} = "legacy" ]; then
-	    echo "${YELLO}Legacy project: pass..." "${NOCOLOR}"
+    if [ ${file} = "legacy" ]; then
+	  echo "${YELLO}Legacy project: pass..." "${NOCOLOR}"
+	elif [ ${file} = "common" ]; then
+	  echo "${YELLO}common: pass..." "${NOCOLOR}"
 	elif [ -e "${file}/Makefile" ]; then
 		make_main "" ${file}
 	elif [ -d "${file}" ]; then

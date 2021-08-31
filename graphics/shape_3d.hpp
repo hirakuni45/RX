@@ -68,10 +68,17 @@ namespace graphics {
 	    	for(int i = 5; i >= 0; i--) {
 	    		tgl_.Color(c[i]);
         		tgl_.Begin(prim);
-        		// Normal(&n[i]);
+//        		tgl_.Normal(&n[i]);
+				tgl_.TexCoord(vtx::fpos(0.0f, 0.0f));
         		tgl_.Vertex(v[faces[i][0]]);
+//        		tgl_.Normal(&n[i]);
+				tgl_.TexCoord(vtx::fpos(1.0f, 0.0f));
         		tgl_.Vertex(v[faces[i][1]]);
+//        		tgl_.Normal(&n[i]);
+				tgl_.TexCoord(vtx::fpos(1.0f, 1.0f));
         		tgl_.Vertex(v[faces[i][2]]);
+//        		tgl_.Normal(&n[i]);
+				tgl_.TexCoord(vtx::fpos(0.0f, 1.0f));
         		tgl_.Vertex(v[faces[i][3]]);
         		tgl_.End();
   	    	}
