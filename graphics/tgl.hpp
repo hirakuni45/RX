@@ -21,29 +21,34 @@ namespace graphics {
 		@param[in]	RDR		レンダークラス（DRW2D インスタンス）
 		@param[in]	VNUM	最大頂点数
 		@param[in]	PNUM	最大プリミティブ数
+		@param[in]	TNUM	テクスチャー管理数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class RDR, uint32_t VNUM, uint32_t PNUM>
+	template<class RDR, uint32_t VNUM, uint32_t PNUM, uint32_t TNUM>
 	class tgl : public tgl_base {
 
 		RDR&		rdr_;
 
+		// 頂点関係
 		struct vtx_t {
-			vtx::fvtx	p_;
-			vtx::fvtx	n_;
+			vtx::fvtx	p_;		// 頂点
+			vtx::fvtx	n_;		// 法線
+			vtx::fpos	t_;		// テクスチャー座標
 			bool		normal_;
-			vtx_t() : p_(), n_(), normal_(false) { }
+			bool		texture_;
+			vtx_t() noexcept : p_(), n_(), t_(), normal_(false), texture_(false) { }
 		};
 
 		uint32_t	vtx_idx_;
 		vtx_t		vtxs_[VNUM];
 
+		// プリミティブ関係
 		struct dt_t {
 			PTYPE		pt_;
 			share_color	col_;
 			uint32_t	org_;
 			uint32_t	end_;
-			dt_t() : pt_(PTYPE::NONE), col_(0, 0, 0), org_(0), end_(0) { }
+			dt_t() noexcept : pt_(PTYPE::NONE), col_(0, 0, 0), org_(0), end_(0) { }
 		};
 
 		uint32_t	dt_idx_;
@@ -52,6 +57,27 @@ namespace graphics {
 		share_color	color_;
 
 		MATRIX		matrix_;
+
+		// テクスチャー関係
+		struct tex_t {
+			vtx::spos	size_;
+			FORMAT		format_;
+			const void*	image_;
+
+			TARGET		target_;
+
+			bool		use_;
+			tex_t() noexcept :
+				size_(0), format_(FORMAT::RGBA8), image_(nullptr),
+				target_(TARGET::NONE),
+				use_(false)
+				{ }
+		};
+		tex_t		tex_[TNUM];
+
+		uint32_t	bind_hnd_;
+
+		uint32_t	flags_;
 
 		bool test_cw_(const vtx::spos* p, int32_t num) noexcept
 		{
@@ -80,7 +106,9 @@ namespace graphics {
 			vtx_idx_(0), vtxs_{},
 			dt_idx_(0), dts_{},
 			color_(0, 0, 0),
-			matrix_()
+			matrix_(),
+			tex_{ }, bind_hnd_(TNUM),
+			flags_(0)
 		{ }
 
 
@@ -92,18 +120,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		bool start() noexcept
 		{
-#ifdef SIG_RX72N
-			// GNU-RX 8.3.0 compile options: -mtfu=intrinsic,mathlib
-			// see: common/mtx.hpp
-			utils::format("TinyGL Start\n");
-			__init_tfu();
-			utils::format("  TFU initializations\n");
-#endif
-//	void __builtin_rx_atan2hypotf(float, float, float*, float*);
-//	float __builtin_rx_sinf(float);
-//	float __builtin_rx_cosf(float);
-//	float __builtin_rx_atan2f(float, float);
-//	float __builtin_rx_hypotf(float, float);
+
 			return true;
 		}
 
@@ -167,7 +184,8 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	2D 頂点の登録
-			@param[in]	v	頂点
+			@param[in]	x	頂点 X
+			@param[in]	y	頂点 Y
 		*/
 		//-----------------------------------------------------------------//
 		void Vertex(float x, float y) noexcept
@@ -187,7 +205,9 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	3D 頂点の登録
-			@param[in]	v	頂点
+			@param[in]	x	頂点 X
+			@param[in]	y	頂点 Y
+			@param[in]	z	頂点 Z
 		*/
 		//-----------------------------------------------------------------//
 		void Vertex(float x, float y, float z) noexcept
@@ -206,8 +226,10 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	法線ベクトルの登録
-			@param[in]	n	法線ベクトル
+			@brief	法線ベクトルの登録（正規化ベクトル）
+			@param[in]	x	法線 X
+			@param[in]	y	法線 Y
+			@param[in]	z	法線 Z
 		*/
 		//-----------------------------------------------------------------//
 		void Normal(float x, float y, float z) noexcept
@@ -224,8 +246,113 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	マトリックスへの参照
-			@return マトリックス
+			@brief	テクスチャー座標の登録
+			@param[in]	s	テクスチャー・コーディネート S
+			@param[in]	t	テクスチャー・コーディネート T
+		*/
+		//-----------------------------------------------------------------//
+		void TexCoord(float s, float t) noexcept
+		{
+			if(vtx_idx_ >= VNUM) return;
+			auto& v = vtxs_[vtx_idx_].t_;
+			v.x = s;
+			v.y = t;
+			vtxs_[vtx_idx_].texture_ = true;
+		}
+		void TexCoord(const vtx::fpos& v) noexcept { TexCoord(v.x, v.y); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	テクスチャー管理を作成
+			@return テクスチャーハンドル（TNUM 以上の場合エラー）
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t GenTexture() noexcept
+		{
+			for(uint32_t i = 0; i < TNUM; ++i) {
+				if(!tex_[i].use_) {
+					tex_[i].use_ = true;
+					return i;
+				}
+			}
+			return TNUM;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	テクスチャー管理を削除
+			@param[in]	hnd		テクスチャーハンドル
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool DeleteTexture(uint32_t hnd) noexcept
+		{
+			if(hnd >= TNUM) return false;
+			tex_[hnd].use_ = false;
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	テクスチャーをバインドする
+			@param[in]	target	テクスチャー・ターゲット
+			@param[in]	hnd		テクスチャーハンドル
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool BindTexture(TARGET traget, uint32_t hnd) noexcept
+		{
+//			if(hnd >= TNUM) return false;
+
+			tex_[hnd].target_ = traget;
+
+			bind_hnd_ = hnd;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	テクスチャー画像を設定
+			@param[in]	target	テクスチャー・ターゲット
+			@param[in]	size	画像サイズ
+			@param[in]	form	画像フォーマット
+			@param[in]	image	画像データ
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool TexImage2D(TARGET target, const vtx::spos& size, FORMAT form, const void* image) noexcept
+		{
+			if(bind_hnd_ >= TNUM) return false;
+
+			tex_[bind_hnd_].size_   = size;
+			tex_[bind_hnd_].format_ = form;
+			tex_[bind_hnd_].image_  = image;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	制御フラグの許可
+			@param[in]	ctrl	制御フラグ
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(CTRL ctrl, bool ena = true) noexcept
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	マトリックス・クラスへの参照
+			@return マトリックス・クラス
 		*/
 		//-----------------------------------------------------------------//
 		MATRIX& at_matrix() noexcept { return matrix_; }		
@@ -257,6 +384,10 @@ namespace graphics {
 				const auto& t = dts_[i];
 				rdr_.set_fore_color(t.col_);
 
+
+				rdr_.set_texture(tex_[0].image_, tex_[0].size_, d2_mode_rgba8888);
+
+
 				uint32_t k = 0;
 				vtx::spos tmp[16];
 				for(uint32_t j = t.org_; j < t.end_; ++j) {
@@ -265,6 +396,11 @@ namespace graphics {
 					tmp[k].x = static_cast<int16_t>(dst.x * w) + (w / 2) + ox;
 					tmp[k].y = static_cast<int16_t>(dst.y * h) + (h / 2) + oy;
 					++k;
+					{
+						vtx::fvtx4 dst;
+						const auto& st = vtxs_[j].t_;
+						matrix_.vertex_world(wm, vtx::fvtx(st.x, st.y, 0.0f), dst);
+					}
 				}
 				switch(t.pt_) {
 				case PTYPE::POINTS:
@@ -290,12 +426,12 @@ namespace graphics {
 					break;
 				case PTYPE::QUAD:
 					for(uint32_t j = 0; j < k; j += 4) {
-						rdr_.quad_d(tmp[j+0], tmp[j+1], tmp[j+2], tmp[j+3]);
+						rdr_.quad_d(tmp[j+0], tmp[j+1], tmp[j+2], tmp[j+3], true);
 					}
 					break;
 				case PTYPE::TRIANGLE:
 					for(uint32_t j = 0; j < k; j += 3) {
-						rdr_.triangle_d(tmp[j+0], tmp[j+1], tmp[j+2]);
+						rdr_.triangle_d(tmp[j+0], tmp[j+1], tmp[j+2], true);
 					}
 					break;
 				default:
