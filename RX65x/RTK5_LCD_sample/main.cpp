@@ -145,7 +145,10 @@ namespace {
 //	FILER		filer_(render_);
 
 	// test for Tiny-GL
-	typedef graphics::tgl<RENDER, 200, 10> TGL;
+	static const uint32_t V_NUM = 500;  // 最大の頂点数
+	static const uint32_t P_NUM = 300;  // プリミティブ最大数
+	static const uint32_t T_NUM = 32;   // テクスチャー管理数
+	typedef graphics::tgl<RENDER, V_NUM, P_NUM, T_NUM> TGL;
 	TGL			tgl_(render_);
 
 	// QSPI B グループ
