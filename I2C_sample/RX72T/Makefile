@@ -7,7 +7,7 @@
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	calc_sample
+TARGET		=	i2c_sample
 
 DEVICE		=	R5F572TK
 
@@ -24,9 +24,9 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	CALC_sample/main.cpp
+PSOURCES	=	I2C_sample/main.cpp
 
-USER_LIBS	=	mpfr gmp
+USER_LIBS	=
 
 USER_DEFS	=
 

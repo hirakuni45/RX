@@ -358,4 +358,25 @@ Wire Wire Line
 Connection ~ 3200 2400
 Wire Wire Line
 	3200 2400 4550 2400
+$Comp
+L akizuki:C C?
+U 1 1 61246A7D
+P 7450 1550
+F 0 "C?" H 7533 1603 60  0000 L CNN
+F 1 "0.1uF" H 7533 1497 60  0000 L CNN
+F 2 "" V 7450 1550 60  0001 C CNN
+F 3 "" V 7450 1550 60  0001 C CNN
+	1    7450 1550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6100 1050 7450 1050
+Wire Wire Line
+	7450 1050 7450 1400
+Connection ~ 6100 1050
+Wire Wire Line
+	7450 1700 7450 1850
+Wire Wire Line
+	7450 1850 7000 1850
+Connection ~ 7000 1850
 $EndSCHEMATC

@@ -1,5 +1,5 @@
-(module HIROSE_MicroB_SMD (layer F.Cu) (tedit 6115AC52)
-  (descr "Hirose Electric Co Ltd ZX62R-B-5P  CONN RCPT MICRO USB B SMD R/A")
+(module HIROSE_MicroB_SMD (layer F.Cu) (tedit 612C03CD)
+  (descr "Hirose Electric Co Ltd ZX62R-B-5P  CONN RCPT MICRO USB B SMD R/A (Top mount)")
   (fp_text reference >NAME (at 0 -5.5) (layer F.SilkS)
     (effects (font (size 0.9652 0.9652) (thickness 0.12192)) (justify bottom))
   )

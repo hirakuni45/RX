@@ -4,6 +4,7 @@
 *.lst
 *.elf
 *.mot
+*.opt
 *.exe
 *.bak
 *.bck
