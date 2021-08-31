@@ -1,8 +1,10 @@
 //=====================================================================//
 /*! @file
-    @brief  RX72N TinyGL サンプル
+    @brief  RX72N Envision Kit TinyGL サンプル @n
+			OpenGL の縮小セット風３Ｄグラフィックスサンプル @n
+			ダブルバッファを使うので、RX72N 専用
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,6 +21,9 @@
 #include "graphics/font.hpp"
 #include "graphics/tgl.hpp"
 #include "graphics/shape_3d.hpp"
+
+#include "common/sci_i2c_io.hpp"
+#include "chip/FT5206.hpp"
 
 namespace {
 
@@ -37,22 +42,40 @@ namespace {
 	typedef device::SCI2 SCI_CH;
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
-	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x0080'0000);
+	uint16_t* fb_ = reinterpret_cast<uint16_t*>(0x0080'0000);
 	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_MGR;
 	typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
 
+	typedef utils::fixed_fifo<uint8_t, 64> RB64;
+	typedef utils::fixed_fifo<uint8_t, 64> SB64;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
+
 	GLCDC_MGR	glcdc_mgr_(nullptr, fb_);
 	RENDER		render_(glcdc_mgr_, font_);
 
-	static const uint32_t VNUM = 500;  // 最大の頂点数
-	static const uint32_t PNUM = 300;  // プリミティブ最大数
-	typedef graphics::tgl<RENDER, VNUM, PNUM> TGL;
+	static const uint32_t V_NUM = 500;  // 最大の頂点数
+	static const uint32_t P_NUM = 300;  // プリミティブ最大数
+	static const uint32_t T_NUM = 32;   // テクスチャー管理数
+	typedef graphics::tgl<RENDER, V_NUM, P_NUM, T_NUM> TGL;
 	TGL			tgl_(render_);
 
 	typedef graphics::shape_3d<TGL> SHAPE;
 	SHAPE		shape_(tgl_);
+
+	// タッチパネル定義
+	FT5206_I2C	ft5206_i2c_;
+	typedef chip::FT5206<FT5206_I2C> TOUCH;
+	TOUCH		touch_(ft5206_i2c_);
+
+	static const int16_t TEX_W = 32;
+	static const int16_t TEX_H = 32;
+	graphics::rgba8_t	texture_[TEX_W * TEX_H];
+	
+	uint32_t	tex_id_;
+
 #endif
 	typedef device::system_io<> SYSTEM_IO;
 
@@ -62,32 +85,6 @@ namespace {
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
-
-	typedef utils::command<256> CMD;
-	CMD 		cmd_;
-
-
-	void command_()
-	{
-		if(!cmd_.service()) {
-			return;
-		}
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "clear")) {
-
-			} else if(cmd_.cmp_word(0, "help")) {
-				f = true;
-			}
-			if(!f) {
-				char tmp[128];
-				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-					utils::format("Command error: '%s'\n") % tmp;
-				}
-			}
-		}
-	}
 }
 
 
@@ -130,8 +127,6 @@ int main(int argc, char** argv)
 
 	utils::format("\r%s Start for TinyGL: %u, %u\n") % system_str_ % LCD_X % LCD_Y;
 
-	cmd_.set_prompt("# ");
-
 	{  // GLCDC 初期化
 		LCD_DISP::DIR  = 1;
 		LCD_LIGHT::DIR = 1;
@@ -145,7 +140,7 @@ int main(int argc, char** argv)
 				utils::format("GLCDC ctrl fail...\n");
 			} else {
 				if(!glcdc_mgr_.enable_double_buffer()) {  // ダブルバッファを有効にする。
-					utils::format("Can't enable double-bufer\n");
+					utils::format("Can't enable double-buffer\n");
 				}
 			}
 		} else {
@@ -162,19 +157,53 @@ int main(int argc, char** argv)
 		}
 	}
 
+	{  // FT5206 touch screen controller
+		TOUCH::reset<FT5206_RESET>();
+		uint8_t intr_lvl = 1;
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, FT5206_I2C::MODE::MASTER, intr_lvl)) {
+			utils::format("FT5206 I2C Start Fail...\n");
+		}
+		if(!touch_.start()) {
+			utils::format("FT5206 Start Fail...\n");
+		}
+	}
+
 	{  // TGL 初期化
 		tgl_.start();
+
+		// テクスチャーパターンの生成
+		for(int16_t y = 0; y < TEX_H; ++y) {
+			for(int16_t x = 0; x < TEX_W; ++x) {
+				texture_[y * TEX_W + x].a = 255;
+				texture_[y * TEX_W + x].r = ((y & 3) < 3) ? 192 : 255;
+				texture_[y * TEX_W + x].g = ((x & 3) < 3) ? 192 : 255;
+				uint8_t b = ((x & 7) < 6) ? 192 : 255;
+				if((y & 7) < 6) b /= 2;
+				texture_[y * TEX_W + x].b = b;
+			}
+		}
+
+		// テクスチャーのバインド
+		tex_id_ = tgl_.GenTexture();
+		tgl_.BindTexture(TGL::TARGET::TEXTURE_2D, tex_id_);
+		tgl_.TexImage2D(TGL::TARGET::TEXTURE_2D, vtx::spos(TEX_W, TEX_H), TGL::FORMAT::RGBA8, texture_);
 	}
 
 	LED::OUTPUT();
 
 	uint8_t n = 0;
+	bool ctrl = false;
+	uint16_t ctrl_timer = 0;
 	int16_t xx = 0;
 	uint16_t nn = 0;
 	float ax = 0.0f;
 	float ay = 0.0f;
+	float ax_org = 0.0f;
+	float ay_org = 0.0f;
 	while(1) {
 		render_.sync_frame();
+
+		touch_.update();
 
 		render_.clear(DEF_COLOR::Black);
 
@@ -191,17 +220,40 @@ int main(int argc, char** argv)
 		m.rotate(ax, 1.0f, 0.0f, 0.0f);
 		m.rotate(ay, 0.0f, 1.0f, 0.0f);
 
-		ax += 1.0f;
-		if(ax >= 360.0f) ax -= 360.0f;
-		ay += 1.5f;
-		if(ay >= 360.0f) ay -= 360.0f;
+		{
+			auto tnum = touch_.get_touch_num();
+			if(tnum == 1) {
+				ctrl = true;
+				const auto& t = touch_.get_touch_pos(0);
+				if(t.event == TOUCH::EVENT::DOWN) {
+					ax_org = ax;
+					ay_org = ay;
+				}
+				auto d = t.org - t.pos;
+				ax = ax_org + static_cast<float>(d.y);
+				ay = ay_org + static_cast<float>(d.x);
+			}
+		}
+		if(ctrl) {
+			ctrl_timer++;
+			if(ctrl_timer >= (60 * 5)) {
+				ctrl_timer = 0;
+				ctrl = false;
+			}
+		} else {
+			ax += 1.0f;
+			ay += 1.5f;
+		}
+		ax = fmod(ax, 360.0f);
+		ay = fmod(ay, 360.0f);
 #if 0
 		render_.set_fore_color(DEF_COLOR::White);
 		render_.set_back_color(DEF_COLOR::Black);
 		render_.set_stipple(0x33);
 		render_.line_d(vtx::spos(0, 100 << 4), vtx::spos(256 << 4, 100 << 4));
 #endif
-		if(nn < 240) {
+#if 0
+		if(nn < (60 * 5)) {
 			tgl_.LineWidth(3.0f);
 			shape_.WireCube(2.0f);
 		} else {
@@ -209,6 +261,8 @@ int main(int argc, char** argv)
 		}
 		++nn;
 		if(nn >= 480) nn = 0;
+#endif
+		shape_.SolidCube(2.0f);
 
 		tgl_.renderring();
 
@@ -216,8 +270,6 @@ int main(int argc, char** argv)
 //		render_.fill_box(vtx::srect(xx, 0, 50, 50));
 //		++xx;
 //		if(xx >= 480) xx = 0;
-
-		command_();
 
 		++n;
 		if(n >= 30) {
