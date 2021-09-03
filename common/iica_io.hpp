@@ -208,13 +208,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  I2C を有効にする
-			@param[in]	spd		スピード・タイプ
 			@param[in]	mode	動作モード
+			@param[in]	spd		スピード・タイプ
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(SPEED spd, MODE mode, uint8_t level = 0) noexcept
+		bool start(MODE mode, SPEED spd, uint8_t level = 0) noexcept
 		{
 			level_ = level;
 

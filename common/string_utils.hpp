@@ -98,18 +98,19 @@ namespace utils {
 		/*!
 			@brief  １６進数ダンプ
 			@param[in]	src	ソース
-			@param[in]	num	数
-			@param[in]	lin	１行辺りの表示数
+			@param[in]	num	表示数
+			@param[in]	lim	１行辺りの表示数
 		*/
 		//-----------------------------------------------------------------//
-		static void hex_dump(char* src, uint16_t num, uint8_t lin) noexcept
+		static void dump_hex(const void* src, uint16_t num, uint8_t lim) noexcept
 		{
 			uint8_t l = 0;
+			auto p = static_cast<const uint8_t*>(src);
 			for(uint16_t i = 0; i < num; ++i) {
-				auto n = *src++;
-				utils::format("%02X") % static_cast<uint16_t>(n);
+				auto v = *p++;
+				utils::format("%02X") % static_cast<uint16_t>(v);
 				++l;
-				if(l == lin) {
+				if(l == lim) {
 					utils::format("\n");
 					l = 0;
 				} else {

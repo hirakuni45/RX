@@ -1,29 +1,37 @@
 //=====================================================================//
 /*! @file
     @brief  I2C サンプル @n
-			対話形式で接続された I2C デバイスをモニターする。@n
+			対話形式で接続された I2C デバイスを操作する。@n
 			RX24T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
+					RX24T/clock_profile.hpp を参照 @n
+					P00 ピンにLEDを接続する @n
 					SCI1 を使用する @n
 			RX66T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
+					RX66T/clock_profile.hpp を参照 @n
+					P00 ピンにLEDを接続する @n
 					SCI1 を使用する @n
-			RX64M, RX71M: @n
-					12MHz のベースクロックを使用する @n
-			　　　　P07 ピンにLEDを接続する @n
+			RX72T: @n
+					RX72T/clock_profile.hpp を参照 @n
+					P01 ピンにLEDを接続する @n
+					SCI1 を使用する @n
+			RX64M: @n
+					RX64M/clock_profile.hpp を参照 @n
+					P07 ピンにLEDを接続する @n
+					SCI1 を使用する @n
+			RX71M: @n
+					RX71M/clock_profile.hpp を参照 @n
+					P07 ピンにLEDを接続する @n
 					SCI1 を使用する @n
 			RX65N (RX65N Envision kit): @n
-					12MHz のベースクロックを使用する @n
-			　　　　P70 に接続された LED を利用する @n
+					RX65x/clock_profile.hpp を参照 @n
+					P70 に接続された LED を利用する @n
 					SCI9 を使用する @n
 			RX72N: (RX72N Envision kit) @n
-					16MHz のベースクロックを使用する @n
+					RX72N/clock_profile.hpp を参照 @n
 					P40 ピンにLEDを接続する @n
-					SCI2 を使用する @n
+					SCI2 を使用する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -41,6 +49,8 @@
 
 #include "common/format.hpp"
 #include "common/input.hpp"
+
+#include "common/string_utils.hpp"
 
 namespace {
 
@@ -99,16 +109,22 @@ namespace {
 	// タッチセンサー I2C ポート設定
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 	#define TOUCH_I2C
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+
+	typedef device::iica_io<device::RIIC0> I2C_IO;
 #endif
+
+//  環境コンテキスト
 	typedef device::system_io<> SYSTEM_IO;
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+	typedef utils::fixed_fifo<char, 512> SCI_RXB;  // SCI RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> SCI_TXB;  // SCI TX (SEND) バッファの定義
 
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-	SCI		sci_;
+	typedef device::sci_io<SCI_CH, SCI_RXB, SCI_TXB> SCI_IO;
+	SCI_IO		sci_io_;
 
 #ifdef TOUCH_I2C
 	FT5206_I2C	ft5206_i2c_;
@@ -124,17 +140,151 @@ namespace {
 	typedef utils::command<256> CMD;
 	CMD 		cmd_;
 
+	uint16_t	i2c_adr_ = 0;
+	uint16_t	i2c_num_ = 0;
+	uint8_t		i2c_data_[256] = { 0 };
+
+	const char* make_i2c_err_str_()
+	{
+		auto err = i2c_io_.get_last_error();
+		switch(err) {
+		case I2C_IO::error::start:
+			return "START";
+		case I2C_IO::error::bus_open:
+			return "BUS-OPEN";
+		case I2C_IO::error::address:
+			return "ADDRESS";
+		case I2C_IO::error::send_data:
+			return "SEND-DATA";
+		case I2C_IO::error::recv_data:
+			return "RECV-DATA";
+		default:
+			break;
+		}
+		return "?";
+	}
+
+	void scan_(uint32_t s, uint32_t e)
+	{
+		uint32_t n = 0;
+		for(uint32_t i = s; i <= e; ++i) {
+			uint8_t tmp[1];
+			if(i2c_io_.recv(i, tmp, sizeof(tmp))) {
+				utils::format("Ditect I2C address: 0x%02X (%3u, 0b%07b)\n") % i % i % i;
+				++n;
+			}
+		}
+		utils::format("  Ditect I2C Device(s): %d\n") % n;
+	}
+
+	void recv_()
+	{
+		if(i2c_num_ == 0) return;
+
+		if(!i2c_io_.recv(i2c_adr_, i2c_data_, i2c_num_)) {
+			auto sub = make_i2c_err_str_();
+			utils::format("I2C I/O recv error: '%s'\n") % sub;
+		} else {
+			utils::str::dump_hex(i2c_data_, i2c_num_, 16);
+		}
+	}
+
+	void send_()
+	{
+		if(i2c_num_ == 0) return;
+
+		if(!i2c_io_.send(i2c_adr_, i2c_data_, i2c_num_)) {
+			auto sub = make_i2c_err_str_();
+			utils::format("I2C I/O send error: '%s'\n") % sub;
+		}
+	}
+
 	void command_()
 	{
 		if(cmd_.service()) {
 			uint32_t cmdn = cmd_.get_words();
-			uint32_t n = 0;
-			while(n < cmdn) {
-				char tmp[256];
-				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
-					utils::format("Param%d: '%s'\n") % n % tmp;
+			const char* err = nullptr;
+			if(cmdn >= 1) {
+				if(cmd_.cmp_word(0, "-help")) {
+					utils::format("I2C Monitor command\n");
+					utils::format("    scan [start] [end]   scan I2C address\n");
+					utils::format("    adr [X]              set I2C address X\n");
+					utils::format("    r [num=1]            recv data [num] bytes\n");
+					utils::format("    s data...            send data bytes\n");
+					utils::format("    -help                help\n");
+					utils::format("\n");
+				} else if(cmd_.cmp_word(0, "scan")) {
+					if(cmdn >= 2) {
+						int32_t s_adr = 0;
+						int32_t e_adr = 127;
+						if(!cmd_.get_integer(1, s_adr, true)) {
+							err = "start address invalid";
+						}
+						if(!cmd_.get_integer(2, e_adr, true)) {
+							err = "end address invalid";
+						}
+						if(err == nullptr) {
+							scan_(s_adr, e_adr);
+						}
+					} else {
+						scan_(0, 127);
+					}
+				} else if(cmd_.cmp_word(0, "adr")) {
+					if(cmdn < 2) {
+						utils::format("I2C address: 0x%02X (%3u, 0b%07b)\n") % i2c_adr_ % i2c_adr_ % i2c_adr_;
+					} else {
+						int32_t val = 0;
+						if(cmd_.get_integer(1, val, true)) {
+							i2c_adr_ = val;
+						} else {
+							err = "I2C Address invalid";
+						}
+					}
+				} else if(cmd_.cmp_word(0, "r")) {
+					if(cmdn <= 1) {
+						i2c_num_ = 1;
+					} else {
+						int32_t val = 1;
+						if(cmd_.get_integer(1, val, true)) {
+							i2c_num_ = val;
+						} else {
+							err = "I2C Recv num invalid";
+						}
+					}
+					if(err == nullptr) {
+						recv_();
+						utils::format("\n");
+					}
+				} else if(cmd_.cmp_word(0, "s")) {
+					if(cmdn > 1) {
+						uint32_t l = 1;
+						i2c_num_ = 0;
+						while(l < cmdn) {
+							int32_t val = 1;
+							if(cmd_.get_integer(l, val, true)) {
+								i2c_data_[i2c_num_] = val;
+								++i2c_num_;
+							} else {
+								err = "I2C Send data invalid";
+								break;
+							}
+							++l;
+						}
+						if(err == nullptr) {
+							send_();
+						}
+					} else {
+						err = "";
+					}
+				} else {
+					err = "Command";
 				}
-				++n;
+			}
+			if(err != nullptr) {
+				char tmp[256];
+				tmp[0] = 0;
+				cmd_.get_word(0, tmp, sizeof(tmp));
+				utils::format("%s error: '%s'\n") % err % tmp;
 			}
 		}
 	}
@@ -142,27 +292,26 @@ namespace {
 
 
 extern "C" {
-
-	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
+	// syscalls.c から呼ばれる、標準出力をシリアル入出力にバインド（stdout, stderr）
 	void sci_putch(char ch)
 	{
-		sci_.putch(ch);
+		sci_io_.putch(ch);
 	}
 
 	void sci_puts(const char* str)
 	{
-		sci_.puts(str);
+		sci_io_.puts(str);
 	}
 
-	// syscalls.c から呼ばれる、標準入力（stdin）
+	// syscalls.c から呼ばれる、標準出力をシリアル入出力にバインド（stdin）
 	char sci_getch(void)
 	{
-		return sci_.getch();
+		return sci_io_.getch();
 	}
 
 	uint16_t sci_length()
 	{
-		return sci_.recv_length();
+		return sci_io_.recv_length();
 	}
 }
 
@@ -181,17 +330,30 @@ int main(int argc, char** argv)
 	{  // SCI の開始
 		uint8_t intr = 2;        // 割り込みレベル
 		uint32_t baud = 115200;  // ボーレート
-		sci_.start(baud, intr);
+		sci_io_.start(baud, intr);
 	}
 
 	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("Start I2C sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
+	{
+		utils::format("SCI Baud rate (set):  %d\n") % sci_io_.get_baud_rate();
+		float rate = 1.0f - static_cast<float>(sci_io_.get_baud_rate()) / sci_io_.get_baud_rate(true);
+		rate *= 100.0f;
+		utils::format("SCI Baud rate (real): %d (%3.2f [%%])\n") % sci_io_.get_baud_rate(true) % rate;
+		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
+		rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
+		rate *= 100.0f;
+		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
+	}
+
 	{  // I2C の開始
-//		uint8_t intr = 3;
-//		if(!i2c_io_.start(I2C_IO::SPEED::STANDARD, I2C_IO::MODE::MASTER, intr)) {
-//			utils::format("I2C Start fail...\n");
-//		}
+		uint8_t intr_lvl = 0;
+		if(!i2c_io_.start(I2C_IO::MODE::MASTER, I2C_IO::SPEED::STANDARD, intr_lvl)) {
+			utils::format("I2C Start fail...\n");
+		} else {
+			utils::format("I2C Start ok: (intrrupt level = %d)\n") % static_cast<int>(intr_lvl);
+		}
 	}
 
 #ifdef TOUCH_I2C
@@ -213,17 +375,6 @@ int main(int argc, char** argv)
 
 	LED::OUTPUT();
 	LED::P = 0;
-
-	{
-		utils::format("SCI Baud rate (set):  %d\n") % sci_.get_baud_rate();
-		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
-		rate *= 100.0f;
-		utils::format("SCI Baud rate (real): %d (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
-		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
-		rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
-		rate *= 100.0f;
-		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
-	}
 
 	cmd_.set_prompt("# ");
 
