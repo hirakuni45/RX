@@ -273,7 +273,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		sci_i2c_io() noexcept : level_(0), error_(ERROR::NONE), i2c_loop_(0) { }
+		sci_i2c_io() noexcept : i2c_base(), level_(0), i2c_loop_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -288,13 +288,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  I2C を有効にする
-			@param[in]	spd		スピード・タイプ
 			@param[in]	mode	動作モード（マスターモードのみ）
+			@param[in]	spd		スピード・タイプ
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(SPEED spd, MODE mode, uint8_t level = 0) noexcept
+		bool start(MODE mode, SPEED spd, uint8_t level = 0) noexcept
 		{
 			// I2C オプションが無い場合エラー
 			if(PSEL == port_map::ORDER::FIRST_I2C || PSEL == port_map::ORDER::SECOND_I2C || PSEL == port_map::ORDER::THIRD_I2C) {

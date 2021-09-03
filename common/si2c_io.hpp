@@ -166,14 +166,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  初期化
-			@param[in]	spd		スピード
 			@param[in]	mode	動作モード（現在は「master」のみ）
+			@param[in]	spd		スピード
 			@param[in]	lvl		割り込みレベル（設定しても無効）
 			@param[in]	pullup	プルアップを有効にする場合「true」
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(SPEED spd, MODE mode, uint8_t lvl = 0, bool pullup = false) noexcept
+		bool start(MODE mode, SPEED spd, uint8_t lvl = 0, bool pullup = false) noexcept
 		{
 			SCL::OD = 1;
 			SDA::OD = 1;
