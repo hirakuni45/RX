@@ -144,26 +144,6 @@ namespace {
 	uint16_t	i2c_num_ = 0;
 	uint8_t		i2c_data_[256] = { 0 };
 
-	const char* make_i2c_err_str_()
-	{
-		auto err = i2c_io_.get_last_error();
-		switch(err) {
-		case I2C_IO::error::start:
-			return "START";
-		case I2C_IO::error::bus_open:
-			return "BUS-OPEN";
-		case I2C_IO::error::address:
-			return "ADDRESS";
-		case I2C_IO::error::send_data:
-			return "SEND-DATA";
-		case I2C_IO::error::recv_data:
-			return "RECV-DATA";
-		default:
-			break;
-		}
-		return "?";
-	}
-
 	void scan_(uint32_t s, uint32_t e)
 	{
 		uint32_t n = 0;
@@ -179,10 +159,13 @@ namespace {
 
 	void recv_()
 	{
-		if(i2c_num_ == 0) return;
+		if(i2c_num_ == 0) {
+			utils::format("I2C: No data recv (skip)\n");
+			return;
+		}
 
 		if(!i2c_io_.recv(i2c_adr_, i2c_data_, i2c_num_)) {
-			auto sub = make_i2c_err_str_();
+			auto sub = i2c_io_.get_error_str();
 			utils::format("I2C I/O recv error: '%s'\n") % sub;
 		} else {
 			utils::str::dump_hex(i2c_data_, i2c_num_, 16);
@@ -191,10 +174,13 @@ namespace {
 
 	void send_()
 	{
-		if(i2c_num_ == 0) return;
+		if(i2c_num_ == 0) {
+			utils::format("I2C: No data send (skip)\n");
+			return;
+		}
 
 		if(!i2c_io_.send(i2c_adr_, i2c_data_, i2c_num_)) {
-			auto sub = make_i2c_err_str_();
+			auto sub = i2c_io_.get_error_str();
 			utils::format("I2C I/O send error: '%s'\n") % sub;
 		}
 	}
@@ -360,7 +346,7 @@ int main(int argc, char** argv)
 	{  // FT5206 touch screen controller
 		TOUCH::reset<FT5206_RESET>();
 		uint8_t intr_lvl = 0;
-		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, FT5206_I2C::MODE::MASTER, intr_lvl)) {
+		if(!ft5206_i2c_.start(FT5206_I2C::MODE::MASTER, FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		} else {
 			utils::format("FT5206/SCI-I2C Start\n");

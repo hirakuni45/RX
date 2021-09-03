@@ -199,7 +199,7 @@ int main(int argc, char** argv)
 
 	{  // IICA(I2C) の開始
 		uint8_t intr_level = 0;
-		if(!i2c_.start(I2C::SPEED::FAST, I2C::MODE::MASTER, intr_level)) {
+		if(!i2c_.start(I2C::MODE::MASTER, I2C::SPEED::FAST, intr_level)) {
 			utils::format("IICA start error (%d)\n") % static_cast<int>(i2c_.get_last_error());
 		}
 	}

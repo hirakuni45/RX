@@ -77,42 +77,53 @@ namespace device {
             ACK,        ///< ACK エラー
 			SEND_DATA,	///< 送信データ転送
 			RECV_DATA,	///< 受信データ転送
+			END,		///< 終了
 			STOP,		///< ストップ・コンディション
 		};
 
+		ERROR		error_;
+	
+		i2c_base() noexcept : error_(ERROR::NONE) { }
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+
+		//-----------------------------------------------------------------//
 		/*!
-			@brief  I2C のエラー表示
+			@brief  I2C のエラー文字列の取得
+			@return エラー文字列
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static void ListError(ERROR err) noexcept
+		//-----------------------------------------------------------------//
+		const char* get_error_str() const noexcept
 		{
-			switch(err) {
+			switch(error_) {
 			case ERROR::START:
-				utils::format("I2C Fail: Start\n");
-				break;
+				return "Start";
 			case ERROR::BUS_OPEN:
-				utils::format("I2C Fail: BUS Open\n");
-				break;
+				return "BUS Open";
 			case ERROR::ADDRESS:
-				utils::format("I2C Fail: Address\n");
-				break;
+				return "Address";
 			case ERROR::ACK:
-				utils::format("I2C Fail: ACK\n");
-				break;
+				return "ACK";
 			case ERROR::SEND_DATA:
-				utils::format("I2C Fail: Send data\n");
-				break;
+				return "Send data";
 			case ERROR::RECV_DATA:
-				utils::format("I2C Fail: Recv data\n");
-				break;
+				return "Recv data";
+			case ERROR::END:
+				return "End";
 			case ERROR::STOP:
-				utils::format("I2C Fail: Stop\n");
-				break;
+				return "Stop";
 			default:
 				break;
 			}
+			return "";
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	最終エラーの取得
+			@return エラー・タイプ
+		 */
+		//-----------------------------------------------------------------//
+		auto get_last_error() const noexcept { return error_; }
     };
 }

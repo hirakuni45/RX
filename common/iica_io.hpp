@@ -25,27 +25,12 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class IICA>
 	class iica_io : public i2c_base {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  I2C エラー・タイプ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class error : uint8_t {
-			none,		///< エラー無し
-			start,		///< スタート（初期化）
-			bus_open,	///< バス・オープン
-			address,	///< アドレス転送
-			send_data,	///< 送信データ転送
-			recv_data,	///< 受信データ転送
-			stop,		///< ストップ・コンディション
-		};
 
-	private:
+		static const uint32_t WAIT_LOOP_MS = 500;  // 500uS
+
 		uint8_t		level_;
 		uint8_t		sadr_;
 		uint8_t		speed_;
-		error		error_;
 
 		enum class event : uint8_t {
 			NONE,
@@ -170,7 +155,7 @@ namespace device {
 
 
 		bool setup_start_() {
-			int loop = 0;
+			uint32_t loop = 0;
 			while(IICA::ICCR2.BBSY() != 0) {
 #if 0
 				if(IICA::ICSR2.TMOF()) {
@@ -181,7 +166,7 @@ namespace device {
 #endif
 				utils::delay::micro_second(1);
 				++loop;
-				if(loop >= 1000) {
+				if(loop >= WAIT_LOOP_MS) {
 					return false;
 				}
 			}
@@ -202,7 +187,7 @@ namespace device {
 			@param[in]	sadr	スレーブ・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		iica_io(uint8_t sadr = 0x00) noexcept : level_(0), sadr_(sadr), speed_(0), error_(error::none) { }
+		iica_io(uint8_t sadr = 0x00) noexcept : i2c_base(), level_(0), sadr_(sadr), speed_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -249,7 +234,7 @@ namespace device {
 				IICA::ICBRL = 0b11100000 | 21;
 				break;
 			default:
-				error_ = error::start;
+				error_ = ERROR::START;
 				port_map::turn(IICA::PERIPHERAL, false);
 				power_mgr::turn(IICA::PERIPHERAL, false);
 				return false;
@@ -286,15 +271,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	最終エラーの取得
-			@return エラー・タイプ
-		 */
-		//-----------------------------------------------------------------//
-		error get_last_error() const noexcept { return error_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	送信状態の検査
 			@return 送信が完了なら「true」
 		 */
@@ -325,15 +301,15 @@ namespace device {
 		{
 			if(len == 0) return false;
 
-			error_ = error::none;
+			error_ = ERROR::NONE;
 
 			if(!setup_start_()) {
-				error_ = error::start;
+				error_ = ERROR::START;
 				return false;
 			}
 
 			bool ret = true;
-			if(level_) {
+			if(level_ > 0) {
 				intr_.send_id_back_ = intr_.send_id_;
 				intr_.firstb_ = adr << 1;
 				intr_.src_ = src;
@@ -344,18 +320,23 @@ namespace device {
 				if(sync) {
 					while(intr_.send_id_back_ == intr_.send_id_) sleep_();
 					if(intr_.event_ != event::NONE) {
-						error_ = error::send_data;
+						error_ = ERROR::SEND_DATA;
 						ret = false;
 					}
 				}
 			} else {
 				IICA::ICCR2.ST = 1;
+
 				bool first = true;
 				while(len > 0) {
 
 					if(IICA::ICSR2.NACKF() != 0) {
 						ret = false;
-						error_ = error::send_data;
+						if(first) {
+							error_ = ERROR::ADDRESS;
+						} else {
+							error_ = ERROR::SEND_DATA;
+						}
 						break;
 					}
 
@@ -372,15 +353,33 @@ namespace device {
 					}
 				}
 				if(ret) {
-					while(IICA::ICSR2.TEND() == 0) ;
+					// アドレス不一致デバイスでも、転送は出来るが、TEND が有効にならない・・
+					uint32_t loop = 0;
+					while(IICA::ICSR2.TEND() == 0) {
+						utils::delay::micro_second(1);
+						++loop;
+						if(loop >= WAIT_LOOP_MS) {
+							ret = false;
+							error_ = ERROR::END;
+							break;
+						}
+					}
 				}
 
 				IICA::ICSR2.STOP = 0;
 				IICA::ICCR2.SP = 1;
-
-				while(IICA::ICSR2.STOP() == 0) {
+				{
+					uint32_t loop = 0;
+					while(IICA::ICSR2.STOP() == 0) {
+						utils::delay::micro_second(1);
+						++loop;
+						if(loop >= WAIT_LOOP_MS) {
+							ret = false;
+							error_ = ERROR::STOP;
+							break;
+						}
+					}
 				}
-
 				IICA::ICSR2.NACKF = 0;
 				IICA::ICSR2.STOP = 0;
 			}
@@ -421,14 +420,15 @@ namespace device {
 		{
 			if(len == 0) return false;
 
-			error_ = error::none;
+			error_ = ERROR::NONE;
 
 			if(!setup_start_()) {
-				error_ = error::start;
+				error_ = ERROR::START;
 				return false;
 			}
 
-			if(level_) {
+			bool ret = true;
+			if(level_ > 0) {
 				intr_.recv_id_back_ = intr_.recv_id_;
 				intr_.firstb_ = (adr << 1) | 0x01;
 				intr_.dst_ = dst;
@@ -455,6 +455,7 @@ namespace device {
 
 					IICA::ICSR2.NACKF = 0;
 					IICA::ICSR2.STOP = 0;
+					error_ = ERROR::ADDRESS;
 					return false;
 				}
 
@@ -494,11 +495,22 @@ namespace device {
 
 				IICA::ICMR3.WAIT = 0;
 
-				while(IICA::ICSR2.STOP() == 0) ;
+				{
+					uint32_t loop = 0;
+					while(IICA::ICSR2.STOP() == 0) {
+						utils::delay::micro_second(1);
+						++loop;
+						if(loop >= WAIT_LOOP_MS) {
+							ret = false;
+							error_ = ERROR::STOP;
+							break;
+						}
+					}
+				}
 				IICA::ICSR2.NACKF = 0;
 				IICA::ICSR2.STOP = 0;
 			}
-			return true;
+			return ret;
 		}
 	};
 

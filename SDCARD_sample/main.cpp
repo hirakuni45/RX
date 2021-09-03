@@ -526,7 +526,7 @@ int main(int argc, char** argv)
 	{  // FT5206 touch screen controller
 		TOUCH::reset<FT5206_RESET>();
 		uint8_t intr_lvl = 1;
-		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, FT5206_I2C::MODE::MASTER, intr_lvl)) {
+		if(!ft5206_i2c_.start(FT5206_I2C::MODE::MASTER, FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		}
 		if(!touch_.start()) {
@@ -544,7 +544,7 @@ int main(int argc, char** argv)
 #ifdef ENABLE_I2C_RTC
 	{  // I2C-RTC の開始
 		uint8_t intr_level = 0;
-		if(!i2c_.start(I2C::SPEED::FAST, I2C::MODE::MASTER, intr_level)) {
+		if(!i2c_.start(I2C::MODE::MASTER, I2C::SPEED::FAST, intr_level)) {
 			utils::format("IICA start error (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
 		}
 		// DS3231(RTC) の開始
