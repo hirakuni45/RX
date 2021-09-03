@@ -129,7 +129,7 @@ SIZE		=	rx-elf-size
 AFLAGS		=	$(AS_OPT) $(AS_DEFS)
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
 PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
-FLAGS		= $(AS_OPT) $(AS_DEFS) $(CC_OPT) $(CP_OPT) $(OPTIMIZE) $(CC_DEFS) $(CP_DEFS) $(DEFS)
+FLAGS		= $(AS_OPT)$(AS_DEFS)$(CC_OPT)$(CP_OPT)$(OPTIMIZE)$(CC_DEFS)$(CP_DEFS)$(DEFS)
 
 # FLAGS_CMP := $(shell cat $(TARGET).opt)
 
