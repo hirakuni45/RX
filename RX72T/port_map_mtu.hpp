@@ -330,9 +330,9 @@ namespace device {
 //					PORTJ::PMR.B3 = ena;
 					break;
 				case ORDER::SECOND:
-					PORT5::PMR.B6 = 0;
-					MPC::P56PFS.PSEL = sel;
-					PORT5::PMR.B6 = ena;
+//					PORT5::PMR.B6 = 0;
+//					MPC::P56PFS.PSEL = sel;
+//					PORT5::PMR.B6 = ena;
 					break;
 				case ORDER::THIRD:
 					PORT1::PMR.B6 = 0;
@@ -448,9 +448,9 @@ namespace device {
 					PORT3::PMR.B0 = ena;
 					break;
 				case ORDER::SECOND:
-					PORT5::PMR.B4 = 0;
-					MPC::P54PFS.PSEL = sel;
-					PORT5::PMR.B4 = ena;
+//					PORT5::PMR.B4 = 0;
+//					MPC::P54PFS.PSEL = sel;
+//					PORT5::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTC::PMR.B2 = 0;
@@ -528,9 +528,9 @@ namespace device {
 					PORT8::PMR.B6 = ena;
 					break;
 				case ORDER::THIRD:
-					PORT5::PMR.B5 = 0;
-					MPC::P55PFS.PSEL = sel;
-					PORT5::PMR.B5 = ena;
+//					PORT5::PMR.B5 = 0;
+//					MPC::P55PFS.PSEL = sel;
+//					PORT5::PMR.B5 = ena;
 					break;
 				case ORDER::FOURTH:
 					PORTC::PMR.B3 = 0;
