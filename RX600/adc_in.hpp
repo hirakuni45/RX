@@ -28,6 +28,7 @@ namespace device {
 		typedef ADCU value_type;
 
 	private:
+
 		static TASK task_;
 
 		static INTERRUPT_FUNC void adi_task_()
@@ -50,21 +51,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	スタート
+			@brief	スタート（シングル）
 			@param[in]	ana		アナログ入力チャンネル型
 			@param[in]	level	割り込みレベル、０の場合はポーリング
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(typename ADCU::analog ana, uint8_t level = 0) noexcept
+		bool start(typename ADCU::ANALOG ana, uint8_t level = 0) noexcept
 		{
 			level_ = level;
 
-			// 基本変換時間（１マイクロ秒）＋マージン
-			uint32_t n = clock_profile::PCLKD / 1000000 + 10;
-			if(n > 255) return false;
+			// 基本変換時間クロック
+			uint32_t n = ADCU::BASE_CLOCK / ADCU::IN_CONV_TIME_NS / 100;
+			n += 5;
+			n /= 10;
+			// チャネル構成により割り切れるように調整
+			{
+				auto m = n % ADCU::UNIT_NUM;
+				if(m > 0) n += ADCU::UNIT_NUM - m;
+			}
+			if(n < 12 || n > 255) return false;
 
 			power_mgr::turn(ADCU::PERIPHERAL);
+
 			ADCU::enable(ana);
 			ADCU::ADANSA.set(ana);
 			ADCU::ADSSTR.set(ana, n);
@@ -80,9 +89,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void scan() noexcept
 		{
-			if(level_) {
-///				set_interrupt_task(adi_task_, static_cast<uint32_t>(ADCU::get_vec()));
-///				icu_mgr::set_level(ADCU::PERIPHERAL, level_);
+			if(level_ > 0) {
+				icu_mgr::set_interrupt(ADCU::VEC, adi_task_, level_);
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b() | ADCU::ADCSR.ADIE.b();
 			} else {
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b();
@@ -118,7 +126,7 @@ namespace device {
 			@return 変換結果（上位１０ビットが有効な値）
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t get(typename ADCU::analog an) const noexcept {
+		uint16_t get(typename ADCU::ANALOG an) const noexcept {
 			return ADCU::ADDR(an);
 		}
 	};

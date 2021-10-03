@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ルネサス RX デバイス選択
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -173,6 +173,7 @@
 #include "RX600/hrpwm.hpp"
 #include "RX600/poeg.hpp"
 #include "RX600/can.hpp"
+#include "RX72T/s12adh.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/dac_out.hpp"
 #include "RX600/usb.hpp"
@@ -193,6 +194,7 @@
 #include "RX600/hrpwm.hpp"
 #include "RX600/poeg.hpp"
 #include "RX600/can.hpp"
+#include "RX72T/s12adh.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/dac_out.hpp"
 #include "RX600/usb.hpp"
