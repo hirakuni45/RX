@@ -1,14 +1,17 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	MAX7219 ドライバー @n
-			LED Display Driver (VCC: 4V to 5.5V)
+			LED Display Driver (VCC: 4V to 5.5V) @n
+			※輝度を大きく設定すると、消費電流が大きくなるので注意が必要。 @n
+			※初期化前は、レジスター値が不定なので、大きな消費電流が流れる恐れがある @n
+			※デージーチェイン接続した場合のバッファ配置に注意
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstdint>
 
 namespace chip {
@@ -45,6 +48,7 @@ namespace chip {
 			DISPLAY_TEST = 0x0F,
 		};
 
+
 		// MAX7212 MSB first, 2 bytes
 		void out_(COMMAND cmd, uint8_t dat) noexcept
 		{
@@ -58,13 +62,14 @@ namespace chip {
 			SELECT::P = 1;  // load
 		}
 
-		void outp_(COMMAND cmd, const uint8_t* ptr) noexcept
+
+		void out_digit_(COMMAND cmd, uint8_t idx) noexcept
 		{
 			SELECT::P = 0;
 			uint8_t tmp[2];
 			tmp[0] = static_cast<uint8_t>(cmd);
 			for(uint8_t i = 0; i < CHAIN; ++i) {
-				tmp[1] = *ptr++;
+				tmp[1] = fb_[8 * (CHAIN - i - 1) + idx];
 				spi_.send(tmp, 2);
 			}
 			SELECT::P = 1;  // load
@@ -77,7 +82,7 @@ namespace chip {
 			@param[in]	spi	SPI クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		MAX7219(SPI& spi) noexcept : spi_(spi), fb_{0} { }
+		MAX7219(SPI& spi) noexcept : spi_(spi), fb_{ 0 } { }
 
 
 		//-----------------------------------------------------------------//
@@ -122,16 +127,15 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief サービス
+			@brief サービス @n
+				   フレームバッファを転送
 		 */
 		//-----------------------------------------------------------------//
 		void service() noexcept
 		{
 			auto cmd = COMMAND::DIGIT_0;
-			uint8_t idx = 0;
-			for(uint8_t j = 0; j < 8; ++j) {
-				outp_(cmd, &fb_[idx]);
-				idx += CHAIN;
+			for(uint8_t i = 0; i < 8; ++i) {
+				out_digit_(cmd, i);
 				cmd = static_cast<COMMAND>(static_cast<uint8_t>(cmd) + 1);					
 			}
 		}
@@ -140,21 +144,37 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief 値の設定
-			@param[in]	idx	インデックス（０～７）
-			@param[in]	dat	データ
+			@param[in]	idx	インデックス
+			@param[in]	val	値
 		 */
 		//-----------------------------------------------------------------//
-		void set(uint8_t idx, uint8_t dat) noexcept
+		void set(uint8_t idx, uint8_t val) noexcept
 		{
-			if(idx >= (8 * CHAIN)) return;
-			fb_[idx] = dat;
+			if(idx >= (CHAIN * 8)) return;
+
+			fb_[idx] = val;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief 値の取得
+			@param[in]	idx	インデックス
+			@return 値
+		 */
+		//-----------------------------------------------------------------//
+		uint8_t get(uint8_t idx) const noexcept
+		{
+			if(idx >= (CHAIN * 8)) return 0;
+
+			return fb_[idx];
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief キャラクターの設定
-			@param[in]	idx	インデックス（０～７）
+			@param[in]	idx	インデックス
 			@param[in]	cha	キャラクターコード
 			@param[in]	dp	小数点
 		 */
@@ -319,10 +339,48 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief フレームバッファの参照
-			@return フレームバッファ
+			@brief シフト、バッファ先頭
+			@param[in]  fill    埋めるデータ
+			@return シフトによりあふれたデータ
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t& at(uint8_t idx) noexcept { return fb_[idx]; }
+		uint8_t shift_top(uint8_t fill = 0) noexcept
+		{
+			uint8_t full = fb_[0];
+			std::memmove(&fb_[1], &fb_[0], CHAIN * 8 - 1);
+			fb_[0] = fill;
+			return full;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief シフト、バッファ終端
+			@param[in]  fill    埋めるデータ
+			@return シフトによりあふれたデータ
+		 */
+		//-----------------------------------------------------------------//
+		uint8_t shift_end(uint8_t fill = 0) noexcept
+		{
+			uint8_t full = fb_[CHAIN * 8 - 1];
+			std::memmove(&fb_[0], &fb_[1], CHAIN * 8 - 1);
+			fb_[CHAIN * 8 - 1] = fill;
+			return full;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief [] オペレーター
+			@return 参照値
+		 */
+		//-----------------------------------------------------------------//
+		uint8_t& operator [] (uint8_t idx)
+		{
+			if(idx >= (CHAIN * 8)) {
+				idx %= CHAIN * 8;
+			}
+			return fb_[idx];
+		}
 	};
 }
