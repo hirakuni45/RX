@@ -1,9 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	MAX7219 ドライバー
+	@brief	MAX7219 ドライバー @n
+			LED Display Driver (VCC: 4V to 5.5V)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,20 +16,19 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MAX7219 テンプレートクラス
-		@param[in]	SPI		SPI クラス
+		@param[in]	SPI		SPI クラス（出力のみ）
 		@param[in]	SELECT	デバイス選択
-		@param[in]	CHAIN	デージー・チェイン数
+		@param[in]	CHAIN	デージーチェーン数（通常１）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SPI, class SELECT, uint32_t CHAIN = 1>
+	template <class SPI, class SELECT, uint8_t CHAIN = 1>
 	class MAX7219 {
 
 		SPI&		spi_;
 
-		uint16_t	limit_;
-		uint8_t		data_[CHAIN * 8];
+		uint8_t		fb_[8 * CHAIN];
 
-		enum class command : uint8_t {
+		enum class COMMAND : uint8_t {
 			NO_OP        = 0x00,
 			DIGIT_0      = 0x01,
 			DIGIT_1      = 0x02,
@@ -46,12 +46,27 @@ namespace chip {
 		};
 
 		// MAX7212 MSB first, 2 bytes
-		void out_(command cmd, uint8_t dat) {
+		void out_(COMMAND cmd, uint8_t dat) noexcept
+		{
 			SELECT::P = 0;
 			uint8_t tmp[2];
 			tmp[0] = static_cast<uint8_t>(cmd);
 			tmp[1] = dat;
-			spi_.send(tmp, 2);
+			for(uint8_t i = 0; i < CHAIN; ++i) {
+				spi_.send(tmp, 2);
+			}
+			SELECT::P = 1;  // load
+		}
+
+		void outp_(COMMAND cmd, const uint8_t* ptr) noexcept
+		{
+			SELECT::P = 0;
+			uint8_t tmp[2];
+			tmp[0] = static_cast<uint8_t>(cmd);
+			for(uint8_t i = 0; i < CHAIN; ++i) {
+				tmp[1] = *ptr++;
+				spi_.send(tmp, 2);
+			}
 			SELECT::P = 1;  // load
 		}
 
@@ -62,33 +77,27 @@ namespace chip {
 			@param[in]	spi	SPI クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		MAX7219(SPI& spi) noexcept : spi_(spi), limit_(0) { }
+		MAX7219(SPI& spi) noexcept : spi_(spi), fb_{0} { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
-			@param[in]	limit	スキャン・リミット
 			@return エラーなら「false」を返す
 		 */
 		//-----------------------------------------------------------------//
-		bool start(uint8_t limit = (CHAIN * 8)) noexcept {
-			if(limit_ > (8 * CHAIN) || limit == 0) {
-				return false;
-			}
-			limit_ = limit;
-
+		bool start() noexcept
+		{
 			SELECT::DIR = 1;  // output;
 			SELECT::PU  = 0;  // pull-up disable
-			SELECT::P = 1;    // /CS = H
+			SELECT::P = 1;    // LOAD = H
 
-			for(uint8_t i = 0; i < sizeof(data_); ++i) {
-				data_[i] = 0;
-			}
+			out_(COMMAND::NO_OP, 0x00);  // ダミー（NOP)
+			out_(COMMAND::DISPLAY_TEST, 0x00);  // TEST off
+			out_(COMMAND::SHUTDOWN, 0x01);  // ノーマル・モード
+			out_(COMMAND::DECODE_MODE, 0x00);  // デコード・モード
+			out_(COMMAND::SCAN_LIMIT, 7);  // 表示桁設定
 
-			out_(command::SHUTDOWN, 0x01);  // ノーマル・モード
-			out_(command::DECODE_MODE, 0x00);  // デコード・モード
-			out_(command::SCAN_LIMIT, limit - 1);  // 表示桁設定
 			set_intensity(0);  // 輝度（最低）
 
 			service();
@@ -104,41 +113,27 @@ namespace chip {
 			@return エラー（初期化不良）なら「false」
 		 */
 		//-----------------------------------------------------------------//
-		bool set_intensity(uint8_t inten) noexcept {
-			if(limit_ == 0) return false;
-			out_(command::INTENSITY, inten);
+		bool set_intensity(uint8_t inten) noexcept
+		{
+			out_(COMMAND::INTENSITY, inten);
 			return true;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief データ転送
-			@return エラー（初期化不良）なら「false」
+			@brief サービス
 		 */
 		//-----------------------------------------------------------------//
-		bool service() noexcept {
-			if(limit_ == 0) return false;
-
-			for(uint8_t i = 0; i < limit_; ++i) {
-				out_(static_cast<command>(static_cast<uint8_t>(command::DIGIT_0) + i), data_[i]);
+		void service() noexcept
+		{
+			auto cmd = COMMAND::DIGIT_0;
+			uint8_t idx = 0;
+			for(uint8_t j = 0; j < 8; ++j) {
+				outp_(cmd, &fb_[idx]);
+				idx += CHAIN;
+				cmd = static_cast<COMMAND>(static_cast<uint8_t>(cmd) + 1);					
 			}
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief 値の取得
-			@param[in]	idx	インデックス（０～７）
-			@return 値
-		 */
-		//-----------------------------------------------------------------//
-		uint8_t get(uint8_t idx) const noexcept {
-			if(idx < limit_) {
-				return data_[idx];
-			}
-			return 0;
 		}
 
 
@@ -149,10 +144,10 @@ namespace chip {
 			@param[in]	dat	データ
 		 */
 		//-----------------------------------------------------------------//
-		void set(uint8_t idx, uint8_t dat) noexcept {
-			if(idx < limit_) {
-				data_[idx] = dat;
-			}
+		void set(uint8_t idx, uint8_t dat) noexcept
+		{
+			if(idx >= (8 * CHAIN)) return;
+			fb_[idx] = dat;
 		}
 
 
@@ -324,30 +319,10 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief シフト、バッファ先頭
-			@param[in]	fill	埋めるデータ
+			@brief フレームバッファの参照
+			@return フレームバッファ
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t shift_top(uint8_t fill = 0) noexcept {
-			uint8_t full = data_[0];
-			std::memmove(&data_[1], &data_[0], 7);
-			data_[0] = fill;
-			return full;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief シフト、バッファ終端
-			@param[in]	fill	埋めるデータ
-		 */
-		//-----------------------------------------------------------------//
-		uint8_t shift_end(uint8_t fill = 0) noexcept {
-			uint8_t full = data_[7];
-			std::memmove(&data_[0], &data_[1], 7);
-			data_[7] = fill;
-			return full;
-		}
-
+		uint8_t& at(uint8_t idx) noexcept { return fb_[idx]; }
 	};
 }
