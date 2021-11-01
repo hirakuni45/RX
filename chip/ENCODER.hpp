@@ -6,7 +6,7 @@
 			※外部接続の抵抗は、通常５Ｋ～１０Ｋ、ロータリーエンコーダーのマニュアルを参照
 	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
-				https://github.com/hirakuni45/RX/blob/master/LICENSE
+				https://github.com/hirakuni45/R8C/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>
@@ -48,6 +48,8 @@ namespace chip {
 		volatile VTYPE	count_;
 		uint8_t	lvl_;
 
+		uint8_t input_() { return static_cast<uint8_t>(PHA::P()) | (static_cast<uint8_t>(PHB::P()) << 1); }
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -59,7 +61,7 @@ namespace chip {
 			PHA::DIR = 0;
 			PHB::DIR = 0;
 			count_ = 0;
-			lvl_ = 0;
+			lvl_ = input_();
 		}
 
 
@@ -72,7 +74,7 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void service() noexcept
 		{
-			uint8_t lvl = static_cast<uint8_t>(PHA::P()) | (static_cast<uint8_t>(PHB::P()) << 1);
+			uint8_t lvl = input_();
 			uint8_t pos = ~lvl_ &  lvl;
 			uint8_t neg =  lvl_ & ~lvl; 
 			lvl_ = lvl;
