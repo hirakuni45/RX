@@ -1,19 +1,33 @@
 {
-    "terminal.integrated.shell.windows": "C:\\msys64\\usr\\bin\\bash.exe",
-    "terminal.integrated.env.windows": {
-        "MSYSTEM": "MINGW64",
-        "MSYS2_PATH_TYPE": "inherit",
-        "CHERE_INVOKING": "1"
+    "terminal.integrated.profiles.windows": {
+        "MSYS2": {
+            "path": "C:\\msys64\\usr\\bin\\bash.exe",
+            // "sourse": "PowerShell" または "Git Bush",  // windows限定？　pathはパスを直接指定し、こちらは既定のターミナルを選ぶという形？
+            "args": [
+                // 起動オプション。これまでterminal.integrated.shellArgs.windowsで設定したいたもの。
+                "--login"
+            ],
+            "overrideName": true,  // trueじゃないと、ターミナルの一覧(tabs)に名前が反映されない。falseの場合表示がcmdとかになる。
+            "env": {
+                "MSYSTEM": "MINGW64",
+                "MSYS2_PATH_TYPE": "inherit",
+                "CHERE_INVOKING": "1"
+                // "JAVA_HOME": "C:\\Program Files\\Java\\jdk-13.0.1" など
+            },
+            "icon": "terminal"  // アイコンID。色々ある。後述。
+        }
     },
-    "terminal.integrated.shellArgs.windows": [
-        "--login"
-    ],
-    "terminal.integrated.cursorStyle": "line",
-    "C_Cpp.updateChannel": "Insiders",
-    "C_Cpp.default.intelliSenseMode": "clang-x64",
-    "C_Cpp.default.compileCommands": "clang",
-    "C_Cpp.default.compilerPath": "C:\\msys64\\usr\\bin",
+    "files.associations": {
+        "functional": "cpp"
+    },
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": false
+    // "terminal.integrated.cursorStyle": "line",
+    // "C_Cpp.updateChannel": "Insiders",
+    // "C_Cpp.default.intelliSenseMode": "clang-x64",
+    // "C_Cpp.default.compileCommands": "clang",
+    // "C_Cpp.default.compilerPath": "C:\\msys64\\usr\\bin",
     // Gitのパスの設定(先ほど作ったバッチファイルを読み込むように)
-    "git.path": "C:/msys64/usr/local/bin/git-wrap.bat",
-    "tabnine.experimentalAutoImports": true,
+    // "git.path": "C:/msys64/usr/local/bin/git-wrap.bat",
+    // "tabnine.experimentalAutoImports": true,
 }

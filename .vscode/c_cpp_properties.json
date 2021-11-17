@@ -3,7 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:/Program Files (x86)/GCC for Renesas RX 8.3.0.202002-GNURX-ELF/rx-elf/rx-elf/include",
+                "C:/msys64/usr/local/rx-elf/rx-elf/include",
                 "C:/msys64/mingw64/include",
                 "D:/Git/RX",
                 "D:/Git/RX/RX600/drw2d/inc/tes",
