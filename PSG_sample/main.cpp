@@ -45,6 +45,7 @@ namespace {
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
 	typedef device::SCI2 SCI_CH;
 
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
@@ -82,12 +83,10 @@ namespace {
 	SOUND_OUT	sound_out_(ZERO_LEVEL);
 
 	static constexpr uint16_t SAMPLE = 48'000;  // サンプリング周期（F_CLK は CPU の動作周波数）
-	static constexpr uint16_t BSIZE = 512;  // SAMPLE / TICK * 2 以上で、２のｎ乗倍になる値
-
 	static constexpr uint16_t TICK = 100;	// サンプルの楽曲では、１００を前提にしている。
 	static constexpr uint16_t CNUM = 3;		// 同時発音数（大きくすると処理負荷が増えるので注意）
 	typedef utils::psg_base PSG;
-	typedef utils::psg_mng<SAMPLE, TICK, BSIZE, CNUM> PSG_MNG;
+	typedef utils::psg_mng<SAMPLE, TICK, CNUM> PSG_MNG;
 	PSG_MNG		psg_mng_;
 
 #ifdef USE_DAC
@@ -1165,18 +1164,28 @@ int main(int argc, char** argv)
 	psg_mng_.set_score(0, score0_);
 	psg_mng_.set_score(1, score1_);
 
+	SW2::INPUT();
+
 	uint8_t cnt = 0;
 	uint8_t delay = 200;
+	bool lvl = SW2::P();
 	while(1) {
 		cmt_.sync();
 		{
+			auto tmp = SW2::P();
+			if(!lvl && tmp) {
+				psg_mng_.set_score(0, score0_);
+				psg_mng_.set_score(1, score1_);
+			}
+			lvl = tmp;
+		}
+		{
 			uint32_t n = SAMPLE / TICK;
-			psg_mng_.set_wav_pos(0);
-			psg_mng_.render(n);
+			int8_t tmp[n];
+			psg_mng_.render(n, tmp);
 			typename SOUND_OUT::WAVE t;
 			for(uint32_t i = 0; i < n; ++i) {
-				uint8_t w = psg_mng_.get_wav(i);
-				w -= 0x80;
+				auto w = tmp[i];
 				t.l_ch = t.r_ch = (static_cast<int16_t>(w) << 8) | ((w & 0x7f) << 1);
 				sound_out_.at_fifo().put(t);
 			}

@@ -244,11 +244,10 @@ namespace utils {
 		@brief  PSG Manager テンプレート class
 		@param[in]	SAMPLE	サンプリング周期
 		@param[in]	TICK	演奏tick（通常１００Ｈｚ）
-		@param[in]	BSIZE	バッファサイズ（通常５１２）
 		@param[in]	CNUM	チャネル数（通常４）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint16_t SAMPLE, uint16_t TICK, uint16_t BSIZE, uint16_t CNUM>
+	template <uint16_t SAMPLE, uint16_t TICK, uint16_t CNUM>
 	class psg_mng : public psg_base {
 
 		// 12 平均音階率の計算：
@@ -271,9 +270,6 @@ namespace utils {
 		static constexpr uint8_t	SUB_SCORE_NUM = 8;  // サブスコア最大数
 		static constexpr uint8_t	STACK_DEPTH = 4;  // 4 レベル
 		static constexpr uint16_t	ENV_CYCLE = SAMPLE / TICK;
-
-		uint16_t	wav_pos_;
-		uint8_t		wav_[BSIZE];
 
 		struct share_t {
 			const SCORE*	sub_score_[SUB_SCORE_NUM];
@@ -561,7 +557,7 @@ namespace utils {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		psg_mng() noexcept : wav_pos_(0), wav_{ 0x80 },
+		psg_mng() noexcept :
 			share_(),
 			channel_{ share_, share_, share_ }
 		{ }
@@ -631,9 +627,10 @@ namespace utils {
 		/*!
 			@brief  レンダリング
 			@param[in]	count	波形数
+			@param[out]	out		波形出力
 		*/
 		//-----------------------------------------------------------------//
-		void render(uint16_t count) noexcept
+		void render(uint16_t count, int8_t* out) noexcept
 		{
 			for(uint16_t i = 0; i < count; ++i) {
 				int16_t sum = 0;
@@ -647,30 +644,9 @@ namespace utils {
 						++n;
 					}
 				}
-				wav_[wav_pos_] = (sum / n) + 0x80;
-				++wav_pos_;
-				if(wav_pos_ >= BSIZE) wav_pos_ = 0;
+				out[i] = (sum / n);
 			}
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  レンダリング位置の指定
-			@param[in]	pos		位置
-		*/
-		//-----------------------------------------------------------------//
-		void set_wav_pos(uint16_t pos) noexcept { wav_pos_ = pos; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  波形の取得
-			@param[in]	idx		バッファの位置
-			@return	波形（+V:0xff, 0V:0x80, -V:0x00）
-		*/
-		//-----------------------------------------------------------------//
-		uint8_t get_wav(uint16_t idx) const noexcept { return wav_[idx]; }
 
 
 		//-----------------------------------------------------------------//
@@ -747,6 +723,6 @@ namespace utils {
 		}
 	};
 
-	template<uint16_t SAMPLE, uint16_t TICK, uint16_t BSIZE, uint16_t CNUM>
-		constexpr uint16_t psg_mng<SAMPLE, TICK, BSIZE, CNUM>::key_tbl_[12];
+	template<uint16_t SAMPLE, uint16_t TICK, uint16_t CNUM>
+		constexpr uint16_t psg_mng<SAMPLE, TICK, CNUM>::key_tbl_[12];
 }
