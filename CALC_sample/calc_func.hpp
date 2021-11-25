@@ -52,7 +52,7 @@ namespace utils {
 		enum class ATYPE : uint8_t {
 			Deg,	///< Deg 度数法 (360)
 			Rad,	///< Rad 弧度法 (2pai)
-			Grad	///< 具ラード (400)
+			Grad	///< グラード (400)
 		};
 
 	private:

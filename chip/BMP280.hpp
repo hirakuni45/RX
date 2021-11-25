@@ -5,7 +5,7 @@
 			Bosch Sensotec / Digital Pressure Sensor @n
 			https://www.bosch-sensortec.com/bst/products/all_products/bmp280
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -25,12 +25,13 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class I2C_IO>
 	class BMP280 {
-
+	public:
 		// R/W ビットを含まない７ビット値
 		// ※ SDO:L ---> 0x76, SDO:H ---> 0x77
-		static const uint8_t BMP280_ADR_ = 0x77;
+		static const uint8_t I2C_ADR = 0x77;
 
-		I2C_IO& i2c_;
+	private:
+		I2C_IO& i2c_io_;
 
 		uint8_t	addr_;
 
@@ -92,32 +93,32 @@ namespace chip {
 		uint8_t read8_(REG adr) {
 			uint8_t reg[1];
 			reg[0] = static_cast<uint8_t>(adr);
-			i2c_.send(addr_, reg, 1);
-			i2c_.recv(addr_, reg, 1);
+			i2c_io_.send(addr_, reg, 1);
+			i2c_io_.recv(addr_, reg, 1);
 			return reg[0];
 		}
 
 		uint16_t read16_(REG adr) {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(adr);
-			i2c_.send(addr_, reg, 1);
-			i2c_.recv(addr_, reg, 2);
+			i2c_io_.send(addr_, reg, 1);
+			i2c_io_.recv(addr_, reg, 2);
 			return (reg[0] << 8) | reg[1];
 		}
 
 		uint32_t read24_(REG adr) {
 			uint8_t reg[3];
 			reg[0] = static_cast<uint8_t>(adr);
-			i2c_.send(addr_, reg, 1);
-			i2c_.recv(addr_, reg, 3);
+			i2c_io_.send(addr_, reg, 1);
+			i2c_io_.recv(addr_, reg, 3);
 			return (static_cast<uint32_t>(reg[0]) << 16) | (static_cast<uint32_t>(reg[1]) << 8) | reg[2];
 		}
 
 		uint16_t read16le_(REG adr) {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(adr);
-			i2c_.send(addr_, reg, 1);
-			i2c_.recv(addr_, reg, 2);
+			i2c_io_.send(addr_, reg, 1);
+			i2c_io_.recv(addr_, reg, 2);
 			return (reg[1] << 8) | reg[0];
 		}
 
@@ -125,7 +126,7 @@ namespace chip {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(a);
 			reg[1] = data;
-			i2c_.send(addr_, reg, 2);
+			i2c_io_.send(addr_, reg, 2);
 		}
 
 		void get_coefficients_() {
@@ -148,10 +149,10 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	i2c	iica_io クラスを参照で渡す
+			@param[in]	i2c_io	iica_io クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		BMP280(I2C_IO& i2c) : i2c_(i2c), addr_(0), calib_(), t_fine_(0) { }
+		BMP280(I2C_IO& i2c_io) : i2c_io_(i2c_io), addr_(0), calib_(), t_fine_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -162,7 +163,7 @@ namespace chip {
 			@return エラーなら「false」を返す
 		 */
 		//-----------------------------------------------------------------//
-		bool start(uint8_t addr = BMP280_ADR_)
+		bool start(uint8_t addr = I2C_ADR)
 		{
 			addr_ = addr;
 
@@ -301,6 +302,5 @@ namespace chip {
 			float altitude = 44330.0f * (1.0f - std::pow(pressure / seaLevelhPa, 0.1903f));
 			return altitude;
 		}
-
 	};
 }

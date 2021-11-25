@@ -495,54 +495,6 @@ namespace device {
 			switch(opt) {
 
 			case ORDER::FIRST:
-				// PD2/MOSIA  (28/144) (28/144)
-				// PD1/MISOA  (29/144) (29/144)
-				// PD0/RSPCKA (30/144) (30/144)
-				{
-					PORTD::PMR.B2 = 0;
-					PORTD::PMR.B1 = 0;
-					PORTD::PMR.B0 = 0;
-					MPC::PD2PFS.PSEL = sel;
-					MPC::PD1PFS.PSEL = sel;
-					MPC::PD0PFS.PSEL = sel;
-					PORTD::PMR.B2 = enable;
-					PORTD::PMR.B1 = enable;
-					PORTD::PMR.B0 = enable;
-				}
-				break;
-			case ORDER::SECOND:
-				// PB0/MOSIA  (35/100) (51/144)
-				// PA5/MISOA  (36/100) (54/144)
-				// PA4/RSPCKA (37/100) (55/144)
-				{
-					PORTB::PMR.B0 = 0;
-					PORTA::PMR.B5 = 0;
-					PORTA::PMR.B4 = 0;
-					MPC::PB0PFS.PSEL = sel;
-					MPC::PA5PFS.PSEL = sel;
-					MPC::PA4PFS.PSEL = sel;
-					PORTB::PMR.B0 = enable;
-					PORTA::PMR.B5 = enable;
-					PORTA::PMR.B4 = enable;
-				}
-				break;
-			case ORDER::THIRD:
-				// P24/RSPCKA (65/100) (95/144)
-				// P23/MOSIA  (66/100) (96/144)
-				// P22/MISOA  (67/100) (97/144)
-				{
-					PORT2::PMR.B4 = 0;
-					PORT2::PMR.B3 = 0;
-					PORT2::PMR.B2 = 0;
-					MPC::P24PFS.PSEL = sel;
-					MPC::P23PFS.PSEL = sel;
-					MPC::P22PFS.PSEL = sel;
-					PORT2::PMR.B4 = enable;
-					PORT2::PMR.B3 = enable;
-					PORT2::PMR.B2 = enable;
-				}
-				break;
-			case ORDER::FOURTH:
 				// P22/MISOA  (67/100) ( 97/100)
 				// P21/MOSIA  (68/100) (100/144)
 				// P20/RSPCKA (69/100) (101/144)
@@ -558,10 +510,58 @@ namespace device {
 					PORT2::PMR.B0 = enable;
 				}
 				break;
-			case ORDER::FIFTH:
+			case ORDER::SECOND:
+				// P24/RSPCKA (65/100) (95/144)
+				// P23/MOSIA  (66/100) (96/144)
+				// P22/MISOA  (67/100) (97/144)
+				{
+					PORT2::PMR.B4 = 0;
+					PORT2::PMR.B3 = 0;
+					PORT2::PMR.B2 = 0;
+					MPC::P24PFS.PSEL = sel;
+					MPC::P23PFS.PSEL = sel;
+					MPC::P22PFS.PSEL = sel;
+					PORT2::PMR.B4 = enable;
+					PORT2::PMR.B3 = enable;
+					PORT2::PMR.B2 = enable;
+				}
+				break;
+			case ORDER::THIRD:
+				// PB0/MOSIA  (35/100) (51/144)
+				// PA5/MISOA  (36/100) (54/144)
+				// PA4/RSPCKA (37/100) (55/144)
+				{
+					PORTB::PMR.B0 = 0;
+					PORTA::PMR.B5 = 0;
+					PORTA::PMR.B4 = 0;
+					MPC::PB0PFS.PSEL = sel;
+					MPC::PA5PFS.PSEL = sel;
+					MPC::PA4PFS.PSEL = sel;
+					PORTB::PMR.B0 = enable;
+					PORTA::PMR.B5 = enable;
+					PORTA::PMR.B4 = enable;
+				}
+				break;
+			case ORDER::FOURTH:
 				// PB3/RSPCKA (48/144)
 				// PB0/MOSIA  (51/144)
 				// PA5/MISOA  (54/144)
+				{
+					PORTD::PMR.B2 = 0;
+					PORTD::PMR.B1 = 0;
+					PORTD::PMR.B0 = 0;
+					MPC::PD2PFS.PSEL = sel;
+					MPC::PD1PFS.PSEL = sel;
+					MPC::PD0PFS.PSEL = sel;
+					PORTD::PMR.B2 = enable;
+					PORTD::PMR.B1 = enable;
+					PORTD::PMR.B0 = enable;
+				}
+				break;
+			case ORDER::FIFTH:
+				// PD2/MOSIA  (28/144) (28/144)
+				// PD1/MISOA  (29/144) (29/144)
+				// PD0/RSPCKA (30/144) (30/144)
 				{
 					PORTD::PMR.B2 = 0;
 					PORTD::PMR.B1 = 0;

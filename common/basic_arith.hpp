@@ -61,8 +61,6 @@ namespace utils {
 
 		NVAL		value_;
 
-		bool		str_;
-
 		uint32_t	nest_;
 
 
@@ -114,31 +112,29 @@ namespace utils {
 			}
 
 			NVAL nval;
-			if(str_) {  // 変数名、関数名が文字列の場合
-				if((ch_ >= '0' && ch_ <= '9') || ch_ == '(') {  // 数値のチェック
+			if((ch_ >= '0' && ch_ <= '9') || ch_ == '(') {  // 数値のチェック
 
-				} else {
-					typename SYMBOL::NAME sc;
-					tx_ = symbol_.get_code(tx_ - 1, sc);
-					if(symbol_(sc, nval)) {
-						ch_ = *tx_++;
-						if(minus) { nval = -nval; }
-						return nval;
-					} else {
-						typename FUNC::NAME fc;
-						tx_ = func_.get_code(tx_ - 1, fc);
-						if(fc != FUNC::NAME::NONE) {
-							func_sub_(fc, nval);
-							if(minus) { nval = -nval; }
-							return nval;
-						}
-					}
-					error_.set(error::symbol_fatal);
+			} else if(ch_ <= 0x7f) {  // 通常の文字列の場合
+				typename SYMBOL::NAME sc;
+				auto tmp = symbol_.get_code(tx_ - 1, sc);
+				if(symbol_(sc, nval)) {
+					tx_ = tmp;
+					ch_ = *tx_++;
 					if(minus) { nval = -nval; }
 					return nval;
+				} else {
+					typename FUNC::NAME fc;
+					auto tmp = func_.get_code(tx_ - 1, fc);
+					if(fc != FUNC::NAME::NONE) {
+						tx_ = tmp;
+						func_sub_(fc, nval);
+						if(minus) { nval = -nval; }
+						return nval;
+					}
 				}
-			}
-			if(static_cast<uint8_t>(ch_) >= 0x80) {  // symbol?, func?
+				error_.set(error::symbol_fatal);
+				return nval;
+			} else if(static_cast<uint8_t>(ch_) >= 0x80) {  // symbol?, func?
 				if(static_cast<uint8_t>(ch_) >= 0xC0) {  // func ?
 					auto fc = static_cast<typename FUNC::NAME>(ch_);
 					func_sub_(fc, nval);
@@ -324,28 +320,25 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		basic_arith(SYMBOL& symbol, FUNC& func) noexcept : symbol_(symbol), func_(func),
-			tx_(nullptr), ch_(0), error_(), value_(), str_(false), nest_(0)
+			tx_(nullptr), ch_(0), error_(), value_(), nest_(0)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	解析を開始 @n
-					・高速化の為、シンボル名、関数名は修飾コードを使う。@n
-					・シンボル名、関数名を文字列として扱う場合、「str = true」とする。
+					・高速化の場合、シンボル名、関数名は修飾コードを使う事が出来る。
 			@param[in]	text	解析テキスト
-			@param[in]	str		変数名、関数名を文字列とした扱う場合「true」
 			@return	文法にエラーがあった場合、「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool analize(const char* text, bool str = false) noexcept
+		bool analize(const char* text) noexcept
 		{
 			if(text == nullptr) {
 				error_.set(error::fatal);
 				return false;
 			}
 			tx_ = text;
-			str_ = str;
 
 			error_.clear();
 			nest_ = 0;
