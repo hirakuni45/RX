@@ -90,7 +90,11 @@ namespace app {
 				utils::format("  LOG2\n");
 				utils::format("  EULER\n");
 				utils::format("  ANS\n");
-				utils::format("  V[0-9]\n");
+				utils::format("  V[0-9]     Memory symbol 0..9\n");
+				utils::format("  Min[0-9]   Memory In 0..9\n");
+				utils::format("  Rad        0 to 2*PI\n");
+				utils::format("  Grad       0 to 400\n");
+				utils::format("  Deg        0 to 360\n");
 				utils::format("  sin(x)\n");
 				utils::format("  cos(x)\n");
 				utils::format("  tan(x)\n");
@@ -102,10 +106,29 @@ namespace app {
 				utils::format("  ln(x)\n");
 				utils::format("  exp10(x)\n");
 				return;
+			} else if(strncmp(cmd, "Min", 3) == 0) {
+				if(cmd[3] >= '0' && cmd[3] <= '9') {
+					NVAL val;
+					symbol_(SYMBOL::NAME::ANS, val);
+					auto vi = SYMBOL::NAME::V0;
+					vi = static_cast<SYMBOL::NAME>(static_cast<uint8_t>(vi) + (cmd[3] - '0'));
+					symbol_.set_value(vi, val);
+				} else {
+					utils::format("Min number fail.\n");
+				}
+				return;
+			} else if(strcmp(cmd, "Rad") == 0) {
+				func_.set_atype(FUNC::ATYPE::Rad);
+				return;
+			} else if(strcmp(cmd, "Grad") == 0) {
+				func_.set_atype(FUNC::ATYPE::Grad);
+				return;
+			} else if(strcmp(cmd, "Deg") == 0) {
+				func_.set_atype(FUNC::ATYPE::Deg);
+				return;
 			}
 
-			bool str_sf = true;
-			if(arith_.analize(cmd, str_sf)) {
+			if(arith_.analize(cmd)) {
 
 				auto ans = arith_();
 				symbol_.set_value(SYMBOL::NAME::ANS, ans);
