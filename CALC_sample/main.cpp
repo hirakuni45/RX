@@ -15,7 +15,7 @@
 					SCI1 を使用する。@n
 			RX72N: (Renesas Envision kit RX72N) @n
 					16MHz のベースクロックを使用する @n
-					P40 ピンにLEDを接続する @n
+					P40 に接続された LED を利用する @n
 					SCI2 を使用する。 @n
 			RX72T: @n
 					16MHz のベースクロックを使用する @n

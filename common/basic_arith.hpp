@@ -119,8 +119,9 @@ namespace utils {
 
 				} else {
 					typename SYMBOL::NAME sc;
-					tx_ = symbol_.get_code(tx_ - 1, sc);
+					auto tmp = symbol_.get_code(tx_ - 1, sc);
 					if(symbol_(sc, nval)) {
+						tx_ = tmp;
 						ch_ = *tx_++;
 						if(minus) { nval = -nval; }
 						return nval;
