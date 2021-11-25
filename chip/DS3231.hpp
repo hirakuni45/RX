@@ -5,13 +5,12 @@
 			中華製モジュールの注意点：@n
 			・バッテリーバックアップにリチウム電池を使う場合、直列抵抗を除く事
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>
-#include "common/iica_io.hpp"
 #include "common/time.h"
 
 namespace chip {
@@ -19,20 +18,22 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  DS3231 RTC テンプレートクラス
-		@param[in]	I2C		i2c クラス
+		@param[in]	I2C_IO	i2c クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class I2C>
+	template <class I2C_IO>
 	class DS3231 {
-
+	public:
 		// R/W ビットを含まない７ビット値
-		static const uint8_t DS3231_ADR_ = 0x68;
+		static const uint8_t I2C_ADR = 0x68;
 
-		I2C&	i2c_;
+	private:
+		I2C_IO&	i2c_io_;
 
 		bool	start_;
 
-		struct reg_t {
+		struct reg_t
+		{
 			uint8_t	reg[7];
 			bool operator != (const reg_t& t) {
 				for(uint8_t i = 0; i < 7; ++i) {
@@ -42,13 +43,13 @@ namespace chip {
 			}
 		};
 
-		bool get_time_(reg_t& t) const {
+		bool get_time_(reg_t& t) const noexcept {
 			uint8_t reg[1];
 			reg[0] = 0x00;	// set address
-			if(!i2c_.send(DS3231_ADR_, reg, 1)) {
+			if(!i2c_io_.send(I2C_ADR, reg, 1)) {
 				return false;
 			}
-			if(!i2c_.recv(DS3231_ADR_, &t.reg[0], 7)) {
+			if(!i2c_io_.recv(I2C_ADR, &t.reg[0], 7)) {
 				return false;
 			}
 			return true;
@@ -58,10 +59,10 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	i2c	I2C クラスを参照で渡す
+			@param[in]	i2c_io	I2C クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		DS3231(I2C& i2c) : i2c_(i2c), start_(false) { }
+		DS3231(I2C_IO& i2c_io) noexcept : i2c_io_(i2c_io), start_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -70,11 +71,12 @@ namespace chip {
 			@return エラーなら「false」を返す
 		 */
 		//-----------------------------------------------------------------//
-		bool start() {
+		bool start() noexcept
+		{
 			uint8_t reg[2];
 			reg[0] = 0x0e;	/// internal register address
 			reg[1] = 0x00;
-			start_ = i2c_.send(DS3231_ADR_, reg, 2);
+			start_ = i2c_io_.send(I2C_ADR, reg, 2);
 			return start_;
 		}
 
@@ -86,7 +88,8 @@ namespace chip {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool set_time(time_t t) const {
+		bool set_time(time_t t) const noexcept
+		{
 			if(!start_) return false;
 
 			tm tmt;
@@ -101,7 +104,7 @@ namespace chip {
 			reg[5] = ((mon / 10) << 4) | (mon % 10);  // 1 to 12
 			uint16_t y = tmt.tm_year % 100;
 			reg[6] = ((y / 10) << 4) | (y % 10);  // 0 to 99
-			return i2c_.send(DS3231_ADR_, 0x00, reg, 7);
+			return i2c_io_.send(I2C_ADR, 0x00, reg, 7);
 		}
 
 
@@ -112,7 +115,7 @@ namespace chip {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool get_time(time_t& t) const {
+		bool get_time(time_t& t) const noexcept {
 			if(!start_) return false;
 
 			reg_t tt;

@@ -4,10 +4,10 @@
 	@brief	FT5206 class @n
 			FocalTech @n
 			Capacitive Touch Panel Controller ドライバー @n
-			・I2C 割り込み対応 @n
+			・I2C 割り込み対応（作業中） @n
 			・２点同時までのタッチ位置を補足
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
