@@ -196,7 +196,7 @@ namespace device {
 			@brief  P2n 端子機能制御レジスタ（P2nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-#if defined(SIG_RX72T)
+#if defined(SIG_RX72T) || defined(SIG_RX66T)
 		typedef pfs_pia_t<0x0008C150> P20PFS_;
 		typedef pfs_pia_t<0x0008C151> P21PFS_;
 		typedef pfs_pia_t<0x0008C152> P22PFS_;
@@ -270,7 +270,7 @@ namespace device {
 			@brief  P5n 端子機能制御レジスタ（P5nPFS）（n = 0 ～ 2, 4 ～ 6）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-#if defined(SIG_RX72T)
+#if defined(SIG_RX72T) || defined(SIG_RX66T)
 		typedef pfs_ia_t<0x0008C168> P50PFS_;
 		typedef pfs_ia_t<0x0008C169> P51PFS_;
 		typedef pfs_ia_t<0x0008C16A> P52PFS_;
@@ -567,7 +567,7 @@ namespace device {
 			@brief  PHn 端子機能制御レジスタ（PHnPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-#if defined(SIG_RX72T)
+#if defined(SIG_RX72T) || defined(SIG_RX66T)
 		typedef pfs_a_t<0x0008C1C8> PH0PFS_;
 		typedef pfs_a_t<0x0008C1C9> PH1PFS_;
 		typedef pfs_a_t<0x0008C1CA> PH2PFS_;
@@ -1010,7 +1010,7 @@ namespace device {
 	template<class _> typename mpc_t<_>::P46PFS_ mpc_t<_>::P46PFS;
 	template<class _> typename mpc_t<_>::P47PFS_ mpc_t<_>::P47PFS;
 
-#if defined(SIG_RX72T)
+#if defined(SIG_RX72T) || defined(SIG_RX66T)
 	template<class _> typename mpc_t<_>::P50PFS_ mpc_t<_>::P50PFS;
 	template<class _> typename mpc_t<_>::P51PFS_ mpc_t<_>::P51PFS;
 	template<class _> typename mpc_t<_>::P52PFS_ mpc_t<_>::P52PFS;
