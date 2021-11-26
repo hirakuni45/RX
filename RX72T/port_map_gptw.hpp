@@ -793,12 +793,12 @@ namespace device {
 			@param[in]	per	周辺機器タイプ型
 			@param[in]	ch	チャネル型
 			@param[in]	ena	無効にする場合「false」
-			@param[in]	neg	反転入出力の場合「true」
 			@param[in]	order	候補を選択する場合
+			@param[in]	neg	反転入出力の場合「true」
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, CHANNEL ch, bool ena = true, bool neg = false, ORDER order = ORDER::FIRST) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER order = ORDER::FIRST, bool neg = false) noexcept
 		{
 			if(order == ORDER::BYPASS) return true;
 
