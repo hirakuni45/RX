@@ -400,21 +400,21 @@ namespace device {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GPTW[0-3]、チャネル別ポート切り替え
-			@param[in]	per	周辺機器タイプ
-			@param[in]	ch	チャネル
-			@param[in]	ena	無効にする場合「false」
-			@param[in]	neg	反転入出力の場合「true」(RX72N では neg は無効)
-			@param[in]	opt	候補を選択する場合
+			@brief  GPTW[0-9]、チャネル別ポート切り替え
+			@param[in]	per		周辺機器タイプ型
+			@param[in]	ch		チャネル型
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	order	候補を選択する場合
+			@param[in]	neg		反転入出力の場合「true」
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, CHANNEL ch, bool ena, bool neg, ORDER opt) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER order = ORDER::FIRST, bool neg = false) noexcept
 		{
             // RX72N 系は「neg」が無い
             if(neg) return false;
 
-			if(opt == ORDER::BYPASS) return true;
+			if(order == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -422,16 +422,16 @@ namespace device {
 			bool ret = false;
 			switch(per) {
 			case peripheral::GPTW0:
-				ret = gptw0_(ch, ena, opt);
+				ret = gptw0_(ch, ena, order);
 				break;
 			case peripheral::GPTW1:
-				ret = gptw1_(ch, ena, opt);
+				ret = gptw1_(ch, ena, order);
 				break;
 			case peripheral::GPTW2:
-				ret = gptw2_(ch, ena, opt);
+				ret = gptw2_(ch, ena, order);
 				break;
 			case peripheral::GPTW3:
-				ret = gptw3_(ch, ena, opt);
+				ret = gptw3_(ch, ena, order);
 				break;
 			default:
 				break;

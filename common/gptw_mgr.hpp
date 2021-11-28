@@ -187,13 +187,13 @@ namespace device {
 				break;
 			}
 			if(outa) {
-				if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, true, nega, ord_a)) {
+				if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, true, ord_a, nega)) {
 					power_mgr::turn(GPTWn::PERIPHERAL, false);
 					return false;
 				}
 			}
 			if(outb) {
-				if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, true, negb, ord_b)) {
+				if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, true, ord_b, negb)) {
 					power_mgr::turn(GPTWn::PERIPHERAL, false);
 					return false;
 				}
@@ -351,11 +351,11 @@ namespace device {
 
 			bool nega = false;
 			bool negb = false;
-			if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, true, nega, ord_a)) {
+			if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, true, ord_a, nega)) {
 				power_mgr::turn(GPTWn::PERIPHERAL, false);
 				return false;
 			}
-			if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, true, negb, ord_b)) {
+			if(!port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, true, ord_b, negb)) {
 				power_mgr::turn(GPTWn::PERIPHERAL, false);
 				return false;
 			}
@@ -407,8 +407,8 @@ namespace device {
 
 			protect_enable_();
 
-			port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, false, false, ord_a_);
-			port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, false, false, ord_b_);
+			port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::A, ord_a_, false, false);
+			port_map_gptw::turn(GPTWn::PERIPHERAL, port_map_gptw::CHANNEL::B, ord_b_, false, false);
 
 			power_mgr::turn(GPTWn::PERIPHERAL, false);
 
