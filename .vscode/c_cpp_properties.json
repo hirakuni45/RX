@@ -2,6 +2,8 @@
     "configurations": [
         {
             "name": "Win32",
+            "compilerPath": "",
+            "intelliSenseMode": "linux-gcc-x86",
             "includePath": [
                 "C:/msys64/usr/local/rx-elf/rx-elf/include",
                 "C:/msys64/mingw64/include",
@@ -18,8 +20,7 @@
             ],
             "windowsSdkVersion": "8.1",
             "cStandard": "c11",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64"
+            "cppStandard": "c++17"
         }
     ],
     "version": 4
