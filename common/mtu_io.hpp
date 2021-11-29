@@ -273,6 +273,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  インターバルタイマー
+			@param[in]	ch		出力チャネル
+			@param[in]	out		出力タイプ
+			@param[in]	freq	出力周波数
+			@param[in]	lvl		割り込みレベル
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(uint32_t freq, uint8_t lvl = 0) noexcept
+		{
+			return start_normal(MTUX::CHANNEL::A, OUTPUT::NONE, freq, lvl);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  周期再設定（コンペア・マッチ・タイマー周期）
 			@param[in]	ch		出力チャネル
 			@param[in]	freq	出力周波数

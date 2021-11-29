@@ -10,11 +10,6 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 
-/// F_PCLKA タイマーのクロックに必要なので定義が無い場合エラーにします。
-#ifndef F_PCLKA
-#  error "gpt_io.hpp requires F_PCLKA to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

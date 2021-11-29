@@ -63,7 +63,8 @@ namespace device {
 
 	private:
 
-		uint8_t	level_;
+		uint32_t	speed_;
+		uint8_t		level_;
 
 		// 便宜上のスリープ
 		void sleep_() { asm("nop"); }
@@ -100,7 +101,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		rspi_io() noexcept : level_(0) { }
+		rspi_io() noexcept : speed_(0), level_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -137,6 +138,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t speed, PHASE ctype, DLEN dlen, uint8_t level = 0) noexcept
 		{
+			speed_ = speed;
 			level_ = level;
 
 			uint8_t brdv;
@@ -200,6 +202,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start_sdc(uint32_t speed) noexcept
 		{
+			speed_ = speed;
 			level_ = 0;
 
 			uint8_t brdv;
@@ -228,13 +231,16 @@ namespace device {
 			utils::format("RSPI Real Speed: %u [Hz]\n") % z;
 #endif
 			RSPI::SPPCR = 0x00;	 // Fixed idle value, disable loop-back
-			RSPI::SPSCR = 0x00;	 // disable sequence control
-			RSPI::SPDCR = 0x20;	 // SPLW=1 (data register 32bits access) 
-			RSPI::SPND = 0b011;  // 4 RSPCK + 2 PCLK
+			RSPI::SPSCR = 0x00;	 // sequence length: 1 
+			// BYTE access
+			RSPI::SPDCR = RSPI::SPDCR.SPBYT.b(1);
+			RSPI::SPND  = 0b011;  // 4 RSPCK + 2 PCLK
 			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
 				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(DLEN::W8))
 				| RSPI::SPCMD0.CPHA.b(1) | RSPI::SPCMD0.CPOL.b(1) | RSPI::SPCMD0.SPNDEN.b(1);
 
+			// RSPCK 自動停止有効
+			RSPI::SPCR2 = RSPI::SPCR2.SCKASE.b(1);
 			// 3 線式（SSLAx を使わない）、Master
 			RSPI::SPCR = RSPI::SPCR.SPMS.b(1) | RSPI::SPCR.MSTR.b(1);
 
@@ -253,9 +259,14 @@ namespace device {
 		//----------------------------------------------------------------//
 		uint8_t xchg(uint8_t data = 0xff) noexcept
 		{
-			RSPI::SPDR = static_cast<uint32_t>(data);
-			while(RSPI::SPSR.SPRF() == 0) sleep_();
-		    return RSPI::SPDR();
+			RSPI::SPDR.HH = data;
+			uint32_t cnt = 0;
+			while(RSPI::SPSR.SPRF() == 0) {
+				++cnt;
+				if(cnt > 40000) break;
+			}
+			auto val = RSPI::SPDR.HH();
+		    return val;
 		}
 
 
