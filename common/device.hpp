@@ -70,6 +70,7 @@
 #include "RX72N/port_map_mtu.hpp"
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
+#include "RX72N/port_map_qspi.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX65N)
