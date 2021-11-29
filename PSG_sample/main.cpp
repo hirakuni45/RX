@@ -98,14 +98,14 @@ namespace {
 	PSG_MNG		psg_mng_;
 
 #ifdef USE_DAC
-	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+	typedef sound::dac_stream<device::R12DA, device::MTU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
 	DAC_STREAM	dac_stream_(sound_out_);
 
 	void start_audio_()
 	{
 		uint8_t dmac_intl = 4;
-		uint8_t tpu_intl  = 5;
-		if(dac_stream_.start(48'000, dmac_intl, tpu_intl)) {
+		uint8_t mtu_intl  = 5;
+		if(dac_stream_.start(48'000, dmac_intl, mtu_intl)) {
 			utils::format("Start D/A Stream\n");
 		} else {
 			utils::format("D/A Stream Not start...\n");

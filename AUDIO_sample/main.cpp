@@ -225,7 +225,7 @@ namespace {
 	CODEC_MGR	codec_mgr_(list_ctrl_, sound_out_);
 
 #ifdef USE_DAC
-	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+	typedef sound::dac_stream<device::R12DA, device::MTU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
 	DAC_STREAM	dac_stream_(sound_out_);
 
 	void start_audio_()
