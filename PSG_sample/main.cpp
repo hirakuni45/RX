@@ -18,6 +18,7 @@
 #include "common/input.hpp"
 
 #include "sound/sound_out.hpp"
+#include "sound/dac_stream.hpp"
 #include "sound/psg_mng.hpp"
 
 namespace {
@@ -59,6 +60,13 @@ namespace {
 	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+
 #endif
 // クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
 	typedef device::system_io<> SYSTEM_IO;
@@ -1164,13 +1172,16 @@ int main(int argc, char** argv)
 	psg_mng_.set_score(0, score0_);
 	psg_mng_.set_score(1, score1_);
 
+#ifdef SIG_RX72N
 	SW2::INPUT();
+	bool lvl = SW2::P();
+#endif
 
 	uint8_t cnt = 0;
 	uint8_t delay = 200;
-	bool lvl = SW2::P();
 	while(1) {
 		cmt_.sync();
+#ifdef SIG_RX72N
 		{
 			auto tmp = SW2::P();
 			if(!lvl && tmp) {
@@ -1179,6 +1190,7 @@ int main(int argc, char** argv)
 			}
 			lvl = tmp;
 		}
+#endif
 		{
 			uint32_t n = SAMPLE / TICK;
 			int8_t tmp[n];
