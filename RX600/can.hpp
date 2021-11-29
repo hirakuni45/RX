@@ -234,7 +234,7 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct can_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -865,11 +865,11 @@ namespace device {
 		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::VECTOR_BE0 ers>
 	struct can_norm_t : can_t<base, per> {
 
-		static const auto RXF_VEC = rxf;	///< RXF 割り込みベクター
-		static const auto TXF_VEC = txf;	///< TXF 割り込みベクター
-		static const auto RXM_VEC = rxm;	///< RXM 割り込みベクター
-		static const auto TXM_VEC = txm;	///< TXM 割り込みベクター
-		static const auto ERS_VEC = ers;	///< ERS 割り込みベクター
+		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
+		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
+		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
+		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
+		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
 	};
 	typedef can_norm_t<0x00090200, peripheral::CAN0,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
@@ -895,11 +895,11 @@ namespace device {
 		ICU::VECTOR_BE0 ers>
 	struct can_seli_t : can_t<base, per> {
 
-		static const auto RXF_VEC = rxf;	///< RXF 割り込みベクター
-		static const auto TXF_VEC = txf;	///< TXF 割り込みベクター
-		static const auto RXM_VEC = rxm;	///< RXM 割り込みベクター
-		static const auto TXM_VEC = txm;	///< TXM 割り込みベクター
-		static const auto ERS_VEC = ers;	///< ERS 割り込みベクター
+		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
+		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
+		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
+		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
+		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
 	};
 
 	typedef can_seli_t<0x00090200, peripheral::CAN0,
