@@ -28,11 +28,11 @@ namespace device {
 		typename INT, INT tev, uint32_t pclk>
 	struct sci_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto TX_VEC = txv;		///< 受信割り込みベクター
-		static const auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static const auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static const uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
 
 		//-----------------------------------------------------------------//
 		/*!

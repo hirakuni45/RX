@@ -97,6 +97,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>	SPLP;
 			bit_rw_t<io_, bitpos::B1>	SPLP2;
+
 			bit_rw_t<io_, bitpos::B4>	MOIFV;
 			bit_rw_t<io_, bitpos::B5>	MOIFE;
 		};
@@ -123,6 +124,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2> MODF;
 			bit_rw_t<io_, bitpos::B3> PERF;
 			bit_rw_t<io_, bitpos::B5> SPTEF;
+
 			bit_rw_t<io_, bitpos::B7> SPRF;
 		};
 		typedef spsr_t<base + 0x03> SPSR_;
@@ -143,7 +145,8 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			rw16_t<ofs> H;
+			rw16_t<ofs>	H;
+			rw8_t<ofs>	HH;
 		};
 		typedef spdr_t<base + 0x04> SPDR_;
 		static SPDR_ SPDR;
@@ -184,6 +187,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 3> SPCP;
+
 			bits_rw_t<io_, bitpos::B4, 3> SPECM;
 		};
 		typedef spssr_t<base + 0x09> SPSSR_;
@@ -214,8 +218,10 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2> SPFC;
+
 			bit_rw_t <io_, bitpos::B4>    SPRDTD;
 			bit_rw_t <io_, bitpos::B5>    SPLW;
+			bit_rw_t <io_, bitpos::B6>    SPBYT;
 		};
 		typedef spdcr_t<base + 0x0B> SPDCR_;
 		static SPDCR_ SPDCR;
