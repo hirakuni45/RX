@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・8 ビットタイマ（TMR）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,11 +26,11 @@ namespace device {
 	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
 	struct tmr_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto CMIA_VEC = cmia;		///< CMIA 割り込みベクタ
-		static const auto CMIB_VEC = cmib;		///< CMIB 割り込みベクタ
-		static const auto OVI_VEC  = ovi;		///< OVI 割り込みベクタ
-		static const uint32_t PCLK = clock_profile::PCLKB;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto CMIA_VEC = cmia;		///< CMIA 割り込みベクタ
+		static constexpr auto CMIB_VEC = cmib;		///< CMIB 割り込みベクタ
+		static constexpr auto OVI_VEC  = ovi;		///< OVI 割り込みベクタ
+		static constexpr auto PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -225,7 +225,7 @@ namespace device {
 		typename tmr1357_t<base, per, INT, cmia, cmib, ovi>::TCSR_ tmr1357_t<base, per, INT, cmia, cmib, ovi>::TCSR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR_SELB,
 		ICU::VECTOR_SELB::CMIA0, ICU::VECTOR_SELB::CMIB0, ICU::VECTOR_SELB::OVI0> TMR0;
 	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR_SELB,
@@ -236,7 +236,7 @@ namespace device {
 		ICU::VECTOR_SELB::CMIA3, ICU::VECTOR_SELB::CMIB3, ICU::VECTOR_SELB::OVI3> TMR3;
 #endif
 
-#if defined(SIG_RX24T) || defined(SIG_RX66T)
+#if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR,
 		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0> TMR0;
 	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR,

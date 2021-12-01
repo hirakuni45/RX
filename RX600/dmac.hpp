@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ　DMACa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,8 +23,8 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct dmac_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto IVEC = ivec;			///< 割り込みベクター
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto IVEC = ivec;			///< 割り込みベクター
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -223,7 +223,6 @@ namespace device {
 		typedef dmcsl_t<base + 0x1F> DMCSL_;
 		static DMCSL_ DMCSL;
 	};
-
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 		typename dmac_t<base, per, ivec>::DMSAR_ dmac_t<base, per, ivec>::DMSAR;
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
