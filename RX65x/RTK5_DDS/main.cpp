@@ -20,7 +20,6 @@
 #include "common/shell.hpp"
 #include "common/spi_io2.hpp"
 #include "common/tpu_io.hpp"
-#include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
