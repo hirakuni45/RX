@@ -390,7 +390,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B31> DSLPE;
 		};
-		typedef mstpcrb_t<0x00080018> MSTPCRC_t;
+		typedef mstpcrc_t<0x00080018> MSTPCRC_t;
 		static MSTPCRC_t MSTPCRC;
 
 
