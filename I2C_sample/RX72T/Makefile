@@ -26,7 +26,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	I2C_sample/main.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++ m
 
 USER_DEFS	=
 
