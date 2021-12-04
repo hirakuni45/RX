@@ -3,12 +3,13 @@
 /*!	@file
 	@brief	RX600 グループ・ICU ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include "common/vect.h"
 
 namespace device {
 
@@ -44,40 +45,93 @@ namespace device {
 		};
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  選択型割り込みテンプレート
-			@param[in]	vec		割り込み要因
-			@param[in]	task	割り込みタスク
-			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@brief  選択型割り込みＡ設定テンプレート
+			@param[in]	ICU			ICU クラス
+			@param[in]	VEC_TYPE	割り込み要因型
+			@param[in]	TASK_TYPE	タスクタイプ
+			@param[in]	sel			割り込み要因
+			@param[in]	task		割り込みタスク
+			@param[in]	lvl			割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		template <class ICU, typename VEC_TYPE, typename TASK_TYPE, uint8_t org, uint8_t end>
-		typename ICU::VECTOR set_interrupt(VEC_TYPE vec, TASK_TYPE task, uint8_t lvl) noexcept
+		template <class ICU, typename VEC_TYPE, typename TASK_TYPE, uint16_t org, uint16_t end>
+		static typename ICU::VECTOR set_interruptSELA(VEC_TYPE sel, TASK_TYPE task, uint8_t lvl) noexcept
 		{
-			for(uint8_t i = org; i <= end; ++i) {
-				if(lvl > 0) {
-					if(ICU::SLIAR[i] == 0) {
-						ICU::IER.enable(i, 0);
-						set_task(static_cast<typename ICU::VECTOR>(i), task);
-						ICU::IPR[i] = lvl;
-						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
-						ICU::IR[i] = 0;
-						ICU::IER.enable(i, 1);
-						return static_cast<typename ICU::VECTOR>(i);
-					}
-				} else if(ICU::SLIAR[i] == static_cast<uint8_t>(vec)) {
-					ICU::IER.enable(i, 0);
-					set_task(static_cast<typename ICU::VECTOR>(i), nullptr);
-					ICU::SLIXR[i] = 0;
-					ICU::IR[i] = 0;
-					return static_cast<typename ICU::VECTOR>(i);
+			// sel 要因があれば消す。
+			for(uint16_t i = org; i < (end + 1); ++i) {
+				auto idx = static_cast<typename ICU::VECTOR>(i);
+				if(ICU::SLIAR[idx] == sel) {
+					ICU::IER.enable(idx, 0);
+					set_interrupt_task(nullptr, i);
+					ICU::IPR[idx] = 0;
+					ICU::SLIAR[idx] = VEC_TYPE::NONE;
+					ICU::IR[idx] = 0;
 				}
 			}
+			if(lvl == 0 || task == nullptr) return ICU::VECTOR::NONE;
+
+			for(uint16_t i = org; i < (end + 1); ++i) {
+				auto idx = static_cast<typename ICU::VECTOR>(i);
+				if(ICU::SLIAR[idx] == VEC_TYPE::NONE) {
+					ICU::IER.enable(idx, 0);
+					set_interrupt_task(task, i);
+					ICU::IPR[idx] = lvl;
+					ICU::SLIAR[idx] = sel;
+					ICU::IR[idx] = 0;
+					ICU::IER.enable(idx, 1);
+					return idx;
+				}
+			}
+
 			return ICU::VECTOR::NONE;
 		}
-#endif
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  選択型割り込みＢ設定テンプレート
+			@param[in]	ICU			ICU クラス
+			@param[in]	VEC_TYPE	割り込み要因型
+			@param[in]	TASK_TYPE	タスクタイプ
+			@param[in]	sel			割り込み要因
+			@param[in]	task		割り込みタスク
+			@param[in]	lvl			割り込みレベル
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		template <class ICU, typename VEC_TYPE, typename TASK_TYPE, uint16_t org, uint16_t end>
+		static typename ICU::VECTOR set_interruptSELB(VEC_TYPE sel, TASK_TYPE task, uint8_t lvl) noexcept
+		{
+			// sel 要因があれば消す。
+			for(uint16_t i = org; i < (end + 1); ++i) {
+				auto idx = static_cast<typename ICU::VECTOR>(i);
+				if(ICU::SLIBR[idx] == sel) {
+					ICU::IER.enable(idx, 0);
+					set_interrupt_task(nullptr, i);
+					ICU::IPR[idx] = 0;
+					ICU::SLIBR[idx] = VEC_TYPE::NONE;
+					ICU::IR[idx] = 0;
+				}
+			}
+			if(lvl == 0 || task == nullptr) return ICU::VECTOR::NONE;
+
+			for(uint16_t i = org; i < (end + 1); ++i) {
+				auto idx = static_cast<typename ICU::VECTOR>(i);
+				if(ICU::SLIBR[idx] == VEC_TYPE::NONE) {
+					ICU::IER.enable(idx, 0);
+					set_interrupt_task(task, i);
+					ICU::IPR[idx] = lvl;
+					ICU::SLIBR[idx] = sel;
+					ICU::IR[idx] = 0;
+					ICU::IER.enable(idx, 1);
+					return idx;
+				}
+			}
+
+			return ICU::VECTOR::NONE;
+		}
 	};
 }
