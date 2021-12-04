@@ -17,6 +17,8 @@ html/
 *.db
 libusb/
 tmp/
+rxlib/src
+.vscode/*.log
 !NESEMU_sample/RX65N/nesemu_stable.mot
 !NESEMU_sample/RX72N/nesemu_stable.mot
 !RX600/drw2d/libdrw2d.a
@@ -26,4 +28,3 @@ tmp/
 !rxlib/lib/libz.a
 !rxlib/lib/libpng.a
 !rxlib/lib/libjpeg.a
-rxlib/src
