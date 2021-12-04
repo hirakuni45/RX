@@ -101,6 +101,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/SYNTH_sample](./SYNTH_sample)|FM Sound Source Synthesizer and Emulato|
 |[/CALC_sample](./CALC_sample)|Generic Calculator Sample (gmp, mpfr library)|
 |[/DSOS_sample](./DSOS_sample)|Digital Storage Oscilloscope Sample|
+|[/PSG_sample](./PSG_sample)|Pseudo PSG music performance Sample|
 |[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   
