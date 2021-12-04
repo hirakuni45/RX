@@ -868,6 +868,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B11>	MSTPB11;
 #endif
 			bit_rw_t<io_, bitpos::B12>	MSTPB12;
+			bit_rw_t<io_, bitpos::B13>	MSTPB13;
 
 			bit_rw_t<io_, bitpos::B14>	MSTPB14;
 			bit_rw_t<io_, bitpos::B15>	MSTPB15;
@@ -972,6 +973,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B21>	MSTPD21;
 
 			bit_rw_t<io_, bitpos::B23>	MSTPD23;
+
+			bit_rw_t<io_, bitpos::B27>	MSTPD27;
 		};
 		typedef mstpcrd_t<0x0008001C> MSTPCRD_;
 		static MSTPCRD_ MSTPCRD;

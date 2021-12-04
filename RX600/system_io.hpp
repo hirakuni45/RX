@@ -226,20 +226,4 @@ namespace device {
 		device::SYSTEM::SWRR = 0xA501;
 		device::SYSTEM::PRCR = 0xA500;
 	}
-
-
-	//-------------------------------------------------------------//
-	/*!
-		@brief  MTU マスタークロック取得
-		@return MTU マスタークロック
-	*/
-	//-------------------------------------------------------------//
-	inline uint32_t get_mtu_master_clock() noexcept
-	{
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
-		return clock_profile::PCLKC;
-#else
-		return clock_profile::PCLKA;
-#endif
-	}
 }
