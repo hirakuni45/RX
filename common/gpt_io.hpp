@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・GPT I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,11 +15,14 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  GPT I/O 制御クラス
-		@param[in]	GPT	GPTx定義クラス
+		@param[in]	GPT		GPTx デバイス・クラス
+		@param[in]	MTASK	割り込み・メインタスク
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GPT>
+	template <class GPT, class MTASK = utils::null_task>
 	class gpt_io {
+
+		MTASK		mtask_;
 
 		// ※必要なら、実装する
 		void sleep_() { }
