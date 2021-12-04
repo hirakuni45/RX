@@ -34,7 +34,10 @@
 // #ifdef TFU
 // #define OUT_TPU
 // #define OUT_MTU
-#define SCI_I2C
+// #define SCI_I2C
+// #define TEST_QSPI
+// #define TEST_MTU
+#define TEST_TMR
 
 #ifdef OUT_TPU
 #include "common/tpu_io.hpp"
@@ -47,6 +50,19 @@
 #ifdef SCI_I2C
 #include "common/sci_i2c_io.hpp"
 #include "chip/FT5206.hpp"
+#endif
+
+#ifdef TEST_QSPI
+#include "common/qspi_io.hpp"
+#include "chip/MX25L3233F.hpp"
+#endif
+
+#ifdef TEST_MTU
+#include "common/mtu_io.hpp"
+#endif
+
+#ifdef TEST_TMR
+#include "common/tmr_mgr.hpp"
 #endif
 
 #if 0
@@ -88,6 +104,7 @@ namespace {
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 #endif
+
 	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
@@ -136,6 +153,27 @@ namespace {
 			% mtu_io_.get_rate(true) % rate;
 	}
 #endif
+
+#ifdef TEST_QSPI
+	device::port_map_qspi::group_t qspi_order_(device::port_map_order::RENESAS::RX72N_ENVISION_KIT);
+	typedef device::qspi_io<device::QSPI> QSPI_IO;
+	QSPI_IO		qspi_io_(qspi_order_);
+
+	typedef chip::MX25L3233F<QSPI_IO> MX25;
+	MX25		mx25_(qspi_io_);
+#endif
+
+#ifdef TEST_MTU
+	typedef device::MTU0 MTU_CH;
+	typedef device::mtu_io<MTU_CH, utils::null_task> MTU_IO;
+	MTU_IO		mtu_io_;
+#endif
+
+#ifdef TEST_TMR
+	typedef device::TMR0 TMR_CH;
+	typedef device::tmr_mgr<TMR_CH, utils::count_task> TMR_MGR;
+	TMR_MGR		tmr_mgr_;
+#endif
 }
 
 extern "C" {
@@ -170,32 +208,32 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
-	{  // タイマー設定
-		uint8_t intr = 4;
-		cmt_.start(100, intr);
-	}
-
 	{  // SCI の開始
 		uint8_t intr = 2;        // 割り込みレベル
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
-	}
 
-	auto iclk = device::clock_profile::ICLK / 1'000'000;
-	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
-
-	{
 		utils::format("SCI Baud rate (set):  %d\n") % sci_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
 		rate *= 100.0f;
 		utils::format("SCI Baud rate (real): %d (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
-		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
-		rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
-		rate *= 100.0f;
-		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
 	LED::OUTPUT();  // LED ポートを出力に設定
+
+	auto iclk = device::clock_profile::ICLK / 1'000'000;
+	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
+
+#ifdef TEST_CMT
+	{  // タイマー設定
+		uint8_t intr = 4;
+		cmt_.start(100, intr);
+		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
+		float rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
+		rate *= 100.0f;
+		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
+	}
+#endif
 
 #ifdef TFU
 	__init_tfu();
@@ -244,19 +282,64 @@ int main(int argc, char** argv)
 	}
 #endif
 
+#ifdef TEST_QSPI
+	{
+		if(mx25_.start()) {
+			utils::format("Start MX25 Device (Read/Write)\n");
+		} else {
+			utils::format("Can't start MX25 Device\n");
+		}
+	}
+#endif
+
+#ifdef TEST_MTU
+	{
+		uint32_t freq = 300;
+		uint8_t intr = 3;
+		if(mtu_io_.start(freq, intr)) {
+			utils::format("Start MTU interval timer\n");
+		} else {
+			utils::format("Can't start MTU interval timer\n");
+		}
+	}
+#endif
+
+#ifdef TEST_TMR
+	{
+		uint32_t freq = 100;
+		uint8_t intr = 2;
+		if(tmr_mgr_.start(freq, intr)) {
+			utils::format("Start TMU interval timer\n");
+			utils::format("TMR interrupt: %u\n") % static_cast<uint16_t>(tmr_mgr_.get_intr_vec());
+			utils::format("TMR rate (set):  %d [Hz]\n") % tmr_mgr_.get_rate();
+			float rate = 1.0f - static_cast<float>(tmr_mgr_.get_rate()) / tmr_mgr_.get_rate(true);
+			rate *= 100.0f;
+			utils::format("TMR rate (real): %d [Hz] (%3.2f [%%])\n") % tmr_mgr_.get_rate(true) % rate;
+		} else {
+			utils::format("Can't start TMU interval timer\n");
+		}
+	}
+#endif
+
 	cmd_.set_prompt("# ");
 
-
+#if 0
 	if(0) {
 		float a = 1.999999f;
 		// printf("Value: %5.4f\n", (double)a);
 		utils::format("Value: %8.7f\n") % a;
 	}
-
+#endif
 
 	uint8_t cnt = 0;
 	while(1) {
-		cmt_.sync();
+#ifdef TEST_MTU
+		mtu_io_.sync();
+#endif
+
+#ifdef TEST_TMR
+		tmr_mgr_.at_task().sync();
+#endif
 
 #ifdef TFU
 		if(sci_.recv_length() > 0) {
@@ -309,7 +392,6 @@ touch_.update();
 			}
 		}
 #endif
-//		PD1::P = cnt & 1;
 
 		++cnt;
 		if(cnt >= 50) {
