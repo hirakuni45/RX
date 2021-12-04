@@ -293,8 +293,7 @@ namespace dsos {
 		{
 #ifndef GLFW_SIM
 			uint8_t intr_level = 5;
-			bool intr_only = true;  // 割り込みタスクのみ実行
-			if(!tpu0_.start(TPU0::TYPE::MATCH_A, freq, intr_level, TPU0::OUTPUT::NONE, intr_only)) {
+			if(!tpu0_.start(freq, intr_level)) {
 				utils::format("TPU0 start error...\n");
 			}
 #endif
