@@ -231,8 +231,8 @@ namespace {
 	void start_audio_()
 	{
 		uint8_t dmac_intl = 4;
-		uint8_t tpu_intl  = 5;
-		if(dac_stream_.start(48'000, dmac_intl, tpu_intl)) {
+		uint8_t mtu_intl  = 5;
+		if(dac_stream_.start(48'000, dmac_intl, mtu_intl)) {
 			utils::format("Start D/A Stream\n");
 		} else {
 			utils::format("D/A Stream Not start...\n");

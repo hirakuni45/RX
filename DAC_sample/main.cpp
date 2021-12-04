@@ -23,11 +23,12 @@
 #include "common/cmt_mgr.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
-#include "common/mtu_io.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
 #include "common/command.hpp"
 #include "common/intmath.hpp"
+#include "common/mtu_io.hpp"
+// #include "common/tpu_io.hpp"
 
 namespace {
 
@@ -68,8 +69,6 @@ namespace {
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI			sci_;
 
 	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
@@ -77,7 +76,6 @@ namespace {
 
 	typedef utils::command<256> COMMAND;
 	COMMAND		cmd_;
-
 
 	/// DMAC 終了割り込み
 	class dmac_term_task {
@@ -107,8 +105,8 @@ namespace {
 	};
 	wave_t		wave_[DMAC_MGR::BLOCK_SIZE_MAX];
 
-
 	typedef device::mtu_io<device::MTU0> MTU_IO;
+//	typedef device::tpu_io<device::TPU0> MTU_IO;
 	MTU_IO		mtu_io_;
 
 
@@ -136,7 +134,7 @@ namespace {
 			if(cmd_.get_word(1, tmp, sizeof(tmp))) {
 				int freq = 0;
 				if((utils::input("%d", tmp) % freq).status()) {
-					mtu_io_.set_freq(MTU_IO::mtu_type::CHANNEL::A, freq);
+					/// mtu_io_.set_freq(MTU_IO::mtu_type::CHANNEL::A, freq);
 					utils::format("Freq: %d [Hz]\n") % freq;
 				}
 			}
@@ -215,9 +213,9 @@ int main(int argc, char** argv)
 
 
 	{  // MTU0 の初期化
-		uint32_t frq = 96000;
+		uint32_t freq = 96'000;
 		uint8_t intr = 4;
-		auto ret = mtu_io_.start_normal(MTU_IO::mtu_type::CHANNEL::A, MTU_IO::OUTPUT::NONE, frq, intr);
+		auto ret = mtu_io_.start(freq, intr);
 		if(!ret) {
 			utils::format("MTU0 Not start...\n");
 		}
@@ -241,8 +239,6 @@ int main(int argc, char** argv)
 		utils::format("Start D/A sample for '%s' %u [MHz]\n") % system_str_ % clk;
 	}
 
-
-
 	{
 		calc_sico_(4);
 //		for(uint32_t i = 0; i < DMAC_MGR::BLOCK_SIZE_MAX; ++i) {
@@ -254,10 +250,19 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 	uint8_t cnt = 0;
+	auto count = dmac_mgr_.at_task().get_count();
 	while(1) {
 		cmt_.sync();
 
 		command_service_();
+
+		{
+			auto tmp = dmac_mgr_.at_task().get_count();
+			if(tmp != count) {
+				utils::format("%u\n") % tmp;
+				count = tmp;
+			}
+		}
 
 		++cnt;
 		if(cnt >= 50) {
