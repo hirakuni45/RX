@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・電力制御 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,84 +18,96 @@ namespace device {
 		@brief  電力制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct power_mgr {
+	template <class _>
+	struct power_mgr_t {
 
+		struct pad_t {
+
+			uint8_t		tmr_;
+			uint8_t		gpt_;
+			uint16_t	mtu_;
+
+			uint8_t		cmt_;
+			uint8_t		tpu_;
+
+			uint16_t	dmac_;
+			uint8_t		exdmac_;
+			uint8_t		cmpc_;
+
+			pad_t() :
+				tmr_(0),
+				gpt_(0),
+				mtu_(0),
+
+				cmt_(0),
+				tpu_(0),
+
+				dmac_(0),
+				exdmac_(0),
+				cmpc_(0)
+			{ }
+		};
+		static pad_t	pad_;
+
+		static void sr_(bool f, uint8_t& pad, peripheral org, peripheral tgt)
+		{
+			if(f) {
+				pad |= 1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org));
+			} else {
+				pad &= ~(1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org)));
+			}
+		}
+
+		static void sr_(bool f, uint16_t& pad, peripheral org, peripheral tgt)
+		{
+			if(f) {
+				pad |= 1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org));
+			} else {
+				pad &= ~(1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org)));
+			}
+		}
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  モジュール・ストップ機能を設定
-			@param[in]	t	周辺機器タイプ
+			@param[in]	per	周辺機器タイプ
 			@param[in]	ena	オフにする場合「false」
 			@return ペリフェラルが見つからない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, bool ena = true)
+		static bool turn(peripheral per, bool ena = true)
 		{
 			device::SYSTEM::PRCR = 0xA500 | 0b0010;	// 低消費電力機能
 
 			bool ret = true;
 			bool f = !ena;
-			switch(t) {
-			case peripheral::DTC:
-				SYSTEM::MSTPCRA.MSTPA28 = f;
-				break;
-
-			case peripheral::CMT0:
-			case peripheral::CMT1:
-				SYSTEM::MSTPCRA.MSTPA15 = f;
-				break;
-			case peripheral::CMT2:
-			case peripheral::CMT3:
-				SYSTEM::MSTPCRA.MSTPA14 = f;
-				break;
-
-			case peripheral::CAN0:
-				SYSTEM::MSTPCRB.MSTPB0 = f;
-				break;
-
-			case peripheral::RSPI0:
-				SYSTEM::MSTPCRB.MSTPB17 = f;
-				break;
-
-			case peripheral::RIIC0:
-				SYSTEM::MSTPCRB.MSTPB21 = f;
-				break;
-
-			case peripheral::SCI1:
-			case peripheral::SCI1C:
-				SYSTEM::MSTPCRB.MSTPB30 = f;
-				break;
-			case peripheral::SCI5:
-			case peripheral::SCI5C:
-				SYSTEM::MSTPCRB.MSTPB26 = f;
-				break;
-			case peripheral::SCI6:
-			case peripheral::SCI6C:
-				SYSTEM::MSTPCRB.MSTPB25 = f;
-				break;
-
-			case peripheral::TMR0:
-			case peripheral::TMR1:
-				SYSTEM::MSTPCRA.MSTPA5 = f;
-				break;
-			case peripheral::TMR2:
-			case peripheral::TMR3:
-				SYSTEM::MSTPCRA.MSTPA4 = f;
+			switch(per) {
+			case peripheral::TMR6:
+			case peripheral::TMR7:
+				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
+				SYSTEM::MSTPCRA.MSTPA2 = ((pad_.tmr_ & 0b11'00'00'00) == 0);
 				break;
 			case peripheral::TMR4:
 			case peripheral::TMR5:
-				SYSTEM::MSTPCRA.MSTPA3 = f;
+				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
+				SYSTEM::MSTPCRA.MSTPA3 = ((pad_.tmr_ & 0b00'11'00'00) == 0);
 				break;
-			case peripheral::TMR6:
-			case peripheral::TMR7:
-				SYSTEM::MSTPCRA.MSTPA2 = f;
+			case peripheral::TMR3:
+			case peripheral::TMR2:
+				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
+				SYSTEM::MSTPCRA.MSTPA4 = ((pad_.tmr_ & 0b00'00'11'00) == 0);
+				break;
+			case peripheral::TMR1:
+			case peripheral::TMR0:
+				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
+				SYSTEM::MSTPCRA.MSTPA5 = ((pad_.tmr_ & 0b00'00'00'11) == 0);
 				break;
 
 			case peripheral::GPT0:
 			case peripheral::GPT1:
 			case peripheral::GPT2:
 			case peripheral::GPT3:
-				SYSTEM::MSTPCRA.MSTPA7 = f;
-				break;
+				sr_(ena, pad_.gpt_, peripheral::GPT0, per);
+				SYSTEM::MSTPCRA.MSTPA7 = (pad_.gpt_ == 0);
 
 			case peripheral::MTU0:
 			case peripheral::MTU1:
@@ -106,28 +118,86 @@ namespace device {
 			case peripheral::MTU6:
 			case peripheral::MTU7:
 			case peripheral::MTU9:
-				SYSTEM::MSTPCRA.MSTPA9 = f;
+				sr_(ena, pad_.mtu_, peripheral::MTU0, per);
+				SYSTEM::MSTPCRA.MSTPA9 = (pad_.mtu_ == 0);
 				break;
 
-			case peripheral::S12AD:
-				SYSTEM::MSTPCRA.MSTPA17 = f;
+			case peripheral::CMT2:
+			case peripheral::CMT3:
+				// CMT2, CMT3 のストップ状態設定
+				sr_(ena, pad_.cmt_, peripheral::CMT0, per);
+				SYSTEM::MSTPCRA.MSTPA14 = ((pad_.cmt_ & 0b1100) == 0);
 				break;
+			case peripheral::CMT0:
+			case peripheral::CMT1:
+				// CMT0, CMT1 のストップ状態設定
+				sr_(ena, pad_.cmt_, peripheral::CMT0, per);
+				SYSTEM::MSTPCRA.MSTPA15 = ((pad_.cmt_ & 0b0011) == 0);
+				break;
+
 			case peripheral::S12AD1:
 				SYSTEM::MSTPCRA.MSTPA16 = f;
 				break;
-			case peripheral::S12AD2:
-				SYSTEM::MSTPCRA.MSTPA23 = f;
+			case peripheral::S12AD:
+				SYSTEM::MSTPCRA.MSTPA17 = f;
 				break;
 
 			case peripheral::DA:
 				SYSTEM::MSTPCRA.MSTPA19 = f;
 				break;
 
+			case peripheral::S12AD2:
+				SYSTEM::MSTPCRA.MSTPA23 = f;
+				break;
+
+			case peripheral::DTC:
+				SYSTEM::MSTPCRA.MSTPA28 = f;
+				break;
+
+			case peripheral::RSCAN:
+				SYSTEM::MSTPCRB.MSTPB0 = f;
+				break;
+
+			case peripheral::DOC:
+				SYSTEM::MSTPCRB.MSTPB6 = f;
+				break;
+
 			case peripheral::CMPC0:
 			case peripheral::CMPC1:
 			case peripheral::CMPC2:
 			case peripheral::CMPC3:
-				SYSTEM::MSTPCRB.MSTPB10 = f;
+				sr_(ena, pad_.cmpc_, peripheral::CMPC0, per);
+				SYSTEM::MSTPCRB.MSTPB10 = (pad_.cmpc_ == 0);
+				break;
+
+			case peripheral::RSPI0:
+				SYSTEM::MSTPCRB.MSTPB17 = f;
+				break;
+
+			case peripheral::RIIC0:
+				SYSTEM::MSTPCRB.MSTPB21 = f;
+				break;
+
+			case peripheral::CRC:
+				SYSTEM::MSTPCRB.MSTPB23 = f;	// CRC のストップ状態解除
+				break;
+
+			case peripheral::SCI6:
+			case peripheral::SCI6C:
+				SYSTEM::MSTPCRB.MSTPB25 = f;
+				break;
+			case peripheral::SCI5:
+			case peripheral::SCI5C:
+				SYSTEM::MSTPCRB.MSTPB26 = f;
+				break;
+
+			case peripheral::SCI1:
+			case peripheral::SCI1C:
+				SYSTEM::MSTPCRB.MSTPB30 = f;
+				break;
+
+			case peripheral::CAC:
+				SYSTEM::MSTPCRC.MSTPC19 = f;
 				break;
 
 			default:
@@ -138,4 +208,7 @@ namespace device {
 			return ret;
 		}
 	};
+	template <class _> typename power_mgr_t<_>::pad_t power_mgr_t<_>::pad_;
+
+	typedef power_mgr_t<void> power_mgr;
 }

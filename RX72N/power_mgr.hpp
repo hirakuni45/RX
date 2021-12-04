@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX72N グループ・電力制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,7 +11,6 @@
 #include "RX72N/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX600/bus.hpp"
-#include "common/static_holder.hpp"
 
 namespace device {
 
@@ -20,23 +19,41 @@ namespace device {
 		@brief  電力制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class power_mgr {
+	template <class _>
+	class power_mgr_t {
 
 		struct pad_t {
 
-			uint16_t	cmt_;
-			uint16_t	tpu_;
-			uint16_t	tmr_;
+			uint8_t		cmt_;
+			uint8_t		tpu_;
+			uint8_t		tmr_;
+			uint8_t		gptw_;
 			uint16_t	mtu_;
-			uint16_t	gptw_;
 			uint16_t	dmac_;
+			uint8_t		exdmac_;
 
-			pad_t() : cmt_(0), tpu_(0), tmr_(0), mtu_(0), gptw_(0), dmac_(0) { }
+			pad_t() :
+				cmt_(0),
+				tpu_(0),
+				tmr_(0),
+				gptw_(0),
+				mtu_(0),
+				dmac_(0),
+				exdmac_(0)
+			{ }
 		};
+		static pad_t	pad_;
 
-		typedef utils::static_holder<pad_t> STH;
+		static void sr_(bool f, uint8_t& pad, peripheral org, peripheral tgt)
+		{
+			if(f) {
+				pad |=   1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org));
+			} else {
+				pad &= ~(1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org)));
+			}
+		}
 
-		static void set_(bool f, uint16_t& pad, peripheral org, peripheral tgt)
+		static void sr_(bool f, uint16_t& pad, peripheral org, peripheral tgt)
 		{
 			if(f) {
 				pad |=   1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org));
@@ -71,14 +88,23 @@ namespace device {
 
 			case peripheral::TMR2:
 			case peripheral::TMR3:
-				set_(ena, STH::st.tmr_, peripheral::TMR0, t);
-				SYSTEM::MSTPCRA.MSTPA4 = ((STH::st.tmr_ & 0b1100) == 0);
+				sr_(ena, pad_.tmr_, peripheral::TMR0, t);
+				SYSTEM::MSTPCRA.MSTPA4 = ((pad_.tmr_ & 0b1100) == 0);
 
 				break;
 			case peripheral::TMR0:
 			case peripheral::TMR1:
-				set_(ena, STH::st.tmr_, peripheral::TMR0, t);
-				SYSTEM::MSTPCRA.MSTPA5 = ((STH::st.tmr_ & 0b0011) == 0);
+				sr_(ena, pad_.tmr_, peripheral::TMR0, t);
+				SYSTEM::MSTPCRA.MSTPA5 = ((pad_.tmr_ & 0b0011) == 0);
+				break;
+
+			case peripheral::POE:
+			case peripheral::GPTW0:
+			case peripheral::GPTW1:
+			case peripheral::GPTW2:
+			case peripheral::GPTW3:
+				sr_(ena, pad_.gptw_, peripheral::POE, t);
+				SYSTEM::MSTPCRA.MSTPA7 = (pad_.gptw_ == 0);
 				break;
 
 			case peripheral::MTU0:
@@ -89,17 +115,9 @@ namespace device {
 			case peripheral::MTU5:
 			case peripheral::MTU6:
 			case peripheral::MTU7:
-				set_(ena, STH::st.mtu_, peripheral::MTU0, t);
-				SYSTEM::MSTPCRA.MSTPA9 = (STH::st.mtu_ == 0);
-				break;
-
-			case peripheral::POE:
-			case peripheral::GPTW0:
-			case peripheral::GPTW1:
-			case peripheral::GPTW2:
-			case peripheral::GPTW3:
-				set_(ena, STH::st.gptw_, peripheral::POE, t);
-				SYSTEM::MSTPCRA.MSTPA7 = (STH::st.gptw_ == 0);
+			case peripheral::MTU8:
+				sr_(ena, pad_.mtu_, peripheral::MTU0, t);
+				SYSTEM::MSTPCRA.MSTPA9 = (pad_.mtu_ == 0);
 				break;
 
 			case peripheral::PPG1:
@@ -116,22 +134,22 @@ namespace device {
 			case peripheral::TPU3:
 			case peripheral::TPU4:
 			case peripheral::TPU5:
-				set_(ena, STH::st.tpu_, peripheral::TPU0, t);
-				SYSTEM::MSTPCRA.MSTPA13 = (STH::st.tpu_ == 0);
+				sr_(ena, pad_.tpu_, peripheral::TPU0, t);
+				SYSTEM::MSTPCRA.MSTPA13 = (pad_.tpu_ == 0);
 				break;
 
 			// CMT2, CMT3 のストップ状態設定
 			case peripheral::CMT2:
 			case peripheral::CMT3:
-				set_(ena, STH::st.cmt_, peripheral::CMT0, t);
-				SYSTEM::MSTPCRA.MSTPA14 = ((STH::st.cmt_ & 0b1100) == 0);
+				sr_(ena, pad_.cmt_, peripheral::CMT0, t);
+				SYSTEM::MSTPCRA.MSTPA14 = ((pad_.cmt_ & 0b1100) == 0);
 				break;
 
 			// CMT0, CMT1 のストップ状態設定
 			case peripheral::CMT0:
 			case peripheral::CMT1:
-				set_(ena, STH::st.cmt_, peripheral::CMT0, t);
-				SYSTEM::MSTPCRA.MSTPA15 = ((STH::st.cmt_ & 0b0011) == 0);
+				sr_(ena, pad_.cmt_, peripheral::CMT0, t);
+				SYSTEM::MSTPCRA.MSTPA15 = ((pad_.cmt_ & 0b0011) == 0);
 				break;
 
 			case peripheral::S12AD1:
@@ -155,8 +173,14 @@ namespace device {
 			case peripheral::DMAC6:
 			case peripheral::DMAC7:
 			case peripheral::DTC:
-				set_(ena, STH::st.dmac_, peripheral::DMAC0, t);
-				SYSTEM::MSTPCRA.MSTPA28 = (STH::st.dmac_ == 0);
+				sr_(ena, pad_.dmac_, peripheral::DMAC0, t);
+				SYSTEM::MSTPCRA.MSTPA28 = (pad_.dmac_ == 0);
+				break;
+
+			case peripheral::EXDMAC0:
+			case peripheral::EXDMAC1:
+				sr_(ena, pad_.exdmac_, peripheral::EXDMAC0, t);
+				SYSTEM::MSTPCRA.MSTPA29 = (pad_.exdmac_ == 0);
 				break;
 
 			// CAN モジュール
@@ -184,6 +208,11 @@ namespace device {
 
 			case peripheral::ELC:				// イベントリンク
 				SYSTEM::MSTPCRB.MSTPB9 = f;
+				break;
+
+			case peripheral::EPTPC:
+			case peripheral::PTPEDMAC:
+				SYSTEM::MSTPCRB.MSTPB13 = f;
 				break;
 
 			case peripheral::ETHERC1:
@@ -311,6 +340,10 @@ namespace device {
 				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
 				break;
 
+			case peripheral::MMCIF:
+				SYSTEM::MSTPCRD.MSTPD21 = f;
+				break;
+
 			default:
 				ret = false;
 				break;
@@ -319,4 +352,7 @@ namespace device {
 			return ret;
 		}
 	};
+	template<class _> typename power_mgr_t<_>::pad_t power_mgr_t<_>::pad_;
+
+	typedef power_mgr_t<void> power_mgr;
 }

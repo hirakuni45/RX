@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・ペリフェラル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016,2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016,2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,7 +19,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class peripheral {
 
-		CAC,		///< クロック周波数精度測定回路
+		CAC,	///< クロック周波数精度測定回路
 
 		DTC,	///< データトランスファコントローラ
 
@@ -41,7 +41,7 @@ namespace device {
 
 		CRC,	///< CRC 演算器（CRC）
 
-		CAN0,	///< CAN インタフェース０（※Ｂバージョンのみ）
+		RSCAN,	///< RSCAN インタフェース（※Ｂバージョンのみ）
 
 		MTU0,	///< マルチファンクションタイマパルスユニット０
 		MTU1,	///< マルチファンクションタイマパルスユニット１
