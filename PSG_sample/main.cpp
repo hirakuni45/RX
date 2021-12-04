@@ -25,7 +25,7 @@ namespace {
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
@@ -36,7 +36,7 @@ namespace {
 
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
@@ -47,7 +47,7 @@ namespace {
 
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, false> SW2;
 	typedef device::SCI9 SCI_CH;
 
@@ -60,15 +60,23 @@ namespace {
 
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
+
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
 	typedef device::SCI2 SCI_CH;
 
@@ -82,7 +90,7 @@ namespace {
 
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
@@ -101,8 +109,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+
 	SCI		sci_;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
