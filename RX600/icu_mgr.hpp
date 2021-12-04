@@ -18,6 +18,8 @@
   #error "icu.hpp requires SIG_RX64M or SIG_RX71M to be defined"
 #endif
 
+#include "common/format.hpp"
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -106,28 +108,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA sel, utils::TASK task, uint8_t lvl) noexcept
 		{
-			for(uint8_t i = 208; i <= 255; ++i) {
-				auto idx = static_cast<ICU::VECTOR>(i);
-				if(lvl > 0) {
-					if(ICU::SLIAR[idx] == ICU::VECTOR_SELA::NONE) {
-						ICU::IER.enable(idx, 0);
-						set_task(idx, task);
-						ICU::IPR[idx] = lvl;
-						ICU::SLIAR[idx] = sel;
-						ICU::IR[idx] = 0;
-						ICU::IER.enable(idx, 1);
-						return idx;
-					}
-				} else if(ICU::SLIAR[idx] == sel) {
-					ICU::IER.enable(idx, 0);
-					set_task(idx, nullptr);
-					ICU::SLIAR[idx] = ICU::VECTOR_SELA::NONE;
-					ICU::IPR[idx] = 0;
-					ICU::IR[idx] = 0;
-					return idx;
-				}
-			}
-			return ICU::VECTOR::NONE;
+			return icu_utils::set_interruptSELA<ICU, ICU::VECTOR_SELA, utils::TASK, 208, 255>(sel, task, lvl);
 		}
 
 
@@ -142,28 +123,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELB sel, utils::TASK task, uint8_t lvl) noexcept
 		{
-			for(uint8_t i = 144; i <= 207; ++i) {
-				auto idx = static_cast<ICU::VECTOR>(i);
-				if(lvl > 0) {
-					if(ICU::SLIBR[idx] == ICU::VECTOR_SELB::NONE) {
-						ICU::IER.enable(idx, 0);
-						set_task(idx, task);
-						ICU::IPR[idx] = lvl;
-						ICU::SLIBR[idx] = sel;
-						ICU::IR[idx] = 0;
-						ICU::IER.enable(idx, 1);
-						return idx;
-					}
-				} else if(ICU::SLIBR[idx] == sel) {
-					ICU::IER.enable(idx, 0);
-					set_task(idx, nullptr);
-					ICU::SLIBR[idx] = ICU::VECTOR_SELB::NONE;
-					ICU::IPR[idx] = 0;
-					ICU::IR[idx] = 0;
-					return idx;
-				}
-			}
-			return ICU::VECTOR::NONE;
+			return icu_utils::set_interruptSELB<ICU, ICU::VECTOR_SELB, utils::TASK, 144, 207>(sel, task, lvl);
 		}
 
 

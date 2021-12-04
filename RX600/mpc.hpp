@@ -235,11 +235,13 @@ namespace device {
 		typedef pfs_pi_t<0x0008C15A> P32PFS_;
 		typedef pfs_pi_t<0x0008C15B> P33PFS_;
 		typedef pfs_pi_t<0x0008C15C> P34PFS_;
+		typedef pfs_pi_t<0x0008C15D> P35PFS_;
 		static P30PFS_ P30PFS;
 		static P31PFS_ P31PFS;
 		static P32PFS_ P32PFS;
 		static P33PFS_ P33PFS;
 		static P34PFS_ P34PFS;
+		static P35PFS_ P35PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1000,6 +1002,7 @@ namespace device {
 	template<class _> typename mpc_t<_>::P32PFS_ mpc_t<_>::P32PFS;
 	template<class _> typename mpc_t<_>::P33PFS_ mpc_t<_>::P33PFS;
 	template<class _> typename mpc_t<_>::P34PFS_ mpc_t<_>::P34PFS;
+	template<class _> typename mpc_t<_>::P35PFS_ mpc_t<_>::P35PFS;
 
 	template<class _> typename mpc_t<_>::P40PFS_ mpc_t<_>::P40PFS;
 	template<class _> typename mpc_t<_>::P41PFS_ mpc_t<_>::P41PFS;

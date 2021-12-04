@@ -1,17 +1,17 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72T Makefile
+#   @brief  RX65N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	i2c_sample
+TARGET		=	psg_sample
 
-DEVICE		=	R5F572TK
+DEVICE		=	R5F565NE
 
-RX_DEF		=	SIG_RX72T
+RX_DEF		=	SIG_RX65N
 
 BUILD		=	release
 # BUILD		=	debug
@@ -24,9 +24,9 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	I2C_sample/main.cpp
+PSOURCES	=	PSG_sample/main.cpp
 
-USER_LIBS	=	supc++ m
+USER_LIBS	=
 
 USER_DEFS	=
 

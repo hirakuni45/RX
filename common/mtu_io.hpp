@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ MTU3 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -57,7 +57,7 @@ namespace device {
 			volatile uint16_t	ovfw_count_;
 
 			capture_t() : all_count_(0),
-				ovfw_limit_(get_mtu_master_clock() / 65536),   // タイムアウト１秒
+				ovfw_limit_(0),   // タイムアウト１秒
 				ovfw_count_(0)
 			{ }
 
@@ -91,7 +91,6 @@ namespace device {
 
 		struct task_t {
 			volatile uint32_t	tgr_adr_;		// TGR の実アドレス
-			volatile uint32_t	main_tick_;
 			volatile uint32_t	ovfw_tick_;
 
 			uint32_t	rate_;
@@ -102,7 +101,7 @@ namespace device {
 			capture_t	cap_;
 
 			task_t() : tgr_adr_(MTUX::TGRA.address()),
-				main_tick_(0), ovfw_tick_(0),
+				ovfw_tick_(0),
 				rate_(0), tgr_(0), shift_(0), out_(OUTPUT::NONE),
 				cap_()
 			{ }
@@ -117,11 +116,11 @@ namespace device {
 
 		ICU::VECTOR		intr_vec_;
 
+		uint8_t			intr_level_;
+
 
 		static INTERRUPT_FUNC void cap_task_()
 		{
-			++tt_.main_tick_;
-
 			tt_.cap_.all_count_ = (tt_.ovfw_tick_ << 16) | rd16_(tt_.tgr_adr_);
 			mtask_();
 			tt_.ovfw_tick_ = 0;
@@ -138,9 +137,8 @@ namespace device {
 			otask_();
 		}
 
-		static INTERRUPT_FUNC void out_task_()
+		static INTERRUPT_FUNC void match_task_()
 		{
-			++tt_.main_tick_;
 			mtask_();
 		}
 
@@ -148,7 +146,7 @@ namespace device {
 		// dv: 0 to 10
 		static void set_TCR_(typename MTUX::CHANNEL ch)
 		{
-			static const uint8_t ckt[] = {
+			static constexpr uint8_t ckt[] = {
 				0b000000,  // (0)  1/1
 				0b001000,  // (1)  1/2
 				0b000001,  // (2)  1/4
@@ -161,11 +159,11 @@ namespace device {
 				0b101000,  // (9)  1/512(NG: 1/1024)
 				0b101000,  // (10) 1/1024
 			};
-			static const uint8_t cclr[4] = { 0b001, 0b010, 0b101, 0b110 };
-			MTUX::TCR  = MTUX::TCR.TPSC.b(ckt[tt_.shift_] & 7)
+			static constexpr uint8_t cclr[4] = { 0b001, 0b010, 0b101, 0b110 };
+			MTUX::TCR  = MTUX::TCR.TPSC.b(ckt[tt_.shift_] & 0b111)
 					   | MTUX::TCR.CKEG.b(0b00)
 					   | MTUX::TCR.CCLR.b(cclr[static_cast<uint8_t>(ch)]);
-			MTUX::TCR2 = MTUX::TCR2.TPSC2.b((ckt[tt_.shift_] >> 3) & 7);
+			MTUX::TCR2 = MTUX::TCR2.TPSC2.b((ckt[tt_.shift_] >> 3) & 0b111);
 		}
 
 
@@ -173,16 +171,17 @@ namespace device {
 		{
 			tt_.rate_ = freq;
 			tt_.shift_ = 0;
-			match = get_mtu_master_clock() / freq;
+			match = MTUX::PCLK / freq;
 			while(match > 65535) {
 				++tt_.shift_;
-				bool mod = match & 1;
 				match /= 2;
-				if(mod) ++match;
+				if(tt_.shift_ > 10) {  // 1/1024
+					return false;
+				}
 			}
-			if(tt_.shift_ > 10) {  // 1/1024
-				// overflow clock divide...
-				return false;
+			while(tt_.shift_ == 7 || tt_.shift_ == 9) {
+				++tt_.shift_;
+				match /= 2;
 			}
 			return true;
 		}
@@ -190,10 +189,14 @@ namespace device {
 
 		void set_output_type_(typename MTUX::CHANNEL ch, OUTPUT ot, uint32_t& match)
 		{
-			uint8_t ctd = 0;
+			uint8_t ctd = 0b0000;  // 出力禁止
 			switch(ot) {
-			case OUTPUT::LOW_TO_HIGH: ctd = 0b0010; break;
-			case OUTPUT::HIGH_TO_LOW: ctd = 0b0101; break;
+			case OUTPUT::LOW_TO_HIGH:
+				ctd = 0b0010;
+				break;
+			case OUTPUT::HIGH_TO_LOW:
+				ctd = 0b0101;
+				break;
 			case OUTPUT::TOGGLE:
 				{
 					ctd = 0b0111;
@@ -202,10 +205,22 @@ namespace device {
 					if(mod) ++match;
 				}
 				break;
-			default: break;
+			default:
+				break;
 			}
 
 			MTUX::TIOR.set(ch, ctd);
+		}
+
+
+		void set_interrupt_(typename MTUX::CHANNEL ch, bool ovf)
+		{
+			auto cvec = MTUX::get_vec(static_cast<typename MTUX::INTERRUPT>(ch));
+			intr_vec_ = icu_mgr::set_interrupt(cvec, match_task_, intr_level_);
+			MTUX::enable_interrupt(static_cast<typename MTUX::INTERRUPT>(ch));
+			if(ovf) {
+				MTUX::enable_interrupt(MTUX::INTERRUPT::OVF);
+			}
 		}
 
 	public:
@@ -214,7 +229,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		mtu_io() noexcept : clk_base_(get_mtu_master_clock()), intr_vec_(ICU::VECTOR::NONE)
+		mtu_io() noexcept : clk_base_(MTUX::PCLK), intr_vec_(ICU::VECTOR::NONE), intr_level_(0)
 		{ }
 
 
@@ -228,20 +243,28 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_normal(typename MTUX::CHANNEL ch, OUTPUT out, uint32_t freq,
-			uint8_t lvl = 0) noexcept
+		bool start_normal(typename MTUX::CHANNEL ch, OUTPUT out, uint32_t freq, uint8_t lvl = 0) noexcept
 		{
 			if(MTUX::PERIPHERAL == peripheral::MTU5) {  // MTU5 は通常出力として利用不可
 				return false;
 			}
 
-			power_mgr::turn(MTUX::PERIPHERAL);
+			if(!power_mgr::turn(MTUX::PERIPHERAL)) {
+				return false;
+			}
 
+			MTUX::enable(false);
+			MTUX::TIER = 0;
+			MTUX::TIOR.disable();
+
+			intr_level_ = lvl;
 			channel_ = ch;
 			tt_.out_ = out;
 
-			bool pena = (out != OUTPUT::NONE);
-			port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL);
+			if(out != OUTPUT::NONE) {
+				bool pena = true;
+				port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL);
+			}
 
 			uint32_t match;
 			if(!make_clock_(freq, match)) {
@@ -249,25 +272,37 @@ namespace device {
 			}
 
 			set_output_type_(ch, out, match);
-
 			set_TCR_(ch);
+
 			MTUX::TMDR1 = 0x00;  // 通常動作
 
-			if(lvl > 0) {
-				auto cvec = MTUX::get_vec(static_cast<typename MTUX::INTERRUPT>(ch));
-				intr_vec_ = icu_mgr::set_interrupt(cvec, out_task_, lvl);
-				MTUX::TIER = (1 << static_cast<uint8_t>(ch)) | MTUX::TIER.TCIEV.b();
+			if(intr_level_ > 0) {
+				bool ovf = false;
+				set_interrupt_(ch, ovf);
 			}
 
-			// 各チャネルに相当するジャネラルレジスタ
-			tt_.tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
-			wr16_(tt_.tgr_adr_, match - 1);
+			MTUX::TGR[ch] = match - 1;
+
 			tt_.tgr_ = match;
 
 			MTUX::TCNT = 0;
 			MTUX::enable();
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  インターバルタイマー
+			@param[in]	freq	出力周波数
+			@param[in]	lvl		割り込みレベル
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(uint32_t freq, uint8_t lvl = 0) noexcept
+		{
+			return start_normal(MTUX::CHANNEL::A, OUTPUT::NONE, freq, lvl);
 		}
 
 
@@ -350,8 +385,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm2(typename MTUX::CHANNEL ch, OUTPUT out, uint32_t freq,
-			uint8_t level = 0) noexcept
+		bool start_pwm2(typename MTUX::CHANNEL ch, OUTPUT out, uint32_t freq, uint8_t level = 0) noexcept
 		{
 			if(peripheral::MTU3 <= MTUX::PERIPHERAL && MTUX::PERIPHERAL <= peripheral::MTU7) {
 				return false;
@@ -359,6 +393,7 @@ namespace device {
 
 			power_mgr::turn(MTUX::PERIPHERAL);
 
+			intr_level_ = level;
 			channel_ = ch;
 			tt_.out_ = out;
 
@@ -395,7 +430,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		void set_base_clock(uint32_t clk) noexcept {
-			uint32_t a = get_mtu_master_clock();
+			uint32_t a = MTUX::PCLK;
 			while(a < clk) {
 				a <<= 1;
 			}
@@ -449,6 +484,7 @@ namespace device {
 
 			power_mgr::turn(MTUX::PERIPHERAL);
 
+			intr_level_ = lvl;
 			bool pena = true;
 			port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL);
 
@@ -461,7 +497,7 @@ namespace device {
 			}
 			MTUX::TIOR.set(ch, ctd);
 
-			uint32_t dv = get_mtu_master_clock() / clk_base_;
+			uint32_t dv = MTUX::PCLK / clk_base_;
 			--dv;
 			if(dv >= 10) dv = 10;
 			tt_.shift_ = dv;
@@ -508,6 +544,8 @@ namespace device {
 			}
 
 			power_mgr::turn(MTUX::PERIPHERAL);
+
+			intr_level_ = level;
 #if 0
 			bool pena = (ot != OUTPUT_TYPE::NONE);
 			port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL);
@@ -530,6 +568,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  同期 @n
+					※主にインターバルタイマーとして使う場合の同期
+		*/
+		//-----------------------------------------------------------------//
+		void sync() noexcept
+		{
+			if(intr_level_ > 0) {
+				auto tmp = tt_.main_tick_;
+				while(tmp == tt_.main_tick_) { }
+			} else {  // インターバルの周期が CPU ループに対して、短い場合は、正しく機能しないので注意！
+				auto tmp = MTUX::TCNT();
+				while(1) {
+					auto tmp2 = MTUX::TCNT();
+					if(tmp2 < tmp) break;
+					tmp = tmp2;
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  停止
 		*/
 		//-----------------------------------------------------------------//
@@ -543,6 +603,7 @@ namespace device {
 			if(MTU::TSTRA() == 0 && MTU::TSTRB() == 0 && MTU::TSTR() == 0) {			
 				power_mgr::turn(MTUX::get_peripheral(), false);
 			}
+			intr_level_ = 0;
 		}
 
 
@@ -556,7 +617,7 @@ namespace device {
 		static uint32_t get_rate(bool real = false) noexcept
 		{
 			if(real) {
-				uint32_t rate = (get_mtu_master_clock() >> tt_.shift_) / tt_.tgr_;
+				uint32_t rate = (MTUX::PCLK >> tt_.shift_) / tt_.tgr_;
 				if(tt_.out_ == OUTPUT::TOGGLE) {
 					rate >>= 1;
 				}
@@ -573,7 +634,7 @@ namespace device {
 			@return 割り込みベクター
 		*/
 		//-----------------------------------------------------------------//
-		ICU::VECTOR get_intr_vec() const noexcept { return intr_vec_; }
+		auto get_intr_vec() const noexcept { return intr_vec_; }
 
 
 		//-----------------------------------------------------------------//
@@ -610,6 +671,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static MTASK& at_main_task() noexcept { return mtask_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  MTASK クラスの参照
+			@return MTASK クラス
+		*/
+		//-----------------------------------------------------------------//
+		static MTASK& at_task() noexcept { return mtask_; }
 
 
 		//-----------------------------------------------------------------//

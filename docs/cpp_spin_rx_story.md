@@ -308,9 +308,9 @@ CoreMark では、どのような構成のプログラムを動かすのか判�
   R5F524T8、R5F524TA   
 - ＲＸ６６Ｔ   
   R5F566TA、R5F566TE、R5F566TF、R5F566TK   
-- ＲＸ７２Ｎ
+- ＲＸ７２Ｎ   
   R5F572ND、R5F572NN
-- ＲＸ７２Ｔ
+- ＲＸ７２Ｔ   
   R5F572TF、R5F572TK
 
 これらマイコンの、ハードウェアー定義が実装されており、C++ からアクセスできます。   
@@ -613,7 +613,7 @@ CoreMark では、どのような構成のプログラムを動かすのか判�
 ---
 ## 黒歴史「Embedded C++」
    
-<img src="Black.jpg" width="25%">
+<img src="black.jpg" width="25%">
    
 Ｃ＋＋を理解していない人が策定したものとしか思えない、陳腐な物になっています。   
    
@@ -1452,7 +1452,7 @@ RX65N Envision Kit の性質を考えれば、オーディオプレイヤーは�
 - WAV 内タグのパース（一部）
 - ID3V2 タグのパース（ID3V1 タグは未対応）
    
-<img src="AudioPlayer001.jpg" width="50%">   
+<img src="AudioPlayer.jpg" width="50%">   
    
 ---
 ### （４）スペースインベーダー・エミュレーター

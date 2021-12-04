@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・QSPI I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,29 +15,33 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  QSPI 制御クラス
-		@param[in]	QSPI	QSPI 定義クラス
-		@param[in]	PSEL	ポート候補
+		@brief  QSPI ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class QSPI, port_map::ORDER PSEL = port_map::ORDER::FIRST>
-	class qspi_io {
-	public:
+	struct qspi_base {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  通信幅
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class WIDTH : uint8_t {
+			SINGLE,		///< シングル
+			DUAL,		///< デュアル
+			QUAD,		///< クアッド
+		};
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  データ、クロック位相タイプ型
-					TYPE1(MODE0): CPOL:0 CPHA:0 @n
-					TYPE2(MODE1): CPOL:0 CPHA:1 @n
-					TYPE3(MODE2): CPOL:1 CPHA:0 @n
-					TYPE4(MODE3): CPOL:1 CPHA:1
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PHASE : uint8_t {
-			TYPE1,  ///< タイプ１
-			TYPE2,  ///< タイプ２
-			TYPE3,  ///< タイプ３
-			TYPE4,  ///< タイプ４ (SD カードアクセス）
+			MODE0,  ///< モード０、CPOL:0 CPHA:0
+			MODE1,  ///< モード１、CPOL:0 CPHA:1
+			MODE2,  ///< モード２、CPOL:1 CPHA:0
+			MODE3,  ///< モード３、CPOL:1 CPHA:1
 		};
 
 
@@ -47,31 +51,35 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class DLEN : uint8_t {
-			W8  = 0b0111,	///< 8 Bits
-			W9  = 0b1000,	///< 9 Bits
-			W10 = 0b1001,	///< 10 Bits
-			W11 = 0b1010,	///< 11 Bits
-			W12 = 0b1011,	///< 12 Bits
-			W13 = 0b1100,	///< 13 Bits
-			W14 = 0b1101,	///< 14 Bits
-			W15 = 0b1110,	///< 15 Bits
-			W16 = 0b1111,	///< 16 Bits
-			W20 = 0b0000,	///< 20 Bits
-			W24 = 0b0001,	///< 24 Bits
-			W32 = 0b0011,	///< 32 Bits
+			W8, 	///< 8 bits
+			W16,	///< 16 bits
+			W32,	///< 32 bits
 		};
+	};
 
-	private:
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  QSPI 制御クラス
+		@param[in]	QSPI	QSPI 定義クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class QSPI>
+	class qspi_io : public qspi_base {
+
+		const device::port_map_qspi::group_t&		group_;
 
 		uint8_t	level_;
 
+		DLEN	dlen_;
 
 		// 便宜上のスリープ
 		void sleep_() { asm("nop"); }
 
 
-		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
-///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(PCLK);
+		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) noexcept
+		{
+///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(QSPI::PCLK);
 			uint32_t br = static_cast<uint32_t>(QSPI::PCLK) / speed;
 			uint8_t dv = 0;
 			while(br > 512) {
@@ -99,22 +107,25 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in] group	ポート・グループ
 		*/
 		//-----------------------------------------------------------------//
-		qspi_io() noexcept : level_(0) { }
+		qspi_io(const device::port_map_qspi::group_t& group) noexcept :
+			group_(group), level_(0), dlen_(DLEN::W8)
+		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  通信速度を設定して、CSI を有効にする
 			@param[in]	speed	通信速度
-			@param[in]	ctype	クロック位相タイプ
+			@param[in]	phase	クロック位相タイプ
 			@param[in]	dlen	データ長設定
-			@param[in]	level	割り込みレベル（１～２）、０の場合はポーリング
-			@return エラー（速度設定範囲外）なら「false」
+			@param[in]	level	割り込みレベル、０の場合はポーリング
+			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, PHASE ctype, DLEN dlen, uint8_t level = 0) noexcept
+		bool start(uint32_t speed, PHASE phase, DLEN dlen, uint8_t level = 0) noexcept
 		{
 			uint8_t brdv;
 			uint8_t spbr;
@@ -125,9 +136,10 @@ namespace device {
 			power_mgr::turn(QSPI::PERIPHERAL);
 
 			// ポートを有効にする
-			port_map::turn(QSPI::PERIPHERAL, true, PSEL);
+			port_map_qspi::turn(group_, true);
 
 			level_ = level;
+			dlen_ = dlen;
 
 			// デバイスを不許可
 //			QSPI::SPCR = 0x00;
@@ -138,27 +150,12 @@ namespace device {
 			QSPI::SPSCR = 0x00;	// disable sequence control
 			QSPI::SPDCR = 0x20;	// SPLW=1 (long word access) 
 ///			QSPI::SPCMD0 = RSPI::SPCMD0.LSBF.b() | RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0100);
-			bool cpol = 0;
-			bool cpha = 0;
-			switch(ctype) {
-			case PHASE::TYPE1:
-				break;
-			case PHASE::TYPE2:
-				cpha = 1;
-				break;
-			case PHASE::TYPE3:
-				cpol = 1;
-				break;
-			case PHASE::TYPE4:
-				cpol = 1;
-				cpha = 1;
-				break;
-			default:
-				break;
-			}
-			QSPI::SPCMD0 = QSPI::SPCMD0.BRDV.b(brdv)
-				| QSPI::SPCMD0.SPB.b(static_cast<uint8_t>(dlen))
-				| QSPI::SPCMD0.CPOL.b(cpol) | QSPI::SPCMD0.CPHA.b(cpha);
+			bool cpol = static_cast<uint8_t>(phase) & 1;
+			bool cpha = (static_cast<uint8_t>(phase) >> 1) & 1;
+
+			QSPI::SPCMD[0] = QSPI::SPCMD[0].BRDV.b(brdv)
+				| QSPI::SPCMD[0].SPB.b(static_cast<uint8_t>(dlen))
+				| QSPI::SPCMD[0].CPOL.b(cpol) | QSPI::SPCMD[0].CPHA.b(cpha);
 
 			QSPI::SPCR.MSTR = 1;
 
@@ -170,16 +167,13 @@ namespace device {
 
 		//----------------------------------------------------------------//
 		/*!
-			@brief	リード・ライト
-			@param[in]	data	書き込みデータ
-			@return 読み出しデータ
+			@brief	SSL を許可
+			@param[in]	ena		SSL の値
 		*/
 		//----------------------------------------------------------------//
-		uint8_t xchg(uint8_t data = 0xff) noexcept
+		void enable_ssl(bool ena) noexcept
 		{
-			QSPI::SPDR = static_cast<uint32_t>(data);
-			while(QSPI::SPSR.SPRF() == 0) sleep_();
-		    return QSPI::SPDR();
+//			QSPI::SPCMD[0].
 		}
 
 
@@ -187,14 +181,35 @@ namespace device {
 		/*!
 			@brief	リード・ライト
 			@param[in]	data	書き込みデータ
+			@param[in]	width	通信幅（指定しないと１ビット）
 			@return 読み出しデータ
 		*/
 		//----------------------------------------------------------------//
-		uint32_t xchg32(uint32_t data = 0) noexcept
+		uint32_t xchg(uint32_t data = 0, WIDTH width = WIDTH::SINGLE) noexcept
 		{
-			QSPI::SPDR = static_cast<uint32_t>(data);
+			QSPI::SPCMD[0].SPB = static_cast<uint8_t>(width);
+			switch(dlen_) {
+			case DLEN::W8:
+				QSPI::SPDR8 = data;
+				break;
+			case DLEN::W16:
+				QSPI::SPDR16 = data;
+				break;
+			case DLEN::W32:
+				QSPI::SPDR32 = data;
+				break;
+			}
+	
 			while(QSPI::SPSR.SPRF() == 0) sleep_();
-		    return QSPI::SPDR();
+	
+			switch(dlen_) {
+			case DLEN::W8:
+				return QSPI::SPDR8();
+			case DLEN::W16:
+				return QSPI::SPDR16();
+			case DLEN::W32:
+				return QSPI::SPDR32();
+			}
 		}
 
 
@@ -203,14 +218,16 @@ namespace device {
 			@brief  シリアル送信
 			@param[in]	src	送信ソース
 			@param[in]	cnt	送信サイズ
+			@param[in]	width	通信幅（指定しないと１ビット）
 		*/
 		//-----------------------------------------------------------------//
-		void send(const uint8_t* src, uint16_t size) noexcept
+		void send(const void* src, uint32_t size, WIDTH width = WIDTH::SINGLE) noexcept
 		{
-			auto end = src + size;
-			while(src < end) {
-				xchg(*src);
-				++src;
+			auto org = static_cast<const uint8_t*>(src);
+			auto end = org + size;
+			while(org < end) {
+				xchg(*org, width);
+				++org;
 			}
 		}
 

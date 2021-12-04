@@ -64,6 +64,8 @@ namespace synth {
 		TEXT		sc_name_;
 		BUTTON		sc_idx_p_;
 
+		BUTTON		test_play_;
+
 		BUTTON		octave_m_;
 		SLIDER		octave_d_;
 		BUTTON		octave_p_;
@@ -124,9 +126,10 @@ namespace synth {
 			render_(render), touch_(touch), widd_(render, touch),
 			keyboard_(render, touch),
 			filer_run_(vtx::srect(CENTER-SC_TEX_W/2 - (SC_BTN_SZ+SC_SPC) * 2 - 10, SC_LOC, SC_BTN_SZ, SC_BTN_SZ), "@"),
-			sc_idx_m_(vtx::srect(CENTER-SC_TEX_W/2-SC_BTN_SZ-SC_SPC, SC_LOC, SC_BTN_SZ, SC_BTN_SZ), "<"),
+			sc_idx_m_(vtx::srect(CENTER-SC_TEX_W/2 - SC_BTN_SZ-SC_SPC, SC_LOC, SC_BTN_SZ, SC_BTN_SZ), "<"),
 			sc_name_ (vtx::srect(CENTER-SC_TEX_W/2, SC_LOC+(SC_BTN_SZ-SC_TEX_H)/2, SC_TEX_W, SC_TEX_H),  ""),
-			sc_idx_p_(vtx::srect(CENTER+SC_TEX_W/2+SC_SPC,        SC_LOC, SC_BTN_SZ, SC_BTN_SZ), ">"),
+			sc_idx_p_(vtx::srect(CENTER+SC_TEX_W/2 + SC_SPC, SC_LOC, SC_BTN_SZ, SC_BTN_SZ), ">"),
+			test_play_(vtx::srect(CENTER+SC_TEX_W/2 + (SC_BTN_SZ+SC_SPC) * 2 - 30, SC_LOC, SC_BTN_SZ, SC_BTN_SZ), "T"),
 			octave_m_(vtx::srect(0,              OCT_LOC, OCT_BTN_SZ, OCT_BTN_SZ), "<<"),
 			octave_d_(vtx::srect(CENTER-OCT_AREA_W/2, OCT_LOC+(OCT_BTN_SZ-OCT_AREA_H)/2, OCT_AREA_W, OCT_AREA_H)),
 			octave_p_(vtx::srect(480-OCT_BTN_SZ, OCT_LOC, OCT_BTN_SZ, OCT_BTN_SZ), ">>"),
@@ -168,6 +171,11 @@ namespace synth {
 				if(sc_idx_ >= SC_NUM) {
 					sc_idx_ = SC_NUM - 1;
 				}
+			};
+
+			test_play_.enable();
+			test_play_.at_select_func() = [this](uint32_t id) {
+				
 			};
 
 			sc_idx_before_ = SC_NUM;

@@ -7,7 +7,7 @@
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	i2c_sample
+TARGET		=	psg_sample
 
 DEVICE		=	R5F572TK
 
@@ -24,9 +24,9 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	I2C_sample/main.cpp
+PSOURCES	=	PSG_sample/main.cpp
 
-USER_LIBS	=	supc++ m
+USER_LIBS	=
 
 USER_DEFS	=
 

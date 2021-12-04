@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CMT 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,9 +24,9 @@ namespace device {
 	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
 	struct cmt_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto IVEC = ivec;			///< 割り込みベクター
-		static const uint32_t PCLK = clock_profile::PCLKB;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto IVEC = ivec;			///< 割り込みベクター
+		static constexpr auto PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

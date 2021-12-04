@@ -31,13 +31,13 @@ namespace device {
 		ICU::VECTOR_SELB intrv, ICU::VECTOR_SELB intru>
 	struct tpux_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto RA_INN = intra;	///< 割り込み要因Ａ
-		static const auto RB_INN = intrb;	///< 割り込み要因Ｂ
-		static const auto RC_INN = intrc;	///< 割り込み要因Ｃ
-		static const auto RD_INN = intrd;	///< 割り込み要因Ｄ
-		static const auto RV_INN = intrv;	///< 割り込み要因Ｖ
-		static const auto RU_INN = intru;	///< 割り込み要因Ｕ
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto RA_INN = intra;	///< 割り込み要因Ａ
+		static constexpr auto RB_INN = intrb;	///< 割り込み要因Ｂ
+		static constexpr auto RC_INN = intrc;	///< 割り込み要因Ｃ
+		static constexpr auto RD_INN = intrd;	///< 割り込み要因Ｄ
+		static constexpr auto RV_INN = intrv;	///< 割り込み要因Ｖ
+		static constexpr auto RU_INN = intru;	///< 割り込み要因Ｕ
 
 		//-----------------------------------------------------------------//
 		/*!

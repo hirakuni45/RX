@@ -105,25 +105,28 @@ namespace synth {
         bool        enable_;
 
 
-        void draw_key_(const key_t& t)
-        {
-            auto r = t.rect_;
-            r.size.x -= KEY_SPACE;
-            if(t.level_) {
-                if(t.is_sharp()) {
-                    render_.set_fore_color(DEF_COLOR::Gray);
-                } else {
-                    render_.set_fore_color(DEF_COLOR::Silver);
-                }
-            } else {
-                if(t.is_sharp()) {
-                    render_.set_fore_color(DEF_COLOR::Black);
-                } else {
-                    render_.set_fore_color(DEF_COLOR::White);
-                }
-            }
-            render_.fill_box(r);
-        }
+		void draw_key_(const key_t& t)
+		{
+			auto r = t.rect_;
+			r.size.x -= KEY_SPACE;
+			if(t.level_) {
+				if(t.is_sharp()) {
+					render_.set_fore_color(DEF_COLOR::Gray);
+					render_.round_box(r, 8, false, true);
+				} else {
+					render_.set_fore_color(DEF_COLOR::Silver);
+					render_.fill_box(r);
+				}
+			} else {
+				if(t.is_sharp()) {
+					render_.set_fore_color(DEF_COLOR::Black);
+					render_.round_box(r, 8, false, true);
+				} else {
+					render_.set_fore_color(DEF_COLOR::White);
+					render_.fill_box(r);
+				}
+			}
+		}
 
     public:
 		//-----------------------------------------------------------------//

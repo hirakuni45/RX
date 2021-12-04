@@ -18,6 +18,7 @@
 #include "common/input.hpp"
 
 #include "sound/sound_out.hpp"
+#include "sound/dac_stream.hpp"
 #include "sound/psg_mng.hpp"
 
 namespace {
@@ -26,14 +27,37 @@ namespace {
 	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, false> SW2;
 	typedef device::SCI9 SCI_CH;
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+	#define USE_SW2
+
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -54,11 +78,19 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x0000;
 
 	#define USE_SSIE
+	#define USE_SW2
 
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+
 #endif
 // クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
 	typedef device::system_io<> SYSTEM_IO;
@@ -90,14 +122,16 @@ namespace {
 	PSG_MNG		psg_mng_;
 
 #ifdef USE_DAC
-	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+//	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+	typedef sound::dac_stream<device::R12DA, device::MTU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+//	typedef sound::dac_stream<device::R12DA, device::CMT1, device::DMAC0, SOUND_OUT> DAC_STREAM;
 	DAC_STREAM	dac_stream_(sound_out_);
 
 	void start_audio_()
 	{
 		uint8_t dmac_intl = 4;
-		uint8_t tpu_intl  = 5;
-		if(dac_stream_.start(48'000, dmac_intl, tpu_intl)) {
+		uint8_t timer_intl  = 5;
+		if(dac_stream_.start(48'000, dmac_intl, timer_intl)) {
 			utils::format("Start D/A Stream\n");
 		} else {
 			utils::format("D/A Stream Not start...\n");
@@ -1164,23 +1198,35 @@ int main(int argc, char** argv)
 	psg_mng_.set_score(0, score0_);
 	psg_mng_.set_score(1, score1_);
 
+#ifdef USE_SW2
 	SW2::INPUT();
+	bool lvl = SW2::P();
+#endif
 
 	uint8_t cnt = 0;
 	uint8_t delay = 200;
-	bool lvl = SW2::P();
+
+	cmt_.sync();
+	cmt_.sync();
+	uint32_t avg = 0;
+	uint32_t pos = sound_out_.get_sample_pos();
+	uint32_t min = sound_out_.get_sample_size();
+	uint32_t max = 0;
 	while(1) {
 		cmt_.sync();
-		{
-			auto tmp = SW2::P();
-			if(!lvl && tmp) {
-				psg_mng_.set_score(0, score0_);
-				psg_mng_.set_score(1, score1_);
+		{  // 減った分を追加する。
+			auto newpos = sound_out_.get_sample_pos();
+			auto n = newpos - pos;
+			n &= sound_out_.get_sample_size() - 1;
+
+			if(min > n) min = n;
+			if(max < n) max = n;
+			if(avg != n) {
+				avg = n;
+//				utils::format("%u (min: %u, max: %u)\n") % avg % min % max;
 			}
-			lvl = tmp;
-		}
-		{
-			uint32_t n = SAMPLE / TICK;
+
+			pos = newpos;
 			int8_t tmp[n];
 			psg_mng_.render(n, tmp);
 			typename SOUND_OUT::WAVE t;
@@ -1196,6 +1242,19 @@ int main(int argc, char** argv)
 				psg_mng_.service();
 			}
 		}
+
+#ifdef USE_SW2
+		{
+			auto tmp = SW2::P();
+			if(!lvl && tmp) {
+				utils::format("Music restart\n");
+				psg_mng_.set_score(0, score0_);
+				psg_mng_.set_score(1, score1_);
+				delay = 100;
+			}
+			lvl = tmp;
+		}
+#endif
 
 		++cnt;
 		if(cnt >= 50) {

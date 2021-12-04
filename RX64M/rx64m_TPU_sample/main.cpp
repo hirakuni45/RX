@@ -19,7 +19,7 @@
 
 namespace {
 
-	typedef device::tpu_io<device::TPU0, utils::null_task> TPU;
+	typedef device::tpu_io<device::TPU0, utils::count_task> TPU;
 	TPU		tpu_;
 
 	typedef utils::fixed_fifo<char, 128> BUFFER;
@@ -79,10 +79,10 @@ int main(int argc, char** argv)
 
 	uint32_t cnt = 0;
 	while(1) {
-		tpu_.sync();
+		tpu_.at_task().sync();
 
 		if(cmd_.service()) {
-			utils::format("Count: %d\n") % tpu_.get_counter();
+			utils::format("Count: %d\n") % tpu_.at_task().get_count();
 		}
 
 		++cnt;

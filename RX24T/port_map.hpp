@@ -27,7 +27,7 @@ namespace device {
 		{
 			switch(t) {
 
-			case peripheral::CAN0:  // Only Version B
+			case peripheral::RSCAN:  // Only Version B
 				{
 					uint8_t sel = enable ? 0b10000 : 0;
 					PORTA::PMR.B0 = 0;

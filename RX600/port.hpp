@@ -399,8 +399,8 @@ namespace device {
 	template <class PORTX, bitpos BPOS, bool ASSERT = 1>
 	struct PORT {
 
-		static const uint8_t PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);
-		static const uint8_t BIT_POS = static_cast<uint8_t>(BPOS);
+		static constexpr uint8_t PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);
+		static constexpr uint8_t BIT_POS = static_cast<uint8_t>(BPOS);
 
 		/// オープンドレインタイプ
 		enum class OD_TYPE : uint8_t {

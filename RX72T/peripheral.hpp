@@ -21,8 +21,6 @@ namespace device {
 
 		CAC,		///< クロック周波数精度測定回路
 
-		DTC,		///< データトランスファコントローラ
-
 		DMAC0,		///< DMA コントローラ・チャネル０
 		DMAC1,		///< DMA コントローラ・チャネル１
 		DMAC2,		///< DMA コントローラ・チャネル２
@@ -31,6 +29,7 @@ namespace device {
 		DMAC5,		///< DMA コントローラ・チャネル５
 		DMAC6,		///< DMA コントローラ・チャネル６
 		DMAC7,		///< DMA コントローラ・チャネル７
+		DTC,		///< データトランスファコントローラ
 
 		MTU0,		///< マルチファンクションタイマパルスユニット０
 		MTU1,		///< マルチファンクションタイマパルスユニット１
@@ -113,7 +112,9 @@ namespace device {
 
 		CRC,
 
-		ECCRAM,		/// ECC RAM (32K)
+		ECCRAM,		///< ECC RAM (32K)
+
+		TSIP,		///< Trusted Secure IP (TSIP-Lite)
 
 		// 仮の仕様
 		IRQ0,

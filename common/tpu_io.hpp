@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M/RX65[1N]/RX72[MN] グループ・TPU 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -60,16 +60,9 @@ namespace device {
 
 		ICU::VECTOR	intr_vec_;
 
-		static volatile uint32_t counter_;
-
 		static TASK	task_;
 
-		static INTERRUPT_FUNC void tpu_task_only_() noexcept {
-			task_();
-		}
-
 		static INTERRUPT_FUNC void tpu_task_() noexcept {
-			++counter_;
 			task_();
 		}
 
@@ -93,11 +86,10 @@ namespace device {
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル（０ならポーリング）
 			@param[in]	out		出力タイプ
-			@param[in]	intronly	割り込みタスクのみの場合「true」
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(TYPE type, uint32_t freq, uint8_t level, OUTPUT out = OUTPUT::NONE, bool intronly = false) noexcept
+		bool start(TYPE type, uint32_t freq, uint8_t level, OUTPUT out = OUTPUT::NONE) noexcept
 		{
 			if(freq == 0) return false;
 
@@ -158,9 +150,13 @@ namespace device {
 			}
 			shift_ = shift * 2;
 
-			bool ret = true;
-			power_mgr::turn(per);
+			if(!power_mgr::turn(per)) {
+				return false;
+			}
 
+			bool ret = true;
+			TPU::TSTR = 0;	// 再設定の時に止める～
+			TPU::TIER = 0;
 			TPU::TMDR = 0;  // 通常モード、通常動作
 
 			switch(type) {
@@ -183,13 +179,7 @@ namespace device {
 			TPU::TCNT = 0x0000;
 
 			if(level_ > 0) {  // 割り込み設定
-				if(intr_vec_ == ICU::VECTOR::NONE) {
-					if(intronly) {
-						intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_only_, level_);
-					} else {
-						intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
-					}
-				}
+				intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
 				switch(type) {
 				case TYPE::MATCH_A:
 					TPU::TIER.TGIEA = 1;  // TGRA interrupt
@@ -260,42 +250,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  タイマー同期
-		*/
-		//-----------------------------------------------------------------//
-		void sync() const noexcept
-		{
-			if(level_ > 0) {
-				volatile uint32_t cnt = counter_;
-				while(cnt == counter_) sleep_();
-			} else {
-				switch(type_) {
-				case TYPE::MATCH_A:
-					while(TPU::TSR.TGFA() == 0) sleep_();
-					TPU::TSR.TGFA = 0;
-					break;
-				case TYPE::MATCH_B:
-					while(TPU::TSR.TGFB() == 0) sleep_();
-					TPU::TSR.TGFB = 0;
-					break;
-				}
-				task_();
-				++counter_;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みカウンターの値を取得
-			@return 割り込みカウンターの値
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_counter() const noexcept { return counter_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  TCNT レジスターの値を取得
 			@return TCNT レジスター
 		*/
@@ -359,6 +313,5 @@ namespace device {
 		static TASK& at_task() noexcept { return task_; }
 	};
 
-	template <class TPU, class TASK> volatile uint32_t tpu_io<TPU, TASK>::counter_ = 0;
 	template <class TPU, class TASK> TASK tpu_io<TPU, TASK>::task_;
 }

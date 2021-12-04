@@ -149,12 +149,14 @@ namespace device {
 
 		static uint32_t intr_vec_(ICU::VECTOR v) { return static_cast<uint32_t>(v); }
 
-		void sleep_() {
+		void sleep_() noexcept
+		{
 			asm("nop");
 		}
 
 
-		bool setup_start_() {
+		bool setup_start_() noexcept
+		{
 			uint32_t loop = 0;
 			while(IICA::ICCR2.BBSY() != 0) {
 #if 0
@@ -174,7 +176,8 @@ namespace device {
 		}
 
 
-		void setup_ackbt_() {
+		void setup_ackbt_() noexcept
+		{
 			IICA::ICMR3.ACKWP = 1;
 			IICA::ICMR3.ACKBT = 1;
 			IICA::ICMR3.ACKWP = 0;
@@ -271,7 +274,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	送信状態の検査
+			@brief	送信状態の検査（割り込み動作時）
 			@return 送信が完了なら「true」
 		 */
 		//-----------------------------------------------------------------//
@@ -280,8 +283,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	受信割り込みIDを取得
-			@return 受信割り込みID
+			@brief	受信状態の検査（割り込み動作時）
+			@return 受信完了なら「true」
 		 */
 		//-----------------------------------------------------------------//
 		static bool get_recv_state() noexcept { return intr_.recv_id_ != intr_.recv_id_back_; }
@@ -290,14 +293,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	送信
-			@param[in]	adr	７ビットアドレス
+			@param[in]	adr	I2C ７ビットアドレス
 			@param[in]	src	転送先
 			@param[in]	len	送信バイト数
 			@param[in]	sync	非同期の場合「false」
 			@return 送信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool send(uint8_t adr, const uint8_t* src, uint16_t len, bool sync = true) noexcept
+		bool send(uint8_t adr, const void* src, uint16_t len, bool sync = true) noexcept
 		{
 			if(len == 0) return false;
 
@@ -308,11 +311,14 @@ namespace device {
 				return false;
 			}
 
+			const uint8_t* ptr = static_cast<const uint8_t*>(src);
+
 			bool ret = true;
 			if(level_ > 0) {
 				intr_.send_id_back_ = intr_.send_id_;
 				intr_.firstb_ = adr << 1;
-				intr_.src_ = src;
+				intr_.src_ = ptr;
+				intr_.dst_ = nullptr;
 				intr_.len_ = len;
 				intr_.event_ = event::NACKF;
 				IICA::ICIER = IICA::ICIER() | IICA::ICIER.NAKIE.b() | IICA::ICIER.TIE.b();
@@ -348,7 +354,7 @@ namespace device {
 						IICA::ICDRT = (adr << 1);
 						first = false;
 					} else {
-						IICA::ICDRT = *src++;
+						IICA::ICDRT = *ptr++;
 						--len;
 					}
 				}
@@ -389,21 +395,43 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	送信
-			@param[in]	adr	７ビットアドレス
-			@param[in]	val	転送値
-			@param[in]	src	転送先
-			@param[in]	len	送信バイト数
+			@brief	送信（シングルバイト付き）
+			@param[in]	adr		I2C ７ビットアドレス
+			@param[in]	first	ファーストバイト
+			@param[in]	src		転送先
+			@param[in]	len		送信バイト数
 			@param[in]	sync	非同期の場合「false」
 			@return 送信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool send(uint8_t adr, uint8_t val, const uint8_t* src, uint16_t len, bool sync = true) noexcept
+		bool send(uint8_t adr, uint8_t first, const void* src, uint16_t len, bool sync = true) noexcept
 		{
 			uint8_t tmp[len + 1];
-			tmp[0] = val;
+			tmp[0] = first;
 			std::memcpy(&tmp[1], src, len);
 			return send(adr, tmp, len + 1, sync);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信（ダブルバイト付き）
+			@param[in]	adr		I2C ７ビットアドレス
+			@param[in]	first	ファーストバイト
+			@param[in]	second	セカンドバイト
+			@param[in]	src		転送先
+			@param[in]	len		送信バイト数
+			@param[in]	sync	非同期の場合「false」
+			@return 送信が完了した場合「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool send(uint8_t adr, uint8_t first, uint8_t second, const void* src, uint16_t len, bool sync = true) noexcept
+		{
+			uint8_t tmp[len + 2];
+			tmp[0] = first;
+			tmp[1] = second;
+			std::memcpy(&tmp[2], src, len);
+			return send(adr, tmp, len + 2, sync);
 		}
 
 
@@ -416,7 +444,7 @@ namespace device {
 			@return 受信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool recv(uint8_t adr, uint8_t* dst, uint16_t len) noexcept
+		bool recv(uint8_t adr, void* dst, uint16_t len) noexcept
 		{
 			if(len == 0) return false;
 
@@ -427,11 +455,14 @@ namespace device {
 				return false;
 			}
 
+			uint8_t* ptr = static_cast<uint8_t*>(dst);
+
 			bool ret = true;
 			if(level_ > 0) {
 				intr_.recv_id_back_ = intr_.recv_id_;
 				intr_.firstb_ = (adr << 1) | 0x01;
-				intr_.dst_ = dst;
+				intr_.src_ = nullptr;
+				intr_.dst_ = ptr;
 				intr_.len_ = len;
 
 				IICA::ICIER.TIE = 1;
@@ -468,7 +499,7 @@ namespace device {
 					setup_ackbt_();
 					volatile uint8_t tmp = IICA::ICDRR();
 					if(len == 2) {  // 1 バイトの場合ダミーリード
-						*dst++ = tmp;
+						*ptr++ = tmp;
 					}
 					while(IICA::ICSR2.RDRF() == 0) ;
 				} else {
@@ -480,18 +511,18 @@ namespace device {
 							IICA::ICMR3.WAIT = 1;
 						}
 
-						*dst++ = IICA::ICDRR();
+						*ptr++ = IICA::ICDRR();
 						while(IICA::ICSR2.RDRF() == 0) ;
 						--len;
 					}
 					setup_ackbt_();
-					*dst++ = IICA::ICDRR();
+					*ptr++ = IICA::ICDRR();
 					while(IICA::ICSR2.RDRF() == 0) ;
 				}
 				IICA::ICSR2.STOP = 0;
 				IICA::ICCR2.SP = 1;
 	
-				*dst = IICA::ICDRR();
+				*ptr = IICA::ICDRR();
 
 				IICA::ICMR3.WAIT = 0;
 

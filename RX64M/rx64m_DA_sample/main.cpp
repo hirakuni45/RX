@@ -22,6 +22,7 @@
 #include "common/delay.hpp"
 #include "common/command.hpp"
 #include "common/tpu_io.hpp"
+#include "common/mtu_io.hpp"
 #include "common/intmath.hpp"
 
 // ソフトウェアー（タイマー割り込みタスク）で転送を行う場合に有効にする。
@@ -90,11 +91,15 @@ namespace {
 		uint16_t get_pos() const { return pos_; }
 	};
 #ifdef SOFT_TRANS
-	typedef device::tpu_io<device::TPU0, timer_task> TPU0;
+//	typedef device::tpu_io<device::TPU0, timer_task> ITVT;
+//	typedef device::mtu_io<device::MTU0, timer_task> ITVT;
+//	typedef device::cmt_mgr<device::CMT1, timer_task> ITVT;
 #else
-	typedef device::tpu_io<device::TPU0, utils::null_task> TPU0;
+//	typedef device::tpu_io<device::TPU0, utils::null_task> ITVT;
+	typedef device::mtu_io<device::MTU0, utils::null_task> ITVT;
+//	typedef device::cmt_mgr<device::CMT1, utils::null_task> ITVT;
 #endif
-	TPU0		tpu0_;
+	ITVT		itvt_;
 
 	bool		init_ = false;
 	float		freq_ = 100.0f;
@@ -102,7 +107,11 @@ namespace {
 	intmath::sincos_t sico_(0);
 	void service_sin_cos_()
 	{
+#ifdef SOFT_TRANS
+		uint32_t pos = itvt_.at_task().get_pos();
+#else
 		uint32_t pos = (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff;
+#endif
 		int32_t gain_shift = 16; 
 		if(!init_) {
 			sico_.x = static_cast<int64_t>(32767) << gain_shift;
@@ -166,9 +175,9 @@ int main(int argc, char** argv)
 		sci_.start(115200, intr_level);
 	}
 
-	{  // サンプリング・タイマー設定
+	{  // インターバル・タイマー設定
 		uint8_t intr_level = 5;
-		if(!tpu0_.start(48000, intr_level)) {
+		if(!itvt_.start(48'000, intr_level)) {
 			utils::format("TPU0 start error...\n");
 		}
 	}
@@ -205,7 +214,7 @@ int main(int argc, char** argv)
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
 		bool cpu_intr = true;
-		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
+		auto ret = dmac_mgr_.start(itvt_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
 			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address(), WAVE_NUM, intr_level, cpu_intr);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");

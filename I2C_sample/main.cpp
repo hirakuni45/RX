@@ -29,7 +29,11 @@
 			RX72N: (RX72N Envision kit) @n
 					RX72N/clock_profile.hpp を参照 @n
 					P40 ピンにLEDを接続する @n
-					SCI2 を使用する
+					SCI2 を使用する @n
+			接続想定デバイス： @n
+					・24C32 (EEPROM, DS3231 ボードに内蔵) @n
+					・DS3231 (RTC) @n
+					・BMP280 (温度、圧力センサ)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -52,7 +56,16 @@
 
 #include "common/string_utils.hpp"
 
+#include <functional>
+
+#include "exec_cmd.hpp"
+
+#include "chip/DS3231.hpp"
+#include "chip/bmp280.hpp"
+
 namespace {
+
+	static const int VERSION = 20;
 
 #if defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
@@ -144,18 +157,125 @@ namespace {
 	uint16_t	i2c_num_ = 0;
 	uint8_t		i2c_data_[256] = { 0 };
 
+	typedef std::function<void()> I2C_TASK;
+
+	int			i2c_dev_idx_ = -1;
+
+	typedef utils::exec_cmd<I2C_IO, CMD> EXEC_CMD;
+	EXEC_CMD	exec_cmd_(i2c_io_, cmd_);
+
+	struct i2c_dev {
+		bool		ena_;
+		uint8_t		adr_;
+		const char*	name_;
+		const char*	opts_;
+		utils::exec_base::DEV	dev_;
+		i2c_dev(uint8_t adr, const char* name, const char* opts, utils::exec_base::DEV dev) noexcept :
+			ena_(false),
+			adr_(adr),
+			name_(name),
+			opts_(opts),
+			dev_(dev)
+		{ }
+	};
+
+	bool exec_common_(bool exit = false)
+	{
+		if(exit || cmd_.cmp_word(0, "exit")) {
+			cmd_.set_prompt("# ");
+			i2c_dev_idx_ = -1;
+//			start_i2c_dev_ = false;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
+	static const int I2C_DEV_NUM = 10;
+	i2c_dev		i2c_dev_[I2C_DEV_NUM] = {
+		{ 0x50, "EEPROM0", "ID=0", utils::exec_base::DEV::EEPROM },
+		{ 0x51, "EEPROM1", "ID=1", utils::exec_base::DEV::EEPROM },
+		{ 0x52, "EEPROM2", "ID=2", utils::exec_base::DEV::EEPROM },
+		{ 0x53, "EEPROM3", "ID=3", utils::exec_base::DEV::EEPROM },
+		{ 0x54, "EEPROM4", "ID=4", utils::exec_base::DEV::EEPROM },
+		{ 0x55, "EEPROM5", "ID=5", utils::exec_base::DEV::EEPROM },
+		{ 0x56, "EEPROM6", "ID=6", utils::exec_base::DEV::EEPROM },
+		{ 0x57, "EEPROM7", "ID=7", utils::exec_base::DEV::EEPROM },
+		{ 0x68, "DS3231",  "(RTC)", utils::exec_base::DEV::DS3231 },
+		{ 0x77, "BMP280",  "(Pressure Sensor)", utils::exec_base::DEV::BMP280 }
+	};
+
+
+	void list_()
+	{
+		utils::format("Exec support device:\n");
+		for(uint32_t i = 0; i < I2C_DEV_NUM; ++i) {
+			utils::format("  I2C Device 0x%02X: '%s' (%s)\n")
+				% static_cast<uint16_t>(i2c_dev_[i].adr_) % i2c_dev_[i].name_ % i2c_dev_[i].opts_;
+		}
+	}
+
+
+	int find_i2c_(uint8_t adr)
+	{
+		for(uint32_t i = 0; i < I2C_DEV_NUM; ++i) {
+			if(i2c_dev_[i].adr_ == adr) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+
 	void scan_(uint32_t s, uint32_t e)
 	{
 		uint32_t n = 0;
 		for(uint32_t i = s; i <= e; ++i) {
 			uint8_t tmp[1];
 			if(i2c_io_.recv(i, tmp, sizeof(tmp))) {
-				utils::format("Ditect I2C address: 0x%02X (%3u, 0b%07b)\n") % i % i % i;
+				auto n = find_i2c_(i);
+				const char* name = "";
+				const char* opts = "";
+				if(n >= 0) {
+					name = i2c_dev_[n].name_;
+					opts = i2c_dev_[n].opts_;
+					i2c_dev_[n].ena_ = true;
+				}
+				utils::format("Ditect %s: 0x%02X (%3u, 0b%07b), '%s'\n") % name % i % i % i % opts;
 				++n;
 			}
 		}
 		utils::format("  Ditect I2C Device(s): %d\n") % n;
 	}
+
+
+	void exec_(const char* name)
+	{
+		for(int i = 0; i < I2C_DEV_NUM; ++i) {
+			if(strcmp(i2c_dev_[i].name_, name) == 0) {
+				if(!i2c_dev_[i].ena_) {
+					uint8_t tmp[1];
+					if(i2c_io_.recv(i2c_dev_[i].adr_, tmp, sizeof(tmp))) {
+						i2c_dev_[i].ena_ = true;
+					} else {
+						utils::format("Device is not ditect: '%s'\n") % name;
+						return;
+					}
+				}
+				if(exec_cmd_.start(i2c_dev_[i].adr_, i2c_dev_[i].dev_)) {
+					i2c_dev_idx_ = i;
+					static char tmp[16];
+					strcpy(tmp, i2c_dev_[i].name_);
+					strcat(tmp, " $ ");
+					cmd_.set_prompt(tmp);
+				}
+				return;
+			}
+		}
+		utils::format("No match I2C device name: '%s'\n") % name;
+	}
+
 
 	void recv_()
 	{
@@ -172,6 +292,7 @@ namespace {
 		}
 	}
 
+
 	void send_()
 	{
 		if(i2c_num_ == 0) {
@@ -185,35 +306,51 @@ namespace {
 		}
 	}
 
+
 	void command_()
 	{
 		if(cmd_.service()) {
+			if(i2c_dev_idx_ >= 0) {
+			}
+
 			uint32_t cmdn = cmd_.get_words();
 			const char* err = nullptr;
 			if(cmdn >= 1) {
-				if(cmd_.cmp_word(0, "-help")) {
-					utils::format("I2C Monitor command\n");
-					utils::format("    scan [start] [end]   scan I2C address\n");
-					utils::format("    adr [X]              set I2C address X\n");
-					utils::format("    r [num=1]            recv data [num] bytes\n");
-					utils::format("    s data...            send data bytes\n");
-					utils::format("    -help                help\n");
+				if(cmd_.cmp_word(0, "--help")) {
+					utils::format("I2C Monitor command version %d.%02d\n")
+						% static_cast<int>(VERSION / 100) % static_cast<int>(VERSION % 100);
+					utils::format("    list                       list for exec device\n");
+					utils::format("    scan [start=0] [end=127]   scan I2C address\n");
+					utils::format("    exec I2C-name              exec I2C operations\n");
+					utils::format("    adr [X]                    set I2C address X\n");
+					utils::format("    r [num=1]                  recv data [num] bytes\n");
+					utils::format("    s data...                  send data bytes\n");
+					utils::format("    --help                      help\n");
 					utils::format("\n");
+				} else if(cmd_.cmp_word(0, "list")) {
+					list_();
 				} else if(cmd_.cmp_word(0, "scan")) {
-					if(cmdn >= 2) {
+					if(cmdn >= 3) {
 						int32_t s_adr = 0;
 						int32_t e_adr = 127;
 						if(!cmd_.get_integer(1, s_adr, true)) {
-							err = "start address invalid";
+							err = "I2C start address invalid";
 						}
 						if(!cmd_.get_integer(2, e_adr, true)) {
-							err = "end address invalid";
+							err = "I2C end address invalid";
 						}
 						if(err == nullptr) {
 							scan_(s_adr, e_adr);
 						}
 					} else {
 						scan_(0, 127);
+					}
+				} else if(cmd_.cmp_word(0, "exec")) {
+					if(cmdn >= 2) {
+						char tmp[256];
+						tmp[0] = 0;
+						cmd_.get_word(1, tmp, sizeof(tmp));
+						exec_(tmp);
 					}
 				} else if(cmd_.cmp_word(0, "adr")) {
 					if(cmdn < 2) {
@@ -334,7 +471,7 @@ int main(int argc, char** argv)
 	}
 
 	{  // I2C の開始
-		uint8_t intr_lvl = 0;
+		uint8_t intr_lvl = 0;  // 0 ならポーリング
 		if(!i2c_io_.start(I2C_IO::MODE::MASTER, I2C_IO::SPEED::STANDARD, intr_lvl)) {
 			utils::format("I2C Start fail...\n");
 		} else {

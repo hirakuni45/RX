@@ -18,7 +18,6 @@
 #include "common/command.hpp"
 #include "common/shell.hpp"
 #include "common/spi_io2.hpp"
-#include "common/qspi_io.hpp"
 
 #include "scenes.hpp"
 

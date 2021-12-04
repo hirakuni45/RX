@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M, RX65x, RX71M, RX72M, RX72N グループ・CMTW 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,9 +28,9 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct cmtw_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto IVEC = ivec;			///< 割り込みベクター
-		static const uint32_t PCLK = clock_profile::PCLKB;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto IVEC = ivec;			///< 割り込みベクター
+		static constexpr auto PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
