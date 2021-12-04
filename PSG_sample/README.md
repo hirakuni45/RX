@@ -1,4 +1,4 @@
-Renesas RX64M, RX65N, RX71M, RX66T, RX72T, RX72N LED flashing sample
+Renesas RX64M, RX65N, RX71M, RX66T, RX72T, RX72N pseudo PSG music performance sample
 =========
 
 <iframe width="560" height="315" src="https://www.youtube.com/watch?v=4ZHuMYcSQko" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -35,7 +35,7 @@ This is a sample of a pseudo PSG music performance using an RX microcontroller.
  - Connect the amplifier to DA0/DA1.
  - In the RX72N Envision Kit, the output is provided through the analog output pins.
  - In the DA0/DA1 analog output, the silence level is the middle potential of the supply voltage, so voltage conversion must be performed when connecting to a line amplifier.
- - The reference circuit for analog to line output is (AUDIO_sample)[. /AUDIO_sample], so please refer to it.
+ - The reference circuit for analog to line output is [AUDIO_sample](./AUDIO_sample), so please refer to it.
 
 ## Resource preparation
 

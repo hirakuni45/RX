@@ -99,6 +99,7 @@ int main(int argc, char** argv)
 |[/SYNTH_sample](./SYNTH_sample)|FM 音源シンセサイザー・エミュレータ|
 |[/CALC_sample](./CALC_sample)|汎用電卓サンプル (gmp, mpfr ライブラリ)|
 |[/DSOS_sample](./DSOS_sample)|デジタルストレージオシロスコープサンプル|
+|[/PSG_sample](./PSG_sample)|疑似 PSG 音源演奏サンプル|
 |[LICENSE](./LICENSE)   |ライセンス表記ファイル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
