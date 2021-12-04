@@ -18,8 +18,9 @@
         }
     },
     "files.associations": {
-        "functional": "cpp"
-    },
+		"functional": "cpp",
+		"*.ipp": "cpp"
+	},
     "editor.detectIndentation": false,
     "editor.insertSpaces": false
     // "terminal.integrated.cursorStyle": "line",
