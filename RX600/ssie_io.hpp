@@ -87,16 +87,16 @@ namespace device {
 		static INTERRUPT_FUNC void send_task_()
 		{
 			auto p = static_cast<sound_task_t*>(sound_task_ptr_);
-			uint32_t wpos = p->sound_out_.get_wave_pos();
+			uint32_t wpos = p->sound_out_.get_sample_pos();
 			wpos += FIFO_TH / 2 * 2;  // オフセット
-			wpos &= (p->sound_out_.size() - 1);
+			wpos &= (p->sound_out_.get_sample_size() - 1);
 			// FIFO の L/R 出２段消費するので８段
 			for(uint32_t i = 0; i < (FIFO_TH / 2); ++i) {
-				auto w = p->sound_out_.get_wave(wpos);
+				auto w = p->sound_out_.get_sample(wpos);
 				SSIE::SSIFTDR16 = w->l_ch;
 				SSIE::SSIFTDR16 = w->r_ch;
 				++wpos;
-				wpos &= (p->sound_out_.size() - 1);
+				wpos &= (p->sound_out_.get_sample_size() - 1);
 			}
 			p->sound_out_.service(FIFO_TH / 2);
 
