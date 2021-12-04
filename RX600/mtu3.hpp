@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・MTU3x 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,6 +19,12 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class _>
 	struct mtu_t {
+
+#if defined(SIG_RX66T) || defined(SIG_RX72T)
+		static constexpr auto PCLK = clock_profile::PCLKC;
+#else
+		static constexpr auto PCLK = clock_profile::PCLKA;
+#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1229,9 +1235,6 @@ namespace device {
 		static  TADSTRGR1_ TADSTRGR1;
 
 	};
-	typedef mtu_t<void> MTU;
-
-
 	template <class _> typename mtu_t<_>::TMDR2A_ mtu_t<_>::TMDR2A;
 	template <class _> typename mtu_t<_>::TMDR2B_ mtu_t<_>::TMDR2B;
 	template <class _> typename mtu_t<_>::TSTRA_ mtu_t<_>::TSTRA;
@@ -1279,6 +1282,7 @@ namespace device {
 	template <class _> typename mtu_t<_>::TADSTRGR0_ mtu_t<_>::TADSTRGR0;
 	template <class _> typename mtu_t<_>::TADSTRGR1_ mtu_t<_>::TADSTRGR1;
 
+	typedef mtu_t<void> MTU;
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -1290,7 +1294,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu0_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1325,6 +1329,8 @@ namespace device {
 			B,
 			C,
 			D,
+			E,
+			F,
 		};
 
 
@@ -1339,7 +1345,8 @@ namespace device {
 			C,		///< TGIC
 			D,		///< TGID
 			OVF,	///< TCIV オーバーフロー
-			E,		///< TGIE
+
+			E = 8,	///< TGIE
 			F,		///< TGIF
 		};
 
@@ -1437,6 +1444,18 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+				TIORL = 0;
+			}
+
 
 			//-------------------------------------------------------------//
 			/*!
@@ -1589,6 +1608,44 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				case CHANNEL::C:
+					return TGRC.address();
+				case CHANNEL::D:
+					return TGRD.address();
+				case CHANNEL::E:
+					return TGRE.address();
+				case CHANNEL::F:
+					return TGRF.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -1603,6 +1660,33 @@ namespace device {
 		//-----------------------------------------------------------------//
 		typedef nfcr_t<0x000C1299> NFCRC_;
 		static  NFCRC_ NFCRC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			} else {
+				n &= 7;
+				if(ena) {
+					TIER2 |=  (1 << n);
+				} else {
+					TIER2 |=  (1 << n);
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -1641,6 +1725,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRD_ mtu0_t<per, INT>::TGRD;
 	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRE_ mtu0_t<per, INT>::TGRE;
 	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRF_ mtu0_t<per, INT>::TGRF;
+	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGR_ mtu0_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu0_t<per, INT>::NFCR_ mtu0_t<per, INT>::NFCR;
 	template <peripheral per, typename INT> typename mtu0_t<per, INT>::NFCRC_ mtu0_t<per, INT>::NFCRC;
 
@@ -1655,7 +1740,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu1_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1695,10 +1780,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class INTERRUPT : uint8_t {
-			A,		///< TGIA
-			B,		///< TGIB
-			OVF,	///< TCIV オーバーフロー
-			UDF,	///< TCIU アンダーフロー
+			A,			///< TGIA
+			B,			///< TGIB
+
+			OVF = 4,	///< TCIV オーバーフロー
+			UDF,		///< TCIU アンダーフロー
 		};
 
 
@@ -1804,6 +1890,17 @@ namespace device {
 
 			//-------------------------------------------------------------//
 			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
 				@brief  TIOR の設定
 				@param[in]	ch	チャネル
 				@param[in]	val	設定値
@@ -1836,10 +1933,8 @@ namespace device {
 				switch(ch) {
 				case CHANNEL::A:
 					return TIORH.IOA();
-					break;
 				case CHANNEL::B:
 					return TIORH.IOB();
-					break;
 				default:
 					return 0x00;
 				}
@@ -1928,6 +2023,36 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	タイマロングワードジェネラルレジスタ（TGRALW）
 		*/
 		//-----------------------------------------------------------------//
@@ -1951,6 +2076,26 @@ namespace device {
 		//-----------------------------------------------------------------//
 		typedef nfcr_t<0x000C1291> NFCR_;
 		static  NFCR_ NFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -1983,6 +2128,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TCNTLW_ mtu1_t<per, INT>::TCNTLW;
 	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TGRA_ mtu1_t<per, INT>::TGRA;
 	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TGRB_ mtu1_t<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TGR_ mtu1_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TGRALW_ mtu1_t<per, INT>::TGRALW;
 	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TGRBLW_ mtu1_t<per, INT>::TGRBLW;
 	template <peripheral per, typename INT> typename mtu1_t<per, INT>::NFCR_ mtu1_t<per, INT>::NFCR;
@@ -1998,7 +2144,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu2_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2038,10 +2184,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class INTERRUPT : uint8_t {
-			A,		///< TGIA
-			B,		///< TGIB
-			OVF,	///< TCIV オーバーフロー
-			UDF,	///< TCIU アンダーフロー
+			A,			///< TGIA
+			B,			///< TGIB
+
+			OVF = 4,	///< TCIV オーバーフロー
+			UDF,		///< TCIU アンダーフロー
 		};
 
 
@@ -2123,6 +2270,17 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+			}
+
 
 			//-------------------------------------------------------------//
 			/*!
@@ -2218,11 +2376,61 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
 		typedef nfcr_t<0x000C1292> NFCR_;
 		static  NFCR_ NFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -2238,6 +2446,8 @@ namespace device {
 			case INTERRUPT::B:   return INT::TGIB2;
 			case INTERRUPT::OVF: return INT::TCIV2;
 			case INTERRUPT::UDF: return INT::TCIU2;
+			default:
+				break;
 			}
 			return INT::NONE;
 		}
@@ -2252,6 +2462,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TCNT_ mtu2_t<per, INT>::TCNT;
 	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TGRA_ mtu2_t<per, INT>::TGRA;
 	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TGRB_ mtu2_t<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TGR_ mtu2_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu2_t<per, INT>::NFCR_ mtu2_t<per, INT>::NFCR;
 
 
@@ -2265,7 +2476,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu3_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2297,6 +2508,7 @@ namespace device {
 			B,  ///< P71 / MTIOC3B (LFQFP100:56)
 			C,  ///< P32 / MTIOC3C (LFQFP100:59)
 			D,  ///< P74 / MTIOC3D (LFQFP100:53)
+			E,
 		};
 
 
@@ -2407,6 +2619,17 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+				TIORL = 0;
+			}
 
 			//-------------------------------------------------------------//
 			/*!
@@ -2552,11 +2775,67 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				case CHANNEL::C:
+					return TGRC.address();
+				case CHANNEL::D:
+					return TGRD.address();
+				case CHANNEL::E:
+					return TGRE.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
 		typedef nfcr_t<0x000C1293> NFCR_;
 		static  NFCR_ NFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -2592,6 +2871,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGRC_ mtu3_t<per, INT>::TGRC;
 	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGRD_ mtu3_t<per, INT>::TGRD;
 	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGRE_ mtu3_t<per, INT>::TGRE;
+	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGR_ mtu3_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu3_t<per, INT>::NFCR_ mtu3_t<per, INT>::NFCR;
 
 
@@ -2605,7 +2885,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu4_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2637,6 +2917,8 @@ namespace device {
 			B,  ///< P73 / MTIOC4B (LFQFP100:54)
 			C,  ///< P75 / MTIOC4C (LFQFP100:52)
 			D,  ///< P76 / MTIOC4D (LFQFP100:51)
+			E,
+			F,
 		};
 
 
@@ -2747,6 +3029,18 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+				TIORL = 0;
+			}
+
 
 			//-------------------------------------------------------------//
 			/*!
@@ -2903,6 +3197,44 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				case CHANNEL::C:
+					return TGRC.address();
+				case CHANNEL::D:
+					return TGRD.address();
+				case CHANNEL::E:
+					return TGRE.address();
+				case CHANNEL::F:
+					return TGRF.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -2977,6 +3309,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  MTU4 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
@@ -3009,6 +3361,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGRD_ mtu4_t<per, INT>::TGRD;
 	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGRE_ mtu4_t<per, INT>::TGRE;
 	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGRF_ mtu4_t<per, INT>::TGRF;
+	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGR_ mtu4_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu4_t<per, INT>::NFCR_ mtu4_t<per, INT>::NFCR;
 	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TADCR_ mtu4_t<per, INT>::TADCR;
 	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TADCORA_ mtu4_t<per, INT>::TADCORA;
@@ -3027,7 +3380,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu5_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -3142,6 +3495,38 @@ namespace device {
 		//-----------------------------------------------------------------//
 		typedef tcr_t<0x000C1CA4> TCRW_;
 		static  TCRW_ TCRW;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::U:
+					return TGRU.address();
+				case CHANNEL::V:
+					return TGRV.address();
+				case CHANNEL::W:
+					return TGRW.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3335,6 +3720,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
@@ -3363,6 +3768,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TGRU_ mtu5_t<per, INT>::TGRU;
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TGRV_ mtu5_t<per, INT>::TGRV;
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TGRW_ mtu5_t<per, INT>::TGRW;
+	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TGR_ mtu5_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TSTR_ mtu5_t<per, INT>::TSTR;
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::NFCR_ mtu5_t<per, INT>::NFCR;
 
@@ -3377,7 +3783,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu6_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -3409,6 +3815,7 @@ namespace device {
 			B,  ///< P95 / MTIOC6B (LFQFP100:45)
 			C,  ///< PA0 / MTIOC6C (LFQFP100:41)
 			D,  ///< P92 / MTIOC6D (LFQFP100:48)
+			E,
 		};
 
 
@@ -3519,6 +3926,18 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+				TIORL = 0;
+			}
+
 
 			//-------------------------------------------------------------//
 			/*!
@@ -3689,11 +4108,67 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				case CHANNEL::C:
+					return TGRC.address();
+				case CHANNEL::D:
+					return TGRD.address();
+				case CHANNEL::E:
+					return TGRE.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
 		typedef nfcr_t<0x000C1A93> NFCR_;
 		static  NFCR_ NFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -3730,6 +4205,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu6_t<per, INT>::TGRC_ mtu6_t<per, INT>::TGRC;
 	template <peripheral per, typename INT> typename mtu6_t<per, INT>::TGRD_ mtu6_t<per, INT>::TGRD;
 	template <peripheral per, typename INT> typename mtu6_t<per, INT>::TGRE_ mtu6_t<per, INT>::TGRE;
+	template <peripheral per, typename INT> typename mtu6_t<per, INT>::TGR_ mtu6_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu6_t<per, INT>::NFCR_ mtu6_t<per, INT>::NFCR;
 
 
@@ -3743,7 +4219,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu7_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -3775,6 +4251,8 @@ namespace device {
 			B,  ///< P93 / MTIOC7B (LFQFP100:47)
 			C,  ///< P91 / MTIOC7C (LFQFP100:49)
 			D,  ///< P90 / MTIOC7D (LFQFP100:50)
+			E,
+			F,
 		};
 
 
@@ -3885,6 +4363,18 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+				TIORL = 0;
+			}
+
 
 			//-------------------------------------------------------------//
 			/*!
@@ -4037,6 +4527,44 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				case CHANNEL::C:
+					return TGRC.address();
+				case CHANNEL::D:
+					return TGRD.address();
+				case CHANNEL::E:
+					return TGRE.address();
+				case CHANNEL::F:
+					return TGRF.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -4111,6 +4639,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  MTU7 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
@@ -4143,6 +4691,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu7_t<per, INT>::TGRD_ mtu7_t<per, INT>::TGRD;
 	template <peripheral per, typename INT> typename mtu7_t<per, INT>::TGRE_ mtu7_t<per, INT>::TGRE;
 	template <peripheral per, typename INT> typename mtu7_t<per, INT>::TGRF_ mtu7_t<per, INT>::TGRF;
+	template <peripheral per, typename INT> typename mtu7_t<per, INT>::TGR_ mtu7_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu7_t<per, INT>::NFCR_ mtu7_t<per, INT>::NFCR;
 	template <peripheral per, typename INT> typename mtu7_t<per, INT>::TADCR_ mtu7_t<per, INT>::TADCR;
 	template <peripheral per, typename INT> typename mtu7_t<per, INT>::TADCORA_ mtu7_t<per, INT>::TADCORA;
@@ -4161,7 +4710,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu8_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -4306,6 +4855,18 @@ namespace device {
 
 			//-------------------------------------------------------------//
 			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+				TIORL = 0;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
 				@brief  TIOR の設定
 				@param[in]	ch	チャネル
 				@param[in]	val	設定値
@@ -4386,7 +4947,7 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C160C> TGRA_;
+		typedef rw32_t<0x000C160C> TGRA_;
 		static  TGRA_ TGRA;
 
 
@@ -4395,7 +4956,7 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C1610> TGRB_;
+		typedef rw32_t<0x000C1610> TGRB_;
 		static  TGRB_ TGRB;
 
 
@@ -4404,7 +4965,7 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C1614> TGRC_;
+		typedef rw32_t<0x000C1614> TGRC_;
 		static  TGRC_ TGRC;
 
 
@@ -4413,8 +4974,42 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C1618> TGRD_;
+		typedef rw32_t<0x000C1618> TGRD_;
 		static  TGRD_ TGRD;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				case CHANNEL::C:
+					return TGRC.address();
+				case CHANNEL::D:
+					return TGRD.address();
+				}
+				return 0;
+			}
+
+			uint32_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint32_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint32_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
 
 
 		//-----------------------------------------------------------------//
@@ -4424,6 +5019,26 @@ namespace device {
 		//-----------------------------------------------------------------//
 		typedef nfcr_t<0x000C1298> NFCR_;
 		static  NFCR_ NFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -4456,12 +5071,13 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRB_ mtu8_t<per, INT>::TGRB;
 	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRC_ mtu8_t<per, INT>::TGRC;
 	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRD_ mtu8_t<per, INT>::TGRD;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGR_ mtu8_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu8_t<per, INT>::NFCR_ mtu8_t<per, INT>::NFCR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  MTU9 定義クラス
+		@brief  MTU9 定義クラス（RX24T/RX66T/RX72T）
 		@param[in]	per		ペリフェラル型
 		@param[in]	INT		割り込み型
 	*/
@@ -4469,7 +5085,7 @@ namespace device {
 	template <peripheral per, typename INT>
 	struct mtu9_t : public MTU {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -4504,6 +5120,8 @@ namespace device {
 			B,  ///< PE0 / MTIOC9B (LFQFP100:17)
 			C,  ///< PD6 / MTIOC9C (LFQFP100:19)
 			D,  ///< PE1 / MTIOC9D (LFQFP100:16)
+			E,
+			F,
 		};
 
 
@@ -4619,6 +5237,18 @@ namespace device {
 
 			//-------------------------------------------------------------//
 			/*!
+				@brief  TIOR 全てのチャネルを無効
+			*/
+			//-------------------------------------------------------------//
+			void disable()
+			{
+				TIORH = 0;
+				TIORL = 0;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
 				@brief  TIOR の設定
 				@param[in]	ch	チャネル
 				@param[in]	val	設定値
@@ -4683,15 +5313,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		typedef tiery_t<0x000C1584> TIER_;
 		static  TIER_ TIER;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  タイマインタラプトイネーブルレジスタ（TIER2）
-		*/
-		//-----------------------------------------------------------------//
-		typedef tier2_t<0x000C15A4> TIER2_;
-		static  TIER2_ TIER2;
 
 
 		//-----------------------------------------------------------------//
@@ -4768,11 +5389,69 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマジェネラルレジスタ（TGR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tgr_t {
+
+			static uint32_t address(CHANNEL ch)
+			{
+				switch(ch) {
+				case CHANNEL::A:
+					return TGRA.address();
+				case CHANNEL::B:
+					return TGRB.address();
+				case CHANNEL::C:
+					return TGRC.address();
+				case CHANNEL::D:
+					return TGRD.address();
+				case CHANNEL::E:
+					return TGRE.address();
+				case CHANNEL::F:
+					return TGRF.address();
+				}
+				return 0;
+			}
+
+			uint16_t operator () (CHANNEL ch) {
+				return device::rd16_(address(ch));
+			}
+
+			uint16_t& operator [] (CHANNEL ch) {
+				return *reinterpret_cast<uint16_t*>(address(ch));
+			}
+		};
+		typedef tgr_t TGR_;
+		static TGR_ TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
 		typedef nfcr_t<0x000C1296> NFCR_;
 		static  NFCR_ NFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みを許可する
+			@param[in]	intr	割り込み種別
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_interrupt(INTERRUPT intr, bool ena = true)
+		{
+			auto n = static_cast<uint8_t>(intr);
+			if(n < 8) {
+				if(ena) {
+					TIER |=  (1 << n);
+				} else {
+					TIER &= ~(1 << n);
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -4802,7 +5481,6 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIORL_ mtu9_t<per, INT>::TIORL;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIOR_ mtu9_t<per, INT>::TIOR;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIER_ mtu9_t<per, INT>::TIER;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIER2_ mtu9_t<per, INT>::TIER2;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TBTM_ mtu9_t<per, INT>::TBTM;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TCNT_ mtu9_t<per, INT>::TCNT;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRA_ mtu9_t<per, INT>::TGRA;
@@ -4811,6 +5489,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRD_ mtu9_t<per, INT>::TGRD;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRE_ mtu9_t<per, INT>::TGRE;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRF_ mtu9_t<per, INT>::TGRF;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGR_ mtu9_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::NFCR_ mtu9_t<per, INT>::NFCR;
 
 #if defined(SIG_RX24T)
