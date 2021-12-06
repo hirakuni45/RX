@@ -35,6 +35,8 @@ I2C、SPI、BUS、CAN、等のインターフェースで通信を行うデバ�
 |MAX6675|冷接点補償K熱電対デジタルコンバータ(0℃～+1024℃)|Maxim Integrated|SPI|3.0 to 5.5|[MAXIM](https://www.maximintegrated.com/jp/products/sensors/MAX6675.html)| 
 |ISL29034|Integrated Digital Light Sensor|Renesas (intersil)|I2C|2.25 to 3.63|[Renesas](https://www.renesas.com/jp/ja/products/sensors/ambient-light-sensors/light-to-digital-sensors/device/ISL29034.html)|
 |OBD2|On Board Diagnosis second generation|SAE|CAN|3.3 to 5.0|[Wikipedia](https://en.wikipedia.org/wiki/OBD-II_PIDs)|
+|AS5600|12-bit Programmable Contactless Potentiometer|ams|I2C|3.3V or 5.0V|[ams](https://ams.com/ja/as5600)|
+
 ---
 
 ## I2C インターフェース・クラスに要求される機能

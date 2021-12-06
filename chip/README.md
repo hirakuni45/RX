@@ -166,8 +166,16 @@ On Board Diagnosis second generation
 https://en.wikipedia.org/wiki/OBD-II_PIDs   
 Interface: CAN   
 Vcc 3.3 to 5.0   
----
+
+- AS5600
+ams   
+12-bit Programmable Contactless Potentiometer   
+https://ams.com/ja/as5600   
+Interface: I2C   
+Vcc: 3.3V or 5.0V (See data sheet)   
    
+---
+
 License
 
 MIT
