@@ -27,6 +27,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ORDER : uint8_t {
 			BYPASS,			///< ポートマップの設定をバイパスする場合
+
 			FIRST,			///< 第１候補
 			SECOND,			///< 第２候補
 			THIRD,			///< 第３候補
@@ -37,9 +38,6 @@ namespace device {
 			EIGHTH,			///< 第８候補
 			NINTH,			///< 第９候補
 			TENTH,			///< 第１０候補
-
-			LOCAL0,			///< 独自の特殊な設定０
-			LOCAL1,			///< 独自の特殊な設定１
 
 			FIRST_I2C,		///< SCI ポートを簡易 I2C として使う場合、第１候補
 			SECOND_I2C,		///< SCI ポートを簡易 I2C として使う場合、第２候補
@@ -54,12 +52,34 @@ namespace device {
 
 			FIRST_RMII,		///< ETHERC RMII 接続、第１候補
 			SECOND_RMII,	///< ETHERC RMII 接続、第２候補
+
+			LOCAL0,			///< 独自の特殊な設定０
+			LOCAL1,			///< 独自の特殊な設定１
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ルネサス型 @n
+			@brief  SCI ポート・マッピング・グループ @n
+					CTS/RTS はどちらか片方しか利用出来ない
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct sci_port_t {
+			ORDER		cts_;	///< CTSx 端子の選択権
+			ORDER		rts_;	///< RTSx 端子の選択権
+			ORDER		rxd_;	///< RXDx 端子の選択権
+			ORDER		sck_;	///< SCKx 端子の選択権
+			ORDER		txd_;	///< TXDx 端子の選択権
+			constexpr sci_port_t(ORDER rxd = ORDER::BYPASS, ORDER txd = ORDER::BYPASS) noexcept :
+				cts_(ORDER::BYPASS), rts_(ORDER::BYPASS),
+				rxd_(rxd),  sck_(ORDER::BYPASS),  txd_(txd)
+			{ }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ポート・マッピング・ルネサス型 @n
 					ルネサス社が提供するボードに対する型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
