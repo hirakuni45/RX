@@ -584,7 +584,7 @@ namespace device {
 		/// RIIC0 ポート候補（順番は、MPC の解説に準拠）
 		static bool riic0_(ORDER opt, bool enable)
 		{
-			uint8_t sel = enable ? 0b01111 : 0;
+			uint8_t sel = enable ? 0b001111 : 0;
 			switch(opt) {
 			case ORDER::FIRST:
 				// PB1/SCL0 (50/144) (34/100)
