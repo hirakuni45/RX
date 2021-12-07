@@ -406,8 +406,12 @@ namespace device {
 		enum class OD_TYPE : uint8_t {
 			NONE,	///< 無し
 			N_CH,	///< N-Channel
+#if defined (SIG_RX66T) || defined(SIG_RX72T)
+#else
 			P_CH,	///< P-Channel
+#endif
 		};
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -458,8 +462,7 @@ namespace device {
 					ODR0 = (ODR0() & ~(3 << (pos * 2))) | (static_cast<uint8_t>(val) << (pos * 2));
 				} else {
 					pos -= 4;
-					if(val) ODR1 |= 1 << (pos * 2);
-					else ODR1 &= ~(1 << (pos * 2));
+					ODR1 = (ODR1() & ~(3 << (pos * 2))) | (static_cast<uint8_t>(val) << (pos * 2));
 				}
 			}
 
