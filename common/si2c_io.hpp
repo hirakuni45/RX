@@ -19,7 +19,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  I2C テンプレートクラス @n
+		@brief  I2C テンプレートクラス
 		@param[in]	SDA	SDA ポート定義クラス
 		@param[in]	SCL	SCL ポート定義クラス
 	*/
@@ -175,8 +175,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(MODE mode, SPEED spd, uint8_t lvl = 0, bool pullup = false) noexcept
 		{
-			SCL::OD = 1;
-			SDA::OD = 1;
+			SCL::OD = SCL::OD_TYPE::N_CH;
+			SDA::OD = SDA::OD_TYPE::N_CH;
 			if(pullup) {
 				SCL::PU = 1;
 				SDA::PU = 1;

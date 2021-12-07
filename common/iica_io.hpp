@@ -26,7 +26,7 @@ namespace device {
 	template<class IICA>
 	class iica_io : public i2c_base {
 
-		static const uint32_t WAIT_LOOP_MS = 500;  // 500uS
+		static constexpr uint32_t WAIT_LOOP_MS = 500;  // 500uS
 
 		uint8_t		level_;
 		uint8_t		sadr_;
@@ -475,7 +475,20 @@ namespace device {
 				}
 
 				IICA::ICDRT = (adr << 1) | 0x01;
-				while(IICA::ICSR2.RDRF() == 0) ;
+				uint32_t loop = 0;
+				while(IICA::ICSR2.RDRF() == 0) {
+#if 0
+					utils::delay::micro_second(1);
+					++loop;
+					if(loop >= WAIT_LOOP_MS) {
+						ret = false;
+						error_ = ERROR::ADDRESS;
+						IICA::ICSR2.NACKF = 0;
+						IICA::ICSR2.STOP = 0;
+						return false;
+					}
+#endif
+				}
 
 				if(IICA::ICSR2.NACKF() != 0) {
 					IICA::ICSR2.STOP = 0;
