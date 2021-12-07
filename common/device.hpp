@@ -34,6 +34,7 @@
 #include "RX600/icu.hpp"
 #include "RX600/icu_mgr.hpp"
 #include "RX600/port_map.hpp"
+#include "RX600/port_map_sci.hpp"
 #include "RX600/port_map_mtu.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -45,6 +46,7 @@
 #include "RX600/icu.hpp"
 #include "RX600/icu_mgr.hpp"
 #include "RX600/port_map.hpp"
+#include "RX600/port_map_sci.hpp"
 #include "RX600/port_map_mtu.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -67,6 +69,7 @@
 #include "RX72N/icu.hpp"
 #include "RX72N/icu_mgr.hpp"
 #include "RX72N/port_map.hpp"
+#include "RX72N/port_map_sci.hpp"
 #include "RX72N/port_map_mtu.hpp"
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
