@@ -32,7 +32,7 @@
 			// 上記関数を定義しておけば、syscalls.c との連携で、printf が使えるようになる。@n
 			// ※ C++ では printf は推奨しないし使う理由が無い、utils::format を使って下さい。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -45,39 +45,80 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCI I/O 制御クラス
-		@param[in]	SCI		SCI 型
-		@param[in]	RBF		受信バッファクラス
-		@param[in]	SBF		送信バッファクラス
-		@param[in]	PSEL	シリアルポート選択
-		@param[in]	HCTL	半二重通信制御ポート（for RS-485）
+		@brief  SCI I/O ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, class HCTL = NULL_PORT>
-	class sci_io {
+	class sci_io_base {
 	public:
-		typedef SCI sci_type;
-		typedef RBF rbf_type;
-		typedef SBF sbf_type;
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	SCI 通信プロトコル型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class PROTOCOL {
-			B8_N_1S,	///< 8 ビット、No-Parity、 1 Stop Bit
+		enum class PROTOCOL : uint8_t {
+			B7_N_1S,	///< 7 ビット、No-Parity、1 Stop Bit
+			B7_E_1S,	///< 7 ビット、Even(偶数)、1 Stop Bit
+			B7_O_1S,	///< 7 ビット、Odd (奇数)、1 Stop Bit
+			B7_N_2S,	///< 7 ビット、No-Parity、2 Stop Bits
+			B7_E_2S,	///< 7 ビット、Even(偶数)、2 Stop Bits
+			B7_O_2S,	///< 7 ビット、Odd (奇数)、2 Stop Bits
+			B8_N_1S,	///< 8 ビット、No-Parity、1 Stop Bit
 			B8_E_1S,	///< 8 ビット、Even(偶数)、1 Stop Bit
 			B8_O_1S,	///< 8 ビット、Odd (奇数)、1 Stop Bit
-			B8_N_2S,	///< 8 ビット、No-Parity、 2 Stop Bits
+			B8_N_2S,	///< 8 ビット、No-Parity、2 Stop Bits
 			B8_E_2S,	///< 8 ビット、Even(偶数)、2 Stop Bits
 			B8_O_2S,	///< 8 ビット、Odd (奇数)、2 Stop Bits
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	SCI ボーレート型（シリアル通信で標準的に指定する定型値）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class BAUDRATE : uint32_t {
+			B110    =    110,	///<    110 B.P.S.
+			B150    =    150,	///<    150 B.P.S.
+			B300    =    300,	///<    300 B.P.S.
+			B600    =    600,	///<    600 B.P.S.
+			B1200   =   1200,	///<   1200 B.P.S.
+			B2400   =   2400,	///<   2400 B.P.S.
+			B4800   =   4800,	///<   4800 B.P.S.
+			B9600   =   9600,	///<   9600 B.P.S.
+			B19200  =  19200,	///<  19200 B.P.S.
+			B38400  =  38400,	///<  38400 B.P.S.
+			B57600  =  57600,	///<  57600 B.P.S.
+			B76800  =  76800,	///<  76800 B.P.S.
+			B96000  =  96000,	///<  96000 B.P.S.
+			B115200 = 115200,	///< 115200 B.P.S.
+		};
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCI I/O 制御クラス
+		@param[in]	SCI		SCI 型
+		@param[in]	RBF		受信バッファクラス
+		@param[in]	SBF		送信バッファクラス
+		@param[in]	PSEL	ポートマップ選択
+		@param[in]	HCTL	半二重通信制御ポート（for RS-485）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, class HCTL = NULL_PORT>
+	class sci_io : public sci_io_base {
+	public:
+		typedef SCI sci_type;
+		typedef RBF rbf_type;
+		typedef SBF sbf_type;
+
 	private:
 
-		static const char XON  = 0x11;
-		static const char XOFF = 0x13;
+		static constexpr char XON  = 0x11;
+		static constexpr char XOFF = 0x13;
+
+		const port_map_order::sci_port_t&	port_map_;
 
 		static RBF	recv_;
 		static SBF	send_;
@@ -158,7 +199,9 @@ namespace device {
 			@param[in]	softflow	ソフトフロー制御を無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		sci_io(bool autocrlf = true, bool softflow = true) noexcept : level_(0),
+		sci_io(bool autocrlf = true, bool softflow = true, const port_map_order::sci_port_t& sci_port = port_map_order::sci_port_t()) noexcept :
+			port_map_(sci_port),
+			level_(0),
 			auto_crlf_(autocrlf), baud_(0) {
 			soft_flow_ = softflow;
 			stop_ = false;
@@ -216,9 +259,26 @@ namespace device {
 			if(!power_mgr::turn(SCI::PERIPHERAL)) {
 				return false;
 			}
-			if(!port_map::turn(SCI::PERIPHERAL, true, PSEL)) {
-				power_mgr::turn(SCI::PERIPHERAL, false);
-				return false;
+			// PSEL に、BYPASS が選択された場合、個別にポートを設定する事が出来る。
+			if(PSEL == port_map_order::ORDER::BYPASS) {
+// この仕組みは、現在開発中・・・
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N)
+				uint8_t ok = 0;
+				ok += port_map_sci::turn(SCI::PERIPHERAL, port_map_sci::CHANNEL::CTS, true, port_map_.cts_);
+				ok += port_map_sci::turn(SCI::PERIPHERAL, port_map_sci::CHANNEL::RTS, true, port_map_.rts_);
+				ok += port_map_sci::turn(SCI::PERIPHERAL, port_map_sci::CHANNEL::RXD, true, port_map_.rxd_);
+				ok += port_map_sci::turn(SCI::PERIPHERAL, port_map_sci::CHANNEL::SCK, true, port_map_.sck_);
+				ok += port_map_sci::turn(SCI::PERIPHERAL, port_map_sci::CHANNEL::TXD, true, port_map_.txd_);
+				if(ok != 5) {
+					power_mgr::turn(SCI::PERIPHERAL, false);
+					return false;
+				}
+#endif
+			} else {
+				if(!port_map::turn(SCI::PERIPHERAL, true, PSEL)) {
+					power_mgr::turn(SCI::PERIPHERAL, false);
+					return false;
+				}
 			}
 
 			set_intr_(0);
@@ -258,31 +318,37 @@ namespace device {
 			bool pm = 0;
 			bool pe = 0;
 			switch(prot) {
+			case PROTOCOL::B7_N_1S:
 			case PROTOCOL::B8_N_1S:
 				stop = 0;
 				pm = 0;
 				pe = 0;
 				break;
+			case PROTOCOL::B7_E_1S:
 			case PROTOCOL::B8_E_1S:
 				stop = 0;
 				pm = 0;
 				pe = 1;
 				break;
+			case PROTOCOL::B7_O_1S:
 			case PROTOCOL::B8_O_1S:
 				stop = 0;
 				pm = 1;
 				pe = 1;
 				break;
+			case PROTOCOL::B7_N_2S:
 			case PROTOCOL::B8_N_2S:
 				stop = 1;
 				pm = 0;
 				pe = 0;
 				break;
+			case PROTOCOL::B7_E_2S:
 			case PROTOCOL::B8_E_2S:
 				stop = 1;
 				pm = 0;
 				pe = 1;
 				break;
+			case PROTOCOL::B7_O_2S:
 			case PROTOCOL::B8_O_2S:
 				stop = 1;
 				pm = 1;
@@ -291,8 +357,10 @@ namespace device {
 			default:
 				return false;
 			}
+			bool seven = 0;
+			if(static_cast<uint8_t>(prot) < 6) seven = 1;
 			SCI::SMR = SCI::SMR.CKS.b(cks) | SCI::SMR.STOP.b(stop)
-					 | SCI::SMR.PM.b(pm) | SCI::SMR.PE.b(pe);
+					 | SCI::SMR.PM.b(pm) | SCI::SMR.PE.b(pe) | SCI::SMR.CHR.b(seven);
 			bool brme = false;
 			if(mddr >= 128 && mddr < 256) brme = true;
 			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b(brme) | SCI::SEMR.BGDM.b(bgdm);
@@ -307,6 +375,21 @@ namespace device {
 			}
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ボーレートを設定して、SCI を有効にする
+			@param[in]	baud	ボーレート型
+			@param[in]	level	割り込みレベル（０の場合ポーリング）
+			@param[in]	prot	通信プロトコル（標準は、８ビット、パリティ無し、１ストップ）
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(BAUDRATE baud, uint8_t level = 0, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
+		{
+			return start(static_cast<uint32_t>(baud), level, prot);
 		}
 
 
