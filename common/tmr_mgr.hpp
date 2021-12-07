@@ -17,7 +17,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  TMR マネージャー・クラス @
-				１６ビット・モードで利用する場合、TMR は、TMR0、又は、TMR2 を指定
+				※１６ビット・モードで利用する場合、TMR は、TMR0、又は、TMR2 を指定する事
 		@param[in]	TMR		TMR チャネルクラス
 		@param[in]	TASK	タイマー動作クラス
 	*/
@@ -57,10 +57,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t freq, uint8_t level = 0) noexcept
 		{
-			// 16 bits バインドでは、奇数は NG
-			if(TMR::PERIPHERAL == device::peripheral::TMR1 || TMR::PERIPHERAL == device::peripheral::TMR3) {
-				return false;
-			}
+			// 16 bits バインドモードでは、TMR0、TMR2 以外は NG
+			static_assert(((TMR::PERIPHERAL == device::peripheral::TMR0) || (TMR::PERIPHERAL == device::peripheral::TMR2)),
+				"The TMR peripheral specifies TMR0 or TMR2.");
 
 			freq_ = freq;
 
