@@ -259,10 +259,10 @@ namespace device {
 			if(!power_mgr::turn(SCI::PERIPHERAL)) {
 				return false;
 			}
-			// PSEL に、BYPASS が選択された場合、個別にポートを設定する事が出来る。
+			// PSEL に、BYPASS が選択された場合、個別のポート設定が有効になる。
 			if(PSEL == port_map_order::ORDER::BYPASS) {
 // この仕組みは、現在開発中・・・
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72T)
 				uint8_t ok = 0;
 				ok += port_map_sci::turn(SCI::PERIPHERAL, port_map_sci::CHANNEL::CTS, true, port_map_.cts_);
 				ok += port_map_sci::turn(SCI::PERIPHERAL, port_map_sci::CHANNEL::RTS, true, port_map_.rts_);

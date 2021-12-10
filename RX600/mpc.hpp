@@ -345,6 +345,7 @@ namespace device {
 			@brief  P7n 端子機能制御レジスタ（P7nPFS）（n = 1 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef pfs_p_t<0x0008C178> P70PFS_;
 		typedef pfs_p_t<0x0008C179> P71PFS_;
 		typedef pfs_p_t<0x0008C17A> P72PFS_;
 		typedef pfs_p_t<0x0008C17B> P73PFS_;
@@ -352,6 +353,7 @@ namespace device {
 		typedef pfs_p_t<0x0008C17D> P75PFS_;
 		typedef pfs_p_t<0x0008C17E> P76PFS_;
 		typedef pfs_p_t<0x0008C17F> P77PFS_;
+		static P70PFS_ P70PFS;
 		static P71PFS_ P71PFS;
 		static P72PFS_ P72PFS;
 		static P73PFS_ P73PFS;
@@ -1048,6 +1050,7 @@ namespace device {
 	template<class _> typename mpc_t<_>::P64PFS_ mpc_t<_>::P64PFS;
 	template<class _> typename mpc_t<_>::P65PFS_ mpc_t<_>::P65PFS;
 #endif
+	template<class _> typename mpc_t<_>::P70PFS_ mpc_t<_>::P70PFS;
 	template<class _> typename mpc_t<_>::P71PFS_ mpc_t<_>::P71PFS;
 	template<class _> typename mpc_t<_>::P72PFS_ mpc_t<_>::P72PFS;
 	template<class _> typename mpc_t<_>::P73PFS_ mpc_t<_>::P73PFS;
