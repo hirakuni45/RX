@@ -107,6 +107,7 @@
 #include "RX72T/icu.hpp"
 #include "RX72T/icu_mgr.hpp"
 #include "RX72T/port_map.hpp"
+#include "RX72T/port_map_sci.hpp"
 #include "RX72T/port_map_mtu.hpp"
 #include "RX72T/port_map_gptw.hpp"
 #include "RX600/rx_dsp_inst.h"
