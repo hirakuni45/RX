@@ -6,6 +6,11 @@
             "intelliSenseMode": "linux-gcc-x86",
             "includePath": [
                 "C:/msys64/usr/local/rx-elf/rx-elf/include",
+                "C:/msys64/usr/local/rx-elf/rx-elf/lib/gcc/rx-elf/8.3.0.202004-GNURX/include-fixed",
+                "C:/msys64/usr/local/rx-elf/rx-elf/lib/gcc/rx-elf/8.3.0.202004-GNURX/include",
+                "C:/msys64/usr/local/rx-elf/rx-elf/rx-elf/include/c++/8.3.0.202004-GNURX/backward",
+                "C:/msys64/usr/local/rx-elf/rx-elf/rx-elf/include/c++/8.3.0.202004-GNURX/rx-elf",
+                "C:/msys64/usr/local/rx-elf/rx-elf/rx-elf/include/c++/8.3.0.202004-GNURX",
                 "C:/msys64/mingw64/include",
                 "D:/Git/RX",
                 "D:/Git/RX/RX600/drw2d/inc/tes",

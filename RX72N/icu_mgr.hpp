@@ -650,9 +650,24 @@ namespace device {
 			}
 			return ICU::VECTOR::GROUPAL1;
 		}
-	};
-	typedef icu_mgr_<void> icu_mgr;
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  高速割り込み設定
+			@param[in]	vec		割り込み要因
+			@param[in]	ena		不許可にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable_fast_interrupt(ICU::VECTOR vec, bool ena = true) noexcept
+		{
+			if(ena) {
+				ICU::FIR = ICU::FIR.FVCT.b(static_cast<uint8_t>(vec)) | ICU::FIR.FIEN.b();
+			} else {
+				ICU::FIR = 0;
+			}
+		}
+	};
 	template <class _> typename icu_mgr_<_>::GROUPIE0_dispatch_t icu_mgr_<_>::GROUPIE0_dispatch_;
 	template <class _> typename icu_mgr_<_>::GROUPBE0_dispatch_t icu_mgr_<_>::GROUPBE0_dispatch_;
 	template <class _> typename icu_mgr_<_>::GROUPBL0_dispatch_t icu_mgr_<_>::GROUPBL0_dispatch_;
@@ -660,4 +675,6 @@ namespace device {
 	template <class _> typename icu_mgr_<_>::GROUPBL2_dispatch_t icu_mgr_<_>::GROUPBL2_dispatch_;
 	template <class _> typename icu_mgr_<_>::GROUPAL0_dispatch_t icu_mgr_<_>::GROUPAL0_dispatch_;
 	template <class _> typename icu_mgr_<_>::GROUPAL1_dispatch_t icu_mgr_<_>::GROUPAL1_dispatch_;
+
+	typedef icu_mgr_<void> icu_mgr;
 }
