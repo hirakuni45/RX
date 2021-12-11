@@ -57,7 +57,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t freq, uint8_t level = 0) noexcept
 		{
-			// 16 bits バインドモードでは、TMR0、TMR2 以外は NG
+			// 16 bits バインドモードでは、TMR0、TMR2 以外はエラー
 			static_assert(((TMR::PERIPHERAL == device::peripheral::TMR0) || (TMR::PERIPHERAL == device::peripheral::TMR2)),
 				"The TMR peripheral specifies TMR0 or TMR2.");
 
