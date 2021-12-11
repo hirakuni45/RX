@@ -205,11 +205,10 @@ namespace device {
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 	};
-	typedef r12da_a_t<peripheral::R12DA> R12DA;
-
 	template <peripheral per> typename r12da_a_t<per>::DAAMPCR_ r12da_a_t<per>::DAAMPCR;
 	template <peripheral per> typename r12da_a_t<per>::DAADUSR_ r12da_a_t<per>::DAADUSR;
 
+	typedef r12da_a_t<peripheral::R12DA> R12DA;
 
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -253,7 +252,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  OUTREF0;
 			bit_rw_t<io_, bitpos::B3>  OUTREF1;
 		};
-		static dadselr_t<0x00088049> DADSELR;
+		typedef dadselr_t<0x00088049> DADSELR_;
+		static DADSELR_ DADSELR;
 
 
 		//-----------------------------------------------------------------//
@@ -284,6 +284,8 @@ namespace device {
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 	};
+	template <peripheral per> typename r12da_b_t<per>::DADSELR_ r12da_b_t<per>::DADSELR;
+
 	typedef r12da_b_t<peripheral::R12DA> R12DA;
 #endif
 }
