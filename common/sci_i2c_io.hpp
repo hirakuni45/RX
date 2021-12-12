@@ -477,6 +477,48 @@ level = 0;
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	送信（シングルバイト付き）
+			@param[in]	adr		I2C ７ビットアドレス
+			@param[in]	first	ファーストバイト
+			@param[in]	src		転送先
+			@param[in]	len		送信バイト数
+			@param[in]	sync	非同期の場合「false」
+			@return 送信が完了した場合「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool send(uint8_t adr, uint8_t first, const void* src, uint16_t len) noexcept
+		{
+			uint8_t tmp[len + 1];
+			tmp[0] = first;
+			std::memcpy(&tmp[1], src, len);
+			return send(adr, tmp, len + 1);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信（ダブルバイト付き）
+			@param[in]	adr		I2C ７ビットアドレス
+			@param[in]	first	ファーストバイト
+			@param[in]	second	セカンドバイト
+			@param[in]	src		転送先
+			@param[in]	len		送信バイト数
+			@param[in]	sync	非同期の場合「false」
+			@return 送信が完了した場合「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool send(uint8_t adr, uint8_t first, uint8_t second, const void* src, uint16_t len) noexcept
+		{
+			uint8_t tmp[len + 2];
+			tmp[0] = first;
+			tmp[1] = second;
+			std::memcpy(&tmp[2], src, len);
+			return send(adr, tmp, len + 2);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  データ受信
 			@param[in]	adr		I2C アドレス（下位７ビット）
 			@param[in]	dst		受信データ
