@@ -28,6 +28,7 @@ namespace utils {
 			EEPROM,
 			DS3231,
 			BMP280,
+			AS5600,
 		};
 	};
 
@@ -43,6 +44,7 @@ namespace utils {
 	class exec_cmd : public exec_base {
 
 		DEV				dev_;
+		uint8_t			adr_;
 
 		typedef EEPROM::exec<I2C_IO, CMD_LIN> EEPROM_EXEC;
 		EEPROM_EXEC		EEPROM_EXEC_;
@@ -51,7 +53,7 @@ namespace utils {
 		typedef BMP280::exec<I2C_IO, CMD_LIN> BMP280_EXEC;
 		BMP280_EXEC		BMP280_EXEC_;
 
-		CMD_LIN			cmd_;
+		CMD_LIN&		cmd_;
 
 	public:
 		//-------------------------------------------------------------//
@@ -59,8 +61,8 @@ namespace utils {
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		exec_cmd(I2C_IO& i2c_io, CMD_LIN& cmd) :
-			dev_(DEV::NONE),
+		exec_cmd(I2C_IO& i2c_io, CMD_LIN& cmd) noexcept :
+			dev_(DEV::NONE), adr_(0),
 			EEPROM_EXEC_(i2c_io, cmd),
 			DS3231_EXEC_(i2c_io, cmd),
 			BMP280_EXEC_(i2c_io, cmd),
@@ -76,7 +78,7 @@ namespace utils {
 			@return 正常に開始出来たら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool start(uint8_t adr, DEV dev)
+		bool start(uint8_t adr, DEV dev) noexcept
 		{
 			bool ret = false;
 			if(dev_ != dev) {
@@ -95,6 +97,7 @@ namespace utils {
 				}
 				if(ret) {
 					dev_ = dev;
+					adr_ = adr;
 				} else {
 					utils::format("Start fail I2C: \n");
 				}
@@ -103,6 +106,37 @@ namespace utils {
 		}
 
 
+		//-------------------------------------------------------------//
+		/*!
+			@brief	各 I2C デバイスの解析
+			@return 終了の場合「true」
+		*/
+		//-------------------------------------------------------------//
+		bool analize() noexcept
+		{
+			auto cmdn = cmd_.get_words();
+			if(cmdn >= 1) {
+				if(cmd_.cmp_word(0, "exit")) {
+					dev_ = DEV::NONE;
+					adr_ = 0;
+					return true;
+				}
+			}
 
+			switch(dev_) {
+			case DEV::EEPROM:
+				EEPROM_EXEC_.analize();
+				break;
+			case DEV::DS3231:
+				DS3231_EXEC_.analize();
+				break;
+			case DEV::BMP280:
+				BMP280_EXEC_.analize();
+				break;
+			default:
+				break;
+			}
+			return false;
+		}
     };
 }
