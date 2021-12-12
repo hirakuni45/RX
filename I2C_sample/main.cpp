@@ -48,6 +48,7 @@
 #include "common/command.hpp"
 #include "common/iica_io.hpp"
 #include "common/sci_i2c_io.hpp"
+#include "common/si2c_io.hpp"
 
 #include "chip/FT5206.hpp"
 
@@ -62,10 +63,11 @@
 
 #include "chip/DS3231.hpp"
 #include "chip/bmp280.hpp"
+#include "chip/AS5600.hpp"
 
 namespace {
 
-	static const int VERSION = 20;
+	static constexpr int VERSION = 50;
 
 #if defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
@@ -123,11 +125,19 @@ namespace {
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 	#define TOUCH_I2C
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
+	static const char* system_str_ = { "RX72T hirakuni45" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 
+//	#define SOFT_I2C
+
+#ifdef SOFT_I2C
+	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
+	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
+	typedef device::si2c_io<SDA, SCL> I2C_IO;
+#else
 	typedef device::iica_io<device::RIIC0> I2C_IO;
+#endif
 #endif
 
 //  環境コンテキスト
@@ -157,6 +167,11 @@ namespace {
 	uint16_t	i2c_num_ = 0;
 	uint8_t		i2c_data_[256] = { 0 };
 
+
+//	typedef chip::AS5600<I2C_IO> AS5600;
+//	AS5600		as5600_(i2c_io_);
+
+
 	typedef std::function<void()> I2C_TASK;
 
 	int			i2c_dev_idx_ = -1;
@@ -179,6 +194,7 @@ namespace {
 		{ }
 	};
 
+
 	bool exec_common_(bool exit = false)
 	{
 		if(exit || cmd_.cmp_word(0, "exit")) {
@@ -192,8 +208,9 @@ namespace {
 	}
 
 
-	static const int I2C_DEV_NUM = 10;
+	static constexpr int I2C_DEV_NUM = 11;
 	i2c_dev		i2c_dev_[I2C_DEV_NUM] = {
+		{ 0x36, "AS5600",  "(Contactless Potentiometer)", utils::exec_base::DEV::AS5600 },
 		{ 0x50, "EEPROM0", "ID=0", utils::exec_base::DEV::EEPROM },
 		{ 0x51, "EEPROM1", "ID=1", utils::exec_base::DEV::EEPROM },
 		{ 0x52, "EEPROM2", "ID=2", utils::exec_base::DEV::EEPROM },
@@ -203,7 +220,7 @@ namespace {
 		{ 0x56, "EEPROM6", "ID=6", utils::exec_base::DEV::EEPROM },
 		{ 0x57, "EEPROM7", "ID=7", utils::exec_base::DEV::EEPROM },
 		{ 0x68, "DS3231",  "(RTC)", utils::exec_base::DEV::DS3231 },
-		{ 0x77, "BMP280",  "(Pressure Sensor)", utils::exec_base::DEV::BMP280 }
+		{ 0x77, "BMP280",  "(Pressure Sensor)", utils::exec_base::DEV::BMP280 },
 	};
 
 
@@ -230,23 +247,27 @@ namespace {
 
 	void scan_(uint32_t s, uint32_t e)
 	{
-		uint32_t n = 0;
+		uint32_t num = 0;
 		for(uint32_t i = s; i <= e; ++i) {
 			uint8_t tmp[1];
 			if(i2c_io_.recv(i, tmp, sizeof(tmp))) {
 				auto n = find_i2c_(i);
 				const char* name = "";
 				const char* opts = "";
-				if(n >= 0) {
+				if(n >= 0 && n < I2C_DEV_NUM) {
 					name = i2c_dev_[n].name_;
 					opts = i2c_dev_[n].opts_;
 					i2c_dev_[n].ena_ = true;
 				}
 				utils::format("Ditect %s: 0x%02X (%3u, 0b%07b), '%s'\n") % name % i % i % i % opts;
-				++n;
+				++num;
 			}
 		}
-		utils::format("  Ditect I2C Device(s): %d\n") % n;
+		if(num == 0) {
+			utils::format("  No Ditect I2C Device\n");
+		} else {
+			utils::format("  Ditect I2C Device(s): %d\n") % num;
+		}
 	}
 
 
@@ -311,12 +332,17 @@ namespace {
 	{
 		if(cmd_.service()) {
 			if(i2c_dev_idx_ >= 0) {
+				if(exec_cmd_.analize()) {
+					i2c_dev_idx_ = -1;
+					cmd_.set_prompt("# ");
+				}
+				return;
 			}
 
 			uint32_t cmdn = cmd_.get_words();
 			const char* err = nullptr;
 			if(cmdn >= 1) {
-				if(cmd_.cmp_word(0, "--help")) {
+				if(cmd_.cmp_word(0, "--help") || cmd_.cmp_word(0, "-help") || cmd_.cmp_word(0, "?")) {
 					utils::format("I2C Monitor command version %d.%02d\n")
 						% static_cast<int>(VERSION / 100) % static_cast<int>(VERSION % 100);
 					utils::format("    list                       list for exec device\n");
@@ -325,7 +351,7 @@ namespace {
 					utils::format("    adr [X]                    set I2C address X\n");
 					utils::format("    r [num=1]                  recv data [num] bytes\n");
 					utils::format("    s data...                  send data bytes\n");
-					utils::format("    --help                      help\n");
+					utils::format("    --help -help ?             help\n");
 					utils::format("\n");
 				} else if(cmd_.cmp_word(0, "list")) {
 					list_();
@@ -415,6 +441,7 @@ namespace {
 
 
 extern "C" {
+
 	// syscalls.c から呼ばれる、標準出力をシリアル入出力にバインド（stdout, stderr）
 	void sci_putch(char ch)
 	{
@@ -475,7 +502,7 @@ int main(int argc, char** argv)
 		if(!i2c_io_.start(I2C_IO::MODE::MASTER, I2C_IO::SPEED::STANDARD, intr_lvl)) {
 			utils::format("I2C Start fail...\n");
 		} else {
-			utils::format("I2C Start ok: (intrrupt level = %d)\n") % static_cast<int>(intr_lvl);
+			utils::format("I2C Start OK: (intrrupt level = %d)\n") % static_cast<int>(intr_lvl);
 		}
 	}
 
@@ -522,6 +549,8 @@ int main(int argc, char** argv)
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
+//			auto a = as5600_.get_raw_angle();
+//			utils::format("A: %4u\n") % a;
 		}
 		if(cnt < 25) {
 			LED::P = 0;

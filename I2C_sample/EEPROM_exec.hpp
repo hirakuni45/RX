@@ -35,37 +35,34 @@ namespace EEPROM {
 			@param[in] cmd_		コマンドライン入力クラス
 		*/
 		//-----------------------------------------------------------------//
-		exec(I2C_IO& i2c_io, CMD_LIN& cmd) : I2C_DEV_(i2c_io), cmd_(cmd) { } 
+		exec(I2C_IO& i2c_io, CMD_LIN& cmd) noexcept : I2C_DEV_(i2c_io), cmd_(cmd) { } 
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	開始
+			@brief	EEPROM 開始
 			@param[in]	adr		I2C address
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t adr)
+		bool start(uint8_t adr) noexcept
 		{
 			auto id = static_cast<typename I2C_DEV::M64KB>(adr & 7);
 			I2C_DEV_.start(id, 32);
 			return true;
 		}
 
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	解析
+			@brief	EEPROM 解析
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool analize()
+		bool analize() noexcept
 		{
-			uint32_t cmdn = cmd_.get_words();
-			if(cmdn == 0) return true;  // 入力が無い場合はエラー無しとする
-
-//			if(exec_common_()) {
-//				return;
-//			}
+			auto cmdn = cmd_.get_words();
+			if(cmdn == 0) return true;
 
 			if(cmdn >= 2 && cmd_.cmp_word(0, "read")) {
 				int32_t org = 0;
