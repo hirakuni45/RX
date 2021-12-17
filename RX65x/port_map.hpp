@@ -1037,6 +1037,131 @@ namespace device {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  USB ポート専用切り替え
+			@param[in]	sel		USB ポート選択
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	odr		ポート・マップ・オプション（ポート候補）
+			@return 無効な場合「false」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool turn_usb(USB_PORT sel, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
+		{
+			if(odr == ORDER::BYPASS) return false;
+
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = true;
+			switch(sel) {
+			case USB_PORT::VBUS:
+				// P16 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B6 = 0;
+					MPC::P16PFS.PSEL = ena ? 0b010001 : 0;
+					PORT1::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::EXICEN:
+				// P21 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT2::PMR.B1 = 0;
+					MPC::P21PFS.PSEL = ena ? 0b010011 : 0;
+					PORT2::PMR.B1 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::VBUSEN:
+				// P16 o
+				// P24 o
+				// P32 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B6 = 0;
+					MPC::P16PFS.PSEL = ena ? 0b010010 : 0;
+					PORT1::PMR.B6 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT2::PMR.B4 = 0;
+					MPC::P24PFS.PSEL = ena ? 0b010011 : 0;
+					PORT2::PMR.B4 = ena;
+					break;
+				case ORDER::THIRD:
+					PORT3::PMR.B2 = 0;
+					MPC::P32PFS.PSEL = ena ? 0b010011 : 0;
+					PORT3::PMR.B2 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::OVRCURA:
+				// P14 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B4 = 0;
+					MPC::P14PFS.PSEL = ena ? 0b010010 : 0;
+					PORT1::PMR.B4 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::OVRCURB:
+				// P16 o
+				// P22 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B6 = 0;
+					MPC::P16PFS.PSEL = ena ? 0b010011 : 0;
+					PORT1::PMR.B6 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT2::PMR.B2 = 0;
+					MPC::P22PFS.PSEL = ena ? 0b010011 : 0;
+					PORT2::PMR.B2 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::ID:
+				// P20 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT2::PMR.B0 = 0;
+					MPC::P20PFS.PSEL = ena ? 0b010011 : 0;
+					PORT2::PMR.B0 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  SDHI ポート専用切り替え
 			@param[in]	sit		SHDI シチュエーション
 			@param[in]	opt		ポート・マップ・オプション（ポート候補）

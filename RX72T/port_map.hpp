@@ -686,6 +686,173 @@ namespace device {
 
 
 	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  USB ポート専用切り替え
+			@param[in]	sel		USB ポート選択
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	odr		ポート・マップ・オプション（ポート候補）
+			@return 無効な場合「false」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool turn_usb(USB_PORT sel, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
+		{
+			if(odr == ORDER::BYPASS) return false;
+
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = true;
+			switch(sel) {
+			case USB_PORT::VBUS:
+				switch(odr) {
+				// PC0 o
+				// PD2 o
+				case ORDER::FIRST:
+					PORTC::PMR.B0 = 0;
+					MPC::PC0PFS.PSEL = ena ? 0b010001 : 0;
+					PORTC::PMR.B0 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTD::PMR.B2 = 0;
+					MPC::PD2PFS.PSEL = ena ? 0b010001 : 0;
+					PORTD::PMR.B2 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::EXICEN:
+				// PA0 o
+				// PC1 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORTA::PMR.B0 = 0;
+					MPC::PA0PFS.PSEL = ena ? 0b010001 : 0;
+					PORTA::PMR.B0 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B1 = 0;
+					MPC::PC1PFS.PSEL = ena ? 0b010001 : 0;
+					PORTC::PMR.B1 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::VBUSEN:
+				// PA0 o
+				// PC1 o
+				// PB5 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORTA::PMR.B0 = 0;
+					MPC::PA0PFS.PSEL = ena ? 0b010010 : 0;
+					PORTA::PMR.B0 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B1 = 0;
+					MPC::PC1PFS.PSEL = ena ? 0b010010 : 0;
+					PORTC::PMR.B1 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTB::PMR.B5 = 0;
+					MPC::PB5PFS.PSEL = ena ? 0b010001 : 0;
+					PORTB::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::OVRCURA:
+				// PA1 o
+				// PB6 o
+				// PC2 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = ena ? 0b010010 : 0;
+					PORTA::PMR.B1 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTB::PMR.B6 = 0;
+					MPC::PB6PFS.PSEL = ena ? 0b010001 : 0;
+					PORTB::PMR.B6 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTC::PMR.B2 = 0;
+					MPC::PC2PFS.PSEL = ena ? 0b010010 : 0;
+					PORTC::PMR.B2 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::OVRCURB:
+				// P34 o
+				// PB4 o
+				// PB7 o
+				// PE0 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT3::PMR.B4 = 0;
+					MPC::P34PFS.PSEL = ena ? 0b010001 : 0;
+					PORT3::PMR.B4 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTB::PMR.B4 = 0;
+					MPC::PB4PFS.PSEL = ena ? 0b010001 : 0;
+					PORTB::PMR.B4 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTB::PMR.B7 = 0;
+					MPC::PB7PFS.PSEL = ena ? 0b010001 : 0;
+					PORTB::PMR.B7 = ena;
+					break;
+				case ORDER::FOURTH:
+					PORTE::PMR.B0 = 0;
+					MPC::PE0PFS.PSEL = ena ? 0b010001 : 0;
+					PORTE::PMR.B0 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::ID:
+				// PA1 o
+				// PC2 o
+				switch(odr) {
+				case ORDER::FIRST:
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = ena ? 0b010001 : 0;
+					PORTA::PMR.B1 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B2 = 0;
+					MPC::PC2PFS.PSEL = ena ? 0b010001 : 0;
+					PORTC::PMR.B2 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  周辺機器別ポート切り替え

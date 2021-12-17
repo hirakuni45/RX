@@ -79,6 +79,21 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  USB ポート型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class USB_PORT : uint8_t {
+			VBUS,		///< VBUS input
+			EXICEN,		///< EXICEN output
+			VBUSEN,		///< VBUSEN output
+			OVRCURA,	///< OVRCURA input
+			OVRCURB,	///< OVRCURB input
+			ID,			///< ID input
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  ポート・マッピング・ルネサス型 @n
 					ルネサス社が提供するボードに対する型
 		*/
