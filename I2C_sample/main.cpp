@@ -330,6 +330,10 @@ namespace {
 
 	void command_()
 	{
+		if(i2c_dev_idx_ >= 0) {
+			exec_cmd_.service();
+		}
+
 		if(cmd_.service()) {
 			if(i2c_dev_idx_ >= 0) {
 				if(exec_cmd_.analize()) {

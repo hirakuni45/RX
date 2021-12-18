@@ -58,7 +58,7 @@ namespace chip {
 
 	private:
 		// I2C アドレス：（R/W ビットを含まない７ビット値）
-		static const uint8_t ADR_ = 0b0101001;
+		static constexpr uint8_t ADR_ = 0b010'1001;
 
 	    enum class reg_addr : uint8_t {
 			SYSRANGE_START                              = 0x00,

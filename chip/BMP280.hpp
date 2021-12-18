@@ -28,7 +28,7 @@ namespace chip {
 	public:
 		// R/W ビットを含まない７ビット値
 		// ※ SDO:L ---> 0x76, SDO:H ---> 0x77
-		static const uint8_t I2C_ADR = 0x77;
+		static constexpr uint8_t I2C_ADR = 0x77;
 
 	private:
 		I2C_IO& i2c_io_;

@@ -102,6 +102,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/CALC_sample](./CALC_sample)|Generic Calculator Sample (gmp, mpfr library)|
 |[/DSOS_sample](./DSOS_sample)|Digital Storage Oscilloscope Sample|
 |[/PSG_sample](./PSG_sample)|Pseudo PSG music performance Sample|
+|[/I2C_sample](./I2C_sample)|I2C device access sample|
 |[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   
