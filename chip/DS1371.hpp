@@ -23,7 +23,7 @@ namespace chip {
 	template <class I2C_IO>
 	class DS1371 {
 
-		static const uint8_t	DS1371_ADR_ = 0x68;
+		static constexpr uint8_t	DS1371_ADR_ = 0x68;
 
 		I2C_IO&	i2c_;
 

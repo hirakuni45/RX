@@ -2,6 +2,8 @@
 //=====================================================================//
 /*!	@file
 	@brief	DS3231 RTC ドライバー @n
+			Maxim Integrated @n
+			https://datasheets.maximintegrated.com/en/ds/DS3231.pdf @n
 			中華製モジュールの注意点：@n
 			・バッテリーバックアップにリチウム電池を使う場合、直列抵抗を除く事
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -25,7 +27,7 @@ namespace chip {
 	class DS3231 {
 	public:
 		// R/W ビットを含まない７ビット値
-		static const uint8_t I2C_ADR = 0x68;
+		static constexpr uint8_t I2C_ADR = 0x68;
 
 	private:
 		I2C_IO&	i2c_io_;

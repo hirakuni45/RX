@@ -17,31 +17,55 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MX25L3233F テンプレートクラス
-		@param[in]	QSPI	QSPI 制御クラス
+		@param[in]	QSPI_IO	QSPI 制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class QSPI>
+	template <class QSPI_IO>
 	class MX25L3233F {
 
-		QSPI&	qspi_;
+		QSPI_IO&	qspi_io_;
+
+		enum class CMD : uint8_t {
+			READ = 0x03,	// read (4 + n)
+			FAST_READ = 0x0B,	// fast read (4 + n)
+			READ2 = 0xBB,	// 2 x I/O read
+			READD = 0x3B,	// 1l / 2O read
+			READ4 = 0xEB,	// 4 x I/O read
+			READQ = 0x6B,	// 1l / 4O read
+
+			WREN  = 0x06,	// write enable (1)
+		};
+
+		void send_command_(CMD cmd, uint32_t adr) noexcept
+		{
+			qspi_io_.xchg(static_cast<uint8_t>(cmd));
+
+
+		}
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	qspi	qspi 制御クラスを参照で渡す
+			@param[in]	qspi_io	qspi 制御クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		MX25L3233F(QSPI& qspi) noexcept : qspi_(qspi) { }
+		MX25L3233F(QSPI_IO& qspi_io) noexcept : qspi_io_(qspi_io) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
+			@return 正常なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		void start() noexcept
+		bool start() noexcept
 		{
+			if(!qspi_io_.start(4'000'000, QSPI_IO::PHASE::MODE0, QSPI_IO::DLEN::W8)) {
+				return false;
+			}
+
+			return true;
 		}
 
 
