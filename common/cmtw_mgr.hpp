@@ -21,7 +21,6 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class cmtw_base {
 	public:
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CMTW ベースクラス
@@ -36,13 +35,17 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  CMTW 管理クラス
-		@param[in]	CMTW	チャネルクラス
+		@param[in]	CMTW	チャネル・クラス
 		@param[in]	FUNC	タイマー動作、ファンクタクラス型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class CMTW, class FUNC = utils::null_task>
 	class cmtw_mgr : public cmtw_base {
+	public:
 
+		typedef CMTW value_type;	///< チャネル・クラス型
+
+	private:
 		uint8_t		level_;
 
 		void sleep_() const { asm("nop"); }
@@ -102,7 +105,7 @@ namespace device {
 
 			counter_ = 0;
 
-			auto vec = CMTW::get_ivec();
+			auto vec = CMTW::IVEC;
 			if(level_ > 0) {
 				icu_mgr::set_interrupt(vec, i_task_, level_);
 			    CMTW::CMCR = CMTW::CMCR.CKS.b(cks) | CMTW::CMCR.CMIE.b();

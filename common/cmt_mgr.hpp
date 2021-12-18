@@ -10,7 +10,6 @@
 //=========================================================================//
 #include "common/renesas.hpp"
 #include "common/intr_utils.hpp"
-#include "common/vect.h"
 
 namespace device {
 
@@ -24,6 +23,8 @@ namespace device {
 	template <class CMT, class TASK = utils::null_task>
 	class cmt_mgr {
 	public:
+		typedef CMT value_type;		///< CMT チャネル・クラス型
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  レジスタ直接型
@@ -78,7 +79,7 @@ namespace device {
 			@param[in]	direct	レジスタ直接設定値
 			@param[in]	cks		分周器設定型
 			@param[in]	level	割り込みレベル（０ならポーリング）
-			@param[in]	task	割り込み時に起動する関数 @n
+			@param[in]	task	割り込み時に起動する関数 (FreeRTOS 用) @n
 								※割り込み関数は属性「INTERRUPT_FUNC」を付加する。
 			@return タイマー周波数が範囲を超えた場合「false」を返す
 		*/
@@ -135,12 +136,12 @@ namespace device {
 			cmcor >>= 1;
 
 			uint8_t cks = 0;
-			while(cmcor > (65535 + 1)) {
+			while(cmcor > 65536) {
 				cmcor >>= 2;
 				++cks;
 			}
 
-			if(cks > 3 || cmcor == 0 || cmcor > 65536) {
+			if(cks > 3 || cmcor == 0) {
 				return false;
 			}
 
