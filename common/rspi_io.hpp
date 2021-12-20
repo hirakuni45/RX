@@ -112,13 +112,15 @@ namespace device {
 			@return 最大速度
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_max_speed() const noexcept {
-			uint32_t clk = RSPI::PCLK;
+		uint32_t get_max_speed() const noexcept
+		{
+			// 最大クロックは、PCLK の 1/2
+			uint32_t clk = RSPI::PCLK / 2;
 #ifdef SEEDA
-			while(clk > 20000000) {  // 15MHz
-//			while(clk > 10000000) {  // 7MHz
+			while(clk > 20'000'000) {  // 20MHz
+//			while(clk > 10000000) {  // 10MHz
 #else
-			while(clk > 40000000) {
+			while(clk > 40'000'000) {  // 最大 40MHz にしておく
 #endif
 				clk >>= 1;
 			}
