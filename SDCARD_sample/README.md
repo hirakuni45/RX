@@ -42,6 +42,7 @@ SD card access, sample program
 |RX64M|Soft SPI|○|
 |RX65N|SDHI|△|
 |RX72N|SDHI|△|
+|RX72T|RSPI|△|
 
 ※RTC is used to record the time when writing a file.   
 ※RX24T can use RTC with I2C connection.   
@@ -150,6 +151,21 @@ For power supply control ICs, general-purpose MOS-FETs were used because of avai
 |PC2|86|DAT3(1)|SELECT||
 |P82|79|-|Power CTRL|active-low|
 |P81|80|-|CardDetect|active-low|
+
+---
+
+### RX72T (RSPIc)
+
+|Port name|LFQFP100|SD pin|SD function|Remarks|
+|---|---|---|---|---|
+|P22(MISO)|67|DAT0(7)|SO|pull-up(22K)|
+|P21(MOSI)|68|CMD(2)|SI|damping-register(22)+pull-up(22K)|
+|P20(SPCK)|69|CLK(5)|SCLK|damping-register(22)+pull-up(22K)|
+|P30|63|DAT3(1)|SELECT|pull-up(22K)|
+|PA2|39|-|Power CTRL|active-high|
+|PB4|30|-|CardDetect|active-low|
+
+※[RX72T_100_PGA_USB board circuit](../RX72T/RX72T_100_PGA_USB)
 
 ---
 
@@ -378,6 +394,19 @@ Write Close: 4 [ms]
 
 Read Open:  1 [ms]
 Read: 1622 KBytes/Sec
+Read Close: 0 [ms]
+```
+
+### SPI Mode RX72T (RSPI)
+
+```
+Lexar 633X 16GB (SDHC) Class10
+Write Open:  200 [ms]
+Write: 151 KBytes/Sec
+Write Close: 17 [ms]
+
+Read Open:  2 [ms]
+Read: 654 KBytes/Sec
 Read Close: 0 [ms]
 ```
 

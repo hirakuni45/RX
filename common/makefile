@@ -75,7 +75,7 @@ endif
 
 ifeq ($(RX_DEF),SIG_RX72N)
   LIB_ROOT += ../../RX600/drw2d
-  INC_APP +=  ../../RX600/drw2d/inc/tes 
+  INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CPU = RX72N
   RX_OPT = v3
@@ -96,11 +96,11 @@ TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
 # Renesas GNU-RX (8.3.0) compiler 
 ifeq ($(TARGET_ISA_TEXT),)
-  # for gcc-7.5.0 current gcc source build
+  # for plain gcc-7.5.0 current gcc source build
   AS_DEFS		=	-mcpu=rx600
   CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
   CP_DEFS		=	-mcpu=rx600
-else # Renesas GNU-RX gcc 8.3.0
+else # Renesas GNU-RX gcc-8.3.0
   AS_DEFS		=	-misa=$(RX_OPT)
   CC_DEFS		=	-misa=$(RX_OPT)
   CP_DEFS		=	-misa=$(RX_OPT)
@@ -153,7 +153,7 @@ DEPENDS =   $(patsubst %.o,%.d, $(DOBJECTS))
 
 all: $(BUILD) $(TARGET).elf text
 
-$(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile
+$(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile ../../common/makefile
 	$(CC) $(LDFLAGS) $(LIBINCS) -o $@ $(OBJECTS) $(LIBS)
 	$(SIZE) $@
 
@@ -169,13 +169,13 @@ $(BUILD)/%.o : %.cpp
 	mkdir -p $(dir $@); \
 	$(CP) -c $(POPT) $(PFLAGS) $(PINCS) $(CPWARN) -o $@ $<
 
-$(BUILD)/%.d: %.c
+$(BUILD)/%.d: %.c Makefile
 	mkdir -p $(dir $@); \
 	$(CC) -MM -DDEPEND_ESCAPE $(COPT) $(CFLAGS) $(APPINCS) $< \
 	| sed 's/$(notdir $*)\.o:/$(subst /,\/,$(patsubst %.d,%.o,$@) $@):/' > $@ ; \
 	[ -s $@ ] || rm -f $@
 
-$(BUILD)/%.d: %.cpp
+$(BUILD)/%.d: %.cpp Makefile
 	mkdir -p $(dir $@); \
 	$(CP) -MM -DDEPEND_ESCAPE $(POPT) $(PFLAGS) $(APPINCS) $< \
 	| sed 's/$(notdir $*)\.o:/$(subst /,\/,$(patsubst %.d,%.o,$@) $@):/' > $@ ; \
@@ -208,16 +208,6 @@ bin: $(TARGET).bin
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
-
-# $(TARGET).opt: $(TARGET).elf
-#ifeq ($(FLAGS),$(FLAGS_CMP))
-#	@echo "eq..."
-#else
-#	@echo $(FLAGS) > $(TARGET).opt
-#	@echo "not eq..."
-#	@echo $(FLAGS)
-#	@echo $(FLAGS_CMP)
-#endif
 
 # Serial Flash write 
 run:
