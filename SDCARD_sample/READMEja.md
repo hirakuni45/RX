@@ -42,6 +42,8 @@ SD カード・アクセス、サンプルプログラム
 |RX64M|Soft SPI|○|
 |RX65N|SDHI|△|
 |RX72N|SDHI|△|
+|RX72T|RSPI|△|
+
 
 ※RTC はファイル書き込み時の時間を記録する為に利用しています。   
 ※RX24T では、I2C 接続の RTC を利用する事が出来ます。   
@@ -164,6 +166,21 @@ typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< 「�
 |PC2|86|DAT3(1)|SELECT||
 |P82|79|-|Power CTRL|active-low|
 |P81|80|-|CardDetect|active-low|
+
+---
+
+### RX72T (RSPIc)
+
+|ピン名|LFQFP100|SD ピン|SD 機能|備考|
+|---|---|---|---|---|
+|P22(MISO)|67|DAT0(7)|SO|pull-up(22K)|
+|P21(MOSI)|68|CMD(2)|SI|damping-register(22)+pull-up(22K)|
+|P20(SPCK)|69|CLK(5)|SCLK|damping-register(22)+pull-up(22K)|
+|P30|63|DAT3(1)|SELECT|pull-up(22K)|
+|PA2|39|-|Power CTRL|active-high|
+|PB4|30|-|CardDetect|active-low|
+
+※[RX72T_100_PGA_USB ボード回路図参照](../RX72T/RX72T_100_PGA_USB)
 
 ---
 
@@ -392,6 +409,19 @@ Write Close: 4 [ms]
 
 Read Open:  1 [ms]
 Read: 1622 KBytes/Sec
+Read Close: 0 [ms]
+```
+
+### SPI モード RX72T (RSPI)
+
+```
+Lexar 633X 16GB (SDHC) Class10
+Write Open:  200 [ms]
+Write: 151 KBytes/Sec
+Write Close: 17 [ms]
+
+Read Open:  2 [ms]
+Read: 654 KBytes/Sec
 Read Close: 0 [ms]
 ```
 

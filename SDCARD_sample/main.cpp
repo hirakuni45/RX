@@ -172,7 +172,33 @@ namespace {
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
+
+#elif defined(SIG_RX72T)
+	// RSPI I/F
+	static const char* system_str_ = { "RX72T" };
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+
+#if 0
+	// SDCARD 制御リソース（ソフト SPI）
+	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
+	typedef device::PORT<device::PORT2, device::bitpos::B1> MOSI;
+	typedef device::PORT<device::PORT2, device::bitpos::B0> SPCK;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;  ///< Soft SPI 定義
+#else
+	// RSPI 定義、FIRST: P20:RSPCK, P21:MOSI, P22:MISO
+	typedef device::rspi_io<device::RSPI0> SDC_SPI;
 #endif
+
+	SDC_SPI	sdc_spi_;
+	typedef device::PORT<device::PORT3, device::bitpos::B0> SDC_SELECT;			///< カード選択信号
+	typedef device::PORT<device::PORTA, device::bitpos::B2> SDC_POWER;			///< カード電源制御 MIC2076-1YM (ACTIVE-HIGH)
+	typedef device::PORT<device::PORTB, device::bitpos::B4, 0> SDC_DETECT;		///< カード検出（ACTIVE-LOW）
+	typedef device::NULL_PORT SDC_WPRT;											///< カード書き込み禁止ポート設定（無効）
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
+	SDC		sdc_(sdc_spi_, 20'000'000);
+#endif
+
 	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
@@ -245,6 +271,7 @@ namespace {
 	RTC		rtc_(i2c_);
 #endif
 
+// Renesas Envision Kit Touch Screen 定義 (RX65N/RX72N Envision Kit)
 #ifdef TOUCH_FILER
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
 
@@ -278,6 +305,7 @@ namespace {
 	TOUCH	touch_(ft5206_i2c_);
 #endif
 
+	// ファイル書き込みテスト
 	bool write_test_(const char* fname, uint32_t size)
 	{
 		utils::format("Write: '%s'\n") % fname;
@@ -323,6 +351,7 @@ namespace {
 	}
 
 
+	// ファイル読出しテスト
 	void read_test_(const char* fname, uint32_t size)
 	{
 		utils::format("Read: '%s'\n") % fname;
@@ -435,6 +464,7 @@ extern "C" {
 		return sci_.recv_length();
 	}
 
+	// FatFs から呼ばれるファイル操作関数
 	DSTATUS disk_initialize(BYTE drv) {
 		return sdc_.disk_initialize(drv);
 	}
