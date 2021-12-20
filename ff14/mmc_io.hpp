@@ -15,7 +15,7 @@
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
-/// #define DEBUG_MMC
+#define DEBUG_MMC
 
 namespace fatfs {
 
@@ -32,7 +32,10 @@ namespace fatfs {
 	template <class SPI, class SEL, class POW, class CDT, class WPR>
 	class mmc_io {
 
-		static const BYTE DO_MOUNT_INIT = 1;	///< マウント時に初期化を行う場合「１」
+		static constexpr BYTE DO_MOUNT_INIT = 1;	///< マウント時に初期化を行う場合「１」
+
+//		typedef utils::format debug_format;
+		typedef utils::null_format debug_format;
 
 		inline void lock_() {
 #ifdef RTOS
@@ -119,13 +122,10 @@ namespace fatfs {
 			lock_();
 			SEL::P = 0;
 			unlock_();
-#ifdef DEBUG_MMC
-			utils::format("Select port: %d\n") % static_cast<uint32_t>(SEL::P());
-#endif
+			debug_format("Select port: %d\n") % static_cast<uint32_t>(SEL::P());
 			volatile BYTE d = spi_.xchg();	/* Dummy clock (force DO enabled) */
-#ifdef DEBUG_MMC
-			utils::format("Select dummy: 0x%02X\n") % static_cast<uint32_t>(d);
-#endif
+			debug_format("Select dummy: 0x%02X\n") % static_cast<uint32_t>(d);
+
 			if (wait_ready_()) return 1;	/* Wait for card ready */
 			deselect_();
 			return 0;			/* Failed */
@@ -145,11 +145,10 @@ namespace fatfs {
 				utils::delay::micro_second(100);
 			}
 			if (d[0] != 0xFE) return 0;		/* If not valid data token, return with error */
-#ifdef DEBUG_MMC
-			utils::format("rcvr_datablock_: 0x%08X, %d\n") % (uint32_t)(buff)
+
+			debug_format("rcvr_datablock_: 0x%08X, %d\n") % (uint32_t)(buff)
 				% static_cast<uint32_t>(btr);
-			utils::delay::micro_second(100000);
-#endif
+
 			spi_.recv(buff, btr);			/* Receive the data block into buffer */
 			spi_.recv(d, 2);				/* Discard CRC */
 			return 1;						/* Return with success */
@@ -180,9 +179,7 @@ namespace fatfs {
 
 		BYTE send_cmd_(command cmd, DWORD arg) {
 
-#ifdef DEBUG_MMC
-			utils::format("send_cmd_: 0x%02X, 0x%08X\n") % static_cast<uint32_t>(cmd) % static_cast<uint32_t>(arg);
-#endif
+			debug_format("send_cmd_: 0x%02X, 0x%08X\n") % static_cast<uint32_t>(cmd) % static_cast<uint32_t>(arg);
 			uint8_t c = static_cast<uint8_t>(cmd);
 			if (c & 0x80) {	/* ACMD<n> is the command sequense of CMD55-CMD<n> */
 				c &= 0x7F;
@@ -197,10 +194,9 @@ namespace fatfs {
 ///				utils::format("Select...\n");
 				if (!select_()) return 0xFF;
 			}
-#ifdef DEBUG_MMC
-			utils::format("SEL: %d\n") % static_cast<int>(SEL::P());
-			utils::format("CMD: 0x%02X\n") % static_cast<uint32_t>(cmd);
-#endif
+			debug_format("SEL: %d\n") % static_cast<int>(SEL::P());
+			debug_format("CMD: 0x%02X\n") % static_cast<uint32_t>(cmd);
+
 			/* Send a command packet */
 			BYTE buf[6];
 			buf[0] = 0x40 | c;						/* Start + Command index */
@@ -235,11 +231,11 @@ namespace fatfs {
 				speed = spi_.get_max_speed();
 				if(speed > limitc_) speed = limitc_;
 			} else {
-				speed = 400000;  // 初期化時、400Kbits/s
+				speed = 400'000;  // 初期化時、400Kbits/s
 			}
 /// utils::format("Entry SPI start_sdc\n");
 			if(!spi_.start_sdc(speed)) {
-				utils::format("CSI Start fail ! (Clock spped over range)\n");
+				debug_format("CSI Start fail ! (Clock spped over range)\n");
 			}
 /// utils::format("Final SPI start_sdc\n");
 		}
@@ -267,7 +263,7 @@ namespace fatfs {
 		{
 			if(init_port_) return;
 
-			if(POW::BIT_POS < 32) {
+			if(POW::BIT_POS < 32) {  // POW が有効な場合
 				lock_();
 				POW::DIR = 1;
 				POW::P = 0;  // power off
@@ -278,7 +274,7 @@ namespace fatfs {
 			  // ※電源 OFF 時は、SEL を「１」にすると、SEL から電流が流れるので、「０」にする
 				SEL::P = 0;
 				unlock_();
-			} else {
+			} else {  // POW が無効な場合
 				lock_();
 				SEL::DIR = 1;
 				SEL::PU = 0;
@@ -374,9 +370,7 @@ namespace fatfs {
 					}
 				}
 			} else {
-#ifdef DEBUG_MMC
-				utils::format("Idle state error...\n");
-#endif
+				debug_format("Idle state error...\n");
 			}
 			CardType_ = ty;
 			DSTATUS s = ty ? 0 : STA_NOINIT;
@@ -386,9 +380,8 @@ namespace fatfs {
 
 			start_spi_(true);
 
-#ifdef DEBUG_MMC
-			utils::format("init ret: cardtype: %d\n") % static_cast<uint32_t>(ty);
-#endif
+			debug_format("init ret: cardtype: %d\n") % static_cast<uint32_t>(ty);
+
 			return s;
 		}
 
@@ -517,7 +510,7 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	サービス @n
-					※チャタリング除去を行う為、最大で、60Hz 間隔で呼び出す。
+					※チャタリング除去を行う為、最大で、5ms ～ 20ms 間隔程度で呼び出す。
 			@return カードがマウントされたら「true」
 		 */
 		//-----------------------------------------------------------------//
@@ -525,17 +518,30 @@ namespace fatfs {
 		{
 			start();
 
-			auto st = !CDT::P();
-			if(st) {
+#if 0
+			static bool nnn = false;
+			if(nnn != CDT::P()) {
+				nnn = CDT::P();
+				utils::format("Card: %d\n") % static_cast<uint16_t>(nnn);
+			}
+#endif
+
+			bool cd_back = cd_;
+			if(CDT::P()) {
 				if(select_wait_ < 255) {
 					++select_wait_;
 				}
+				if(select_wait_ >= 10) {  // 10 フレーム以上連続して有効になったら、「ON」とする。
+					cd_ = 1;
+				}
 			} else {
 				select_wait_ = 0;
+				cd_ = 0;
 			}
-			if(!cd_ && select_wait_ >= 10) {
+
+			if(cd_ && !cd_back) {  // カードが挿入された！
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
-				if(POW::BIT_POS < 32) {
+				if(POW::BIT_POS < 32) {  // POW が有効な場合
 					lock_();
 					POW::P = 1;
 					SEL::P = 1;
@@ -545,11 +551,10 @@ namespace fatfs {
 					SEL::P = 1;
 					unlock_();
 				}
-/// utils::format("Card ditect signal\n");
-			} else if(cd_ && select_wait_ == 0) {
+				debug_format("Card ditect signal\n");
+			} else if(!cd_ && cd_back) {  // カードが外された！
 				f_mount(nullptr, "", 0);  // 登録抹消（nullptr）
-///				spi_.destroy();
-				if(POW::BIT_POS < 32) {
+				if(POW::BIT_POS < 32) {  // POW が有効な場合
 					lock_();
 					POW::P = 0;
 					SEL::P = 0;
@@ -560,19 +565,18 @@ namespace fatfs {
 					unlock_();
 				}
 				mount_ = false;
-/// utils::format("Card unditect signal\n");
+				debug_format("Card unditect signal\n");
 			}
-			if(select_wait_ >= 10) cd_ = true;
-			else cd_ = false;
 
 			if(mount_delay_) {
 				--mount_delay_;
 				if(mount_delay_ == 0) {
+					debug_format("Start f_mount\n");
 					auto st = f_mount(&fatfs_, "", DO_MOUNT_INIT);
 					if(st != FR_OK) {
 						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();
-						if(POW::BIT_POS < 32) {
+						if(POW::BIT_POS < 32) {  // 電源制御がある場合
 							lock_();
 							POW::P = 0;
 							SEL::P = 0;
@@ -583,7 +587,7 @@ namespace fatfs {
 							unlock_();
 						}
 						mount_ = false;
-						init_port_ = false;  // 再マウント
+						select_wait_ = 0;
 					} else {
 						mount_ = true;
 					}
