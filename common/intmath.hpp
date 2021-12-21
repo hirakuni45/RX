@@ -204,10 +204,10 @@ static short randTapTables[] = {
 		@param[in]	alp		1 周期のループ数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static void build_sincos(sincos_t& t, int16_t alp)
+	static void build_sincos(sincos_t& t, int32_t alp)
 	{
-		static const uint32_t pai_ = 0xC90FDAA2;	///< 円周率(3.141592654 * 2^30)
-		static const uint32_t pai_shift_ = 30;		///< 円周率、小数点位置
+		static constexpr uint32_t pai_ = 0xC90FDAA2;	///< 円周率(3.141592654 * 2^30)
+		static constexpr uint32_t pai_shift_ = 30;		///< 円周率、小数点位置
 		t.x -= ((static_cast<int64_t>(pai_) * t.y) >> (pai_shift_ - 1)) / alp;
 		t.y += ((static_cast<int64_t>(pai_) * t.x) >> (pai_shift_ - 1)) / alp;
 	}
