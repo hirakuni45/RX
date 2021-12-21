@@ -74,6 +74,7 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
 	SDC		sdc_(sdc_spi_, 20'000'000);
+
 	typedef device::iica_io<device::RIIC0> I2C;
 	typedef chip::DS3231<I2C> RTC;
 	#define ENABLE_I2C_RTC
@@ -197,6 +198,10 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;											///< カード書き込み禁止ポート設定（無効）
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
 	SDC		sdc_(sdc_spi_, 20'000'000);
+
+	#define ENABLE_I2C_RTC
+	typedef device::iica_io<device::RIIC0> I2C;
+	typedef chip::DS3231<I2C> RTC;
 #endif
 
 	typedef device::system_io<> SYSTEM_IO;
@@ -331,6 +336,7 @@ namespace {
 			UINT sz = sizeof(buff);
 			if(sz > rs) sz = rs;
 			auto bw = fio.write(buff, sz);
+			LED::P = !LED::P();
 			rs -= bw;
 		}
 		ed = cmt_.get_counter();
@@ -373,6 +379,7 @@ namespace {
 			if(sz > rs) sz = rs;
 			auto s = fin.read(buff, sz);
 			if(s == 0) break;
+			LED::P = !LED::P();
 			rs -= s;
 		}
 		ed = cmt_.get_counter();

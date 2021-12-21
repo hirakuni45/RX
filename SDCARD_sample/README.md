@@ -408,6 +408,16 @@ Write Close: 17 [ms]
 Read Open:  2 [ms]
 Read: 654 KBytes/Sec
 Read Close: 0 [ms]
+
+-----------------------------------------
+TOSHIBA 40MB/s 32GB (SDHC) Class10
+Write Open:  0 [ms]
+Write: 122 KBytes/Sec
+Write Close: 40 [ms]
+
+Read Open:  0 [ms]
+Read: 522 KBytes/Sec
+Read Close: 0 [ms]
 ```
 
 Since the test is in units of 512 bytes, I think that it is much faster when running continuously.   
