@@ -423,6 +423,16 @@ Write Close: 17 [ms]
 Read Open:  2 [ms]
 Read: 654 KBytes/Sec
 Read Close: 0 [ms]
+
+-----------------------------------------
+TOSHIBA 40MB/s 32GB (SDHC) Class10
+Write Open:  0 [ms]
+Write: 122 KBytes/Sec
+Write Close: 40 [ms]
+
+Read Open:  0 [ms]
+Read: 522 KBytes/Sec
+Read Close: 0 [ms]
 ```
 
 テストは５１２バイト単位である為、連続で行う場合、もっと高速だと思います。   
