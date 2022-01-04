@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M/RX65x/RX66T グループ・R12DA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,7 +26,7 @@ namespace device {
 	template <peripheral per>
 	struct r12da_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!

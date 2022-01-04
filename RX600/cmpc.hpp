@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T/RX66T グループ・CMPC 定義
+	@brief	RX24T/RX66T/RX72T グループ・CMPC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,8 +28,8 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct cmpc_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto IVEC = ivec;			///< 割り込みベクター
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto IVEC = ivec;			///< 割り込みベクター
 
 
 		//-----------------------------------------------------------------//

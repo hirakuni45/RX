@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・S12ADC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -25,8 +25,8 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi>
 	struct s12adc_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto CMP_VEC = cmpi;		///< CMP 割り込みベクター
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto CMP_VEC = cmpi;		///< CMP 割り込みベクター
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -479,7 +479,7 @@ namespace device {
 			@brief	アナログ入力数
 		*/
 		//-----------------------------------------------------------------//		
-		static const uint32_t analog_num_ = 8;
+		static constexpr uint32_t analog_num_ = 8;
 
 
 		//-----------------------------------------------------------------//
@@ -857,7 +857,7 @@ namespace device {
 			@brief	アナログ入力数
 		*/
 		//-----------------------------------------------------------------//		
-		static const uint32_t analog_num_ = 20;
+		static constexpr uint32_t analog_num_ = 20;
 
 
 		//-----------------------------------------------------------------//

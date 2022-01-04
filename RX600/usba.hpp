@@ -4,7 +4,7 @@
 	@brief	RX600 グループ・USBA 定義 @n
 			RX64M/RX71M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,10 +26,10 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
 	struct usba_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto R_VEC = rvec;		///< R 割り込み Vector
-		static const auto D0_VEC = d0vec;	///< D0 割り込み Vector
-		static const auto D1_VEC = d1vec;	///< D0 割り込み Vector
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto R_VEC = rvec;		///< R 割り込み Vector
+		static constexpr auto D0_VEC = d0vec;	///< D0 割り込み Vector
+		static constexpr auto D1_VEC = d1vec;	///< D0 割り込み Vector
 
 
 		//-----------------------------------------------------------------//

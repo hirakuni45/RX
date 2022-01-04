@@ -22,7 +22,7 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct pmgi_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

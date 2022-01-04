@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・RTC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,7 +11,7 @@
 #include "common/device.hpp"
 
 /// RTC モジュールが無いデバイスでエラーとする
-#if defined(SIG_RX24T) || defined(SIG_RX66T)
+#if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
   #error "rtc.hpp: This module does not exist"
 #endif
 
@@ -26,7 +26,7 @@ namespace device {
 	template <peripheral per>
 	struct rtc_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!

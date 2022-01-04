@@ -78,6 +78,9 @@ namespace device {
 
 		RTC,		///< リアルタイムクロック
 
+		WDTA,		///< ウォッチドッグタイマ
+		IWDT,		///< 独立ウォッチドッグタイマ
+
 		ETHERC0,	///< イーサネットコントローラ 0
 		EDMAC0,		///< Ethernet DMA 0
 

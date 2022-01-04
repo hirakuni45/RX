@@ -25,10 +25,10 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
 	struct rspi_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto TX_VEC = txv;		///< 受信割り込みベクター
-		static const auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static const uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -437,8 +437,11 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  BYSW;
 		};
-		static spdcr2_t<base + 0x20> SPDCR2;
+		typedef spdcr2_t<base + 0x20> SPDCR2_;
+		static SPDCR2_ SPDCR2;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_c_t<base, per, txv, rxv, pclk>::SPDCR2_ rspi_c_t<base, per, txv, rxv, pclk>::SPDCR2;
 
 
 #if defined(SIG_RX24T)

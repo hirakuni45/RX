@@ -4,7 +4,7 @@
 	@brief	ポートアウトプットイネーブル 3（POE3）定義 @n
 			RX64M, RX71M, RX65N, RX651, RX66T, RX24T
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,34 +23,34 @@ namespace device {
 	template <uint32_t org, peripheral per>
 	struct poe3_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
 #if defined(SIG_RX24T)
 		/// アウトプットイネーブル割り込み 1 POE0F, OSF1
-		static const auto OEI1_VEC = ICU::VECTOR::OEI1;
+		static constexpr auto OEI1_VEC = ICU::VECTOR::OEI1;
 		/// アウトプットイネーブル割り込み 2 POE4F, OSF2
-		static const auto OEI2_VEC = ICU::VECTOR::OEI2;
+		static constexpr auto OEI2_VEC = ICU::VECTOR::OEI2;
 		/// アウトプットイネーブル割り込み 3 POE8F, RX66T: POE8F, POE9F
-		static const auto OEI3_VEC = ICU::VECTOR::OEI3;
+		static constexpr auto OEI3_VEC = ICU::VECTOR::OEI3;
 		/// アウトプットイネーブル割り込み 4 POE10F, OSF11F
-		static const auto OEI4_VEC = ICU::VECTOR::OEI4;
+		static constexpr auto OEI4_VEC = ICU::VECTOR::OEI4;
 		/// アウトプットイネーブル割り込み 5 POE4F, OSF12F
-		static const auto OEI5_VEC = ICU::VECTOR::OEI5;
+		static constexpr auto OEI5_VEC = ICU::VECTOR::OEI5;
 
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
 		/// アウトプットイネーブル割り込み 1 POE0F, OSF1
-		static const auto OEI1_VEC = ICU::VECTOR_BL1::OEI1;
+		static constexpr auto OEI1_VEC = ICU::VECTOR_BL1::OEI1;
 		/// アウトプットイネーブル割り込み 2 POE4F, OSF2
-		static const auto OEI2_VEC = ICU::VECTOR_BL1::OEI2;
+		static constexpr auto OEI2_VEC = ICU::VECTOR_BL1::OEI2;
 		/// アウトプットイネーブル割り込み 3 POE8F
-		static const auto OEI3_VEC = ICU::VECTOR_BL1::OEI3;
+		static constexpr auto OEI3_VEC = ICU::VECTOR_BL1::OEI3;
 		/// アウトプットイネーブル割り込み 4 POE10F, OSF11F
-		static const auto OEI4_VEC = ICU::VECTOR_BL1::OEI4;
+		static constexpr auto OEI4_VEC = ICU::VECTOR_BL1::OEI4;
 
 #if defined(SIG_RX66T)
 		/// アウトプットイネーブル割り込み 5 POE12F, OSF13F, POE14F, OSF3, OSF4, OSF5
-		static const auto OEI5_VEC = ICU::VECTOR_BL1::OEI5;
+		static constexpr auto OEI5_VEC = ICU::VECTOR_BL1::OEI5;
 #endif
 #endif
 

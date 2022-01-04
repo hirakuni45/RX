@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・SSI 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,10 +26,10 @@ namespace device {
 		ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL1 ssif>
 	struct ssi_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto TX_VEC = txv;		///< 送信データエンプティ割り込みベクタ
-		static const auto RX_VEC = rxv;		///< 受信データフル割り込みベクタ
-		static const auto SS_VEC = ssif;	///< ステータス割り込み
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 送信データエンプティ割り込みベクタ
+		static constexpr auto RX_VEC = rxv;		///< 受信データフル割り込みベクタ
+		static constexpr auto SS_VEC = ssif;	///< ステータス割り込み
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

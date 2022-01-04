@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M グループ・PDC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,10 +21,10 @@ namespace device {
 	template <peripheral per>
 	struct pdc_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto VEC_DFI = ICU::VECTOR::PCDFI;		///< 受信データレディ割り込み
-		static const auto VEC_FEI = ICU::VECTOR_BL0::PCFEI;	///< フレームエンド割り込み
-		static const auto VEC_ERI = ICU::VECTOR_BL0::PCERI;	///< エラー割り込み
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto VEC_DFI = ICU::VECTOR::PCDFI;		///< 受信データレディ割り込み
+		static constexpr auto VEC_FEI = ICU::VECTOR_BL0::PCFEI;	///< フレームエンド割り込み
+		static constexpr auto VEC_ERI = ICU::VECTOR_BL0::PCERI;	///< エラー割り込み
 
 		//-----------------------------------------------------------------//
 		/*!

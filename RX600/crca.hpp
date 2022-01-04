@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CRCA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,7 +22,7 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct crca_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!

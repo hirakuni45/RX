@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ　DTCa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,7 +21,7 @@ namespace device {
 	template <peripheral per>
 	struct dtc_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -118,7 +118,6 @@ namespace device {
 	template <peripheral per> typename dtc_t<per>::DTCADMOD_ dtc_t<per>::DTCADMOD;
 	template <peripheral per> typename dtc_t<per>::DTCST_ dtc_t<per>::DTCST;
 	template <peripheral per> typename dtc_t<per>::DTCSTS_ dtc_t<per>::DTCSTS;
-
 
 	typedef dtc_t<peripheral::DTC>  DTC;
 }

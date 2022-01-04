@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・ペリフェラル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016,2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016,2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,7 @@ namespace device {
 		@brief  ペリフェラル種別
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class peripheral {
+	enum class peripheral : uint16_t {
 
 		CAC,	///< クロック周波数精度測定回路
 
@@ -27,6 +27,8 @@ namespace device {
 		CMT1,	///< コンペアマッチタイマー１
 		CMT2,	///< コンペアマッチタイマー２
 		CMT3,	///< コンペアマッチタイマー３
+
+		IWDT,	///< 独立ウォッチドッグタイマ
 
 		RIIC0,	///< I 2 C バスインタフェース０
 
