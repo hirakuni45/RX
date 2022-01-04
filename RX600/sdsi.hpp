@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・SDSI 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,7 +26,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi>
 	struct sdsi_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 //		static const auto CDET_VEC = cdeti;	///< カード検出割り込み・ベクタ
 //		static const auto CAC_VEC  = caci;	///< カードアクセス割り込み・ベクタ
 //		static const auto SDAC_VEC = sdaci;	///< SDIO アクセス割り込み・ベクタ

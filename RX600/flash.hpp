@@ -22,9 +22,9 @@ namespace device {
 	template <uint32_t dsize, uint32_t idnum>
 	struct flash_t {
 
-		static const auto DATA_SIZE = dsize;
-		static const uint32_t DATA_BLOCK_SIZE = 64;
-		static const auto ID_NUM = idnum;
+		static constexpr auto DATA_SIZE = dsize;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;
+		static constexpr auto ID_NUM = idnum;
 
 		//-----------------------------------------------------------------//
 		/*!

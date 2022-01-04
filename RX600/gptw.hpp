@@ -36,22 +36,22 @@ namespace device {
 		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
 	struct gptw_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto CHANNEL_NO = static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::GPTW0);	///< チャネル番号
-		static const auto GTCIA = gtcia;	///< GTCIAn 割り込みベクタ
-		static const auto GTCIB = gtcib;	///< GTCIBn 割り込みベクタ
-		static const auto GTCIC = gtcic;	///< GTCICn 割り込みベクタ
-		static const auto GTCID = gtcid;	///< GTCIDn 割り込みベクタ
-		static const auto GDTE  = gdte;		///< GDTEn  割り込みベクタ
-		static const auto GTCIE = gtcie;	///< GTCIEn 割り込みベクタ
-		static const auto GTCIF = gtcif;	///< GTCIFn 割り込みベクタ
-		static const auto GTCIU = gtciu;	///< GTCIUn 割り込みベクタ
-		static const auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto CHANNEL_NO = static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::GPTW0);	///< チャネル番号
+		static constexpr auto GTCIA = gtcia;	///< GTCIAn 割り込みベクタ
+		static constexpr auto GTCIB = gtcib;	///< GTCIBn 割り込みベクタ
+		static constexpr auto GTCIC = gtcic;	///< GTCICn 割り込みベクタ
+		static constexpr auto GTCID = gtcid;	///< GTCIDn 割り込みベクタ
+		static constexpr auto GDTE  = gdte;		///< GDTEn  割り込みベクタ
+		static constexpr auto GTCIE = gtcie;	///< GTCIEn 割り込みベクタ
+		static constexpr auto GTCIF = gtcif;	///< GTCIFn 割り込みベクタ
+		static constexpr auto GTCIU = gtciu;	///< GTCIUn 割り込みベクタ
+		static constexpr auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
 
 #if defined(SIG_RX66T) || defined(SIG_RX72T)
-		static const uint32_t PCLK = clock_profile::PCLKC;	///< カウント基準クロック
+		static constexpr uint32_t PCLK = clock_profile::PCLKC;	///< カウント基準クロック
 #elif defined(SIG_RX72N) || defined(SIG_RX72M)
-		static const uint32_t PCLK = clock_profile::PCLKA;	///< カウント基準クロック
+		static constexpr uint32_t PCLK = clock_profile::PCLKA;	///< カウント基準クロック
 #endif
 
 

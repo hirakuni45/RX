@@ -17,15 +17,15 @@ namespace device {
 		@brief  CMT 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
-		@param[in]	VEC		ベクター型
+		@param[in]	VEC		割り込みベクター型
 		@param[in]	ivec	割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
 	struct cmt_t {
 
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto IVEC = ivec;			///< 割り込みベクター
+		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
+		static constexpr auto IVEC = ivec;					///< 割り込みベクター
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

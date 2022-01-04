@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX700 グループ・SSIE 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -27,10 +27,10 @@ namespace device {
 		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
 	struct ssie_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto TX_VEC = txi;		///< 送信データエンプティ割り込みベクタ
-		static const auto RX_VEC = rxi;		///< 受信データフル割り込みベクタ
-		static const auto SS_VEC = ssie;	///< ステータス割り込みベクタ
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txi;		///< 送信データエンプティ割り込みベクタ
+		static constexpr auto RX_VEC = rxi;		///< 受信データフル割り込みベクタ
+		static constexpr auto SS_VEC = ssie;	///< ステータス割り込みベクタ
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -21,7 +21,7 @@ namespace device {
 	template <peripheral per>
 	struct hrpwm_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//=================================================================//
 		/*!

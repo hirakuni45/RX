@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX24T/RX66T CAC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -25,10 +25,10 @@ namespace device {
 	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff>
 	struct cac_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto FERR_VEC = ferr;		///< 周波数エラー割り込みベクター
-		static const auto MEND_VEC = mend;		///< 測定終了割り込みベクター
-		static const auto OVFF_VEC = ovff;		///< オーバーフロー割り込みベクター
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto FERR_VEC = ferr;		///< 周波数エラー割り込みベクター
+		static constexpr auto MEND_VEC = mend;		///< 測定終了割り込みベクター
+		static constexpr auto OVFF_VEC = ovff;		///< オーバーフロー割り込みベクター
 
 
 		//-----------------------------------------------------------------//
@@ -168,7 +168,6 @@ namespace device {
 		typedef rw16_t<0x0008B00A>  CACNTBR_;
 		static  CACNTBR_ CACNTBR;
 	};
-
 	template <peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::  CACR0_ cac_t<per, INT, ferr, mend, ovff>::CACR0;
 	template <peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::  CACR1_ cac_t<per, INT, ferr, mend, ovff>::CACR1;
 	template <peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::  CACR2_ cac_t<per, INT, ferr, mend, ovff>::CACR2;

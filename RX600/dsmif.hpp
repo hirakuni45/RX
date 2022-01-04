@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX700 グループ Δ-Σモジュレータインタフェース定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,10 +26,10 @@ namespace device {
 		ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi>
 	struct dsmif_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto OCD_VEC  = ocdi;	///< 過電流検出割り込み
-		static const auto SUME_VEC = sumei;	///< 合計電流エラー割り込み
-		static const auto SCD_VEC  = scdi;	///< 短絡検出割り込み
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto OCD_VEC  = ocdi;	///< 過電流検出割り込み
+		static constexpr auto SUME_VEC = sumei;	///< 合計電流エラー割り込み
+		static constexpr auto SCD_VEC  = scdi;	///< 短絡検出割り込み
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -283,7 +283,6 @@ namespace device {
 		static  DSCHR_ DSCHR;
 	};
 	typedef dsmif_<void> DSMIF;
-
 
 	template <class _> typename dsmif_<_>::DSCCR_ dsmif_<_>::DSCCR;
 	template <class _> typename dsmif_<_>::DSCHR_ dsmif_<_>::DSCHR;

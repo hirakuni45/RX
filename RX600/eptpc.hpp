@@ -4,7 +4,7 @@
 	@brief	RX64M/RX71M グループ EPTPC 定義 @n
 			RX72M/RX72N グループ EPTPCb
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,7 +22,7 @@ namespace device {
 	template <peripheral per>
 	struct eptpc_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -940,7 +940,7 @@ namespace device {
 	template <uint32_t ofs, peripheral per>
 	struct eptpcx_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!

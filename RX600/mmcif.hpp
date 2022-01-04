@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65N/RX651 マルチメディアカードインタフェース（MMCIF）定義
+	@brief	マルチメディアカードインタフェース（MMCIF）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,11 +22,11 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct mmcif_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto ACC_VEC  = ICU::VECTOR_BL1::ACCIO;
-		static const auto ERR_VEC  = ICU::VECTOR_BL1::ERRIO;
-		static const auto CDET_VEC = ICU::VECTOR_BL1::CDETIO;
-		static const auto MBFA_VEC = ICU::VECTOR::MBFAI;
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto ACC_VEC  = ICU::VECTOR_BL1::ACCIO;
+		static constexpr auto ERR_VEC  = ICU::VECTOR_BL1::ERRIO;
+		static constexpr auto CDET_VEC = ICU::VECTOR_BL1::CDETIO;
+		static constexpr auto MBFA_VEC = ICU::VECTOR::MBFAI;
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

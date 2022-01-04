@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T/RX66T/RX64M/RX71M/RX65N RIICa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,11 +28,11 @@ namespace device {
 		typename INT, INT eev, INT tev>
 	struct riic_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto TX_VEC = txv;		///< 受信割り込みベクター
-		static const auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static const auto EE_VEC = eev;		///< 通信エラー、イベント割り込みベクター
-		static const auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto EE_VEC = eev;		///< 通信エラー、イベント割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

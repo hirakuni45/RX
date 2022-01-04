@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX65x/RX72x グループ・S12ADFa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,9 +24,9 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec>
 	struct s12adf_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto CMPA_VEC   = avec;	///< CMPA 割り込みベクター
-		static const auto CMPB_VEC   = bvec;	///< CMPB 割り込みベクター
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto CMPA_VEC   = avec;	///< CMPA 割り込みベクター
+		static constexpr auto CMPB_VEC   = bvec;	///< CMPB 割り込みベクター
 
 		//-----------------------------------------------------------------//
 		/*!

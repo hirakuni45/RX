@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・WDTA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,15 +16,17 @@ namespace device {
 	/*!
 		@brief  wdta 定義基底クラス
 		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
 		@param[in]	ivec	割り込み要因
 		@param[in]	pclk	マスタークロック
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
 	struct wdta_t {
 
-		static const auto IVEC = ivec;	///< 割り込みベクター
-		static const auto PCLK = pclk;	///< マスタークロック周波数
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto IVEC = ivec;		///< 割り込みベクター
+		static constexpr auto PCLK = pclk;		///< マスタークロック周波数
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -102,15 +104,14 @@ namespace device {
 		typedef wdtrcr_t<base + 0x06> WDTRCR_;
 		static WDTRCR_ WDTRCR;
 	};
-	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
-		typename wdta_t<base, ivec, pclk>::WDTRR_ wdta_t<base, ivec, pclk>::WDTRR;
-	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
-		typename wdta_t<base, ivec, pclk>::WDTCR_ wdta_t<base, ivec, pclk>::WDTCR;
-	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
-		typename wdta_t<base, ivec, pclk>::WDTSR_ wdta_t<base, ivec, pclk>::WDTSR;
-	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
-		typename wdta_t<base, ivec, pclk>::WDTRCR_ wdta_t<base, ivec, pclk>::WDTRCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
+		typename wdta_t<base, per, ivec, pclk>::WDTRR_ wdta_t<base, per, ivec, pclk>::WDTRR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
+		typename wdta_t<base, per, ivec, pclk>::WDTCR_ wdta_t<base, per, ivec, pclk>::WDTCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
+		typename wdta_t<base, per, ivec, pclk>::WDTSR_ wdta_t<base, per, ivec, pclk>::WDTSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
+		typename wdta_t<base, per, ivec, pclk>::WDTRCR_ wdta_t<base, per, ivec, pclk>::WDTRCR;
 
-
-	typedef wdta_t<0x00088020, ICU::VECTOR::WUNI, clock_profile::PCLKB> WDT;
+	typedef wdta_t<0x00088020, peripheral::WDTA, ICU::VECTOR::WUNI, clock_profile::PCLKB> WDT;
 }

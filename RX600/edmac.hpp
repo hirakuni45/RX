@@ -4,7 +4,7 @@
 	@brief	イーサネットコントローラ用 DMA コントローラ (EDMACa) @n
 			RX64M/RX71M/RX65N/RX72M/RX72N/RX66N
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,7 +12,7 @@
 #include "common/device.hpp"
 
 /// EDMAC モジュールが無いデバイスでエラーとする
-#if defined(SIG_RX24T) || defined(SIG_RX66T)
+#if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 #  error "edmac.hpp: This module does not exist"
 #endif
 
@@ -28,7 +28,7 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct edmac_core_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -365,7 +365,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
 	struct edmac_t : public edmac_core_t<base, per> {
 
-		static const auto EINT = eint;
+		static constexpr auto EINT = eint;
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
