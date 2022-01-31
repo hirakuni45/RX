@@ -30,27 +30,36 @@
 namespace {
 
 /// LED 接続ポートの定義
+/// LED を「吸い込み：出力０で点灯する場合」
+	static constexpr bool LED_ASSERT = 0;
+/// LED を「吐き出し：出力１で点灯する場合」
+//	static constexpr bool LED_ASSERT = 1;
 #if defined(SIG_RX71M)
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
 #elif defined(SIG_RX72M)
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
 #elif defined(SIG_RX72N)
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ASSERT> LED;
 #elif defined(SIG_RX64M)
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
 #elif defined(SIG_RX65N)
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ASSERT> LED;
 #elif defined(SIG_RX24T)
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ASSERT> LED;
 #elif defined(SIG_RX66T)
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ASSERT> LED;
 #elif defined(SIG_RX72T)
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ASSERT> LED;
 #endif
+
 // クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
+// 外部クリスタル接続
 	typedef device::system_io<> SYSTEM_IO;
+// 外部発信器接続
+//	typedef device::system_io<device::system_base::OSC_TYPE::EXT> SYSTEM_IO;
 // 内蔵、高速発信器の利用
 //	typedef device::system_io<device::system_base::OSC_TYPE::HOCO> SYSTEM_IO;
+
 }
 
 int main(int argc, char** argv);
@@ -63,8 +72,8 @@ int main(int argc, char** argv)
 
 	while(1) {
 		utils::delay::milli_second(250);
-		LED::P = 0;
+		LED::P = 1;  // 点灯
 		utils::delay::milli_second(250);
-		LED::P = 1;
+		LED::P = 0;  // 消灯
 	}
 }
