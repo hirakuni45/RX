@@ -250,7 +250,7 @@ namespace utils {
 	template <uint16_t SAMPLE, uint16_t TICK, uint16_t CNUM>
 	class psg_mng : public psg_base {
 
-		// 12 平均音階率の計算：
+		// 12 平均音階率の計算： 6 オクターブ（3520Hz）を基底にする。
 		// 2^(1/12) の定数、１２乗すると２倍（１オクターブ上がる）となる。
 		static constexpr uint16_t key_tbl_[12] = {
 			static_cast<uint16_t>((3520 * 65536.0 * 1.000000000) / SAMPLE),  ///< A  ラ
