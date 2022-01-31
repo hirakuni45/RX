@@ -24,6 +24,8 @@ namespace device {
 	class rspi_io {
 	public:
 
+		typedef RSPI value_type;	///< RSPI 型
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  データ、クロック位相タイプ型
@@ -68,7 +70,6 @@ namespace device {
 
 		// 便宜上のスリープ
 		void sleep_() { asm("nop"); }
-
 
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
 ///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(RSPI::PCLK);
@@ -118,12 +119,9 @@ namespace device {
 			uint32_t clk = RSPI::PCLK / 2;
 #ifdef SEEDA
 			while(clk > 20'000'000) {  // 20MHz
-//			while(clk > 10000000) {  // 10MHz
-#else
-			while(clk > 40'000'000) {  // 最大 40MHz にしておく
-#endif
 				clk >>= 1;
 			}
+#endif
 			return clk;
 		}
 
@@ -225,13 +223,6 @@ namespace device {
 #endif
 		    RSPI::SPBR = spbr;
 
-			// 実際のクロックを表示
-#if 0
-			static const uint8_t n[4] = { 1, 2, 4, 8 };
-			uint32_t z = static_cast<uint32_t>(RSPI::PCLK)
-					/ (2 * static_cast<uint32_t>(spbr + 1) * static_cast<uint32_t>(n[brdv]));
-			utils::format("RSPI Real Speed: %u [Hz]\n") % z;
-#endif
 			RSPI::SPPCR = 0x00;	 // Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	 // sequence length: 1 
 			// BYTE access
@@ -345,6 +336,26 @@ namespace device {
 				*ptr = xchg();
 				++ptr;
 				size--;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	RSPI の速度を取得
+			@param[in]	real	「true」にした場合、内部で計算されたリアルな値
+			@return 周期
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_speed(bool real = false) const noexcept
+		{
+			if(real) {
+				static constexpr uint8_t n[4] = { 1, 2, 4, 8 };
+				uint32_t spd = static_cast<uint32_t>(RSPI::PCLK)
+						/ (2 * static_cast<uint32_t>(RSPI::SPBR() + 1) * static_cast<uint32_t>(n[RSPI::SPCMD0.BRDV()]));
+				return spd;
+			} else {
+				return speed_;
 			}
 		}
 

@@ -18,6 +18,7 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/spi_io2.hpp"
+#include "common/rspi_io.hpp"
 
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
@@ -117,6 +118,28 @@ namespace {
 
 	#define USE_SSIE
 	#define USE_GLCDC
+
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
+	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
+	typedef device::SCI1 SCI_CH;
+
+	// RSPI 定義、FIRST: P20:RSPCK, P21:MOSI, P22:MISO
+	typedef device::rspi_io<device::RSPI0> SDC_SPI;
+
+	SDC_SPI	sdc_spi_;
+	typedef device::PORT<device::PORT3, device::bitpos::B0> SDC_SELECT;			///< カード選択信号
+	typedef device::PORT<device::PORTA, device::bitpos::B2> SDC_POWER;			///< カード電源制御 MIC2076-1YM (ACTIVE-HIGH)
+	typedef device::PORT<device::PORTB, device::bitpos::B4, 0> SDC_DETECT;		///< カード検出（ACTIVE-LOW）
+	typedef device::NULL_PORT SDC_WPRT;											///< カード書き込み禁止ポート設定（無効）
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
+	SDC		sdc_(sdc_spi_, 20'000'000);
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
 
 #endif
 	typedef device::system_io<> SYSTEM_IO;

@@ -4,7 +4,7 @@
 	@brief	ソフトウェア SPI I/O 制御２@n
 			SD カードに特化したソフト SPI 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,6 +23,13 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class MISO, class MOSI, class SPCK>
 	class spi_io2 {
+	public:
+
+		typedef MISO MISO_type;		///< MISO ポート型
+		typedef MOSI MOSI_type;		///< MOSI ポート型
+		typedef SPCK SPCK_type;		///< SPCK ポート型
+
+	private:
 
 		inline void lock_() {
 #ifdef RTOS
@@ -37,6 +44,7 @@ namespace device {
 #endif
 		}
 
+		uint32_t	speed_;
 		uint16_t	delay_;
 
 		inline void clock_fast_() noexcept
@@ -57,6 +65,8 @@ namespace device {
 
 		void setup_delay_(uint32_t speed)
 		{
+			speed_ = speed;
+
 			uint32_t n = device::clock_profile::ICLK / speed;
 			if(n > 511) n = 511;
 			delay_ = n / 4;  // ハーフクロック幅の補正（かなり大雑把）
@@ -69,7 +79,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		spi_io2() noexcept : delay_(0) { }
+		spi_io2() noexcept : speed_(0), delay_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -259,6 +269,24 @@ namespace device {
 				*ptr = xchg();
 				++ptr;
 				++pos;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SPI の速度を取得 @n
+					ソフト SPI なので、不正確、目安程度。
+			@param[in]	real	「true」にした場合、内部で計算されたリアルな値
+			@return 周期
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_speed(bool real = false) const noexcept
+		{
+			if(real) {
+				return device::clock_profile::ICLK / static_cast<uint32_t>(delay_ * 4);
+			} else {
+				return speed_;
 			}
 		}
 
