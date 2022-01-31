@@ -114,6 +114,8 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
 	#endif
 
+	#define USE_SPI
+
 	SDC_SPI	sdc_spi_;
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
 	SDC		sdc_(sdc_spi_, 20'000'000);
@@ -198,6 +200,8 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;											///< カード書き込み禁止ポート設定（無効）
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
 	SDC		sdc_(sdc_spi_, 20'000'000);
+
+	#define USE_SPI
 
 	#define ENABLE_I2C_RTC
 	typedef device::iica_io<device::RIIC0> I2C;
@@ -531,6 +535,11 @@ int main(int argc, char** argv)
 
 	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("Start SD-CARD Access sample for '%s' %d[MHz]\n") % system_str_ % clk;
+
+#ifdef USE_SPI
+	utils::format("SPI Set  Speed: %u [Hz]\n") % sdc_spi_.get_speed();
+	utils::format("SPI Real Speed: %u [Hz]\n") % sdc_spi_.get_speed(true);
+#endif
 
 #ifdef TOUCH_FILER
 	{  // GLCDC の初期化
