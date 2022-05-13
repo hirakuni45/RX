@@ -17,7 +17,8 @@
                 "${workspaceFolder}"
             ],
             "defines": [
-                "__GNUC__", "__BYTE_ORDER__=__ORDER_LITTLE_ENDIAN__",
+                "__GNUC__",
+                "__BYTE_ORDER__=__ORDER_LITTLE_ENDIAN__",
                 "SIG_RX72N",
                 "_DEBUG",
                 "UNICODE",
@@ -25,7 +26,8 @@
             ],
             "windowsSdkVersion": "8.1",
             "cStandard": "c11",
-            "cppStandard": "c++17"
+            "cppStandard": "c++17",
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4
