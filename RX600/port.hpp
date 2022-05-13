@@ -390,19 +390,10 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  単ポート定義テンプレート
-		@param[in]	PORT	ポート・クラス
-		@param[in]	BPOS	ビット位置
-		@param[in]	ASSERT	アサート論理（通常「１」）
+		@brief  ポート・オープンドレイン・タイプ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class PORTX, bitpos BPOS, bool ASSERT = 1>
-	struct PORT {
-
-		static constexpr uint8_t PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);
-		static constexpr uint8_t BIT_POS = static_cast<uint8_t>(BPOS);
-
-		/// オープンドレインタイプ
+	struct PORT_BASE {
 		enum class OD_TYPE : uint8_t {
 			NONE,	///< 無し
 			N_CH,	///< N-Channel
@@ -411,7 +402,23 @@ namespace device {
 			P_CH,	///< P-Channel
 #endif
 		};
+	};
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  単ポート定義テンプレート
+		@param[in]	PORT	ポート・クラス
+		@param[in]	BPOS	ビット位置
+		@param[in]	ASSERT	アサート論理 @n
+							※反転入力、反転出力として扱う場合「０」
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class PORTX, bitpos BPOS, bool ASSERT = 1>
+	struct PORT : public PORT_BASE {
+
+		static constexpr uint8_t PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);
+		static constexpr uint8_t BIT_POS = static_cast<uint8_t>(BPOS);
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -502,6 +509,14 @@ namespace device {
 		};
 		typedef port_t P_;
 		static P_ P;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  反転
+		*/
+		//-----------------------------------------------------------------//
+		static void FLIP() { P = !P(); }
 	};
 	template <class PORTX, bitpos BPOS, bool ASSERT>
 		typename PORT<PORTX, BPOS, ASSERT>::DIR_ PORT<PORTX, BPOS, ASSERT>::DIR;
