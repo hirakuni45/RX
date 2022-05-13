@@ -77,7 +77,7 @@ namespace chip {
 
 	private:
 
-		static const uint8_t	FT5206_ADR = 0x38;
+		static constexpr uint8_t	FT5206_ADR = 0x38;
 
 		I2C&	i2c_;
 
