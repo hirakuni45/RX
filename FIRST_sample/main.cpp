@@ -70,10 +70,17 @@ int main(int argc, char** argv)
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 
+	LED::P = 0;  // 消灯から開始
+
 	while(1) {
+#if 0
 		utils::delay::milli_second(250);
 		LED::P = 1;  // 点灯
 		utils::delay::milli_second(250);
 		LED::P = 0;  // 消灯
+#else
+		utils::delay::milli_second(250);
+		LED::FLIP();  // 反転
+#endif
 	}
 }
