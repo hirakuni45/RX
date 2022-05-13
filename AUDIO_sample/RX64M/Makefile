@@ -41,12 +41,9 @@ CSOURCES	=	common/init.c \
                 FreeRTOS/Source/timers.c
 
 PSOURCES	=	AUDIO_sample/main.cpp \
-				graphics/font8x16.cpp \
-				graphics/kfont16.cpp \
-				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ mad png z m
+USER_LIBS	=	supc++ mad m
 
 USER_DEFS	=	FAT_FS FAT_FS_NUM=16 RTOS
 
