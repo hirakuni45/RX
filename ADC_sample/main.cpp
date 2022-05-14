@@ -74,6 +74,7 @@ namespace {
 }
 
 extern "C" {
+
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
 	void sci_putch(char ch)
 	{
@@ -95,6 +96,7 @@ extern "C" {
 	{
 		return sci_.recv_length();
 	}
+
 }
 
 int main(int argc, char** argv);

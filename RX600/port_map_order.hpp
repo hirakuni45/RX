@@ -94,6 +94,139 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  ETHER RMII 型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ETHER_RMII : uint8_t {
+			REF50CK,		///< REF50CK input
+			CRS_DV,			///< CRS_DV input
+			TXD0,			///< TXD0 output
+			TXD1,			///< TXD1 output
+			RXD0,			///< RXD0 input
+			RXD1,			///< RXD1 input
+			TXD_EN,			///< TXD_EN output
+			RX_ER,			///< RX_ER input
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ETHER MII 型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ETHER_MII : uint8_t {
+			CRS,			///< REF50CK input
+			RX_DV,			///< CRS_DV input
+			EX_OUT,			///< EX_OUT output
+			LINKSTA,		///< LINKSTA input
+			ETXD0,			///< ETXD0 output
+			ETXD1,			///< ETXD1 output
+			ETXD2,			///< ETXD2 output
+			ETXD3,			///< ETXD3 output
+			ERXD0,			///< ERXD0 input
+			ERXD1,			///< ERXD1 input
+			ERXD2,			///< ERXD2 input
+			ERXD3,			///< ERXD3 input
+			TX_EN,			///< TX_EN output
+			TX_ER,			///< TX_ER input
+			RX_ER,			///< RX_ER input
+			TX_CLK,			///< TX_CLK input
+			RX_CLK,			///< RX_CLK input
+			COL,			///< COL input
+			WOL,			///< WOL output
+			MDC,			///< MDC output
+			MDIO,			///< MDIO input/output
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ETHER RMII ポート・マッピング・グループ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct ether_rmii_t {
+			ORDER	ref50ck_;
+			ORDER	crs_dv_;
+			ORDER	txd0_;
+			ORDER	txd1_;
+			ORDER	rxd0_;
+			ORDER	rxd1_;
+			ORDER	txd_en_;
+			ORDER	rx_er_;
+			ORDER	mdc_;
+			ORDER	mdio_;
+
+			ether_rmii_t() noexcept :
+				ref50ck_(ORDER::BYPASS),
+				crs_dv_(ORDER::BYPASS),
+				txd0_(ORDER::BYPASS),
+				txd1_(ORDER::BYPASS),
+				rxd0_(ORDER::BYPASS),
+				rxd1_(ORDER::BYPASS),
+				txd_en_(ORDER::BYPASS),
+				rx_er_(ORDER::BYPASS),
+				mdc_(ORDER::BYPASS),
+				mdio_(ORDER::BYPASS)
+			{ }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ETHER MII ポート・マッピング・グループ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct ether_mii_t {
+			ORDER	crs_;
+			ORDER	rx_dv_;
+			ORDER	exout_;
+			ORDER	linksta_;
+			ORDER	etxd0_;
+			ORDER	etxd1_;
+			ORDER	etxd2_;
+			ORDER	etxd3_;
+			ORDER	erxd0_;
+			ORDER	erxd1_;
+			ORDER	erxd2_;
+			ORDER	erxd3_;
+			ORDER	tx_en_;
+			ORDER	tx_er_;
+			ORDER	rx_er_;
+			ORDER	tx_clk_;
+			ORDER	rx_clk_;
+			ORDER	col_;
+			ORDER	wol_;
+			ORDER	mdc_;
+			ORDER	mdio_;
+
+			ether_mii_t() noexcept :
+				crs_(ORDER::BYPASS),
+				rx_dv_(ORDER::BYPASS),
+				exout_(ORDER::BYPASS),
+				linksta_(ORDER::BYPASS),
+				etxd0_(ORDER::BYPASS),
+				etxd1_(ORDER::BYPASS),
+				etxd2_(ORDER::BYPASS),
+				etxd3_(ORDER::BYPASS),
+				erxd0_(ORDER::BYPASS),
+				erxd1_(ORDER::BYPASS),
+				erxd2_(ORDER::BYPASS),
+				erxd3_(ORDER::BYPASS),
+				tx_en_(ORDER::BYPASS),
+				tx_er_(ORDER::BYPASS),
+				rx_er_(ORDER::BYPASS),
+				tx_clk_(ORDER::BYPASS),
+				rx_clk_(ORDER::BYPASS),
+				col_(ORDER::BYPASS),
+				wol_(ORDER::BYPASS),
+				mdc_(ORDER::BYPASS),
+				mdio_(ORDER::BYPASS)
+			{ }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  ポート・マッピング・ルネサス型 @n
 					ルネサス社が提供するボードに対する型
 		*/

@@ -62,7 +62,7 @@ namespace {
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
-	static const int16_t ZERO_LEVEL = 0x8000;
+	static constexpr int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
 
@@ -74,7 +74,7 @@ namespace {
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
-	static const int16_t ZERO_LEVEL = 0x8000;
+	static constexpr int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
 
@@ -93,7 +93,7 @@ namespace {
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
-	static const int16_t ZERO_LEVEL = 0x8000;
+	static constexpr int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
 	#define USE_GLCDC
@@ -114,7 +114,7 @@ namespace {
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// SSIE の FIFO サイズの２倍以上（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
-	static const int16_t ZERO_LEVEL = 0x0000;
+	static constexpr int16_t ZERO_LEVEL = 0x0000;
 
 	#define USE_SSIE
 	#define USE_GLCDC
@@ -137,7 +137,7 @@ namespace {
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
-	static const int16_t ZERO_LEVEL = 0x8000;
+	static constexpr int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
 
@@ -534,7 +534,7 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
-		static const uint8_t sci_level = 2;
+		uint8_t sci_level = 2;
 		sci_.start(115200, sci_level);
 	}
 

@@ -14,7 +14,7 @@
 		　　　　PORT (P00:LQFP100-4) にLEDを接続する @n
 				DA0 (P64:LQFP100-70)、DA1 (P65:LQFP100-69) からアナログ出力（１２ビット）する。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -71,7 +71,7 @@ namespace {
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI			sci_;
 
-	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
+	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;
 
 	typedef utils::command<256> COMMAND;
@@ -109,17 +109,13 @@ namespace {
 //	typedef device::tpu_io<device::TPU0> MTU_IO;
 	MTU_IO		mtu_io_;
 
+	uint32_t	sample_ = 100'000;
+	uint32_t	freq_ = 100;
+	uint32_t	wavidx_ = 0;
+	static constexpr int32_t gain_shift_ = 16;
 
-	void calc_sico_(int div)
-	{
-		int32_t gain_shift = 16;
-		intmath::sincos_t sico(static_cast<int32_t>(32767) << gain_shift);
-		for(uint32_t i = 0; i < DMAC_MGR::BLOCK_SIZE_MAX; ++i) {
-			wave_[i].l = (sico.x >> gain_shift) + 32768;
-			wave_[i].r = (sico.y >> gain_shift) + 32768;
-			intmath::build_sincos(sico,  DMAC_MGR::BLOCK_SIZE_MAX / div);
-		}
-	}
+// オーバーフローに備えて -50 する。
+	intmath::sincos_t sico_(static_cast<int64_t>(32767 - 64) << gain_shift_, 0);
 
 	void command_service_()
 	{
@@ -134,22 +130,17 @@ namespace {
 			if(cmd_.get_word(1, tmp, sizeof(tmp))) {
 				int freq = 0;
 				if((utils::input("%d", tmp) % freq).status()) {
-					/// mtu_io_.set_freq(MTU_IO::mtu_type::CHANNEL::A, freq);
 					utils::format("Freq: %d [Hz]\n") % freq;
+					freq_ = freq;
+					sico_.x = static_cast<int64_t>(32767 -64) << gain_shift_;
+					sico_.y = 0;
 				}
 			}
-		} else if(cmd_.cmp_word(0, "step")) {
-			char tmp[16];
-			if(cmd_.get_word(1, tmp, sizeof(tmp))) {
-				int step = 0;
-				if((utils::input("%d", tmp) % step).status()) {
-					calc_sico_(step);
-					utils::format("Step: %d\n") % step;
-				}
-			}
-		} else if(cmd_.cmp_word(0, "clear")) {
-//			device::ICU::PIAR0.PIR0 = 0;
+		} else if(cmd_.cmp_word(0, "sample")) {
+
+
 		} else if(cmd_.cmp_word(0, "?") || cmd_.cmp_word(0, "help")) {
+			utils::format("freq xxxx    set frequency [Hz]\n");
 		} else {
 			const char* p = cmd_.get_command();
 			if(p[0]) {
@@ -192,9 +183,9 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
-	{  // タイマー設定（100Hz）
+	{  // タイマー設定（200Hz）
 		uint8_t intr = 4;
-		cmt_.start(100, intr);
+		cmt_.start(200, intr);
 	}
 
 	{  // SCI の開始
@@ -213,9 +204,8 @@ int main(int argc, char** argv)
 
 
 	{  // MTU0 の初期化
-		uint32_t freq = 96'000;
 		uint8_t intr = 4;
-		auto ret = mtu_io_.start(freq, intr);
+		auto ret = mtu_io_.start(sample_, intr);
 		if(!ret) {
 			utils::format("MTU0 Not start...\n");
 		}
@@ -235,34 +225,32 @@ int main(int argc, char** argv)
 	cmd_.set_prompt("# ");
 
 	{
-		auto clk = device::clock_profile::ICLK / 1000000;
+		auto clk = device::clock_profile::ICLK / 1'000'000;
 		utils::format("Start D/A sample for '%s' %u [MHz]\n") % system_str_ % clk;
 	}
 
-	{
-		calc_sico_(4);
-//		for(uint32_t i = 0; i < DMAC_MGR::BLOCK_SIZE_MAX; ++i) {
-//			wave_[i].l = i << 6;
-//			wave_[i].r = (i << 6) + 32768;
-//		}
-	}
-
-
 	LED::DIR = 1;
 	uint8_t cnt = 0;
-	auto count = dmac_mgr_.at_task().get_count();
+	auto dmapos = 1023 - (dmac_mgr_.get_count() & 0x3ff);
+	wavidx_ = dmapos / 2;
+
 	while(1) {
 		cmt_.sync();
 
-		command_service_();
-
 		{
-			auto tmp = dmac_mgr_.at_task().get_count();
-			if(tmp != count) {
-				utils::format("%u\n") % tmp;
-				count = tmp;
+			auto tmp = 1023 - (dmac_mgr_.get_count() & 0x3ff);
+			auto n = (tmp - dmapos) & 0x3ff;
+			dmapos = tmp;
+			for(uint32_t i = 0; i < n; ++i) {
+				wave_[wavidx_].l = (sico_.x >> gain_shift_) + 32768;
+				wave_[wavidx_].r = (sico_.y >> gain_shift_) + 32768;
+				++wavidx_;
+				wavidx_ &= 0x3ff;
+				intmath::build_sincos(sico_, sample_ / freq_);
 			}
 		}
+
+		command_service_();
 
 		++cnt;
 		if(cnt >= 50) {

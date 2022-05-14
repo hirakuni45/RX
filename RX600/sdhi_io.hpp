@@ -41,39 +41,39 @@ namespace fatfs {
 //		typedef utils::format debug_format;
 		typedef utils::null_format debug_format;
 
-		static const BYTE DO_MOUNT_INIT = 1;	///< マウント時に初期化を行う場合「１」
+		static constexpr BYTE DO_MOUNT_INIT = 1;	///< マウント時に初期化を行う場合「１」
 
-		static const uint32_t MOUNT_DELAY_FRAME = 60;		///< 60 frame (1.0 sec)
+		static constexpr uint32_t MOUNT_DELAY_FRAME = 60;		///< 60 frame (1.0 sec)
 
-		static const int DUMMY_LOOP_LIMIT = 1000;
+		static constexpr int DUMMY_LOOP_LIMIT = 1000;
 
 		// 通常 PCLKB は 60MHz
-		static const uint8_t CARD_DETECT_DIVIDE_ = 12;		///< CD 信号サンプリング周期
-		static const uint8_t TIME_OUT_DIVIDE_    = 14;		///< タイムアウトカウント（０～１４）
+		static constexpr uint8_t CARD_DETECT_DIVIDE_ = 12;		///< CD 信号サンプリング周期
+		static constexpr uint8_t TIME_OUT_DIVIDE_    = 14;		///< タイムアウトカウント（０～１４）
 		// SD カード初期化時100～400KBPS(60MHz / 256: 224KBPS）
-		static const uint8_t CLOCK_SLOW_DIVIDE_  = 0b01000000;	///< 初期化時の分周比 (1/256)
+		static constexpr uint8_t CLOCK_SLOW_DIVIDE_  = 0b01000000;	///< 初期化時の分周比 (1/256)
 		// RX65N Envision Kit では、30MHz までが安定動作。
 		// RX72N Envision Kit では、60MHz まで動作確認したものの、マージンを取り、30MHz で運用。
-///		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b11111111;	///< ブースト時 (60MHz:1/1)
-		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000000;	///< ブースト時 (30MHz:1/2)
-//		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000001;	///< ブースト時 (15MHz:1/4)
-//		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000010;	///< ブースト時 (7.5MHz:1/8)
-//		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000100;	///< ブースト時 (3.75MHz:1/16)
+///		static constexpr uint8_t CLOCK_FAST_DIVIDE_  = 0b11111111;	///< ブースト時 (60MHz:1/1)
+		static constexpr uint8_t CLOCK_FAST_DIVIDE_  = 0b00000000;	///< ブースト時 (30MHz:1/2)
+//		static constexpr uint8_t CLOCK_FAST_DIVIDE_  = 0b00000001;	///< ブースト時 (15MHz:1/4)
+//		static constexpr uint8_t CLOCK_FAST_DIVIDE_  = 0b00000010;	///< ブースト時 (7.5MHz:1/8)
+//		static constexpr uint8_t CLOCK_FAST_DIVIDE_  = 0b00000100;	///< ブースト時 (3.75MHz:1/16)
 
 		// MMC card type flags (MMC_GET_TYPE)
-		static const uint8_t CT_MMC   = 0b00000001;	///< MMC ver 3
-		static const uint8_t CT_SD1   = 0b00000010;	///< SD(SC) ,FAT12(16) (2G までのカード）
-		static const uint8_t CT_SD2   = 0b00000100;	///< SDHC   ,FAT32 (32G までのカード）
-//		static const uint8_t CT_SD3   = 0b00001000;	///< SDXC   ,exFAT (32G を超えるカード）
-		static const uint8_t CT_BLOCK = 0b00010000;	///< Block addressing
+		static constexpr uint8_t CT_MMC   = 0b00000001;	///< MMC ver 3
+		static constexpr uint8_t CT_SD1   = 0b00000010;	///< SD(SC) ,FAT12(16) (2G までのカード）
+		static constexpr uint8_t CT_SD2   = 0b00000100;	///< SDHC   ,FAT32 (32G までのカード）
+//		static constexpr uint8_t CT_SD3   = 0b00001000;	///< SDXC   ,exFAT (32G を超えるカード）
+		static constexpr uint8_t CT_BLOCK = 0b00010000;	///< Block addressing
 
-		static const int BUSY_LOOP_LIMIT  = 1000;
-		static const int ACEND_LOOP_LIMIT = 10000;
-		static const int CMD0_LOOP_MAX   = 3;
-		static const int ACMD41_LOOP_MAX = 1000;
-		static const int CMD3_LOOP_MAX   = 3;
-		static const int BRE_LOOP_LIMIT  = 1000;
-		static const int BWE_LOOP_LIMIT  = 1000;
+		static constexpr int BUSY_LOOP_LIMIT  = 1000;
+		static constexpr int ACEND_LOOP_LIMIT = 10000;
+		static constexpr int CMD0_LOOP_MAX    = 3;
+		static constexpr int ACMD41_LOOP_MAX  = 1000;
+		static constexpr int CMD3_LOOP_MAX    = 3;
+		static constexpr int BRE_LOOP_LIMIT   = 1000;
+		static constexpr int BWE_LOOP_LIMIT   = 1000;
 
 		FATFS		fatfs_;
 		DSTATUS		stat_;			// Disk status
