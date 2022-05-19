@@ -375,7 +375,7 @@ http://www.rvf-rc45.net/Renesas_GNU_Tools/
 ## RX フレームワークのソースコードを取得
    
 ```
-    git clone git://github.com/hirakuni45/RX.git
+    git clone https://github.com/hirakuni45/RX.git
 ```
    
 ### ＲＸフレームワークが利用している boost のインストール

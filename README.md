@@ -368,7 +368,7 @@ http://www.rvf-rc45.net/Renesas_GNU_Tools/
 ---
 ## Get RX Framework Source Code
 ```
-    git clone git://github.com/hirakuni45/RX.git
+    git clone https://github.com/hirakuni45/RX.git
 ```
    
 ---
