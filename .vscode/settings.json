@@ -19,7 +19,8 @@
     },
     "files.associations": {
 		"functional": "cpp",
-		"*.ipp": "cpp"
+		"*.ipp": "cpp",
+		"tuple": "cpp"
 	},
     "editor.detectIndentation": false,
     "editor.insertSpaces": false
