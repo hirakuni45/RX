@@ -36,6 +36,10 @@
 #include "audio_gui.hpp"
 #endif
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "task.h"
+
 namespace {
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
@@ -148,6 +152,10 @@ namespace {
 	typedef utils::fixed_fifo<char, 2048> SEND_BUFF;
 	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
+
+	SemaphoreHandle_t	putch_sync_;
+	SemaphoreHandle_t	puts_sync_;
+	SemaphoreHandle_t	getch_sync_;
 
 	// コマンドライン
 	typedef utils::command<256> CMD;
@@ -348,31 +356,25 @@ extern "C" {
 
 	void sci_putch(char ch)
 	{
-        static volatile bool lock_ = false;
-        while(lock_) ;
-        lock_ = true;
+		xSemaphoreTake(putch_sync_, (TickType_t)0 );
         sci_.putch(ch);
-        lock_ = false;
+		xSemaphoreGive(putch_sync_);
 	}
 
 
 	void sci_puts(const char* str)
 	{
-        static volatile bool lock_ = false;
-        while(lock_) ;
-        lock_ = true;
+		xSemaphoreTake(puts_sync_, (TickType_t)0 );
         sci_.puts(str);
-        lock_ = false;
+		xSemaphoreGive(puts_sync_);
 	}
 
 
 	char sci_getch(void)
 	{
-        static volatile bool lock_ = false;
-        while(lock_) ;
-        lock_ = true;
+		xSemaphoreTake(getch_sync_, (TickType_t)0 );
         auto ch = sci_.getch();
-        lock_ = false;
+		xSemaphoreGive(getch_sync_);
         return ch;
 	}
 
@@ -534,6 +536,9 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
+		putch_sync_ = xSemaphoreCreateBinary();
+		puts_sync_  = xSemaphoreCreateBinary();
+		getch_sync_ = xSemaphoreCreateBinary();
 		uint8_t sci_level = 2;
 		sci_.start(115200, sci_level);
 	}

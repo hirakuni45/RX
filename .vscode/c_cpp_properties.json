@@ -14,7 +14,8 @@
                 "C:/msys64/mingw64/include",
                 "D:/Git/RX",
                 "D:/Git/RX/RX600/drw2d/inc/tes",
-                "${workspaceFolder}"
+				"D:/Git/RX/FreeRTOS/Source/include",
+				"${workspaceFolder}"
             ],
             "defines": [
                 "__GNUC__",

@@ -32,6 +32,7 @@
 #include "common/input.hpp"
 
 #include "FreeRTOS.h"
+#include "semphr.h"
 #include "task.h"
 
 #ifdef SIG_RX64M
@@ -93,6 +94,15 @@ namespace {
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI			sci_;
+
+//  StaticSemaphore を使う場合、「configSUPPORT_STATIC_ALLOCATION」を「1」にする必要がある。
+//	StaticSemaphore_t	putch_semaphore_;
+	SemaphoreHandle_t	putch_sync_;
+//	StaticSemaphore_t	puts_semaphore_;
+	SemaphoreHandle_t	puts_sync_;
+//	StaticSemaphore_t	getch_semaphore_;
+	SemaphoreHandle_t	getch_sync_;
+
 }
 
 extern "C" {
@@ -100,32 +110,26 @@ extern "C" {
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
 	void sci_putch(char ch)
 	{
-		static volatile bool lock_ = false;
-		while(lock_) ;
-		lock_ = true;
+		xSemaphoreTake(putch_sync_, (TickType_t)0 );  // ポーリング 
 		sci_.putch(ch);
-		lock_ = false;
+		xSemaphoreGive(putch_sync_);
 	}
 
 
 	void sci_puts(const char* str)
 	{
-		static volatile bool lock_ = false;
-		while(lock_) ;
-		lock_ = true;
+		xSemaphoreTake(puts_sync_, (TickType_t)0 );  // ポーリング 
 		sci_.puts(str);
-		lock_ = false;
+		xSemaphoreGive(puts_sync_);
 	}
 
 
 	// syscalls.c から呼ばれる、標準入力（stdin）
 	char sci_getch(void)
 	{
-		static volatile bool lock_ = false;
-		while(lock_) ;
-		lock_ = true;
+		xSemaphoreTake(getch_sync_, (TickType_t)0 );  // ポーリング
 		auto ch = sci_.getch();
-		lock_ = false;
+		xSemaphoreGive(getch_sync_);
 		return ch;
 	}
 
@@ -284,6 +288,9 @@ int main(int argc, char** argv)
 #endif
 
 	{  // SCI の開始
+		putch_sync_ = xSemaphoreCreateBinary();	// putch 排他制御のリソースを作成
+		puts_sync_  = xSemaphoreCreateBinary();	// puts  排他制御のリソースを作成
+		getch_sync_ = xSemaphoreCreateBinary();	// getch 排他制御のリソースを作成
 		uint8_t intr = 2;        // 割り込みレベル
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
