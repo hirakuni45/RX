@@ -476,7 +476,7 @@ There is no need to make complicated settings if you set "second candidate" or "
 4. Transmission and reception are performed through a fixed length FIFO class, and the size can be freely defined.   
 5. The sci_putch and sci_getch functions are called from POSIX file functions, so they can be linked externally.   
 6. The above functions are accessed from stdout, stdin, stderr descriptors, so you can also use the printf function, but for various reasons we do not recommend using "utils :: format", which is the size It is smaller, more flexible, convenient and safe.   
-```
+```C++
 #include "common/renesas.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
