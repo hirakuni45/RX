@@ -20,7 +20,7 @@
 					16MHz のベースクロックを使用する @n
 			　　　　P40 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -160,6 +160,7 @@ namespace {
 						uint32_t s = bank * FLASH_IO::DATA_FLASH_BLOCK;
 						uint32_t e = s + FLASH_IO::DATA_FLASH_BLOCK - 1;
 						utils::format("Erase check: bank %d: 0x%04X to 0x%04X %s\n") % bank % s % e % (f ? "OK" : "NG");
+						f = true;
 					}
 				}
 			}
@@ -200,29 +201,16 @@ namespace {
 							if(!(utils::input("%x", buff) % data).status()) {
 								break;
 							}
-#ifdef SINGLE							
-							uint32_t inc = 1;
-							uint8_t tmp[1];
-							tmp[0] = data;
-							if(!flash_io_.write(org, tmp, 1)) {
-#else
-							uint32_t inc = 4;
 							uint8_t tmp[4];
-							tmp[3] = data;
-							tmp[2] = data >> 8;
-							tmp[1] = data >> 16;
-							tmp[0] = data >> 24;
-							if(!flash_io_.write(org, tmp, 4)) {
-#endif
-
-#ifdef SINGLE
-								utils::format("Write error: %04X: %02X\n")
-#else
-								utils::format("Write error: %04X: %08X\n")
-#endif
-									% static_cast<uint32_t>(org) % data;
+							auto d = data;
+							for(uint32_t j = 0; j < device::FLASH::DATA_WORD_SIZE; ++j) {
+								tmp[device::FLASH::DATA_WORD_SIZE - j - 1] = d;
+								d >>= 8;
 							}
-							org += inc;
+							if(!flash_io_.write(org, tmp, device::FLASH::DATA_WORD_SIZE)) {
+								utils::format("Write error: 0x%04X: 0x%08X\n") % org % data;
+							}
+							org += device::FLASH::DATA_WORD_SIZE;
 						}
 					}
 					f = true;
@@ -241,6 +229,8 @@ namespace {
 				}
 			}
 		} else if(command_.cmp_word(0, "?") || command_.cmp_word(0, "help")) {
+			utils::format("Data Flash Size: %d, Bank: %d, Block: %d, Word: %d\n")
+				% FLASH_IO::DATA_FLASH_SIZE % FLASH_IO::DATA_FLASH_BANK % FLASH_IO::DATA_FLASH_BLOCK % device::FLASH::DATA_WORD_SIZE;
 			utils::format("erase [bank] (erase 0 to %d)\n") % FLASH_IO::DATA_FLASH_BANK;
 			utils::format("check [bank] (erase check 0 to %d)\n") % FLASH_IO::DATA_FLASH_BANK;
 			utils::format("r[ead] org [end] (read)\n");
@@ -305,8 +295,10 @@ int main(int argc, char** argv)
 		utils::format("Start Data Flash sample for '%s' %u [MHz]\n") % system_str_ % clk;
 		auto fclk = device::clock_profile::FCLK / 1'000'000;
 		utils::format("Flash drive clock: %u [MHz]\n") % fclk;
-		utils::format("Data Flash total size: %08X\n") % FLASH_IO::DATA_FLASH_SIZE;
-		utils::format("Data Flash word size: %d\n") % device::FLASH::DATA_WORD_SIZE;
+		utils::format("Data Flash total size: 0x%08X\n") % FLASH_IO::DATA_FLASH_SIZE;
+		utils::format("Data Flash block size: %d bytes\n") % FLASH_IO::DATA_FLASH_BLOCK;
+		utils::format("Data Flash word size: %d byte%c\n") % device::FLASH::DATA_WORD_SIZE
+			% ((device::FLASH::DATA_WORD_SIZE > 1) ? "s" : "");
 	}
 
 	{  // DataFlash 開始
