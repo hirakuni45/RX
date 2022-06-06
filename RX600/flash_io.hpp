@@ -46,7 +46,6 @@ namespace device {
 		static constexpr uint32_t DATA_FLASH_BLOCK = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
 		static constexpr uint32_t DATA_FLASH_BANK  = FLASH::DATA_SIZE / DATA_FLASH_BLOCK;	///< データ・フラッシュのバンク数
 
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  エラー型
@@ -62,10 +61,24 @@ namespace device {
 
 	private:
 
+		static constexpr uint32_t MODE_CHANGE_DELAY = 10;	///< モード変更における遅延
+
 		enum class mode : uint8_t {
 			NONE,
 			RD,
 			PE
+		};
+
+		/// FACI シーケンサ・コマンド
+		enum class FACI : uint8_t {
+			WRITE_TOP = 0xE8,		///< プログラム(データフラッシュメモリ) 4バイトプログラム
+			WRITE_FIN = 0xD0,		///< プログラム(データフラッシュメモリ) 4バイトプログラム 最終コマンド
+			ERASE1 = 0x20,			///< 1st ブロックイレーズ (データフラッシュメモリ 64バイト)
+			ERASE2 = 0xD0,			///< 2nd ブロックイレーズ (データフラッシュメモリ 64バイト)
+			CLEAR_STATUS = 0x50,	///< ステータスクリア
+			BREAK = 0xB3,			///< 強制終了
+			CHECK_BLANK1 = 0x71,	///< 1st ブランクチェック
+			CHECK_BLANK2 = 0xD0,	///< 2nd ブランクチェック
 		};
 
 		error	error_;
@@ -73,11 +86,22 @@ namespace device {
 
 		bool	trans_farm_;
 
+		inline void faci_cmd_(FACI cmd) const noexcept
+		{
+			FLASH::FACI_CMD_AREA = static_cast<uint8_t>(cmd);
+		}
+
+		inline void faci_cmd_(FACI cmd1, FACI cmd2) noexcept
+		{
+			FLASH::FACI_CMD_AREA = static_cast<uint8_t>(cmd1);
+			FLASH::FACI_CMD_AREA = static_cast<uint8_t>(cmd2);
+		}
+
 		// return 「true」正常、「false」ロック状態
 		// 強制終了コマンド
 		bool turn_break_() const noexcept
 		{
-			FLASH::FACI_CMD_AREA = 0xB3;
+			faci_cmd_(FACI::BREAK);
 
 			// break (4 bytes): FCLK 20MHz to 60MHz max 20us
 			//                  FCLK 4MHz max 32us
@@ -116,7 +140,7 @@ namespace device {
 			}
 		
 			device::FLASH::FENTRYR = 0xAA00;
-			utils::delay::micro_second(100);
+			utils::delay::micro_second(MODE_CHANGE_DELAY);
 			if(device::FLASH::FENTRYR() != 0x0000) {
 				debug_format("FACI 'RD' not ready: 'turn_rd_'\n"); 
 			}
@@ -134,12 +158,10 @@ namespace device {
 					debug_format("FACI not ready: 'turn_pe_'\n");
 					return false;
 				}
-			} 
-
-//			debug_format("FENTRYR: %04X\n") % device::FLASH::FENTRYR();
+			}
 
 			device::FLASH::FENTRYR = 0xAA80;
-			utils::delay::micro_second(100);
+			utils::delay::micro_second(MODE_CHANGE_DELAY);
 			if(device::FLASH::FENTRYR() == 0x0080) {
 				mode_ = mode::PE;
 				return true;
@@ -208,8 +230,8 @@ namespace device {
 #endif
 			device::FLASH::FSADDR = org;
 
-			FLASH::FACI_CMD_AREA = 0xE8;
-			FLASH::FACI_CMD_AREA = 0x02;
+			faci_cmd_(FACI::WRITE_TOP);
+			FLASH::FACI_CMD_AREA = 0x02;  // 書き込み数
 
 			const uint8_t* p = static_cast<const uint8_t*>(src);
 			FLASH::FACI_CMD_AREA16 = (static_cast<uint16_t>(p[1]) << 8) | static_cast<uint16_t>(p[0]);
@@ -223,8 +245,7 @@ namespace device {
 			while(device::FLASH::FSTATR.DBFULL() != 0) {
 				asm("nop");
 			}
-
-			FLASH::FACI_CMD_AREA = 0xD0;
+			faci_cmd_(FACI::WRITE_FIN);
 
 			// write (4 bytes): FCLK 20MHz to 60MHz max 1.7ms
 			//                  FCLK 4MHz max 3.8ms
@@ -389,8 +410,7 @@ namespace device {
 			device::FLASH::FSADDR = org;
 			device::FLASH::FEADDR = org + len - 1;
 
-			FLASH::FACI_CMD_AREA = 0x71;
-			FLASH::FACI_CMD_AREA = 0xD0;
+			faci_cmd_(FACI::CHECK_BLANK1, FACI::CHECK_BLANK2);
 
 			// erase cheak (4 bytes): FCLK 20MHz to 60MHz max 30us
 			//                        FCLK 4MHz max 84us
@@ -412,6 +432,7 @@ namespace device {
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
 				return device::FLASH::FBCSTAT.BCST() == 0;
 			} else {
+				turn_break_();
 				error_ = error::LOCK;
 				debug_format("FACI 'erase_check' lock fail\n");
 				return false;
@@ -443,8 +464,7 @@ namespace device {
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
 			device::FLASH::FSADDR = org;
 
-			FLASH::FACI_CMD_AREA = 0x20;
-			FLASH::FACI_CMD_AREA = 0xD0;
+			faci_cmd_(FACI::ERASE1, FACI::ERASE2);
 
 			// 64 bytes erase: FCLK 20MHz to 60MHz max 10ms
 			//                 FCLK 4MHz max 18ms
@@ -467,6 +487,7 @@ namespace device {
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
 				return true;
 			} else {
+				turn_break_();
 				error_ = error::LOCK;
 				debug_format("FACI 'erase' lock fail\n");
 				return false;
