@@ -5,7 +5,7 @@
 			・データフラッシュ消去サイズ（６４バイト単位）
 			・データフラッシュ書き込みサイズ（４バイト単位）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -37,14 +37,14 @@ namespace device {
 		/*!
 			@brief  データ・フラッシュ構成 @n
 					RX64M/RX71M: ６４Ｋバイト、６４バイト、１０２４ブロック @n
-					RX651/RX65N: ３２Ｋバイト、６４バイト、５１２ブロック
-					RX66T/RX72T: ３２Ｋバイト、６４バイト、５１２ブロック
+					RX651/RX65N: ３２Ｋバイト、６４バイト、５１２ブロック @n
+					RX66T/RX72T: ３２Ｋバイト、６４バイト、５１２ブロック @n
+					RX72N/RX72M: ３２Ｋバイト、６４バイト、５１２ブロック
 		*/
 		//-----------------------------------------------------------------//
-		static const uint32_t data_flash_size  = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
-		static const uint32_t data_flash_block = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
-		static const uint32_t data_flash_bank  = FLASH::DATA_SIZE / data_flash_block;	///< データ・フラッシュのバンク数
-		static const uint32_t data_flash_word  = 4;		///< データ・フラッシュ書き込みワードサイズ
+		static constexpr uint32_t DATA_FLASH_SIZE  = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
+		static constexpr uint32_t DATA_FLASH_BLOCK = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
+		static constexpr uint32_t DATA_FLASH_BANK  = FLASH::DATA_SIZE / DATA_FLASH_BLOCK;	///< データ・フラッシュのバンク数
 
 
 		//-----------------------------------------------------------------//
@@ -116,44 +116,49 @@ namespace device {
 			}
 		
 			device::FLASH::FENTRYR = 0xAA00;
-
+			utils::delay::micro_second(100);
 			if(device::FLASH::FENTRYR() != 0x0000) {
-				debug_format("FACI 'turn_rd_' fail\n"); 
+				debug_format("FACI 'RD' not ready: 'turn_rd_'\n"); 
 			}
 			mode_ = mode::RD;
 		}
 
 
-		void turn_pe_() noexcept
+		bool turn_pe_() noexcept
 		{
 			uint32_t n = 100;  // 最大１００マイクロ秒待つ
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
 				--n;
 				if(n == 0) {
-					debug_format("FACI not ready...\n");
-					return;
+					debug_format("FACI not ready: 'turn_pe_'\n");
+					return false;
 				}
 			} 
 
-			device::FLASH::FENTRYR = 0xAA80;
+//			debug_format("FENTRYR: %04X\n") % device::FLASH::FENTRYR();
 
+			device::FLASH::FENTRYR = 0xAA80;
+			utils::delay::micro_second(100);
 			if(device::FLASH::FENTRYR() == 0x0080) {
 				mode_ = mode::PE;
+				return true;
 			} else {
-				debug_format("FACI 'turn_pe_' fail\n");
+				debug_format("FACI 'P/E' not ready: 'turn_pe_'\n");
+				return false;
 			}
 		}
 
 
-		/// RX64M, RX71M, RX65x
-		/// FCUファームウェア格納領域 FEFF F000h～FEFF FFFFh 4Kバイト
-		/// FCURAM領域 007F 8000h～007F 8FFFh 4Kバイト
-		/// コンフィギュレーション設定領域 0012 0040h～0012 007Fh 64バイト
 		bool init_fcu_() noexcept
 		{
 			if(trans_farm_) return true;
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+			/// RX64M, RX71M, RX65x では、ファームを転送する必要がある。
+			/// FCUファームウェア格納領域 FEFF F000h～FEFF FFFFh 4Kバイト
+			/// FCURAM領域 007F 8000h～007F 8FFFh 4Kバイト
+			/// コンフィギュレーション設定領域 0012 0040h～0012 007Fh 64バイト
 			if(device::FLASH::FENTRYR() != 0) {
 				device::FLASH::FENTRYR = 0xAA00;
 
@@ -167,7 +172,7 @@ namespace device {
 					}
 				}
 			}
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+
 			device::FLASH::FCURAME = 0xC403;  // Write only
 
 			const uint32_t* src = reinterpret_cast<const uint32_t*>(0xFEFFF000);  // Farm master
@@ -176,9 +181,6 @@ namespace device {
 				*dst++ = *src++;
 			}
 			device::FLASH::FCURAME = 0xC400;
-#elif defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX72T)
-			device::FLASH::FSUINITR = 0x2D01;
-#endif
 
 			turn_pe_();
 
@@ -190,6 +192,9 @@ namespace device {
 				turn_break_();
 				debug_format("FACI Tras FARM lock\n");
 			}
+#else
+			trans_farm_ = turn_pe_();
+#endif
 			return trans_farm_;
 		}
 
@@ -221,7 +226,6 @@ namespace device {
 
 			FLASH::FACI_CMD_AREA = 0xD0;
 
-
 			// write (4 bytes): FCLK 20MHz to 60MHz max 1.7ms
 			//                  FCLK 4MHz max 3.8ms
 			// * 1.1
@@ -240,8 +244,9 @@ namespace device {
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() != 0) {
+				turn_break_();
 				error_ = error::LOCK;
-				debug_format("FACI 'write32_' CMD Lock fail\n");
+				debug_format("FACI 'write32_' write error: 0x%04X\n") % org;
 				return false;
 			}
 
@@ -286,20 +291,24 @@ namespace device {
 		{
 			if(trans_farm_) return false;  // ファームが既に転送済み
 
-			device::FLASH::FWEPROR.FLWE = 0b01;
+			device::FLASH::FWEPROR = 0b01;  // プロテクトを解除
 
 			// クロック速度の最適化
-			uint32_t clk = ((static_cast<uint32_t>(clock_profile::FCLK) / 500'000) + 1) >> 1;
+			auto clk = ((static_cast<uint32_t>(clock_profile::FCLK) / 500'000) + 1) >> 1;
 			if(clk > 60) {
 				clk = 60;
 			}
+			debug_format("FCLK base: %d MHz\n") % clk;
 			device::FLASH::FPCKAR = 0x1E00 | clk;
+
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
-			device::FLASH::EEPFCLK = clk;
+//			system_io::boost_master_clock に移動
+//			device::FLASH::EEPFCLK = clk;
 #endif
 			auto state = init_fcu_();
 			if(!state) {
 				error_ = error::INIT;
+				debug_format("'init_fcu_' fail\n");
 			}
 
 			return state;
@@ -315,7 +324,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint8_t read(uint32_t org) noexcept
 		{
-			if(org >= data_flash_size) {
+			if(org >= DATA_FLASH_SIZE) {
 				error_ = error::ADDRESS;
 				return 0;
 			}
@@ -339,12 +348,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool read(uint32_t org, void* dst, uint32_t len) noexcept
 		{
-			if(org >= data_flash_size) {
+			if(org >= DATA_FLASH_SIZE) {
 				error_ = error::ADDRESS;
 				return false;
 			}
-			if((org + len) > data_flash_size) {
-				len = data_flash_size - org;
+			if((org + len) > DATA_FLASH_SIZE) {
+				len = DATA_FLASH_SIZE - org;
 			}
 			if(mode_ != mode::RD) {
 				turn_rd_();
@@ -365,9 +374,9 @@ namespace device {
 			@return 消去されていれば「true」（エラーは「false」）
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_check(uint32_t org, uint32_t len = data_flash_block) noexcept
+		bool erase_check(uint32_t org, uint32_t len = DATA_FLASH_BLOCK) noexcept
 		{
-			if(org >= data_flash_size) {
+			if(org >= DATA_FLASH_SIZE) {
 				error_ = error::ADDRESS;
 				return false;
 			}
@@ -419,7 +428,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase(uint32_t org) noexcept
 		{
-			if(org >= data_flash_size) {
+			if(org >= DATA_FLASH_SIZE) {
 				error_ = error::ADDRESS;
 				return false;
 			}
@@ -473,7 +482,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase_all() noexcept
 		{
-			for(uint32_t pos = 0; pos < data_flash_size; pos += data_flash_block) {
+			for(uint32_t pos = 0; pos < DATA_FLASH_SIZE; pos += DATA_FLASH_BLOCK) {
 				if(!erase_check(pos)) {
 					auto ret = erase(pos);
 					if(!ret) {
@@ -498,13 +507,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool write(uint32_t org, const void* src, uint32_t len) noexcept
 		{
-			if(org >= data_flash_size || (org & 0x03) != 0) {
+			if(org >= DATA_FLASH_SIZE || (org & 0x03) != 0) {
 				error_ = error::ADDRESS;
 				return false;
 			}
 
-			if((org + len) > data_flash_size) {
-				len = data_flash_size - org;
+			if((org + len) > DATA_FLASH_SIZE) {
+				len = DATA_FLASH_SIZE - org;
 			}
 
 			if(mode_ != mode::PE) {

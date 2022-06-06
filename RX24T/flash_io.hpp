@@ -27,10 +27,9 @@ namespace device {
 					（全体８Ｋバイト、ブロック１０２４バイト、バンク８個）
 		*/
 		//-----------------------------------------------------------------//
-		static const uint32_t data_flash_block = 1024;	///< データ・フラッシュのブロックサイズ
-		static const uint32_t data_flash_size  = 8192;  ///< データ・フラッシュの容量
-		static const uint32_t data_flash_bank  = 8;		///< データ・フラッシュのバンク数
-		static const uint32_t data_flash_word  = 1;		///< データ・フラッシュ書き込みワードサイズ
+		static const uint32_t DATA_FLASH_BLOCK = 1024;	///< データ・フラッシュのブロックサイズ
+		static const uint32_t DATA_FLASH_SIZE  = 8192;  ///< データ・フラッシュの容量
+		static const uint32_t DATA_FLASH_BANK  = 8;		///< データ・フラッシュのバンク数
 
 	private:
 
@@ -102,7 +101,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint8_t read(uint16_t org) const
 		{
-			if(org >= data_flash_size) return 0;
+			if(org >= DATA_FLASH_SIZE) return 0;
 			turn_rd_();
 			return device::rd8_(0x00100000 + org);
 		}
@@ -118,9 +117,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void read(uint16_t org, uint16_t len, void* dst) const
 		{
-			if(org >= data_flash_size) return;
-			if((org + len) > data_flash_size) {
-				len = data_flash_size - org;
+			if(org >= DATA_FLASH_SIZE) return;
+			if((org + len) > DATA_FLASH_SIZE) {
+				len = DATA_FLASH_SIZE - org;
 			}
 			turn_rd_();
 			const void* src = reinterpret_cast<const void*>(0x00100000 + org);
@@ -137,7 +136,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase_check(uint32_t bank) const
 		{
-			if(bank >= data_flash_bank) {
+			if(bank >= DATA_FLASH_BANK) {
 				return false;
 			}
 
@@ -145,11 +144,11 @@ namespace device {
 
 			device::FLASH::FASR.EXS = 0;
 
-			uint32_t org = bank * data_flash_block;
+			uint32_t org = bank * DATA_FLASH_BLOCK;
 			device::FLASH::FSARH = 0xFE00;
 			device::FLASH::FSARL = org;
 			device::FLASH::FEARH = 0xFE00;
-			device::FLASH::FEARL = org + data_flash_block - 1;
+			device::FLASH::FEARL = org + DATA_FLASH_BLOCK - 1;
 
 			device::FLASH::FCR = 0x83;
 			while(device::FLASH::FSTATR1.FRDY() == 0) ;
@@ -176,7 +175,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase(uint32_t bank) const
 		{
-			if(bank >= data_flash_bank) {
+			if(bank >= DATA_FLASH_BANK) {
 				return false;
 			}
 
@@ -184,11 +183,11 @@ namespace device {
 
 			device::FLASH::FASR.EXS = 0;
 
-			uint16_t org = bank * data_flash_block;
+			uint16_t org = bank * DATA_FLASH_BLOCK;
 			device::FLASH::FSARH = 0xFE00;
 			device::FLASH::FSARL = org;
 			device::FLASH::FEARH = 0xFE00;
-			device::FLASH::FEARL = org + data_flash_block - 1;
+			device::FLASH::FEARL = org + DATA_FLASH_BLOCK - 1;
 
 			device::FLASH::FCR = 0x84;
 			while(device::FLASH::FSTATR1.FRDY() == 0) ;
@@ -217,10 +216,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool write(uint32_t org, const void* src, uint32_t len) const
 		{
-			if(org >= data_flash_size) return false;
+			if(org >= DATA_FLASH_SIZE) return false;
 
-			if((org + len) > data_flash_size) {
-				len = data_flash_size - org;
+			if((org + len) > DATA_FLASH_SIZE) {
+				len = DATA_FLASH_SIZE - org;
 			}
 
 			turn_pe_();
@@ -230,12 +229,12 @@ namespace device {
 			const uint8_t*p = static_cast<const uint8_t*>(src);
 
 			bool ret = true;
-			uint16_t page = data_flash_size;
+			uint16_t page = DATA_FLASH_SIZE;
 			for(uint16_t i = 0; i < len; ++i) {
-				if(page != (org & ~(data_flash_block - 1))) {
+				if(page != (org & ~(DATA_FLASH_BLOCK - 1))) {
 					device::FLASH::FSARH = 0xFE00;
 					device::FLASH::FSARL = org;
-					page = org & ~(data_flash_block - 1);
+					page = org & ~(DATA_FLASH_BLOCK - 1);
 				}
 				device::FLASH::FWB0 = *p++;
 				device::FLASH::FCR = 0x81;

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -20,9 +20,10 @@ namespace device {
 	template<class _>
 	struct flash_t {
 
-		static const auto DATA_SIZE = 8192;
-		static const uint32_t DATA_BLOCK_SIZE = 64;
-		static const auto ID_NUM = 4;
+		static constexpr auto DATA_SIZE = 8192;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;
+		static constexpr uint32_t DATA_WORD_SIZE = 1;
+		static constexpr auto ID_NUM = 4;
 
 		//-----------------------------------------------------------------//
 		/*!
