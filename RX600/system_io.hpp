@@ -8,7 +8,7 @@
 			16MHz を使います。@n
 			(16MHz x 12.5 -> 200MHz, 16MHz x 15 -> 240MHz)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,6 +18,10 @@
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX65N) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 #elif
   #error "system_io.hpp: Not available on RX24T"
+#endif
+
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
+#include "RX600/flash.hpp"
 #endif
 
 namespace device {
@@ -149,6 +153,18 @@ namespace device {
 					device::SYSTEM::SCKCR2.UCK = usb_div - 1;
 				}
 			}
+
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
+			{
+				// Set for DataFlash memory access clocks
+				uint32_t clk = ((static_cast<uint32_t>(clock_profile::FCLK) / 500'000) + 1) >> 1;
+				if(clk > 60) {
+					clk = 60;
+				}
+				device::FLASH::EEPFCLK = clk;
+				while(device::FLASH::EEPFCLK() != clk) { asm("nop"); }
+			}
+#endif
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
 

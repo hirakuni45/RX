@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72T/RX72N グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,9 +22,10 @@ namespace device {
 	template <uint32_t dsize, uint32_t idnum>
 	struct flash_t {
 
-		static constexpr auto DATA_SIZE = dsize;
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;
-		static constexpr auto ID_NUM = idnum;
+		static constexpr auto DATA_SIZE = dsize;  ///< データ領域のサイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;  ///< データブロックのサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 4;   ///< 書き込み時のワードサイズ
+		static constexpr auto ID_NUM = idnum;  ///< ユニーク ID 数
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -213,6 +214,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>     FENTRYC;
+
 			bit_rw_t <io_, bitpos::B7>     FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
@@ -372,7 +374,7 @@ namespace device {
 			typedef ro32_t<base> io_;
 			using io_::operator ();
 
-			bits_ro_t<io_, bitpos::B0, 19>  PSADR;
+			bits_ro_t<io_, bitpos::B0, 19>  PSADR;  // RX72N: 17 bits
 		};
 		typedef fpsaddr_t<0x007FE0D8> FPSADDR_;
 		static FPSADDR_ FPSADDR;

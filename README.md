@@ -32,7 +32,7 @@ YouTube: NES Emulator for RX65N Envision kit
 Device control classes with template design patterns provide flexible and concise functionality.   
 Due to its functionality, it does not require difficult or complicated settings or code generation by separate programs.   
    
-```
+```C++
 // LED flashing program
 #include "common/renesas.hpp"
 

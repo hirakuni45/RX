@@ -84,18 +84,24 @@ namespace {
 	FLASH_IO	flash_io_;
 
 
-	void dump_(uint16_t org, uint16_t len)
+	void dump_(uint32_t org, uint32_t len)
 	{
 		bool adr = true;
-		for(uint16_t i = 0; i < len; ++i) {
+		for(uint32_t i = 0; i < len; i += device::FLASH::DATA_WORD_SIZE) {
 			if(adr) {
 				utils::format("0x%04X:") % static_cast<uint32_t>(org);
 				adr = false;
 			}
-			uint8_t dat = flash_io_.read(org);
-			utils::format(" %02X%") % static_cast<uint32_t>(dat);
-			uint16_t a = org;
-			++org;
+			for(uint32_t j = 0; j < device::FLASH::DATA_WORD_SIZE; ++j) {
+				uint8_t dat = flash_io_.read(org + j);
+				if(j == 0) {
+					utils::format(" %02X%") % static_cast<uint32_t>(dat);
+				} else {
+					utils::format("%02X%") % static_cast<uint32_t>(dat);
+				}
+			}
+			auto a = org;
+			org += device::FLASH::DATA_WORD_SIZE;
 			if(((a ^ org) & 16) != 0) {
 				utils::format("\n");
 				adr = true;
@@ -121,8 +127,8 @@ namespace {
 			if(command_.get_word(1, buff, sizeof(buff))) {
 				int bank = 0;
 				if((utils::input("%d", buff) % bank).status()) {
-					if(static_cast<uint32_t>(bank) < FLASH_IO::data_flash_bank) {
-						f = flash_io_.erase(bank);
+					if(static_cast<uint32_t>(bank) < FLASH_IO::DATA_FLASH_BANK) {
+						f = flash_io_.erase(bank * FLASH_IO::DATA_FLASH_BLOCK);
 						if(!f) {
 							utils::format("Erase error: bank %d\n") % bank;
 							f = true;
@@ -131,8 +137,29 @@ namespace {
 							if(!f) {
 								utils::format("Erase Check error: bank %d\n") % bank;
 								f = true;
+							} else {
+								uint32_t s = bank * FLASH_IO::DATA_FLASH_BLOCK;
+								uint32_t e = s + FLASH_IO::DATA_FLASH_BLOCK - 1;
+								utils::format("Erase OK: bank %d, 0x%04X to 0x%04X\n") % bank % s % e;
 							}
 						}
+					}
+				}
+			}
+			if(!f) {
+				utils::format("Erase param error: '%s'\n") % buff;
+			}
+		} else if(command_.cmp_word(0, "check") && n >= 2) {
+			bool f = false;
+			char buff[16];
+			if(command_.get_word(1, buff, sizeof(buff))) {
+				int bank = 0;
+				if((utils::input("%d", buff) % bank).status()) {
+					if(static_cast<uint32_t>(bank) < FLASH_IO::DATA_FLASH_BANK) {
+						f = flash_io_.erase_check(bank * FLASH_IO::DATA_FLASH_BLOCK);
+						uint32_t s = bank * FLASH_IO::DATA_FLASH_BLOCK;
+						uint32_t e = s + FLASH_IO::DATA_FLASH_BLOCK - 1;
+						utils::format("Erase check: bank %d: 0x%04X to 0x%04X %s\n") % bank % s % e % (f ? "OK" : "NG");
 					}
 				}
 			}
@@ -148,7 +175,7 @@ namespace {
 					f = true;
 				}
 			}
-			uint32_t len = 1;
+			uint32_t len = device::FLASH::DATA_WORD_SIZE;
 			if(n >= 3) {
 				if(command_.get_word(2, buff, sizeof(buff))) {
 					if((utils::input("%x", buff) % len).status()) {
@@ -214,7 +241,8 @@ namespace {
 				}
 			}
 		} else if(command_.cmp_word(0, "?") || command_.cmp_word(0, "help")) {
-			utils::format("erase [bank] (erase 0 to %d)\n") % FLASH_IO::data_flash_bank;
+			utils::format("erase [bank] (erase 0 to %d)\n") % FLASH_IO::DATA_FLASH_BANK;
+			utils::format("check [bank] (erase check 0 to %d)\n") % FLASH_IO::DATA_FLASH_BANK;
 			utils::format("r[ead] org [end] (read)\n");
 			utils::format("write org data... (write)\n");
 			utils::format("uid (unique ID list)\n");
@@ -277,7 +305,8 @@ int main(int argc, char** argv)
 		utils::format("Start Data Flash sample for '%s' %u [MHz]\n") % system_str_ % clk;
 		auto fclk = device::clock_profile::FCLK / 1'000'000;
 		utils::format("Flash drive clock: %u [MHz]\n") % fclk;
-		utils::format("Data Flash size: %08X\n") % FLASH_IO::data_flash_size;
+		utils::format("Data Flash total size: %08X\n") % FLASH_IO::DATA_FLASH_SIZE;
+		utils::format("Data Flash word size: %d\n") % device::FLASH::DATA_WORD_SIZE;
 	}
 
 	{  // DataFlash 開始
