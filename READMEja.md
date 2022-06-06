@@ -31,7 +31,7 @@ YouTube: NES Emulator for RX65N Envision kit
    
  テンプレートデザインパターンによるデバイス制御クラスは、柔軟で、簡潔、自在な機能を提供します。   
  その機能性により、難解で複雑な設定や、別プログラムによるコード生成を必要としません。   
-```
+```C++
 // LED flashing program
 #include "common/renesas.hpp"
 
