@@ -1,6 +1,8 @@
 Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N, RX72T SCI (UART) サンプル
 =========
 
+[English](README.md)
+
 ## 概要
 RX マイコンを使った SCI (UART) のサンプルプログラム
    

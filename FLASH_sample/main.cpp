@@ -2,23 +2,29 @@
 /*! @file
     @brief  CPU 内蔵 Data Flash 操作サンプル @n
 			RX64M, RX71M: @n
-					12MHz のベースクロックを使用する @n
-			　　　　P07 ピンにLEDを接続する @n
+				12MHz のベースクロックを使用する @n
+				P07 ピンにLEDを接続する @n
+				Size: 64K, Block: 64, Word: 4, ID: - @n
 			RX65N (Renesas Envision kit RX65N): @n
-					12MHz のベースクロックを使用する @n
-			　　　　P70 に接続された LED を利用する @n
+				12MHz のベースクロックを使用する @n
+				P70 に接続された LED を利用する @n
+				Size: 32K, Block: 64, Word: 4, ID: 4 @n
 			RX24T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
+				10MHz のベースクロックを使用する @n
+				P00 ピンにLEDを接続する @n
+				Size: 8K, Block: 64, Word: 1, ID: 4 @n
 			RX66T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
+				10MHz のベースクロックを使用する @n
+				P00 ピンにLEDを接続する @n
+				Size: 32K, Block: 64, Word: 4, ID: 3 @n
 			RX72T: @n
-					16MHz のベースクロックを使用する @n
-			　　　　P01 ピンにLEDを接続する @n
+				16MHz のベースクロックを使用する @n
+				P01 ピンにLEDを接続する @n
+				Size: 32K, Block: 64, Word: 4, ID: 3 @n
 			RX72N (Renesas Envision kit RX72N): @n
-					16MHz のベースクロックを使用する @n
-			　　　　P40 ピンにLEDを接続する
+				16MHz のベースクロックを使用する @n
+				P40 ピンにLEDを接続する @n
+				Size: 32K, Block: 64, Word: 4, ID: 4
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
