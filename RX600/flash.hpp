@@ -559,7 +559,7 @@ namespace device {
 	typedef flash_t<65536, 0> FLASH;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef flash_t<32768, 3> FLASH;
-#else
+#elif defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef flash_t<32768, 4> FLASH;
 #endif
 }
