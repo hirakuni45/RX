@@ -1,6 +1,8 @@
 Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N, RX72T I2C サンプル
 =========
 
+[英語版](README.md)
+
 ## 概要
 
 - RX マイコンを使った I2C のサンプルプログラム

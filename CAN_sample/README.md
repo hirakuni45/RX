@@ -23,7 +23,7 @@ The environment variable "MULTI" is enabled in "main.cpp".
 ## Hardware preparation
 
 - If the base crystal is different, change the typedef parameters.
-- The Makefile declares a set frequency for each module.
+- The RXxxx/clock_profile.hpp declares a set frequency for each module.
 - RX64M: 120MHz (12MHz)
 - RX71M: 240MHz (12MHz)
 - RX66T: 160MHz (10MHz)
@@ -75,7 +75,8 @@ For RX64M (port_map.hpp FIRST candidate)
 ### Typical varieties of CAN bus transceivers
 
 [Texas Instruments: SN65HVD23x](https://www.ti.com/lit/ds/symlink/sn65hvd234.pdf?ts=1604192672378&ref_url=https%253A%252F%252Fwww.google.com%252F)
-      
+Candidate for operation at 3.3V
+
 ### In the case of RX64M/RX71M
 
 - Multi-channel support
