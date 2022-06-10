@@ -1,7 +1,7 @@
 Renesas RX64M, RX71M, RX66T, RX72T, RX72N CAN 通信サンプル
 =========
    
-[English](README.md)
+[英語版](README.md)
    
 ## 概要
 
@@ -24,7 +24,7 @@ CAN が複数チャネルある場合、チャネルを切り替えて通信す�
 ## ハードウェアーの準備
 
 - ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
-- Makefile で、各モジュール別の設定周波数を宣言している。
+- RXxxx/clock_profile.h で、各モジュール別の設定周波数を宣言している。
 - RX64M: 120MHz (12MHz)
 - RX71M: 240MHz (12MHz)
 - RX66T: 160MHz (10MHz)
@@ -76,6 +76,7 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 ### CAN バス・トランシーバーの代表的な品種
 
 [Texas Instruments: SN65HVD23x](https://www.ti.com/jp/lit/ds/symlink/sn65hvd230.pdf?ts=1604189973572&ref_url=https%253A%252F%252Fwww.google.com%252F)
+※ 3.3V で動作させる場合の候補
 
 ### RX64M/RX71M の場合
 

@@ -30,12 +30,14 @@ See [SCI_sample](../SCI_sample/README.md).
  - Connect RXD pin on microcontroller side and TXD pin on USB serial.
  - Connect the TXD terminal on the microcontroller side to the RXD terminal on the USB serial.
  - Use terminal software.
---- ## Build method
+
+---
    
 ## How to build
  - Move to each platform directory and make.
  - Write flash_sample.mot file.
---- ## How to build
+
+--- 
    
 ## Operation
  - LED blinks at 0.25 second intervals.
@@ -44,8 +46,9 @@ See [SCI_sample](../SCI_sample/README.md).
  - TeraTerm serial setting: 115200 baud, 8-bit data, 1 stop, no parity. 1 stop, no parity.
  - The baud rate can be freely set by initializing SCI in main.cpp.
  - If the "value" cannot be set, initialization will fail (extremely slow or fast). (Extremely slow or fast)
- - Interactive, data flush operation.
+ - Interactive, data flash operation.
  - The operation of the data flash is performed in an interactive manner.
+
 ---
    
 ## data flush operation commands
@@ -68,7 +71,7 @@ See [SCI_sample](../SCI_sample/README.md).
 - Display of unique IDs
 - For RX64M, RX71M and other models that do not have unique IDs, display the contents of a specific memory.
 
---- ## Remarks
+---
 
 ## Notes
 
