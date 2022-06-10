@@ -225,7 +225,7 @@ namespace device {
 		// org: align 4 bytes
 		bool write32_(const void* src, uint32_t org) noexcept
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
 			device::FLASH::FPROTR = 0x5501;
 #endif
 			device::FLASH::FSADDR = org;
@@ -322,10 +322,6 @@ namespace device {
 			debug_format("FCLK base: %d MHz\n") % clk;
 			device::FLASH::FPCKAR = 0x1E00 | clk;
 
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
-//			system_io::boost_master_clock に移動
-//			device::FLASH::EEPFCLK = clk;
-#endif
 			auto state = init_fcu_();
 			if(!state) {
 				error_ = error::INIT;

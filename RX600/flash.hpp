@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72T/RX72N グループ・フラッシュ 定義
+	@brief	RX64M/RX71M/RX65N/RX66T/RX72T/RX72N/RX72M グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,16 +16,16 @@ namespace device {
 	/*!
 		@brief  フラッシュ・メモリー制御クラス
 		@param[in]	dsize	データフラッシュ容量
-		@param[in]	idnum	ID 数
+		@param[in]	idnum	ユニーク ID 数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t dsize, uint32_t idnum>
 	struct flash_t {
 
-		static constexpr auto DATA_SIZE = dsize;  ///< データ領域のサイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;  ///< データブロックのサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 4;   ///< 書き込み時のワードサイズ
-		static constexpr auto ID_NUM = idnum;  ///< ユニーク ID 数
+		static constexpr auto DATA_SIZE = dsize;		///< データ領域のサイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
+		static constexpr auto ID_NUM = idnum;			///< ユニーク ID 数
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -188,7 +188,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B13>  ERSERR;
 			bit_ro_t <io_, bitpos::B14>  ILGERR;
 			bit_ro_t <io_, bitpos::B15>  FRDY;
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 			bit_ro_t <io_, bitpos::B20>  OTERR;
 			bit_ro_t <io_, bitpos::B21>  SECERR;
 			bit_ro_t <io_, bitpos::B22>  FESETERR;
@@ -222,7 +222,7 @@ namespace device {
 		static FENTRYR_ FENTRYR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T) 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T) 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュプロテクトレジスタ（FPROTR）
@@ -267,7 +267,7 @@ namespace device {
 		static FSUINITR_ FSUINITR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ロックビットステータスレジスタ（FLKSTAT）
@@ -307,7 +307,7 @@ namespace device {
 		static FCMDR_ FCMDR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュ P/E ステータスレジスタ（FPESTAT）
@@ -513,6 +513,29 @@ namespace device {
 		static UIDR1_ UIDR1;
 		static UIDR2_ UIDR2;
 		static UIDR3_ UIDR3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  EEPFCLK レジスタの設定 @n
+					RX72N, RX72M にあるレジスタで、クロックジェネレーターの @n
+					FCLK を変更する前に設定する必要がある。 @n
+					この API は、system_io クラス、boost_master_clock から呼び出される。
+			@param[in]	fclk	FCLK 周波数
+		*/
+		//-----------------------------------------------------------------//
+		static void set_eepfclk(uint32_t fclk)
+		{
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
+			// Set for DataFlash memory access clocks
+			uint32_t clk = ((fclk / 500'000) + 1) >> 1;
+			if(clk > 60) {
+				clk = 60;
+			}
+			EEPFCLK = clk;
+			while(EEPFCLK() != clk) { asm("nop"); }
+#endif
+		}
 	};
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FWEPROR_  flash_t<dsize, idnum>::FWEPROR;
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FASTAT_   flash_t<dsize, idnum>::FASTAT;
