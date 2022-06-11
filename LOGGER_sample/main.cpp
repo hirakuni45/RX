@@ -30,6 +30,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 512>  REB;
 	typedef utils::fixed_fifo<char, 1024> SEB;
 #if defined(SIG_RX65N)
+	static const char* SYSTEM_STR = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< '0'でＯＮ
@@ -37,6 +38,7 @@ namespace {
 	// RX65N Envision Kit の SDHI ポートは、候補３で指定できる。
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
 #elif defined(SIG_RX72N)
+	static const char* SYSTEM_STR = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;  ///< '1'でＯＮ
@@ -50,10 +52,6 @@ namespace {
 	SCI			sci_;
 
 	SDC			sdc_;
-
-	// QSPI B グループ
-//	typedef device::qspi_io<device::QSPI, device::port_map::ORDER::SECOND> QSPI;
-//	QSPI		qspi_;
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
@@ -247,12 +245,6 @@ extern "C" {
 
 		cmd_.set_prompt("# ");
 
-//		{  // QSPI の初期化（Flash Memory Read/Write Interface)
-//			if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
-//				utils::format("QSPI not start.\n");
-//			}
-//		}
-
 		// シーン初期化
 		scenes_.at_base().init();
 
@@ -293,7 +285,11 @@ int main(int argc, char** argv)
 		sci_.start(115200, intr);
 	}
 
-	utils::format("\rRTK5RX65N Start for Data Logger\n");
+	{  // SD カード・クラスの初期化
+		sdc_.start();
+	}
+
+	utils::format("\rStart '%s' Data Logger\n") % SYSTEM_STR;
 
     {
         uint32_t stack_size = 8192;

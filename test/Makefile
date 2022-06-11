@@ -22,16 +22,42 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c
+				common/syscalls.c \
+				tinyusb/src/tusb.c \
+				tinyusb/src/common/tusb_fifo.c \
+				tinyusb/src/device/usbd.c \
+				tinyusb/src/device/usbd_control.c \
+				tinyusb/src/class/audio/audio_device.c \
+				tinyusb/src/class/cdc/cdc_device.c \
+				tinyusb/src/class/dfu/dfu_device.c \
+				tinyusb/src/class/dfu/dfu_rt_device.c \
+				tinyusb/src/class/hid/hid_device.c \
+				tinyusb/src/class/midi/midi_device.c \
+				tinyusb/src/class/msc/msc_device.c \
+				tinyusb/src/class/net/ecm_rndis_device.c \
+				tinyusb/src/class/net/ncm_device.c \
+				tinyusb/src/class/usbtmc/usbtmc_device.c \
+				tinyusb/src/class/video/video_device.c \
+				tinyusb/src/class/vendor/vendor_device.c \
+				hid_app.c \
+				tinyusb/src/class/cdc/cdc_host.c \
+				tinyusb/src/class/hid/hid_host.c \
+				tinyusb/src/class/msc/msc_host.c \
+				tinyusb/src/host/hub.c \
+				tinyusb/src/host/usbh.c \
+				tinyusb/src/host/usbh_control.c \
+				tinyusb/src/portable/ohci/ohci.c
 
 PSOURCES	=	main.cpp \
-				common/stdapi.cpp
+ 				dcd_usb.cpp \
+ 				hcd_usb.cpp
 
 USER_LIBS	=	supc++
 
 LDSCRIPT	=	../RX72N/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72N
+# USER_DEFS	=	SIG_RX72N CFG_TUSB_MCU=OPT_MCU_RX72N
+USER_DEFS	=	SIG_RX72N CFG_TUSB_MCU=OPT_MCU_RX72N
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
@@ -70,7 +96,8 @@ endif
 INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ \
-				../RX600/drw2d/inc/tes
+				../RX600/drw2d/inc/tes \
+				../tinyusb/src
 
 LIB_ROOT	=	../RX600/drw2d ../libmad ../zlib ../libpng
 
@@ -88,6 +115,11 @@ CC_OPT		=	-Wall -Werror \
                 -Wno-maybe-uninitialized \
                 -Wno-unused-but-set-variable \
                 -fno-exceptions
+
+#				-fdata-sections \
+				-ffunction-sections \
+				-fsingle-precision-constant \
+				-fno-strict-aliasing
 
 ifeq ($(BUILD),debug)
     CC_OPT += -g -DDEBUG

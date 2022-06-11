@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ラップタイム
+	@brief	ラップタイム計測
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,10 +22,10 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class laptime : public utils::scene {
 
-		static const uint16_t LAP_LIST_NUM = 6;
-		static const uint16_t LAP_LIST_X = 24;
-		static const uint16_t LAP_LIST_Y = 48;
-		static const uint16_t LAP_FONT_HEIGHT = 28;
+		static constexpr uint16_t LAP_LIST_NUM = 6;
+		static constexpr uint16_t LAP_LIST_X = 24;
+		static constexpr uint16_t LAP_LIST_Y = 48;
+		static constexpr uint16_t LAP_FONT_HEIGHT = 28;
 
 		gui::button		button_;
 		gui::slider		slider_;
@@ -37,7 +37,7 @@ namespace app {
 		typedef RENDER::glc_type GLC;
 		typedef graphics::def_color DEF_COLOR;
 
-		void make_file_name_(time_t t, char* out, uint32_t len)
+		static void build_file_name_(time_t t, char* out, uint32_t len)
 		{
 			struct tm *m = localtime(&t);
 			utils::sformat("%04d%s%02d%02d%02d", out, len)
@@ -182,7 +182,8 @@ namespace app {
 			@brief	シーンの終了
 		*/
 		//-------------------------------------------------------------//
-		void exit() override {
+		void exit() override
+		{
 			button_.enable(false);
 			slider_.enable(false);
 		}
