@@ -26,8 +26,8 @@ namespace utils {
 	template <class NVAL, class SYMBOL, class FUNC>
 	struct basic_arith {
 
-		static const uint32_t NUMBER_NUM = 50;  ///< 最大桁数
-		static const uint32_t NEST_MAX   = 10;  ///< 最大ネスト
+		static constexpr uint32_t NUMBER_NUM = 50;  ///< 最大桁数
+		static constexpr uint32_t NEST_MAX   = 10;  ///< 最大ネスト
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

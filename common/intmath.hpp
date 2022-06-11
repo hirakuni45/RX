@@ -246,7 +246,7 @@ static short randTapTables[] = {
 	template <uint16_t shi, uint16_t len>
 	class sin_cos {
 
-		static const uint16_t TN = 1 << shi;
+		static constexpr uint16_t TN = 1 << shi;
 
 		int16_t tbl_[TN + 1];
 

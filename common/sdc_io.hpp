@@ -47,8 +47,8 @@ namespace utils {
 
 	private:
 
-		static const uint8_t MOUNT_RETRY_LIMIT = 3;   ///< 再マウントの最大回数
-		static const uint8_t MOUNT_RETRY_DELAY = 60;  ///< 再マウントの遅延時間（単位：フレーム）
+		static constexpr uint8_t MOUNT_RETRY_LIMIT = 3;   ///< 再マウントの最大回数
+		static constexpr uint8_t MOUNT_RETRY_DELAY = 60;  ///< 再マウントの遅延時間（単位：フレーム）
 
 		FATFS	fatfs_;  ///< FatFS コンテキスト
 

@@ -27,11 +27,11 @@ namespace utils {
 	template <class SCI_IO>
 	class nmea_dec {
 
-		static const uint32_t FAST_BAUDRATE = 57600;
-		static const uint32_t UPDATE_FAST_RATE = 10;	///< 10Hz
+		static constexpr uint32_t FAST_BAUDRATE = 57600;
+		static constexpr uint32_t UPDATE_FAST_RATE = 10;	///< 10Hz
 
 	public:
-		static const uint32_t SINFO_MAX = 14;		///< 衛星情報の最大数
+		static constexpr uint32_t SINFO_MAX = 14;		///< 衛星情報の最大数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

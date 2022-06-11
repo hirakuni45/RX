@@ -109,7 +109,7 @@ namespace utils {
 	class base_input {
 	public:
 
-		static const uint16_t VERSION = 101;
+		static constexpr uint16_t VERSION = 101;
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

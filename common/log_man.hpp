@@ -22,8 +22,8 @@ namespace utils {
 	template <class MEMIO>
 	class log_man {
 
-		static const uint32_t offset_ = 8;
-		static const uint32_t uniq_id_ = 0x1a3c5976;  // 初期化判定ユニークコード
+		static constexpr uint32_t offset_ = 8;
+		static constexpr uint32_t uniq_id_ = 0x1a3c5976;  // 初期化判定ユニークコード
 
 		struct area_t {
 			uint32_t	id_;

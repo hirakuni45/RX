@@ -34,14 +34,14 @@ namespace utils {
 	template <class _>
 	class file_io_ {
 
-		static const uint32_t COPY_TMP_SIZE = 512;	///< コピーを行う場合のテンポラリサイズ
+		static constexpr uint32_t COPY_TMP_SIZE = 512;	///< コピーを行う場合のテンポラリサイズ
 
 	public:
 
 #ifdef MANAGE_CURRENT_PATH_
-		static const uint32_t PATH_MAX_SIZE = 256 + 1;			///< パスの最大サイズ
+		static constexpr uint32_t PATH_MAX_SIZE = 256 + 1;			///< パスの最大サイズ
 #else
-		static const uint32_t PATH_MAX_SIZE = FF_MAX_LFN + 1;	///< パスの最大サイズ
+		static constexpr uint32_t PATH_MAX_SIZE = FF_MAX_LFN + 1;	///< パスの最大サイズ
 #endif
 
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
