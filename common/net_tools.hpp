@@ -113,7 +113,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		static const uint8_t* get_brodcast_mac()
 		{
-			static uint8_t bmac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+			static constexpr uint8_t bmac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 			return bmac;
 		}
 
@@ -140,7 +140,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		static bool check_allzero_mac(const uint8_t* top)
 		{
-			static uint8_t zero[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+			static constexpr uint8_t zero[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 			return std::memcmp(zero, top, 6) == 0;
 		}
 

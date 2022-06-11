@@ -40,7 +40,7 @@ namespace imath {
 			if(std::abs(p.x) > std::abs(p.y)) n |= 0b001;
 			if(p.x < 0) n |= 0b100;
 			if(p.y < 0) n |= 0b010;
-			static const int8_t map[8] = {
+			static constexpr int8_t map[8] = {
 				0, 1, 3, 2, 7, 6, 4, 5
 			};
 			return map[n];
