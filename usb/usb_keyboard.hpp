@@ -24,19 +24,19 @@ namespace usb {
 
 	private:
 
-		static const uint8_t BITS_CTRL_LEFT   = 0b00000001;
-		static const uint8_t BITS_SHIFT_LEFT  = 0b00000010;
-		static const uint8_t BITS_ALT_LEFT    = 0b00000100;
-		static const uint8_t BITS_WIN_LEFT    = 0b00001000;
-		static const uint8_t BITS_CTRL_RIGHT  = 0b00010000;
-		static const uint8_t BITS_SHIFT_RIGHT = 0b00100000;
-		static const uint8_t BITS_ALT_RIGHT   = 0b01000000;
-		static const uint8_t BITS_WIN_RIGHT   = 0b10000000;
+		static constexpr uint8_t BITS_CTRL_LEFT   = 0b00000001;
+		static constexpr uint8_t BITS_SHIFT_LEFT  = 0b00000010;
+		static constexpr uint8_t BITS_ALT_LEFT    = 0b00000100;
+		static constexpr uint8_t BITS_WIN_LEFT    = 0b00001000;
+		static constexpr uint8_t BITS_CTRL_RIGHT  = 0b00010000;
+		static constexpr uint8_t BITS_SHIFT_RIGHT = 0b00100000;
+		static constexpr uint8_t BITS_ALT_RIGHT   = 0b01000000;
+		static constexpr uint8_t BITS_WIN_RIGHT   = 0b10000000;
 
-		static const uint8_t BITS_SHIFT       = BITS_SHIFT_LEFT | BITS_SHIFT_RIGHT;
-		static const uint8_t BITS_CTRL        = BITS_CTRL_LEFT | BITS_CTRL_RIGHT;
-		static const uint8_t BITS_ALT         = BITS_ALT_LEFT | BITS_ALT_RIGHT;
-		static const uint8_t BITS_WIN         = BITS_WIN_LEFT | BITS_WIN_RIGHT;
+		static constexpr uint8_t BITS_SHIFT       = BITS_SHIFT_LEFT | BITS_SHIFT_RIGHT;
+		static constexpr uint8_t BITS_CTRL        = BITS_CTRL_LEFT | BITS_CTRL_RIGHT;
+		static constexpr uint8_t BITS_ALT         = BITS_ALT_LEFT | BITS_ALT_RIGHT;
+		static constexpr uint8_t BITS_WIN         = BITS_WIN_LEFT | BITS_WIN_RIGHT;
 
 		FIFO		fifo_;
 
