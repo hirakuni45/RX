@@ -65,8 +65,8 @@ namespace app {
 	class scenes_base {
 
 		/// GLCDC
-		static const int16_t LCD_X = 480;
-		static const int16_t LCD_Y = 272;
+		static constexpr int16_t LCD_X = 480;
+		static constexpr int16_t LCD_Y = 272;
         typedef utils::fixed_fifo<uint8_t, 64> RB64;
         typedef utils::fixed_fifo<uint8_t, 64> SB64;
 #if defined(SIG_RX65N)
@@ -74,7 +74,7 @@ namespace app {
 
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-		static const uint32_t LCD_ORG = 0x0000'0100;
+		static constexpr uint32_t LCD_ORG = 0x0000'0100;
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
         typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 #elif defined(SIG_RX72N)
@@ -82,11 +82,11 @@ namespace app {
 
         typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
         typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
-        static const uint32_t LCD_ORG = 0x0080'0000;
+        static constexpr uint32_t LCD_ORG = 0x0080'0000;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
         typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 #endif
-		static const auto PIX = graphics::pixel::TYPE::RGB565;
+		static constexpr auto PIX = graphics::pixel::TYPE::RGB565;
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
 
 	public:

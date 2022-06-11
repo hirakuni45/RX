@@ -178,7 +178,7 @@ namespace dsos {
 		static constexpr char SMP_FINE4_STR[] = "10ms,20ms,50ms";
 		static constexpr char SMP_FINE5_STR[] = "100ms,200ms,500ms";
 
-		static const uint8_t SMP_FINE_NUM = 3;
+		static constexpr uint8_t SMP_FINE_NUM = 3;
 
 		/// サンプリング時間（マイクロ秒）
 		static constexpr int32_t SMP_RATE_US[] = {
