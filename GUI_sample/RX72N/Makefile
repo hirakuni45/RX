@@ -34,7 +34,6 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	GUI_sample/main.cpp \
 				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
-				graphics/color.cpp \
 				common/stdapi.cpp
 
 USER_LIBS	=	supc++ png z m

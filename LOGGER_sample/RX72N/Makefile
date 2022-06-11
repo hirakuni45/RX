@@ -43,10 +43,9 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	LOGGER_sample/main.cpp \
 				LOGGER_sample/resource.cpp \
 				graphics/font8x16.cpp \
-				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ drw2d mad png z m
+USER_LIBS	=	supc++ drw2d png z m
 
 USER_DEFS	=	FAT_FS FAT_FS_NUM=16 RTOS
 

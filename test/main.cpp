@@ -1,23 +1,9 @@
 //=====================================================================//
 /*! @file
-    @brief  ファースト・サンプル（LED 点滅） @n
-			RX64M, RX71M: @n
-					12MHz のベースクロックを使用する @n
-			　　　　P07 ピンにLEDを接続する @n
-			RX65N (Renesas Envision kit RX65N): @n
-					12MHz のベースクロックを使用する @n
-			　　　　P70 に接続された LED を利用する @n
-			RX63T @n
-					12MHz のベースクロックを使用する @n
-					PB7 に接続された LED を利用する @n
-			RX24T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
-			RX66T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する
+    @brief  テスト・プロジェクト（unittest では無い！） @n
+			RX72N Envision kit
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -31,13 +17,15 @@
 #include "common/command.hpp"
 #include "common/input.hpp"
 
+#define TEST_CMT
 // #ifdef TFU
 // #define OUT_TPU
 // #define OUT_MTU
 // #define SCI_I2C
 // #define TEST_QSPI
 // #define TEST_MTU
-#define TEST_TMR
+// #define TEST_TMR
+// #define TINY_USB
 
 #ifdef OUT_TPU
 #include "common/tpu_io.hpp"
@@ -63,6 +51,14 @@
 
 #ifdef TEST_TMR
 #include "common/tmr_mgr.hpp"
+#endif
+
+#ifdef TINY_USB
+#include "tusb.h"
+
+extern "C" void cdc_task(void);
+extern "C" void hid_app_task(void);
+
 #endif
 
 #if 0
@@ -103,6 +99,9 @@ namespace {
 	static const char* system_str_ = { "RX72N" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
+
+//	P16/USB0_VBUSEN
+//	P14/USB0_OVR
 #endif
 
 	typedef device::system_io<> SYSTEM_IO;
@@ -113,8 +112,18 @@ namespace {
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI		sci_;
 
+	typedef utils::command<256> CMD;
+	CMD		cmd_;
+
+#ifdef TEST_CMT
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
+#endif
+
+#ifdef TEST_USB
+	typedef device::cmt_mgr<device::CMT0> CMT;
+	CMT		cmt_;
+#endif
 
 #ifdef OUT_TPU
 	typedef device::tpu_io<device::TPU4> TPU;
@@ -139,9 +148,6 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> TOUCH;
 	TOUCH	touch_(ft5206_i2c_);
 #endif
-
-	typedef utils::command<256> CMD;
-	CMD		cmd_;
 
 #ifdef OUT_MTU
 	void list_mtu_freq_()
@@ -174,6 +180,7 @@ namespace {
 	typedef device::tmr_mgr<TMR_CH, utils::count_task> TMR_MGR;
 	TMR_MGR		tmr_mgr_;
 #endif
+
 }
 
 extern "C" {
@@ -225,6 +232,20 @@ int main(int argc, char** argv)
 	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
 
 #ifdef TEST_CMT
+	{  // タイマー設定
+		uint8_t intr = 4;
+		if(!cmt_.start(1, intr)) {
+			utils::format("Can't start CMT\n");
+		} else {
+			utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
+			float rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
+			rate *= 100.0f;
+			utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
+		}
+	}
+#endif
+
+#ifdef TEST_USB
 	{  // タイマー設定
 		uint8_t intr = 4;
 		cmt_.start(100, intr);
@@ -331,8 +352,43 @@ int main(int argc, char** argv)
 	}
 #endif
 
+#ifdef TINY_USB
+	{  // タイマー設定
+		uint8_t intr = 4;
+		cmt_.start(1000, intr);
+		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
+		float rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
+		rate *= 100.0f;
+		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
+	}
+
+	tusb_init();
+#endif
+
 	uint8_t cnt = 0;
 	while(1) {
+
+#ifdef TEST_CMT
+		cmt_.sync();
+#endif
+
+//-------------------------------
+
+#ifdef TINY_USB
+		cmt_.sync();
+
+		tuh_task();
+#if CFG_TUH_CDC
+		cdc_task();
+#endif
+
+#if CFG_TUH_HID
+		hid_app_task();
+#endif
+#endif
+
+//------------------------------
+
 #ifdef TEST_MTU
 		mtu_io_.sync();
 #endif
@@ -392,6 +448,7 @@ touch_.update();
 			}
 		}
 #endif
+
 
 		++cnt;
 		if(cnt >= 50) {

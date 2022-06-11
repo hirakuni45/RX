@@ -30,18 +30,19 @@ namespace graphics {
 		T		g;
 		T		r;
 		T		a;
-		constexpr rgba_base_t(T rr = 0, T gg = 0, T bb = 0, T aa = 255) :
+		constexpr rgba_base_t(T rr = 0, T gg = 0, T bb = 0, T aa = 255) noexcept :
 			b(bb), g(gg), r(rr), a(aa) { }
-		constexpr rgba_base_t(const rgba_base_t<T>& t) : b(t.b), g(t.g), r(t.r), a(t.a) { }
+		constexpr rgba_base_t(const rgba_base_t<T>& t) noexcept : b(t.b), g(t.g), r(t.r), a(t.a) { }
 #elif defined(BIG_ENDIAN)
 		T		a;
 		T		r;
 		T		g;
 		T		b;
-		constexpr rgba_base_t(T rr = 0, T gg = 0, T bb = 0, T aa = 255) :
+		constexpr rgba_base_t(T rr = 0, T gg = 0, T bb = 0, T aa = 255) noexcept :
 			a(aa), r(rr), g(gg), b(bb) { }
-		constexpr rgba_base_t(const rgba_base_t<T>& t) : a(t.a), r(t.r), g(t.g), b(t.b) { }
+		constexpr rgba_base_t(const rgba_base_t<T>& t) noexcept : a(t.a), r(t.r), g(t.g), b(t.b) { }
 #endif
+///		rgba_base_t& operator = (const rgba_base_t& t) noexcept { return *this; }
 	};
 	typedef rgba_base_t<uint8_t> rgba8_t;
 	typedef rgba_base_t<float  > rgbaf_t;
@@ -61,7 +62,7 @@ namespace graphics {
 		constexpr color_t(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) : unit(r, g, b, a) { }
 		constexpr color_t(const color_t& t) noexcept : rgba(t.rgba) { }
  		color_t& operator = (const color_t& t) noexcept { rgba = t.rgba; return *this; }
-		color_t& operator = (color_t&& t) noexcept { rgba = t.rgba; return *this; }
+///		color_t& operator = (color_t&& t) noexcept { rgba = t.rgba; return *this; }
 		color_t& operator *= (uint8_t s) noexcept {
 			unit.r = (static_cast<uint16_t>(unit.r) * (static_cast<uint16_t>(s) + 1)) >> 8;
 			unit.g = (static_cast<uint16_t>(unit.g) * (static_cast<uint16_t>(s) + 1)) >> 8;
@@ -96,7 +97,9 @@ namespace graphics {
 			rgb565(to_565(r, g, b)), rgba8(r, g, b, 255) { }
 
 		constexpr share_color(const share_color& t) noexcept :
-			rgb565(t.rgb565), rgba8(t.rgba8) { }
+			rgb565(t.rgb565),
+			rgba8(t.rgba8.unit.r, t.rgba8.unit.g, t.rgba8.unit.b, t.rgba8.unit.a)
+		{ }
 
 		share_color& operator = (const share_color& t) noexcept {
 			rgb565 = t.rgb565;
@@ -135,11 +138,11 @@ namespace graphics {
 			@return 合成されたカラー
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t color_sum(uint16_t c0, uint16_t c1) noexcept
+		static constexpr uint16_t color_sum(uint16_t c0, uint16_t c1) noexcept
 		{
-			uint16_t r = c0 & 0b1111100000000000;
-			uint16_t g = c0 & 0b0000011111100000;
-			uint16_t b = c0 & 0b0000000000011111;
+			auto r = c0 & 0b1111100000000000;
+			auto g = c0 & 0b0000011111100000;
+			auto b = c0 & 0b0000000000011111;
 			r >>= 1;
 			r += (c1 & 0b1111100000000000) >> 1;
 			r &= 0b1111100000000000;
@@ -160,7 +163,7 @@ namespace graphics {
 			@return 変換されたカラー
 		*/
 		//-----------------------------------------------------------------//
-		static rgba8_t conv_rgba8(uint16_t src) noexcept {
+		static constexpr rgba8_t conv_rgba8(uint16_t src) noexcept {
 			uint8_t r = (src & 0b1111100000000000) >> 8;
 			r |= r >> 5;
 			uint8_t g = (src & 0b0000011111100000) >> 3;
@@ -180,7 +183,7 @@ namespace graphics {
 			@return ブレンドされたカラー
 		*/
 		//-----------------------------------------------------------------//
-		static rgba8_t blend(const rgba8_t& dst, const rgba8_t& src) noexcept {
+		static constexpr rgba8_t blend(const rgba8_t& dst, const rgba8_t& src) noexcept {
 			uint16_t aa = 256 - (src.a + 1);
 			uint16_t ba = src.a + 1;
 			uint16_t r = (dst.r * aa) + (src.r * ba);
@@ -200,7 +203,7 @@ namespace graphics {
 			@return 合成後カラー
 		*/
 		//-----------------------------------------------------------------//
-		static rgba8_t blend(const rgba8_t& fc, uint8_t alpha, const rgba8_t& bc) noexcept
+		static constexpr rgba8_t blend(const rgba8_t& fc, uint8_t alpha, const rgba8_t& bc) noexcept
 		{
 			uint16_t fi = alpha + 1;
 			uint16_t bi = 256 - (alpha + 1);
@@ -214,34 +217,36 @@ namespace graphics {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	カラー定義
+		@brief	標準カラー定義
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct def_color {
-		static const share_color Black;
-		static const share_color Maroon;
-		static const share_color Green;
-		static const share_color Olive;
-		static const share_color Navy;
-		static const share_color Purple;
-		static const share_color Teal;
-		static const share_color Silver;
-		static const share_color Gray;
-		static const share_color Grey;
-		static const share_color Midgray;
-		static const share_color Darkgray;
-		static const share_color Red;
-		static const share_color Lime;
-		static const share_color Yellow;
-		static const share_color Blue;
-		static const share_color Fuchsi;
-		static const share_color Aqua;
-		static const share_color White;
-		static const share_color Orange;
-		static const share_color SafeColor;
-		static const share_color EmeraldGreen;
-		static const share_color LightPink;
-		static const share_color DarkSafeColor;
-		static const share_color LightSafeColor;
+		static constexpr share_color Black   = { 0, 0, 0 };
+		static constexpr share_color Maroon  = { 128,   0,   0 };
+		static constexpr share_color Green   = {   0, 128,   0 };
+		static constexpr share_color Olive   = { 128, 128,   0 };
+		static constexpr share_color Navy    = {   0,   0, 128 };
+		static constexpr share_color Purple  = { 128,   0, 128 };
+		static constexpr share_color Teal    = {   0, 128, 128 };
+		static constexpr share_color Silver  = { 192, 192, 192 };
+		static constexpr share_color Gray    = { 128, 128, 128 };  // 米国
+		static constexpr share_color Grey    = { 128, 128, 128 };  // 英国
+		static constexpr share_color Midgray = {  96,  96,  96 };
+		static constexpr share_color Darkgray= {  64,  64,  64 };
+		static constexpr share_color Red     = { 255,   0,   0 };
+		static constexpr share_color Lime    = {   0, 255,   0 };
+		static constexpr share_color Yellow  = { 255, 255,   0 };
+		static constexpr share_color Blue    = {   0,   0, 255 };
+		static constexpr share_color Fuchsi  = { 255,   0, 255 };  // 赤紫色
+		static constexpr share_color Aqua    = {   0, 255, 255 };
+		static constexpr share_color White   = { 255, 255, 255 };
+
+		static constexpr share_color Orange       = { 255, 165,   0 };  // オレンジ
+		static constexpr share_color SafeColor    = {  51, 204, 255 };  // セーフカラー（水色系）
+		static constexpr share_color EmeraldGreen = {   0, 164, 116 };
+		static constexpr share_color LightPink    = { 255, 182, 193 };
+
+		static constexpr share_color DarkSafeColor  = { 23, 54, 64 };
+		static constexpr share_color LightSafeColor = { 23+23/2, 54+54/2, 64+64/2 };
 	};
 }

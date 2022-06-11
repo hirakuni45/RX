@@ -28,7 +28,6 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	TGL_sample/main.cpp \
 				graphics/font8x16.cpp \
-				graphics/color.cpp \
 				common/stdapi.cpp
 
 USER_LIBS	=	supc++ m

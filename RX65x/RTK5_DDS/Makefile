@@ -29,7 +29,6 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp \
 				graphics/font8x16.cpp \
-				graphics/color.cpp \
 				common/stdapi.cpp
 
 #				graphics/kfont16.cpp
