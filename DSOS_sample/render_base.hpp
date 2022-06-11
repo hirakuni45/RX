@@ -20,12 +20,12 @@ namespace dsos {
 	struct render_base {
 
 		/// グリッド単位数
-		static const int16_t GRID = 40;
+		static constexpr int16_t GRID = 40;
 
 		/// 時間軸サイズ
-		static const int16_t TIME_SIZE = GRID * 11;
+		static constexpr int16_t TIME_SIZE = GRID * 11;
 		/// 電圧軸サイズ
-		static const int16_t VOLT_SIZE = GRID * 6;
+		static constexpr int16_t VOLT_SIZE = GRID * 6;
 
 		static constexpr float VOLT_DIV_L =  4.710407f;  ///< 7.77Vp-p
 		static constexpr float VOLT_DIV_H = 49.571428f;  ///< 82Vp-p

@@ -76,7 +76,7 @@ namespace img {
 		//-----------------------------------------------------------------//
 		bool probe(utils::file_io& fin) noexcept
 		{
-			static const int PNG_BYTES_TO_CHECK = 4;
+			static constexpr int PNG_BYTES_TO_CHECK = 4;
 			uint8_t sig[PNG_BYTES_TO_CHECK];
 
 			auto ofs = fin.tell();

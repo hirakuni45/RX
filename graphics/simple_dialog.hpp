@@ -26,8 +26,8 @@ namespace gui {
 	class simple_dialog {
 	public:
 		typedef graphics::def_color DEF_COLOR;
-		static const int16_t modal_radius = 10;  // modal round radius
-		static const int16_t button_radius = 6;  // button round radius
+		static constexpr int16_t modal_radius = 10;  // modal round radius
+		static constexpr int16_t button_radius = 6;  // button round radius
 
 	private:
 		using GLC = typename RDR::glc_type;

@@ -22,7 +22,7 @@ namespace chip {
 	template <class I2C_IO>
 	class EEPROM {
 	public:
-		static const uint8_t	I2C_ADR = 0x50;
+		static constexpr uint8_t	I2C_ADR = 0x50;
 
 	private:
 

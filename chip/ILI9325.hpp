@@ -27,7 +27,7 @@ namespace chip {
 
 		RW&		rw_;
 
-		static const uint16_t DELAY = 0xffff;
+		static constexpr uint16_t DELAY = 0xffff;
 
 		void write_list_(const uint16_t* list, uint16_t size)
 		{
@@ -73,7 +73,7 @@ namespace chip {
 //				return false;
 //			}
 
-			static const uint16_t init_list_[] = {
+			static constexpr uint16_t init_list_[] = {
 				0x01, 0x0100,  //Driver output control VT (1)
 				0x03, 0x1030,  //Entry mode
 

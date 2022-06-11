@@ -455,7 +455,7 @@ namespace chip {
 
 			// -- VL53L0X_load_tuning_settings() begin
 			// DefaultTuningSettings from vl53l0x_tuning.h
-			static const uint8_t tuning[] = {
+			static constexpr uint8_t tuning[] = {
 				0xFF, 0x01,
 				0x00, 0x00,
 
@@ -898,15 +898,15 @@ namespace chip {
 		bool set_measurement_timing_budget(uint32_t budget_us)
 		{
 			// note that this is different than the value in get_
-			static const uint16_t StartOverhead      = 1320;
-			static const uint16_t EndOverhead        = 960;
-			static const uint16_t MsrcOverhead       = 660;
-			static const uint16_t TccOverhead        = 590;
-			static const uint16_t DssOverhead        = 690;
-			static const uint16_t PreRangeOverhead   = 660;
-			static const uint16_t FinalRangeOverhead = 550;
+			static constexpr uint16_t StartOverhead      = 1320;
+			static constexpr uint16_t EndOverhead        = 960;
+			static constexpr uint16_t MsrcOverhead       = 660;
+			static constexpr uint16_t TccOverhead        = 590;
+			static constexpr uint16_t DssOverhead        = 690;
+			static constexpr uint16_t PreRangeOverhead   = 660;
+			static constexpr uint16_t FinalRangeOverhead = 550;
 
-			uint32_t const MinTimingBudget = 20000;
+			uint32_t constexpr MinTimingBudget = 20000;
 
 			if(budget_us < MinTimingBudget) { return false; }
 
@@ -1200,13 +1200,13 @@ namespace chip {
 		uint32_t get_measurement_timing_budget()
 		{
 			// note that this is different than the value in set_
-			static const uint16_t StartOverhead     = 1910;
-			static const uint16_t EndOverhead        = 960;
-			static const uint16_t MsrcOverhead       = 660;
-			static const uint16_t TccOverhead        = 590;
-			static const uint16_t DssOverhead        = 690;
-			static const uint16_t PreRangeOverhead   = 660;
-			static const uint16_t FinalRangeOverhead = 550;
+			static constexpr uint16_t StartOverhead     = 1910;
+			static constexpr uint16_t EndOverhead        = 960;
+			static constexpr uint16_t MsrcOverhead       = 660;
+			static constexpr uint16_t TccOverhead        = 590;
+			static constexpr uint16_t DssOverhead        = 690;
+			static constexpr uint16_t PreRangeOverhead   = 660;
+			static constexpr uint16_t FinalRangeOverhead = 550;
 
 			// "Start and end overhead times always present"
 			uint32_t budget_us = StartOverhead + EndOverhead;

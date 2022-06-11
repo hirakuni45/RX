@@ -34,11 +34,11 @@ namespace dsos {
 		typedef device::S12AD  ADC0;
 		typedef device::S12AD1 ADC1;
 #if defined(SIG_RX65N)
-		static const auto ADC_CH0 = ADC0::ANALOG::AIN000;  ///< P40 CN10(1)
-		static const auto ADC_CH1 = ADC1::ANALOG::AIN114;  ///< P90 CN10(5)
+		static constexpr auto ADC_CH0 = ADC0::ANALOG::AIN000;  ///< P40 CN10(1)
+		static constexpr auto ADC_CH1 = ADC1::ANALOG::AIN114;  ///< P90 CN10(5)
 #elif defined(SIG_RX72N)
-		static const auto ADC_CH0 = ADC0::ANALOG::AIN007;  ///< P47 Pmod2(10) CN6
-		static const auto ADC_CH1 = ADC1::ANALOG::AIN108;  ///< PD0 Pmod2( 7) CN6
+		static constexpr auto ADC_CH0 = ADC0::ANALOG::AIN007;  ///< P47 Pmod2(10) CN6
+		static constexpr auto ADC_CH1 = ADC1::ANALOG::AIN108;  ///< PD0 Pmod2( 7) CN6
 #endif
 #endif
 
@@ -46,8 +46,8 @@ namespace dsos {
 		// x:ch0, y:ch1
 		typedef vtx::spos DATA;
 
-		static const uint32_t CAP_NUM = CAPN;	///< キャプチャー数
-		static const int16_t CAP_OFS = 2048;	///< 12bit A/D offset
+		static constexpr uint32_t CAP_NUM = CAPN;	///< キャプチャー数
+		static constexpr int16_t CAP_OFS = 2048;	///< 12bit A/D offset
 
 		// キャプチャー・タスク
 		class cap_task {

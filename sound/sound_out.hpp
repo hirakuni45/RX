@@ -58,7 +58,7 @@ namespace sound {
 		typedef wave_t<T> WAVE;
 		typedef utils::fixed_fifo<WAVE, BFS> FIFO;
 
-		static const uint16_t PEAK_LEVEL_FRAME = 400;	///< 400 sample (48KHz : 0.5sec)
+		static constexpr uint16_t PEAK_LEVEL_FRAME = 400;	///< 400 sample (48KHz : 0.5sec)
 
 	private:
 

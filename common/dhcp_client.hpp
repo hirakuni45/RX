@@ -99,10 +99,10 @@ namespace net {
 		typedef utils::format debug_format;
 #endif
 
-		static const uint8_t DOMAIN_GET = 0x01;
+		static constexpr uint8_t DOMAIN_GET = 0x01;
 
-		static const uint32_t EXPANSION_DHCP_PACKET_SIZE  = 300;
-		static const uint32_t TRANSACTION_ID = 0x12345678;
+		static constexpr uint32_t EXPANSION_DHCP_PACKET_SIZE  = 300;
+		static constexpr uint32_t TRANSACTION_ID = 0x12345678;
 
 
 		enum class task : uint8_t {

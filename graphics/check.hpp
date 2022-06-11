@@ -24,11 +24,11 @@ namespace gui {
 
 		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
 
-		static const int16_t round_radius = 2;
-		static const int16_t frame_width  = 3;
-		static const int16_t check_space  = 4;		///< チェック・アイテムの隙間
-		static const int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
-		static const int16_t box_to_title = 5;		///< ボックスから文字までの隙間
+		static constexpr int16_t round_radius = 2;
+		static constexpr int16_t frame_width  = 3;
+		static constexpr int16_t check_space  = 4;		///< チェック・アイテムの隙間
+		static constexpr int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
+		static constexpr int16_t box_to_title = 5;		///< ボックスから文字までの隙間
 
 	private:
 

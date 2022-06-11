@@ -25,9 +25,9 @@ namespace chip {
 	template <class I2C>
 	class ISL29034 {
 
-		static const uint8_t	I2C_ADR = 0x44;  ///< ISL29034 I2C Slave Address
+		static constexpr uint8_t	I2C_ADR = 0x44;  ///< ISL29034 I2C Slave Address
 
-		static const uint8_t	DEVICE_ID = 0x28 ///< ISL29034 Device ID(xx101xxx)
+		static constexpr uint8_t	DEVICE_ID = 0x28 ///< ISL29034 Device ID(xx101xxx)
 
 		enum class REG_ADR : uint8_t {
 			CMD1 = 0x00,
@@ -56,7 +56,7 @@ namespace chip {
 			RES_4  = 0x0C, ///< 4bit
 		};
 
-		static const uint8_t ID_MASK = 0b00111000; ///< ISL29034 Device ID Mask
+		static constexpr uint8_t ID_MASK = 0b00111000; ///< ISL29034 Device ID Mask
 
 		I2C&	i2c_;
 

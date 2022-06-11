@@ -114,10 +114,10 @@ namespace device {
 	class can_io : public can_io_def {
 	public:
 
-		static const uint32_t RX_MB_TOP = 0;	///< 受信用メールボックス先頭番号
-		static const uint32_t RX_MB_NUM = 8;	///< 受信用メールボックス数（最小８）
-		static const uint32_t TX_MB_TOP = 8;	///< 送信用メールボックス先頭番号
-		static const uint32_t TX_MB_NUM = 4;	///< 送信用メールボックス数（最小４）
+		static constexpr uint32_t RX_MB_TOP = 0;	///< 受信用メールボックス先頭番号
+		static constexpr uint32_t RX_MB_NUM = 8;	///< 受信用メールボックス数（最小８）
+		static constexpr uint32_t TX_MB_TOP = 8;	///< 送信用メールボックス先頭番号
+		static constexpr uint32_t TX_MB_NUM = 4;	///< 送信用メールボックス数（最小４）
 
 	private:
 

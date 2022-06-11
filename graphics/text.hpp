@@ -26,8 +26,8 @@ namespace gui {
 
 	private:
 
-		static const uint16_t	SCROLL_SPEED_FRAME = 3;		///< 標準スクロール速度
-		static const uint16_t	SCROLL_WAIT_FRAME = 60 * 6;	///< 標準ホールド時間
+		static constexpr uint16_t	SCROLL_SPEED_FRAME = 3;		///< 標準スクロール速度
+		static constexpr uint16_t	SCROLL_WAIT_FRAME = 60 * 6;	///< 標準ホールド時間
 
 		bool		enable_scroll_;
 		int16_t		text_draw_h_;

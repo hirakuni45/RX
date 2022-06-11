@@ -27,9 +27,9 @@ namespace device {
 					（全体８Ｋバイト、ブロック１０２４バイト、バンク８個）
 		*/
 		//-----------------------------------------------------------------//
-		static const uint32_t DATA_FLASH_BLOCK = 1024;	///< データ・フラッシュのブロックサイズ
-		static const uint32_t DATA_FLASH_SIZE  = 8192;  ///< データ・フラッシュの容量
-		static const uint32_t DATA_FLASH_BANK  = 8;		///< データ・フラッシュのバンク数
+		static constexpr uint32_t DATA_FLASH_BLOCK = 1024;	///< データ・フラッシュのブロックサイズ
+		static constexpr uint32_t DATA_FLASH_SIZE  = 8192;  ///< データ・フラッシュの容量
+		static constexpr uint32_t DATA_FLASH_BANK  = 8;		///< データ・フラッシュのバンク数
 
 	private:
 

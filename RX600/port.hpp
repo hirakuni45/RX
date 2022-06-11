@@ -23,7 +23,7 @@ namespace device {
 	template <uint32_t base, class option>
 	struct port_t : public option {
 
-		static const uint32_t base_address_ = base;	///< ベースアドレス
+		static constexpr uint32_t base_address_ = base;	///< ベースアドレス
 
 
 		//-----------------------------------------------------------------//
@@ -541,8 +541,8 @@ namespace device {
 	template <class PORTx>
 	struct PORT_BYTE {
 
-//		static const uint8_t PNO     = static_cast<uint8_t>(PORTx::base_address_ & 0x1f);
-//		static const uint8_t BIT_POS = static_cast<uint8_t>(bpos);
+//		static constexpr uint8_t PNO     = static_cast<uint8_t>(PORTx::base_address_ & 0x1f);
+//		static constexpr uint8_t BIT_POS = static_cast<uint8_t>(bpos);
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -629,8 +629,8 @@ namespace device {
 	template<class _>
 	struct NULL_PORT_t {
 
-		static const uint8_t PNO     = 0xff;
-		static const uint8_t BIT_POS = 0xff;
+		static constexpr uint8_t PNO     = 0xff;
+		static constexpr uint8_t BIT_POS = 0xff;
 
 		struct null_t {
 			void operator = (bool f) { }

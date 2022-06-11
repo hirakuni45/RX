@@ -26,7 +26,7 @@ namespace device {
 	public:
 		typedef DMAC value_type;
 
-		static const uint32_t BLOCK_SIZE_MAX = 1024;	///< データ転送最大ブロック数
+		static constexpr uint32_t BLOCK_SIZE_MAX = 1024;	///< データ転送最大ブロック数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

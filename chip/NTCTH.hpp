@@ -93,7 +93,7 @@ namespace chip {
 			float THB;
 			float TR25;
 			get_para_(THB, TR25);
-			static const float T0 = 298.15f;   ///< 絶対温度
+			static constexpr float T0 = 298.15f;   ///< 絶対温度
 			float t = 1.0f / (std::log(thr / TR25) / THB + (1.0f / T0));
 			return t - 273.15f;
 		}

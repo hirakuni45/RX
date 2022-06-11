@@ -30,8 +30,8 @@ namespace device {
 		ERROR		error_;
 		uint16_t	busy_;
 
-		static const uint8_t slow_clock_ = 10 / 2;
-		static const uint8_t fast_clock_ = 4 / 2;
+		static constexpr uint8_t slow_clock_ = 10 / 2;
+		static constexpr uint8_t fast_clock_ = 4 / 2;
 
 		void start_() const {
 			SDA::P = 0;

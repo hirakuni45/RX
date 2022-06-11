@@ -24,9 +24,9 @@ namespace gui {
 
 		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
 
-		static const int16_t round_radius = 2;
-		static const int16_t frame_width  = 3;
-		static const int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
+		static constexpr int16_t round_radius = 2;
+		static constexpr int16_t frame_width  = 3;
+		static constexpr int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
 
 	private:
 

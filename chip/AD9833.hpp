@@ -53,28 +53,28 @@ namespace chip {
 		};
 
 	private:
-		static const uint32_t POW2_28 = 268435456;		// 2^28 used in frequency word calculation
+		static constexpr uint32_t POW2_28 = 268435456;		// 2^28 used in frequency word calculation
 		static constexpr float BITS_PER_DEG = 11.3777777777778f;	// 4096 / 360
 
-		static const uint16_t RESET_CMD = 0x0100;		// Reset enabled
+		static constexpr uint16_t RESET_CMD = 0x0100;		// Reset enabled
 
-		static const uint16_t DISABLE_DAC       = 0x0040;
-		static const uint16_t DISABLE_INT_CLK   = 0x0080;
+		static constexpr uint16_t DISABLE_DAC       = 0x0040;
+		static constexpr uint16_t DISABLE_INT_CLK   = 0x0080;
 
-		static const uint16_t PHASE1_OUTPUT_REG	= 0x0400;	// Output is based off REG0/REG1
-		static const uint16_t FREQ1_OUTPUT_REG  = 0x0800;	// ditto
+		static constexpr uint16_t PHASE1_OUTPUT_REG	= 0x0400;	// Output is based off REG0/REG1
+		static constexpr uint16_t FREQ1_OUTPUT_REG  = 0x0800;	// ditto
 
-		static const uint16_t PHASE1_WRITE_REG	= 0x2000;	// Which phase register
+		static constexpr uint16_t PHASE1_WRITE_REG	= 0x2000;	// Which phase register
 
-		static const uint16_t FREQ0_WRITE_REG   = 0x4000;
-		static const uint16_t FREQ1_WRITE_REG   = 0x8000;
+		static constexpr uint16_t FREQ0_WRITE_REG   = 0x4000;
+		static constexpr uint16_t FREQ1_WRITE_REG   = 0x8000;
 
-		static const uint16_t PHASE_WRITE_CMD	= 0xC000;	// Setup for Phase write
+		static constexpr uint16_t PHASE_WRITE_CMD	= 0xC000;	// Setup for Phase write
 
-		static const uint16_t SINE_WAVE         = 0x2000;
-		static const uint16_t TRIANGLE_WAVE     = 0x2002;
-		static const uint16_t SQUARE_WAVE       = 0x2028;
-		static const uint16_t HALF_SQUARE_WAVE  = 0x2020;
+		static constexpr uint16_t SINE_WAVE         = 0x2000;
+		static constexpr uint16_t TRIANGLE_WAVE     = 0x2002;
+		static constexpr uint16_t SQUARE_WAVE       = 0x2028;
+		static constexpr uint16_t HALF_SQUARE_WAVE  = 0x2020;
 
 		SPI&	spi_;
 

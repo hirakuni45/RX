@@ -27,10 +27,10 @@ namespace device {
 	struct sdsi_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-//		static const auto CDET_VEC = cdeti;	///< カード検出割り込み・ベクタ
-//		static const auto CAC_VEC  = caci;	///< カードアクセス割り込み・ベクタ
-//		static const auto SDAC_VEC = sdaci;	///< SDIO アクセス割り込み・ベクタ
-//		static const auto SBFA_VEC = sdfai;	///< バッファアクセス割り込み・ベクタ
+//		static constexpr auto CDET_VEC = cdeti;	///< カード検出割り込み・ベクタ
+//		static constexpr auto CAC_VEC  = caci;	///< カードアクセス割り込み・ベクタ
+//		static constexpr auto SDAC_VEC = sdaci;	///< SDIO アクセス割り込み・ベクタ
+//		static constexpr auto SBFA_VEC = sdfai;	///< バッファアクセス割り込み・ベクタ
 
 
 		//-----------------------------------------------------------------//

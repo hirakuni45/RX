@@ -23,9 +23,9 @@ namespace gui {
 
 		typedef menu value_type;
 
-		static const int16_t round_radius = 6;  ///< round radius
-		static const int16_t item_height  = 28;	///< ITEM height
-		static const int16_t check_size   = 6;	///< check sign width/height
+		static constexpr int16_t round_radius = 6;  ///< round radius
+		static constexpr int16_t item_height  = 28;	///< ITEM height
+		static constexpr int16_t check_size   = 6;	///< check sign width/height
 
 		typedef std::function<void(uint32_t pos, uint32_t num)> SELECT_FUNC_TYPE;
 

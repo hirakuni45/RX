@@ -62,7 +62,7 @@ namespace device {
 	private:
 
 		// SSIE の FIFO は 32 段なので、半分の 16 段で割り込み
-		static const uint32_t FIFO_TH = 16;
+		static constexpr uint32_t FIFO_TH = 16;
 
 		SOUND_OUT&	sound_out_;
 

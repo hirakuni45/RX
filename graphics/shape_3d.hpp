@@ -38,7 +38,7 @@ namespace graphics {
 	    		{  0.0f,  0.0f, -1.0f }
 	    	};
 
-	    	static const int faces[6][4] =
+	    	static constexpr int faces[6][4] =
 	    	{
 	    		{ 0, 1, 2, 3 },
 	    		{ 3, 2, 6, 7 },

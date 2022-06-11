@@ -91,13 +91,13 @@ namespace synth {
 
         typedef graphics::def_color DEF_COLOR;
 
-        static const int16_t    KEY_W_WIDTH  = 40;
-        static const int16_t    KEY_W_HEIGHT = 180;
-        static const int16_t    KEY_B_WIDTH  = 32;
-        static const int16_t    KEY_B_HEIGHT = 110;
-        static const int16_t    KEY_POS_X = 0;
-        static const int16_t    KEY_POS_Y = 272 - KEY_W_HEIGHT;
-        static const int16_t    KEY_SPACE = 3;
+        static constexpr int16_t    KEY_W_WIDTH  = 40;
+        static constexpr int16_t    KEY_W_HEIGHT = 180;
+        static constexpr int16_t    KEY_B_WIDTH  = 32;
+        static constexpr int16_t    KEY_B_HEIGHT = 110;
+        static constexpr int16_t    KEY_POS_X = 0;
+        static constexpr int16_t    KEY_POS_Y = 272 - KEY_W_HEIGHT;
+        static constexpr int16_t    KEY_SPACE = 3;
 
         typedef std::array<key_t, 21> KEYS;
         KEYS        keys_;

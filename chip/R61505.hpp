@@ -27,7 +27,7 @@ namespace chip {
 	template <class BUS, class RES>
 	class R61505 {
 
-		static const uint16_t DELAY = 0xffff;
+		static constexpr uint16_t DELAY = 0xffff;
 
 		void write_list_(const uint16_t* list, uint16_t size)
 		{
@@ -80,7 +80,7 @@ namespace chip {
 				return false;
 			}
 
-			static const uint16_t R61505_init_list_[] = {
+			static constexpr uint16_t R61505_init_list_[] = {
 				// R61505W (TFT1N3204-E)
 				0x0000, 0x0001,
 				0x0007, 0x0000,

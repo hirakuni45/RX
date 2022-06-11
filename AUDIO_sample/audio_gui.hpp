@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	オーディオ GUI クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -38,12 +38,12 @@ namespace app {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     class audio_gui {
 	public:
-		static const int16_t LCD_X = 480;
-		static const int16_t LCD_Y = 272;
-		static const auto PIX = graphics::pixel::TYPE::RGB565;
+		static constexpr int16_t LCD_X = 480;
+		static constexpr int16_t LCD_Y = 272;
+		static constexpr auto PIX = graphics::pixel::TYPE::RGB565;
 
 		/// ピークホールド減衰時間調整（100 * 60 / 32768) 秒辺りの減衰ピクセル数
-		static const int16_t PEAK_HOLD_SUB = 100;
+		static constexpr int16_t PEAK_HOLD_SUB = 100;
 
 		typedef utils::fixed_fifo<uint8_t, 64> RB64;
 		typedef utils::fixed_fifo<uint8_t, 64> SB64;
@@ -51,7 +51,7 @@ namespace app {
 #if defined(SIG_RX65N)
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-		static const uint32_t LCD_ORG = 0x0000'0100;
+		static constexpr uint32_t LCD_ORG = 0x0000'0100;
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 #ifdef USE_FAMIPAD
@@ -68,7 +68,7 @@ namespace app {
 #elif defined(SIG_RX72N)
 		typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
-		static const uint32_t LCD_ORG = 0x0080'0000;
+		static constexpr uint32_t LCD_ORG = 0x0080'0000;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 #ifdef USE_FAMIPAD

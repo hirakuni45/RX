@@ -3,7 +3,7 @@
 /*! @file
     @brief  四則演算コマンドライン
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -29,9 +29,9 @@ namespace app {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     class calc_cmd {
 
-		static const uint32_t CALC_NUM = 250;  ///< 250 桁
+		static constexpr uint32_t CALC_NUM = 250;  ///< 250 桁
 
-		static const uint32_t ANS_NUM = 60;
+		static constexpr uint32_t ANS_NUM = 60;
 
 		typedef utils::command<256> CMD;
 		CMD		cmd_;

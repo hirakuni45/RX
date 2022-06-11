@@ -27,7 +27,7 @@ namespace img {
 		PLOT&		plot_;
 
 		struct tga_t {
-			static const uint32_t HEADER_SIZE = 18;
+			static constexpr uint32_t HEADER_SIZE = 18;
 
 			typedef std::vector<rgba8>	clut_type;
 

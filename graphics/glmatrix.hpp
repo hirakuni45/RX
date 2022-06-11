@@ -39,7 +39,7 @@ namespace gl {
 		typedef mtx::matrix4<T> matrix_type;
 
 	private:
-		static const uint32_t STACK_SIZE = 4;
+		static constexpr uint32_t STACK_SIZE = 4;
 
 		mode		mode_;
 

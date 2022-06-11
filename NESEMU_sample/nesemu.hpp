@@ -35,11 +35,11 @@ namespace emu {
 	template <class RENDER, uint32_t AUDIO_SAMPLE_RATE>
 	class nesemu {
 
-		static const int nes_width_  = 256;
-		static const int nes_height_ = 240;
-        static const int sample_rate_ = AUDIO_SAMPLE_RATE;
-		static const int sample_bits_ = 16;
-		static const int audio_len_ = (sample_rate_ / 60) + 1;
+		static constexpr int nes_width_  = 256;
+		static constexpr int nes_height_ = 240;
+        static constexpr int sample_rate_ = AUDIO_SAMPLE_RATE;
+		static constexpr int sample_bits_ = 16;
+		static constexpr int audio_len_ = (sample_rate_ / 60) + 1;
 
 		RENDER&			render_;
 
