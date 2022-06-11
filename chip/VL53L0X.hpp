@@ -455,7 +455,7 @@ namespace chip {
 
 			// -- VL53L0X_load_tuning_settings() begin
 			// DefaultTuningSettings from vl53l0x_tuning.h
-			static const uint8_t tuning[] = {
+			static constexpr uint8_t tuning[] = {
 				0xFF, 0x01,
 				0x00, 0x00,
 

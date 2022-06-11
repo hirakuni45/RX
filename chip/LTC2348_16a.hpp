@@ -296,7 +296,7 @@ namespace chip {
 			if(span == 2 || span == 3 || span == 6 || span == 7) {
 				ofs = 0.5f;
 			}
-			static const float gain[8] = { 0.0f, 5.12f, 5.0f, 5.12f, 10.0f, 10.24f, 10.0f, 10.24f };
+			static constexpr float gain[8] = { 0.0f, 5.12f, 5.0f, 5.12f, 10.0f, 10.24f, 10.0f, 10.24f };
 			return ((static_cast<float>(data_[ch & 7] >> 8) / 65535.0f) - ofs) * gain[span];
 		}
 	};

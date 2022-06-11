@@ -36,8 +36,8 @@ namespace chip {
 
 	private:
 		// R/W ビットを含まない７ビット値
-		static const uint8_t MPU6050_ADR_ = 0x68;  // AD0 = 0; (GY-521 module default)
-//		static const uint8_t MPU6050_ADR_ = 0x69;  // AD0 = 1;
+		static constexpr uint8_t MPU6050_ADR_ = 0x68;  // AD0 = 0; (GY-521 module default)
+//		static constexpr uint8_t MPU6050_ADR_ = 0x69;  // AD0 = 1;
 
 		enum class REG : uint8_t {
 			XG_OFFS_TC       = 0x00, //[7] PWR_MODE, [6:1] XG_OFFS_TC, [0] OTP_BNK_VLD
