@@ -268,9 +268,9 @@ namespace device {
 		template <uint32_t base, uint32_t org, uint32_t end>
 		class cs_t {
 		public:
-			static const auto ORG = org;			///< CS 空間開始アドレス
-			static const auto END = end;			///< CS 空間終了アドレス
-			static const auto LEN = end - org + 1;	///< CS 空間長さ
+			static constexpr auto ORG = org;			///< CS 空間開始アドレス
+			static constexpr auto END = end;			///< CS 空間終了アドレス
+			static constexpr auto LEN = end - org + 1;	///< CS 空間長さ
 
 
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -122,9 +122,9 @@ namespace device {
 	template <class ETHRC, class EDMAC, class PHY, port_map::ORDER PSEL, uint32_t TXDN = 4, uint32_t RXDN = 4>
 	class ether_io {
 	public:
-		static const int EMAC_BUFSIZE = 1536;	///< イーサーネット・バッファ最大値
-		static const uint32_t TXD_NUM = TXDN;	///< 送信バッファ数
-		static const uint32_t RXD_NUM = RXDN;	///< 受信バッファ数
+		static constexpr int EMAC_BUFSIZE = 1536;	///< イーサーネット・バッファ最大値
+		static constexpr uint32_t TXD_NUM = TXDN;	///< 送信バッファ数
+		static constexpr uint32_t RXD_NUM = RXDN;	///< 受信バッファ数
 
 	private:
 #ifndef ETHRC_DEBUG
@@ -134,40 +134,40 @@ namespace device {
 #endif
 
 		// Bit definitions of status member of DescriptorS
-		static const uint32_t TACT = 0x80000000;
-		static const uint32_t RACT = 0x80000000;
-		static const uint32_t TDLE = 0x40000000;
-		static const uint32_t RDLE = 0x40000000;
-		static const uint32_t TFP1 = 0x20000000;
-		static const uint32_t RFP1 = 0x20000000;
-		static const uint32_t TFP0 = 0x10000000;
-		static const uint32_t RFP0 = 0x10000000;
-		static const uint32_t TFE  = 0x08000000;
-		static const uint32_t RFE  = 0x08000000;
+		static constexpr uint32_t TACT = 0x80000000;
+		static constexpr uint32_t RACT = 0x80000000;
+		static constexpr uint32_t TDLE = 0x40000000;
+		static constexpr uint32_t RDLE = 0x40000000;
+		static constexpr uint32_t TFP1 = 0x20000000;
+		static constexpr uint32_t RFP1 = 0x20000000;
+		static constexpr uint32_t TFP0 = 0x10000000;
+		static constexpr uint32_t RFP0 = 0x10000000;
+		static constexpr uint32_t TFE  = 0x08000000;
+		static constexpr uint32_t RFE  = 0x08000000;
 
-		static const uint32_t RFS9_RFOVER = 0x00000200;
-		static const uint32_t RFS8_RAD    = 0x00000100;
-		static const uint32_t RFS7_RMAF   = 0x00000080;
-		static const uint32_t RFS4_RRF    = 0x00000010;
-		static const uint32_t RFS3_RTLF   = 0x00000008;
-		static const uint32_t RFS2_RTSF   = 0x00000004;
-		static const uint32_t RFS1_PRE    = 0x00000002;
-		static const uint32_t RFS0_CERF   = 0x00000001;
+		static constexpr uint32_t RFS9_RFOVER = 0x00000200;
+		static constexpr uint32_t RFS8_RAD    = 0x00000100;
+		static constexpr uint32_t RFS7_RMAF   = 0x00000080;
+		static constexpr uint32_t RFS4_RRF    = 0x00000010;
+		static constexpr uint32_t RFS3_RTLF   = 0x00000008;
+		static constexpr uint32_t RFS2_RTSF   = 0x00000004;
+		static constexpr uint32_t RFS1_PRE    = 0x00000002;
+		static constexpr uint32_t RFS0_CERF   = 0x00000001;
 
-		static const uint32_t TWBI        = 0x04000000;
-		static const uint32_t TFS8_TAD    = 0x00000100;
-		static const uint32_t TFS3_CND    = 0x00000008;
-		static const uint32_t TFS2_DLC    = 0x00000004;
-		static const uint32_t TFS1_CD     = 0x00000002;
-		static const uint32_t TFS0_TRO    = 0x00000001;
+		static constexpr uint32_t TWBI        = 0x04000000;
+		static constexpr uint32_t TFS8_TAD    = 0x00000100;
+		static constexpr uint32_t TFS3_CND    = 0x00000008;
+		static constexpr uint32_t TFS2_DLC    = 0x00000004;
+		static constexpr uint32_t TFS1_CD     = 0x00000002;
+		static constexpr uint32_t TFS0_TRO    = 0x00000001;
 
-		static const int PAUSE_TABLE_ENTRIES = 8;	///< Number of entries in PAUSE resolution table
+		static constexpr int PAUSE_TABLE_ENTRIES = 8;	///< Number of entries in PAUSE resolution table
 
 		/* Local device and link partner PAUSE settings */
-		static const int XMIT_PAUSE_OFF = 0; ///< The pause frame transmission is prohibited.
-		static const int RECV_PAUSE_OFF = 0; ///< The pause frame reception is prohibited.   
-		static const int XMIT_PAUSE_ON  = 1; ///< The pause frame transmission is permitted.
-		static const int RECV_PAUSE_ON  = 1; ///< The pause frame reception is permitted.   
+		static constexpr int XMIT_PAUSE_OFF = 0; ///< The pause frame transmission is prohibited.
+		static constexpr int RECV_PAUSE_OFF = 0; ///< The pause frame reception is prohibited.   
+		static constexpr int XMIT_PAUSE_ON  = 1; ///< The pause frame transmission is permitted.
+		static constexpr int RECV_PAUSE_ON  = 1; ///< The pause frame reception is permitted.   
 
 		/* PAUSE link mask and shift values */
 		/*
@@ -175,20 +175,20 @@ namespace device {
 		 * for comparing the bit information of PAUSE function which support the local device and 
 		 * Link partner with the assorted table(pause_resolution) which enable or disable the PAUSE frame. 
 		 */
-		static const int LINK_RES_ABILITY_MASK = 3;
-		static const int LINK_RES_LOCAL_ABILITY_BITSHIFT = 2;
+		static constexpr int LINK_RES_ABILITY_MASK = 3;
+		static constexpr int LINK_RES_LOCAL_ABILITY_BITSHIFT = 2;
 
 
 		// Bit definition of interrupt factor of Ethernet interrupt
-		static const uint32_t EMAC_LCHNG_INT  =   (1UL << 2);
-		static const uint32_t EMAC_MPD_INT    =   (1UL << 1);
+		static constexpr uint32_t EMAC_LCHNG_INT  =   (1UL << 2);
+		static constexpr uint32_t EMAC_MPD_INT    =   (1UL << 1);
 
-		static const uint32_t EMAC_RFCOF_INT  =   (1UL << 24);
-		static const uint32_t EMAC_ECI_INT    =   (1UL << 22);
-		static const uint32_t EMAC_TC_INT     =   (1UL << 21);
-		static const uint32_t EMAC_FR_INT     =   (1UL << 18);
-		static const uint32_t EMAC_RDE_INT    =   (1UL << 17);
-		static const uint32_t EMAC_RFOF_INT   =   (1UL << 16);
+		static constexpr uint32_t EMAC_RFCOF_INT  =   (1UL << 24);
+		static constexpr uint32_t EMAC_ECI_INT    =   (1UL << 22);
+		static constexpr uint32_t EMAC_TC_INT     =   (1UL << 21);
+		static constexpr uint32_t EMAC_FR_INT     =   (1UL << 18);
+		static constexpr uint32_t EMAC_RDE_INT    =   (1UL << 17);
+		static constexpr uint32_t EMAC_RFOF_INT   =   (1UL << 16);
 
 
 		enum class pausemask_e : uint8_t {
@@ -218,21 +218,21 @@ namespace device {
 		};
 
 	public:
-		static const int OK    = 0;
-		static const int ERROR = -1;
-		static const int ERROR_LINK = -2;
-		static const int ERROR_MPDE = -3;
-		static const int ERROR_TACT = -4;	///< Transmission buffer dryness error. 
+		static constexpr int OK    = 0;
+		static constexpr int ERROR = -1;
+		static constexpr int ERROR_LINK = -2;
+		static constexpr int ERROR_MPDE = -3;
+		static constexpr int ERROR_TACT = -4;	///< Transmission buffer dryness error. 
 
-		static const int FLAG_OFF         = 0;
-		static const int FLAG_ON          = 1;
-		static const int FLAG_ON_LINK_OFF = 2;
-		static const int FLAG_ON_LINK_ON  = 3;
+		static constexpr int FLAG_OFF         = 0;
+		static constexpr int FLAG_ON          = 1;
+		static constexpr int FLAG_ON_LINK_OFF = 2;
+		static constexpr int FLAG_ON_LINK_ON  = 3;
 
 		 // Please define the level of the LINKSTA signal when Link becomes up.
-		static const int LINK_PRESENT    = 0;
+		static constexpr int LINK_PRESENT    = 0;
 		// Please define the level of the LINKSTA signal when Link becomes down.
-		static const int LINK_NOTPRESENT = 1;
+		static constexpr int LINK_NOTPRESENT = 1;
 
 		struct descriptor_s {
     		uint32_t	status;
@@ -406,7 +406,7 @@ namespace device {
 			// of the IEEE 802.3 values.
 			uint8_t ability_compare = ((local_ability & LINK_RES_ABILITY_MASK) << LINK_RES_LOCAL_ABILITY_BITSHIFT) | (partner_ability & LINK_RES_ABILITY_MASK);
 
-			static const pause_resolution_t pause_resolution[PAUSE_TABLE_ENTRIES] = {
+			static constexpr pause_resolution_t pause_resolution[PAUSE_TABLE_ENTRIES] = {
 				{ pausemask_e::MASKC, pauseval_e::VAL0, XMIT_PAUSE_OFF, RECV_PAUSE_OFF },
 				{ pausemask_e::MASKE, pauseval_e::VAL4, XMIT_PAUSE_OFF, RECV_PAUSE_OFF },
 				{ pausemask_e::MASKF, pauseval_e::VAL6, XMIT_PAUSE_OFF, RECV_PAUSE_OFF },

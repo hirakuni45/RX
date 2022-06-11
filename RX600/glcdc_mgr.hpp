@@ -27,19 +27,19 @@ namespace device {
 	template <class GLC, int16_t XSIZE, int16_t YSIZE, graphics::pixel::TYPE PXT_>
 	class glcdc_mgr {
 	public:
-		static const int16_t width  = XSIZE;
-		static const int16_t height = YSIZE;
-		static const graphics::pixel::TYPE PXT = PXT_;
-		static const int16_t line_width =
+		static constexpr int16_t width  = XSIZE;
+		static constexpr int16_t height = YSIZE;
+		static constexpr graphics::pixel::TYPE PXT = PXT_;
+		static constexpr int16_t line_width =
 			(((width * static_cast<int16_t>(PXT) / 8) + 63) & 0x7fc0) / (static_cast<int16_t>(PXT) / 8);
-		static const uint32_t frame_size =
+		static constexpr uint32_t frame_size =
 			line_width * (static_cast<uint32_t>(PXT) / 8) * height;
 
 	private:
 
-		static const uint32_t FRAME_LAYER_NUM  = 2;		///< Number of graphics layers
-		static const uint32_t CLUT_PLANE_NUM   = 2;		///< Number of color palletes
-		static const uint32_t PANEL_CLKDIV_NUM = 13;	///< Number of clock division ratio
+		static constexpr uint32_t FRAME_LAYER_NUM  = 2;		///< Number of graphics layers
+		static constexpr uint32_t CLUT_PLANE_NUM   = 2;		///< Number of color palletes
+		static constexpr uint32_t PANEL_CLKDIV_NUM = 13;	///< Number of clock division ratio
 
 
 		/** Serial RGB data output delay cycles select (this function is not supported) */
@@ -62,8 +62,8 @@ namespace device {
 
 		struct gamma_correction_t
 		{
-			static const uint32_t GAMMA_CURVE_GAIN_ELEMENT_NUM      = 16;
-			static const uint32_t GAMMA_CURVE_THRESHOLD_ELEMENT_NUM = 15;
+			static constexpr uint32_t GAMMA_CURVE_GAIN_ELEMENT_NUM      = 16;
+			static constexpr uint32_t GAMMA_CURVE_THRESHOLD_ELEMENT_NUM = 15;
 
 			struct correction_t
 			{
@@ -232,8 +232,8 @@ namespace device {
 
 
 	public:
-		static const uint32_t FRAME_LAYER_1 = 0;	///< Frame layer 1.
-		static const uint32_t FRAME_LAYER_2 = 1;	///< Frame layer 2.
+		static constexpr uint32_t FRAME_LAYER_1 = 0;	///< Frame layer 1.
+		static constexpr uint32_t FRAME_LAYER_2 = 1;	///< Frame layer 2.
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -314,91 +314,91 @@ namespace device {
 
 		private:
 
-		static const uint32_t PIX_WIDTH        = static_cast<uint32_t>(PXT_);
-		static const uint32_t BYTES_PER_LINE   = ((PIX_WIDTH * XSIZE) / 8);
-		static const uint32_t LINE_OFFSET      = (((BYTES_PER_LINE + 63) / 64) * 64);
-		static const uint32_t VXSIZE_PHYS      = ((LINE_OFFSET * 8) / PIX_WIDTH);
-		static const uint32_t BYTES_PER_BUFFER = (LINE_OFFSET * YSIZE);
+		static constexpr uint32_t PIX_WIDTH        = static_cast<uint32_t>(PXT_);
+		static constexpr uint32_t BYTES_PER_LINE   = ((PIX_WIDTH * XSIZE) / 8);
+		static constexpr uint32_t LINE_OFFSET      = (((BYTES_PER_LINE + 63) / 64) * 64);
+		static constexpr uint32_t VXSIZE_PHYS      = ((LINE_OFFSET * 8) / PIX_WIDTH);
+		static constexpr uint32_t BYTES_PER_BUFFER = (LINE_OFFSET * YSIZE);
 
-		static const uint32_t BRIGHTNESS_ = 0x200;
-		static const uint32_t CONTRAST_   = 0x80;
+		static constexpr uint32_t BRIGHTNESS_ = 0x200;
+		static constexpr uint32_t CONTRAST_   = 0x80;
 
-		static const uint32_t ADDRESS_ALIGNMENT_64B = 0x0000003F;
+		static constexpr uint32_t ADDRESS_ALIGNMENT_64B = 0x0000003F;
 
-		static const uint32_t GAMMA_CURVE_GAIN_ELEMENT_NUM      = 16;
-		static const uint32_t GAMMA_CURVE_THRESHOLD_ELEMENT_NUM = 15;
+		static constexpr uint32_t GAMMA_CURVE_GAIN_ELEMENT_NUM      = 16;
+		static constexpr uint32_t GAMMA_CURVE_THRESHOLD_ELEMENT_NUM = 15;
 
 		/* Fixed margin by Hardware operation */
-		static const uint32_t BG_PLANE_H_CYC_MARGIN_MIN  = 2;    /* Hsync signal margin is 2 */
-		static const uint32_t BG_PLANE_V_CYC_MARGIN_MIN  = 1;    /* Vsync signal margin is 1 */
+		static constexpr uint32_t BG_PLANE_H_CYC_MARGIN_MIN  = 2;    /* Hsync signal margin is 2 */
+		static constexpr uint32_t BG_PLANE_V_CYC_MARGIN_MIN  = 1;    /* Vsync signal margin is 1 */
 
 		/* Color correction setting threshold */
 		// OUT_BRIGHT1.BRTG, OUT_BRIGHT2.BRTR and .BRTB (Mid=512)
-		static const uint32_t BRIGHTNESS_DEFAULT  = 512;
+		static constexpr uint32_t BRIGHTNESS_DEFAULT  = 512;
 		// OUT_BRIGHT1.BRTG, OUT_BRIGHT2.BRTR and .BRTB (Max=1023)
-		static const uint32_t BRIGHTNESS_MAX      = 1023;
+		static constexpr uint32_t BRIGHTNESS_MAX      = 1023;
 		// OUT_CONTRAST.CONTG and .CONTB and .CONTR (Mid=128)
-		static const uint32_t CONTRAST_DEFAULT    = 128;
+		static constexpr uint32_t CONTRAST_DEFAULT    = 128;
 		// OUT_CONTRAST.CONTG and .CONTB and .CONTR (Max=255)
-		static const uint32_t CONTRAST_MAX        = 255;
+		static constexpr uint32_t CONTRAST_MAX        = 255;
 		// GAMx_LUTn.GAIN15 - GAIN0 (Max=2047)
-		static const uint32_t GAMMA_GAIN_MAX      = 2047;
+		static constexpr uint32_t GAMMA_GAIN_MAX      = 2047;
 		// GAMx_AREAn.TH15  - TH0   (Max=1023)
-		static const uint32_t GAMMA_THRESHOLD_MAX = 1023;
+		static constexpr uint32_t GAMMA_THRESHOLD_MAX = 1023;
 
-		static const uint32_t OUT_SET_FRQSEL_NO_DIVISION     = 0;
-		static const uint32_t OUT_SET_FRQSEL_QUATER_DIVISION = 1;
+		static constexpr uint32_t OUT_SET_FRQSEL_NO_DIVISION     = 0;
+		static constexpr uint32_t OUT_SET_FRQSEL_QUATER_DIVISION = 1;
 
 
 		/* Panel timing, Minimum threshold */
-		static const int32_t BG_PLANE_H_CYC_MIN  = 24;             // BG_PERI.FH (Min=24)
-		static const int32_t BG_PLANE_V_CYC_MIN  = 20;             // BG_PERI.FV (Min=20)
-		static const int32_t BG_PLANE_HSYNC_POS_MIN = 1;           // BG_HSYNC.HP (Min=1)
-		static const int32_t BG_PLANE_VSYNC_POS_MIN = 1;           // BG_HSYNC.VP (Min=1)
-		static const int32_t BG_PLANE_H_CYC_ACTIVE_SIZE_MIN = 16;  // BG_HSIZE.HW (Min=16)
-		static const int32_t BG_PLANE_V_CYC_ACTIVE_SIZE_MIN = 16;  // BG_VSIZE.VW (Min=16)
-		static const int32_t BG_PLANE_H_ACTIVE_POS_MIN = 6;        // BG_HSIZE.HP (Min=6)
-		static const int32_t BG_PLANE_V_ACTIVE_POS_MIN = 3;        // BG_VSIZE.VP (Min=3)
+		static constexpr int32_t BG_PLANE_H_CYC_MIN  = 24;             // BG_PERI.FH (Min=24)
+		static constexpr int32_t BG_PLANE_V_CYC_MIN  = 20;             // BG_PERI.FV (Min=20)
+		static constexpr int32_t BG_PLANE_HSYNC_POS_MIN = 1;           // BG_HSYNC.HP (Min=1)
+		static constexpr int32_t BG_PLANE_VSYNC_POS_MIN = 1;           // BG_HSYNC.VP (Min=1)
+		static constexpr int32_t BG_PLANE_H_CYC_ACTIVE_SIZE_MIN = 16;  // BG_HSIZE.HW (Min=16)
+		static constexpr int32_t BG_PLANE_V_CYC_ACTIVE_SIZE_MIN = 16;  // BG_VSIZE.VW (Min=16)
+		static constexpr int32_t BG_PLANE_H_ACTIVE_POS_MIN = 6;        // BG_HSIZE.HP (Min=6)
+		static constexpr int32_t BG_PLANE_V_ACTIVE_POS_MIN = 3;        // BG_VSIZE.VP (Min=3)
 
 		// GRn_FLM3_LNOFF(positive num min=-32768)
-		static const int32_t GR_PLANE_LNOFF_POS_MIN = -32768;
-		static const int32_t GR_PLANE_H_CYC_ACTIVE_SIZE_MIN = 16;  // GRn_AB3.GRCHW (Min=16)
-		static const int32_t GR_PLANE_V_CYC_ACTIVE_SIZE_MIN = 16;  // GRn_AB2.GRCVW (Min=16)
-		static const int32_t GR_PLANE_H_ACTIVE_POS_MIN = 5;        // GRn_AB2.GRCHS (Min=5)
-		static const int32_t GR_PLANE_V_ACTIVE_POS_MIN = 2;        // GRn_AB2.GRCVS (Min=2)
+		static constexpr int32_t GR_PLANE_LNOFF_POS_MIN = -32768;
+		static constexpr int32_t GR_PLANE_H_CYC_ACTIVE_SIZE_MIN = 16;  // GRn_AB3.GRCHW (Min=16)
+		static constexpr int32_t GR_PLANE_V_CYC_ACTIVE_SIZE_MIN = 16;  // GRn_AB2.GRCVW (Min=16)
+		static constexpr int32_t GR_PLANE_H_ACTIVE_POS_MIN = 5;        // GRn_AB2.GRCHS (Min=5)
+		static constexpr int32_t GR_PLANE_V_ACTIVE_POS_MIN = 2;        // GRn_AB2.GRCVS (Min=2)
 		// Horizontal front porch parameter (MIN=3)
-		static const int32_t BG_PLANE_H_FRONT_PORCH_MIN = 3;
+		static constexpr int32_t BG_PLANE_H_FRONT_PORCH_MIN = 3;
 		// Vertical front porch parameter (MIN=2)
-		static const int32_t BG_PLANE_V_FRONT_PORCH_MIN = 2;
+		static constexpr int32_t BG_PLANE_V_FRONT_PORCH_MIN = 2;
 		// Horizontal back porch parameter (MIN=1)
-		static const int32_t BG_PLANE_H_BACK_PORCH_MIN = 1;
+		static constexpr int32_t BG_PLANE_H_BACK_PORCH_MIN = 1;
 		// Vertical back porch parameter (MIN=1)
-		static const int32_t BG_PLANE_V_BACK_PORCH_MIN = 1;
+		static constexpr int32_t BG_PLANE_V_BACK_PORCH_MIN = 1;
 		// Horizontal sync signal width parameter (MIN=4)
-		static const int32_t BG_PLANE_H_SYNC_WIDTH_MIN = 4;
+		static constexpr int32_t BG_PLANE_H_SYNC_WIDTH_MIN = 4;
 		// Vertical sync signal width parameter (MIN=1)
-		static const int32_t BG_PLANE_V_SYNC_WIDTH_MIN = 1;  
-		static const int32_t GR_BLEND_H_ACTIVE_POS_MIN = 5;       // GRn_AB5_GRCHS (Min=5)
-		static const int32_t GR_BLEND_V_ACTIVE_POS_MIN = 2;       // GRn_AB4_GRCVS (Min=2)
-		static const int32_t GR_BLEND_H_CYC_ACTIVE_SIZE_MIN = 1;  // GRn_AB5_GRCHW (Min=1)
-		static const int32_t GR_BLEND_V_CYC_ACTIVE_SIZE_MIN = 1;  // GRn_AB4_GRCVW (Min=1)
+		static constexpr int32_t BG_PLANE_V_SYNC_WIDTH_MIN = 1;  
+		static constexpr int32_t GR_BLEND_H_ACTIVE_POS_MIN = 5;       // GRn_AB5_GRCHS (Min=5)
+		static constexpr int32_t GR_BLEND_V_ACTIVE_POS_MIN = 2;       // GRn_AB4_GRCVS (Min=2)
+		static constexpr int32_t GR_BLEND_H_CYC_ACTIVE_SIZE_MIN = 1;  // GRn_AB5_GRCHW (Min=1)
+		static constexpr int32_t GR_BLEND_V_CYC_ACTIVE_SIZE_MIN = 1;  // GRn_AB4_GRCVW (Min=1)
 
 
 
 		struct TCON_SIGNAL_SELECT {
-		    static const uint32_t STVA_VS = 0;  // STVA/VS
-		    static const uint32_t STVB_VE = 1;  // STVB/VE
-		    static const uint32_t STHA_HS = 2;  // STH/SP/HS
-		    static const uint32_t STHB_HE = 3;  // STB/LP/HE
-		    static const uint32_t DE      = 7;  // DE
+		    static constexpr uint32_t STVA_VS = 0;  // STVA/VS
+		    static constexpr uint32_t STVB_VE = 1;  // STVB/VE
+		    static constexpr uint32_t STHA_HS = 2;  // STH/SP/HS
+		    static constexpr uint32_t STHB_HE = 3;  // STB/LP/HE
+		    static constexpr uint32_t DE      = 7;  // DE
 		};
 
 
 		struct FADING_CONTROL_INITIAL_ALPHA {
 			// Initial alpha value setting for a graphics plane is zero.
-			static const uint32_t MIN = 0x00;
+			static constexpr uint32_t MIN = 0x00;
 			// Initial alpha value setting for a graphics plane is maximum.
-			static const uint32_t MAX = 0xff;
+			static constexpr uint32_t MAX = 0xff;
 		};
 
 
@@ -411,14 +411,14 @@ namespace device {
 		};
 
 
-		static const uint32_t CLUT_PLANE_0 = 0;    // GLCD CLUT plane 0.
-		static const uint32_t CLUT_PLANE_1 = 1;    // GLCD CLUT plane 1.
+		static constexpr uint32_t CLUT_PLANE_0 = 0;    // GLCD CLUT plane 0.
+		static constexpr uint32_t CLUT_PLANE_1 = 1;    // GLCD CLUT plane 1.
 
 
 		struct DITHERING_OUTPUT_FORMAT {
-			static const uint32_t RGB888 = 0;  // Dithering output format RGB888.
-			static const uint32_t RGB666 = 1;  // Dithering output format RGB666.
-			static const uint32_t RGB565 = 2;  // Dithering output format RGB565.
+			static constexpr uint32_t RGB888 = 0;  // Dithering output format RGB888.
+			static constexpr uint32_t RGB666 = 1;  // Dithering output format RGB666.
+			static constexpr uint32_t RGB565 = 2;  // Dithering output format RGB565.
 		};
 
 
