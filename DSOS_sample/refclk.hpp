@@ -28,11 +28,11 @@ namespace dsos {
 #if defined(SIG_RX65N)
 	// CN13 (1): PD1_AN109_IRQ1
 	typedef device::MTU4 MTU;
-	static const auto PSEL = device::port_map_mtu::ORDER::FIFTH;
+	static constexpr auto PSEL = device::port_map_mtu::ORDER::FIFTH;
 #elif defined(SIG_RX72N)
 	// Pmod2 (8): PD1_RESET
 	typedef device::MTU4 MTU;
-	static const auto PSEL = device::port_map_mtu::ORDER::FIFTH;
+	static constexpr auto PSEL = device::port_map_mtu::ORDER::FIFTH;
 #endif
 	typedef device::mtu_io<MTU, utils::null_task, utils::null_task, PSEL> MTU_IO;
 #else

@@ -27,8 +27,8 @@ namespace dsos {
 	template <class RENDER, class TOUCH, class CAPTURE>
 	class dso_gui : public render_base {
 
-		static const int16_t BTN_GRID = 40;
-		static const int16_t BTN_SIZE = 38;
+		static constexpr int16_t BTN_GRID = 40;
+		static constexpr int16_t BTN_SIZE = 38;
 
 		RENDER&		render_;
 		TOUCH&		touch_;
