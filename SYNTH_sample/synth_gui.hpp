@@ -26,9 +26,9 @@ namespace synth {
 	template <class RENDER, class TOUCH>
 	class synth_gui {
 	public:
-		static const int16_t SC_NAME_LEN = 16;   ///< With EOT
-		static const int16_t SC_NUM = 32;   ///< 音色最大数
-		static const int16_t OCT_NUM = 5;   ///< オクターブ域
+		static constexpr int16_t SC_NAME_LEN = 16;   ///< With EOT
+		static constexpr int16_t SC_NUM = 32;   ///< 音色最大数
+		static constexpr int16_t OCT_NUM = 5;   ///< オクターブ域
 
 		typedef keyboard<RENDER, TOUCH> KEYBOARD;
 
@@ -42,17 +42,17 @@ namespace synth {
 
         KEYBOARD    keyboard_;
 
-		static const int16_t SC_LOC = 10;   ///< ボタン関係、縦の位置
-		static const int16_t SC_SPC = 10;   ///< ボタンとの隙間
-		static const int16_t CENTER = 480/2;   ///< X 中心
-		static const int16_t SC_BTN_SZ = 40;   ///< ボタンサイズ
-		static const int16_t SC_TEX_W = 8 * SC_NAME_LEN;  ///< テキスト横幅
-		static const int16_t SC_TEX_H = 24;       ///< テキスト高さ
+		static constexpr int16_t SC_LOC = 10;   ///< ボタン関係、縦の位置
+		static constexpr int16_t SC_SPC = 10;   ///< ボタンとの隙間
+		static constexpr int16_t CENTER = 480/2;   ///< X 中心
+		static constexpr int16_t SC_BTN_SZ = 40;   ///< ボタンサイズ
+		static constexpr int16_t SC_TEX_W = 8 * SC_NAME_LEN;  ///< テキスト横幅
+		static constexpr int16_t SC_TEX_H = 24;       ///< テキスト高さ
 
-		static const int16_t OCT_LOC = 40;   ///< オクターブ関係、縦の位置
-		static const int16_t OCT_AREA_W = 300;
-		static const int16_t OCT_AREA_H = 20;
-		static const int16_t OCT_BTN_SZ = 50;   ///< ボタンサイズ
+		static constexpr int16_t OCT_LOC = 40;   ///< オクターブ関係、縦の位置
+		static constexpr int16_t OCT_AREA_W = 300;
+		static constexpr int16_t OCT_AREA_H = 20;
+		static constexpr int16_t OCT_BTN_SZ = 50;   ///< ボタンサイズ
 
 		typedef gui::widget WIDGET;
 		typedef gui::button BUTTON;
