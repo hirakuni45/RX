@@ -29,7 +29,7 @@ namespace sound {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class mp3_in : public af_play {
 
-		static const uint32_t INPUT_BUFFER_SIZE = 2048;
+		static constexpr uint32_t INPUT_BUFFER_SIZE = 2048;
 
 		mad_stream	mad_stream_;
 		mad_frame	mad_frame_;
@@ -144,7 +144,7 @@ namespace sound {
 		}
 
 
-		static const short SHRT_MAX_ = 32767;
+		static constexpr short SHRT_MAX_ = 32767;
 
 		/****************************************************************************
 		 * Converts a sample from mad's fixed point number format to a signed		*
