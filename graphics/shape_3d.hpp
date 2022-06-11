@@ -56,7 +56,7 @@ namespace graphics {
 	    	v[0].z = v[3].z = v[4].z = v[7].z = -size / 2;
 	    	v[1].z = v[2].z = v[5].z = v[6].z =  size / 2;
 
-	    	static const graphics::share_color c[6] = {
+	    	static constexpr graphics::share_color c[6] = {
 	    		DEF_COLOR::White,
 	    		DEF_COLOR::Red,
 	    		DEF_COLOR::Blue,
