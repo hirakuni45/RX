@@ -27,17 +27,17 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
 	struct s12adh_t {
 
-		static const auto PERIPHERAL = per;		///< ペリフェラル型
-		static const auto VEC   	 = vec;		///< 割り込みベクター
-		static const auto GB_VEC	 = gbi;		///< GB 割り込みベクター
-		static const auto GC_VEC	 = gci;		///< GC 割り込みベクター
-		static const auto CMPA_VEC	 = cmpai;	///< CMPA 割り込みベクター
-		static const auto CMPB_VEC	 = cmpbi;	///< CMPB 割り込みベクター
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto VEC   	 = vec;		///< 割り込みベクター
+		static constexpr auto GB_VEC	 = gbi;		///< GB 割り込みベクター
+		static constexpr auto GC_VEC	 = gci;		///< GC 割り込みベクター
+		static constexpr auto CMPA_VEC	 = cmpai;	///< CMPA 割り込みベクター
+		static constexpr auto CMPB_VEC	 = cmpbi;	///< CMPB 割り込みベクター
 
-		static const uint32_t UNIT_NUM = 3;		///< 変換ユニット数
-		static const auto BASE_CLOCK = clock_profile::PCLKB;	///< A/D 変換クロック
-		static const uint32_t IN_CONV_TIME_NS = 900;	///< A/D 入力 0.9uS、単位「ns」
-		static const uint32_t TO_CONV_TIME_NS = 4000;	///< 温度、基準電圧 4uS、単位「ns」
+		static constexpr uint32_t UNIT_NUM = 3;		///< 変換ユニット数
+		static constexpr auto BASE_CLOCK = clock_profile::PCLKB;	///< A/D 変換クロック
+		static constexpr uint32_t IN_CONV_TIME_NS = 900;	///< A/D 入力 0.9uS、単位「ns」
+		static constexpr uint32_t TO_CONV_TIME_NS = 4000;	///< 温度、基準電圧 4uS、単位「ns」
 
 
 		//-----------------------------------------------------------------//
@@ -935,7 +935,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
 	struct s12ad_t : public s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> {
 
-		static const uint32_t UNIT_NO = 0;		///< 変換ユニット番号
+		static constexpr uint32_t UNIT_NO = 0;		///< 変換ユニット番号
 
 		typedef s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> base_class;
 
@@ -961,7 +961,7 @@ namespace device {
 			@brief	アナログ入力数
 		*/
 		//-----------------------------------------------------------------//		
-		static const uint32_t analog_num = 8;
+		static constexpr uint32_t analog_num = 8;
 
 
 		//-----------------------------------------------------------------//
@@ -1266,7 +1266,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
 	struct s12ad1_t : public s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> {
 
-		static const uint32_t UNIT_NO = 1;		///< 変換ユニット番号
+		static constexpr uint32_t UNIT_NO = 1;		///< 変換ユニット番号
 
 		typedef s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> base_class;
 
@@ -1292,7 +1292,7 @@ namespace device {
 			@brief	アナログ入力数
 		*/
 		//-----------------------------------------------------------------//		
-		static const uint32_t analog_num = 8;
+		static constexpr uint32_t analog_num = 8;
 
 
 		//-----------------------------------------------------------------//
@@ -1597,7 +1597,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
 	struct s12ad2_t : public s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> {
 
-		static const uint32_t UNIT_NO = 2;		///< 変換ユニット番号
+		static constexpr uint32_t UNIT_NO = 2;		///< 変換ユニット番号
 
 		typedef s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> base_class;
 
@@ -1633,7 +1633,7 @@ namespace device {
 			@brief	アナログ入力数
 		*/
 		//-----------------------------------------------------------------//		
-		static const uint32_t analog_num = 12;
+		static constexpr uint32_t analog_num = 12;
 
 
 		//-----------------------------------------------------------------//
