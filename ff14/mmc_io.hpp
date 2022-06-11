@@ -50,11 +50,11 @@ namespace fatfs {
 		}
 
 		// MMC card type flags (MMC_GET_TYPE)
-		static const BYTE CT_MMC   = 0x01;	///< MMC ver 3
-		static const BYTE CT_SD1   = 0x02;	///< SD ver 1
-		static const BYTE CT_SD2   = 0x04;	///< SD ver 2
-		static const BYTE CT_SDC   = CT_SD1 | CT_SD2;   ///< SD
-		static const BYTE CT_BLOCK = 0x08;	///< Block addressing
+		static constexpr BYTE CT_MMC   = 0x01;	///< MMC ver 3
+		static constexpr BYTE CT_SD1   = 0x02;	///< SD ver 1
+		static constexpr BYTE CT_SD2   = 0x04;	///< SD ver 2
+		static constexpr BYTE CT_SDC   = CT_SD1 | CT_SD2;   ///< SD
+		static constexpr BYTE CT_BLOCK = 0x08;	///< Block addressing
 
 		SPI&		spi_;
 
