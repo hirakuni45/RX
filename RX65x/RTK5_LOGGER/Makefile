@@ -39,7 +39,6 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp \
 				graphics/font8x16.cpp \
-				graphics/color.cpp \
 				resource.cpp \
 				common/stdapi.cpp
 
