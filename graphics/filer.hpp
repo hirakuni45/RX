@@ -93,15 +93,15 @@ namespace gui {
 
 		using GLC = typename RDR::glc_type;
 
-		static const int32_t FRAME_PER_FILES = 10;  ///< ディレクトリー取得で処理するフレーム辺りのファイル数
-		static const int16_t MODAL_RADIUS = 10;  ///< modal round radius
+		static constexpr int32_t FRAME_PER_FILES = 10;  ///< ディレクトリー取得で処理するフレーム辺りのファイル数
+		static constexpr int16_t MODAL_RADIUS = 10;  ///< modal round radius
 
-		static const int16_t SPC = 2;									///< 文字間隙間
-		static const int16_t FLN = RDR::font_type::height + SPC;		///< 行幅
-		static const int16_t SCN = (RDR::glc_type::height - SPC) / FLN;	///< 行数
+		static constexpr int16_t SPC = 2;									///< 文字間隙間
+		static constexpr int16_t FLN = RDR::font_type::height + SPC;		///< 行幅
+		static constexpr int16_t SCN = (RDR::glc_type::height - SPC) / FLN;	///< 行数
 
-		static const uint16_t REPEAT_DELAY = 40;	///< リピートまでの時間（フレーム数）
-		static const uint16_t REPEAT_CYCLE = 8;		///< リピート間隔（フレーム数）
+		static constexpr uint16_t REPEAT_DELAY = 40;	///< リピートまでの時間（フレーム数）
+		static constexpr uint16_t REPEAT_CYCLE = 8;		///< リピート間隔（フレーム数）
 
 		typedef graphics::def_color DEF_COLOR;
 

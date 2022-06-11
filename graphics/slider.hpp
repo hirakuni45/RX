@@ -24,9 +24,9 @@ namespace gui {
 
 		typedef std::function<void(float ratio)> SELECT_FUNC_TYPE;
 
-		static const int16_t round_radius = 10;  ///< 標準ラウンド半径
-		static const int16_t frame_width  = 3;   ///< 標準フレーム幅
-		static const int16_t handle_size  = 20;  ///< 標準ハンドルサイズ
+		static constexpr int16_t round_radius = 10;  ///< 標準ラウンド半径
+		static constexpr int16_t frame_width  = 3;   ///< 標準フレーム幅
+		static constexpr int16_t handle_size  = 20;  ///< 標準ハンドルサイズ
 
 	private:
 

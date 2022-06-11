@@ -26,80 +26,80 @@ namespace img {
 
 		PLOT&		plot_;
 
-		static const uint16_t BMP_SIGNATURE		 = 0x4D42;
-		static const uint16_t BMP_SIG_BYTES		 = 2;
+		static constexpr uint16_t BMP_SIGNATURE		 = 0x4D42;
+		static constexpr uint16_t BMP_SIG_BYTES		 = 2;
 
 		// BITMAPFILEHEADER
-		static const uint16_t BFH_WTYPE			 = 0;	// WORD   bfType;
-		static const uint16_t BFH_DSIZE			 = 2;	// DWORD  bfSize;
-		static const uint16_t BFH_WRESERVED1	 = 6;	// WORD   bfReserved1;
-		static const uint16_t BFH_WRESERVED2     = 8;	// WORD   bfReserved2;
-		static const uint16_t BFH_DOFFBITS		 = 10;	// DWORD  bfOffBits;
-		static const uint16_t BFH_DBIHSIZE		 = 14;	// DWORD  biSize;
-		static const uint16_t FILEHED_SIZE		 = 14;	// sizeof(BITMAPFILEHEADER)
-		static const uint16_t BIHSIZE_SIZE		 = 4;	// sizeof(biSize)
+		static constexpr uint16_t BFH_WTYPE			 = 0;	// WORD   bfType;
+		static constexpr uint16_t BFH_DSIZE			 = 2;	// DWORD  bfSize;
+		static constexpr uint16_t BFH_WRESERVED1	 = 6;	// WORD   bfReserved1;
+		static constexpr uint16_t BFH_WRESERVED2     = 8;	// WORD   bfReserved2;
+		static constexpr uint16_t BFH_DOFFBITS		 = 10;	// DWORD  bfOffBits;
+		static constexpr uint16_t BFH_DBIHSIZE		 = 14;	// DWORD  biSize;
+		static constexpr uint16_t FILEHED_SIZE		 = 14;	// sizeof(BITMAPFILEHEADER)
+		static constexpr uint16_t BIHSIZE_SIZE		 = 4;	// sizeof(biSize)
 
 		// BITMAPINFOHEADER, BITMAPV4HEADER, BITMAPV5HEADER
-		static const uint16_t BIH_DSIZE			 = 0;	// DWORD  biSize;
-		static const uint16_t BIH_LWIDTH		 = 4;	// LONG   biWidth;
-		static const uint16_t BIH_LHEIGHT		 = 8;	// LONG   biHeight;
-		static const uint16_t BIH_WPLANES		 = 12;	// WORD   biPlanes;
-		static const uint16_t BIH_WBITCOUNT		 = 14;	// WORD   biBitCount;
-		static const uint16_t BIH_DCOMPRESSION	 = 16;	// DWORD  biCompression;
-		static const uint16_t BIH_DSIZEIMAGE	 = 20;	// DWORD  biSizeImage;
-		static const uint16_t BIH_LXPELSPERMETER = 24;	// LONG   biXPelsPerMeter;
-		static const uint16_t BIH_LYPELSPERMETER = 28;	// LONG   biYPelsPerMeter;
-		static const uint16_t BIH_DCLRUSED		 = 32;	// DWORD  biClrUsed;
-		static const uint16_t BIH_DCLRIMPORANT	 = 36;	// DWORD  biClrImportant;
-		static const uint16_t B4H_DREDMASK		 = 40; 	// DWORD  bV4RedMask;
-		static const uint16_t B4H_DGREENMASK	 = 44;	// DWORD  bV4GreenMask;
-		static const uint16_t B4H_DBLUEMASK		 = 48;	// DWORD  bV4BlueMask;
-		static const uint16_t B4H_DALPHAMASK	 = 52;	// DWORD  bV4AlphaMask;
-		static const uint16_t B4H_DCSTYPE		 = 56;	// DWORD  bV4CSType;
-		static const uint16_t B4H_XENDPOINTS	 = 60;	// CIEXYZTRIPLE bV4Endpoints;
-		static const uint16_t B4H_DGAMMARED		 = 96;	// DWORD  bV4GammaRed;
-		static const uint16_t B4H_DGAMMAGREEN	 = 100;	// DWORD  bV4GammaGreen;
-		static const uint16_t B4H_DGAMMABLUE	 = 104;	// DWORD  bV4GammaBlue;
-		static const uint16_t B5H_DINTENT		 = 108;	// DWORD  bV5Intent;
-		static const uint16_t B5H_DPROFILEDATA	 = 112;	// DWORD  bV5ProfileData;
-		static const uint16_t B5H_DPROFILESIZE	 = 116;	// DWORD  bV5ProfileSize;
-		static const uint16_t B5H_DRESERVED		 = 120;	// DWORD  bV5Reserved;
-		static const uint16_t INFOHED_SIZE		 = 40;	// sizeof(BITMAPINFOHEADER)
-		static const uint16_t BMPV4HED_SIZE		 = 108;	// sizeof(BITMAPV4HEADER)
-		static const uint16_t BMPV5HED_SIZE		 = 124;	// sizeof(BITMAPV5HEADER)
+		static constexpr uint16_t BIH_DSIZE			 = 0;	// DWORD  biSize;
+		static constexpr uint16_t BIH_LWIDTH		 = 4;	// LONG   biWidth;
+		static constexpr uint16_t BIH_LHEIGHT		 = 8;	// LONG   biHeight;
+		static constexpr uint16_t BIH_WPLANES		 = 12;	// WORD   biPlanes;
+		static constexpr uint16_t BIH_WBITCOUNT		 = 14;	// WORD   biBitCount;
+		static constexpr uint16_t BIH_DCOMPRESSION	 = 16;	// DWORD  biCompression;
+		static constexpr uint16_t BIH_DSIZEIMAGE	 = 20;	// DWORD  biSizeImage;
+		static constexpr uint16_t BIH_LXPELSPERMETER = 24;	// LONG   biXPelsPerMeter;
+		static constexpr uint16_t BIH_LYPELSPERMETER = 28;	// LONG   biYPelsPerMeter;
+		static constexpr uint16_t BIH_DCLRUSED		 = 32;	// DWORD  biClrUsed;
+		static constexpr uint16_t BIH_DCLRIMPORANT	 = 36;	// DWORD  biClrImportant;
+		static constexpr uint16_t B4H_DREDMASK		 = 40; 	// DWORD  bV4RedMask;
+		static constexpr uint16_t B4H_DGREENMASK	 = 44;	// DWORD  bV4GreenMask;
+		static constexpr uint16_t B4H_DBLUEMASK		 = 48;	// DWORD  bV4BlueMask;
+		static constexpr uint16_t B4H_DALPHAMASK	 = 52;	// DWORD  bV4AlphaMask;
+		static constexpr uint16_t B4H_DCSTYPE		 = 56;	// DWORD  bV4CSType;
+		static constexpr uint16_t B4H_XENDPOINTS	 = 60;	// CIEXYZTRIPLE bV4Endpoints;
+		static constexpr uint16_t B4H_DGAMMARED		 = 96;	// DWORD  bV4GammaRed;
+		static constexpr uint16_t B4H_DGAMMAGREEN	 = 100;	// DWORD  bV4GammaGreen;
+		static constexpr uint16_t B4H_DGAMMABLUE	 = 104;	// DWORD  bV4GammaBlue;
+		static constexpr uint16_t B5H_DINTENT		 = 108;	// DWORD  bV5Intent;
+		static constexpr uint16_t B5H_DPROFILEDATA	 = 112;	// DWORD  bV5ProfileData;
+		static constexpr uint16_t B5H_DPROFILESIZE	 = 116;	// DWORD  bV5ProfileSize;
+		static constexpr uint16_t B5H_DRESERVED		 = 120;	// DWORD  bV5Reserved;
+		static constexpr uint16_t INFOHED_SIZE		 = 40;	// sizeof(BITMAPINFOHEADER)
+		static constexpr uint16_t BMPV4HED_SIZE		 = 108;	// sizeof(BITMAPV4HEADER)
+		static constexpr uint16_t BMPV5HED_SIZE		 = 124;	// sizeof(BITMAPV5HEADER)
 
 		// BITMAPCOREHEADER
-		static const uint16_t BCH_DSIZE			 = 0;	// DWORD  bcSize;
-		static const uint16_t BCH_WWIDTH		 = 4;	// WORD   bcWidth;
-		static const uint16_t BCH_WHEIGHT		 = 6;	// WORD   bcHeight;
-		static const uint16_t BCH_WPLANES		 = 8;	// WORD   bcPlanes;
-		static const uint16_t BCH_WBITCOUNT		 = 10;	// WORD   bcBitCount;
-		static const uint16_t COREHED_SIZE		 = 12;	// sizeof(BITMAPCOREHEADER)
+		static constexpr uint16_t BCH_DSIZE			 = 0;	// DWORD  bcSize;
+		static constexpr uint16_t BCH_WWIDTH		 = 4;	// WORD   bcWidth;
+		static constexpr uint16_t BCH_WHEIGHT		 = 6;	// WORD   bcHeight;
+		static constexpr uint16_t BCH_WPLANES		 = 8;	// WORD   bcPlanes;
+		static constexpr uint16_t BCH_WBITCOUNT		 = 10;	// WORD   bcBitCount;
+		static constexpr uint16_t COREHED_SIZE		 = 12;	// sizeof(BITMAPCOREHEADER)
 
 		// RGBQUAD
-		static const uint16_t RGBQ_BLUE			 = 0;	// BYTE   rgbBlue;
-		static const uint16_t RGBQ_GREEN		 = 1;	// BYTE   rgbGreen;
-		static const uint16_t RGBQ_RED			 = 2;	// BYTE   rgbRed;
-		static const uint16_t RGBQ_RESERVED		 = 3;	// BYTE   rgbReserved;
-		static const uint16_t RGBQUAD_SIZE		 = 4;	// sizeof(RGBQUAD)
+		static constexpr uint16_t RGBQ_BLUE			 = 0;	// BYTE   rgbBlue;
+		static constexpr uint16_t RGBQ_GREEN		 = 1;	// BYTE   rgbGreen;
+		static constexpr uint16_t RGBQ_RED			 = 2;	// BYTE   rgbRed;
+		static constexpr uint16_t RGBQ_RESERVED		 = 3;	// BYTE   rgbReserved;
+		static constexpr uint16_t RGBQUAD_SIZE		 = 4;	// sizeof(RGBQUAD)
 
 		// RGBTRIPLE
-		static const uint16_t RGBT_BLUE			 = 0;	// BYTE   rgbtBlue;
-		static const uint16_t RGBT_GREEN		 = 1;	// BYTE   rgbtGreen;
-		static const uint16_t RGBT_RED			 = 2;	// BYTE   rgbtRed;
-		static const uint16_t RGBTRIPLE_SIZE	 = 3;	// sizeof(RGBTRIPLE)
+		static constexpr uint16_t RGBT_BLUE			 = 0;	// BYTE   rgbtBlue;
+		static constexpr uint16_t RGBT_GREEN		 = 1;	// BYTE   rgbtGreen;
+		static constexpr uint16_t RGBT_RED			 = 2;	// BYTE   rgbtRed;
+		static constexpr uint16_t RGBTRIPLE_SIZE	 = 3;	// sizeof(RGBTRIPLE)
 
 
 		/* Constants for the biCompression field */
-		static const uint16_t BI_RGB			 = 0;	// Uncompressed
-		static const uint16_t BI_RLE8			 = 1;	// RLE (8 bits/pixel)
-		static const uint16_t BI_RLE4			 = 2;	// RLE (4 bits/pixel)
-		static const uint16_t BI_BITFIELDS		 = 3;	// Bitfield
-		static const uint16_t BI_JPEG			 = 4;	// JPEG Extension
-		static const uint16_t BI_PNG			 = 5;	// PNG Extension
+		static constexpr uint16_t BI_RGB			 = 0;	// Uncompressed
+		static constexpr uint16_t BI_RLE8			 = 1;	// RLE (8 bits/pixel)
+		static constexpr uint16_t BI_RLE4			 = 2;	// RLE (4 bits/pixel)
+		static constexpr uint16_t BI_BITFIELDS		 = 3;	// Bitfield
+		static constexpr uint16_t BI_JPEG			 = 4;	// JPEG Extension
+		static constexpr uint16_t BI_PNG			 = 5;	// PNG Extension
 
-		static const uint16_t BMP_MAX_WIDTH      = 16384;  // 許容される最大サイズ
-		static const uint16_t BMP_MAX_HEIGHT	 = 16384;  // 許容される最大サイズ
+		static constexpr uint16_t BMP_MAX_WIDTH      = 16384;  // 許容される最大サイズ
+		static constexpr uint16_t BMP_MAX_HEIGHT	 = 16384;  // 許容される最大サイズ
 
 		struct BGRA_PAD {
 			unsigned int	b;

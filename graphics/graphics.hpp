@@ -33,7 +33,7 @@ namespace graphics {
 		GLC&		glc_;
 
 	public:
-		static const uint16_t VERSION = 111;
+		static constexpr uint16_t VERSION = 111;
 
 //		typedef typename device::glcdc_def::pix<GLC::PXT>::type T;
 		typedef uint16_t T;

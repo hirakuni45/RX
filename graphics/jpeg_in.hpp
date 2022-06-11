@@ -30,7 +30,7 @@ namespace img {
 
 		int		error_code_;
 
-		static const uint32_t INPUT_BUF_SIZE = 4096;
+		static constexpr uint32_t INPUT_BUF_SIZE = 4096;
 
 		struct fio_src_mgr {
 			struct jpeg_source_mgr	pub;		// public fields

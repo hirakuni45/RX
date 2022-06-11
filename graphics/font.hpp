@@ -24,7 +24,7 @@ namespace graphics {
 	template <class AFONT, class KFONT>
 	class font {
 	public:
-		static const int16_t height  = KFONT::height < AFONT::height
+		static constexpr int16_t height  = KFONT::height < AFONT::height
 			? AFONT::height : KFONT::height;
 
 		typedef AFONT a_type;

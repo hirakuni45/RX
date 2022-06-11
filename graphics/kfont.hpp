@@ -31,8 +31,8 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class kfont_null {
 	public:
-		static const int8_t width = 0;
-		static const int8_t height = 0;
+		static constexpr int8_t width = 0;
+		static constexpr int8_t height = 0;
 		void flush_cash() noexcept { }
 		const uint8_t* get(uint16_t code) noexcept { return nullptr; }
 		bool injection_utf8(uint8_t ch) noexcept { return true; }
@@ -60,7 +60,7 @@ namespace graphics {
 #endif
 	class kfont {
 
-		static const uint32_t FONTS = ((WIDTH * HEIGHT) + 7) / 8;
+		static constexpr uint32_t FONTS = ((WIDTH * HEIGHT) + 7) / 8;
 
 		uint16_t	code_;
 		int8_t		cnt_;
@@ -119,7 +119,7 @@ namespace graphics {
 			@brief	文字の横幅
 		*/
 		//-----------------------------------------------------------------//
-		static const int8_t width = WIDTH;
+		static constexpr int8_t width = WIDTH;
 
 
 		//-----------------------------------------------------------------//
@@ -127,7 +127,7 @@ namespace graphics {
 			@brief	文字の高さ
 		*/
 		//-----------------------------------------------------------------//
-		static const int8_t height = HEIGHT;
+		static constexpr int8_t height = HEIGHT;
 
 
 		//-----------------------------------------------------------------//

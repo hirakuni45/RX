@@ -21,7 +21,7 @@ namespace gui {
 
 		typedef dialog value_type;
 
-		static const int16_t round_radius = 6;  // round radius
+		static constexpr int16_t round_radius = 6;  // round radius
 
 	private:
 
