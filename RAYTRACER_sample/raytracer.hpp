@@ -58,31 +58,31 @@ static inline int ceilf_(float x) { return ceilf(x); }
 ------------------------------------------------------------------------*/
 
 // Position of the camera (nb. 'Z' is up/down)
-static const float cameraX = 0.0f;
-static const float cameraY = 0.0f;
-static const float cameraZ = 3.0f;
+static constexpr float cameraX = 0.0f;
+static constexpr float cameraY = 0.0f;
+static constexpr float cameraZ = 3.0f;
 
 // What the camera is pointing at
-static const float targetX = 1.0f;
-static const float targetY = 8.0f;
-static const float targetZ = 4.0f;
+static constexpr float targetX = 1.0f;
+static constexpr float targetY = 8.0f;
+static constexpr float targetZ = 4.0f;
 
 // We cast this many rays per pixel for stochastic antialiasing and soft-shadows. 
 //
 // Large numbers produce a nicer image but it runs a lot slower
-//static const int raysPerPixel = 4;
+//static constexpr int raysPerPixel = 4;
 
 // The camera's field of view, smaller=>zoom, larger=>wide angle
-static const float fov = 0.45f;
+static constexpr float fov = 0.45f;
 
 // The size of the soft shadow, larger=>wider area
-static const float shadowRegion = 0.125f;
+static constexpr float shadowRegion = 0.125f;
 
 /*------------------------------------------------------------------------
   Materials
 ------------------------------------------------------------------------*/
-static const float ambient = 0.05f;
-static const float materials[] = {
+static constexpr float ambient = 0.05f;
+static constexpr float materials[] = {
 // R,    G,    B,   REFLECTIVITY
   0.8f, 0.8f, 0.8f,   0.5f,    // Mirror
 //  1.0f, 0.0f, 0.0f,   0.3f,    // Red
@@ -95,7 +95,7 @@ static const float materials[] = {
   The spheres in the world
 ------------------------------------------------------------------------*/
 #define NUM_SPHERES 4
-static const float spheres[] = {
+static constexpr float spheres[] = {
 // center  radius material
    5,15,8,   5,     0,
   -6,12,4,   3,     0,
@@ -162,8 +162,8 @@ struct ray {
   The surface normal at the hit is returned in 'normal'
 ------------------------------------------------------------------------*/
 // Values for 'SKY' and 'FLOOR'
-static const uint8_t SKY=255;
-static const uint8_t FLOOR=254;
+static constexpr uint8_t SKY=255;
+static constexpr uint8_t FLOOR=254;
 
 uint8_t trace(const ray& r, float& distance, vec3& normal)
 {

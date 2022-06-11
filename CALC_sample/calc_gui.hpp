@@ -6,7 +6,7 @@
 			RX72N Envision Kit @n
 			calc_gui
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -45,15 +45,15 @@ namespace app {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     class calc_gui {
 	public:
-		static const uint32_t CALC_NUM = 250;  ///< 計算精度桁数 (250)
-		static const uint32_t ANS_NUM = 60;  ///< 結果表示桁数
+		static constexpr uint32_t CALC_NUM = 250;  ///< 計算精度桁数 (250)
+		static constexpr uint32_t ANS_NUM = 60;  ///< 結果表示桁数
 
-		static const int16_t  DISP_OFS_X = 4;
-		static const int16_t  DISP_OFS_Y = 6;
+		static constexpr int16_t  DISP_OFS_X = 4;
+		static constexpr int16_t  DISP_OFS_Y = 6;
 
-		static const int16_t LCD_X = 480;
-		static const int16_t LCD_Y = 272;
-		static const auto PIX = graphics::pixel::TYPE::RGB565;
+		static constexpr int16_t LCD_X = 480;
+		static constexpr int16_t LCD_Y = 272;
+		static constexpr auto PIX = graphics::pixel::TYPE::RGB565;
 
 #ifndef EMU
 		typedef utils::fixed_fifo<uint8_t, 64> RB64;
@@ -63,7 +63,7 @@ namespace app {
 #if defined(SIG_RX65N)
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-		static const uint32_t LCD_ORG = 0x0000'0100;
+		static constexpr uint32_t LCD_ORG = 0x0000'0100;
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
@@ -71,7 +71,7 @@ namespace app {
 #elif defined(SIG_RX72N)
 		typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
-		static const uint32_t LCD_ORG = 0x0080'0000;
+		static constexpr uint32_t LCD_ORG = 0x0080'0000;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
@@ -81,9 +81,9 @@ namespace app {
 		template <uint32_t LCDX, uint32_t LCDY>
 		class glcdc_emu {
 		public:
-			static const uint32_t	width  = LCDX;
-			static const uint32_t	height = LCDY;
-			static const uint32_t	line_width = width;
+			static constexpr uint32_t	width  = LCDX;
+			static constexpr uint32_t	height = LCDY;
+			static constexpr uint32_t	line_width = width;
 
 		private:
 			uint16_t fb_[LCDX * LCDY];
@@ -161,12 +161,12 @@ namespace app {
 		typedef gui::widget_director<RENDER, TOUCH, 60> WIDD;
 		WIDD	widd_;
 
-		static const int16_t BTN_W = 41;
-		static const int16_t BTN_H = 38;
-		static const int16_t ORG_X = 8;
-		static const int16_t ORG_Y = 94;
-		static const int16_t SPC_X = 47;
-		static const int16_t SPC_Y = 44;
+		static constexpr int16_t BTN_W = 41;
+		static constexpr int16_t BTN_H = 38;
+		static constexpr int16_t ORG_X = 8;
+		static constexpr int16_t ORG_Y = 94;
+		static constexpr int16_t SPC_X = 47;
+		static constexpr int16_t SPC_Y = 44;
 
 		constexpr int16_t LOC_X(int16_t x)
 		{
@@ -247,7 +247,7 @@ namespace app {
 		uint32_t	cbuff_pos_;
 		uint32_t	del_len_;
 
-		static const int16_t limit_ = 3;
+		static constexpr int16_t limit_ = 3;
 		vtx::spos	cur_pos_;
 
 		bool		fc_mode_;
