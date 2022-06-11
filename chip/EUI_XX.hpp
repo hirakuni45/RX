@@ -28,8 +28,8 @@ namespace chip {
 	template <class SPI, class CS>
 	class EUI_XX {
 	public:
-		static const uint8_t eui48_org = 0xFA;
- 		static const uint8_t eui64_org = 0xF8;
+		static constexpr uint8_t eui48_org = 0xFA;
+ 		static constexpr uint8_t eui64_org = 0xF8;
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

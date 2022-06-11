@@ -73,7 +73,7 @@ namespace chip {
 	class phy_base : public phy_def {
 	public:
 
-		static const phy_interface phyif = PHYIF;
+		static constexpr phy_interface phyif = PHYIF;
 
 	private:
 #ifndef PHY_DEBUG
@@ -82,75 +82,75 @@ namespace chip {
 		typedef utils::format debug_format;
 #endif
 
-		static const uint16_t REG_CONTROL          = 0;
-		static const uint16_t REG_STATUS           = 1;
-		static const uint16_t REG_IDENTIFIER1      = 2;
-		static const uint16_t REG_IDENTIFIER2      = 3;
-		static const uint16_t REG_AN_ADVERTISEMENT = 4;
-		static const uint16_t REG_AN_LINK_PARTNER  = 5;
-		static const uint16_t REG_AN_EXPANSION     = 6;
+		static constexpr uint16_t REG_CONTROL          = 0;
+		static constexpr uint16_t REG_STATUS           = 1;
+		static constexpr uint16_t REG_IDENTIFIER1      = 2;
+		static constexpr uint16_t REG_IDENTIFIER2      = 3;
+		static constexpr uint16_t REG_AN_ADVERTISEMENT = 4;
+		static constexpr uint16_t REG_AN_LINK_PARTNER  = 5;
+		static constexpr uint16_t REG_AN_EXPANSION     = 6;
 
-		static const uint16_t MII_ST     = 1;
-		static const uint16_t MII_READ   = 2;
-		static const uint16_t MII_WRITE  = 1;
+		static constexpr uint16_t MII_ST     = 1;
+		static constexpr uint16_t MII_READ   = 2;
+		static constexpr uint16_t MII_WRITE  = 1;
 
-		static const int MII_WAIT = 2;
+		static constexpr int MII_WAIT = 2;
 
 		// Basic Mode Control Register Bit Definitions
-		static const uint16_t CONTROL_RESET        = (1 << 15);
-		static const uint16_t CONTROL_LOOPBACK     = (1 << 14);
-		static const uint16_t CONTROL_100_MBPS     = (1 << 13);
-		static const uint16_t CONTROL_AN_ENABLE    = (1 << 12);
-		static const uint16_t CONTROL_POWER_DOWN   = (1 << 11);
-		static const uint16_t CONTROL_ISOLATE      = (1 << 10);
-		static const uint16_t CONTROL_AN_RESTART   = (1 << 9);
-		static const uint16_t CONTROL_FULL_DUPLEX  = (1 << 8);
-		static const uint16_t CONTROL_COLLISION    = (1 << 7);
+		static constexpr uint16_t CONTROL_RESET        = (1 << 15);
+		static constexpr uint16_t CONTROL_LOOPBACK     = (1 << 14);
+		static constexpr uint16_t CONTROL_100_MBPS     = (1 << 13);
+		static constexpr uint16_t CONTROL_AN_ENABLE    = (1 << 12);
+		static constexpr uint16_t CONTROL_POWER_DOWN   = (1 << 11);
+		static constexpr uint16_t CONTROL_ISOLATE      = (1 << 10);
+		static constexpr uint16_t CONTROL_AN_RESTART   = (1 << 9);
+		static constexpr uint16_t CONTROL_FULL_DUPLEX  = (1 << 8);
+		static constexpr uint16_t CONTROL_COLLISION    = (1 << 7);
 
 		// Basic Mode Status Register Bit Definitions
-		static const uint16_t STATUS_100_T4        = (1 << 15);
-		static const uint16_t STATUS_100F          = (1 << 14);
-		static const uint16_t STATUS_100H          = (1 << 13);
-		static const uint16_t STATUS_10F           = (1 << 12);
-		static const uint16_t STATUS_10H           = (1 << 11);
-		static const uint16_t STATUS_AN_COMPLETE   = (1 << 5);
-		static const uint16_t STATUS_RM_FAULT      = (1 << 4);
-		static const uint16_t STATUS_AN_ABILITY    = (1 << 3);
-		static const uint16_t STATUS_LINK_UP       = (1 << 2);
-		static const uint16_t STATUS_JABBER        = (1 << 1);
-		static const uint16_t STATUS_EX_CAPABILITY = (1 << 0);
+		static constexpr uint16_t STATUS_100_T4        = (1 << 15);
+		static constexpr uint16_t STATUS_100F          = (1 << 14);
+		static constexpr uint16_t STATUS_100H          = (1 << 13);
+		static constexpr uint16_t STATUS_10F           = (1 << 12);
+		static constexpr uint16_t STATUS_10H           = (1 << 11);
+		static constexpr uint16_t STATUS_AN_COMPLETE   = (1 << 5);
+		static constexpr uint16_t STATUS_RM_FAULT      = (1 << 4);
+		static constexpr uint16_t STATUS_AN_ABILITY    = (1 << 3);
+		static constexpr uint16_t STATUS_LINK_UP       = (1 << 2);
+		static constexpr uint16_t STATUS_JABBER        = (1 << 1);
+		static constexpr uint16_t STATUS_EX_CAPABILITY = (1 << 0);
 
 		// Auto Negotiation Advertisement Bit Definitions
-		static const uint16_t AN_ADVERTISEMENT_NEXT_PAGE = (1 << 15);  
-		static const uint16_t AN_ADVERTISEMENT_RM_FAULT  = (1 << 13);
-		static const uint16_t AN_ADVERTISEMENT_ASM_DIR   = (1 << 11);
-		static const uint16_t AN_ADVERTISEMENT_PAUSE     = (1 << 10);
-		static const uint16_t AN_ADVERTISEMENT_100_T4    = (1 << 9);
-		static const uint16_t AN_ADVERTISEMENT_100F      = (1 << 8);
-		static const uint16_t AN_ADVERTISEMENT_100H      = (1 << 7);
-		static const uint16_t AN_ADVERTISEMENT_10F       = (1 << 6);
-		static const uint16_t AN_ADVERTISEMENT_10H       = (1 << 5);
-		static const uint16_t AN_ADVERTISEMENT_SELECTOR  = (1 << 0);
+		static constexpr uint16_t AN_ADVERTISEMENT_NEXT_PAGE = (1 << 15);  
+		static constexpr uint16_t AN_ADVERTISEMENT_RM_FAULT  = (1 << 13);
+		static constexpr uint16_t AN_ADVERTISEMENT_ASM_DIR   = (1 << 11);
+		static constexpr uint16_t AN_ADVERTISEMENT_PAUSE     = (1 << 10);
+		static constexpr uint16_t AN_ADVERTISEMENT_100_T4    = (1 << 9);
+		static constexpr uint16_t AN_ADVERTISEMENT_100F      = (1 << 8);
+		static constexpr uint16_t AN_ADVERTISEMENT_100H      = (1 << 7);
+		static constexpr uint16_t AN_ADVERTISEMENT_10F       = (1 << 6);
+		static constexpr uint16_t AN_ADVERTISEMENT_10H       = (1 << 5);
+		static constexpr uint16_t AN_ADVERTISEMENT_SELECTOR  = (1 << 0);
 
 		// Auto Negostiate Link Partner Ability Bit Definitions
-		static const uint16_t AN_LINK_PARTNER_NEXT_PAGE  = (1 << 15);
-		static const uint16_t AN_LINK_PARTNER_ACK        = (1 << 14);
-		static const uint16_t AN_LINK_PARTNER_RM_FAULT   = (1 << 13);
-		static const uint16_t AN_LINK_PARTNER_ASM_DIR    = (1 << 11);
-		static const uint16_t AN_LINK_PARTNER_PAUSE      = (1 << 10);
-		static const uint16_t AN_LINK_PARTNER_100_T4     = (1 << 9);
-		static const uint16_t AN_LINK_PARTNER_100F       = (1 << 8);
-		static const uint16_t AN_LINK_PARTNER_100H       = (1 << 7);
-		static const uint16_t AN_LINK_PARTNER_10F        = (1 << 6);
-		static const uint16_t AN_LINK_PARTNER_10H        = (1 << 5);
-		static const uint16_t AN_LINK_PARTNER_SELECTOR   = (1 << 0);
+		static constexpr uint16_t AN_LINK_PARTNER_NEXT_PAGE  = (1 << 15);
+		static constexpr uint16_t AN_LINK_PARTNER_ACK        = (1 << 14);
+		static constexpr uint16_t AN_LINK_PARTNER_RM_FAULT   = (1 << 13);
+		static constexpr uint16_t AN_LINK_PARTNER_ASM_DIR    = (1 << 11);
+		static constexpr uint16_t AN_LINK_PARTNER_PAUSE      = (1 << 10);
+		static constexpr uint16_t AN_LINK_PARTNER_100_T4     = (1 << 9);
+		static constexpr uint16_t AN_LINK_PARTNER_100F       = (1 << 8);
+		static constexpr uint16_t AN_LINK_PARTNER_100H       = (1 << 7);
+		static constexpr uint16_t AN_LINK_PARTNER_10F        = (1 << 6);
+		static constexpr uint16_t AN_LINK_PARTNER_10H        = (1 << 5);
+		static constexpr uint16_t AN_LINK_PARTNER_SELECTOR   = (1 << 0);
 
 		// Delay constants
-		static const uint32_t DELAY_RESET     = 0x00020000L;
-		static const uint32_t DELAY_AN        = 0x00800000L;
+		static constexpr uint32_t DELAY_RESET     = 0x00020000L;
+		static constexpr uint32_t DELAY_AN        = 0x00800000L;
 
 		// for MICREL/KSZ8041NL Vender special register
-		static const uint16_t REG_PHY_CONTROL_1    = 0x1E;
+		static constexpr uint16_t REG_PHY_CONTROL_1    = 0x1E;
 
 		/*==============================================================================*/
 		//  DP83822 Boot Strap:															//
@@ -181,12 +181,12 @@ namespace chip {
 		//    FX_EN: 1, AN_EN: X, AN_1: X, AN_0: 0 ---> 100BASE-FX, Half-Duplex			//
 		//    FX_EN: 1, AN_EN: X, AN_1: X, AN_0: 1 ---> 100BASE-FX, Full-Duplex			//
 		/*==============================================================================*/
-		static const uint16_t REG_DP83822_REGCR   = 0x000D;
-		static const uint16_t REG_DP83822_ADDAR   = 0x000E;
-		static const uint16_t REG_DP83822_RCSR    = 0x0017;
-		static const uint16_t REG_DP83822_LEDCR   = 0x0018;
-		static const uint16_t REG_DP83822_PHYCR   = 0x0019;
-		static const uint16_t REG_DP83822_IOCTRL1 = 0x0462;
+		static constexpr uint16_t REG_DP83822_REGCR   = 0x000D;
+		static constexpr uint16_t REG_DP83822_ADDAR   = 0x000E;
+		static constexpr uint16_t REG_DP83822_RCSR    = 0x0017;
+		static constexpr uint16_t REG_DP83822_LEDCR   = 0x0018;
+		static constexpr uint16_t REG_DP83822_PHYCR   = 0x0019;
+		static constexpr uint16_t REG_DP83822_IOCTRL1 = 0x0462;
 
 		uint16_t local_advertise_;
 

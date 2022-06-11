@@ -25,7 +25,7 @@ namespace chip {
 	class BMP180 {
 
 		// R/W ビットを含まない７ビット値
-		static const uint8_t BMP180_ADR_ = 0x77;
+		static constexpr uint8_t BMP180_ADR_ = 0x77;
 
 		I2C_IO& i2c_;
 

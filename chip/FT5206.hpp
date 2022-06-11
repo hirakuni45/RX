@@ -139,7 +139,7 @@ namespace chip {
 			LOG_CUR_CHA					// R
 		};
 
-		static const uint32_t TOUCH_NUM = 4;
+		static constexpr uint32_t TOUCH_NUM = 4;
 
 		uint8_t		touch_id_;
 		uint8_t		touch_num_;
