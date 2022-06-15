@@ -1,10 +1,7 @@
-グラフィックス、GUI Widgets フレームワーク
+graphics, GUI Widgets framework
 =========
 
-## 概要
-2D、3D 描画、GUI Widgets、画像ファイルローダーなど、グラフィックス関係の操作を行うもの。
-   
-## プロジェクト・リスト
+[Japanese](./READMEja.md)
 
    
 ---
