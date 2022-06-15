@@ -121,7 +121,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 - Open source libraries built for RX microcontrollers
 
-[rxlib][. /rxlib] See also
+[rxlib][./rxlib] See also
 
 ---
 
@@ -131,7 +131,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 - Convenience Classes
 - Common files for each microcontrollers
 
-[common/READMEja](./common/READMEja.md) See also
+[common](./common) See also
 
 ---
 
@@ -143,7 +143,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 - The context of the interface (control pins) is given by reference.
 - Since there is no definition of interfaces, the creation is very versatile and highly flexible.
 
-[chip/READMEja](./chip/READMEja.md) See also
+[chip](./chip) See also
 
 ---
 
@@ -151,7 +151,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
  - Classes related to screen rendering
 
-[graphics/READMEja](./graphics/READMEja.md) See also
+[graphics](./graphics) See also
 
 ---
 
@@ -159,7 +159,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
  - Classes related to sound
 
-[sound/READMEja](./sound/READMEja.md) See also
+[sound](./sound) See also
 
 ---
 
