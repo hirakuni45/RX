@@ -2,7 +2,7 @@ Renesas RX Microcontroller
 =========
 ![R5F564ML](docs/RX600_group.jpg)
 
-[English](README.md)
+[英語版](README.md)
 
 ## 概要
 
@@ -62,13 +62,15 @@ int main(int argc, char** argv)
 開発にはマルチプラットホームでも使える、「Visual Studio Code」の利用を推奨します。 
    
 ---
-## RX プロジェクト・リスト
 
-デバイスＩ／Ｏ操作では、C++ で実装されたテンプレート・クラス・ライブラリーを活用して専用のヘッダーを用意してあり、ユーティリティー、クラス・ライブラリーの充実も行っています。   
+## RX プロジェクト、ライブラリ・リスト
 
-|ディレクトリ・ファイル|内容|
-|-----------------------|----------------------------------------------|
-|all_project_build.sh   |全てのプロジェクトをビルド(シェル・スクリプト)|
+- デバイス I/O 操作では、C++ で実装されたテンプレート・クラス・ライブラリーを活用して専用のヘッダーを用意してあります。
+- ユーティリティー、クラス・ライブラリーの充実も行っています。   
+
+|ディレクトリ|内容|
+|-----------------------|------------------------------------------|
+|[all_project_build.sh](./all_project_build.sh)|全てのプロジェクトをビルド(シェル・スクリプト)|
 |[/rxlib](./rxlib)      |zlib, png, mad, gmp, mpfr ライブラリ|
 |[/RX600](./RX600)      |RX マイコン共通デバイス定義クラス|
 |[/RX24T](./RX24T)      |RX24T 専用デバイス定義クラス、リンカースクリプト|
@@ -84,27 +86,106 @@ int main(int argc, char** argv)
 |[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
 |[/graphics](./graphics)|グラフィックス描画関係クラス、GUI Widget|
 |[/sound](./sound)      |サウンド、オーディオ関係クラス|
-|[/rxprog](./rxprog)    |RX フラッシュ、プログラム書き込みツール（Windows、OS-X、Linux 対応）|
-|[/FIRST_sample](./FIRST_sample)|各プラットホーム対応、LED 点滅プログラム|
-|[/SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
-|[/CAN_sample](./CAN_sample)|CAN 通信サンプルプログラム|
-|[/GPTW_sample](./GPTW_sample)|GPTW PWM サンプルプログラム|
-|[/FLASH_sample](./FLASH_sample)|各プラットホーム対応、内臓データフラッシュ操作サンプル|
-|[/RAYTRACER_sample](./RAYTRACER_sample)|レイトレーシング・ベンチマーク|
-|[/SDCARD_sample](./SDCARD_sample)|SD カードの動作サンプル|
-|[/SIDE_sample](./SIDE_sample)|ルネサス製 RX65N/RX72N Envision Kit, Space Invaders エミュレーター|
-|[/NESEMU_sample](./NESEMU_sample)|ルネサス製 RX65N/RX72N Envision Kit, NES エミュレーター|
-|[/GUI_sample](./GUI_sample)|GUI サンプル、Graphics User Interface (ソフトレンダリング、DRW2D エンジン)|
-|[/AUDIO_sample](./AUDIO_sample)|MP3/WAV オーディオプレイヤー (FreeRTOS)|
-|[/SYNTH_sample](./SYNTH_sample)|FM 音源シンセサイザー・エミュレータ|
-|[/CALC_sample](./CALC_sample)|汎用電卓サンプル (gmp, mpfr ライブラリ)|
-|[/DSOS_sample](./DSOS_sample)|デジタルストレージオシロスコープサンプル|
-|[/PSG_sample](./PSG_sample)|疑似 PSG 音源演奏サンプル|
-|[/I2C_sample](./I2C_sample)|I2C デバイス・アクセス・サンプル|
+|[/rxprog](./rxprog)    |RX マイコン、フラッシュプログラム書き込みツール（Windows、OS-X、Linux 対応）|
 |[LICENSE](./LICENSE)   |ライセンス表記ファイル|
+
+---
+
+### サンプル・プロジェクト（アプリケーション）
+
+|ディレクトリ|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
+|-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
+|[/FIRST_sample](./FIRST_sample)  |〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
+|[/SCI_sample](./SCI_sample)      |〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
+|[/CAN_sample](./CAN_sample)      |－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
+|[/FLASH_sample](./FLASH_sample)  |〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
+|[/GPTW_sample](./GPTW_sample)    |△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
+|[/I2C_sample](./I2C_sample)      |〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
+|[/SDCARD_sample](./SDCARD_sample)|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
+|[/SIDE_sample](./SIDE_sample)    |－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
+|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
+|[/GUI_sample](./GUI_sample)      |－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (ソフトレンダリング、DRW2D エンジン利用)|
+|[/AUDIO_sample](./AUDIO_sample)  |－|－|－|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
+|[/SYNTH_sample](./SYNTH_sample)  |〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
+|[/CALC_sample](./CALC_sample)    |－|△|△|△|△|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
+|[/DSOS_sample](./DSOS_sample)    |－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
+|[/PSG_sample](./PSG_sample)      |△|△|△|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
-   
+
+---
+
+### rxlib ディレクトリー
+
+- RX マイコン用にビルドしたオープンソース系ライブラリ
+
+[rxlib][./rxlib] 参照
+
+---
+
+### common ディレクトリー
+
+- 各種ユーティリティー
+- 便利クラス
+- 各マイコン共通ファイル
+
+[common/READMEja](./common/) 参照
+
+---
+
+### chip ディレクトリー
+
+- 各種 IC メーカー用テンプレートドライバークラス（I2C、SPI など色々なインターフェース）
+- C++ では、テンプレートを上手く使う事で、I2C や SPI などのインターフェースを使った操作を一般化する事が出来ます。
+- chip ディレクトリーにあるヘッダーは、各 IC の初期化や、制御に特化していて、インターフェースの定義は関知していません。
+- インターフェース（制御ピン）のコンテキストは、参照で与える構成になっています。
+- インターフェースの定義が無いので、非常に汎用性があり、自由度が高い創りになっています。
+
+[chip/READMEja](./chip) 参照
+
+---
+
+### graphics ディレクトリー
+
+ - 画面の描画に関係するクラス
+
+[graphics/READMEja](./graphics) 参照
+
+---
+
+### sound ディレクトリー
+
+ - サウンドに関係するクラス
+
+[sound/READMEja](./sound) 参照
+
+---
+
+### ff14 ディレクトリー
+
+- ChaN 氏の FatFs ソースコード一式
+- MMC ドライバークラス（SPI）
+- SDHIインターフェースが使える場合は、リアルモードドライバーも選択出来ます。
+
+[ff14](./ff14) 参照
+
+---
+
+### KiCAD ディレクトリー
+
+- KiCAD 用、部品ファイルなど
+
+[KiCAD_lib](./KiCAD_lib) 参照
+
+---
+
+### legacy ディレクトリー
+
+- 現在はサポートしていないファイルなど
+
+[legacy](./legacy) 参照
+
 ---
 
 ## Renesas GNU-RX のインストールと機能紹介
@@ -127,7 +208,7 @@ RX マイコン用 最新（2020/07 現在）GNU ツールチェインとして�
 
 サポートも行っているようです。（CyberTHOR Studios Limited）   
 
-このツールを利用するには、ツールチェインをインストール後、「.bash_profile」に、コマンドパスを設定して下さい。
+MSYS2 からこのツールを利用するには、ツールチェインをインストール後、「.bash_profile」に、コマンドパスを設定して下さい。
 
 ```
 # rx-elf path
@@ -144,8 +225,9 @@ Renesas GNU-RX 8.3.0 に搭載された機能：
 ---
 
 CC-RX との違い：   
-コンパイラの最適化において、CoreMark によるベンチマークでは、CC-RX は、GNU-RX よりかなり優秀なようです。   
-※普通に考えると、このような大きな差が生まれる理由は考え辛いですが、CPU 内部の構造を知っていれば、達成出来るのかもしれません・・   
+- コンパイラの最適化において、CoreMark によるベンチマークでは、CC-RX は、GNU-RX よりかなり優秀なようです。   
+- 普通に考えると、このような大きな差が生まれる理由は考え辛いですが、CPU 内部の構造を知っていれば、達成出来るのかもしれません・・
+- 良く調べていませんが、CC-RX では、整数を使った行列計算を DSP 命令に置き換える事が出来るのかもしれません。   
    
 |コンパイラ|RXコア|CoreMark (MHz)|比率|
 |---------|------|--------------|---|
@@ -159,8 +241,9 @@ CC-RX との違い：
 - 掛け算や割り算などの比較的 CPU サイクルが多い命令を多用したアプリの場合に大きな差が生まれるようです。   
 - 浮動小数点命令などが多いアプリの場合には、GNU-RX の方が速い場合もあるようです。
    
-CC-RX がどんなに優れていても、「有償」でホビーではコスト的に見合わないと思われますし、C++11 にも対応していないとなると、現実的には使えません。   
-又、上記のベンチマークは、CoreMark での事なので、実際のアプリで評価しないと本当の事は判りません。   
+- CC-RX がどんなに優れていても、「有償」では、ホビーにはコスト的に見合わないと思われます。
+- 上記のベンチマークは、CoreMark での事なので、実際のアプリで評価しないと本当のパフォーマンスは判りません。   
+- C++11 もサポート出来ないとなると、オープンソース系 C++ ライブラリ、ツールキットもコンパイル出来ません。
    
 ---
 ## RX 開発環境準備（Windows、MSYS2）
