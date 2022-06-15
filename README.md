@@ -63,49 +63,129 @@ No need for a dedicated boot program or loader I can write and execute.
 For development, we recommend using "Visual Studio Code" that can be used on multiple platforms.   
    
 ---
-## Description
-   
-In device I / O operation, a dedicated header is prepared using template class library implemented in C++, and utility and class library are also enhanced.   
-- Some of them use a library made by Renesas.   
-   
-|Directory/file|Contents|
-|-----------------------|----------------------------------------------|
-|all_project_build.sh   |All project builds (shell script)|
-|[/rxlib](./rxlib)      |zlib, png, mad, gmp, mpfr library|
-|[/RX600](./RX600)      |RX microcontroller common device definition class|
-|[/RX24T](./RX24T)      |Device definition class dedicated to RX24T, linker script|
-|[/RX64M](./RX64M)      |Device definition class dedicated to RX64M, linker script|
-|[/RX71M](./RX71M)      |Device definition class dedicated to RX71M, linker script|
-|[/RX65x](./RX65x)      |Device definition class dedicated to RX65(1N), linker script|
-|[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script|
-|[/RX72T](./RX72T)      |Device definition class dedicated to RX72T, linker script|
-|[/RX72N](./RX72N)      |Device definition class dedicated to RX72N, linker script|
-|[/FreeRTOS](./FreeRTOS)|FreeRTOS RX microcontroller compatible version and a simple sample|
-|[/ff14](./ff14)        |ChaN's fatfs source code and handler for RX microcontroller|
-|[/common](./common)    |Shared classes, utilities, etc.|
-|[/chip](./chip)        |Device-specific control driver library for I2C, SPI, etc.|
-|[/graphics](./graphics)|Graphics drawing relation class|
-|[/sound](./sound)      |Sound, audio relationship class|
-|[/rxprog](./rxprog)    |Program writing tool to RX microcontroller flash (Windows, OS-X, Linux compatible)|
-|[/FIRST_sample](./FIRST_sample)|LED flashing program for each platform|
-|[/SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
-|[/CAN_sample](./CAN_sample)|CAN sample program|
-|[/GPTW_sample](./GPTW_sample)|GPTW PWM sample program|
-|[/FLASH_sample](./FLASH_sample)|Built-in data flash operation sample for each platform|
-|[/RAYTRACER_sample](./RAYTRACER_sample)|For each platform, Ray tracing benchmark|
-|[/SDCARD_sample](./SDCARD_sample)|For each platform, SD card operation sample|
-|[/SIDE_sample](./SIDE_sample)|Renesas RX65N/RX72N Envision Kit, Space Invaders emulator|
-|[/NESEMU_sample](./NESEMU_sample)|Renesas RX65N/RX72N Envision Kit, NES emulator|
-|[/GUI_sample](./GUI_sample)|GUI samples, Graphics User Interface (soft rendering, DRW2D engine)|
-|[/AUDIO_sample](./AUDIO_sample)|For each platform, MP3/WAV Audio player|
-|[/SYNTH_sample](./SYNTH_sample)|FM Sound Source Synthesizer and Emulato|
-|[/CALC_sample](./CALC_sample)|Generic Calculator Sample (gmp, mpfr library)|
-|[/DSOS_sample](./DSOS_sample)|Digital Storage Oscilloscope Sample|
-|[/PSG_sample](./PSG_sample)|Pseudo PSG music performance Sample|
-|[/I2C_sample](./I2C_sample)|I2C device access sample|
-|[LICENSE](./LICENSE)  |License notation file|
-   
-- Although not in the above list, please think that directories and files that exist when you check out are working.   
+
+## RX Project, Library List
+
+- For device I/O operations, dedicated headers are provided utilizing template class libraries implemented in C++.
+- We also provide a full set of utilities and class libraries. 
+
+|directory|contents|
+|-----------------------|------------------------------------------|
+|[all_project_build.sh](./all_project_build.sh)|build all projects (shell script) |
+|[/rxlib](./rxlib) |zlib, png, mad, gmp, mpfr libraries|
+|[/rx600](./RX600) |RX microcontroller common device definition class|
+|[/RX24T](./RX24T) |RX24T specific device definition class, linker script|
+|[/RX64M](./RX64M) |RX64M dedicated device definition class, linker script|
+|[/RX71M](./RX71M) |RX71M dedicated device definition class, linker script|
+|[/RX65x](./RX65x) |Device definition class for RX651 and RX65N, linker script|
+|[/RX66T](./RX66T) |RX66T dedicated device definition class, linker script|
+|[/RX72T](./RX72T) |RX72T dedicated device definition class, linker script|
+|[/RX72N](./RX72N) |RX72N dedicated device definition class, linker script|
+|[/FreeRTOS](./FreeRTOS)|FreeRTOS for various RX microcontrollers and simple samples|
+|[/ff14](./ff14) |ChaN's fatfs source code and handler for RX microcontrollers|
+|[/common](./common) |shared classes, headers, etc.|
+|[/chip](./chip) |various device specific control driver libraries such as I2C, SPI, etc|
+|[/graphics](./graphics)|Graphics drawing related classes, GUI Widget|
+|[/sound](./sound) |sound and audio related classes|
+|[/rxprog](./rxprog) |RX microcontroller, Flash program writing tool (for Windows, OS-X, Linux)
+|[LICENSE](./LICENSE) |license description file|
+
+---
+
+### Sample Projects (Applications)
+
+|Directory|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|Contents|
+|-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
+|[/FIRST_sample](./FIRST_sample)  |〇|〇|〇|〇|〇|〇|〇|LED Flashing Program|
+|[/SCI_sample](./SCI_sample)      |〇|〇|〇|〇|〇|〇|〇|Serial Communication Sample Program|
+|[/CAN_sample](./CAN_sample)      |－|〇|〇|〇|〇|△|〇|CAN Communication Sample Program|
+|[/FLASH_sample](./FLASH_sample)  |〇|〇|〇|〇|〇|〇|〇|Internal data flash operation sample|
+|[/GPTW_sample](./GPTW_sample)    |△|〇|〇|－|－|△|〇|GPTW PWM Sample Program|
+|[/I2C_sample](./I2C_sample)      |〇|〇|〇|〇|〇|〇|〇|I2C Device Access Sample|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|〇|〇|〇|〇|〇|〇|〇|Ray Tracing Benchmark|
+|[/SDCARD_sample](./SDCARD_sample)|〇|〇|〇|〇|△|〇|〇|SD Card Operation Sample|
+|[/SIDE_sample](./SIDE_sample)    |－|－|－|－|－|〇|〇|Envision Kit, Space Invaders emulator|
+|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|〇|〇|Envision Kit, NES emulator|
+|[/GUI_sample](./GUI_sample)      |－|－|－|－|－|〇|〇|GUI Sample、Graphics User Interface (Soft rendering, using DRW2D engine)|
+|[/AUDIO_sample](./AUDIO_sample)  |－|－|－|〇|△|〇|〇|MP3/WAV Audio Player (FreeRTOS)|
+|[/SYNTH_sample](./SYNTH_sample)  |〇|〇|〇|〇|〇|〇|〇|FM sound synthesizer emulator|
+|[/CALC_sample](./CALC_sample)    |－|△|△|△|△|〇|〇|Function calculator samples (gmp, mpfr libraries)|
+|[/DSOS_sample](./DSOS_sample)    |－|－|－|－|－|△|〇|Digital Storage Oscilloscope Samples|
+|[/PSG_sample](./PSG_sample)      |△|△|△|〇|〇|〇|〇|Pseudo PSG Sound Source Performance Samples|
+
+*Please consider directories and files that are not in the above list but exist when checked out as work in progress.
+
+---
+
+### rxlib directory
+
+- Open source libraries built for RX microcontrollers
+
+[rxlib][. /rxlib] See also
+
+---
+
+### common directory
+
+- Various utilities
+- Convenience Classes
+- Common files for each microcontrollers
+
+[common/READMEja](./common/READMEja.md) See also
+
+---
+
+### chip directory
+
+- Template driver classes for various IC manufacturers (I2C, SPI, and various other interfaces)
+- In C++, the use of templates can be used to generalize operations using interfaces such as I2C and SPI.
+- The headers in the chip directory are dedicated to the initialization and control of each IC and are not concerned with the interface definition.
+- The context of the interface (control pins) is given by reference.
+- Since there is no definition of interfaces, the creation is very versatile and highly flexible.
+
+[chip/READMEja](./chip/READMEja.md) See also
+
+---
+
+### graphics directory
+
+ - Classes related to screen rendering
+
+[graphics/READMEja](./graphics/READMEja.md) See also
+
+---
+
+### sound directory
+
+ - Classes related to sound
+
+[sound/READMEja](./sound/READMEja.md) See also
+
+---
+
+### ff14 directory
+
+- Mr. ChaN's FatFs source code set
+- MMC Driver Class (SPI)
+- If SDHI interface is available, real mode driver can also be selected.
+
+[ff14](./ff14) See also
+
+---
+
+### KiCAD directory
+
+- For KiCAD, parts files, etc.
+
+[KiCAD_lib](./KiCAD_lib) See also
+
+---
+
+### legacy directory
+
+- Files not currently supported, etc.
+
+[legacy](./legacy) See also
 
 ---
 
@@ -530,6 +610,11 @@ int main(int argc, char** argv)
 }
 ```
 ---
+
+Translated with www.DeepL.com/Translator (free version)
+
+---
+
 ## License
 
 [MIT](../LICENSE)
