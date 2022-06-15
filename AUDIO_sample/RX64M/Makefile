@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX64M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -29,7 +29,6 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ffsystem.c \
 				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
-				graphics/picojpeg.c \
                 FreeRTOS/Source/portable/GCC/RX600v2/port.c \
                 FreeRTOS/Source/portable/MemMang/heap_3.c \
                 FreeRTOS/Source/croutine.c \
