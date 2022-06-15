@@ -1,8 +1,8 @@
 /*!	@file
-	@brief	RX66T R5F566TF リンカー・スクリプト @n
+	@brief	RX72T R5F572TF リンカー・スクリプト @n
 			Code: 512K, RAM: 128K, DataFlash: 32K
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,12 +14,12 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX66TF chip.  */
+/* This memory layout corresponds to the smallest predicted RX72TF chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001FC00 /* 128K - stack_size (1024) */
-	USTACK (w) : ORIGIN = 0x0001FF80, LENGTH = 4 /* ustack 896 bytes */
-	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4 /* istack 128 bytes  */
-	ROM (w)    : ORIGIN = 0xFFF80000, LENGTH = 0x0007FFD0 /* 512K - hw_vectors(48) */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001E000 /* 128K - stack_size (8192) */
+	USTACK (w) : ORIGIN = 0x0001FC00, LENGTH = 4 /* ustack 7168 bytes */
+	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4 /* istack 1024 bytes  */
+	ROM (w)    : ORIGIN = 0xFFF00000, LENGTH = 0x000FFFD0 /* 1024K - hw_vectors(48) */
 }
 
 SECTIONS

@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 - 便利クラス
 - 各マイコン共通ファイル
 
-[common/READMEja](./common/) 参照
+[common](./common/) 参照
 
 ---
 
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
 - インターフェース（制御ピン）のコンテキストは、参照で与える構成になっています。
 - インターフェースの定義が無いので、非常に汎用性があり、自由度が高い創りになっています。
 
-[chip/READMEja](./chip) 参照
+[chip](./chip) 参照
 
 ---
 
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 
  - 画面の描画に関係するクラス
 
-[graphics/READMEja](./graphics) 参照
+[graphics](./graphics) 参照
 
 ---
 
@@ -158,7 +158,7 @@ int main(int argc, char** argv)
 
  - サウンドに関係するクラス
 
-[sound/READMEja](./sound) 参照
+[sound](./sound) 参照
 
 ---
 

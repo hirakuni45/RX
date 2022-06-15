@@ -10,7 +10,7 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
 
  - RX マイコンで実現するオーディオプレイヤー
  - RX65N/RX72N Envision Kit で利用する場合、GUI での操作が可能
- - RX64M では、コンソールから操作可能
+ - RX64M/RX72T では、コンソールから操作可能
  - WAV、MP3 形式のオーディオファイルの再生（最大：48KHz、16ビット）
  - ID3 タグ情報、アルバムアートの表示（RX65N/RX72N Envision Kit）
  - 内蔵 D/A の利用（RX64M、RX65N Envision Kit）
@@ -33,7 +33,7 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
 <img src="../docs/AudioLead.jpg" width="60%">
 
  - SD カードインターフェースの準備
- - RX64M、RX65N Envision Kit、オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）3.3V p-p
+ - RX64M、RX72T、RX65N Envision Kit、オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）3.3V p-p
  - RX72N Envision Kit (内蔵オーディオ出力を利用)
  - RX65N Envision Kit、P03_JOY_RIGHT_IRQ11 (DA0) Left 出力
  - RX65N Envision Kit、P05_IRQ13_SW (DA1) Right 出力

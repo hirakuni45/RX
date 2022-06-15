@@ -550,14 +550,14 @@ int main(int argc, char** argv)
 	utils::format("\r%s Start for Audio Sample\n") % system_str_;
 
     {
-        uint32_t stack_size = 16384;
+        uint32_t stack_size = 4096;
         void* param = nullptr;
         uint32_t prio = 2;
         xTaskCreate(codec_task_, "Codec", stack_size, param, prio, nullptr);
     }
 
     {
-        uint32_t stack_size = 8192;
+        uint32_t stack_size = 1024;
         void* param = nullptr;
         uint32_t prio = 1;
         xTaskCreate(main_task_, "Main", stack_size, param, prio, nullptr);
