@@ -9,7 +9,7 @@ Renesas RX65N/RX72N Envision Kit, RX64M Audio Player
 ## Overview
  - Audio player realized with RX microcontroller
  - GUI operation is available when using the RX65N/RX72N Envision Kit.
- - The RX64M can be operated from the console.
+ - The RX64M,RX72T can be operated from the console.
  - Playback of audio files in WAV and MP3 format (up to 48 kHz, 16 bits)
  - Displaying ID3 tag information and album art (RX65N/RX72N Envision Kit)
  - Use of built-in D/A (RX65N Envision Kit, RX64M)
