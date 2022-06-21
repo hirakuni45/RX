@@ -4,7 +4,7 @@
 	@brief	RX72M グループ・クロック。プロファイル @n
             クロックジェネレータで発生させる周波数の定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,6 +24,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class clock_profile {
 	public:
+		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 		static constexpr uint32_t	BASE		=  16'000'000;		///< 外部接続クリスタル
 		static constexpr uint32_t	PLL_BASE	= 240'000'000;		///< PLL ベースクロック（最大240MHz）
 

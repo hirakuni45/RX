@@ -33,14 +33,15 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発信器タイプ @n
-					HOCO を使う場合、同時に、BASE_CLOCK_ に周波数（16,18,20 MHz）を設定します。
+					HOCO を使う場合、同時に、clock_profile::PLL_BASE に周波数（16,18,20 MHz）を設定します。 @n
+					LOCO は、起動時のモードなので、敢えて設定する事は無いと思います。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class OSC_TYPE {
 			XTAL,		///< クリスタル接続
-			EXT,		///< クロック入力
-			HOCO,		///< 高速オンチップオシレーター
-			LOCO,		///< 低速オンチップオシレーター (240KHz)
+			EXT,		///< 外部クロック入力
+			HOCO,		///< 内蔵高速オンチップオシレーター
+			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
 		};
 	};
 
@@ -48,28 +49,92 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス @n
-				INTR_CLOCK は、内部 PLL で扱える最大速度です、@n
-				外部クリスタルを微妙な周波数にする場合、その整数倍にしなければなりません。 @n
 				RX71M はスーパーバイザモードでの変更が必要なので、「start.s」内で行う。 @n
 				RX71M の場合、アセンブラにオプション「--defsym MEMWAIT=1」を渡す。
 		@param[in]	OSC_TYPE	発信器タイプを設定（通常、XTAL）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <auto OSC_TYPE_ = system_base::OSC_TYPE::XTAL>
-	struct system_io : public system_base {
+	class system_io : public system_base 
+	{
+		static constexpr bool check_base_clock_() noexcept
+		{
+			bool ok = true;
+			if(OSC_TYPE_ == OSC_TYPE::XTAL) {
+				if(clock_profile::BASE < 8'000'000 || clock_profile::BASE > 24'000'000) ok = false;
+			} else if(OSC_TYPE_ == OSC_TYPE::EXT) {
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
+				if(clock_profile::BASE > 30'000'000) ok = false;
+#else
+				if(clock_profile::BASE > 24'000'000) ok = false;
+#endif
+			} else if(OSC_TYPE_ == OSC_TYPE::HOCO) {  // 16MHz, 18MHz, 20MHｚ
+				if(clock_profile::BASE != 16'000'000 && clock_profile::BASE != 18'000'000 && clock_profile::BASE != 20'000'000) ok = false;
+			}
+			return ok;
+		}
 
-		static uint8_t clock_div_(uint32_t clk) noexcept
+		static constexpr uint8_t clock_div_(uint32_t clk) noexcept
 		{
 			uint8_t div = 0;
 			while(clk < clock_profile::PLL_BASE) {
 				++div;
 				clk <<= 1;
 			}
-			if(div > 0b0110) div = 0b0110;
+			if(div > 0b0110) div = 0b111;
 			return div;
 		}
 
+		static constexpr bool check_clock_div_(uint32_t clk) noexcept
+		{
+			auto div = clock_div_(clk);
+			if(div > 0b0110) {
+				return false;  // overflow
+			}
+			if((clk << div) != (clock_profile::PLL_BASE & (0xffffffff << div))) {
+				return false;  // 割り切れない周期
+			}
+			return true;
+		}
 
+		static constexpr uint8_t clock_div_bus_(uint32_t clk) noexcept
+		{
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
+			if((clock_profile::PLL_BASE - (clk * 3)) < 3) {  // 1/3 設定の検出
+				return 0b1001;
+			}
+#endif
+			return clock_div_(clk);
+		}
+
+		static constexpr bool check_clock_div_bus_(uint32_t clk) noexcept
+		{
+			auto div = clock_div_bus_(clk);
+			if((div & 0b0111) > 0b0110) {
+				return false;  // overflow
+			}
+			if(div == 0b1001) {  // 1/3
+				return true;
+			} else {
+				if((clk << div) != (clock_profile::PLL_BASE & (0xffffffff << div))) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		}
+
+		static constexpr uint32_t usb_div_() noexcept
+		{
+			if(clock_profile::TURN_USB) {
+				if((clock_profile::PLL_BASE % 48'000'000) != 0) return 0;  // 割り切れない場合
+				return (clock_profile::PLL_BASE / 48'000'000);
+			} else {  // USB を使わない場合は、常に「２」（リセット時の値）を返す
+				return 0b0001 + 1;
+			}
+		}
+
+	public:
 		//-------------------------------------------------------------//
 		/*!
 			@brief  マスター・クロックのブースト @n
@@ -81,6 +146,9 @@ namespace device {
 			device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
 			device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
+
+			// ベースクロック周波数の検査
+			static_assert(check_base_clock_(), "BASE out of range.");
 
 			// メインクロック強制発振とドライブ能力設定
 			if(OSC_TYPE_ == OSC_TYPE::XTAL) {
@@ -128,29 +196,38 @@ namespace device {
 #endif
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
 			// ... MAX x30.0
+			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) >= 20, "PLL_BASE clock divider underflow.");
+			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) <= 60, "PLL_BASE clock divider overflow.");
+			static_assert((clock_profile::PLL_BASE * 2 % clock_profile::BASE) == 0, "PLL_BASE clock can't divided.");
 			uint32_t n = clock_profile::PLL_BASE * 2 / clock_profile::BASE;
-			if(n < 20) n = 20;
-			else if(n > 60) n = 60;
 			n -= 20;
 			device::SYSTEM::PLLCR.STC = n + 0b010011;  // base x10
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
 
+			// 1/64 以上、分周出来ない設定は不可
+			// ※RX72N, RX72M などは BCLK: 1/3 を選択する事が出来る。
+			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
+			static_assert(check_clock_div_(clock_profile::ICLK), "ICLK can't divided.");
+			static_assert(check_clock_div_bus_(clock_profile::BCLK), "BCLK can't divided.");
+			static_assert(check_clock_div_(clock_profile::PCLKA), "PCLKA can't divided.");
+			static_assert(check_clock_div_(clock_profile::PCLKB), "PCLKB can't divided.");
+			static_assert(check_clock_div_(clock_profile::PCLKC), "PCLKC can't divided.");
+			static_assert(check_clock_div_(clock_profile::PCLKD), "PCLKD can't divided.");
+
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
-								  | device::SYSTEM::SCKCR.BCK.b(clock_div_(clock_profile::BCLK))
+								  | device::SYSTEM::SCKCR.BCK.b(clock_div_bus_(clock_profile::BCLK))
 								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
 								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(clock_profile::PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
-			{  // USB Master Clock の設定
-				auto usb_div = clock_profile::PLL_BASE / 48'000'000;
-				if(usb_div >= 2 && usb_div <= 5) {
-					// 1/2, 1/3, 1/4, 1/5
-					device::SYSTEM::SCKCR2.UCK = usb_div - 1;
-				}
-			}
 
+			static_assert(usb_div_() >= 2 && usb_div_() <= 5, "USB Clock can't divided.");
+			// 1/2, 1/3, 1/4, 1/5
+			device::SYSTEM::SCKCR2.UCK = usb_div_() - 1;
+
+			// マイクロコントローラによっては、FCLK 周期を事前に設定する必要がある。
 			device::FLASH::set_eepfclk(clock_profile::FCLK);
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
@@ -176,7 +253,7 @@ namespace device {
 		}
 
 
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 		//-------------------------------------------------------------//
 		/*!
 			@brief  PPLL 制御を使って PHY 向け 25MHz を出力する。

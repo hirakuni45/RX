@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX65N/RX72N Envision Kit SYNTH sample
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,6 +17,9 @@
 #include "common/shell.hpp"
 #include "sound/dac_stream.hpp"
 #include "sound/sound_out.hpp"
+
+#include "sound/synth/synth_unit.h"
+
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/font.hpp"
@@ -25,8 +28,6 @@
 #include "graphics/simple_dialog.hpp"
 
 #include "chip/FT5206.hpp"
-
-#include "sound/synth/synth_unit.h"
 
 #include "synth_gui.hpp"
 
@@ -48,7 +49,7 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 
-	static const uint32_t AUDIO_SAMPLE_RATE = 48'000;
+	static constexpr uint32_t AUDIO_SAMPLE_RATE = 48'000;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
@@ -72,7 +73,7 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
-	#define GRAPHICS
+	#define USE_GRAPHICS
 
 #elif defined(SIG_RX72N)
 
@@ -83,7 +84,7 @@ namespace {
 
 //	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
 
-	static const uint32_t AUDIO_SAMPLE_RATE = 48'000;
+	static constexpr uint32_t AUDIO_SAMPLE_RATE = 48'000;
 
 	// GLCDC の制御関係
 	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
@@ -106,7 +107,7 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x0000;
 
 	#define USE_SSIE
-	#define GRAPHICS
+	#define USE_GRAPHICS
 
 #elif defined(SIG_RX72T)
 
@@ -115,7 +116,7 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 
-	static const uint32_t AUDIO_SAMPLE_RATE = 48'000;
+	static constexpr uint32_t AUDIO_SAMPLE_RATE = 48'000;
 
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
@@ -132,7 +133,7 @@ namespace {
 	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
 
-#ifdef GRAPHICS
+#ifdef USE_GRAPHICS
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	static const graphics::pixel::TYPE PIX = graphics::pixel::TYPE::RGB565;
