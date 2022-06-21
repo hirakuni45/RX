@@ -41,7 +41,7 @@ CAN が複数チャネルある場合、チャネルを切り替えて通信す�
 CAN バス・トランシーバーを接続するポートは、以下のソースを参照して下さい。
 
 |マイコン|ファイル|CAN0 候補|CAN1 候補|
-|-------|--------|--------|---------|
+|-------|--------|:---:|:---:|
 |RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|

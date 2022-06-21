@@ -20,7 +20,7 @@
 					P01 ピンにLEDを接続する @n
 					SCI1 を使用する。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -49,7 +49,7 @@
 
 namespace {
 
-	static const uint32_t can_cmd_ver_ = 89;
+	static constexpr uint32_t can_cmd_ver_ = 89;
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
@@ -57,8 +57,8 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
 	typedef device::CAN1 CAN1_CH;
-	static const auto CAN0_PORT = device::port_map::ORDER::FIRST;
-	static const auto CAN1_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto CAN1_PORT = device::port_map::ORDER::FIRST;
 	#define MULTI
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
@@ -66,8 +66,8 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
 	typedef device::CAN1 CAN1_CH;
-	static const auto CAN0_PORT = device::port_map::ORDER::FIRST;
-	static const auto CAN1_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto CAN1_PORT = device::port_map::ORDER::FIRST;
 //	#define MULTI
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
@@ -78,19 +78,19 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
-	static const auto CAN0_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	typedef device::CAN1 CAN0_CH;
-	static const auto CAN0_PORT = device::port_map::ORDER::SECOND;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::SECOND;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::CAN0 CAN0_CH;
-	static const auto CAN0_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #endif
 	typedef device::system_io<> SYSTEM_IO;
 

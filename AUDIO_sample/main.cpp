@@ -318,7 +318,7 @@ namespace {
 			}
 		} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
 			shell_.help();
-			utils::format("    play file-name\n");
+			utils::format("    play file-name  (wild card: '*')\n");
 		} else {
 			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}

@@ -1,11 +1,16 @@
-各種デバイスドライバー
+各種デバイス（ IC ）ドライバー
 =========
 
-[English](README.md)
+[英語版](./README.md)
+
+---
 
 ## 概要
+
 I2C、SPI、BUS、CAN、等のインターフェースで通信を行うデバイス制御クラス
-   
+
+---
+
 ## デバイス・リスト
 
 |デバイス名|機能|メーカー|I/F|電源電圧|URL|
@@ -38,6 +43,66 @@ I2C、SPI、BUS、CAN、等のインターフェースで通信を行うデバ�
 |AS5600|12-bit Programmable Contactless Potentiometer|ams|I2C|3.3V or 5.0V|[ams](https://ams.com/ja/as5600)|
 
 ---
+
+## デバイス・テンプレート・クラスの特徴
+
+- デバイスクラスは、C++ テンプレート活用したクラスで、通常ヘッダーをインクルードするだけで使えるように設計されています。
+- 物理的な定義（どのピンを使うか、どのインターフェースを使うかなど）を極限まで排除して、純粋に IC の仕様を網羅した制御コードのみ実装されています。
+- その為、非常に汎用性が高く、色々な異なったマイコンに最小限の定義で適合します。
+- 例えば、RX マイコンの場合、I2C は、IICA、SCI-I2C、ソフト I2C、など色々なインターフェースが考えられますが、同じように扱えます。
+- オーサリングツールに頼って、別プログラムで設定を生成したりする事が必要ありません。（生成したコードと自分のコードをマージする必要性が無い）
+- コードは読みやすく、間違いが少なく、保守が簡単になるように工夫しています。
+
+I2C 接続、タッチパネルコントローラー FT5206 の例：
+
+```C++
+#include "common/sci_i2c_io.hpp"
+#include "chip/FT5206.hpp"
+
+	//SCI-I2C で利用する FIFO バッファの定義
+	typedef utils::fixed_fifo<uint8_t, 64> RB64;  // 受信バッファ
+	typedef utils::fixed_fifo<uint8_t, 64> SB64;  // 送信バッファ
+
+	// Ft5206 の RESET 信号の型
+	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+	// SCI-I2C インターフェースの型（SCI6、３番目候補のポートを利用）
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
+
+
+	// SCI-I2C インターフェースの定義（実態）
+	FT5206_I2C	ft5206_i2c_;
+	// FT5206 チップの型
+	typedef chip::FT5206<FT5206_I2C> TOUCH;
+	// FT5206 チップの定義（実態）
+	TOUCH	touch_;
+
+
+	{  // FT5206 の初期化
+		TOUCH::reset<FT5206_RESET>();  // FT5206 のリセット
+		uint8_t intr_lvl = 1;
+		// I2C マスター、標準速度で初期化
+		if(!ft5206_i2c_.start(FT5206_I2C::MODE::MASTER, FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
+			utils::format("FT5206 I2C Start Fail...\n");
+		}
+		// FT5206 を開始
+		if(!touch_.start()) {
+			utils::format("FT5206 Start Fail...\n");
+		}
+	}
+
+
+	// メインループ
+	while(1) {
+		touch_.update();
+
+
+		auto tnum = touch_.get_touch_num();  // タッチ数の取得
+		if(tnum > 0) {
+			const auto& t = touch_.get_touch_pos(0);  // タッチ位置の取得
+		}
+	}
+```
+
 
 ## I2C インターフェース・クラスに要求される機能
 

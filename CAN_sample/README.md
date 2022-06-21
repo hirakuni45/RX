@@ -40,7 +40,7 @@ The environment variable "MULTI" is enabled in "main.cpp".
 See the following sources for the ports to connect the CAN bus transceiver.
 
 |microcontroller|file|CAN0 Alternate|CAN1 Alternate|
-|-------|--------|--------|---------|
+|-------|--------|:---:|:---:|
 |RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|
