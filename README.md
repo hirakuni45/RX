@@ -121,7 +121,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 - Open source libraries built for RX microcontrollers
 
-[rxlib][./rxlib] See also
+[rxlib](./rxlib) See also
 
 ---
 
