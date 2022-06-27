@@ -85,7 +85,7 @@ namespace device {
 
 		void set_intr_() {
 			set_vector_(SCIF::get_rx_vec(), SCIF::get_tx_vec());
-			icu_mgr::set_level(SCIF::get_peripheral(), level_);
+			icu_mgr::set_level(SCIF::PERIPHERAL, level_);
 		}
 
 	public:
@@ -115,7 +115,7 @@ namespace device {
 
 			SCIF::SCR = 0x00;			// TE, RE disable.
 
-			port_map::turn(SCIF::get_peripheral(), true, PSEL);
+			port_map::turn(SCIF::PERIPHERAL, true, PSEL);
 
 			uint32_t brr = F_PCLKA / baud / 32;
 			uint8_t cks = 0;
@@ -127,7 +127,7 @@ namespace device {
 			bool abcs0 = 0;
 			if(brr > 256) { brr /= 2; abcs0 = 1; }
 
-			power_mgr::turn(SCIF::get_peripheral());
+			power_mgr::turn(SCIF::PERIPHERAL);
 
 			set_intr_();
 
@@ -178,7 +178,7 @@ namespace device {
 			}
 			if(cks > 3 || brr > 256) return false;
 
-			power_cfg::turn(SCI::get_peripheral());
+			power_cfg::turn(SCI::PERIPHERAL);
 
 			set_intr_();
 

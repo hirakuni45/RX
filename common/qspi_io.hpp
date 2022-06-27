@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・QSPI I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -80,7 +80,7 @@ namespace device {
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) noexcept
 		{
 ///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(QSPI::PCLK);
-			uint32_t br = static_cast<uint32_t>(QSPI::PCLK) / speed;
+			auto br = static_cast<uint32_t>(QSPI::PCLK) / speed;
 			uint8_t dv = 0;
 			while(br > 512) {
 				br >>= 1;
@@ -133,6 +133,7 @@ namespace device {
 				return false;
 			}
 
+			// 電源を有効にする
 			power_mgr::turn(QSPI::PERIPHERAL);
 
 			// ポートを有効にする
@@ -217,11 +218,12 @@ namespace device {
 		/*!
 			@brief  シリアル送信
 			@param[in]	src	送信ソース
-			@param[in]	cnt	送信サイズ
+			@param[in]	cnt	送信サイズ（バイト）
 			@param[in]	width	通信幅（指定しないと１ビット）
+			@return 転送サイズを返す（バイト）
 		*/
 		//-----------------------------------------------------------------//
-		void send(const void* src, uint32_t size, WIDTH width = WIDTH::SINGLE) noexcept
+		uint32_t send(const void* src, uint32_t size, WIDTH width = WIDTH::SINGLE) noexcept
 		{
 			auto org = static_cast<const uint8_t*>(src);
 			auto end = org + size;
@@ -229,6 +231,7 @@ namespace device {
 				xchg(*org, width);
 				++org;
 			}
+			return size;
 		}
 
 
@@ -258,8 +261,8 @@ namespace device {
 		void destroy(bool power = true) noexcept
 		{
 			QSPI::SPCR = 0x00;
-			port_map::turn(QSPI::get_peripheral(), false);
-			if(power) power_mgr::turn(QSPI::get_peripheral(), false);
+			port_map::turn(QSPI::PERIPHERAL, false);
+			if(power) power_mgr::turn(QSPI::PERIPHERAL, false);
 		}
 	};
 }

@@ -120,7 +120,7 @@ int main(int argc, char** argv)
 
 - RX マイコン用にビルドしたオープンソース系ライブラリ
 
-[rxlib][./rxlib] 参照
+[rxlib](./rxlib) 参照
 
 ---
 

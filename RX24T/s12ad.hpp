@@ -267,11 +267,17 @@ namespace device {
 	/*!
 		@brief  S12AD0 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per>
 	struct s12ad0_t : public s12ad_t<base> {
+
+		static constexpr auto PERIPHERAL = per;  ///< ペリフェラル型
+		static constexpr auto S12ADI = ICU::VECTOR::S12ADI;	///< スキャン終了割り込みベクター
+		static constexpr auto GBADI  = ICU::VECTOR::GBADI;	///< グループＢスキャン終了割り込みベクター
+		static constexpr auto GCADI  = ICU::VECTOR::GCADI;	///< グループＣスキャン終了割り込みベクター
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -694,42 +700,6 @@ namespace device {
 		};
 		typedef adpgags0_t<base + 0x1A2>  ADPGAGS0_;
 		static  ADPGAGS0_ ADPGAGS0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  スキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec() { return ICU::VECTOR::S12ADI; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＢスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_gb_vec() { return ICU::VECTOR::GBADI; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＣスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_gc_vec() { return ICU::VECTOR::GCADI; }
 	};
 	 template <uint32_t base, peripheral per> typename s12ad0_t<base, per>::ADDR_ s12ad0_t<base, per>::ADDR;
 	 template <uint32_t base, peripheral per> typename s12ad0_t<base, per>::ADDR16_ s12ad0_t<base, per>::ADDR16;
@@ -758,11 +728,17 @@ namespace device {
 	/*!
 		@brief  S12AD1 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per>
 	struct s12ad1_t : public s12ad_t<base> {
+
+		static constexpr auto PERIPHERAL = per;  ///< ペリフェラル型
+		static constexpr auto S12ADI = ICU::VECTOR::S12ADI1;	///< スキャン終了割り込みベクター
+		static constexpr auto GBADI  = ICU::VECTOR::GBADI1;		///< グループＢスキャン終了割り込みベクター
+		static constexpr auto GCADI  = ICU::VECTOR::GCADI1;		///< グループＣスキャン終了割り込みベクター
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1121,43 +1097,6 @@ namespace device {
 		};
 		typedef adshcr_t<base + 0x66>   ADSHCR_;
 		static  ADSHCR_ ADSHCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  スキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec() { return ICU::VECTOR::S12ADI1; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＢスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_gb_vec() { return ICU::VECTOR::GBADI1; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＣスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_gc_vec() { return ICU::VECTOR::GCADI1; }
-
 	};
 	template <uint32_t base, peripheral per> typename s12ad1_t<base, per>::ADDR_ s12ad1_t<base, per>::ADDR;
 	template <uint32_t base, peripheral per> typename s12ad1_t<base, per>::ADDR16_ s12ad1_t<base, per>::ADDR16;
@@ -1183,11 +1122,17 @@ namespace device {
 	/*!
 		@brief  S12AD2 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per>
 	struct s12ad2_t : public s12ad_t<base> {
+
+		static constexpr auto PERIPHERAL = per;					///< ペリフェラル型
+		static constexpr auto S12ADI = ICU::VECTOR::S12ADI2;	///< スキャン終了割り込みベクター
+		static constexpr auto GBADI  = ICU::VECTOR::GBADI2;		///< グループＢスキャン終了割り込みベクター
+		static constexpr auto GCADI  = ICU::VECTOR::GCADI2;		///< グループＣスキャン終了割り込みベクター
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1666,42 +1611,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		typedef rw8_t<base + 0xEB> ADSSTR11_;
 		static  ADSSTR11_ ADSSTR11;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  スキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec() { return ICU::VECTOR::S12ADI2; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＢスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_gb_vec() { return ICU::VECTOR::GBADI2; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＣスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_gc_vec() { return ICU::VECTOR::GCADI2; }
 	};
 	template <uint32_t base, peripheral per> typename s12ad2_t<base, per>::ADDR_ s12ad2_t<base, per>::ADDR;
 	template <uint32_t base, peripheral per> typename s12ad2_t<base, per>::ADDR4_ s12ad2_t<base, per>::ADDR4;

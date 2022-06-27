@@ -96,7 +96,7 @@ namespace device {
 
 			level_ = level;
 
-			power_mgr::turn(CMTW::get_peripheral());
+			power_mgr::turn(CMTW::PERIPHERAL);
 
 			CMTW::CMWSTR = 0;
 

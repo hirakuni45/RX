@@ -599,9 +599,9 @@ namespace device {
 			MTUX::TIER = 0x00;
 			MTUX::enable(false);
 //			icu_mgr::set_level(MTUX::get_vec(MTUX::interrupt::OVF), 0);
-//			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), false);
+//			port_map::turn(MTUX::PERIPHERAL, static_cast<port_map::channel>(ch), false);
 			if(MTU::TSTRA() == 0 && MTU::TSTRB() == 0 && MTU::TSTR() == 0) {			
-				power_mgr::turn(MTUX::get_peripheral(), false);
+				power_mgr::turn(MTUX::PERIPHERAL, false);
 			}
 			intr_level_ = 0;
 		}
