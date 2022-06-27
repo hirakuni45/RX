@@ -26,7 +26,7 @@ _start:
 # RAM 全領域のゼロクリア
 		mov	#__datastart, r1
 		mov	#0, r2
-		mov	#__istack, r3
+		mov	#__mainramend, r3
 		sub r1, r3
 		sstr.b
 

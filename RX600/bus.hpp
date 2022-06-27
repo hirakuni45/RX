@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600/RX700 バス定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -38,7 +38,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>     EMODE;
 			bit_rw_t <io_, bitpos::B12>    MPXEN;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		typedef csncr_t<0x00083802> CS0CR_;
 		static CS0CR_ CS0CR;
 		typedef csncr_t<0x00083812> CS1CR_;
@@ -76,7 +76,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> PRCV;
 			bits_rw_t<io_, bitpos::B8, 4> WRCV;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		typedef csncr_t<0x0008380A> CS0REC_;
 		static CS0REC_ CS0REC;
 		typedef csncr_t<0x0008381A> CS1REC_;
@@ -152,7 +152,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B9>  PWENB;
 			bit_rw_t<io_, bitpos::B15> PRMOD;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		typedef csnmod_t<0x00083002> CS0MOD_;
 		static CS0MOD_ CS0MOD;
 		typedef csnmod_t<0x00083012> CS1MOD_;
@@ -192,7 +192,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 5> CSWWAIT;
 			bits_rw_t<io_, bitpos::B24, 5> CSRWWAIT;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		typedef csnwcr1_t<0x00083004> CS0WCR1_;
 		static CS0WCR1_ CS0WCR1;
 		typedef csnwcr1_t<0x00083014> CS1WCR1_;
@@ -236,7 +236,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 3> WDON;
 			bits_rw_t<io_, bitpos::B28, 3> CSON;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		typedef csnwcr2_t<0x00083008> CS0WCR2_;
 		static CS0WCR2_ CS0WCR2;
 		typedef csnwcr2_t<0x00083018> CS1WCR2_;
@@ -342,7 +342,7 @@ namespace device {
 			static csnwcr1_t<base + 0x0008> CSWCR2;
 		};
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		typedef cs_t<0x0008'3000, 0xFF00'0000, 0xFFFF'FFFF> CS0;
 		typedef cs_t<0x0008'3010, 0x0700'0000, 0x07FF'FFFF> CS1;
 		typedef cs_t<0x0008'3020, 0x0600'0000, 0x06FF'FFFF> CS2;
@@ -735,7 +735,7 @@ namespace device {
 	};
 	typedef bus_t<void> BUS;
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	template <class _> typename bus_t<_>::CS0CR_   bus_t<_>::CS0CR;
 	template <class _> typename bus_t<_>::CS1CR_   bus_t<_>::CS1CR;
 	template <class _> typename bus_t<_>::CS2CR_   bus_t<_>::CS2CR;
@@ -747,7 +747,7 @@ namespace device {
 	template <class _> typename bus_t<_>::CS6CR_   bus_t<_>::CS6CR;
 	template <class _> typename bus_t<_>::CS7CR_   bus_t<_>::CS7CR;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	template <class _> typename bus_t<_>::CS0REC_  bus_t<_>::CS0REC;
 	template <class _> typename bus_t<_>::CS1REC_  bus_t<_>::CS1REC;
 	template <class _> typename bus_t<_>::CS2REC_  bus_t<_>::CS2REC;
@@ -760,7 +760,7 @@ namespace device {
 	template <class _> typename bus_t<_>::CS7REC_  bus_t<_>::CS7REC;
 #endif
 	template <class _> typename bus_t<_>::CSRECEN_ bus_t<_>::CSRECEN;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	template <class _> typename bus_t<_>::CS0MOD_  bus_t<_>::CS0MOD;
 	template <class _> typename bus_t<_>::CS1MOD_  bus_t<_>::CS1MOD;
 	template <class _> typename bus_t<_>::CS2MOD_  bus_t<_>::CS2MOD;
@@ -772,7 +772,7 @@ namespace device {
 	template <class _> typename bus_t<_>::CS6MOD_  bus_t<_>::CS6MOD;
 	template <class _> typename bus_t<_>::CS7MOD_  bus_t<_>::CS7MOD;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	template <class _> typename bus_t<_>::CS0WCR1_ bus_t<_>::CS0WCR1;
 	template <class _> typename bus_t<_>::CS1WCR1_ bus_t<_>::CS1WCR1;
 	template <class _> typename bus_t<_>::CS2WCR1_ bus_t<_>::CS2WCR1;
@@ -784,7 +784,7 @@ namespace device {
 	template <class _> typename bus_t<_>::CS6WCR1_ bus_t<_>::CS6WCR1;
 	template <class _> typename bus_t<_>::CS7WCR1_ bus_t<_>::CS7WCR1;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	template <class _> typename bus_t<_>::CS0WCR2_ bus_t<_>::CS0WCR2;
 	template <class _> typename bus_t<_>::CS1WCR2_ bus_t<_>::CS1WCR2;
 	template <class _> typename bus_t<_>::CS2WCR2_ bus_t<_>::CS2WCR2;
