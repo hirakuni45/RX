@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	I2C 制御ベースクラス @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -33,19 +33,20 @@ namespace device {
 		/*!
 			@brief  速度タイプ型 @n
 					※簡易 I2C では誤差が大きい。 @n
-					※設定出来ない速度では、初期化で失敗する。
+					※設定出来ない速度の場合、初期化で失敗する。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class SPEED : uint32_t {
 			_50K      =    50'000,	///<  50K b.p.s.
 			STANDARD  =   100'000,	///< 100K b.p.s. (Standard mode)
-			_100K     =   100'000,
+			_100K     =   100'000,  ///< 100K b.p.s. (Even STANDARD)
 			_150K     =   150'000,	///< 150K b.p.s.
 			_200K     =   200'000,	///< 200K b.p.s.
 			_250K     =   250'000,	///< 250K b.p.s.
 			_300K     =   300'000,	///< 300K b.p.s.
 			_350K     =   350'000,	///< 350K b.p.s.
 			FAST      =   400'000,	///< 400K b.p.s. (Fast mode) 60MHz では、対応していません。
+			_400      =   400'000,  ///< 400K b.p.s. (Even FAST)
             FAST_PLUS = 1'000'000   ///<   1M b.p.s.
 		};
 
