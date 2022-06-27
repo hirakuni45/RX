@@ -1,6 +1,8 @@
 /*!	@file
 	@brief	RX72T R5F572TF リンカー・スクリプト @n
-			Code: 512K, RAM: 128K, DataFlash: 32K
+			Code: 512K, RAM: 128K, ECCRAM: 16K, DataFlash: 32K @n
+			RAM:    0 wait (1 cycle) @n
+			ECCRAM: 1 wait (2 cycle)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,9 +18,15 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX72TF chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001E000 /* 128K - stack_size (8192) */
-	USTACK (w) : ORIGIN = 0x0001FC00, LENGTH = 4 /* ustack 7168 bytes */
-	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4 /* istack 1024 bytes  */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001F000  /* 128K - stack_size (8192) */
+	USTACK (w) : ORIGIN = 0x0001FC00, LENGTH = 4  /* ustack 7168 bytes */
+	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4  /* istack 1024 bytes  */
+
+/*	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00020000 /* 128K */
+/*	USTACK (w) : ORIGIN = 0x00FFF800, LENGTH = 4 /* ustack for ECCRAM (16384 - 2048) bytes */
+/*	ISTACK (w) : ORIGIN = 0x01000000, LENGTH = 4 /* istack for ECCRAM (2048) bytes  */
+
+	ECCRAM (w) : ORIGIN = 0x00FFC000, LENGTH = 0x00004000 /* 16K */
 	ROM (w)    : ORIGIN = 0xFFF00000, LENGTH = 0x000FFFD0 /* 1024K - hw_vectors(48) */
 }
 
@@ -110,6 +118,8 @@ SECTIONS
     PROVIDE (edata = .);
     PROVIDE (__dataend = .);
   } > RAM AT> ROM
+
+  PROVIDE (__mainramend = ORIGIN(RAM) + LENGTH(RAM));
 
   /* Note that __romdatacopysize may be ZERO for the simulator, which
      knows how to intialize RAM directly.  It should ONLY be used for

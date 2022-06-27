@@ -113,6 +113,8 @@ SECTIONS
     PROVIDE (__dataend = .);
   } > RAM AT> ROM
 
+  PROVIDE (__mainramend = ORIGIN(RAM) + LENGTH(RAM));
+
   /* Note that __romdatacopysize may be ZERO for the simulator, which
      knows how to intialize RAM directly.  It should ONLY be used for
      copying data from ROM to RAM; if you need to know the size of the
