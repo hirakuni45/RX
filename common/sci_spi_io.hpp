@@ -98,7 +98,7 @@ namespace device {
 #else
 			set_vector_(SCI::get_rx_vec(), SCI::get_te_vec());
 #endif
-			icu_mgr::set_level(SCI::get_peripheral(), level_);
+			icu_mgr::set_level(SCI::PERIPHERAL, level_);
 		}
 #endif
 
@@ -123,7 +123,7 @@ namespace device {
 		{
 			level_ = level;
 
-			power_mgr::turn(SCI::get_peripheral());
+			power_mgr::turn(SCI::PERIPHERAL);
 
 			SCI::SCR = 0x00;			// TE, RE disable.
 

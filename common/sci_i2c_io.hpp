@@ -6,7 +6,7 @@
 			ので、割り込みレベルには注意する事（上書きされる）@n
 			※現在、マスターモードのみ実装
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
