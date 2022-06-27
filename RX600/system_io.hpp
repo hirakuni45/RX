@@ -224,7 +224,7 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
 
 			static_assert(usb_div_() >= 2 && usb_div_() <= 5, "USB Clock can't divided.");
-			// 1/2, 1/3, 1/4, 1/5
+			// 1/2:0b0001, 1/3:0b0010, 1/4:0b0011, 1/5:0b0100
 			device::SYSTEM::SCKCR2.UCK = usb_div_() - 1;
 
 			// マイクロコントローラによっては、FCLK 周期を事前に設定する必要がある。
