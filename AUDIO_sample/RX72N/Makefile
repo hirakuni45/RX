@@ -30,7 +30,7 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
 				graphics/picojpeg.c \
-                FreeRTOS/Source/portable/GCC/RX600v2/port.c \
+                FreeRTOS/Source/portable/GCC/RX700v3_DPFPU/port.c \
                 FreeRTOS/Source/portable/MemMang/heap_3.c \
                 FreeRTOS/Source/croutine.c \
                 FreeRTOS/Source/event_groups.c \
@@ -53,7 +53,7 @@ AS_OPT		=
 
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
-				../../FreeRTOS/Source/portable/GCC/RX600v2
+				../../FreeRTOS/Source/portable/GCC/RX700v3_DPFPU
 
 # for FreeRTOS option
 AS_OPT		=	--defsym NOT_USER=1
