@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -23,7 +23,7 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-                FreeRTOS/Source/portable/GCC/RX600v2/port.c \
+                FreeRTOS/Source/portable/GCC/RX700v3_DPFPU/port.c \
                 FreeRTOS/Source/portable/MemMang/heap_3.c \
                 FreeRTOS/Source/croutine.c \
                 FreeRTOS/Source/event_groups.c \
@@ -41,7 +41,7 @@ USER_DEFS	=	RTOS
 
 INC_APP		=	. ../../ ../ \
 				../../FreeRTOS/Source/include \
-				../../FreeRTOS/Source/portable/GCC/RX600v2 \
+				../../FreeRTOS/Source/portable/GCC/RX700v3_DPFPU \
 				../../RX600/drw2d/inc/tes
 
 AS_OPT		=	--defsym NOT_USER=1

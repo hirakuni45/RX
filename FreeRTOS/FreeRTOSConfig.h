@@ -88,6 +88,12 @@ the application code.  This constant should be set to the vector number of the
 peripheral chosen.  As supplied this is CMT0. */
 /// #define configTICK_VECTOR						_CMT0_CMI0
 
+#ifdef __DPFPU
+#define configUSE_TASK_DPFPU_SUPPORT	1
+#else
+#define configUSE_TASK_DPFPU_SUPPORT	0
+#endif
+
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
 
