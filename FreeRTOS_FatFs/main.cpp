@@ -1,18 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  FreeRTOS FatFs サンプル @n
-			RX64M, RX71M, RX72M: @n
-					12MHz のベースクロックを使用する @n
-			　　　　P07 ピンにLEDを接続する @n
-			RX65N (Renesas Envision kit RX65N): @n
-					12MHz のベースクロックを使用する @n
-			　　　　P70 に接続された LED を利用する @n
-			RX24T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
-			RX66T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する
+    @brief  FreeRTOS FatFs サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -53,19 +41,20 @@
 
 namespace {
 
-/// ベースクリスタルの定義
-/// LED 接続ポートの定義
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 
-	static const uint32_t sdc_spi_speed_ = 30000000;
+	static constexpr uint32_t sdc_spi_speed_ = 30000000;
+
 #elif defined(SIG_RX72M)
+
 	static const char* system_str_ = { "RX72M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static const uint32_t sdc_spi_speed_ = 30000000;
+	static constexpr uint32_t sdc_spi_speed_ = 30000000;
+
 #elif defined(SIG_RX64M)
 	typedef utils::rtc_io RTC;
 
@@ -107,7 +96,7 @@ namespace {
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;  ///< カード選択信号
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
 
-	static const uint32_t sdc_spi_speed_ = 30000000;
+	static constexpr uint32_t sdc_spi_speed_ = 30000000;
 #endif
 
 #elif defined(SIG_RX65N)
@@ -123,7 +112,7 @@ namespace {
 	typedef device::NULL_PORT  SDC_POWER;	///< SD カード電源制御（制御なし、常にＯＮ）
 	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD カード検出
 
-	static const uint32_t sdc_spi_speed_ = 30000000;
+	static constexpr uint32_t sdc_spi_speed_ = 30000000;
 
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
@@ -145,14 +134,7 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
 
-	static const uint32_t sdc_spi_speed_ = 20000000;
-
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
-
-	static const uint32_t sdc_spi_speed_ = 30000000;
+	static constexpr uint32_t sdc_spi_speed_ = 20000000;
 
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
@@ -165,8 +147,25 @@ namespace {
     typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
     SDC			sdc_;
 
-	static const uint32_t sdc_spi_speed_ = 30000000;
+	static constexpr uint32_t sdc_spi_speed_ = 30000000;
+
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+
+	// RSPI 定義、FIRST: P20:RSPCK, P21:MOSI, P22:MISO
+	typedef device::rspi_io<device::RSPI0> SDC_SPI;
+
+	typedef device::PORT<device::PORT3, device::bitpos::B0> SDC_SELECT;			///< カード選択信号
+	typedef device::PORT<device::PORTA, device::bitpos::B2> SDC_POWER;			///< カード電源制御 MIC2076-1YM (ACTIVE-HIGH)
+	typedef device::PORT<device::PORTB, device::bitpos::B4, 0> SDC_DETECT;		///< カード検出（ACTIVE-LOW）
+	typedef device::NULL_PORT SDC_WPRT;											///< カード書き込み禁止ポート設定（無効）
+
+	static constexpr uint32_t sdc_spi_speed_ = 30000000;
+
 #endif
+
 	typedef device::system_io<> SYSTEM_IO;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
