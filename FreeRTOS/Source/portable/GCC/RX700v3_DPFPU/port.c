@@ -1,6 +1,8 @@
 /*
- * FreeRTOS Kernel V10.4.2
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.4.6
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,14 +24,13 @@
  * https://www.FreeRTOS.org
  * https://github.com/FreeRTOS
  *
- * 1 tab == 4 spaces!
  */
 
 /*-----------------------------------------------------------
 * Implementation of functions defined in portable.h for the RXv3 DPFPU port.
 *----------------------------------------------------------*/
 
-#warning Testing for DFPU support in this port is not yet complete
+///  #warning Testing for DFPU support in this port is not yet complete
 
 /* Scheduler includes. */
 #include "FreeRTOS.h"
@@ -45,7 +46,7 @@
 
 #else /* configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H */
 
-///    #include "iodefine.h"
+///  #include "iodefine.h"
 
 #endif /* configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H */
 
