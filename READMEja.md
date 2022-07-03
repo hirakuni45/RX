@@ -26,7 +26,7 @@ Space Invaders Emulator, NES Emulator, for RX65N Envision kit
 WAV/MP3 Audio Player, ファイル選択 for RX65N Envision kit   
 <img src="docs/calc_sample.jpg" width="40%"> <img src="docs/SYNTH_sample.jpg" width="40%">   
 関数電卓、DX7 エミュレータ   
-<a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'">{:target="_blank"}</a>   
+<a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'"></a>   
 YouTube: NES Emulator for RX65N Envision kit   
    
  テンプレートデザインパターンによるデバイス制御クラスは、柔軟で、簡潔、自在な機能を提供します。   
@@ -70,24 +70,24 @@ int main(int argc, char** argv)
 
 |ディレクトリ|内容|
 |---|---|
-|[all_project_build.sh](./all_project_build.sh){:target="_blank"}|全てのプロジェクトをビルド(シェル・スクリプト)|
-|[/rxlib](./rxlib){:target="_blank"}|zlib, png, mad, gmp, mpfr ライブラリ|
-|[/RX600](./RX600){:target="_blank"}|RX マイコン共通デバイス定義クラス|
-|[/RX24T](./RX24T){:target="_blank"}|RX24T 専用デバイス定義クラス、リンカースクリプト|
-|[/RX64M](./RX64M){:target="_blank"}|RX64M 専用デバイス定義クラス、リンカースクリプト|
-|[/RX71M](./RX71M){:target="_blank"}|RX71M 専用デバイス定義クラス、リンカースクリプト|
-|[/RX65x](./RX65x){:target="_blank"}|RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
-|[/RX66T](./RX66T){:target="_blank"}|RX66T 専用デバイス定義クラス、リンカースクリプト|
-|[/RX72T](./RX72T){:target="_blank"}|RX72T 専用デバイス定義クラス、リンカースクリプト|
-|[/RX72N](./RX72N){:target="_blank"}|RX72N 専用デバイス定義クラス、リンカースクリプト|
-|[/FreeRTOS](./FreeRTOS){:target="_blank"}|FreeRTOS の RX マイコン各種対応版と簡単なサンプル|
-|[/ff14](./ff14){:target="_blank"}|ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
-|[/common](./common){:target="_blank"}|共有クラス、ヘッダーなど|
-|[/chip](./chip){:target="_blank"}|I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
-|[/graphics](./graphics){:target="_blank"}|グラフィックス描画関係クラス、GUI Widget|
-|[/sound](./sound){:target="_blank"}|サウンド、オーディオ関係クラス|
-|[/rxprog](./rxprog){:target="_blank"}|RX マイコン、フラッシュプログラム書き込みツール（Windows、OS-X、Linux 対応）|
-|[LICENSE](./LICENSE){:target="_blank"}|ライセンス表記ファイル|
+|[all_project_build.sh](./all_project_build.sh)|全てのプロジェクトをビルド(シェル・スクリプト)|
+|[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr ライブラリ|
+|[/RX600](./RX600)|RX マイコン共通デバイス定義クラス|
+|[/RX24T](./RX24T)|RX24T 専用デバイス定義クラス、リンカースクリプト|
+|[/RX64M](./RX64M)|RX64M 専用デバイス定義クラス、リンカースクリプト|
+|[/RX71M](./RX71M)|RX71M 専用デバイス定義クラス、リンカースクリプト|
+|[/RX65x](./RX65x)|RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
+|[/RX66T](./RX66T)|RX66T 専用デバイス定義クラス、リンカースクリプト|
+|[/RX72T](./RX72T)|RX72T 専用デバイス定義クラス、リンカースクリプト|
+|[/RX72N](./RX72N)|RX72N 専用デバイス定義クラス、リンカースクリプト|
+|[/FreeRTOS](./FreeRTOS)|FreeRTOS の RX マイコン各種対応版と簡単なサンプル|
+|[/ff14](./ff14)|ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
+|[/common](./common)|共有クラス、ヘッダーなど|
+|[/chip](./chip)|I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
+|[/graphics](./graphics/)|グラフィックス描画関係クラス、GUI Widget|
+|[/sound](./sound)|サウンド、オーディオ関係クラス|
+|[/rxprog](./rxprog)|RX マイコン、フラッシュプログラム書き込みツール（Windows、OS-X、Linux 対応）|
+|[LICENSE](./LICENSE)|ライセンス表記ファイル|
 
 ---
 
@@ -95,22 +95,22 @@ int main(int argc, char** argv)
 
 |ディレクトリ|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-|[/FIRST_sample](./FIRST_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
-|[/SCI_sample](./SCI_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
-|[/CAN_sample](./CAN_sample){:target="_blank"}|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
-|[/FLASH_sample](./FLASH_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
-|[/GPTW_sample](./GPTW_sample){:target="_blank"}|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
-|[/I2C_sample](./I2C_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
-|[/RAYTRACER_sample](./RAYTRACER_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
-|[/SDCARD_sample](./SDCARD_sample){:target="_blank"}|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
-|[/SIDE_sample](./SIDE_sample){:target="_blank"}|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
-|[/NESEMU_sample](./NESEMU_sample){:target="_blank"}|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
-|[/GUI_sample](./GUI_sample){:target="_blank"}|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (ソフトレンダリング、DRW2D エンジン利用)|
-|[/AUDIO_sample](./AUDIO_sample){:target="_blank"}|－|－|－|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
-|[/SYNTH_sample](./SYNTH_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
-|[/CALC_sample](./CALC_sample){:target="_blank"}|－|△|△|△|△|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
-|[/DSOS_sample](./DSOS_sample){:target="_blank"}|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
-|[/PSG_sample](./PSG_sample){:target="_blank"}|△|△|△|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
+|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
+|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
+|[/CAN_sample](./CAN_sample)|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
+|[/FLASH_sample](./FLASH_sample)|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
+|[/GPTW_sample](./GPTW_sample)|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
+|[/I2C_sample](./I2C_sample)|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
+|[/SDCARD_sample](./SDCARD_sample)|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
+|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
+|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
+|[/GUI_sample](./GUI_sample)|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (ソフトレンダリング、DRW2D エンジン利用)|
+|[/AUDIO_sample](./AUDIO_sample)|－|－|－|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
+|[/SYNTH_sample](./SYNTH_sample)|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
+|[/CALC_sample](./CALC_sample)|－|△|△|△|△|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
+|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
+|[/PSG_sample](./PSG_sample)|△|△|△|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
 
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
 
 - RX マイコン用にビルドしたオープンソース系ライブラリ
 
-[rxlib](./rxlib){:target="_blank"} 参照
+[rxlib](./rxlib) 参照
 
 ---
 
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 - 便利クラス
 - 各マイコン共通ファイル
 
-[common](./common/){:target="_blank"} 参照
+[common](./common/) 参照
 
 ---
 
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
 - インターフェース（制御ピン）のコンテキストは、参照で与える構成になっています。
 - インターフェースの定義が無いので、非常に汎用性があり、自由度が高い創りになっています。
 
-[chip](./chip){:target="_blank"} 参照
+[chip](./chip) 参照
 
 ---
 
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 
  - 画面の描画に関係するクラス
 
-[graphics](./graphics){:target="_blank"} 参照
+[graphics](./graphics) 参照
 
 ---
 
@@ -158,7 +158,7 @@ int main(int argc, char** argv)
 
  - サウンドに関係するクラス
 
-[sound](./sound){:target="_blank"} 参照
+[sound](./sound) 参照
 
 ---
 
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
 - MMC ドライバークラス（SPI）
 - SDHIインターフェースが使える場合は、リアルモードドライバーも選択出来ます。
 
-[ff14](./ff14){:target="_blank"} 参照
+[ff14](./ff14) 参照
 
 ---
 
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 
 - KiCAD 用、部品ファイルなど
 
-[KiCAD_lib](./KiCAD_lib){:target="_blank"} 参照
+[KiCAD_lib](./KiCAD_lib) 参照
 
 ---
 
@@ -184,13 +184,13 @@ int main(int argc, char** argv)
 
 - 現在はサポートしていないファイルなど
 
-[legacy](./legacy){:target="_blank"} 参照
+[legacy](./legacy) 参照
 
 ---
 
 ## Renesas GNU-RX のインストールと機能紹介
    
-以前の KPIT による GNU ツールチェインのサポートに代わり、[Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/){:target="_blank"} が新たに、RX マイコン用 GNU ツールを提供しています。   
+以前の KPIT による GNU ツールチェインのサポートに代わり、[Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/) が新たに、RX マイコン用 GNU ツールを提供しています。   
    
 RX マイコン用 最新（2020/07 現在）GNU ツールチェインとして、   
  - binutils-2.24
