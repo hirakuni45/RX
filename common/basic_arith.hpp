@@ -2,10 +2,9 @@
 //=====================================================================//
 /*!	@file
 	@brief	Arithmetic テンプレート @n
-			※テキストの数式を展開して、計算結果を得る。@n
-			NVAL には、Boost Multiprecision Library を利用する事を前提にしている。
+			※テキストの数式を展開して、計算結果を得る。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2015, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2015, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,8 +18,8 @@ namespace utils {
 	/*!
 		@brief	Arithmetic クラス
 		@param[in]	NVAL	基本型
-		@param[in]	SYMBOL	変数クラス
-		@param[in]	FUNC	関数クラス
+		@param[in]	SYMBOL	変数クラス型
+		@param[in]	FUNC	関数クラス型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class NVAL, class SYMBOL, class FUNC>
@@ -28,6 +27,8 @@ namespace utils {
 
 		static constexpr uint32_t NUMBER_NUM = 50;  ///< 最大桁数
 		static constexpr uint32_t NEST_MAX   = 10;  ///< 最大ネスト
+		static constexpr uint8_t CODE_SYM    = 0x80;	///< 変数の短縮コード（64個）
+		static constexpr uint8_t CODE_FUNC   = 0xC0;	///< 関数の短縮コード（64個）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -134,8 +135,8 @@ namespace utils {
 				}
 				error_.set(error::symbol_fatal);
 				return nval;
-			} else if(static_cast<uint8_t>(ch_) >= 0x80) {  // symbol?, func?
-				if(static_cast<uint8_t>(ch_) >= 0xC0) {  // func ?
+			} else if(static_cast<uint8_t>(ch_) >= CODE_SYM) {  // symbol?, func?
+				if(static_cast<uint8_t>(ch_) >= CODE_FUNC) {  // func ?
 					auto fc = static_cast<typename FUNC::NAME>(ch_);
 					func_sub_(fc, nval);
 				} else {  // to symbol
@@ -316,6 +317,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	symbol	シンボル・クラス（変数）
 			@param[in]	func	関数クラス
 		*/
 		//-----------------------------------------------------------------//
@@ -327,7 +329,8 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	解析を開始 @n
-					・高速化の場合、シンボル名、関数名は修飾コードを使う事が出来る。
+					高速化の場合、シンボル名、関数名は修飾コードを使う事が出来る。 @n
+					※スペースは取り除く事
 			@param[in]	text	解析テキスト
 			@return	文法にエラーがあった場合、「false」
 		*/
@@ -338,8 +341,8 @@ namespace utils {
 				error_.set(error::fatal);
 				return false;
 			}
-			tx_ = text;
 
+			tx_ = text;
 			error_.clear();
 			nest_ = 0;
 
@@ -362,7 +365,7 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	エラーを受け取る
+			@brief	エラーを取得
 			@return エラー
 		*/
 		//-----------------------------------------------------------------//
@@ -372,12 +375,14 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	エラーメッセージを取得
+			@param[in]	STR	文字列クラス型
 			@return エラーメッセージ
 		*/
 		//-----------------------------------------------------------------//
 		template <class STR>
 		STR get_error() const noexcept {
 			STR str;
+			
 			return str;
 		}
 
@@ -396,10 +401,10 @@ namespace utils {
 			char ch;
 			while(len > 1 && (ch = *in++) != 0) {
 				uint8_t n = static_cast<uint8_t>(ch);
-				if(n < 0x80) {
+				if(n < CODE_SYM) {
 					*out++ = ch;
 					len--;
-				} else if(n < 0xc0) {  // シンボル
+				} else if(n < CODE_FUNC) {  // シンボル
 
 				} else {  // 関数
 
