@@ -26,7 +26,7 @@ Space Invaders Emulator, NES Emulator, for RX65N/RX72N Envision kit
 WAV/MP3 Audio Player, File selector, for RX65N/RX72N Envision kit   
 <img src="docs/calc_sample.jpg" width="40%"> <img src="docs/SYNTH_sample.jpg" width="40%">   
 functional calculator, DX7 Emulator   
-<a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'">{:target="_blank"}</a>   
+<a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'"></a>   
 YouTube: NES Emulator for RX65N Envision kit
    
 Device control classes with template design patterns provide flexible and concise functionality.   
@@ -71,24 +71,24 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 |directory|contents|
 |---|---|
-|[all_project_build.sh]{:target="_blank"}(./all_project_build.sh)|build all projects (shell script) |
-|[/rxlib](./rxlib){:target="_blank"}|zlib, png, mad, gmp, mpfr libraries|
-|[/rx600](./RX600){:target="_blank"}|RX microcontroller common device definition class|
-|[/RX24T](./RX24T){:target="_blank"}|RX24T specific device definition class, linker script|
-|[/RX64M](./RX64M){:target="_blank"}|RX64M dedicated device definition class, linker script|
-|[/RX71M](./RX71M){:target="_blank"}|RX71M dedicated device definition class, linker script|
-|[/RX65x](./RX65x){:target="_blank"}|Device definition class for RX651 and RX65N, linker script|
-|[/RX66T](./RX66T){:target="_blank"}|RX66T dedicated device definition class, linker script|
-|[/RX72T](./RX72T){:target="_blank"}|RX72T dedicated device definition class, linker script|
-|[/RX72N](./RX72N){:target="_blank"}|RX72N dedicated device definition class, linker script|
-|[/FreeRTOS](./FreeRTOS){:target="_blank"}|FreeRTOS for various RX microcontrollers and simple samples|
-|[/ff14](./ff14){:target="_blank"}|ChaN's fatfs source code and handler for RX microcontrollers|
-|[/common](./common){:target="_blank"}|shared classes, headers, etc.|
-|[/chip](./chip){:target="_blank"}|various device specific control driver libraries such as I2C, SPI, etc|
-|[/graphics](./graphics){:target="_blank"}|Graphics drawing related classes, GUI Widget|
-|[/sound](./sound){:target="_blank"}|sound and audio related classes|
-|[/rxprog](./rxprog){:target="_blank"}|RX microcontroller, Flash program writing tool (for Windows, OS-X, Linux)
-|[LICENSE](./LICENSE){:target="_blank"}|license description file|
+|[all_project_build.sh](./all_project_build.sh)|build all projects (shell script) |
+|[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr libraries|
+|[/rx600](./RX600)|RX microcontroller common device definition class|
+|[/RX24T](./RX24T)|RX24T specific device definition class, linker script|
+|[/RX64M](./RX64M)|RX64M dedicated device definition class, linker script|
+|[/RX71M](./RX71M)|RX71M dedicated device definition class, linker script|
+|[/RX65x](./RX65x)|Device definition class for RX651 and RX65N, linker script|
+|[/RX66T](./RX66T)|RX66T dedicated device definition class, linker script|
+|[/RX72T](./RX72T)|RX72T dedicated device definition class, linker script|
+|[/RX72N](./RX72N)|RX72N dedicated device definition class, linker script|
+|[/FreeRTOS](./FreeRTOS)|FreeRTOS for various RX microcontrollers and simple samples|
+|[/ff14](./ff14)|ChaN's fatfs source code and handler for RX microcontrollers|
+|[/common](./common)|shared classes, headers, etc.|
+|[/chip](./chip)|various device specific control driver libraries such as I2C, SPI, etc|
+|[/graphics](./graphics)|Graphics drawing related classes, GUI Widget|
+|[/sound](./sound)|sound and audio related classes|
+|[/rxprog](./rxprog)|RX microcontroller, Flash program writing tool (for Windows, OS-X, Linux)
+|[LICENSE](./LICENSE)|license description file|
 
 ---
 
@@ -96,22 +96,22 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 |Directory|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|Contents|
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-|[/FIRST_sample](./FIRST_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|LED Flashing Program|
-|[/SCI_sample](./SCI_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|Serial Communication Sample Program|
-|[/CAN_sample](./CAN_sample){:target="_blank"}|－|〇|〇|〇|〇|△|〇|CAN Communication Sample Program|
-|[/FLASH_sample](./FLASH_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|Internal data flash operation sample|
-|[/GPTW_sample](./GPTW_sample){:target="_blank"}|△|〇|〇|－|－|△|〇|GPTW PWM Sample Program|
-|[/I2C_sample](./I2C_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|I2C Device Access Sample|
-|[/RAYTRACER_sample](./RAYTRACER_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|Ray Tracing Benchmark|
-|[/SDCARD_sample](./SDCARD_sample){:target="_blank"}|〇|〇|〇|〇|△|〇|〇|SD Card Operation Sample|
-|[/SIDE_sample](./SIDE_sample){:target="_blank"}|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders emulator|
-|[/NESEMU_sample](./NESEMU_sample){:target="_blank"}|－|－|－|－|－|〇|〇|Envision Kit, NES emulator|
-|[/GUI_sample](./GUI_sample){:target="_blank"}|－|－|－|－|－|〇|〇|GUI Sample、Graphics User Interface (Soft rendering, using DRW2D engine)|
-|[/AUDIO_sample](./AUDIO_sample){:target="_blank"}|－|－|－|〇|△|〇|〇|MP3/WAV Audio Player (FreeRTOS)|
-|[/SYNTH_sample](./SYNTH_sample){:target="_blank"}|〇|〇|〇|〇|〇|〇|〇|FM sound synthesizer emulator|
-|[/CALC_sample](./CALC_sample){:target="_blank"}|－|△|△|△|△|〇|〇|Function calculator samples (gmp, mpfr libraries)|
-|[/DSOS_sample](./DSOS_sample){:target="_blank"}|－|－|－|－|－|△|〇|Digital Storage Oscilloscope Samples|
-|[/PSG_sample](./PSG_sample){:target="_blank"}|△|△|△|〇|〇|〇|〇|Pseudo PSG Sound Source Performance Samples|
+|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|LED Flashing Program|
+|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|Serial Communication Sample Program|
+|[/CAN_sample](./CAN_sample)|－|〇|〇|〇|〇|△|〇|CAN Communication Sample Program|
+|[/FLASH_sample](./FLASH_sample)|〇|〇|〇|〇|〇|〇|〇|Internal data flash operation sample|
+|[/GPTW_sample](./GPTW_sample)|△|〇|〇|－|－|△|〇|GPTW PWM Sample Program|
+|[/I2C_sample](./I2C_sample)|〇|〇|〇|〇|〇|〇|〇|I2C Device Access Sample|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|〇|〇|〇|〇|〇|〇|〇|Ray Tracing Benchmark|
+|[/SDCARD_sample](./SDCARD_sample)|〇|〇|〇|〇|△|〇|〇|SD Card Operation Sample|
+|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders emulator|
+|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|〇|〇|Envision Kit, NES emulator|
+|[/GUI_sample](./GUI_sample)|－|－|－|－|－|〇|〇|GUI Sample、Graphics User Interface (Soft rendering, using DRW2D engine)|
+|[/AUDIO_sample](./AUDIO_sample)|－|－|－|〇|△|〇|〇|MP3/WAV Audio Player (FreeRTOS)|
+|[/SYNTH_sample](./SYNTH_sample)|〇|〇|〇|〇|〇|〇|〇|FM sound synthesizer emulator|
+|[/CALC_sample](./CALC_sample)|－|△|△|△|△|〇|〇|Function calculator samples (gmp, mpfr libraries)|
+|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|△|〇|Digital Storage Oscilloscope Samples|
+|[/PSG_sample](./PSG_sample)|△|△|△|〇|〇|〇|〇|Pseudo PSG Sound Source Performance Samples|
 
 *Please consider directories and files that are not in the above list but exist when checked out as work in progress.
 
@@ -121,7 +121,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 - Open source libraries built for RX microcontrollers
 
-[rxlib](./rxlib){:target="_blank"} See also
+[rxlib](./rxlib) See also
 
 ---
 
@@ -131,7 +131,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 - Convenience Classes
 - Common files for each microcontrollers
 
-[common](./common){:target="_blank"} See also
+[common](./common) See also
 
 ---
 
@@ -143,7 +143,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 - The context of the interface (control pins) is given by reference.
 - Since there is no definition of interfaces, the creation is very versatile and highly flexible.
 
-[chip](./chip){:target="_blank"} See also
+[chip](./chip) See also
 
 ---
 
@@ -151,7 +151,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
  - Classes related to screen rendering
 
-[graphics](./graphics){:target="_blank"} See also
+[graphics](./graphics) See also
 
 ---
 
@@ -159,7 +159,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
  - Classes related to sound
 
-[sound](./sound){:target="_blank"} See also
+[sound](./sound) See also
 
 ---
 
@@ -169,7 +169,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 - MMC Driver Class (SPI)
 - If SDHI interface is available, real mode driver can also be selected.
 
-[ff14](./ff14){:target="_blank"} See also
+[ff14](./ff14) See also
 
 ---
 
@@ -177,7 +177,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 - For KiCAD, parts files, etc.
 
-[KiCAD_lib](./KiCAD_lib){:target="_blank"} See also
+[KiCAD_lib](./KiCAD_lib) See also
 
 ---
 
@@ -185,13 +185,13 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 - Files not currently supported, etc.
 
-[legacy](./legacy){:target="_blank"} See also
+[legacy](./legacy) See also
 
 ---
 
 ## Installation and features of Renesas GNU-RX
    
-The former KPIT support for the GNU toolchain has been replaced by [Open Source Tools for Renesas](https://llvm-gcc-renesas.com/en/){:target="_blank"} has added a new GNU tools.      
+The former KPIT support for the GNU toolchain has been replaced by [Open Source Tools for Renesas](https://llvm-gcc-renesas.com/en/) has added a new GNU tools.      
    
 As the latest (as of July 2020) GNU toolchain for RX microcontrollers,   
  - binutils-2.24
