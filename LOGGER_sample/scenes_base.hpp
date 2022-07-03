@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	シーン共通関係
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -67,6 +67,7 @@ namespace app {
 		/// GLCDC
 		static constexpr int16_t LCD_X = 480;
 		static constexpr int16_t LCD_Y = 272;
+		static constexpr auto PIX = graphics::pixel::TYPE::RGB565;
         typedef utils::fixed_fifo<uint8_t, 64> RB64;
         typedef utils::fixed_fifo<uint8_t, 64> SB64;
 #if defined(SIG_RX65N)
@@ -86,7 +87,6 @@ namespace app {
 		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
         typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 #endif
-		static constexpr auto PIX = graphics::pixel::TYPE::RGB565;
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
 
 	public:
@@ -98,8 +98,8 @@ namespace app {
 #endif
 		typedef graphics::font<AFONT, KFONT> FONT;
 
-//		typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
-		typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+		typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
+//		typedef graphics::render<GLCDC_MGR, FONT> RENDER;
 
 		// FT5206 touch device
 		typedef chip::FT5206<FT5206_I2C> TOUCH;
@@ -197,6 +197,7 @@ namespace app {
 		typedef device::cmt_mgr<device::CMT1, watch_task> CMT;
 
 		// GPS 専用シリアル定義
+		// RX72N Envision Kit: Pmod1: (3)P52:RXD2, (2)P50:TXD2, (5)GND
 		typedef utils::fixed_fifo<char, 2048>  G_REB;
 		typedef utils::fixed_fifo<char, 512> G_SEB;
 		typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::ORDER::SECOND> GPS_S;
@@ -231,11 +232,10 @@ namespace app {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
-			@param[in]	lcdorg	LCD フレームバッファの先頭アドレス
 		*/
 		//-------------------------------------------------------------//
-		scenes_base(void* lcdorg = reinterpret_cast<void*>(0x00000100)) noexcept :
-			glcdc_mgr_(nullptr, lcdorg),
+		scenes_base() noexcept :
+			glcdc_mgr_(nullptr, reinterpret_cast<void*>(LCD_ORG)),
 			afont_(), kfont_(), font_(afont_, kfont_),
 			render_(glcdc_mgr_, font_),
 			touch_(ft5206_i2c_),
@@ -275,6 +275,16 @@ namespace app {
 					}
 				} else {
 					utils::format("GLCDC Fail\n");
+				}
+			}
+
+			{  // レンダラー初期化
+				auto ver = render_.get_version();
+				utils::format("DRW2D Version: %04X\n") % ver;
+				if(render_.start()) {
+					utils::format("Start DRW2D\n");
+				} else {
+					utils::format("DRW2D Fail\n");
 				}
 			}
 
