@@ -31,7 +31,7 @@ Sample program of LED blinking using RX microcontroller
    
 - Connect the LED to the specified port.
    
-```
+```C++
 #if defined(SIG_RX71M)
 	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
