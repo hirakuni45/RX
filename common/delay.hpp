@@ -49,7 +49,7 @@ namespace utils {
 		static void micro_second(uint32_t us)
 		{
 			while(us > 0) {
-#if defined(SIG_RX64M) || defined(SIG_RX63T) || defined(SIG_RX71M) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX63T) || defined(SIG_RX71M)
 				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 4285714); ++n) {
 					asm("nop");
 				}
@@ -71,7 +71,7 @@ namespace utils {
 				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 3000000); ++n) {
 					asm("nop");
 				}
-#elif defined(SIG_RX72N)
+#elif defined(SIG_RX72N) || defined(SIG_RX72M)
 				// 240MHz: 78 : 20uS->50.763KHz
 				// 240MHz: 79 : 20uS->50.127KHz
 				for(uint32_t n = 0; n < (device::clock_profile::ICLK / 3037974); ++n) {

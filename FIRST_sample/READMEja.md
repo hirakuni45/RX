@@ -1,7 +1,7 @@
 Renesas RX24T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
 =========
    
-[Japanese](READMEja.md)
+[英語版](README.md)
    
 ## 概要
 RX マイコンを使った LED 点滅のサンプルプログラム
@@ -23,7 +23,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
  - 各マイコンの、クリスタル周波数、各モジュールの周波数は、RXxxx/clock_profile.hpp を参照して下さい。
  - インジケーター LED を指定のポートに接続する。
    
-```
+```C++
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
@@ -59,7 +59,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - main 関数に動作が移行したら、内部インストラクションクロックを最大速度にブーストします。
 - 内部デバイス用クロックも設定します。（RXxxx/clock_profile.hpp に設定があります）
    
-```
+```C++
     SYSTEM_IO::boost_master_clock();
 ```
    
