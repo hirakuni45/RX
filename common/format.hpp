@@ -8,10 +8,10 @@
 			※ N：全桁数、M：小数部桁数、L：小数部のビット数 @n
 			※ N には、小数点、符号が含まれる @n
 			Ex: %3.2:8y ---> 256 で 1.00、128 で 0.50、384 で 1.50 @n
-			と表示される。@n
+			と表示される。 @n
             ・NO_FLOAT_FORM を有効にすると、float 関係の機能を無効にでき @n
             メモリを節約出来る。@n
-			・組み込みマイコンでは、64 ビット整数、浮動小数点など、リソースを @n
+			・組み込みマイコンでは、64 ビット整数、倍精度浮動小数点など、リソースを @n
 			多く消費する為、サポートしていません。（オプションでサポートを追加する予定）
 			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
 			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
@@ -33,8 +33,11 @@
 			! 2020/11/20 07:44- sformat 時の nega_ フラグの初期化漏れ
 			! 2020/11/20 07:44- nega_ 符号表示の順番、不具合
 			! 2020/11/20 16:59- uint 型を削除
+			! 2022/06/13 15:03- 'static const' を 'static constexpr' に変更
+			! 2022/07/06 09:24- %6.0f の符号付きの場合に、スペースが足りなくなるバグ修正。(V95)
+			! 2022/07/07 20:52- %g の自動（有効桁）フォーマットの対応。(v96)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -57,7 +60,7 @@
 // ８進表示をサポートしない場合（メモリの節約）
 // #define NO_OCTAL_FORM
 
-// 64 ビットの整数をサポートする場合
+// 64 ビットの整数をサポートする場合（工事中）
 #define USE_INT64
 
 /* 
@@ -373,7 +376,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class base_format {
 	public:
-		static constexpr uint16_t VERSION = 93;		///< バージョン番号（整数）
+		static constexpr uint16_t VERSION = 96;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -424,24 +427,25 @@ namespace utils {
 
 		const char*	form_;
 
-		char		buff_[34];
+		char		buff_[34];  // uint32_t 型で二進表示に必要な大きさ
 
 		uint16_t	num_;
 
 		uint8_t		point_;
 		uint8_t		bitlen_;
+		uint8_t		udec_num_;
 		error		error_;
 		mode		mode_;
 		bool		zerosupp_;
 		bool		sign_;
 		bool		nega_;
 
-		void str_(const char* str) {
+		void str_(const char* str) noexcept {
 			char ch;
 			while((ch = *str++) != 0) chaout_(ch);
 		}
 
-		void reset_() {
+		void reset_() noexcept {
 			num_ = 0;
 			point_ = 0;
 			bitlen_ = 0;
@@ -451,7 +455,7 @@ namespace utils {
 			nega_ = false;
 		}
 
-		void next_() {
+		void next_() noexcept {
 			enum class apmd : uint8_t {
 				none,
 				num,	// 数字
@@ -555,8 +559,7 @@ namespace utils {
 		}
 
 
-		void out_str_(const char* str, char sign, uint16_t n)
-		{
+		void out_str_(const char* str, char sign, uint16_t n) noexcept {
 			if(nega_) {
 				if(sign != 0) { chaout_(sign); }
 				str_(str);
@@ -588,7 +591,7 @@ namespace utils {
 		}
 
 #ifndef NO_BIN_FORM
-		void out_bin_(uint32_t v) {
+		void out_bin_(uint32_t v) noexcept {
 			char* p = &buff_[sizeof(buff_) - 1];
 			*p = 0;
 			uint8_t n = 0;
@@ -603,7 +606,7 @@ namespace utils {
 #endif
 
 #ifndef NO_OCTAL_FORM
-		void out_oct_(uint32_t v) {
+		void out_oct_(uint32_t v) noexcept {
 			char* p = &buff_[sizeof(buff_) - 1];
 			*p = 0;
 			uint8_t n = 0;
@@ -617,29 +620,30 @@ namespace utils {
 		}
 #endif
 
-		void out_udec_(uint32_t v, char sign) {
+		char* out_udec_(uint32_t v) noexcept {
 			char* p = &buff_[sizeof(buff_) - 1];
 			*p = 0;
-			uint8_t n = 0;
+			udec_num_ = 0;
 			do {
 				--p;
 				*p = (v % 10) + '0';
 				v /= 10;
-				++n;
+				++udec_num_;
 			} while(v != 0) ;
-			out_str_(p, sign, n);
+			return p;
 		}
 
 
-		void out_dec_(int32_t v) {
+		void out_dec_(int32_t v) noexcept {
 			char sign = 0;
 			if(v < 0) { v = -v; sign = '-'; }
 			else if(sign_) { sign = '+'; }
-			out_udec_(v, sign);
+			char* tmp = out_udec_(v);
+			out_str_(tmp, sign, udec_num_);
 		}
 
 
-		void out_hex_(uint32_t v, char top) {
+		void out_hex_(uint32_t v, char top) noexcept {
 			char* p = &buff_[sizeof(buff_) - 1];
 			*p = 0;
 			uint8_t n = 0;
@@ -656,7 +660,7 @@ namespace utils {
 		}
 
 
-		void decimal_(int32_t val, bool sign) {
+		void decimal_(int32_t val, bool sign) noexcept {
 			switch(mode_) {
 #ifndef NO_BIN_FORM
 			case mode::BINARY:
@@ -672,7 +676,10 @@ namespace utils {
 				out_dec_(val);
 				break;
 			case mode::U_DECIMAL:
-				out_udec_(val, sign_ ? '+' : 0);
+				{
+					char* tmp = out_udec_(val);
+					out_str_(tmp, sign_ ? '+' : 0, udec_num_);
+				}
 				break;
 			case mode::HEX:
 				out_hex_(static_cast<uint32_t>(val), 'a');
@@ -695,7 +702,7 @@ namespace utils {
 		}
 
 
-		uint64_t make_mask_(uint8_t num) {
+		uint64_t make_mask_(uint8_t num) noexcept {
 			uint64_t m = 0;
 			while(num > 0) {
 				m += m;
@@ -707,7 +714,7 @@ namespace utils {
 
 
 		template <typename VAL>
-		void out_fixed_point_(VAL v, uint8_t fixpoi, bool sign)
+		void out_fixed_point_(VAL v, uint8_t fixpoi, bool sign, bool zerodel = false) noexcept
 		{
 			// 四捨五入処理用 0.5
 			VAL m = 0;
@@ -724,16 +731,29 @@ namespace utils {
 			if(sign) sch = '-';
 			else if(sign_) sch = '+';
 			v += m;
-			if(num_ >= point_) num_ -= point_;
-			if(num_ > 0 && sch != 0) --num_;
-			if(num_ > 0 && point_ != 0) {
-				--num_;
+			if(mode_ != mode::REAL_AUTO && mode_ != mode::REAL_AUTO_CAPS) {
+				if(num_ >= point_) num_ -= point_;
+				if(num_ > 0 && point_ != 0) {
+					--num_;
+				}
 			}
+			char* tmp;
 			if(fixpoi < (sizeof(VAL) * 8 - 4)) {
-				out_udec_(v >> fixpoi, sch);
+				tmp = out_udec_(v >> fixpoi);
 			} else {
-				out_udec_(0, sch);
+				tmp = out_udec_(0);
 			}
+
+			if(mode_ == mode::REAL_AUTO || mode_ == mode::REAL_AUTO_CAPS) {
+				if(num_ >= udec_num_) {
+					point_ = num_ - udec_num_;
+					num_ = udec_num_;
+				} else {
+					return;
+				}
+			}
+
+			out_str_(tmp, sch, udec_num_);
 
 			if(point_ == 0) return;
 
@@ -755,19 +775,24 @@ namespace utils {
 				*out++ = '0';
 				++l;
 			}
-			if(mode_ == mode::REAL_AUTO || mode_ == mode::REAL_AUTO_CAPS) {
-				while (*(out - 1) == '0') {
-					out--;
+
+			if(zerodel) {  // 小数点以下で、後ろの'0'を除去
+				while(out != &buff_[1]) {
+					if(*(out - 1) == '0') --out;
+					else break;
 				}
-				if(*(out - 1) == '.') out--;		
+				if(out == &buff_[1]) --out;
 			}
+
 			*out++ = 0;
-			str_(buff_);			
+
+			str_(buff_);
+			return;
 		}
 
 
 #ifndef NO_FLOAT_FORM
-		void out_real_(float v, char e)
+		void out_real_(float v, char e, bool zerodel = false) noexcept
 		{
 			void* p = &v;
 			uint32_t fpv = *(uint32_t*)p;
@@ -798,22 +823,23 @@ namespace utils {
 			// エキスポーネント表記の場合
 			int8_t dexp = 0;
 			if(e != 0) {
-				if(v64 > (static_cast<uint64_t>(2) << shift)) {  // 2.0 以上の場合
+				auto ref = static_cast<uint64_t>(1) << shift;
+				if(v64 < ref) {  // 1.0 以下
+					while(v64 < (ref - (ref / 10))) {  // 0.99999...
+						v64 *= 10;
+						--dexp;
+					}
+				} else {
 					while(v64 > (static_cast<uint64_t>(2) << shift)) {
 						v64 /= 10;
 						++dexp;
 					}
-				} else if(v64 < (static_cast<uint64_t>(1) << shift)) {  // 1.0 以下
-					while(v64 < (static_cast<uint64_t>(1) << shift)) {
-						v64 *= 10;
-						--dexp;
-					}
 				}
 			}
 
-			out_fixed_point_<uint64_t>(v64, shift, sign);
+			out_fixed_point_<uint64_t>(v64, shift, sign, zerodel);
 
-			if(e) {
+			if(e != 0) {
 				chaout_(e);
 				zerosupp_ = true;
 				sign_ = true;
@@ -821,9 +847,63 @@ namespace utils {
 				out_dec_(dexp);
 			}
 		}
+
+
+		static float abs_(float val) noexcept { if(val < 0.0f) return -val; else return val; }
+		static float pow10_(int n) noexcept
+		{
+			switch(n) {
+			case 4: return 1e4;
+			case 5: return 1e5;
+			case 6: return 1e6;
+			case -4: return 1e-4;
+			case -5: return 1e-5;
+			case -6: return 1e-6;
+			default:
+				break;
+			}
+			float v = 1.0f;
+			if(n > 0) {
+				while(n > 0) { v *= 10.0f; --n; }
+			} else {
+				while(n < 0) { v /= 10.0f; ++n; }
+			}
+			return v;
+		}
+
+
+		void out_auto_real_(float v, char e) noexcept
+		{
+			if(abs_(v) >= pow10_(num_)) {
+				mode_ = mode::EXPONENT;
+				point_ = num_ - 1;
+				num_ = 1;
+				out_real_(v, e, true);
+			} else if(abs_(v) < pow10_(-(num_ - 2))) {
+				mode_ = mode::EXPONENT;
+				point_ = num_ - 1;
+				num_ = 1;
+				out_real_(v, e, true);
+			} else {
+				point_ = num_;
+				if(abs_(v) < 1.0f) {  // 小数点以下の場合
+					// 小数点以下の有効桁を求める
+					++num_;
+					for(uint8_t i = 1; i < point_; ++i) {
+						if(abs_(v) < pow10_(-i)) {
+							++num_;
+							++point_;
+						} else {
+							break;
+						}
+					}
+				}
+				out_real_(v, 0, true);
+			}
+		}
 #endif
 
-		void str_sub_(const char* val)
+		void str_sub_(const char* val) noexcept
 		{
 			if(mode_ == mode::STR) {
 				if(val == nullptr) {
@@ -840,7 +920,7 @@ namespace utils {
 		}
 
 
-		void pointer_(const void* val)
+		void pointer_(const void* val) noexcept
 		{
 			auto v = reinterpret_cast<uint64_t>(val);
 			if(sizeof(val) > 4) {
@@ -865,6 +945,7 @@ namespace utils {
 			num_(0),
 			point_(0),
 			bitlen_(0),
+			udec_num_(0),
 			error_(error::none),
 			mode_(mode::NONE), zerosupp_(false), sign_(false), nega_(false)
 		{
@@ -899,13 +980,16 @@ namespace utils {
 		}
 
 
+		// virtual ~basic_format() { }
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  出力ファンクタの参照
 			@return 出力ファンクタ
 		*/
 		//-----------------------------------------------------------------//
-		static CHAOUT& chaout() { return chaout_; }
+		static CHAOUT& chaout() noexcept { return chaout_; }
 
 
 		//-----------------------------------------------------------------//
@@ -1042,19 +1126,19 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  オペレーター「%」
-			@param[in]	ptr	ポインター型
+			@param[in]	val	ポインター型
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
 		template <typename T>
-		basic_format& operator % (T* ptr) noexcept
+		basic_format& operator % (T* val) noexcept
 		{
 			if(error_ != error::none) {
 				return *this;
 			}
 
 			if(mode_ == mode::POINTER) {
-				pointer_(static_cast<const void*>(ptr));
+				pointer_(static_cast<const void*>(val));
 			} else {
 				error_ = error::unknown;
 			}
@@ -1079,13 +1163,7 @@ namespace utils {
 				return *this;
 			}
 
-			if(std::is_pointer<T>::value) {
-				if(mode_ == mode::POINTER) {
-
-				} else {
-					error_ = error::different;
-				}
-			} else if(std::is_integral<T>::value) {
+			if(std::is_integral<T>::value) {
 				if(mode_ == mode::CHA) {
 					auto chn = static_cast<int32_t>(val);
 					if(chn > -128 && chn < 128) {
@@ -1113,8 +1191,10 @@ namespace utils {
 					out_real_(val, 'e');
 					break;
 				case mode::REAL_AUTO_CAPS:
+					out_auto_real_(val, 'E');
+					break;
 				case mode::REAL_AUTO:
-					out_real_(val, 0);
+					out_auto_real_(val, 'e');
 					break;
 				default:
 					error_ = error::different;
