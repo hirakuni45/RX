@@ -147,6 +147,8 @@ namespace {
 	TEXT		text_(vtx::srect(240, 70, 150, 20), "１６ピクセル漢字の表示サンプル～");
 	typedef gui::textbox TEXTBOX;
 	TEXTBOX		textbox_(vtx::srect(240, 100, 160, 80), "");
+	typedef gui::spinbox SPINBOX;
+	SPINBOX		spinbox_(vtx::srect(20, 220, 120, 0), -10, 10, 0);
 
 	void setup_gui_()
 	{
@@ -236,6 +238,13 @@ namespace {
 		textbox_.enable();
 		textbox_.set_title("(1) 項目\n(2) GUI サンプルについて。\n(3) まとめ");
 		textbox_.set_vertical_alignment(TEXTBOX::V_ALIGNMENT::CENTER);
+
+		spinbox_.enable();
+		spinbox_.at_select_func() = [=](int val, SPINBOX::TOUCH_AREA area) {
+			static const char* st[3] = { "Minus", "Stay", "Plus" };
+			utils::format("Spinbox: %s Value: %d\n")
+				% st[static_cast<uint8_t>(area)] % spinbox_.get_value();
+		};
 	}
 
 
