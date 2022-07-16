@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	スライダー表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -25,7 +25,6 @@ namespace gui {
 		typedef std::function<void(float ratio)> SELECT_FUNC_TYPE;
 
 		static constexpr int16_t round_radius = 10;  ///< 標準ラウンド半径
-		static constexpr int16_t frame_width  = 3;   ///< 標準フレーム幅
 		static constexpr int16_t handle_size  = 20;  ///< 標準ハンドルサイズ
 
 	private:
@@ -121,10 +120,10 @@ namespace gui {
 				float val = 0.0f;
 				const auto& loc = get_location();
 				if(loc.size.x > loc.size.y) {
-					ref = static_cast<float>(loc.size.x - frame_width * 2 - loc.size.y);
+					ref = static_cast<float>(loc.size.x - DEF_FRAME_WIDTH * 2 - loc.size.y);
 					val = static_cast<float>(d.x);
 				} else {
-					ref = static_cast<float>(loc.size.y - frame_width * 2 - loc.size.x);
+					ref = static_cast<float>(loc.size.y - DEF_FRAME_WIDTH * 2 - loc.size.x);
 					val = static_cast<float>(d.y);
 				}
 				ratio_ = ratio_org_ + (val / ref);
@@ -232,9 +231,9 @@ namespace gui {
 			sh.set_color(get_base_color().rgba8, inten);
 			rdr.set_fore_color(sh);
 
-			r.org  += frame_width;
-			r.size -= frame_width * 2;
-			rdr.round_box(r, round_radius - frame_width);
+			r.org  += DEF_FRAME_WIDTH;
+			r.size -= DEF_FRAME_WIDTH * 2;
+			rdr.round_box(r, round_radius - DEF_FRAME_WIDTH);
 
 			const auto& size = get_location().size;
 			auto cen = org;
@@ -242,15 +241,15 @@ namespace gui {
 			if(size.x > size.y) {
 				rad = size.y / 2;
 				--rad;
-				cen.x += frame_width + rad;
+				cen.x += DEF_FRAME_WIDTH + rad;
 				cen.y += rad;
-				cen.x += (size.x - frame_width * 2 - size.y) * ratio_;
+				cen.x += (size.x - DEF_FRAME_WIDTH * 2 - size.y) * ratio_;
 			} else {
 				rad = size.x / 2;
 				--rad;
-				cen.y += frame_width + rad;
+				cen.y += DEF_FRAME_WIDTH + rad;
 				cen.x += rad;
-				cen.y += (size.y - frame_width * 2 - size.x) * ratio_;
+				cen.y += (size.y - DEF_FRAME_WIDTH * 2 - size.x) * ratio_;
 			}
 			rdr.set_fore_color(graphics::def_color::White);
 			rdr.fill_circle(cen, rad);

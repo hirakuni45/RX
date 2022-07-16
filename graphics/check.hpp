@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	チェック・ボタン表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,12 +23,6 @@ namespace gui {
 		typedef check value_type;
 
 		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
-
-		static constexpr int16_t round_radius = 2;
-		static constexpr int16_t frame_width  = 3;
-		static constexpr int16_t check_space  = 4;		///< チェック・アイテムの隙間
-		static constexpr int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
-		static constexpr int16_t box_to_title = 5;		///< ボックスから文字までの隙間
 
 	private:
 
@@ -51,10 +45,10 @@ namespace gui {
 				if(str != nullptr) {
 					tlen = strlen(str) * 8;
 				}
-				at_location().size.x = box_size + box_to_title + tlen;
+				at_location().size.x = DEF_CHECK_BOX + DEF_CHECK_TO_STR + tlen;
 			}
 			if(loc.size.y <= 0) {
-				at_location().size.y = box_size;
+				at_location().size.y = DEF_CHECK_BOX;
 			}
 			insert_widget(this);
 		}
@@ -176,25 +170,25 @@ namespace gui {
 			auto r = loc;
 
 			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, round_radius);
+			rdr.round_box(r, DEF_CHECK_ROUND_RADIUS);
 
-			r.org  += frame_width;
-			r.size -= frame_width * 2;
+			r.org  += DEF_CHECK_FRAME_WIDTH;
+			r.size -= DEF_CHECK_FRAME_WIDTH * 2;
 
 			graphics::share_color sh(0, 0, 0);
 			sh.set_color(get_base_color().rgba8, 64);
 			rdr.set_fore_color(sh);
-			rdr.round_box(r, round_radius - frame_width);
+			rdr.round_box(r, DEF_CHECK_ROUND_RADIUS - DEF_CHECK_FRAME_WIDTH);
 
 			if(get_touch_state().level_ || enable_) {
 				rdr.set_fore_color(get_base_color());
-				r.org  += check_space;
-				r.size -= check_space * 2;
+				r.org  += DEF_CHECK_SPACE;
+				r.size -= DEF_CHECK_SPACE * 2;
 				rdr.fill_box(r);
 			}
 
 			rdr.set_fore_color(get_font_color());
-			vtx::spos pos = vtx::spos(loc.end_x() + box_to_title,
+			vtx::spos pos = vtx::spos(loc.end_x() + DEF_CHECK_TO_STR,
 				loc.org.y + (loc.size.y - font_height) / 2);
 			rdr.draw_text(pos, get_title());
 		}
