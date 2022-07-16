@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	メニュー・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,9 +23,7 @@ namespace gui {
 
 		typedef menu value_type;
 
-		static constexpr int16_t round_radius = 6;  ///< round radius
-		static constexpr int16_t item_height  = 28;	///< ITEM height
-		static constexpr int16_t check_size   = 6;	///< check sign width/height
+//		static constexpr int16_t check_size   = 6;	///< check sign width/height
 
 		typedef std::function<void(uint32_t pos, uint32_t num)> SELECT_FUNC_TYPE;
 
@@ -53,8 +51,8 @@ namespace gui {
 			num_(utils::str::get_words(str, ',')), select_pos_(0), check_draw_(chd)
 		{
 			if(loc.size.y <= 0) {
-				at_location().size.y = num_ * item_height;
-				item_size_.y = item_height;
+				at_location().size.y = num_ * DEF_ITEM_HEIGHT;
+				item_size_.y = DEF_ITEM_HEIGHT;
 			} else {
 				item_size_.y = loc.size.y / num_;
 			}
@@ -253,13 +251,13 @@ namespace gui {
 				bool dn = false;
 				if(i == 0) up = true;
 				if(i == (num_ - 1)) dn = true;
-				rdr.round_box(r, round_radius, up, dn);
+				rdr.round_box(r, DEF_ROUND_RADIUS, up, dn);
 
 				if(check_draw_ && i == select_pos_) {
 					rdr.set_fore_color(get_base_color());
 					rdr.fill_box(
-						vtx::srect(r.org.x + check_size, r.org.y + (r.size.y - check_size) / 2,
-						check_size, check_size));
+						vtx::srect(r.org.x + DEF_ITEM_SPACE, r.org.y + (r.size.y - DEF_ITEM_CHECK) / 2,
+						DEF_ITEM_CHECK, DEF_ITEM_CHECK));
 				}
 
 				char tmp[32];

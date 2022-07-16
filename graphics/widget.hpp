@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Widget クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,6 +21,18 @@ namespace gui {
 	struct widget {
 
 		typedef graphics::def_color DEF_COLOR;	///< 標準カラー
+
+		static constexpr int16_t DEF_ROUND_RADIUS = 6;		///< 標準、コーナーの半径
+		static constexpr int16_t DEF_FRAME_WIDTH  = 3;		///< 標準、外周のフレーム幅
+		static constexpr int16_t DEF_FRAME_HEIGHT = 30;		///< 標準、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_ITEM_HEIGHT  = 28;		///< 標準、アイテム高さ（メニューなど）
+		static constexpr int16_t DEF_ITEM_SPACE   = 5;		///< 標準、アイテム・チェックまでの隙間
+		static constexpr int16_t DEF_ITEM_CHECK   = 6;		///< 標準、アイテム・チェックの大きさ
+		static constexpr int16_t DEF_CHECK_ROUND_RADIUS = 2;	///< 標準、チェックボックスのコーナー半径
+		static constexpr int16_t DEF_CHECK_FRAME_WIDTH  = 3;	///< 標準、チェックボックスの外周フレーム幅
+		static constexpr int16_t DEF_CHECK_BOX    = 22;		///< 標準、チェックボックスの大きさ
+		static constexpr int16_t DEF_CHECK_SPACE  = 4;		///< 標準、チェック・有効アイテムの隙間
+		static constexpr int16_t DEF_CHECK_TO_STR = 5;		///< 標準、チェックボックスから文字までの隙間
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

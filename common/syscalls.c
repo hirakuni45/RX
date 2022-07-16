@@ -4,7 +4,7 @@
 			通常は libc.a にアーカイブされているモジュールを @n
 			置き換える。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2015, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2015, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdint.h>
 
+// stdin, stdout, stderr ディスクリプタの標準通信先
 void sci_putch(char ch) __attribute__((weak));
 void sci_putch(char ch) { }
 char sci_getch(void) __attribute__((weak));
@@ -50,11 +51,11 @@ int fatfs_get_mount(void) { return 1; }
 // stdin, stdout, stderr のオフセット
 #define STD_OFS_ (3)
 
-// 同時にオープンできる標準的な数（３）
 #if defined(FAT_FS_NUM)
 #define OPEN_MAX_ (STD_OFS_ + FAT_FS_NUM)
 #else
-#define OPEN_MAX_ (STD_OFS_ + 3)
+// FAT_FS_NUM が指定されていない場合
+#define OPEN_MAX_ (STD_OFS_ + 2)
 #endif
 
 static FIL file_obj_[OPEN_MAX_ - STD_OFS_];
@@ -580,13 +581,25 @@ int isatty(int file)
 }
 
 
-void kill(int n, int m)
+//-----------------------------------------------------------------//
+/*!
+	@brief	プロセスへのシグナルの送信
+	@param[in]	pid		プロセス ID
+	@param[in]	sig		シグナル
+*/
+//-----------------------------------------------------------------//
+void kill(pid_t pid, int sig)
 {
 }
 
 
+//-----------------------------------------------------------------//
+/*!
+	@brief	プロセスへ ID の取得
+	@return	プロセスへ ID
+*/
+//-----------------------------------------------------------------//
 pid_t getpid()
 {
 	return (pid_t)1;
 }
-

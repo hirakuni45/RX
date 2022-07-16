@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ダイアログ表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -20,8 +20,6 @@ namespace gui {
 	struct dialog : public widget {
 
 		typedef dialog value_type;
-
-		static constexpr int16_t round_radius = 6;  // round radius
 
 	private:
 
@@ -123,7 +121,7 @@ namespace gui {
 		{
 			auto r = get_location();
 			rdr.set_fore_color(graphics::def_color::White);
-			rdr.round_box(r, round_radius);
+			rdr.round_box(r, DEF_ROUND_RADIUS);
 			if(get_touch_state().level_) {
 				rdr.set_fore_color(graphics::def_color::Silver);
 			} else {
@@ -131,7 +129,7 @@ namespace gui {
 			}
 			r.org += 2;
 			r.size -= 4;
-			rdr.round_box(r, round_radius - 2);
+			rdr.round_box(r, DEF_ROUND_RADIUS - 2);
 
 			rdr.set_fore_color(graphics::def_color::White);
 			auto sz = rdr.at_font().get_text_size(get_title());

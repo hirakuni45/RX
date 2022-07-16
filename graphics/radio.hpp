@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ラジオ・ボタン表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,7 +24,6 @@ namespace gui {
 
 		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
 
-		static constexpr int16_t frame_width  = 3;
 		static constexpr int16_t check_space  = 4;		///< チェック・アイテムの隙間
 
 		static constexpr int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
@@ -175,7 +174,7 @@ namespace gui {
 
 			rdr.set_fore_color(get_base_color());
 			rdr.fill_circle(cen, rad);
-			rad -= frame_width;
+			rad -= DEF_FRAME_WIDTH;
 
 			graphics::share_color sh(0, 0, 0);
 			sh.set_color(get_base_color().rgba8, 64);

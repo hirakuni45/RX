@@ -86,50 +86,50 @@ C++ の機能を使い、構造的なアクセスなどを行えるようにし�
 - [D/A 変換クラス](dac_out.hpp?ts=4)
 - [データーフラッシュメモリ入出力](flash_io.hpp?ts=4)
 
-|機能|名称|ファイル|RX24T|RX64M/RX71M|RX65N|RX66T|RX72N|
-|----|----|--------|-----|-----------|-----|-----|-----|-----|-----|
-|システム関係定義|-|[system.hpp](system.hpp?ts=4)|O|O|O|O|O|
-|電圧検出回路|LVDA|[lvda.hpp](lvda.hpp?ts=4)|O|O|O|O|O|
-|クロック周波数精度測定回路|CAC|[cac.hpp](cac.hpp?ts=4)|O|O|O|O|O|
-|メモリプロテクションユニット|MPU|[mpu.hpp](mpu.hpp?ts=4)|O|O|O|O|O|
-|DMAコントローラ|DMAC0-7|[dmac.hpp](dmac.hpp?ts=4)|O|O|O|O|O|
-|EXDMAコントローラ|EXDMAC0-1|[exdmac.hpp](exdmac.hpp?ts=4)|O|O|O|O|O|
-|データトランスファコントローラ|DTC|[dtc.hpp](dtc.hpp?ts=4)|O|O|O|O|O|
-|イベントリンクコントローラ|ELC|[elc.hpp](elc.hpp?ts=4)|O|O|O|O|O|
-|I/Oポート|-|[port.hpp](port.hpp?ts=4)|O|O|O|O|O|
-|マルチファンクションピンコントローラ|MPC|[mpc.hpp](mpc.hpp?ts=4)|O|O|O|O|O|
-|マルチファンクションタイマパルスユニット 3|MTU0-n|[mtu3.hpp](mtu3.hpp?ts=4)|O|O|O|O|O|
-|ポートアウトプットイネーブル 3|POE3|[poe3.hpp](poe3.hpp?ts=4)|O|O|O|O|O|
-|汎用 PWM タイマ|GPTxx|[gpt.hpp](gpt.hpp?ts=4)|O|O|O|O|O|
-|16 ビットタイマパルスユニット|TPU0-5|[tpu.hpp](tpu.hpp?ts=4)|O|O|O|O|O|
-|プログラマブルパルスジェネレータ|PPG|[ppg.hpp](ppg.hpp?ts=4)|O|O|O|O|O|
-|8 ビットタイマ|TMR0-n|[tmr.hpp](tmr.hpp?ts=4)|O|O|O|O|O|
-|コンペアマッチタイマ|CMT0-3|[cmt.hpp](cmt.hpp?ts=4)|O|O|O|O|O|
-|コンペアマッチタイマ W|CMTW0-1|[cmtw.hpp](cmtw.hpp?ts=4)|O|O|O|O|O|
-|リアルタイムクロック|RTC|[rtc.hpp](rtc.hpp?ts=4)|O|O|O|O|O|
-|ウォッチドッグタイマ|-|[wdta.hpp](wdta.hpp?ts=4)|O|O|O|O|O|
-|独立ウォッチドッグタイマ|-|[iwdt.hpp](iwdt.hpp?ts=4)|O|O|O|O|O|
-|機能|名称|ファイル|RX24T|RX64M/RX71M|RX65N|RX66T|RX72N|
-|イーサネットコントローラ|ETHERC0-1|[etherc.hpp](etherc.hpp?ts=4)|X|O|O|X|O|
-|イーサネットコントローラ用 PTP コントローラ|EPTPC|[eptpc.hpp](eptpc.hpp?ts=4)|X|O|X|X|O|
-|イーサネットコントローラ用 DMA コントローラ|EDMAC|[edmac.hpp](edmac.hpp?ts=4)|X|O|O|X|O|
-|USB2.0FS ホスト / ファンクションモジュール|USB|[usb.hpp](usb.hpp?ts=4)|X|O|O|O|O|
-|USB 2.0 High-Speed ホスト / ファンクションモジュール|USBA|[usba.hpp](usba.hpp?ts=4)|X|O|X|X|X|
-|シリアルコミュニケーションインタフェース|SCIn|[sci.hpp](sci.hpp?ts=4)|O|O|O|O|O|
-|FIFO 内蔵シリアルコミュニケーションインタフェース|SCIF|[scif.hpp](scif.hpp?ts=4)|X|O|X|X|X|
-|I2C バスインタフェース|RIICn|[riic.hpp](riic.hpp?ts=4)|O|O|O|O|O|
-|CAN モジュール|CANn|[can.hpp](can.hpp?ts=4)|O|O|O|O|*|
-|シリアルペリフェラルインタフェース|RSPIn|[rspi.hpp](rspi.hpp?ts=4)|O|O|O|O|O|
-|クワッドシリアルペリフェラルインタフェース|QSPI|[qspi.hpp](qspi.hpp?ts=4)|X|O|O|X|O|
-|CRC 演算器|CRC|[crc.hpp](crc.hpp?ts=4)|O|O|O|O|O|
-|シリアルサウンドインタフェース|SSI0-1|[ssi.hpp](ssi.hpp?ts=4)|X|O|X|X|X|
-|拡張シリアルサウンドインタフェース|SSIE0-1|[ssie.hpp](ssie.hpp?ts=4)|X|X|X|X|O|
-|サンプリングレートコンバータ|SRC|[src.hpp](src.hpp?ts=4)|X|O|X|X|X|
-|SD ホストインタフェース|(SDHI|[sdhi.hpp](sdhi.hpp?ts=4)|X|O|O|X|O|
-|パラレルデータキャプチャユニット|PDC|[pdc.hpp](pdc.hpp?ts=4)|X|O|O|X|O|
-|12 ビット A/D コンバータ|S12AD-1|[s12adc.hpp](s12adc.hpp?ts=4)|O|O|O|O|O|
-|12 ビット D/A コンバータ|R12DA|[r12da.hpp](r12da.hpp?ts=4)|X|O|O|O|O|
-|フラッシュメモリ|-|[flash.hpp](flash.hpp?ts=4)|O|O|O|O|O|
+|機能|名称|ファイル|RX24T|RX64M|RX71M|RX65N|RX66T|RX72T|RX72N|
+|----|----|----|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|システム関係定義|-|[system.hpp](system.hpp?ts=4)|O|O|O|O|O|O|O|
+|電圧検出回路|LVDA|[lvda.hpp](lvda.hpp?ts=4)|O|O|O|O|O|O|O|
+|クロック周波数精度測定回路|CAC|[cac.hpp](cac.hpp?ts=4)|O|O|O|O|O|O|O|
+|メモリプロテクションユニット|MPU|[mpu.hpp](mpu.hpp?ts=4)|O|O|O|O|O|O|O|
+|DMAコントローラ|DMAC0-7|[dmac.hpp](dmac.hpp?ts=4)|O|O|O|O|O|O|O|
+|EXDMAコントローラ|EXDMAC0-1|[exdmac.hpp](exdmac.hpp?ts=4)|O|O|O|O|O|O|O|
+|データトランスファコントローラ|DTC|[dtc.hpp](dtc.hpp?ts=4)|O|O|O|O|O|O|O|
+|イベントリンクコントローラ|ELC|[elc.hpp](elc.hpp?ts=4)|O|O|O|O|O|O|O|
+|I/Oポート|-|[port.hpp](port.hpp?ts=4)|O|O|O|O|O|O|O|
+|マルチファンクションピンコントローラ|MPC|[mpc.hpp](mpc.hpp?ts=4)|O|O|O|O|O|O|O|
+|マルチファンクションタイマパルスユニット 3|MTU0-n|[mtu3.hpp](mtu3.hpp?ts=4)|O|O|O|O|O|O|O|
+|ポートアウトプットイネーブル 3|POE3|[poe3.hpp](poe3.hpp?ts=4)|O|O|O|O|O|O|O|
+|汎用 PWM タイマ|GPTxx|[gpt.hpp](gpt.hpp?ts=4)|O|O|O|O|O|O|O|
+|16 ビットタイマパルスユニット|TPU0-5|[tpu.hpp](tpu.hpp?ts=4)|O|O|O|O|O|O|O|
+|プログラマブルパルスジェネレータ|PPG|[ppg.hpp](ppg.hpp?ts=4)|O|O|O|O|O|O|O|
+|8 ビットタイマ|TMR0-n|[tmr.hpp](tmr.hpp?ts=4)|O|O|O|O|O|O|O|
+|コンペアマッチタイマ|CMT0-3|[cmt.hpp](cmt.hpp?ts=4)|O|O|O|O|O|O|O|
+|コンペアマッチタイマ W|CMTW0-1|[cmtw.hpp](cmtw.hpp?ts=4)|O|O|O|O|O|O|O|
+|リアルタイムクロック|RTC|[rtc.hpp](rtc.hpp?ts=4)|O|O|O|O|O|O|O|
+|ウォッチドッグタイマ|-|[wdta.hpp](wdta.hpp?ts=4)|O|O|O|O|O|O|O|
+|独立ウォッチドッグタイマ|-|[iwdt.hpp](iwdt.hpp?ts=4)|O|O|O|O|O|O|O|
+|機能|名称|ファイル|RX24T|RX64M|RX71M|RX65N|RX66T|RX72T|RX72N|
+|イーサネットコントローラ|ETHERC0-1|[etherc.hpp](etherc.hpp?ts=4)|X|O|O|O|X|X|O|
+|イーサネットコントローラ用 PTP コントローラ|EPTPC|[eptpc.hpp](eptpc.hpp?ts=4)|X|O|O|O|X|X|O|
+|イーサネットコントローラ用 DMA コントローラ|EDMAC|[edmac.hpp](edmac.hpp?ts=4)|X|O|O|O|X|X|O|
+|USB2.0FS ホスト / ファンクションモジュール|USB|[usb.hpp](usb.hpp?ts=4)|X|O|O|O|X|X|O|
+|USB 2.0 High-Speed ホスト / ファンクションモジュール|USBA|[usba.hpp](usba.hpp?ts=4)|X|O|X|X|X|X|X|
+|シリアルコミュニケーションインタフェース|SCIn|[sci.hpp](sci.hpp?ts=4)|O|O|O|O|O|O|O|
+|FIFO 内蔵シリアルコミュニケーションインタフェース|SCIF|[scif.hpp](scif.hpp?ts=4)|X|O|O|X|X|X|X|
+|I2C バスインタフェース|RIICn|[riic.hpp](riic.hpp?ts=4)|O|O|O|O|O|O|O|
+|CAN モジュール|CANn|[can.hpp](can.hpp?ts=4)|X|O|O|O|O|O|O|
+|シリアルペリフェラルインタフェース|RSPIn|[rspi.hpp](rspi.hpp?ts=4)|O|O|O|O|O|O|O|
+|クワッドシリアルペリフェラルインタフェース|QSPI|[qspi.hpp](qspi.hpp?ts=4)|X|O|O|O|X|X|O|
+|CRC 演算器|CRC|[crc.hpp](crc.hpp?ts=4)|O|O|O|O|O|O|O|
+|シリアルサウンドインタフェース|SSI0-1|[ssi.hpp](ssi.hpp?ts=4)|X|O|O|X|X|X|X|
+|拡張シリアルサウンドインタフェース|SSIE0-1|[ssie.hpp](ssie.hpp?ts=4)|X|X|X|X|X|X|O|
+|サンプリングレートコンバータ|SRC|[src.hpp](src.hpp?ts=4)|X|O|O|X|X|X|X|
+|SD ホストインタフェース|(SDHI|[sdhi.hpp](sdhi.hpp?ts=4)|X|O|O|O|X|X|O|
+|パラレルデータキャプチャユニット|PDC|[pdc.hpp](pdc.hpp?ts=4)|X|O|O|O|X|X|O|
+|12 ビット A/D コンバータ|S12AD-1|[s12adc.hpp](s12adc.hpp?ts=4)|O|O|O|O|O|O|O|
+|12 ビット D/A コンバータ|R12DA|[r12da.hpp](r12da.hpp?ts=4)|X|O|O|O|O|O|O|
+|フラッシュメモリ|-|[flash.hpp](flash.hpp?ts=4)|O|O|O|O|O|O|O|
    
 -----
    

@@ -30,6 +30,7 @@ Renesas RX65N/RX72N Envision Kit GUI サンプル
  - メニュー（ItemA, ItemB, ItemC, ItemD）
  - テキスト（自動スクロール）
  - テキストボックス（垂直アライメント：センター）
+ - スピンボックス（数値の変更、-10、+10）
    
 各動作：   
  - 各 widget を操作すると、シリアル出力で、対応する文字列を出力します。
@@ -37,6 +38,7 @@ Renesas RX65N/RX72N Envision Kit GUI サンプル
  - チェックが有効になると、ラジオボタンの描画色を「白」にする。
  - ラジオボタンを操作すると、それに応じて、描画色が変化（Red, Green, Blue）
  - text widget には、表示領域より大きい文字列を登録してあり、それが自動でスクロールします。
+ - スピンボックスを使って、数値の範囲を変更します。
 
 ---
 
@@ -285,6 +287,7 @@ RX65N/RX72N Envision Kit には、I2C 接続の静電容量タイプのタッチ
 |[graphics/menu.hpp](graphics/menu.hpp)|Widget メニュー|
 |[graphics/text.hpp](graphics/text.hpp)|Widget テキスト|
 |[graphics/textbox.hpp](graphics/textbox.hpp)|Widget テキスト・ボックス|
+|[graphics/spinbox.hpp](graphics/spinbox.hpp)|Widget スピン・ボックス|
    
 ※他に、画像ローダーなど、色々なクラスがあり、利用出来ます。   
 
@@ -352,6 +355,8 @@ widget の定義では、コンストラクターで表示座標、文字列な�
 	TEXT		text_(vtx::srect(240, 70, 150, 20), "１６ピクセル漢字の表示サンプル～");
 	typedef gui::textbox TEXTBOX;
 	TEXTBOX		textbox_(vtx::srect(240, 100, 160, 80), "");
+	typedef gui::spinbox SPINBOX;
+	SPINBOX		spinbox_(vtx::srect(20, 220, 120, 0), -10, 10, 0);
 ```
    
 ※「button_」では、X 座標：１０、Y 座標：１０、横幅：８０、高さ：３２、表示文字「Button」で登録しています。   
@@ -453,6 +458,13 @@ widget の定義では、コンストラクターで表示座標、文字列な�
 		textbox_.enable();
 		textbox_.set_title("(1) 項目\n(2) GUI サンプルについて。\n(3) まとめ");
 		textbox_.set_vertical_alignment(TEXTBOX::V_ALIGNMENT::CENTER);
+
+		spinbox_.enable();
+		spinbox_.at_select_func() = [=](int val, SPINBOX::TOUCH_AREA area) {
+			static const char* st[3] = { "Minus", "Stay", "Plus" };
+			utils::format("Spinbox: %s Value: %d\n")
+				% st[static_cast<uint8_t>(area)] % spinbox_.get_value();
+		};
 	}
 ```
    

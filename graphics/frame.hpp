@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	フレーム表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -20,8 +20,6 @@ namespace gui {
 	struct frame : public widget {
 
 		typedef frame value_type;
-
-		static constexpr int16_t round_radius = 6;  ///< round radius
 
 	private:
 
@@ -127,7 +125,7 @@ namespace gui {
 		{
 			auto r = get_location();
 			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, round_radius);
+			rdr.round_box(r, DEF_ROUND_RADIUS);
 
 			uint8_t inten = 64;
 			if(get_touch_state().level_) {  // 0.75
@@ -139,7 +137,7 @@ namespace gui {
 
 			r.org += 2;
 			r.size -= 4;
-			rdr.round_box(r, round_radius - 2);
+			rdr.round_box(r, DEF_ROUND_RADIUS - 2);
 
 			rdr.set_fore_color(get_font_color());
 			auto sz = rdr.at_font().get_text_size(get_title());
