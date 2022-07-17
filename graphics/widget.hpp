@@ -131,6 +131,8 @@ namespace gui {
 
 		bool		update_;
 
+		uint8_t		exec_request_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -145,7 +147,8 @@ namespace gui {
 			location_(loc), title_(title), mobj_(nullptr),
 			base_color_(graphics::def_color::White), font_color_(graphics::def_color::White),
 			state_(STATE::DISABLE), focus_(false), touch_(false),
-			touch_state_(fexp), update_(false)
+			touch_state_(fexp), update_(false),
+			exec_request_(0)
 		{ } 
 
 
@@ -524,6 +527,23 @@ namespace gui {
 			}
 			return pos;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	動作リクエストを取得
+			@return 動作リクエスト
+		*/
+		//-----------------------------------------------------------------//
+		auto get_exec_request() const noexcept { return exec_request_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	動作リクエストを発行
+		*/
+		//-----------------------------------------------------------------//
+		void set_exec_request() noexcept { ++exec_request_; }
 	};
 }
 

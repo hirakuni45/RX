@@ -148,7 +148,8 @@ namespace {
 	typedef gui::textbox TEXTBOX;
 	TEXTBOX		textbox_(vtx::srect(240, 100, 160, 80), "");
 	typedef gui::spinbox SPINBOX;
-	SPINBOX		spinbox_(vtx::srect(20, 220, 120, 0), -10, 10, 0);
+	SPINBOX		spinbox_(vtx::srect(20, 220, 120, 0),
+					{ .min = -100, .value = 0, .max = 100, .step = 1, .accel = true });
 
 	void setup_gui_()
 	{
@@ -240,10 +241,10 @@ namespace {
 		textbox_.set_vertical_alignment(TEXTBOX::V_ALIGNMENT::CENTER);
 
 		spinbox_.enable();
-		spinbox_.at_select_func() = [=](int val, SPINBOX::TOUCH_AREA area) {
+		spinbox_.at_select_func() = [=](SPINBOX::TOUCH_AREA area, int16_t value) {
 			static const char* st[3] = { "Minus", "Stay", "Plus" };
 			utils::format("Spinbox: %s Value: %d\n")
-				% st[static_cast<uint8_t>(area)] % spinbox_.get_value();
+				% st[static_cast<uint8_t>(area)] % value;
 		};
 	}
 

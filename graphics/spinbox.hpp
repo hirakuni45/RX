@@ -2,7 +2,8 @@
 //=====================================================================//
 /*!	@file
 	@brief	スピンボックス表示と制御 @n
-			左右のアクションにより、内部の定数、文字列を選択
+			左右のアクションにより、定数を進めたり、戻したりする。 @n
+			長押しの場合、加速する機能を有する。（許可／不許可）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -24,6 +25,9 @@ namespace gui {
 
 		typedef spinbox value_type;
 
+		static constexpr uint8_t ACCEL_WAIT = 75;	///< 加速開始までの遅延（フレーム数）
+		static constexpr uint8_t ACCEL_TICK = 4;	///< 加速遅延（フレーム数）
+
 		// 横幅を三等分した領域
 		enum class TOUCH_AREA : uint8_t {
 			LEFT,		///< 左側領域
@@ -31,16 +35,40 @@ namespace gui {
 			RIGHT,		///< 右側領域
 		};
 
-		typedef std::function<void(uint32_t, TOUCH_AREA)> SELECT_FUNC_TYPE;
+		/// 数値設定構造体
+		struct number_t {
+			int16_t	min;	///< 最小値
+			int16_t	value;	///< 値
+			int16_t	max;	///< 最大値
+			int16_t	step;	///< 加算、減算幅
+			bool	accel;	///< 数値変更の加速を有効にする場合「true」
+//			number_t() noexcept : min(0), value(0), max(0), step(1), accel(false) { }
+
+			void add() noexcept
+			{
+				if((value + step) <= max) {
+					value += step;
+				}
+			}
+
+			void sub() noexcept
+			{
+				if(min <= (value - step)) {
+					value -= step;
+				}
+			}
+		};
+
+		typedef std::function<void(TOUCH_AREA, int16_t)> SELECT_FUNC_TYPE;	///< 選択関数型
 
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
 		uint32_t			select_id_;
-		int16_t				min_;
-		int16_t				max_;
-		int16_t				org_;
 		TOUCH_AREA			area_;
+		number_t			number_;
+		uint8_t				ace_wait_;
+		uint8_t				ace_tick_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -50,11 +78,13 @@ namespace gui {
 			@param[in]	min		最小値
 			@param[in]	max		最大値
 			@param[in]	org		初期値
+			@param[in]	ace		アクセレーターを許可する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		spinbox(const vtx::srect& loc, int16_t min, int16_t max, int16_t org = 0) noexcept :
+		spinbox(const vtx::srect& loc, const number_t& nmb) noexcept :
 			widget(loc, ""), select_func_(), select_id_(0),
-			min_(min), max_(max), org_(org), area_(TOUCH_AREA::CENTER)
+			area_(TOUCH_AREA::CENTER), number_(nmb),
+			ace_wait_(0), ace_tick_(0)
 		{
 			if(get_location().size.x <= 0) {
 			}
@@ -114,6 +144,18 @@ namespace gui {
 		{
 			update_touch_def(pos, num);
 			if(get_touch_state().level_) {
+				if(number_.accel) {
+					if(ace_wait_ < ACCEL_WAIT) {
+						++ace_wait_;
+					} else {
+						if(ace_tick_ < ACCEL_TICK) {
+							++ace_tick_;
+						} else {
+							ace_tick_ = 0;
+							set_exec_request();
+						}
+					}
+				}
 				auto pos = get_touch_state().relative_.x;
 				if(pos <= (get_location().size.x / 3)) {
 					area_ = TOUCH_AREA::LEFT;
@@ -122,6 +164,9 @@ namespace gui {
 				} else {
 					area_ = TOUCH_AREA::CENTER;
 				}
+			} else {
+				ace_wait_ = 0;
+				ace_tick_ = 0;
 			}
 		}
 
@@ -135,19 +180,13 @@ namespace gui {
 		void exec_select(bool ena = true) noexcept override
 		{
 			++select_id_;
-			if(min_ < max_) {
-				if(area_ == TOUCH_AREA::LEFT) {
-					if(min_ < org_) {
-						org_--;
-					}
-				} else if(area_ == TOUCH_AREA::RIGHT) {
-					if(org_ < max_) {
-						++org_;
-					}
-				}
+			if(area_ == TOUCH_AREA::LEFT) {
+				number_.sub();
+			} else if(area_ == TOUCH_AREA::RIGHT) {
+				number_.add();
 			}
 			if(select_func_) {
-				select_func_(select_id_, area_);
+				select_func_(area_, number_.value);
 			}
 		}
 
@@ -189,29 +228,20 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	最小値の取得
-			@return	最小値
+			@brief	数値構造体の取得
+			@return	数値構造体
 		*/
 		//-----------------------------------------------------------------//
-		auto get_min() const noexcept { return min_; }
+		const auto& get_number() const noexcept { return number_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	最大値の取得
-			@return	最大値
+			@brief	数値構造体の参照
+			@return	数値構造体
 		*/
 		//-----------------------------------------------------------------//
-		auto get_max() const noexcept { return max_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	値の取得
-			@return	値
-		*/
-		//-----------------------------------------------------------------//
-		auto get_value() const noexcept { return org_; }
+		auto& at_number() const noexcept { return number_; }
 
 
 		//-----------------------------------------------------------------//
@@ -253,9 +283,9 @@ namespace gui {
 			}
 
 			rdr.set_fore_color(get_font_color());
-			if(min_ < max_) {
+			{
 				char tmp[10];
-				utils::sformat("%d", tmp, sizeof(tmp)) % org_;
+				utils::sformat("%d", tmp, sizeof(tmp)) % number_.value;
 				auto sz = rdr.at_font().get_text_size(tmp);
 				rdr.draw_text(r.org + (r.size - sz) / 2, tmp);
 			}
