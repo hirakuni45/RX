@@ -46,9 +46,11 @@ namespace gui {
 			bool			focus_;
 			bool			draw_;
 			bool			refresh_;
+			uint8_t			exec_request_;
 			widget_t() : w_(nullptr), title_(nullptr),
 				state_(widget::STATE::DISABLE),
-				init_(false), focus_(false), draw_(false), refresh_(false) { }
+				init_(false), focus_(false), draw_(false), refresh_(false),
+				exec_request_(0) { }
 		};
 
 		typedef std::array<widget_t, WNUM> WIDGETS; 
@@ -264,7 +266,8 @@ namespace gui {
 				if(t.w_ == nullptr) continue;
 				if(t.w_->get_state() == widget::STATE::ENABLE) {
 					const auto& ts = t.w_->get_touch_state();
-					if(ts.negative_) {
+					if(ts.negative_ || t.exec_request_ != t.w_->get_exec_request()) {
+						t.exec_request_ = t.w_->get_exec_request();
 						bool ena = true;
 						if(t.w_->get_id() == widget::ID::CHECK) {
 							auto* w = dynamic_cast<check*>(t.w_);

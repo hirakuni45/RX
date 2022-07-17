@@ -9,9 +9,15 @@ Renesas RX65N/RX72N Envision Kit GUI サンプル
 
  - C++ GUI フレームワークを利用したサンプル
  - GUI のレンダリングは、ソフトウェアー、又は、DRW2D エンジンを選択出来ます。
- - ソフトウェアーレンダラーでは、プラットホームを選びません。
- - 基本的な GUI フレームワークの利用方法や、操作に対する考え方が判ります。
+ - 基本的に、RX65N/RX72N Envision Kit 向けにデザインされていますが、他のプラットホームでも使えます。
+ - ソフトウェアーレンダラーでは、フレームバッファが必要です。
+ - このサンプルでは、基本的な GUI フレームワークの利用方法や、操作に対する考え方が判ります。
  - GUI を使ったアプリを開発する場合の要領が判ります。
+ - なるべく最小限の手間で、必要な GUI パーツを構成する事目的としています。
+ - 標準的には、プリミティブの合成でパーツを描画する為、GUI のビットマップを用意する必要がありません。
+ - C++ の機能を有効に使い、別ツールで GUI のデザインを行う必要がありません。
+
+ ---
     
 ## プロジェクト・リスト
 
@@ -19,6 +25,8 @@ Renesas RX65N/RX72N Envision Kit GUI サンプル
  - RX65N/Makefile
  - RX72N/Makefile
    
+---
+
 ## GUI サンプルの機能
 
  - ボタン「Button」
@@ -30,15 +38,16 @@ Renesas RX65N/RX72N Envision Kit GUI サンプル
  - メニュー（ItemA, ItemB, ItemC, ItemD）
  - テキスト（自動スクロール）
  - テキストボックス（垂直アライメント：センター）
- - スピンボックス（数値の変更、-10、+10）
+ - スピンボックス（数値の変更、-100、+100）
    
-各動作：   
+### 各動作
+
  - 各 widget を操作すると、シリアル出力で、対応する文字列を出力します。
  - 「Button」を押す度に、「Active」ボタンの状態が変化します。（ストール -> 許可）
  - チェックが有効になると、ラジオボタンの描画色を「白」にする。
  - ラジオボタンを操作すると、それに応じて、描画色が変化（Red, Green, Blue）
  - text widget には、表示領域より大きい文字列を登録してあり、それが自動でスクロールします。
- - スピンボックスを使って、数値の範囲を変更します。
+ - スピンボックスを使って、設定数値を変更します。
 
 ---
 
@@ -56,9 +65,9 @@ Renesas RX65N/RX72N Envision Kit GUI サンプル
 
 GUI のアプリケーションを作成する場合、最初のハードルは、部品（Widget）のデザインや配置です。   
 デザインに関しては、角をラウンドさせたシンプルなデザインを採用しており、プリミティブの合成により描画させています。   
-※ビットマップデータでは無いので、柔軟性があります。   
+※ビットマップデータでは無いので、コンパクトで柔軟性があります。   
    
-constexpr を積極利用する事で、配置の問題はかなり柔軟に対応出来ます。   
+C++ では、constexpr を積極利用する事ができ、配置の問題はかなり柔軟に対応出来ます。   
    
 デザインに関しては、初期の段階で標準的なデザインを持った Widget（ボタン、スライダー、チェックボックスなど）を用意してありますので、当面は困らないと思います。   
 もし、異なったデザインが必要なら、ビットマップ画像を利用する事も出来るし、既存のクラスをコピーして自分の気に入るデザインの部品を作る事も可能です。   
@@ -82,7 +91,7 @@ RX65N/RX72N では、LCD に表示を行うハードウェアー（GLCDC）を�
    
 以下の例は、RX65N/RX72N Envision Kit に搭載された LCD の表示設定を行うものです。
 
-```
+```C++
 	// LCD 定義
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
@@ -129,7 +138,7 @@ RX65N/RX72N では、LCD に表示を行うハードウェアー（GLCDC）を�
 - glcdc_mgr クラスは、内部で、480x272 サイズの液晶用パラメータをハードコードしており、他のサイズ液晶を定義する場合、パラメータを修正する必要があります。
 - この構造は良くありませんので、将来的には改善する予定です。
 
-```
+```C++
 		//
 		// Definition of LCD for 480x272 LCD by 60Hz
 		//
@@ -157,7 +166,7 @@ RX65N/RX72N では、LCD に表示を行うハードウェアー（GLCDC）を�
 
 描画を行うリソースとして、ビットマップフォントを設定する必要があります。
 
-```
+```C++
 	// フォントの定義
 	typedef graphics::font8x16 AFONT;
 // 	for cash into SD card /kfont16.bin
@@ -204,7 +213,7 @@ USER_DEFS	=	SIG_RX72N \
 描画クラスは、ソフト描画か、ＲＸマイコンに含まれる、ＤＲＷ２Ｄエンジンを使う事が出来ます。   
 ※DRW2D エンジンでの描画は、マイコンの動作と非同期に行われるので、注意が必要です。   
    
-```
+```C++
 	// DRW2D レンダラー
 //	typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
 	// ソフトウェアーレンダラー
@@ -216,6 +225,7 @@ USER_DEFS	=	SIG_RX72N \
 	FONT		font_(afont_, kfont_);
 	RENDER		render_(glcdc_, font_);
 ```
+
 上記のように、GLCDC、フォントリソース、レンダラーなどの実態を定義します。   
 コンストラクターの引数として、描画ハードウェアー（GLCDC）、フォントリソース、などが必要です。   
    
@@ -229,7 +239,7 @@ RX65N/RX72N Envision Kit には、I2C 接続の静電容量タイプのタッチ
 この定義と設定は以下のようになります。    
 ※タッチセンサの「RESET」信号を制御する必要があります。   
 
-```
+```C++
 	// SCI_I2C バッファ定義
 	typedef utils::fixed_fifo<uint8_t, 64> RB64;
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
@@ -247,7 +257,7 @@ RX65N/RX72N Envision Kit には、I2C 接続の静電容量タイプのタッチ
 
 タッチセンサの初期化は以下のように行います。
 
-```
+```C++
 	{  // FT5206 touch screen controller
 		TOUCH::reset<FT5206_RESET>();
 		uint8_t intr_lvl = 1;
@@ -266,10 +276,12 @@ RX65N/RX72N Envision Kit には、I2C 接続の静電容量タイプのタッチ
 
 ### 主な widget クラスと描画クラス
 
+名前空間は 'gui' となっています。
+
 |ソース|主な機能|
 |-----|-------|
-|[graphics/graphics.hap](graphics/graphics.hpp)|ソフトによる描画クラス|
 |[RX600/drw2d_mgr.hap](RX600/drw2d_mgr.hpp)|DRW2D エンジンによる描画クラス|
+|[graphics/graphics.hap](graphics/graphics.hpp)|ソフトによる描画クラス|
 |[graphics/font.hpp](graphics/font.hpp)|フォント設定(ASCII+漢字ビットマップ)|
 |[graphics/afont.hpp](graphics/afont.hpp)|ASCII フォント|
 |[graphics/font8x16.hpp](graphics/font8x16.hpp)|8 x 16 ピクセルフォント定義（ヘッダー）|
@@ -279,15 +291,15 @@ RX65N/RX72N Envision Kit には、I2C 接続の静電容量タイプのタッチ
 |[graphics/color.hpp](graphics/color.hpp)|基本カラー定義|
 |[graphics/widget_director.hpp](graphics/widget_director.hpp)|Widget ディレクター（管理）|
 |[graphics/widget.hpp](graphics/widget.hpp)|widget 基本クラス|
-|[graphics/group.hpp](graphics/group.hpp)|Widget グループクラス|
-|[graphics/button.hpp](graphics/button.hpp)|Widget ボタンクラス|
-|[graphics/check.hpp](graphics/check.hpp)|Widget チェックボックス|
-|[graphics/radio.hpp](graphics/radio.hpp)|Widget ラジオボタン|
-|[graphics/slider.hpp](graphics/slider.hpp)|Widget スライダー|
-|[graphics/menu.hpp](graphics/menu.hpp)|Widget メニュー|
-|[graphics/text.hpp](graphics/text.hpp)|Widget テキスト|
-|[graphics/textbox.hpp](graphics/textbox.hpp)|Widget テキスト・ボックス|
-|[graphics/spinbox.hpp](graphics/spinbox.hpp)|Widget スピン・ボックス|
+|[graphics/group.hpp](graphics/group.hpp)|Widget グループ・クラス|
+|[graphics/button.hpp](graphics/button.hpp)|Widget ボタン・クラス|
+|[graphics/check.hpp](graphics/check.hpp)|Widget チェックボックス・クラス|
+|[graphics/radio.hpp](graphics/radio.hpp)|Widget ラジオボタン・クラス|
+|[graphics/slider.hpp](graphics/slider.hpp)|Widget スライダー・クラス|
+|[graphics/menu.hpp](graphics/menu.hpp)|Widget メニュー・クラス|
+|[graphics/text.hpp](graphics/text.hpp)|Widget テキスト・クラス|
+|[graphics/textbox.hpp](graphics/textbox.hpp)|Widget テキスト・ボックス・クラス|
+|[graphics/spinbox.hpp](graphics/spinbox.hpp)|Widget スピン・ボックス・クラス|
    
 ※他に、画像ローダーなど、色々なクラスがあり、利用出来ます。   
 
@@ -299,16 +311,19 @@ widget ディレクターは、テンプレートクラスになっており、�
 また、パラメータとして、レンダークラス、タッチクラスの型を定義し、コンストラクターにはインスタンスを渡す必要があります。   
 widget ディレクターは、管理数を固定とする事で、記憶割り当てを使用しない設計となっています。   
    
-```
+```C++
 	// 最大３２個の Widget 管理
 	typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
 	WIDD		widd_(render_, touch_);
 ```
 
-widget ディレクターは、widget の追加、削除 API をグローバル関数として定義しておく必要があります。   
-これは、widget_director はテンプレートクラスなので、このインスタンスにアクセスするには、「型」を知っている必要があります。   
+- widget ディレクターは、widget の追加、削除 API をグローバル関数として定義しておく必要があります。
+- widget_director はテンプレートクラスなので、このインスタンスにアクセスするには、「型」を知っている必要があります。
+- 通常、widget_director の実態があるソースで、グローバル関数として定義しておきます。
+- サンプルでは、main.cpp に widget_director のインスタンスがあり、そこで定義してあります。
+- widget のインサート、削除は、各 widget のコンストラクター、デストラクターから呼ばれます。
 
-```
+```C++
 /// widget の登録・グローバル関数
 bool insert_widget(gui::widget* w)
 {
@@ -321,20 +336,19 @@ void remove_widget(gui::widget* w)
     widd_.remove(w);
 }
 ```
-   
-※ widget のインサート、削除は、各 widget のコンストラクター、デストラクターから呼ばれます。  
-つまり、widget の定義を実装すれば、自動的に widget_director の管理下へ置かれます。    
-   
+      
 ---
    
 ### widget の定義
 
-widget の定義では、コンストラクターで表示座標、文字列などを設定します。   
-※座標で位置を指定しますが、「constexpr」で関数を指定して、かなり複雑な計算をコンパイル時に行う事も出来る為、かなり自由度のある自動的な配置を行う事も出来ます。   
-※「cal_sample（関数電卓サンプル）」を参照して下さい。   
-※サイズを「０」とした場合、内部で設定された標準サイズを利用します。（標準サイズを設定しない部品もあります。）   
-   
-```
+- widget の定義では、コンストラクターで表示座標、文字列などを設定します。   
+- 座標で位置を指定しますが、「constexpr」で関数を指定して、かなり複雑な計算や分岐をコンパイル時に行う事も出来る為、かなり自由度のある自動的な配置を行う事も出来ます。   
+- 「cal_sample（関数電卓サンプル）」を参照して下さい。   
+- サイズを「０」とした場合、内部で設定された標準サイズを利用します。（標準サイズを設定しない部品もあります。）   
+- 各部品のコンストラクターで、widget は、widget ディレクターに取り込まれます。（管理対象となる）   
+- 初期の状態では、管理対象となるだけで、表示は不許可となっています。   
+
+```C++
 	typedef gui::button BUTTON;
 	BUTTON		button_(vtx::srect(10, 10, 80, 32), "Button");
 	BUTTON		button_stall_(vtx::srect(100, 10, 80, 32), "Stall");
@@ -356,19 +370,18 @@ widget の定義では、コンストラクターで表示座標、文字列な�
 	typedef gui::textbox TEXTBOX;
 	TEXTBOX		textbox_(vtx::srect(240, 100, 160, 80), "");
 	typedef gui::spinbox SPINBOX;
-	SPINBOX		spinbox_(vtx::srect(20, 220, 120, 0), -10, 10, 0);
+	SPINBOX		spinbox_(vtx::srect(20, 220, 120, 0),
+					{ .min = -100, .value = 0, .max = 100, .step = 1, .accel = true });
 ```
    
 ※「button_」では、X 座標：１０、Y 座標：１０、横幅：８０、高さ：３２、表示文字「Button」で登録しています。   
    
-コンストラクターで、widget は、widget ディレクターに取り込まれます。（管理対象とする）   
-※取り込まれるだけで、表示は不許可となっています。   
+アプリケーションを開始したら、各 widget の表示設定などを行います。
    
-アプリケーションが開始したら、各 widget の表示設定などを行います。
+- 「at_select_func」は、widget の挙動に関係したコールバック関数を設定します。
+- ラムダ式を受け付けるので、widget に対する挙動を簡潔に実装する事が出来ます。   
    
-「at_select_func」は、挙動に関係したコールバック関数を設定しますが、ラムダ式を受け付けるので、widget に対する挙動を簡潔に定義出来ます。   
-   
-```
+```C++
 	void setup_gui_()
 	{
 		button_.enable();    ///< 表示を有効にする。
@@ -460,10 +473,10 @@ widget の定義では、コンストラクターで表示座標、文字列な�
 		textbox_.set_vertical_alignment(TEXTBOX::V_ALIGNMENT::CENTER);
 
 		spinbox_.enable();
-		spinbox_.at_select_func() = [=](int val, SPINBOX::TOUCH_AREA area) {
+		spinbox_.at_select_func() = [=](SPINBOX::TOUCH_AREA area, int16_t value) {
 			static const char* st[3] = { "Minus", "Stay", "Plus" };
 			utils::format("Spinbox: %s Value: %d\n")
-				% st[static_cast<uint8_t>(area)] % spinbox_.get_value();
+				% st[static_cast<uint8_t>(area)] % value;
 		};
 	}
 ```
@@ -481,19 +494,18 @@ widget の定義では、コンストラクターで表示座標、文字列な�
 
 ### メインループ
 
-widget ディレクターは、同期式描画を前提に設計されています。   
-   
-「同期」とは、LCD の表示（60Hz）に同期してアプリケーションを動かす事です。   
-この方法は、主にリアルタイム性が要求されるアプリに最適な方法です。   
-本来なら、RTOS などでスレッド管理して平行動作させるのが理想的ではありますが、同期式なら、簡易的にかなり広範囲な平行動作をさせる事が可能です。   
-※この方式はゲームのアプリケーションに見られる方法です。   
+- widget ディレクターは、同期式描画を前提に設計されています。   
+-「同期」とは、LCD の表示（60Hz）に同期してアプリケーションを動かす事です。   
+- この方法は、主にリアルタイム性が要求されるアプリに最適な方法です。   
+- 本来なら、RTOS などでスレッド管理して平行動作させるのが理想的ではありますが、同期式なら、簡易的にかなり広範囲な平行動作をさせる事が可能です。   
+- この方式はゲームのアプリケーションに見られる方法です。   
          
 以下のように、表示の同期に合わせて、毎フレーム呼びます。   
 ※各 widget の描画は、内部で必要な場合のみ行い、余分な描画をなるべく行わないようにしています。   
    
 タッチ関係のアップデートも毎フレーム呼び出します。   
    
-```
+```C++
 	setup_gui_();  ///< GUI の設定を行う。
 
 	while(1) {
@@ -527,7 +539,7 @@ widget ディレクターは、同期式描画を前提に設計されていま�
 たとえば、button widget で、ボタン名のテキストは、ポインターで管理しています。   
 ※一般的には、記憶割り当てを行い、コピーを行う。   
    
-```
+```C++
 	button_.set_title("Abcd");
 ```
     
@@ -535,7 +547,7 @@ widget ディレクターは、同期式描画を前提に設計されていま�
 ディレクター内では、ポインターを管理しており、ポインターが以前と異なったタイミングで再描画を行います。   
 その為、スタックで文字列を作成して、そのポインターを渡すような方法は許容されませんので注意が必要です。   
    
-```
+```C++
 	void make_button_title(int no)
 	{
 		char tmp[16];
@@ -547,7 +559,7 @@ widget ディレクターは、同期式描画を前提に設計されていま�
    
 ↑このようなやり方はＮＧ！   
    
-```
+```C++
 	void make_button_title(int no)
 	{
 		static char tmp[16];
