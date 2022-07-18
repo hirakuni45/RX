@@ -104,9 +104,9 @@ namespace {
 	typedef graphics::font<AFONT, KFONT> FONT;
 
 	// DRW2D レンダラー
-//	typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
+	typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
 	// ソフトウェアーレンダラー
-	typedef graphics::render<GLCDC, FONT> RENDER;
+//	typedef graphics::render<GLCDC, FONT> RENDER;
 	// 標準カラーインスタンス
 	typedef graphics::def_color DEF_COLOR;
 
@@ -150,6 +150,12 @@ namespace {
 	typedef gui::spinbox SPINBOX;
 	SPINBOX		spinbox_(vtx::srect(20, 220, 120, 0),
 					{ .min = -100, .value = 0, .max = 100, .step = 1, .accel = true });
+	typedef gui::toggle TOGGLE;
+	TOGGLE		toggle_(vtx::srect(160, 220, 0, 0));
+	typedef gui::progress PROGRESS;
+	PROGRESS	progress_(vtx::srect(240, 220, 150, 0));
+
+	float		progress_ratio_ = 0.0f;
 
 	void setup_gui_()
 	{
@@ -245,6 +251,26 @@ namespace {
 			static const char* st[3] = { "Minus", "Stay", "Plus" };
 			utils::format("Spinbox: %s Value: %d\n")
 				% st[static_cast<uint8_t>(area)] % value;
+		};
+
+		toggle_.enable();
+		toggle_.at_select_func() = [=](bool state) {
+			utils::format("Toggle: %s\n") % (state ? "OFF" : "ON");
+			if(!state) {
+				progress_ratio_ = 0.0f;
+			}
+		};
+
+		progress_.enable();
+		progress_.at_update_func() = [=](float ratio) {
+			if(toggle_.get_switch_state()) {
+				ratio += 1.0f / 120.0f;  // 2 sec
+				if(ratio > 1.0f) ratio = 1.0f;
+			} else {
+				ratio = 0.0f;
+				progress_ratio_ = 0.0f;
+			}
+			return ratio;
 		};
 	}
 

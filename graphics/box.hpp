@@ -36,8 +36,8 @@ namespace gui {
 			@param[in]	str		フレーム・タイトル
 		*/
 		//-----------------------------------------------------------------//
-		box(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), draw_func_()
+		box(const vtx::srect& loc = vtx::srect(0)) noexcept :
+			widget(loc, nullptr), draw_func_()
 		{
 			insert_widget(this);
 		}
@@ -95,10 +95,9 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	inva	無効状態にする場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool inva) noexcept override { }
+		void exec_select() noexcept override { }
 
 
 		//-----------------------------------------------------------------//

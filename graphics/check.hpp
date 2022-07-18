@@ -27,7 +27,7 @@ namespace gui {
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
-		bool				enable_;
+		bool				switch_state_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -35,10 +35,11 @@ namespace gui {
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
 			@param[in]	str		ボタン文字列
+			@param[in]	first	初期状態
 		*/
 		//-----------------------------------------------------------------//
-		check(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(), enable_(false)
+		check(const vtx::srect& loc = vtx::srect(0), const char* str = "", bool first = false) noexcept :
+			widget(loc, str), select_func_(), switch_state_(first)
 		{
 			if(loc.size.x <= 0) {
 				int16_t tlen = 0;
@@ -108,14 +109,13 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool ena = true) noexcept override
+		void exec_select() noexcept override
 		{
-			enable_ = ena;
+			switch_state_ = !switch_state_;
 			if(select_func_) {
-				select_func_(enable_);
+				select_func_(switch_state_);
 			}
 		}
 
@@ -139,11 +139,11 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	セレクト ID の取得
-			@return	セレクト ID
+			@brief	スイッチの状態取得
+			@return	スイッチの状態
 		*/
 		//-----------------------------------------------------------------//
-		bool get_enable() const noexcept { return enable_; }
+		bool get_switch_state() const noexcept { return switch_state_; }
 
 
 		//-----------------------------------------------------------------//
@@ -175,12 +175,12 @@ namespace gui {
 			r.org  += DEF_CHECK_FRAME_WIDTH;
 			r.size -= DEF_CHECK_FRAME_WIDTH * 2;
 
-			graphics::share_color sh(0, 0, 0);
-			sh.set_color(get_base_color().rgba8, 64);
-			rdr.set_fore_color(sh);
+			graphics::share_color sc(0, 0, 0);
+			sc.set_color(get_base_color().rgba8, 64);
+			rdr.set_fore_color(sc);
 			rdr.round_box(r, DEF_CHECK_ROUND_RADIUS - DEF_CHECK_FRAME_WIDTH);
 
-			if(get_touch_state().level_ || enable_) {
+			if(get_touch_state().level_ || switch_state_) {
 				rdr.set_fore_color(get_base_color());
 				r.org  += DEF_CHECK_SPACE;
 				r.size -= DEF_CHECK_SPACE * 2;

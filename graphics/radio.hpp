@@ -24,15 +24,10 @@ namespace gui {
 
 		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
 
-		static constexpr int16_t check_space  = 4;		///< チェック・アイテムの隙間
-
-		static constexpr int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
-		static constexpr int16_t box_to_title = 5;		///< ボックスから文字までの隙間
-
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
-		bool				enable_;
+		bool				switch_state_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -40,18 +35,19 @@ namespace gui {
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
 			@param[in]	str		ボタン文字列
+			@param[in]	first	初期状態
 		*/
 		//-----------------------------------------------------------------//
-		radio(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(), enable_(false)
+		radio(const vtx::srect& loc = vtx::srect(0), const char* str = "", bool first = false) noexcept :
+			widget(loc, str), select_func_(), switch_state_(first)
 		{
 			if(loc.size.x <=0) {
 				int16_t tlen = 0;
 				if(str != nullptr) tlen = strlen(str) * 8;
-				at_location().size.x = box_size + box_to_title + tlen;
+				at_location().size.x = DEF_RADIO_BOX + DEF_RADIO_TO_STR + tlen;
 			}
 			if(loc.size.y <=0) {
-				at_location().size.y = box_size;
+				at_location().size.y = DEF_RADIO_BOX;
 			}
 			insert_widget(this);
 		}
@@ -111,14 +107,13 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool ena = true) noexcept override
+		void exec_select() noexcept override
 		{
-			enable_ = ena;
+			switch_state_ = !switch_state_;
 			if(select_func_) {
-				select_func_(enable_);
+				select_func_(switch_state_);
 			}
 		}
 
@@ -142,11 +137,11 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	セレクト ID の取得
-			@return	セレクト ID
+			@brief	スイッチ状態の取得
+			@return スイッチ状態
 		*/
 		//-----------------------------------------------------------------//
-		bool get_enable() const noexcept { return enable_; }
+		bool get_switch_state() const noexcept { return switch_state_; }
 
 
 		//-----------------------------------------------------------------//
@@ -174,21 +169,21 @@ namespace gui {
 
 			rdr.set_fore_color(get_base_color());
 			rdr.fill_circle(cen, rad);
-			rad -= DEF_FRAME_WIDTH;
+			rad -= DEF_RADIO_FRAME_WIDTH;
 
-			graphics::share_color sh(0, 0, 0);
-			sh.set_color(get_base_color().rgba8, 64);
-			rdr.set_fore_color(sh);
+			graphics::share_color sc(0, 0, 0);
+			sc.set_color(get_base_color().rgba8, 64);
+			rdr.set_fore_color(sc);
 			rdr.fill_circle(cen, rad);
 
-			if(get_touch_state().level_ || enable_) {
-				rad -= check_space;
+			if(get_touch_state().level_ || switch_state_) {
+				rad -= DEF_RADIO_SPACE;
 				rdr.set_fore_color(get_base_color());
 				rdr.fill_circle(cen, rad);
 			}
 
 			auto pos = org;
-			pos.x +=  get_location().size.y + box_to_title;
+			pos.x +=  get_location().size.y + DEF_RADIO_TO_STR;
 			pos.y += (get_location().size.y - RDR::font_type::height) / 2;
 			rdr.set_fore_color(get_font_color());
 			rdr.draw_text(pos, get_title());

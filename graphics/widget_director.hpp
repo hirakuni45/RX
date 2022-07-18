@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Widget ディレクター
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,6 +23,8 @@
 #include "graphics/menu.hpp"
 #include "graphics/term.hpp"
 #include "graphics/spinbox.hpp"
+#include "graphics/toggle.hpp"
+#include "graphics/progress.hpp"
 #include "graphics/closebox.hpp"
 
 namespace gui {
@@ -268,31 +270,29 @@ namespace gui {
 					const auto& ts = t.w_->get_touch_state();
 					if(ts.negative_ || t.exec_request_ != t.w_->get_exec_request()) {
 						t.exec_request_ = t.w_->get_exec_request();
-						bool ena = true;
-						if(t.w_->get_id() == widget::ID::CHECK) {
-							auto* w = dynamic_cast<check*>(t.w_);
-							if(w != nullptr) {
-								ena = !w->get_enable();
-							}
-						}
-						t.w_->exec_select(ena);
+						t.w_->exec_select();
 						t.draw_ = true;
-						if(t.w_->get_id() == widget::ID::RADIO) {
+						if(t.w_->get_id() == widget::ID::RADIO) {  // ラジオボタン、個別案件の処理
 							widget_t* list[16];
-							auto n = create_childs_(t.w_, list, 16, true);
+							auto n = create_childs_(t.w_, list, 16, true);  // 自分以外のラジオボタンを集める
 							for(uint16_t i = 0; i < n; ++i) {
-								list[i]->w_->exec_select(false);
-								list[i]->draw_ = true;
-							}							
+								auto* w = dynamic_cast<radio*>(list[i]->w_);
+								if(w->get_switch_state()) {  // 許可されているボタンを不許可にする。
+									w->exec_select();
+									list[i]->draw_ = true;
+								} else {
+									continue;
+								}
+							}
 						}
 					}
 					if(ts.positive_) {
 						t.draw_ = true;
 					}
 					if(ts.level_) {
-						if(t.w_->get_id() == widget::ID::SLIDER) {
+						if(t.w_->get_id() == widget::ID::SLIDER) {  // スライダー、個別案件の処理
 							t.draw_ = true;
-						} else if(t.w_->get_id() == widget::ID::MENU) {
+						} else if(t.w_->get_id() == widget::ID::MENU) {  // メニュー、個別案件の処理
 							t.draw_ = true;
 						}
 					}
@@ -398,6 +398,20 @@ namespace gui {
 				case widget::ID::SPINBOX:
 					{
 						auto* w = dynamic_cast<spinbox*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::TOGGLE:
+					{
+						auto* w = dynamic_cast<toggle*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::PROGRESS:
+					{
+						auto* w = dynamic_cast<progress*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}
