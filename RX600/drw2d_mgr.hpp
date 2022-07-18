@@ -90,6 +90,7 @@ namespace device {
 
 		void setup_(bool texture)
 		{
+#if 0
 			if(texture) {
 				d2_setfillmode(d2_, d2_fm_texture);
 				return;
@@ -103,10 +104,29 @@ namespace device {
 				set_back_color_ = true;
 			}
 			if(!set_clip_) {
-				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.size.x, clip_.size.y);
+				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.end_x(), clip_.end_y());
 				set_clip_ = true;
 			}
 			d2_setfillmode(d2_, d2_fm_color);
+#else
+			if(!set_fore_color_) {
+				d2_setcolor(d2_, 0, fore_color_.rgba8.rgba);
+				set_fore_color_ = true;
+			}
+			if(!set_back_color_) {
+				d2_setcolor(d2_, 1, back_color_.rgba8.rgba);
+				set_back_color_ = true;
+			}
+			if(!set_clip_) {
+				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.end_x(), clip_.end_y());
+				set_clip_ = true;
+			}
+			if(texture) {
+				d2_setfillmode(d2_, d2_fm_texture);
+			} else {
+				d2_setfillmode(d2_, d2_fm_color);
+			}
+#endif
 		}
 
 
@@ -789,7 +809,7 @@ namespace device {
 			int16_t h = ssz.y;
 
 			if(!set_clip_) {
-				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.size.x, clip_.size.y);
+				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.end_x(), clip_.end_y());
 				set_clip_ = true;
 			}
 
