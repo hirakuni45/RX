@@ -108,12 +108,10 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool ena = true) noexcept override
+		void exec_select() noexcept override
 		{
-			enable_ = ena;
 			if(select_func_) {
 				select_func_(enable_);
 			}

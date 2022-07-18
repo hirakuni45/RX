@@ -64,7 +64,6 @@ namespace gui {
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
-		uint32_t			select_id_;
 		TOUCH_AREA			area_;
 		number_t			number_;
 		uint8_t				ace_wait_;
@@ -82,7 +81,7 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		spinbox(const vtx::srect& loc, const number_t& nmb) noexcept :
-			widget(loc, ""), select_func_(), select_id_(0),
+			widget(loc, nullptr), select_func_(),
 			area_(TOUCH_AREA::CENTER), number_(nmb),
 			ace_wait_(0), ace_tick_(0)
 		{
@@ -174,12 +173,10 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool ena = true) noexcept override
+		void exec_select() noexcept override
 		{
-			++select_id_;
 			if(area_ == TOUCH_AREA::LEFT) {
 				number_.sub();
 			} else if(area_ == TOUCH_AREA::RIGHT) {
@@ -206,15 +203,6 @@ namespace gui {
 				reset_touch_state();
 			}
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	セレクト ID の取得
-			@return	セレクト ID
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_select_id() const noexcept { return select_id_; }
 
 
 		//-----------------------------------------------------------------//
@@ -254,17 +242,15 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-//			rdr.set_fore_color(get_base_color());
-//			rdr.round_box(r, DEF_ROUND_RADIUS);
-
+			
 			uint8_t inten = 64;
 			if(get_touch_state().level_) {  // 0.75
 				inten = 192;
 			}
 
-			graphics::share_color sh(0, 0, 0);
-			sh.set_color(get_base_color().rgba8, inten);
-			rdr.set_fore_color(sh);
+			graphics::share_color sc(0, 0, 0);
+			sc.set_color(get_base_color().rgba8, inten);
+			rdr.set_fore_color(sc);
 			{
 				auto t = r;
 				t.size.x = r.size.x - (DEF_ITEM_SPACE * 2 + DEF_ITEM_CHECK);

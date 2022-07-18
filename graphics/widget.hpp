@@ -22,17 +22,26 @@ namespace gui {
 
 		typedef graphics::def_color DEF_COLOR;	///< 標準カラー
 
-		static constexpr int16_t DEF_ROUND_RADIUS = 6;		///< 標準、コーナーの半径
-		static constexpr int16_t DEF_FRAME_WIDTH  = 3;		///< 標準、外周のフレーム幅
-		static constexpr int16_t DEF_FRAME_HEIGHT = 30;		///< 標準、サイズが省略された場合の高さ
-		static constexpr int16_t DEF_ITEM_HEIGHT  = 28;		///< 標準、アイテム高さ（メニューなど）
-		static constexpr int16_t DEF_ITEM_SPACE   = 5;		///< 標準、アイテム・チェックまでの隙間
-		static constexpr int16_t DEF_ITEM_CHECK   = 6;		///< 標準、アイテム・チェックの大きさ
-		static constexpr int16_t DEF_CHECK_ROUND_RADIUS = 2;	///< 標準、チェックボックスのコーナー半径
-		static constexpr int16_t DEF_CHECK_FRAME_WIDTH  = 3;	///< 標準、チェックボックスの外周フレーム幅
-		static constexpr int16_t DEF_CHECK_BOX    = 22;		///< 標準、チェックボックスの大きさ
-		static constexpr int16_t DEF_CHECK_SPACE  = 4;		///< 標準、チェック・有効アイテムの隙間
-		static constexpr int16_t DEF_CHECK_TO_STR = 5;		///< 標準、チェックボックスから文字までの隙間
+		static constexpr int16_t DEF_ROUND_RADIUS         = 6;	///< 標準、コーナーの半径
+		static constexpr int16_t DEF_FRAME_WIDTH          = 3;	///< 標準、外周のフレーム幅
+		static constexpr int16_t DEF_FRAME_HEIGHT         = 30;	///< 標準、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_ITEM_HEIGHT          = 28;	///< 標準、アイテム高さ（メニューなど）
+		static constexpr int16_t DEF_ITEM_SPACE           = 5;	///< 標準、アイテム・チェックまでの隙間
+		static constexpr int16_t DEF_ITEM_CHECK           = 6;	///< 標準、アイテム・チェックの大きさ
+		static constexpr int16_t DEF_CHECK_ROUND_RADIUS   = 2;	///< 標準、チェックボックスコーナー半径
+		static constexpr int16_t DEF_CHECK_FRAME_WIDTH    = 3;	///< 標準、チェックボックス外周フレーム幅
+		static constexpr int16_t DEF_CHECK_BOX            = 22;	///< 標準、チェックボックス大きさ
+		static constexpr int16_t DEF_CHECK_SPACE          = 4;	///< 標準、チェックボックス有効アイテムの隙間
+		static constexpr int16_t DEF_CHECK_TO_STR         = 5;	///< 標準、チェックボックスから文字までの隙間
+		static constexpr int16_t DEF_RADIO_FRAME_WIDTH    = 3;	///< 標準、ラジオボタン外周フレーム幅
+		static constexpr int16_t DEF_RADIO_BOX            = 22;	///< 標準、ラジオボタン大きさ
+		static constexpr int16_t DEF_RADIO_SPACE          = 4;	///< 標準、ラジオボタン有効アイテムの隙間
+		static constexpr int16_t DEF_RADIO_TO_STR         = 5;	///< 標準、ラジオボタンから文字までの隙間
+		static constexpr int16_t DEF_TOGGLE_FRAME_WIDTH   = 2;	///< 標準、トグルスイッチ外周フレーム幅
+		static constexpr int16_t DEF_TOGGLE_WIDTH         = 58;	///< 標準、トグルスイッチ横幅
+		static constexpr int16_t DEF_TOGGLE_HEIGHT        = 29;	///< 標準、トグルスイッチ高さ
+		static constexpr int16_t DEF_PROGRESS_HEIGHT      = 24;	///< 標準、プログレスバー高さ
+		static constexpr int16_t DEF_PROGRESS_FRAME_WIDTH = 2;	///< 標準、プログレス・バーフレーム幅
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -53,6 +62,8 @@ namespace gui {
 			MENU,		///< メニュー
 			TERM,		///< ターミナル
 			SPINBOX,	///< スピンボックス
+			TOGGLE,		///< トグルスイッチ
+			PROGRESS,	///< プログレスバー
 			CLOSEBOX,	///< クローズボックス
 		};
 
@@ -193,10 +204,9 @@ namespace gui {
 		/*!
 			@brief	選択推移 @n
 					状態の変化が起きた場合に呼び出される。
-			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		virtual void exec_select(bool ena = true) = 0;
+		virtual void exec_select() = 0;
 
 
 		//-----------------------------------------------------------------//

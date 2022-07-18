@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	複数行のテキスト表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -27,6 +27,7 @@ namespace gui {
 		V_ALIGNMENT	v_alignment_;
 
 		bool		text_update_;
+		vtx::spos	text_org_;
 		vtx::spos	text_size_;
 
 	public:
@@ -39,7 +40,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		textbox(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
 			widget(loc, str), h_alignment_(H_ALIGNMENT::LEFT), v_alignment_(V_ALIGNMENT::TOP),
-			text_update_(false), text_size_(0)
+			text_update_(false), text_org_(0), text_size_(0)
 		{
 			set_base_color(graphics::def_color::Gray);
 			insert_widget(this);
@@ -98,10 +99,9 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	inva	無効状態にする場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool inva) noexcept override { }
+		void exec_select() noexcept override { }
 
 
 		//-----------------------------------------------------------------//
@@ -143,6 +143,22 @@ namespace gui {
 			} else {
 				set_state(STATE::DISABLE);
 				reset_touch_state();
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画開始位置を指定
+			@param[in]	org		開始位置
+		*/
+		//-----------------------------------------------------------------//
+		void set_text_org(const vtx::spos& org) noexcept
+		{
+			auto tmp = text_org_;
+			text_org_ = org;
+			if(tmp != org) {
+				set_update();
 			}
 		}
 
@@ -195,7 +211,7 @@ namespace gui {
 
 			auto oc = rdr.get_clip();
 			rdr.set_clip(r);
-			rdr.draw_text(r.org + ofs, get_title());
+			rdr.draw_text(r.org + text_org_ + ofs, get_title());
 			rdr.set_clip(oc);
 		}
 	};

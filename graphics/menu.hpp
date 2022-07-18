@@ -23,8 +23,6 @@ namespace gui {
 
 		typedef menu value_type;
 
-//		static constexpr int16_t check_size   = 6;	///< check sign width/height
-
 		typedef std::function<void(uint32_t pos, uint32_t num)> SELECT_FUNC_TYPE;
 
 	private:
@@ -128,10 +126,9 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	inva	無効状態にする場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool inva) noexcept override
+		void exec_select() noexcept override
 		{
 			if(select_func_) {
 				select_func_(select_pos_, num_);
@@ -244,9 +241,9 @@ namespace gui {
 						inten = 128;
 					}
 				}
-				graphics::share_color sh(0, 0, 0);
-				sh.set_color(get_base_color().rgba8, inten);
-				rdr.set_fore_color(sh);
+				graphics::share_color sc(0, 0, 0);
+				sc.set_color(get_base_color().rgba8, inten);
+				rdr.set_fore_color(sc);
 				bool up = false;
 				bool dn = false;
 				if(i == 0) up = true;

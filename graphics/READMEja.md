@@ -111,11 +111,36 @@
 ## GUI Widget 概要
 
 - タッチパネルと、グラフィックス画面を使った GUI フレームワーク
-- テンプレートを使う事で、記憶割り当てを使わないシンプルな構造
 - ソフトウェアー、及びハードウェアー（DRW2D エンジン）レンダリングに適応出来る構成
 - 記憶割り当てを利用しない、スタテック構造（テンプレートパラメーターにより扱う widget 数を定義）
 - リソースの消費を抑えた設計
 - 描画を最適化させる為の仕組み
+- C++ 17 の機能を活用した構造
+
+|ソース|主な機能|
+|---|---|
+|[RX600/drw2d_mgr.hap](RX600/drw2d_mgr.hpp)|DRW2D エンジンによる描画クラス|
+|[graphics/graphics.hap](graphics/graphics.hpp)|ソフトによる描画クラス|
+|[graphics/font.hpp](graphics/font.hpp)|フォント設定(ASCII+漢字ビットマップ)|
+|[graphics/afont.hpp](graphics/afont.hpp)|ASCII フォント|
+|[graphics/font8x16.hpp](graphics/font8x16.hpp)|8 x 16 ピクセルフォント定義（ヘッダー）|
+|[graphics/font8x16.cpp](graphics/font8x16.cpp)|8 x 16 ピクセルフォント定義（ソース）|
+|[graphics/kfont.hpp](graphics/kfont.hpp)|漢字フォント|
+|[graphics/kfont16.cpp](graphics/kfont16.cpp)|16 x 16 ピクセル漢字フォントデータ|
+|[graphics/color.hpp](graphics/color.hpp)|基本カラー定義|
+|[graphics/widget_director.hpp](graphics/widget_director.hpp)|Widget ディレクター（widget 管理）|
+|[graphics/widget.hpp](graphics/widget.hpp)|widget 基本クラス|
+|[graphics/group.hpp](graphics/group.hpp)|Widget グループ・クラス|
+|[graphics/button.hpp](graphics/button.hpp)|Widget ボタン・クラス|
+|[graphics/check.hpp](graphics/check.hpp)|Widget チェックボックス・クラス|
+|[graphics/radio.hpp](graphics/radio.hpp)|Widget ラジオボタン・クラス|
+|[graphics/slider.hpp](graphics/slider.hpp)|Widget スライダー・クラス|
+|[graphics/menu.hpp](graphics/menu.hpp)|Widget メニュー・クラス|
+|[graphics/text.hpp](graphics/text.hpp)|Widget テキスト・クラス|
+|[graphics/textbox.hpp](graphics/textbox.hpp)|Widget テキスト・ボックス・クラス|
+|[graphics/spinbox.hpp](graphics/spinbox.hpp)|Widget スピン・ボックス・クラス|
+|[graphics/toggle.hpp](graphics/toggle.hpp)|Widget トグル・スイッチ・クラス|
+|[graphics/progress.hpp](graphics/progress.hpp)|Widget プログレス・バー・クラス|
 
 ---
 

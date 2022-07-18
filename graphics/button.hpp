@@ -115,10 +115,9 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool ena = true) noexcept override
+		void exec_select() noexcept override
 		{
 			++select_id_;
 			if(select_func_) {
@@ -178,9 +177,9 @@ namespace gui {
 			if(get_touch_state().level_) {  // 0.75
 				inten = 192;
 			}
-			graphics::share_color sh(0, 0, 0);
-			sh.set_color(get_base_color().rgba8, inten);
-			rdr.set_fore_color(sh);
+			graphics::share_color sc(0, 0, 0);
+			sc.set_color(get_base_color().rgba8, inten);
+			rdr.set_fore_color(sc);
 
 			r.org  += DEF_FRAME_WIDTH;
 			r.size -= DEF_FRAME_WIDTH * 2;
