@@ -8,9 +8,8 @@ Renesas RX65N/RX72N Envision Kit GUI サンプル
 ## 概要
 
  - C++ GUI フレームワークを利用したサンプル
- - GUI のレンダリングは、ソフトウェアー、又は、DRW2D エンジンを選択出来ます。
  - 基本的に、RX65N/RX72N Envision Kit 向けにデザインされていますが、他のプラットホームでも使えます。
- - ソフトウェアーレンダラーでは、フレームバッファが必要です。
+ - 表示デバイスに合致するフレームバッファが必要です。
  - このサンプルでは、基本的な GUI フレームワークの利用方法や、操作に対する考え方が判ります。
  - GUI を使ったアプリを開発する場合の要領が判ります。
  - なるべく最小限の手間で、必要な GUI パーツを構成する事目的としています。
@@ -60,11 +59,11 @@ Renesas RX65N/RX72N Envision Kit GUI サンプル
 - あまり複雑な場面より、単純な場面を想定して設計されている為、扱うのが簡単。
 - 複雑な操作を行う GUI を実装する事も可能な自由度がある。
 - リアルタイム処理にマッチするよう、画面描画を同期式で行っており、FreeRTOS などを使わなくても描画間隔の制御が簡単。
-- もちろん、FreeRTOS を使う場合でも問題なく利用できる。
+- FreeRTOS を使う場合でも問題なく利用できる。
 - C++ の機能を使って、より良い方法で実装が出来る。
-
+   
 GUI のアプリケーションを作成する場合、最初のハードルは、部品（Widget）のデザインや配置です。   
-デザインに関しては、角をラウンドさせたシンプルなデザインを採用しており、プリミティブの合成により描画させています。   
+デザインに関しては、角をラウンドさせたシンプルなデザインを採用しており、プリミティブの合成により描画されています。   
 ※ビットマップデータでは無いので、コンパクトで柔軟性があります。   
    
 C++ では、constexpr を積極利用する事ができ、配置の問題はかなり柔軟に対応出来ます。   
@@ -279,7 +278,7 @@ RX65N/RX72N Envision Kit には、I2C 接続の静電容量タイプのタッチ
 名前空間は 'gui' となっています。
 
 |ソース|主な機能|
-|-----|-------|
+|---|---|
 |[RX600/drw2d_mgr.hap](RX600/drw2d_mgr.hpp)|DRW2D エンジンによる描画クラス|
 |[graphics/graphics.hap](graphics/graphics.hpp)|ソフトによる描画クラス|
 |[graphics/font.hpp](graphics/font.hpp)|フォント設定(ASCII+漢字ビットマップ)|
@@ -289,7 +288,7 @@ RX65N/RX72N Envision Kit には、I2C 接続の静電容量タイプのタッチ
 |[graphics/kfont.hpp](graphics/kfont.hpp)|漢字フォント|
 |[graphics/kfont16.cpp](graphics/kfont16.cpp)|16 x 16 ピクセル漢字フォントデータ|
 |[graphics/color.hpp](graphics/color.hpp)|基本カラー定義|
-|[graphics/widget_director.hpp](graphics/widget_director.hpp)|Widget ディレクター（管理）|
+|[graphics/widget_director.hpp](graphics/widget_director.hpp)|Widget ディレクター（widget 管理）|
 |[graphics/widget.hpp](graphics/widget.hpp)|widget 基本クラス|
 |[graphics/group.hpp](graphics/group.hpp)|Widget グループ・クラス|
 |[graphics/button.hpp](graphics/button.hpp)|Widget ボタン・クラス|
@@ -300,6 +299,8 @@ RX65N/RX72N Envision Kit には、I2C 接続の静電容量タイプのタッチ
 |[graphics/text.hpp](graphics/text.hpp)|Widget テキスト・クラス|
 |[graphics/textbox.hpp](graphics/textbox.hpp)|Widget テキスト・ボックス・クラス|
 |[graphics/spinbox.hpp](graphics/spinbox.hpp)|Widget スピン・ボックス・クラス|
+|[graphics/toggle.hpp](graphics/toggle.hpp)|Widget トグル・スイッチ・クラス|
+|[graphics/progress.hpp](graphics/progress.hpp)|Widget プログレス・バー・クラス|
    
 ※他に、画像ローダーなど、色々なクラスがあり、利用出来ます。   
 
@@ -372,6 +373,12 @@ void remove_widget(gui::widget* w)
 	typedef gui::spinbox SPINBOX;
 	SPINBOX		spinbox_(vtx::srect(20, 220, 120, 0),
 					{ .min = -100, .value = 0, .max = 100, .step = 1, .accel = true });
+	typedef gui::toggle TOGGLE;
+	TOGGLE		toggle_(vtx::srect(160, 220, 0, 0));
+	typedef gui::progress PROGRESS;
+	PROGRESS	progress_(vtx::srect(240, 220, 150, 0));
+
+	float		progress_ratio_ = 0.0f;
 ```
    
 ※「button_」では、X 座標：１０、Y 座標：１０、横幅：８０、高さ：３２、表示文字「Button」で登録しています。   
@@ -477,6 +484,26 @@ void remove_widget(gui::widget* w)
 			static const char* st[3] = { "Minus", "Stay", "Plus" };
 			utils::format("Spinbox: %s Value: %d\n")
 				% st[static_cast<uint8_t>(area)] % value;
+		};
+
+		toggle_.enable();
+		toggle_.at_select_func() = [=](bool state) {
+			utils::format("Toggle: %s\n") % (state ? "OFF" : "ON");
+			if(!state) {
+				progress_ratio_ = 0.0f;
+			}
+		};
+
+		progress_.enable();
+		progress_.at_update_func() = [=](float ratio) {
+			if(toggle_.get_enable()) {
+				ratio += 1.0f / 120.0f;  // 2 sec
+				if(ratio > 1.0f) ratio = 1.0f;
+			} else {
+				ratio = 0.0f;
+				progress_ratio_ = 0.0f;
+			}
+			return ratio;
 		};
 	}
 ```
