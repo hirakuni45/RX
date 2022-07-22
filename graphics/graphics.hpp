@@ -321,8 +321,8 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	水平ラインを描画
-			@param[in]	y	開始位置Ｘ（小数４ビット）
-			@param[in]	x	開始位置Ｙ（小数４ビット）
+			@param[in]	y	開始位置Ｙ（小数４ビット）
+			@param[in]	x	開始位置Ｘ（小数４ビット）
 			@param[in]	w	水平幅（小数４ビット）
 		*/
 		//-----------------------------------------------------------------//
@@ -718,6 +718,66 @@ namespace graphics {
 				}
 				line_h((cen.y - x) << 4, (cen.x - y) << 4, (y + y + 1) << 4);
 				line_h((cen.y + x) << 4, (cen.x - y) << 4, (y + y + 1) << 4);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	三角（線）を描画する
+			@param[in]	p0	頂点０
+			@param[in]	p1	頂点１
+			@param[in]	p2	頂点２
+		*/
+		//-----------------------------------------------------------------//
+		void triangle(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2) noexcept
+		{
+			line(p0, p1);
+			line(p1, p2);
+			line(p2, p0);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	三角を描画する
+			@param[in]	p0	頂点０
+			@param[in]	p1	頂点１
+			@param[in]	p2	頂点２
+		*/
+		//-----------------------------------------------------------------//
+		void fill_triangle(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2) noexcept
+		{
+			vtx::spos tmp[3];
+			if(p0.y < p1.y && p1.y < p2.y) {
+				tmp[0] = p0;
+				tmp[1] = p1;
+				tmp[2] = p2;
+			} else if(p1.y < p2.y) {
+				tmp[0] = p1;
+				if(p2.y < p0.y) {
+					tmp[1] = p2;
+					tmp[2] = p0;
+				} else {
+					tmp[1] = p0;
+					tmp[2] = p2;
+				}
+			} else {
+				tmp[0] = p2;
+				if(p0.y < p1.y) {
+					tmp[1] = p0;
+					tmp[2] = p1;
+				} else {
+					tmp[1] = p1;
+					tmp[2] = p0;
+				}
+			}
+
+			vtx::ipos ps = tmp[1] - tmp[0];
+			vtx::ipos ns = tmp[2] - tmp[0];
+			for(auto i = tmp[0].y; i < tmp[2].y; ++i) {
+				auto w = 0;
+				line_h(tmp[0].y, tmp[0].x, w);
 			}
 		}
 
