@@ -65,6 +65,9 @@ namespace gui {
 
 		WIDGETS		widgets_;
 
+		graphics::share_color	back_color_;
+
+
 		// ipass 自分を含めない場合「false」
 		// 「子」のリストを作成
 		uint32_t create_childs_(widget* w, widget_t** list, uint32_t max, bool ipass)
@@ -113,8 +116,31 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		widget_director(RDR& rdr, TOUCH& touch) noexcept :
-			rdr_(rdr), touch_(touch), widgets_()
+			rdr_(rdr), touch_(touch), widgets_(), back_color_(graphics::def_color::Black)
 		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	全クリア
+		*/
+		//-----------------------------------------------------------------//
+		void clear() noexcept
+		{
+			rdr_.clear(back_color_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	背面色の設定
+			@param[in]	color	背面色
+		*/
+		//-----------------------------------------------------------------//
+		void set_back_color(const graphics::share_color& color) noexcept
+		{
+			back_color_ = color;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -185,6 +211,37 @@ namespace gui {
 			rdr_.swap_color();
 			auto sz = rdr_.at_font().get_text_size(text);
 			rdr_.draw_text(rect.org + (rect.size - sz) / 2, text);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	該当するレイヤーを許可、不許可
+			@param[in]	bits	レイヤービット
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(uint8_t bits, bool ena = true) noexcept
+		{
+			for(auto& t : widgets_) {
+				if(t.w_ == nullptr) continue;
+				if((t.w_->get_layer_bits() & bits) != 0) {
+					t.w_->enable(ena);
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	該当するレイヤーを許可、不許可
+			@param[in]	layer	レイヤー
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(widget::LAYER layer, bool ena = true) noexcept
+		{
+			enable(1 << static_cast<uint8_t>(layer), ena);
 		}
 
 

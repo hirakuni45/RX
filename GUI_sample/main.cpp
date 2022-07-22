@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX65N/RX72N GUI サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -127,6 +127,8 @@ namespace {
 	typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
 	WIDD		widd_(render_, touch_);
 
+	typedef gui::widget WIDGET;
+
 	typedef gui::button BUTTON;
 	BUTTON		button_(vtx::srect(10, 10, 80, 32), "Button");
 	BUTTON		button_stall_(vtx::srect(100, 10, 80, 32), "Stall");
@@ -155,11 +157,15 @@ namespace {
 	typedef gui::progress PROGRESS;
 	PROGRESS	progress_(vtx::srect(240, 220, 150, 0));
 
+	typedef gui::button BUTTON;	BUTTON	next_(vtx::srect(480-45, 272-45, 40, 40), ">", true);  // circle ボタン
+
+	typedef gui::button BUTTON;	BUTTON	prev_(vtx::srect(5, 272-45, 40, 40), "<", true);
+
 	float		progress_ratio_ = 0.0f;
 
 	void setup_gui_()
 	{
-		button_.enable();
+		button_.set_layer(WIDGET::LAYER::_0);
 		button_.at_select_func() = [=](uint32_t id) {
 			utils::format("Select Button: %d\n") % id;
 			if(button_stall_.get_state() == BUTTON::STATE::STALL) {
@@ -170,10 +176,10 @@ namespace {
 				button_stall_.set_title("Stall");
 			}
 		};
-		button_stall_.enable();
+		button_stall_.set_layer(WIDGET::LAYER::_0);
 		button_stall_.set_state(BUTTON::STATE::STALL);
 
-		check_.enable();
+		check_.set_layer(WIDGET::LAYER::_0);
 		check_.at_select_func() = [=](bool ena) {
 			utils::format("Select Check: %s\n") % (ena ? "On" : "Off");
 			if(ena) {
@@ -188,7 +194,7 @@ namespace {
 
 		// グループにラジオボタンを登録
 		group_ + radioR_ + radioG_ + radioB_;
-		group_.enable();  // グループ登録された物が全て有効になる。
+		group_.set_layer(WIDGET::LAYER::_0);  // レイヤー設定は、親にすればＯＫ。
 		radioR_.at_select_func() = [=](bool ena) {
 			utils::format("Select Red: %s\n") % (ena ? "On" : "Off");
 			if(ena) {
@@ -224,36 +230,36 @@ namespace {
 		};
 		radioG_.exec_select();  // 最初に選択されるラジオボタン
 
-		sliderh_.enable();
+		sliderh_.set_layer(WIDGET::LAYER::_0);
 		sliderh_.at_select_func() = [=](float val) {
 			utils::format("Slider H: %3.2f\n") % val;
 		};
-		sliderv_.enable();
+		sliderv_.set_layer(WIDGET::LAYER::_0);
 		sliderv_.at_select_func() = [=](float val) {
 			utils::format("Slider V: %3.2f\n") % val;
 		};
 
-		menu_.enable();
+		menu_.set_layer(WIDGET::LAYER::_0);
 		menu_.at_select_func() = [=](uint32_t pos, uint32_t num) {
 			char tmp[32];
 			menu_.get_select_text(tmp, sizeof(tmp));
 			utils::format("Menu: '%s', %u/%u\n") % tmp % pos % num;
 		};
 
-		text_.enable();
+		text_.set_layer(WIDGET::LAYER::_0);
 
-		textbox_.enable();
+		textbox_.set_layer(WIDGET::LAYER::_0);
 		textbox_.set_title("(1) 項目\n(2) GUI サンプルについて。\n(3) まとめ");
 		textbox_.set_vertical_alignment(TEXTBOX::V_ALIGNMENT::CENTER);
 
-		spinbox_.enable();
+		spinbox_.set_layer(WIDGET::LAYER::_0);
 		spinbox_.at_select_func() = [=](SPINBOX::TOUCH_AREA area, int16_t value) {
 			static const char* st[3] = { "Minus", "Stay", "Plus" };
 			utils::format("Spinbox: %s Value: %d\n")
 				% st[static_cast<uint8_t>(area)] % value;
 		};
 
-		toggle_.enable();
+		toggle_.set_layer(WIDGET::LAYER::_0);
 		toggle_.at_select_func() = [=](bool state) {
 			utils::format("Toggle: %s\n") % (state ? "OFF" : "ON");
 			if(!state) {
@@ -261,10 +267,10 @@ namespace {
 			}
 		};
 
-		progress_.enable();
+		progress_.set_layer(WIDGET::LAYER::_0);
 		progress_.at_update_func() = [=](float ratio) {
 			if(toggle_.get_switch_state()) {
-				ratio += 1.0f / 120.0f;  // 2 sec
+				ratio += 1.0f / 120.0f;  // 2 sec (60 frame/sec)
 				if(ratio > 1.0f) ratio = 1.0f;
 			} else {
 				ratio = 0.0f;
@@ -272,6 +278,22 @@ namespace {
 			}
 			return ratio;
 		};
+
+		next_.set_layer(WIDGET::LAYER::_0);
+		next_.at_select_func() = [=](uint32_t id) {
+			widd_.clear();
+			widd_.enable(WIDGET::LAYER::_0, false);
+			widd_.enable(WIDGET::LAYER::_1);
+		};
+
+		prev_.set_layer(WIDGET::LAYER::_1);
+		prev_.at_select_func() = [=](uint32_t id) {
+			widd_.clear();
+			widd_.enable(WIDGET::LAYER::_0);
+			widd_.enable(WIDGET::LAYER::_1, false);
+		};
+
+		widd_.enable(WIDGET::LAYER::_0);
 	}
 
 

@@ -24,9 +24,6 @@ namespace gui {
 
 		typedef std::function<void(float ratio)> SELECT_FUNC_TYPE;
 
-		static constexpr int16_t round_radius = 10;  ///< 標準ラウンド半径
-		static constexpr int16_t handle_size  = 20;  ///< 標準ハンドルサイズ
-
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
@@ -48,7 +45,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		slider(const vtx::srect& loc = vtx::srect(0), float inr = 0.0f) noexcept :
 			widget(loc, nullptr), select_func_(),
-			touch_org_(0), ratio_org_(inr), ratio_(inr), handle_size_(handle_size), read_only_(false)
+			touch_org_(0), ratio_org_(inr), ratio_(inr), handle_size_(DEF_SLIDER_HANDLE_SIZE), read_only_(false)
 		{
 			if(loc.size.x <= 0) {
 				at_location().size.x = handle_size_;
@@ -120,10 +117,10 @@ namespace gui {
 				float val = 0.0f;
 				const auto& loc = get_location();
 				if(loc.size.x > loc.size.y) {
-					ref = static_cast<float>(loc.size.x - DEF_FRAME_WIDTH * 2 - loc.size.y);
+					ref = static_cast<float>(loc.size.x - DEF_SLIDER_FRAME_WIDTH * 2 - loc.size.y);
 					val = static_cast<float>(d.x);
 				} else {
-					ref = static_cast<float>(loc.size.y - DEF_FRAME_WIDTH * 2 - loc.size.x);
+					ref = static_cast<float>(loc.size.y - DEF_SLIDER_FRAME_WIDTH * 2 - loc.size.x);
 					val = static_cast<float>(d.y);
 				}
 				ratio_ = ratio_org_ + (val / ref);
@@ -221,7 +218,7 @@ namespace gui {
 			auto org = get_final_position();
 			auto r = vtx::srect(org, get_location().size);
 			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, round_radius);
+			rdr.round_box(r, DEF_SLIDER_ROUND_RADIUS);
 			uint8_t inten = 64;
 			if(!read_only_ && get_touch_state().level_) {  // 0.75
 				inten = 192;
@@ -230,9 +227,9 @@ namespace gui {
 			sc.set_color(get_base_color().rgba8, inten);
 			rdr.set_fore_color(sc);
 
-			r.org  += DEF_FRAME_WIDTH;
-			r.size -= DEF_FRAME_WIDTH * 2;
-			rdr.round_box(r, round_radius - DEF_FRAME_WIDTH);
+			r.org  += DEF_SLIDER_FRAME_WIDTH;
+			r.size -= DEF_SLIDER_FRAME_WIDTH * 2;
+			rdr.round_box(r, DEF_SLIDER_ROUND_RADIUS - DEF_SLIDER_FRAME_WIDTH);
 
 			const auto& size = get_location().size;
 			auto cen = org;
@@ -240,17 +237,17 @@ namespace gui {
 			if(size.x > size.y) {
 				rad = size.y / 2;
 				--rad;
-				cen.x += DEF_FRAME_WIDTH + rad;
+				cen.x += DEF_SLIDER_FRAME_WIDTH + rad;
 				cen.y += rad;
-				cen.x += (size.x - DEF_FRAME_WIDTH * 2 - size.y) * ratio_;
+				cen.x += (size.x - DEF_SLIDER_FRAME_WIDTH * 2 - size.y) * ratio_;
 			} else {
 				rad = size.x / 2;
 				--rad;
-				cen.y += DEF_FRAME_WIDTH + rad;
+				cen.y += DEF_SLIDER_FRAME_WIDTH + rad;
 				cen.x += rad;
-				cen.y += (size.y - DEF_FRAME_WIDTH * 2 - size.x) * ratio_;
+				cen.y += (size.y - DEF_SLIDER_FRAME_WIDTH * 2 - size.x) * ratio_;
 			}
-			rdr.set_fore_color(graphics::def_color::White);
+			rdr.set_fore_color(get_base_color());
 			rdr.fill_circle(cen, rad);
 		}
 	};

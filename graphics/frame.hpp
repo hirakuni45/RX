@@ -124,7 +124,7 @@ namespace gui {
 		{
 			auto r = get_location();
 			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, DEF_ROUND_RADIUS);
+			rdr.round_box(r, DEF_FRAME_ROUND_RADIUS);
 
 			uint8_t inten = 64;
 			if(get_touch_state().level_) {  // 0.75
@@ -134,9 +134,9 @@ namespace gui {
 			sh.set_color(get_base_color().rgba8, inten);
 			rdr.set_fore_color(sh);
 
-			r.org += 2;
-			r.size -= 4;
-			rdr.round_box(r, DEF_ROUND_RADIUS - 2);
+			r.org  += DEF_FRAME_FRAME_WIDTH;
+			r.size -= DEF_FRAME_FRAME_WIDTH;
+			rdr.round_box(r, DEF_FRAME_ROUND_RADIUS - DEF_FRAME_FRAME_WIDTH);
 
 			rdr.set_fore_color(get_font_color());
 			auto sz = rdr.at_font().get_text_size(get_title());

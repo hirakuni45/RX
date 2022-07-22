@@ -91,9 +91,9 @@ namespace app {
 		typedef graphics::font<AFONT, KFONT> FONT;
 
 		// ハードウェアレンダラー
-//		typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
+		typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
 		// ソフトウェアーレンダラー
-		typedef graphics::render<GLCDC, FONT> RENDER;
+//		typedef graphics::render<GLCDC, FONT> RENDER;
 		// 標準カラーインスタンス
 		typedef graphics::def_color DEF_COLOR;
 

@@ -2,10 +2,10 @@
 //=====================================================================//
 /*!	@file
 	@brief	ボタン表示と制御 @n
-			・領域内で、「押した」、「離した」がある場合に「選択」と認識する。@n
-			・選択時関数を使わない場合、select_id を監視する事で、状態の変化を認識できる。@n
-			・select_id は、ボタンが押される度にインクリメントする。 @n
-			・選択時関数にはラムダ式を使える。
+			・領域内で、「押した」、「離した」がある場合に「押された」と認識する。 @n
+			・選択時関数を使わない場合、select_id を監視する事で、状態の変化を認識できる。 @n
+			・select_id は、ボタンが押される度にインクリメントされる。 @n
+			・角がラウンドした四角、又は、円が選択可能。（円の場合、幅と高さを同じにする）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -29,12 +29,11 @@ namespace gui {
 		/// 選択される度に count が＋１する。（select_id_）
 		typedef std::function<void(uint32_t count)> SELECT_FUNC_TYPE;
 
-		static constexpr int16_t edge_to_title = 4;		///< エッジからタイトルまでの距離
-
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
 		uint32_t			select_id_;
+		bool				circle_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -42,20 +41,22 @@ namespace gui {
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
 			@param[in]	str		ボタン文字列
+			@param[in]	cir		サークル・ボタンの場合「true」 @n
+								※幅、高さが同じでなければならない
 		*/
 		//-----------------------------------------------------------------//
-		button(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(), select_id_(0)
+		button(const vtx::srect& loc = vtx::srect(0), const char* str = "", bool cir = false) noexcept :
+			widget(loc, str), select_func_(), select_id_(0), circle_(cir)
 		{
 			if(get_location().size.x <= 0) {  // 自動で幅を推定する場合
 				auto tlen = 0;
 				if(str != nullptr) {
 					tlen = strlen(str) * 8;  // font::get_text_size(str); を使うべきだが、インスタンスが・・
 				}
-				at_location().size.x = (DEF_FRAME_WIDTH + edge_to_title) * 2 + tlen;
+				at_location().size.x = (DEF_BUTTON_FRAME_WIDTH + DEF_BUTTON_TO_STR) * 2 + tlen;
 			}
 			if(get_location().size.y <= 0) {
-				at_location().size.y = DEF_FRAME_HEIGHT;
+				at_location().size.y = DEF_BUTTON_HEIGHT;
 			}
 			insert_widget(this);
 		}
@@ -172,18 +173,34 @@ namespace gui {
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
 			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, DEF_ROUND_RADIUS);
+
 			uint8_t inten = 64;
 			if(get_touch_state().level_) {  // 0.75
 				inten = 192;
 			}
-			graphics::share_color sc(0, 0, 0);
-			sc.set_color(get_base_color().rgba8, inten);
-			rdr.set_fore_color(sc);
 
-			r.org  += DEF_FRAME_WIDTH;
-			r.size -= DEF_FRAME_WIDTH * 2;
-			rdr.round_box(r, DEF_ROUND_RADIUS - DEF_FRAME_WIDTH);
+			if(circle_ && r.size.x == r.size.y) {
+				auto rad = r.size.x / 2;
+				vtx::spos cen(r.center_x(), r.center_y());
+				rdr.fill_circle(cen, rad);
+
+				graphics::share_color sc(0, 0, 0);
+				sc.set_color(get_base_color().rgba8, inten);
+				rdr.set_fore_color(sc);
+
+				rad -= DEF_BUTTON_FRAME_WIDTH;
+				rdr.fill_circle(cen, rad);
+			} else {
+				rdr.round_box(r, DEF_BUTTON_ROUND_RADIUS);
+
+				graphics::share_color sc(0, 0, 0);
+				sc.set_color(get_base_color().rgba8, inten);
+				rdr.set_fore_color(sc);
+
+				r.org  += DEF_BUTTON_FRAME_WIDTH;
+				r.size -= DEF_BUTTON_FRAME_WIDTH * 2;
+				rdr.round_box(r, DEF_BUTTON_ROUND_RADIUS - DEF_BUTTON_FRAME_WIDTH);
+			}
 
 			rdr.set_fore_color(get_font_color());
 			auto mobj = get_mobj();

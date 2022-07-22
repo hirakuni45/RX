@@ -90,25 +90,6 @@ namespace device {
 
 		void setup_(bool texture)
 		{
-#if 0
-			if(texture) {
-				d2_setfillmode(d2_, d2_fm_texture);
-				return;
-			}
-			if(!set_fore_color_) {
-				d2_setcolor(d2_, 0, fore_color_.rgba8.rgba);
-				set_fore_color_ = true;
-			}
-			if(!set_back_color_) {
-				d2_setcolor(d2_, 1, back_color_.rgba8.rgba);
-				set_back_color_ = true;
-			}
-			if(!set_clip_) {
-				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.end_x(), clip_.end_y());
-				set_clip_ = true;
-			}
-			d2_setfillmode(d2_, d2_fm_color);
-#else
 			if(!set_fore_color_) {
 				d2_setcolor(d2_, 0, fore_color_.rgba8.rgba);
 				set_fore_color_ = true;
@@ -126,7 +107,6 @@ namespace device {
 			} else {
 				d2_setfillmode(d2_, d2_fm_color);
 			}
-#endif
 		}
 
 
@@ -757,6 +737,36 @@ namespace device {
 			setup_(false);
 			last_error_ = d2_rendercircle(d2_, cen.x << 4, cen.y << 4, rad << 4, 0);
 			return last_error_ == D2_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	三角（線）を描画する
+			@param[in]	p0	頂点０
+			@param[in]	p1	頂点１
+			@param[in]	p2	頂点２
+		*/
+		//-----------------------------------------------------------------//
+		void triangle(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2) noexcept
+		{
+			line(p0, p1);
+			line(p1, p2);
+			line(p2, p0);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	三角を描画する（時計回りに頂点を配置すると描画、逆だと描画されない）
+			@param[in]	p0	頂点０
+			@param[in]	p1	頂点１
+			@param[in]	p2	頂点２
+		*/
+		//-----------------------------------------------------------------//
+		void fill_triangle(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2) noexcept
+		{
+			triangle_d(p0 * 16, p1 * 16, p2 * 16);
 		}
 
 

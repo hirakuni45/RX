@@ -29,8 +29,9 @@ namespace gui {
 
 		SELECT_FUNC_TYPE	select_func_;
 		vtx::spos			item_size_;
-		uint32_t			num_;
-		uint32_t			select_pos_;
+		uint16_t			num_;
+		uint16_t			focus_pos_;
+		uint16_t			select_pos_;
 		bool				check_draw_;
 
 	public:
@@ -46,11 +47,11 @@ namespace gui {
 			noexcept :
 			widget(loc, str),
 			select_func_(), item_size_(0),
-			num_(utils::str::get_words(str, ',')), select_pos_(0), check_draw_(chd)
+			num_(utils::str::get_words(str, ',')), focus_pos_(0), select_pos_(0), check_draw_(chd)
 		{
 			if(loc.size.y <= 0) {
-				at_location().size.y = num_ * DEF_ITEM_HEIGHT;
-				item_size_.y = DEF_ITEM_HEIGHT;
+				at_location().size.y = num_ * DEF_MENU_HEIGHT;
+				item_size_.y = DEF_MENU_HEIGHT;
 			} else {
 				item_size_.y = loc.size.y / num_;
 			}
@@ -112,14 +113,17 @@ namespace gui {
 					auto newpos = st.relative_.y / item_size_.y;
 					if(newpos >= static_cast<int16_t>(num_)) newpos = num_ - 1;
 					else if(newpos < 0) newpos = 0;
-					select_pos_ = newpos;
+					focus_pos_ = newpos;
 				}
 			}
-//			if(st.negative_) {
-//				if(!get_focus()) {
-//					select_pos_ = num_;
-//				}
-//			}
+			if(st.negative_) {
+				if(get_focus()) {
+					auto newpos = st.relative_.y / item_size_.y;
+					if(newpos >= 0 && newpos < static_cast<int16_t>(num_)) {
+						select_pos_ = newpos;
+					}
+				}
+			}
 		}
 
 
@@ -230,9 +234,9 @@ namespace gui {
 
 			auto r = vtx::srect(get_final_position(), get_location().size);
 			r.size.y /= num_;
-			for(uint32_t i = 0; i < num_; ++i) {
+			for(uint16_t i = 0; i < num_; ++i) {
 				uint8_t inten = 64;
-				if(get_touch_state().level_ && select_pos_ == i) {
+				if(get_touch_state().level_ && focus_pos_ == i) {
 					inten = 192;
 				} else {
 					if(i & 1) {
@@ -248,13 +252,13 @@ namespace gui {
 				bool dn = false;
 				if(i == 0) up = true;
 				if(i == (num_ - 1)) dn = true;
-				rdr.round_box(r, DEF_ROUND_RADIUS, up, dn);
+				rdr.round_box(r, DEF_MENU_ROUND_RADIUS, up, dn);
 
 				if(check_draw_ && i == select_pos_) {
 					rdr.set_fore_color(get_base_color());
 					rdr.fill_box(
-						vtx::srect(r.org.x + DEF_ITEM_SPACE, r.org.y + (r.size.y - DEF_ITEM_CHECK) / 2,
-						DEF_ITEM_CHECK, DEF_ITEM_CHECK));
+						vtx::srect(r.org.x + DEF_MENU_SIGN_SPACE, r.org.y + (r.size.y - DEF_MENU_SIGN_SIZE) / 2,
+						DEF_MENU_SIGN_SIZE, DEF_MENU_SIGN_SIZE));
 				}
 
 				char tmp[32];
