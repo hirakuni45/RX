@@ -22,26 +22,50 @@ namespace gui {
 
 		typedef graphics::def_color DEF_COLOR;	///< 標準カラー
 
-		static constexpr int16_t DEF_ROUND_RADIUS         = 6;	///< 標準、コーナーの半径
-		static constexpr int16_t DEF_FRAME_WIDTH          = 3;	///< 標準、外周のフレーム幅
-		static constexpr int16_t DEF_FRAME_HEIGHT         = 30;	///< 標準、サイズが省略された場合の高さ
-		static constexpr int16_t DEF_ITEM_HEIGHT          = 28;	///< 標準、アイテム高さ（メニューなど）
-		static constexpr int16_t DEF_ITEM_SPACE           = 5;	///< 標準、アイテム・チェックまでの隙間
-		static constexpr int16_t DEF_ITEM_CHECK           = 6;	///< 標準、アイテム・チェックの大きさ
-		static constexpr int16_t DEF_CHECK_ROUND_RADIUS   = 2;	///< 標準、チェックボックスコーナー半径
-		static constexpr int16_t DEF_CHECK_FRAME_WIDTH    = 3;	///< 標準、チェックボックス外周フレーム幅
-		static constexpr int16_t DEF_CHECK_BOX            = 22;	///< 標準、チェックボックス大きさ
-		static constexpr int16_t DEF_CHECK_SPACE          = 4;	///< 標準、チェックボックス有効アイテムの隙間
-		static constexpr int16_t DEF_CHECK_TO_STR         = 5;	///< 標準、チェックボックスから文字までの隙間
-		static constexpr int16_t DEF_RADIO_FRAME_WIDTH    = 3;	///< 標準、ラジオボタン外周フレーム幅
-		static constexpr int16_t DEF_RADIO_BOX            = 22;	///< 標準、ラジオボタン大きさ
-		static constexpr int16_t DEF_RADIO_SPACE          = 4;	///< 標準、ラジオボタン有効アイテムの隙間
-		static constexpr int16_t DEF_RADIO_TO_STR         = 5;	///< 標準、ラジオボタンから文字までの隙間
-		static constexpr int16_t DEF_TOGGLE_FRAME_WIDTH   = 2;	///< 標準、トグルスイッチ外周フレーム幅
-		static constexpr int16_t DEF_TOGGLE_WIDTH         = 58;	///< 標準、トグルスイッチ横幅
-		static constexpr int16_t DEF_TOGGLE_HEIGHT        = 29;	///< 標準、トグルスイッチ高さ
-		static constexpr int16_t DEF_PROGRESS_HEIGHT      = 24;	///< 標準、プログレスバー高さ
-		static constexpr int16_t DEF_PROGRESS_FRAME_WIDTH = 2;	///< 標準、プログレス・バーフレーム幅
+		static constexpr int16_t DEF_FRAME_ROUND_RADIUS   = 6;	///< 標準、フレーム、コーナーの半径
+		static constexpr int16_t DEF_FRAME_FRAME_WIDTH    = 2;	///< 標準、フレーム、外周のフレーム幅
+
+		static constexpr int16_t DEF_DIALOG_ROUND_RADIUS  = 6;	///< 標準、ダイアログ、コーナーの半径
+		static constexpr int16_t DEF_DIALOG_FRAME_WIDTH   = 2;	///< 標準、ダイアログ、外周のフレーム幅
+
+		static constexpr int16_t DEF_BUTTON_ROUND_RADIUS  = 6;	///< 標準、ボタン、コーナーの半径
+		static constexpr int16_t DEF_BUTTON_FRAME_WIDTH   = 3;	///< 標準、ボタン、外周のフレーム幅
+		static constexpr int16_t DEF_BUTTON_HEIGHT        = 30;	///< 標準、ボタン、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_BUTTON_TO_STR        = 4;	///< 標準、ボタン、フレームからタイトルまでの距離
+
+		static constexpr int16_t DEF_SLIDER_ROUND_RADIUS  = 10;	///< 標準、スライダー、コーナーの半径
+		static constexpr int16_t DEF_SLIDER_FRAME_WIDTH   = 3;	///< 標準、スライダー、外周のフレーム幅
+		static constexpr int16_t DEF_SLIDER_HANDLE_SIZE   = 20;	///< 標準、スライダー、ハンドルの大きさ
+
+		static constexpr int16_t DEF_MENU_ROUND_RADIUS    = 6;	///< 標準、メニュー、コーナー半径
+		static constexpr int16_t DEF_MENU_HEIGHT          = 28;	///< 標準、メニュー、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_MENU_SIGN_SPACE      = 5;	///< 標準、メニュー、サインまでの隙間
+		static constexpr int16_t DEF_MENU_SIGN_SIZE       = 6;	///< 標準、メニュー、サインの大きさ
+
+		static constexpr int16_t DEF_CHECK_ROUND_RADIUS   = 2;	///< 標準、チェックボックス、コーナー半径
+		static constexpr int16_t DEF_CHECK_FRAME_WIDTH    = 3;	///< 標準、チェックボックス、外周フレーム幅
+		static constexpr int16_t DEF_CHECK_BOX_SIZE       = 22;	///< 標準、チェックボックス、大きさ
+		static constexpr int16_t DEF_CHECK_SPACE          = 4;	///< 標準、チェックボックス、有効アイテムの隙間
+		static constexpr int16_t DEF_CHECK_TO_STR         = 5;	///< 標準、チェックボックス、文字までの隙間
+
+		static constexpr int16_t DEF_RADIO_FRAME_WIDTH    = 3;	///< 標準、ラジオボタン、外周フレーム幅
+		static constexpr int16_t DEF_RADIO_BOX            = 22;	///< 標準、ラジオボタン、大きさ
+		static constexpr int16_t DEF_RADIO_SPACE          = 4;	///< 標準、ラジオボタン、有効アイテムの隙間
+		static constexpr int16_t DEF_RADIO_TO_STR         = 5;	///< 標準、ラジオボタン、文字までの隙間
+
+		static constexpr int16_t DEF_SPINBOX_ROUND_RADIUS = 6;	///< 標準、スピンボックス、コーナー半径
+		static constexpr int16_t DEF_SPINBOX_FRAME_WIDTH  = 2;	///< 標準、スピンボックス、外周フレーム幅
+		static constexpr int16_t DEF_SPINBOX_HEIGHT       = 30;	///< 標準、スピンボックス、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_SPINBOX_ARROW_SPACE  = 2;	///< 標準、スピンボックス、矢印までの隙間
+		static constexpr int16_t DEF_SPINBOX_ARROW_W      = 5;	///< 標準、スピンボックス、矢印の幅
+		static constexpr int16_t DEF_SPINBOX_ARROW_H      = 8;	///< 標準、スピンボックス、矢印の高さ
+
+		static constexpr int16_t DEF_TOGGLE_WIDTH         = 58;	///< 標準、トグルスイッチ、横幅
+		static constexpr int16_t DEF_TOGGLE_HEIGHT        = 29;	///< 標準、トグルスイッチ、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_TOGGLE_FRAME_WIDTH   = 2;	///< 標準、トグルスイッチ、外周フレーム幅
+
+		static constexpr int16_t DEF_PROGRESS_HEIGHT      = 24;	///< 標準、プログレスバー、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_PROGRESS_FRAME_WIDTH = 2;	///< 標準、プログレスバー、フレーム幅
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -121,6 +145,23 @@ namespace gui {
 			BOTTOM,	///< 下寄せ
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	レイヤー型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class LAYER : uint8_t {
+			_0,		///< レイヤー０
+			_1,		///< レイヤー１
+			_2,		///< レイヤー２
+			_3,		///< レイヤー３
+			_4,		///< レイヤー４
+			_5,		///< レイヤー５
+			_6,		///< レイヤー６
+			_7,		///< レイヤー７
+		};
+
 	private:
 
 		widget*		parents_;	///< 親
@@ -144,6 +185,8 @@ namespace gui {
 
 		uint8_t		exec_request_;
 
+		uint8_t		layer_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -159,7 +202,7 @@ namespace gui {
 			base_color_(graphics::def_color::White), font_color_(graphics::def_color::White),
 			state_(STATE::DISABLE), focus_(false), touch_(false),
 			touch_state_(fexp), update_(false),
-			exec_request_(0)
+			exec_request_(0), layer_(0)
 		{ } 
 
 
@@ -398,6 +441,24 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	レイヤーの設定
+			@param[in]	layer	レイヤー
+		*/
+		//-----------------------------------------------------------------//
+		void set_layer(LAYER layer) noexcept { layer_ = 1 << static_cast<uint8_t>(layer); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	レイヤービットの取得
+			@return レイヤー
+		*/
+		//-----------------------------------------------------------------//
+		auto get_layer_bits() const noexcept { return layer_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	ステートの設定
 			@param[in]	state	ステート
 		*/
@@ -557,5 +618,5 @@ namespace gui {
 	};
 }
 
-extern bool insert_widget(gui::widget* w);
-extern void remove_widget(gui::widget* w);
+extern bool insert_widget(gui::widget* w);	///< widget インサートのグローバル関数型
+extern void remove_widget(gui::widget* w);	///< widget リムーブのグローバル関数型
