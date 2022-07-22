@@ -134,7 +134,7 @@ namespace gui {
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto r = get_location();
+			auto r = vtx::srect(get_final_position(), get_location().size);
 			if(draw_func_) {
 				draw_func_(r);
 			} else {

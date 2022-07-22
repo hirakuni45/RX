@@ -120,7 +120,7 @@ namespace gui {
 		{
 			auto r = get_location();
 			rdr.set_fore_color(graphics::def_color::White);
-			rdr.round_box(r, DEF_ROUND_RADIUS);
+			rdr.round_box(r, DEF_DIALOG_ROUND_RADIUS);
 			if(get_touch_state().level_) {
 				rdr.set_fore_color(graphics::def_color::Silver);
 			} else {
@@ -128,7 +128,7 @@ namespace gui {
 			}
 			r.org += 2;
 			r.size -= 4;
-			rdr.round_box(r, DEF_ROUND_RADIUS - 2);
+			rdr.round_box(r, DEF_DIALOG_ROUND_RADIUS - 2);
 
 			rdr.set_fore_color(graphics::def_color::White);
 			auto sz = rdr.at_font().get_text_size(get_title());

@@ -46,10 +46,10 @@ namespace gui {
 				if(str != nullptr) {
 					tlen = strlen(str) * 8;
 				}
-				at_location().size.x = DEF_CHECK_BOX + DEF_CHECK_TO_STR + tlen;
+				at_location().size.x = DEF_CHECK_BOX_SIZE + DEF_CHECK_TO_STR + tlen;
 			}
 			if(loc.size.y <= 0) {
-				at_location().size.y = DEF_CHECK_BOX;
+				at_location().size.y = DEF_CHECK_BOX_SIZE;
 			}
 			insert_widget(this);
 		}
