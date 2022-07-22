@@ -61,6 +61,8 @@
 |[slider.hpp](./slider.hpp)|Widget スライダー|
 |[menu.hpp](./menu.hpp)|Widget メニュー|
 |[spinbox.hpp](./spinbox.hpp)|Widget スピンボックス|
+|[toggle.hpp](./spinbox.hpp)|Widget トグルスイッチ|
+|[progress.hpp](./spinbox.hpp)|Widget プログレスバー|
    
 ---
 
@@ -119,30 +121,65 @@
 
 |ソース|主な機能|
 |---|---|
-|[RX600/drw2d_mgr.hap](RX600/drw2d_mgr.hpp)|DRW2D エンジンによる描画クラス|
-|[graphics/graphics.hap](graphics/graphics.hpp)|ソフトによる描画クラス|
-|[graphics/font.hpp](graphics/font.hpp)|フォント設定(ASCII+漢字ビットマップ)|
-|[graphics/afont.hpp](graphics/afont.hpp)|ASCII フォント|
-|[graphics/font8x16.hpp](graphics/font8x16.hpp)|8 x 16 ピクセルフォント定義（ヘッダー）|
-|[graphics/font8x16.cpp](graphics/font8x16.cpp)|8 x 16 ピクセルフォント定義（ソース）|
-|[graphics/kfont.hpp](graphics/kfont.hpp)|漢字フォント|
-|[graphics/kfont16.cpp](graphics/kfont16.cpp)|16 x 16 ピクセル漢字フォントデータ|
-|[graphics/color.hpp](graphics/color.hpp)|基本カラー定義|
-|[graphics/widget_director.hpp](graphics/widget_director.hpp)|Widget ディレクター（widget 管理）|
-|[graphics/widget.hpp](graphics/widget.hpp)|widget 基本クラス|
-|[graphics/group.hpp](graphics/group.hpp)|Widget グループ・クラス|
-|[graphics/button.hpp](graphics/button.hpp)|Widget ボタン・クラス|
-|[graphics/check.hpp](graphics/check.hpp)|Widget チェックボックス・クラス|
-|[graphics/radio.hpp](graphics/radio.hpp)|Widget ラジオボタン・クラス|
-|[graphics/slider.hpp](graphics/slider.hpp)|Widget スライダー・クラス|
-|[graphics/menu.hpp](graphics/menu.hpp)|Widget メニュー・クラス|
-|[graphics/text.hpp](graphics/text.hpp)|Widget テキスト・クラス|
-|[graphics/textbox.hpp](graphics/textbox.hpp)|Widget テキスト・ボックス・クラス|
-|[graphics/spinbox.hpp](graphics/spinbox.hpp)|Widget スピン・ボックス・クラス|
-|[graphics/toggle.hpp](graphics/toggle.hpp)|Widget トグル・スイッチ・クラス|
-|[graphics/progress.hpp](graphics/progress.hpp)|Widget プログレス・バー・クラス|
+|[common/vtx.hap](../common/vtx.hpp)|2D,3D 座標クラス|
+|[RX600/drw2d_mgr.hap](../RX600/drw2d_mgr.hpp)|DRW2D エンジンによる描画クラス|
+|[graphics/graphics.hap](./graphics.hpp)|ソフトによる描画クラス|
+|[graphics/font.hpp](./font.hpp)|フォント設定(ASCII+漢字ビットマップ)|
+|[graphics/afont.hpp](./afont.hpp)|ASCII フォント|
+|[graphics/font8x16.hpp](./font8x16.hpp)|8 x 16 ピクセルフォント定義（ヘッダー）|
+|[graphics/font8x16.cpp](./font8x16.cpp)|8 x 16 ピクセルフォント実態（ソース）|
+|[graphics/kfont.hpp](./kfont.hpp)|漢字フォント|
+|[graphics/kfont16.cpp](./kfont16.cpp)|16 x 16 ピクセル漢字フォント実態|
+|[graphics/color.hpp](./color.hpp)|基本カラー定義|
+|[graphics/widget_director.hpp](./widget_director.hpp)|Widget ディレクター（widget 管理）|
+|[graphics/widget.hpp](./widget.hpp)|widget 基本クラス|
+|[graphics/group.hpp](./group.hpp)|Widget グループ・クラス|
+|[graphics/button.hpp](./button.hpp)|Widget ボタン・クラス|
+|[graphics/check.hpp](./check.hpp)|Widget チェックボックス・クラス|
+|[graphics/radio.hpp](./radio.hpp)|Widget ラジオボタン・クラス|
+|[graphics/slider.hpp](./slider.hpp)|Widget スライダー・クラス|
+|[graphics/menu.hpp](./menu.hpp)|Widget メニュー・クラス|
+|[graphics/text.hpp](./text.hpp)|Widget テキスト・クラス|
+|[graphics/textbox.hpp](./textbox.hpp)|Widget テキスト・ボックス・クラス|
+|[graphics/spinbox.hpp](./spinbox.hpp)|Widget スピン・ボックス・クラス|
+|[graphics/toggle.hpp](./toggle.hpp)|Widget トグル・スイッチ・クラス|
+|[graphics/progress.hpp](./progress.hpp)|Widget プログレス・バー・クラス|
 
 ---
+
+### widget における座標の設定と大きさの設定
+
+- 座標は、int16_t 型で定義されています。
+- 「vtx::srect(x, y, w, h)」型は、(x)Ｘ座標、(y)Ｙ座標、(w)Ｘサイズ、(h)Ｙサイズになっています。
+
+### ボタン
+
+- widget button は、シンプルな押しボタンの機能を提供します。
+
+定義：
+
+```C++
+	typedef gui::button BUTTON;
+	BUTTON	button_(vtx::srect(10, 10, 80, 32), "OK");
+```
+
+※上記例では、10,10 の位置に、横 80、高さ 32 のボタン、ボタン内文字 "OK" を定義しています。
+
+制御：
+
+```C++
+	button_.enable();
+	button_.at_select_func() = [=](uint32_t id) {
+		utils::format("Select Button: %d\n") % id;
+	};
+```
+
+※ボタンが押される度に、"Select Button: " と、ID 番号がコンソールに出力されます。
+
+
+
+
+
 
 ## TinyGL (Tiny OpenGL)
 
