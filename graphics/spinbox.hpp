@@ -2,6 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	スピンボックス表示と制御 @n
+			領域を三等分して、左、中央、右を判断する @n
 			左右のアクションにより、定数を進めたり、戻したりする。 @n
 			長押しの場合、加速する機能を有する。（許可／不許可）
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -42,7 +43,8 @@ namespace gui {
 			int16_t	max;	///< 最大値
 			int16_t	step;	///< 加算、減算幅
 			bool	accel;	///< 数値変更の加速を有効にする場合「true」
-//			number_t() noexcept : min(0), value(0), max(0), step(1), accel(false) { }
+			/// 変数初期化は、gcc の拡張機能でー
+			/// { .min = -100, .value = 0, .max = 100, .step = 1, .accel = true }
 
 			void add() noexcept
 			{
@@ -85,10 +87,8 @@ namespace gui {
 			area_(TOUCH_AREA::CENTER), number_(nmb),
 			ace_wait_(0), ace_tick_(0)
 		{
-			if(get_location().size.x <= 0) {
-			}
 			if(get_location().size.y <= 0) {
-				at_location().size.y = DEF_FRAME_HEIGHT;
+				at_location().size.y = DEF_SPINBOX_HEIGHT;
 			}
 			insert_widget(this);
 		}
@@ -234,6 +234,21 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	値の変更
+			@param[in] value	値
+		*/
+		//-----------------------------------------------------------------//
+		void set_value(int16_t value) noexcept
+		{
+			if(number_.min <= value && value <= number_.max && number_.value != value) {
+				number_.value = value;
+				set_update();
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	描画
 			@param[in]	rdr		描画インスタンス
 		*/
@@ -242,7 +257,9 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-			
+			rdr.set_fore_color(get_base_color());
+			rdr.round_box(r, DEF_SPINBOX_ROUND_RADIUS);
+
 			uint8_t inten = 64;
 			if(get_touch_state().level_) {  // 0.75
 				inten = 192;
@@ -251,42 +268,31 @@ namespace gui {
 			graphics::share_color sc(0, 0, 0);
 			sc.set_color(get_base_color().rgba8, inten);
 			rdr.set_fore_color(sc);
-			{
-				auto t = r;
-				t.size.x = r.size.x - (DEF_ITEM_SPACE * 2 + DEF_ITEM_CHECK);
-				switch(area_) {
-				case TOUCH_AREA::LEFT:
-					rdr.round_box(t, DEF_ROUND_RADIUS);
-					break;
-				case TOUCH_AREA::RIGHT:
-					t.org.x = r.org.x + (DEF_ITEM_SPACE * 2 + DEF_ITEM_CHECK);
-					rdr.round_box(t, DEF_ROUND_RADIUS);
-					break;
-				default:
-					rdr.round_box(r, DEF_ROUND_RADIUS);
-					break;
-				}
-			}
 
-			rdr.set_fore_color(get_font_color());
+			r.org  += DEF_SPINBOX_FRAME_WIDTH;
+			r.size -= DEF_SPINBOX_FRAME_WIDTH * 2;
+			rdr.round_box(r, DEF_SPINBOX_ROUND_RADIUS - DEF_SPINBOX_FRAME_WIDTH);
+
 			{
-				char tmp[10];
+				rdr.set_fore_color(get_font_color());
+				char tmp[8];  // 最大７桁（符号を入れて）
 				utils::sformat("%d", tmp, sizeof(tmp)) % number_.value;
 				auto sz = rdr.at_font().get_text_size(tmp);
 				rdr.draw_text(r.org + (r.size - sz) / 2, tmp);
 			}
-///			auto sz = rdr.at_font().get_text_size(get_title());
-///			rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
 
 			// 左右のポイント描画
 			rdr.set_fore_color(get_base_color());
-			vtx::srect t;
-			t.org.x = r.org.x + DEF_ITEM_SPACE;
-			t.org.y = r.org.y + (r.size.y - DEF_ITEM_CHECK) / 2;
-			t.size.x = t.size.y = DEF_ITEM_CHECK;
-			rdr.fill_box(t);
-			t.org.x = r.end_x() - DEF_ITEM_SPACE - DEF_ITEM_SPACE - 1;
-			rdr.fill_box(t);
+			vtx::spos t[3];
+			t[0].x = r.org.x + DEF_SPINBOX_ARROW_SPACE;
+			t[0].y = r.org.y + r.size.y / 2;
+			t[1].x = t[2].x = r.org.x + DEF_SPINBOX_ARROW_SPACE + DEF_SPINBOX_ARROW_W;
+			t[1].y = r.org.y + r.size.y / 2 - DEF_SPINBOX_ARROW_H / 2;
+			t[2].y = r.org.y + r.size.y / 2 + DEF_SPINBOX_ARROW_H / 2;
+			rdr.fill_triangle(t[0], t[1], t[2]);
+			t[0].x = r.end_x() - DEF_SPINBOX_ARROW_SPACE - 1;
+			t[1].x = t[2].x = r.end_x() - DEF_SPINBOX_ARROW_SPACE - DEF_SPINBOX_ARROW_W - 1;
+			rdr.fill_triangle(t[0], t[2], t[1]);
 		}
 	};
 }
