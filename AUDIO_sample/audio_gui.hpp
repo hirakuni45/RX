@@ -13,12 +13,13 @@
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
-#include "graphics/filer.hpp"
+#include "graphics/simple_filer.hpp"
 #include "graphics/simple_dialog.hpp"
 #include "graphics/img_in.hpp"
-#include "graphics/widget_director.hpp"
 #include "graphics/scaling.hpp"
 #include "graphics/img_in.hpp"
+
+#include "gui/widget_director.hpp"
 
 #include "sound/tag.hpp"
 #include "sound/af_play.hpp"
@@ -114,8 +115,8 @@ namespace app {
 		// RX65N Envision Kit: INT to P02(IRQ10), not use
 		// RX72N Envision Kit: INT to P34(IRQ4), not use
 
-		typedef gui::filer_base FILER_BASE;
-		typedef gui::filer<RENDER> FILER;
+		typedef gui::simple_filer_base FILER_BASE;
+		typedef gui::simple_filer<RENDER> FILER;
 		FILER	filer_;
 
 		typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;

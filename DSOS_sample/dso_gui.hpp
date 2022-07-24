@@ -8,7 +8,7 @@
                 https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget_director.hpp"
+#include "gui/widget_director.hpp"
 
 #include "capture.hpp"
 #include "render_wave.hpp"

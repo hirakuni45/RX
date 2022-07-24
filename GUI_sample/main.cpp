@@ -16,12 +16,12 @@
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
-#include "graphics/filer.hpp"
 #include "graphics/simple_dialog.hpp"
 #include "graphics/img_in.hpp"
-#include "graphics/widget_director.hpp"
 #include "graphics/scaling.hpp"
 #include "graphics/img_in.hpp"
+
+#include "gui/widget_director.hpp"
 
 #include "common/dir_list.hpp"
 #include "common/shell.hpp"
@@ -129,6 +129,8 @@ namespace {
 
 	typedef gui::widget WIDGET;
 
+	// --- page 1
+
 	typedef gui::button BUTTON;
 	BUTTON		button_(vtx::srect(10, 10, 80, 32), "Button");
 	BUTTON		button_stall_(vtx::srect(100, 10, 80, 32), "Stall");
@@ -159,7 +161,12 @@ namespace {
 
 	typedef gui::button BUTTON;	BUTTON	next_(vtx::srect(480-45, 272-45, 40, 40), ">", true);  // circle ボタン
 
+	// --- page 2
+
 	typedef gui::button BUTTON;	BUTTON	prev_(vtx::srect(5, 272-45, 40, 40), "<", true);
+
+	typedef gui::filer FILER;
+	FILER		filer_(vtx::srect(10, 10, 300, 200));
 
 	float		progress_ratio_ = 0.0f;
 
@@ -286,12 +293,17 @@ namespace {
 			widd_.enable(WIDGET::LAYER::_1);
 		};
 
+		// page 2
 		prev_.set_layer(WIDGET::LAYER::_1);
 		prev_.at_select_func() = [=](uint32_t id) {
 			widd_.clear();
 			widd_.enable(WIDGET::LAYER::_0);
 			widd_.enable(WIDGET::LAYER::_1, false);
 		};
+
+		filer_.set_layer(WIDGET::LAYER::_1);
+
+
 
 		widd_.enable(WIDGET::LAYER::_0);
 	}

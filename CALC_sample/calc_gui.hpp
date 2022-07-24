@@ -23,8 +23,9 @@
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/simple_dialog.hpp"
-#include "graphics/widget_director.hpp"
 #include "graphics/scaling.hpp"
+
+#include "gui/widget_director.hpp"
 
 #include "common/format.hpp"
 #include "common/fixed_string.hpp"
