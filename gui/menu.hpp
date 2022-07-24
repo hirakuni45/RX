@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include <functional>
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 #include "common/string_utils.hpp"
 
 namespace gui {
@@ -43,7 +43,7 @@ namespace gui {
 			@param[in]	chd		チェック描画を行わない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		menu(const vtx::srect& loc = vtx::srect(0), const char* str = "", bool chd = true)
+		menu(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr, bool chd = true)
 			noexcept :
 			widget(loc, str),
 			select_func_(), item_size_(0),

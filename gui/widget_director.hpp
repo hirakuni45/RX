@@ -9,23 +9,24 @@
 */
 //=====================================================================//
 #include <array>
-#include "graphics/widget.hpp"
-#include "graphics/group.hpp"
-#include "graphics/frame.hpp"
-#include "graphics/box.hpp"
-#include "graphics/text.hpp"
-#include "graphics/textbox.hpp"
-#include "graphics/dialog.hpp"
-#include "graphics/button.hpp"
-#include "graphics/check.hpp"
-#include "graphics/radio.hpp"
-#include "graphics/slider.hpp"
-#include "graphics/menu.hpp"
-#include "graphics/term.hpp"
-#include "graphics/spinbox.hpp"
-#include "graphics/toggle.hpp"
-#include "graphics/progress.hpp"
-#include "graphics/closebox.hpp"
+#include "gui/widget.hpp"
+#include "gui/group.hpp"
+#include "gui/frame.hpp"
+#include "gui/box.hpp"
+#include "gui/text.hpp"
+#include "gui/textbox.hpp"
+#include "gui/dialog.hpp"
+#include "gui/button.hpp"
+#include "gui/check.hpp"
+#include "gui/radio.hpp"
+#include "gui/slider.hpp"
+#include "gui/menu.hpp"
+#include "gui/term.hpp"
+#include "gui/spinbox.hpp"
+#include "gui/toggle.hpp"
+#include "gui/progress.hpp"
+#include "gui/closebox.hpp"
+#include "gui/filer.hpp"
 
 namespace gui {
 
@@ -476,6 +477,13 @@ namespace gui {
 				case widget::ID::CLOSEBOX:
 					{
 						auto* w = dynamic_cast<closebox*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::FILER:
+					{
+						auto* w = dynamic_cast<filer*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}

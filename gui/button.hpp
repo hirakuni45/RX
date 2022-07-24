@@ -13,7 +13,7 @@
 */
 //=====================================================================//
 #include <functional>
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 

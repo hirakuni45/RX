@@ -11,7 +11,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
