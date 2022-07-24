@@ -1,56 +1,60 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	グループ制御
+	@brief	クローズ・ボックス・ボタン表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget.hpp"
+#include <functional>
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	グループ・クラス（テンプレート）
-		@param[in]	CNUM	グループ最大数
+		@brief	クローズ・ボックス・ボタン・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t CNUM>
-	struct group : public widget {
+	struct closebox : public widget {
 
-		typedef group value_type;
+		typedef closebox value_type;
+
+		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
+
+		static constexpr int16_t round_radius = 2;
+		static constexpr int16_t frame_width  = 3;
+		static constexpr int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
 
 	private:
-		widget*		child_[CNUM];
-		uint32_t	count_;
 
-		void insert_(widget* w) {
-			if(count_ < CNUM) {
-				child_[count_] = w;
-				++count_;
-			}
-		} 
+		SELECT_FUNC_TYPE	select_func_;
+		bool				enable_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		フレーム・タイトル
+			@param[in]	str		ボタン文字列
 		*/
 		//-----------------------------------------------------------------//
-		group(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), child_{ nullptr }, count_(0)
+		closebox(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+			widget(loc, str), select_func_(), enable_(false)
 		{
+			if(loc.size.x <= 0) {
+				at_location().size.x = box_size;
+			}
+			if(loc.size.y <= 0) {
+				at_location().size.y = box_size;
+			}
 			insert_widget(this);
 		}
 
-
-		group(const group& th) = delete;
-		group& operator = (const group& th) = delete;
+		closebox(const closebox& th) = delete;
+		closebox& operator = (const closebox& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -58,7 +62,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~group() noexcept { remove_widget(this); }
+		virtual ~closebox() { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -67,7 +71,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Group"; }
+		const char* get_name() const override { return "CloseBox"; }
 
 
 		//-----------------------------------------------------------------//
@@ -76,7 +80,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::GROUP; }
+		ID get_id() const override { return ID::CLOSEBOX; }
 
 
 		//-----------------------------------------------------------------//
@@ -84,7 +88,7 @@ namespace gui {
 			@brief	初期化
 		*/
 		//-----------------------------------------------------------------//
-		void init() noexcept override { }
+		void init() override { }
 
 
 		//-----------------------------------------------------------------//
@@ -95,7 +99,10 @@ namespace gui {
 			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override { }
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
+		{
+			update_touch_def(pos, num);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -103,7 +110,12 @@ namespace gui {
 			@brief	選択推移
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select() noexcept override { }
+		void exec_select() noexcept override
+		{
+			if(select_func_) {
+				select_func_(enable_);
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -112,69 +124,67 @@ namespace gui {
 			@param[in]	ena		不許可の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(bool ena = true) override
+		void enable(bool ena = true) noexcept override
 		{
-			auto st = STATE::DISABLE;
 			if(ena) {
-				st = STATE::ENABLE;
+				set_state(STATE::ENABLE);
 			} else {
+				set_state(STATE::DISABLE);
 				reset_touch_state();
 			}
-			set_state(st);
-			for(uint32_t i = 0; i < count_; ++i) {
-				child_[i]->set_state(st);
-				if(!ena) {
-					child_[i]->reset_touch_state();
-				}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	セレクト ID の取得
+			@return	セレクト ID
+		*/
+		//-----------------------------------------------------------------//
+		bool get_enable() const noexcept { return enable_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	セレクト関数への参照
+			@return	セレクト関数
+		*/
+		//-----------------------------------------------------------------//
+		SELECT_FUNC_TYPE& at_select_func() noexcept { return select_func_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画
+			@param[in]	rdr		描画インスタンス
+		*/
+		//-----------------------------------------------------------------//
+		template<class RDR>
+		void draw(RDR& rdr) noexcept
+		{
+			auto font_height = RDR::font_type::height;
+			auto loc = vtx::srect(get_final_position(), get_location().size);
+			loc.size.x = loc.size.y;
+			auto r = loc;
+
+			rdr.set_fore_color(graphics::def_color::White);
+			rdr.round_box(r, round_radius);
+
+			r.org  += frame_width;
+			r.size -= frame_width * 2;
+			rdr.set_fore_color(graphics::def_color::Darkgray);
+			rdr.round_box(r, round_radius - frame_width);
+
+			if(get_touch_state().level_ || enable_) {
+				rdr.set_fore_color(graphics::def_color::White);
+//				r.org  += check_space;
+//				r.size -= check_space * 2;
+				auto s = r.org;
+				auto e = r.org + r.size;
+				rdr.line(s, e);
+				std::swap(s.x, e.x);
+				rdr.line(s, e);
 			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	子供のリスト数取得
-			@return 子供のリスト数
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_child_num() const noexcept { return count_; }
- 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	子供のリスト取得
-			@return 子供のリスト
-		*/
-		//-----------------------------------------------------------------//
-		widget** get_child() noexcept { return child_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	親の設定
-			@param[in]	th	子のインスタンス	
-		*/
-		//-----------------------------------------------------------------//
-		template <class T>
-		group& operator + (T& th)
-		{
-			th.set_parents(this);
-			insert_(&th);
-			return *this;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	親の設定
-			@param[in]	th	子のインスタンス	
-		*/
-		//-----------------------------------------------------------------//
-		template <class T>
-		group& operator += (T& th)
-		{
-			th.set_parents(this);
-			insert_(&th);
-			return *this;
 		}
 	};
 }

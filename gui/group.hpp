@@ -1,55 +1,56 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	プログレスバー表示と制御
+	@brief	グループ制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <functional>
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	プログレス・クラス
+		@brief	グループ・クラス（テンプレート）
+		@param[in]	CNUM	グループ最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct progress : public widget {
+	template <uint32_t CNUM>
+	struct group : public widget {
 
-		typedef progress value_type;
+		typedef group value_type;
 
-		typedef std::function<float(float ratio)> UPDATE_FUNC_TYPE;
-	
 	private:
+		widget*		child_[CNUM];
+		uint32_t	count_;
 
-		UPDATE_FUNC_TYPE	update_func_;
-		float				ratio_;
-		bool				nmbe_;
+		void insert_(widget* w) {
+			if(count_ < CNUM) {
+				child_[count_] = w;
+				++count_;
+			}
+		} 
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	nmbe	百分率の表示（行わない場合「false」）
+			@param[in]	str		フレーム・タイトル
 		*/
 		//-----------------------------------------------------------------//
-		progress(const vtx::srect& loc = vtx::srect(0), bool nmbe = true ) noexcept :
-			widget(loc, nullptr), update_func_(), ratio_(0.0f), nmbe_(nmbe)
+		group(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+			widget(loc, str), child_{ nullptr }, count_(0)
 		{
-			if(loc.size.y <= 0) {
-				at_location().size.y = DEF_PROGRESS_HEIGHT;
-			}
 			insert_widget(this);
 		}
 
 
-		progress(const progress& th) = delete;
-		progress& operator = (const progress& th) = delete;
+		group(const group& th) = delete;
+		group& operator = (const group& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -57,7 +58,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~progress() { remove_widget(this); }
+		virtual ~group() noexcept { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -66,7 +67,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const override { return "Progress"; }
+		const char* get_name() const noexcept override { return "Group"; }
 
 
 		//-----------------------------------------------------------------//
@@ -75,7 +76,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const override { return ID::PROGRESS; }
+		ID get_id() const noexcept override { return ID::GROUP; }
 
 
 		//-----------------------------------------------------------------//
@@ -83,7 +84,7 @@ namespace gui {
 			@brief	初期化
 		*/
 		//-----------------------------------------------------------------//
-		void init() override { }
+		void init() noexcept override { }
 
 
 		//-----------------------------------------------------------------//
@@ -91,15 +92,10 @@ namespace gui {
 			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
+			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
-		{
-			if(update_func_) {
-				auto ratio = update_func_(ratio_);
-				set_ratio(ratio);
-			}
-		}
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override { }
 
 
 		//-----------------------------------------------------------------//
@@ -116,91 +112,69 @@ namespace gui {
 			@param[in]	ena		不許可の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(bool ena = true) noexcept override
+		void enable(bool ena = true) override
 		{
+			auto st = STATE::DISABLE;
 			if(ena) {
-				set_state(STATE::ENABLE);
+				st = STATE::ENABLE;
 			} else {
-				set_state(STATE::DISABLE);
 				reset_touch_state();
 			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	レシオの取得（移動量を正規化した値 0.0 to 1.0）
-			@return	レシオ
-		*/
-		//-----------------------------------------------------------------//
-		float get_ratio() const noexcept { return ratio_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	レシオを設定（正規化した値 0.0 to 1.0）
-			@param	ratio	レシオ
-		*/
-		//-----------------------------------------------------------------//
-		void set_ratio(float ratio) noexcept {
-			auto tmp = ratio_;
-			if(ratio >= 0.0f && ratio <= 1.0f) {
-				ratio_ = ratio;
-			}
-			if(tmp != ratio_) {
-				set_update();
+			set_state(st);
+			for(uint32_t i = 0; i < count_; ++i) {
+				child_[i]->set_state(st);
+				if(!ena) {
+					child_[i]->reset_touch_state();
+				}
 			}
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	アップデート関数への参照
-			@return	アップデート関数
+			@brief	子供のリスト数取得
+			@return 子供のリスト数
 		*/
 		//-----------------------------------------------------------------//
-		UPDATE_FUNC_TYPE& at_update_func() noexcept { return update_func_; }
+		uint32_t get_child_num() const noexcept { return count_; }
+ 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	子供のリスト取得
+			@return 子供のリスト
+		*/
+		//-----------------------------------------------------------------//
+		widget** get_child() noexcept { return child_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	描画
-			@param[in]	rdr		描画インスタンス
+			@brief	親の設定
+			@param[in]	th	子のインスタンス	
 		*/
 		//-----------------------------------------------------------------//
-		template<class RDR>
-		void draw(RDR& rdr) noexcept
+		template <class T>
+		group& operator + (T& th)
 		{
-			auto org = get_final_position();
-			auto r = vtx::srect(org, get_location().size);
-			rdr.set_fore_color(get_base_color());
-			rdr.fill_box(r);
+			th.set_parents(this);
+			insert_(&th);
+			return *this;
+		}
 
-			graphics::share_color sc(0, 0, 0);
-			sc.set_color(get_base_color().rgba8, 170);
-			rdr.set_fore_color(sc);
 
-			r.org  += DEF_PROGRESS_FRAME_WIDTH;
-			r.size -= DEF_PROGRESS_FRAME_WIDTH * 2;
-			auto rr = r;
-
-			auto size = r.size.x; 
-			r.size.x = static_cast<int16_t>(ratio_ * size);
-			rdr.fill_box(r);
-
-			sc.set_color(get_base_color().rgba8, 64);
-			rdr.set_fore_color(sc);
-			r.org.x += r.size.x;
-			r.size.x = size - r.size.x;
-			rdr.fill_box(r);
-
-			if(nmbe_) {
-				rdr.set_fore_color(get_font_color());
-				char tmp[8];
-				utils::sformat("%d%%", tmp, sizeof(tmp)) % static_cast<int>(ratio_ * 100.0f);
-				auto sz = rdr.at_font().get_text_size(tmp);
-				rdr.draw_text(rr.org + (rr.size - sz) / 2, tmp);
-			}
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	親の設定
+			@param[in]	th	子のインスタンス	
+		*/
+		//-----------------------------------------------------------------//
+		template <class T>
+		group& operator += (T& th)
+		{
+			th.set_parents(this);
+			insert_(&th);
+			return *this;
 		}
 	};
 }

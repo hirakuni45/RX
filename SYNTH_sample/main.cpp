@@ -24,7 +24,6 @@
 #include "graphics/kfont.hpp"
 #include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
-#include "graphics/filer.hpp"
 #include "graphics/simple_dialog.hpp"
 
 #include "chip/FT5206.hpp"
@@ -75,6 +74,9 @@ namespace {
 	#define USE_DAC
 	#define USE_GRAPHICS
 
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDHI;
+	SDHI		sdh_;
+
 #elif defined(SIG_RX72N)
 
 	static const char* sys_msg_ = { "RX72N Envision Kit" };
@@ -109,12 +111,39 @@ namespace {
 	#define USE_SSIE
 	#define USE_GRAPHICS
 
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDHI;
+	SDHI		sdh_;
+
 #elif defined(SIG_RX72T)
-
-	static const char* sys_msg_ = { "RX72T" };
-
+	// RSPI I/F
+	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
+
+#if 0
+	// SDCARD 制御リソース（ソフト SPI）
+	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
+	typedef device::PORT<device::PORT2, device::bitpos::B1> MOSI;
+	typedef device::PORT<device::PORT2, device::bitpos::B0> SPCK;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;  ///< Soft SPI 定義
+#else
+	// RSPI 定義、FIRST: P20:RSPCK, P21:MOSI, P22:MISO
+	typedef device::rspi_io<device::RSPI0> SDC_SPI;
+#endif
+
+	SDC_SPI	sdc_spi_;
+	typedef device::PORT<device::PORT3, device::bitpos::B0> SDC_SELECT;			///< カード選択信号
+	typedef device::PORT<device::PORTA, device::bitpos::B2> SDC_POWER;			///< カード電源制御 MIC2076-1YM (ACTIVE-HIGH)
+	typedef device::PORT<device::PORTB, device::bitpos::B4, 0> SDC_DETECT;		///< カード検出（ACTIVE-LOW）
+	typedef device::NULL_PORT SDC_WPRT;											///< カード書き込み禁止ポート設定（無効）
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
+	SDC		sdc_(sdc_spi_, 20'000'000);
+
+	#define USE_SPI
+
+	#define ENABLE_I2C_RTC
+	typedef device::iica_io<device::RIIC0> I2C;
+	typedef chip::DS3231<I2C> RTC;
 
 	static constexpr uint32_t AUDIO_SAMPLE_RATE = 48'000;
 
@@ -168,10 +197,6 @@ namespace {
 	typedef synth::synth_gui<RENDER, TOUCH> SYNTH_GUI;
 	SYNTH_GUI	synth_gui_(render_, touch_);
 #endif
-
-	// RX65N/RX72N Envision Kit の SDHI は、候補３になっている
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDHI;
-	SDHI		sdh_;
 
 	// サウンド出力コンテキスト
 	SOUND_OUT	sound_out_(ZERO_LEVEL);

@@ -1,9 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ファイル選択ユーティリティー @n
+	@brief	ファイル選択ユーティリティー（簡易版） @n
 			ファイルを選択を行う GUI を提供する。@n
 			スイッチによる操作と、タッチパネルによる操作をサポートする。 @n
+			全画面を使ったファイル選択。 @n
 			共通： @n
 			・SD カードがマウントされたら、「MOUNT」ビットを有効にする。 @n
 			スイッチによる制御： @n
@@ -21,7 +22,7 @@
 			・ディレクトリー選択した場合、ディレクトリー移動 @n
 			・左にドラッグでディレクトリーを一つ手前に戻る
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -36,7 +37,7 @@ namespace gui {
 		@brief	ファイラー・ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class filer_base {
+	class simple_filer_base {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -89,7 +90,7 @@ namespace gui {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class RDR>
-	class filer : public filer_base {
+	class simple_filer : public simple_filer_base {
 
 		using GLC = typename RDR::glc_type;
 
@@ -229,7 +230,7 @@ namespace gui {
 			@param[in]	tto		３本指タッチオープンを有効にする場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		filer(RDR& rdr, bool tto = false) noexcept : rdr_(rdr), dlist_(),
+		simple_filer(RDR& rdr, bool tto = false) noexcept : rdr_(rdr), dlist_(),
 			ctrl_(0), rdr_st_(), open_(false), info_(false), 
 			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
 			touch_(0), touch_org_(0), touch_end_(0),

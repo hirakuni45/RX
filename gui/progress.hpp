@@ -1,61 +1,55 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	チェック・ボタン表示と制御
+	@brief	プログレスバー表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <functional>
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	チェック・ボタン・クラス
+		@brief	プログレス・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct check : public widget {
+	struct progress : public widget {
 
-		typedef check value_type;
+		typedef progress value_type;
 
-		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
-
+		typedef std::function<float(float ratio)> UPDATE_FUNC_TYPE;
+	
 	private:
 
-		SELECT_FUNC_TYPE	select_func_;
-		bool				switch_state_;
+		UPDATE_FUNC_TYPE	update_func_;
+		float				ratio_;
+		bool				nmbe_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		ボタン文字列
-			@param[in]	first	初期状態
+			@param[in]	nmbe	百分率の表示（行わない場合「false」）
 		*/
 		//-----------------------------------------------------------------//
-		check(const vtx::srect& loc = vtx::srect(0), const char* str = "", bool first = false) noexcept :
-			widget(loc, str), select_func_(), switch_state_(first)
+		progress(const vtx::srect& loc = vtx::srect(0), bool nmbe = true ) noexcept :
+			widget(loc, nullptr), update_func_(), ratio_(0.0f), nmbe_(nmbe)
 		{
-			if(loc.size.x <= 0) {
-				int16_t tlen = 0;
-				if(str != nullptr) {
-					tlen = strlen(str) * 8;
-				}
-				at_location().size.x = DEF_CHECK_BOX_SIZE + DEF_CHECK_TO_STR + tlen;
-			}
 			if(loc.size.y <= 0) {
-				at_location().size.y = DEF_CHECK_BOX_SIZE;
+				at_location().size.y = DEF_PROGRESS_HEIGHT;
 			}
 			insert_widget(this);
 		}
 
-		check(const check& th) = delete;
-		check& operator = (const check& th) = delete;
+
+		progress(const progress& th) = delete;
+		progress& operator = (const progress& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -63,7 +57,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~check() { remove_widget(this); }
+		virtual ~progress() { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -72,7 +66,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const override { return "Check"; }
+		const char* get_name() const override { return "Progress"; }
 
 
 		//-----------------------------------------------------------------//
@@ -81,7 +75,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const override { return ID::CHECK; }
+		ID get_id() const override { return ID::PROGRESS; }
 
 
 		//-----------------------------------------------------------------//
@@ -97,12 +91,14 @@ namespace gui {
 			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
-			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
 		{
-			update_touch_def(pos, num);
+			if(update_func_) {
+				auto ratio = update_func_(ratio_);
+				set_ratio(ratio);
+			}
 		}
 
 
@@ -111,13 +107,7 @@ namespace gui {
 			@brief	選択推移
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select() noexcept override
-		{
-			switch_state_ = !switch_state_;
-			if(select_func_) {
-				select_func_(switch_state_);
-			}
-		}
+		void exec_select() noexcept override { }
 
 
 		//-----------------------------------------------------------------//
@@ -139,20 +129,37 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	スイッチの状態取得
-			@return	スイッチの状態
+			@brief	レシオの取得（移動量を正規化した値 0.0 to 1.0）
+			@return	レシオ
 		*/
 		//-----------------------------------------------------------------//
-		bool get_switch_state() const noexcept { return switch_state_; }
+		float get_ratio() const noexcept { return ratio_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	セレクト関数への参照
-			@return	セレクト関数
+			@brief	レシオを設定（正規化した値 0.0 to 1.0）
+			@param	ratio	レシオ
 		*/
 		//-----------------------------------------------------------------//
-		SELECT_FUNC_TYPE& at_select_func() noexcept { return select_func_; }
+		void set_ratio(float ratio) noexcept {
+			auto tmp = ratio_;
+			if(ratio >= 0.0f && ratio <= 1.0f) {
+				ratio_ = ratio;
+			}
+			if(tmp != ratio_) {
+				set_update();
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	アップデート関数への参照
+			@return	アップデート関数
+		*/
+		//-----------------------------------------------------------------//
+		UPDATE_FUNC_TYPE& at_update_func() noexcept { return update_func_; }
 
 
 		//-----------------------------------------------------------------//
@@ -164,33 +171,36 @@ namespace gui {
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto font_height = RDR::font_type::height;
-			auto loc = vtx::srect(get_final_position(), get_location().size);
-			loc.size.x = loc.size.y;
-			auto r = loc;
-
+			auto org = get_final_position();
+			auto r = vtx::srect(org, get_location().size);
 			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, DEF_CHECK_ROUND_RADIUS);
-
-			r.org  += DEF_CHECK_FRAME_WIDTH;
-			r.size -= DEF_CHECK_FRAME_WIDTH * 2;
+			rdr.fill_box(r);
 
 			graphics::share_color sc(0, 0, 0);
+			sc.set_color(get_base_color().rgba8, 170);
+			rdr.set_fore_color(sc);
+
+			r.org  += DEF_PROGRESS_FRAME_WIDTH;
+			r.size -= DEF_PROGRESS_FRAME_WIDTH * 2;
+			auto rr = r;
+
+			auto size = r.size.x; 
+			r.size.x = static_cast<int16_t>(ratio_ * size);
+			rdr.fill_box(r);
+
 			sc.set_color(get_base_color().rgba8, 64);
 			rdr.set_fore_color(sc);
-			rdr.round_box(r, DEF_CHECK_ROUND_RADIUS - DEF_CHECK_FRAME_WIDTH);
+			r.org.x += r.size.x;
+			r.size.x = size - r.size.x;
+			rdr.fill_box(r);
 
-			if(get_touch_state().level_ || switch_state_) {
-				rdr.set_fore_color(get_base_color());
-				r.org  += DEF_CHECK_SPACE;
-				r.size -= DEF_CHECK_SPACE * 2;
-				rdr.fill_box(r);
+			if(nmbe_) {
+				rdr.set_fore_color(get_font_color());
+				char tmp[8];
+				utils::sformat("%d%%", tmp, sizeof(tmp)) % static_cast<int>(ratio_ * 100.0f);
+				auto sz = rdr.at_font().get_text_size(tmp);
+				rdr.draw_text(rr.org + (rr.size - sz) / 2, tmp);
 			}
-
-			rdr.set_fore_color(get_font_color());
-			vtx::spos pos = vtx::spos(loc.end_x() + DEF_CHECK_TO_STR,
-				loc.org.y + (loc.size.y - font_height) / 2);
-			rdr.draw_text(pos, get_title());
 		}
 	};
 }

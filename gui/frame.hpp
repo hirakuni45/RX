@@ -1,25 +1,25 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ダイアログ表示と制御
+	@brief	フレーム表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ダイアログ・クラス
+		@brief	フレーム・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct dialog : public widget {
+	struct frame : public widget {
 
-		typedef dialog value_type;
+		typedef frame value_type;
 
 	private:
 
@@ -33,15 +33,15 @@ namespace gui {
 			@param[in]	str		フレーム・タイトル
 		*/
 		//-----------------------------------------------------------------//
-		dialog(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+		frame(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
 			widget(loc, str), caption_height_(0)
 		{
 			insert_widget(this);
 		}
 
 
-		dialog(const dialog& th) = delete;
-		dialog& operator = (const dialog& th) = delete;
+		frame(const frame& th) = delete;
+		frame& operator = (const frame& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -49,7 +49,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~dialog() noexcept { remove_widget(this); }
+		virtual ~frame() noexcept { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -58,7 +58,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Dialog"; }
+		const char* get_name() const noexcept override { return "Frame"; }
 
 
 		//-----------------------------------------------------------------//
@@ -67,7 +67,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::DIALOG; }
+		ID get_id() const noexcept override { return ID::FRAME; }
 
 
 		//-----------------------------------------------------------------//
@@ -105,8 +105,12 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void enable(bool ena = true) override
 		{
-			if(ena) set_state(STATE::ENABLE);
-			else set_state(STATE::DISABLE);
+			if(ena) {
+				set_state(STATE::ENABLE);
+			} else {
+				set_state(STATE::DISABLE);
+				reset_touch_state();
+			}
 		}
 
 
@@ -119,25 +123,29 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = get_location();
-			rdr.set_fore_color(graphics::def_color::White);
-			rdr.round_box(r, DEF_DIALOG_ROUND_RADIUS);
-			if(get_touch_state().level_) {
-				rdr.set_fore_color(graphics::def_color::Silver);
-			} else {
-				rdr.set_fore_color(graphics::def_color::Darkgray);
-			}
-			r.org += 2;
-			r.size -= 4;
-			rdr.round_box(r, DEF_DIALOG_ROUND_RADIUS - 2);
+			rdr.set_fore_color(get_base_color());
+			rdr.round_box(r, DEF_FRAME_ROUND_RADIUS);
 
-			rdr.set_fore_color(graphics::def_color::White);
+			uint8_t inten = 64;
+			if(get_touch_state().level_) {  // 0.75
+				inten = 192;
+			}
+			graphics::share_color sh(0, 0, 0);
+			sh.set_color(get_base_color().rgba8, inten);
+			rdr.set_fore_color(sh);
+
+			r.org  += DEF_FRAME_FRAME_WIDTH;
+			r.size -= DEF_FRAME_FRAME_WIDTH;
+			rdr.round_box(r, DEF_FRAME_ROUND_RADIUS - DEF_FRAME_FRAME_WIDTH);
+
+			rdr.set_fore_color(get_font_color());
 			auto sz = rdr.at_font().get_text_size(get_title());
 			rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
 		}
 
 
 		template <class T>
-		dialog& operator + (T& th)
+		frame& operator + (T& th)
 		{
 			th.set_parents(this);
 			return *this;
@@ -145,7 +153,7 @@ namespace gui {
 
 
 		template <class T>
-		dialog& operator += (T& th)
+		frame& operator += (T& th)
 		{
 			th.set_parents(this);
 			return *this;

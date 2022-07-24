@@ -36,7 +36,7 @@ PSOURCES	=	CALC_sample/main.cpp \
 
 USER_LIBS	=	supc++ mpfr gmp
 
-USER_DEFS	=
+USER_DEFS	=	FAT_FS FAT_FS_NUM=8
 
 INC_APP		=	. ../ ../../
 

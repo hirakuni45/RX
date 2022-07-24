@@ -45,7 +45,7 @@
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
-#include "graphics/filer.hpp"
+#include "graphics/simple_filer.hpp"
 
 #include "common/sci_i2c_io.hpp"
 #include "chip/FT5206.hpp"
@@ -304,8 +304,8 @@ namespace {
 	RENDER	render_(glcdc_, font_);
 
 	// ファイラー定義
-	typedef gui::filer_base FILER_BASE;
-	typedef gui::filer<RENDER> FILER;
+	typedef gui::simple_filer_base FILER_BASE;
+	typedef gui::simple_filer<RENDER> FILER;
 	FILER	filer_(render_, true);  // ３本タッチオープンを有効にする場合第二引数「true」
 
 	// タッチパネル定義

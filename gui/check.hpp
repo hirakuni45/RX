@@ -1,11 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ボタン表示と制御 @n
-			・領域内で、「押した」、「離した」がある場合に「押された」と認識する。 @n
-			・選択時関数を使わない場合、select_id を監視する事で、状態の変化を認識できる。 @n
-			・select_id は、ボタンが押される度にインクリメントされる。 @n
-			・角がラウンドした四角、又は、円が選択可能。（円の場合、幅と高さを同じにする）
+	@brief	チェック・ボタン表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -13,27 +9,25 @@
 */
 //=====================================================================//
 #include <functional>
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ボタン・クラス
+		@brief	チェック・ボタン・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct button : public widget {
+	struct check : public widget {
 
-		typedef button value_type;
+		typedef check value_type;
 
-		/// 選択される度に count が＋１する。（select_id_）
-		typedef std::function<void(uint32_t count)> SELECT_FUNC_TYPE;
+		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
 
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
-		uint32_t			select_id_;
-		bool				circle_;
+		bool				switch_state_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -41,29 +35,27 @@ namespace gui {
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
 			@param[in]	str		ボタン文字列
-			@param[in]	cir		サークル・ボタンの場合「true」 @n
-								※幅、高さが同じでなければならない
+			@param[in]	first	初期状態
 		*/
 		//-----------------------------------------------------------------//
-		button(const vtx::srect& loc = vtx::srect(0), const char* str = "", bool cir = false) noexcept :
-			widget(loc, str), select_func_(), select_id_(0), circle_(cir)
+		check(const vtx::srect& loc = vtx::srect(0), const char* str = "", bool first = false) noexcept :
+			widget(loc, str), select_func_(), switch_state_(first)
 		{
-			if(get_location().size.x <= 0) {  // 自動で幅を推定する場合
-				auto tlen = 0;
+			if(loc.size.x <= 0) {
+				int16_t tlen = 0;
 				if(str != nullptr) {
-					tlen = strlen(str) * 8;  // font::get_text_size(str); を使うべきだが、インスタンスが・・
+					tlen = strlen(str) * 8;
 				}
-				at_location().size.x = (DEF_BUTTON_FRAME_WIDTH + DEF_BUTTON_TO_STR) * 2 + tlen;
+				at_location().size.x = DEF_CHECK_BOX_SIZE + DEF_CHECK_TO_STR + tlen;
 			}
-			if(get_location().size.y <= 0) {
-				at_location().size.y = DEF_BUTTON_HEIGHT;
+			if(loc.size.y <= 0) {
+				at_location().size.y = DEF_CHECK_BOX_SIZE;
 			}
 			insert_widget(this);
 		}
 
-
-		button(const button& th) = delete;
-		button& operator = (const button& th) = delete;
+		check(const check& th) = delete;
+		check& operator = (const check& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -71,7 +63,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~button() { remove_widget(this); }
+		virtual ~check() { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -80,7 +72,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Button"; }
+		const char* get_name() const override { return "Check"; }
 
 
 		//-----------------------------------------------------------------//
@@ -89,7 +81,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::BUTTON; }
+		ID get_id() const override { return ID::CHECK; }
 
 
 		//-----------------------------------------------------------------//
@@ -97,7 +89,7 @@ namespace gui {
 			@brief	初期化
 		*/
 		//-----------------------------------------------------------------//
-		void init() noexcept override { }
+		void init() override { }
 
 
 		//-----------------------------------------------------------------//
@@ -105,6 +97,7 @@ namespace gui {
 			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
+			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
@@ -120,9 +113,9 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void exec_select() noexcept override
 		{
-			++select_id_;
+			switch_state_ = !switch_state_;
 			if(select_func_) {
-				select_func_(select_id_);
+				select_func_(switch_state_);
 			}
 		}
 
@@ -146,11 +139,11 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	セレクト ID の取得
-			@return	セレクト ID
+			@brief	スイッチの状態取得
+			@return	スイッチの状態
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_select_id() const noexcept { return select_id_; }
+		bool get_switch_state() const noexcept { return switch_state_; }
 
 
 		//-----------------------------------------------------------------//
@@ -164,53 +157,40 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	描画テンプレート
+			@brief	描画
 			@param[in]	rdr		描画インスタンス
 		*/
 		//-----------------------------------------------------------------//
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto r = vtx::srect(get_final_position(), get_location().size);
+			auto font_height = RDR::font_type::height;
+			auto loc = vtx::srect(get_final_position(), get_location().size);
+			loc.size.x = loc.size.y;
+			auto r = loc;
+
 			rdr.set_fore_color(get_base_color());
+			rdr.round_box(r, DEF_CHECK_ROUND_RADIUS);
 
-			uint8_t inten = 64;
-			if(get_touch_state().level_) {  // 0.75
-				inten = 192;
-			}
+			r.org  += DEF_CHECK_FRAME_WIDTH;
+			r.size -= DEF_CHECK_FRAME_WIDTH * 2;
 
-			if(circle_ && r.size.x == r.size.y) {
-				auto rad = r.size.x / 2;
-				vtx::spos cen(r.center_x(), r.center_y());
-				rdr.fill_circle(cen, rad);
+			graphics::share_color sc(0, 0, 0);
+			sc.set_color(get_base_color().rgba8, 64);
+			rdr.set_fore_color(sc);
+			rdr.round_box(r, DEF_CHECK_ROUND_RADIUS - DEF_CHECK_FRAME_WIDTH);
 
-				graphics::share_color sc(0, 0, 0);
-				sc.set_color(get_base_color().rgba8, inten);
-				rdr.set_fore_color(sc);
-
-				rad -= DEF_BUTTON_FRAME_WIDTH;
-				rdr.fill_circle(cen, rad);
-			} else {
-				rdr.round_box(r, DEF_BUTTON_ROUND_RADIUS);
-
-				graphics::share_color sc(0, 0, 0);
-				sc.set_color(get_base_color().rgba8, inten);
-				rdr.set_fore_color(sc);
-
-				r.org  += DEF_BUTTON_FRAME_WIDTH;
-				r.size -= DEF_BUTTON_FRAME_WIDTH * 2;
-				rdr.round_box(r, DEF_BUTTON_ROUND_RADIUS - DEF_BUTTON_FRAME_WIDTH);
+			if(get_touch_state().level_ || switch_state_) {
+				rdr.set_fore_color(get_base_color());
+				r.org  += DEF_CHECK_SPACE;
+				r.size -= DEF_CHECK_SPACE * 2;
+				rdr.fill_box(r);
 			}
 
 			rdr.set_fore_color(get_font_color());
-			auto mobj = get_mobj();
-			if(mobj != nullptr) {  // mobj があれば、テキストより優先される。
-				auto sz = rdr.get_mobj_size(mobj);
-				rdr.draw_mobj(r.org + (r.size - sz) / 2, mobj, false);
-			} else {
-				auto sz = rdr.at_font().get_text_size(get_title());
-				rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
-			}
+			vtx::spos pos = vtx::spos(loc.end_x() + DEF_CHECK_TO_STR,
+				loc.org.y + (loc.size.y - font_height) / 2);
+			rdr.draw_text(pos, get_title());
 		}
 	};
 }

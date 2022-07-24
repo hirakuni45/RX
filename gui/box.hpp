@@ -1,14 +1,15 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	フレーム表示と制御
+	@brief	ボックス表示と制御 @n
+			シンプルな描画を行う
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
@@ -17,13 +18,15 @@ namespace gui {
 		@brief	フレーム・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct frame : public widget {
+	struct box : public widget {
 
-		typedef frame value_type;
+		typedef box value_type;
+
+		typedef std::function<void(const vtx::srect& r)> DRAW_FUNC_TYPE;
 
 	private:
 
-		int16_t		caption_height_;
+		DRAW_FUNC_TYPE	draw_func_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -33,15 +36,15 @@ namespace gui {
 			@param[in]	str		フレーム・タイトル
 		*/
 		//-----------------------------------------------------------------//
-		frame(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), caption_height_(0)
+		box(const vtx::srect& loc = vtx::srect(0)) noexcept :
+			widget(loc, nullptr), draw_func_()
 		{
 			insert_widget(this);
 		}
 
 
-		frame(const frame& th) = delete;
-		frame& operator = (const frame& th) = delete;
+		box(const box& th) = delete;
+		box& operator = (const box& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -49,7 +52,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~frame() noexcept { remove_widget(this); }
+		virtual ~box() noexcept { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -58,7 +61,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Frame"; }
+		const char* get_name() const noexcept override { return "Box"; }
 
 
 		//-----------------------------------------------------------------//
@@ -67,7 +70,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::FRAME; }
+		ID get_id() const noexcept override { return ID::BOX; }
 
 
 		//-----------------------------------------------------------------//
@@ -116,47 +119,28 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	描画関数への参照
+			@return	描画関数
+		*/
+		//-----------------------------------------------------------------//
+		DRAW_FUNC_TYPE& at_draw_func() noexcept { return draw_func_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	描画
 		*/
 		//-----------------------------------------------------------------//
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto r = get_location();
-			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, DEF_FRAME_ROUND_RADIUS);
-
-			uint8_t inten = 64;
-			if(get_touch_state().level_) {  // 0.75
-				inten = 192;
+			auto r = vtx::srect(get_final_position(), get_location().size);
+			if(draw_func_) {
+				draw_func_(r);
+			} else {
+				rdr.set_fore_color(get_base_color());
+				rdr.fill_box(r);
 			}
-			graphics::share_color sh(0, 0, 0);
-			sh.set_color(get_base_color().rgba8, inten);
-			rdr.set_fore_color(sh);
-
-			r.org  += DEF_FRAME_FRAME_WIDTH;
-			r.size -= DEF_FRAME_FRAME_WIDTH;
-			rdr.round_box(r, DEF_FRAME_ROUND_RADIUS - DEF_FRAME_FRAME_WIDTH);
-
-			rdr.set_fore_color(get_font_color());
-			auto sz = rdr.at_font().get_text_size(get_title());
-			rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
-		}
-
-
-		template <class T>
-		frame& operator + (T& th)
-		{
-			th.set_parents(this);
-			return *this;
-		}
-
-
-		template <class T>
-		frame& operator += (T& th)
-		{
-			th.set_parents(this);
-			return *this;
 		}
 	};
 }

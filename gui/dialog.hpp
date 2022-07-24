@@ -1,48 +1,47 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ターミナル・クラス
+	@brief	ダイアログ表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ターミナル・クラス
-		@param[in]	SX		横幅
-		@param[in]	SY		高さ
+		@brief	ダイアログ・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t SX, uint32_t SY>
-	struct term : public widget {
+	struct dialog : public widget {
 
-		typedef term value_type;
+		typedef dialog value_type;
 
 	private:
-		uint8_t		code_[SX * SY];
+
+		int16_t		caption_height_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		タイトル
+			@param[in]	str		フレーム・タイトル
 		*/
 		//-----------------------------------------------------------------//
-		term(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
-			widget(loc, str), code_{ 0x20 }
+		dialog(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+			widget(loc, str), caption_height_(0)
 		{
 			insert_widget(this);
 		}
 
-		term(const term& th) = delete;
-		term& operator = (const term& th) = delete;
+
+		dialog(const dialog& th) = delete;
+		dialog& operator = (const dialog& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -50,7 +49,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~term() noexcept { remove_widget(this); }
+		virtual ~dialog() noexcept { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -59,7 +58,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Term"; }
+		const char* get_name() const noexcept override { return "Dialog"; }
 
 
 		//-----------------------------------------------------------------//
@@ -68,7 +67,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::TERM; }
+		ID get_id() const noexcept override { return ID::DIALOG; }
 
 
 		//-----------------------------------------------------------------//
@@ -106,7 +105,50 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void enable(bool ena = true) override
 		{
+			if(ena) set_state(STATE::ENABLE);
+			else set_state(STATE::DISABLE);
 		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画
+		*/
+		//-----------------------------------------------------------------//
+		template<class RDR>
+		void draw(RDR& rdr) noexcept
+		{
+			auto r = get_location();
+			rdr.set_fore_color(graphics::def_color::White);
+			rdr.round_box(r, DEF_DIALOG_ROUND_RADIUS);
+			if(get_touch_state().level_) {
+				rdr.set_fore_color(graphics::def_color::Silver);
+			} else {
+				rdr.set_fore_color(graphics::def_color::Darkgray);
+			}
+			r.org += 2;
+			r.size -= 4;
+			rdr.round_box(r, DEF_DIALOG_ROUND_RADIUS - 2);
+
+			rdr.set_fore_color(graphics::def_color::White);
+			auto sz = rdr.at_font().get_text_size(get_title());
+			rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
+		}
+
+
+		template <class T>
+		dialog& operator + (T& th)
+		{
+			th.set_parents(this);
+			return *this;
+		}
+
+
+		template <class T>
+		dialog& operator += (T& th)
+		{
+			th.set_parents(this);
+			return *this;
+		}
 	};
 }

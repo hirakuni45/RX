@@ -1,37 +1,39 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	クローズ・ボックス・ボタン表示と制御
+	@brief	ボタン表示と制御 @n
+			・領域内で、「押した」、「離した」がある場合に「押された」と認識する。 @n
+			・選択時関数を使わない場合、select_id を監視する事で、状態の変化を認識できる。 @n
+			・select_id は、ボタンが押される度にインクリメントされる。 @n
+			・角がラウンドした四角、又は、円が選択可能。（円の場合、幅と高さを同じにする）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <functional>
-#include "graphics/widget.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	クローズ・ボックス・ボタン・クラス
+		@brief	ボタン・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct closebox : public widget {
+	struct button : public widget {
 
-		typedef closebox value_type;
+		typedef button value_type;
 
-		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
-
-		static constexpr int16_t round_radius = 2;
-		static constexpr int16_t frame_width  = 3;
-		static constexpr int16_t box_size     = 22;		///< サイズが省略された場合の標準的なサイズ
+		/// 選択される度に count が＋１する。（select_id_）
+		typedef std::function<void(uint32_t count)> SELECT_FUNC_TYPE;
 
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
-		bool				enable_;
+		uint32_t			select_id_;
+		bool				circle_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -39,22 +41,29 @@ namespace gui {
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
 			@param[in]	str		ボタン文字列
+			@param[in]	cir		サークル・ボタンの場合「true」 @n
+								※幅、高さが同じでなければならない
 		*/
 		//-----------------------------------------------------------------//
-		closebox(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(), enable_(false)
+		button(const vtx::srect& loc = vtx::srect(0), const char* str = "", bool cir = false) noexcept :
+			widget(loc, str), select_func_(), select_id_(0), circle_(cir)
 		{
-			if(loc.size.x <= 0) {
-				at_location().size.x = box_size;
+			if(get_location().size.x <= 0) {  // 自動で幅を推定する場合
+				auto tlen = 0;
+				if(str != nullptr) {
+					tlen = strlen(str) * 8;  // font::get_text_size(str); を使うべきだが、インスタンスが・・
+				}
+				at_location().size.x = (DEF_BUTTON_FRAME_WIDTH + DEF_BUTTON_TO_STR) * 2 + tlen;
 			}
-			if(loc.size.y <= 0) {
-				at_location().size.y = box_size;
+			if(get_location().size.y <= 0) {
+				at_location().size.y = DEF_BUTTON_HEIGHT;
 			}
 			insert_widget(this);
 		}
 
-		closebox(const closebox& th) = delete;
-		closebox& operator = (const closebox& th) = delete;
+
+		button(const button& th) = delete;
+		button& operator = (const button& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -62,7 +71,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~closebox() { remove_widget(this); }
+		virtual ~button() { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -71,7 +80,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const override { return "CloseBox"; }
+		const char* get_name() const noexcept override { return "Button"; }
 
 
 		//-----------------------------------------------------------------//
@@ -80,7 +89,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const override { return ID::CLOSEBOX; }
+		ID get_id() const noexcept override { return ID::BUTTON; }
 
 
 		//-----------------------------------------------------------------//
@@ -88,7 +97,7 @@ namespace gui {
 			@brief	初期化
 		*/
 		//-----------------------------------------------------------------//
-		void init() override { }
+		void init() noexcept override { }
 
 
 		//-----------------------------------------------------------------//
@@ -96,7 +105,6 @@ namespace gui {
 			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
-			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
@@ -112,8 +120,9 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void exec_select() noexcept override
 		{
+			++select_id_;
 			if(select_func_) {
-				select_func_(enable_);
+				select_func_(select_id_);
 			}
 		}
 
@@ -141,7 +150,7 @@ namespace gui {
 			@return	セレクト ID
 		*/
 		//-----------------------------------------------------------------//
-		bool get_enable() const noexcept { return enable_; }
+		uint32_t get_select_id() const noexcept { return select_id_; }
 
 
 		//-----------------------------------------------------------------//
@@ -155,35 +164,52 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	描画
+			@brief	描画テンプレート
 			@param[in]	rdr		描画インスタンス
 		*/
 		//-----------------------------------------------------------------//
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto font_height = RDR::font_type::height;
-			auto loc = vtx::srect(get_final_position(), get_location().size);
-			loc.size.x = loc.size.y;
-			auto r = loc;
+			auto r = vtx::srect(get_final_position(), get_location().size);
+			rdr.set_fore_color(get_base_color());
 
-			rdr.set_fore_color(graphics::def_color::White);
-			rdr.round_box(r, round_radius);
+			uint8_t inten = 64;
+			if(get_touch_state().level_) {  // 0.75
+				inten = 192;
+			}
 
-			r.org  += frame_width;
-			r.size -= frame_width * 2;
-			rdr.set_fore_color(graphics::def_color::Darkgray);
-			rdr.round_box(r, round_radius - frame_width);
+			if(circle_ && r.size.x == r.size.y) {
+				auto rad = r.size.x / 2;
+				vtx::spos cen(r.center_x(), r.center_y());
+				rdr.fill_circle(cen, rad);
 
-			if(get_touch_state().level_ || enable_) {
-				rdr.set_fore_color(graphics::def_color::White);
-//				r.org  += check_space;
-//				r.size -= check_space * 2;
-				auto s = r.org;
-				auto e = r.org + r.size;
-				rdr.line(s, e);
-				std::swap(s.x, e.x);
-				rdr.line(s, e);
+				graphics::share_color sc(0, 0, 0);
+				sc.set_color(get_base_color().rgba8, inten);
+				rdr.set_fore_color(sc);
+
+				rad -= DEF_BUTTON_FRAME_WIDTH;
+				rdr.fill_circle(cen, rad);
+			} else {
+				rdr.round_box(r, DEF_BUTTON_ROUND_RADIUS);
+
+				graphics::share_color sc(0, 0, 0);
+				sc.set_color(get_base_color().rgba8, inten);
+				rdr.set_fore_color(sc);
+
+				r.org  += DEF_BUTTON_FRAME_WIDTH;
+				r.size -= DEF_BUTTON_FRAME_WIDTH * 2;
+				rdr.round_box(r, DEF_BUTTON_ROUND_RADIUS - DEF_BUTTON_FRAME_WIDTH);
+			}
+
+			rdr.set_fore_color(get_font_color());
+			auto mobj = get_mobj();
+			if(mobj != nullptr) {  // mobj があれば、テキストより優先される。
+				auto sz = rdr.get_mobj_size(mobj);
+				rdr.draw_mobj(r.org + (r.size - sz) / 2, mobj, false);
+			} else {
+				auto sz = rdr.at_font().get_text_size(get_title());
+				rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
 			}
 		}
 	};

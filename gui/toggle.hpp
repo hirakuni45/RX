@@ -1,50 +1,57 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ボックス表示と制御 @n
-			シンプルな描画を行う
+	@brief	トグル（スイッチ）の表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget.hpp"
+#include <functional>
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	フレーム・クラス
+		@brief	トグル・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct box : public widget {
+	struct toggle : public widget {
 
-		typedef box value_type;
+		typedef toggle value_type;
 
-		typedef std::function<void(const vtx::srect& r)> DRAW_FUNC_TYPE;
+		typedef std::function<void(bool state)> SELECT_FUNC_TYPE;
 
 	private:
 
-		DRAW_FUNC_TYPE	draw_func_;
+		SELECT_FUNC_TYPE	select_func_;
+		bool				switch_state_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		フレーム・タイトル
+			@param[in]	first	トグルの初期状態
 		*/
 		//-----------------------------------------------------------------//
-		box(const vtx::srect& loc = vtx::srect(0)) noexcept :
-			widget(loc, nullptr), draw_func_()
+		toggle(const vtx::srect& loc = vtx::srect(0), bool first = false) noexcept :
+			widget(loc, nullptr), select_func_(), switch_state_(first)
 		{
+			if(get_location().size.x <= 0) {  // 自動で幅を推定する場合
+				at_location().size.x = DEF_TOGGLE_WIDTH;
+			}
+			if(get_location().size.y <= 0) {
+				at_location().size.y = DEF_TOGGLE_HEIGHT;
+			}
 			insert_widget(this);
 		}
 
 
-		box(const box& th) = delete;
-		box& operator = (const box& th) = delete;
+		toggle(const toggle& th) = delete;
+		toggle& operator = (const toggle& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -52,7 +59,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~box() noexcept { remove_widget(this); }
+		virtual ~toggle() { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -61,7 +68,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Box"; }
+		const char* get_name() const noexcept override { return "Toggle"; }
 
 
 		//-----------------------------------------------------------------//
@@ -70,7 +77,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::BOX; }
+		ID get_id() const noexcept override { return ID::TOGGLE; }
 
 
 		//-----------------------------------------------------------------//
@@ -86,10 +93,12 @@ namespace gui {
 			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
-			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override { }
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
+		{
+			update_touch_def(pos, num);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -97,7 +106,13 @@ namespace gui {
 			@brief	選択推移
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select() noexcept override { }
+		void exec_select() noexcept override
+		{
+			switch_state_ = !switch_state_;
+			if(select_func_) {
+				select_func_(switch_state_);
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -106,7 +121,7 @@ namespace gui {
 			@param[in]	ena		不許可の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(bool ena = true) override
+		void enable(bool ena = true) noexcept override
 		{
 			if(ena) {
 				set_state(STATE::ENABLE);
@@ -119,28 +134,59 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	描画関数への参照
-			@return	描画関数
+			@brief	トグルスイッチの状態取得
+			@return	トグルスイッチの状態
 		*/
 		//-----------------------------------------------------------------//
-		DRAW_FUNC_TYPE& at_draw_func() noexcept { return draw_func_; }
+		bool get_switch_state() const noexcept { return switch_state_; }
+	
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	セレクト関数への参照
+			@return	セレクト関数
+		*/
+		//-----------------------------------------------------------------//
+		SELECT_FUNC_TYPE& at_select_func() noexcept { return select_func_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	描画
+			@brief	描画テンプレート
+			@param[in]	rdr		描画インスタンス
 		*/
 		//-----------------------------------------------------------------//
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-			if(draw_func_) {
-				draw_func_(r);
-			} else {
-				rdr.set_fore_color(get_base_color());
-				rdr.fill_box(r);
+			rdr.set_fore_color(get_base_color());
+			auto arc = r.size.y / 2;
+			rdr.round_box(r, arc);
+
+			uint8_t inten = 64;
+			if(switch_state_) inten = 128;
+			if(get_touch_state().level_) {  // 0.75
+				inten = 192;
 			}
+			graphics::share_color sc(0, 0, 0);
+			sc.set_color(get_base_color().rgba8, inten);
+			rdr.set_fore_color(sc);
+			r.org  += DEF_TOGGLE_FRAME_WIDTH;
+			r.size -= DEF_TOGGLE_FRAME_WIDTH * 2;
+			arc -= DEF_TOGGLE_FRAME_WIDTH;
+			rdr.round_box(r, arc);
+
+			auto cen = r.org + arc;
+			if(switch_state_) {
+				inten = 255;
+				cen.x = r.org.x + r.size.x - arc - 1;
+			} else {
+				inten = 128;
+			}
+			sc.set_color(get_base_color().rgba8, inten);
+			rdr.set_fore_color(sc);
+			rdr.fill_circle(cen, arc);
 		}
 	};
 }

@@ -1,57 +1,55 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	トグル（スイッチ）の表示と制御
+	@brief	ファイル選択ユーティリティー (widget 版)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <functional>
-#include "graphics/widget.hpp"
+#include "common/file_io.hpp"
+#include "common/fixed_stack.hpp"
+#include "gui/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	トグル・クラス
+		@brief	ファイラー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct toggle : public widget {
+	struct filer : public widget {
 
-		typedef toggle value_type;
+		typedef filer value_type;
 
-		typedef std::function<void(bool state)> SELECT_FUNC_TYPE;
+//		typedef std::function<void(uint32_t pos, uint32_t num)> SELECT_FUNC_TYPE;
 
 	private:
 
-		SELECT_FUNC_TYPE	select_func_;
-		bool				switch_state_;
+		typedef utils::dir_list DLIST;
+		DLIST		dlist_;
+
+		uint16_t	focus_pos_;
+		uint16_t	select_pos_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	first	トグルの初期状態
+			@param[in]	str		タイトル
 		*/
 		//-----------------------------------------------------------------//
-		toggle(const vtx::srect& loc = vtx::srect(0), bool first = false) noexcept :
-			widget(loc, nullptr), select_func_(), switch_state_(first)
+		filer(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
+			widget(loc, str), dlist_(), focus_pos_(0), select_pos_(0)
 		{
-			if(get_location().size.x <= 0) {  // 自動で幅を推定する場合
-				at_location().size.x = DEF_TOGGLE_WIDTH;
-			}
-			if(get_location().size.y <= 0) {
-				at_location().size.y = DEF_TOGGLE_HEIGHT;
-			}
 			insert_widget(this);
 		}
 
 
-		toggle(const toggle& th) = delete;
-		toggle& operator = (const toggle& th) = delete;
+		filer(const filer& th) = delete;
+		filer& operator = (const filer& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -59,7 +57,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~toggle() { remove_widget(this); }
+		virtual ~filer() noexcept { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -68,7 +66,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Toggle"; }
+		const char* get_name() const noexcept override { return "Filer"; }
 
 
 		//-----------------------------------------------------------------//
@@ -77,7 +75,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::TOGGLE; }
+		ID get_id() const noexcept override { return ID::FILER; }
 
 
 		//-----------------------------------------------------------------//
@@ -97,9 +95,26 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
 		{
-			update_touch_def(pos, num);
+			update_touch_def(pos, num, false);
+			const auto& st = get_touch_state();
+			if(st.level_) {
+				if(get_focus()) {
+					auto newpos = st.relative_.y / DEF_FILER_HEIGHT;
+				//	if(newpos >= static_cast<int16_t>(num_)) newpos = num_ - 1;
+				//	else if(newpos < 0) newpos = 0;
+					focus_pos_ = newpos;
+				}
+			}
+			if(st.negative_) {
+				if(get_focus()) {
+					auto newpos = st.relative_.y / DEF_FILER_HEIGHT;
+				//	if(newpos >= 0 && newpos < static_cast<int16_t>(num_)) {
+						select_pos_ = newpos;
+				//	}
+				}
+			}
 		}
-
+	
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -108,10 +123,16 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void exec_select() noexcept override
 		{
-			switch_state_ = !switch_state_;
-			if(select_func_) {
-				select_func_(switch_state_);
-			}
+		}
+	
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイトル更新時処理
+		*/
+		//-----------------------------------------------------------------//
+		void update_title() noexcept override
+		{
 		}
 
 
@@ -134,59 +155,48 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	トグルスイッチの状態取得
-			@return	トグルスイッチの状態
-		*/
-		//-----------------------------------------------------------------//
-		bool get_switch_state() const noexcept { return switch_state_; }
-	
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	セレクト関数への参照
-			@return	セレクト関数
-		*/
-		//-----------------------------------------------------------------//
-		SELECT_FUNC_TYPE& at_select_func() noexcept { return select_func_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	描画テンプレート
-			@param[in]	rdr		描画インスタンス
+			@brief	描画
 		*/
 		//-----------------------------------------------------------------//
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-			rdr.set_fore_color(get_base_color());
-			auto arc = r.size.y / 2;
-			rdr.round_box(r, arc);
+			uint16_t num = r.size.y / DEF_FILER_HEIGHT;
+			r.size.y = DEF_FILER_HEIGHT;
+			for(uint16_t i = 0; i < num; ++i) {
+				uint8_t inten = 64;
+				if(get_touch_state().level_ && focus_pos_ == i) {
+					inten = 192;
+				} else {
+					if(i & 1) {
+						inten = 96;
+					} else {
+						inten = 128;
+					}
+				}
+				graphics::share_color sc(0, 0, 0);
+				sc.set_color(get_base_color().rgba8, inten);
+				rdr.set_fore_color(sc);
+				rdr.fill_box(r);
 
-			uint8_t inten = 64;
-			if(switch_state_) inten = 128;
-			if(get_touch_state().level_) {  // 0.75
-				inten = 192;
-			}
-			graphics::share_color sc(0, 0, 0);
-			sc.set_color(get_base_color().rgba8, inten);
-			rdr.set_fore_color(sc);
-			r.org  += DEF_TOGGLE_FRAME_WIDTH;
-			r.size -= DEF_TOGGLE_FRAME_WIDTH * 2;
-			arc -= DEF_TOGGLE_FRAME_WIDTH;
-			rdr.round_box(r, arc);
+#if 0
+				if(check_draw_ && i == select_pos_) {
+					rdr.set_fore_color(get_base_color());
+					rdr.fill_box(
+						vtx::srect(r.org.x + DEF_MENU_SIGN_SPACE, r.org.y + (r.size.y - DEF_MENU_SIGN_SIZE) / 2,
+						DEF_MENU_SIGN_SIZE, DEF_MENU_SIGN_SIZE));
+				}
 
-			auto cen = r.org + arc;
-			if(switch_state_) {
-				inten = 255;
-				cen.x = r.org.x + r.size.x - arc - 1;
-			} else {
-				inten = 128;
+				char tmp[32];
+				if(utils::str::get_word(get_title(), i, tmp, sizeof(tmp), ',')) {
+					auto sz = rdr.at_font().get_text_size(tmp);
+					rdr.set_fore_color(get_font_color());
+					rdr.draw_text(r.org + (r.size - sz) / 2, tmp);
+				}
+#endif
+				r.org.y += DEF_FILER_HEIGHT;
 			}
-			sc.set_color(get_base_color().rgba8, inten);
-			rdr.set_fore_color(sc);
-			rdr.fill_circle(cen, arc);
 		}
 	};
 }

@@ -17,12 +17,12 @@
 #include "graphics/img_in.hpp"
 #include "graphics/root_menu.hpp"
 #include "graphics/simple_dialog.hpp"
-#include "graphics/filer.hpp"
+#include "graphics/simple_filer.hpp"
 #include "chip/FT5206.hpp"
 
 #include "common/spi_io2.hpp"
 
-#include "graphics/widget_director.hpp"
+#include "gui/widget_director.hpp"
 
 #define USE_SDHI
 
@@ -123,8 +123,8 @@ namespace app {
 
 		typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 #endif
-		typedef gui::filer_base FILER_BASE;
-		typedef gui::filer<RENDER> FILER;
+		typedef gui::simple_filer_base FILER_BASE;
+		typedef gui::simple_filer<RENDER> FILER;
 
 		typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
 

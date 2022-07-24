@@ -22,7 +22,7 @@
 #include "graphics/kfont.hpp"
 #include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
-#include "graphics/filer.hpp"
+#include "graphics/simple_filer.hpp"
 #include "graphics/simple_dialog.hpp"
 #include "graphics/root_menu.hpp"
 
@@ -180,8 +180,8 @@ namespace {
 	typedef gui::simple_dialog<RENDER, FAMIPAD> DIALOG;
 	DIALOG		dialog_(render_, famipad_);
 
-	typedef gui::filer_base FILER_BASE;
-	typedef gui::filer<RENDER> FILER;
+	typedef gui::simple_filer_base FILER_BASE;
+	typedef gui::simple_filer<RENDER> FILER;
 	FILER		filer_(render_);
 
 	typedef gui::back_btn<RENDER> BACK_BTN;

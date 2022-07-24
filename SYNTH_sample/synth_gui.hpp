@@ -8,7 +8,9 @@
                 https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget_director.hpp"
+#include "gui/widget_director.hpp"
+
+#include "graphics/simple_filer.hpp"
 
 #include "keyboard.hpp"
 
@@ -76,8 +78,8 @@ namespace synth {
 
 		uint32_t	oct_idx_;
 
-		typedef gui::filer_base FILER_BASE;
-		typedef gui::filer<RENDER> FILER;
+		typedef gui::simple_filer_base FILER_BASE;
+		typedef gui::simple_filer<RENDER> FILER;
 		FILER		filer_;
 		uint32_t	ctrl_;
 		bool		filer_state_;

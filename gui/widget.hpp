@@ -38,7 +38,7 @@ namespace gui {
 		static constexpr int16_t DEF_SLIDER_HANDLE_SIZE   = 20;	///< 標準、スライダー、ハンドルの大きさ
 
 		static constexpr int16_t DEF_MENU_ROUND_RADIUS    = 6;	///< 標準、メニュー、コーナー半径
-		static constexpr int16_t DEF_MENU_HEIGHT          = 28;	///< 標準、メニュー、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_MENU_HEIGHT          = 28;	///< 標準、メニュー、アイテムの高さ
 		static constexpr int16_t DEF_MENU_SIGN_SPACE      = 5;	///< 標準、メニュー、サインまでの隙間
 		static constexpr int16_t DEF_MENU_SIGN_SIZE       = 6;	///< 標準、メニュー、サインの大きさ
 
@@ -67,6 +67,9 @@ namespace gui {
 		static constexpr int16_t DEF_PROGRESS_HEIGHT      = 24;	///< 標準、プログレスバー、サイズが省略された場合の高さ
 		static constexpr int16_t DEF_PROGRESS_FRAME_WIDTH = 2;	///< 標準、プログレスバー、フレーム幅
 
+		static constexpr int16_t DEF_FILER_HEIGHT         = 20;	///< 標準、ファイラー、アイテムの高さ
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	widget ID
@@ -89,6 +92,7 @@ namespace gui {
 			TOGGLE,		///< トグルスイッチ
 			PROGRESS,	///< プログレスバー
 			CLOSEBOX,	///< クローズボックス
+			FILER,		///< ファイラー
 		};
 
 

@@ -21,10 +21,10 @@
 #include "common/tpu_io.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/graphics.hpp"
-#include "graphics/filer.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/font.hpp"
 #include "graphics/simple_dialog.hpp"
+#include "graphics/simple_filer.hpp"
 
 #include "chip/FT5206.hpp"
 
