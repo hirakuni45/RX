@@ -38,7 +38,8 @@
 			! 2022/07/07 20:52- %g の自動（有効桁６桁）フォーマットの対応。(v96) @n
 			! 2022/07/11 14:08- nan の識別と表示、及びテストの対応。(V97) @n
 			! 2022/07/13 14:45- %Ng の自動（Ｎの有効桁がある場合）フォーマットの対応。(V98) @n
-			! 2022/07/14 13:31- 内部処理で、’if’ 文 から 'switch' へ変更（速度改善？、見やすさに貢献）(V99)
+			! 2022/07/14 13:31- 内部処理で、’if’ 文 から 'switch' へ変更（速度改善？、見やすさに貢献）(V99) @n
+			! 2022/07/24 17:48- V99 で変更した処理の不具合、'%%' の処理 (V100) 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -397,7 +398,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class base_format {
 	public:
-		static constexpr uint16_t VERSION = 99;		///< バージョン番号（整数）
+		static constexpr uint16_t VERSION = 100;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -595,6 +596,7 @@ namespace utils {
 					case '%':
 						chaout_(ch);
 						md = apmd::none;
+						break;
 					default:
 						error_ = error::unknown;
 						return;
