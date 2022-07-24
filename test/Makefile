@@ -22,8 +22,9 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c \
-				tinyusb/src/tusb.c \
+				common/syscalls.c
+
+#				tinyusb/src/tusb.c \
 				tinyusb/src/common/tusb_fifo.c \
 				tinyusb/src/device/usbd.c \
 				tinyusb/src/device/usbd_control.c \
@@ -48,8 +49,8 @@ CSOURCES	=	common/init.c \
 				tinyusb/src/host/usbh_control.c \
 				tinyusb/src/portable/ohci/ohci.c
 
-PSOURCES	=	main.cpp \
- 				dcd_usb.cpp \
+PSOURCES	=	main.cpp
+# 				dcd_usb.cpp \
  				hcd_usb.cpp
 
 USER_LIBS	=	supc++
