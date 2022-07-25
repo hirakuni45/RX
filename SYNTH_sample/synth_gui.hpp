@@ -153,21 +153,21 @@ namespace synth {
 
             keyboard_.start();
 
-			filer_run_.enable();
+			filer_run_.set_layer(WIDGET::LAYER::_0);
 			filer_run_.at_select_func() = [this](uint32_t id) {
 				FILER_BASE::set(FILER_BASE::ctrl::OPEN, ctrl_);
 			};
 
-			sc_idx_m_.enable();
+			sc_idx_m_.set_layer(WIDGET::LAYER::_0);
 			sc_idx_m_.at_select_func() = [this](uint32_t id) {
 				if(sc_idx_ > 0) {
 					sc_idx_--;
 				}
 			};
 
-			sc_name_.enable();
+			sc_name_.set_layer(WIDGET::LAYER::_0);
 
-			sc_idx_p_.enable();
+			sc_idx_p_.set_layer(WIDGET::LAYER::_0);
 			sc_idx_p_.at_select_func() = [this](uint32_t id) {
 				++sc_idx_;
 				if(sc_idx_ >= SC_NUM) {
@@ -175,30 +175,32 @@ namespace synth {
 				}
 			};
 
-			test_play_.enable();
+			test_play_.set_layer(WIDGET::LAYER::_0);
 			test_play_.at_select_func() = [this](uint32_t id) {
 				
 			};
 
 			sc_idx_before_ = SC_NUM;
 
-			octave_m_.enable();
+			octave_m_.set_layer(WIDGET::LAYER::_0);
 			octave_m_.at_select_func() = [this](uint32_t) {
 				if(oct_idx_ > 0) {
 					oct_idx_--;
 				}
 			};
 
-			octave_d_.enable();
+			octave_d_.set_layer(WIDGET::LAYER::_0);
 			octave_d_.enable_read_only();
 
-			octave_p_.enable();
+			octave_p_.set_layer(WIDGET::LAYER::_0);
 			octave_p_.at_select_func() = [this](uint32_t) {
 				++oct_idx_;
 				if(oct_idx_ >= OCT_NUM) {
 					oct_idx_ = OCT_NUM - 1;
 				}
 			};
+
+			widd_.enable(WIDGET::LAYER::_0);
         }
 
 

@@ -8,9 +8,9 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/file_io.hpp"
-#include "common/fixed_stack.hpp"
 #include "gui/widget.hpp"
+#include "common/file_io.hpp"
+#include "common/fixed_string.hpp"
 
 namespace gui {
 
@@ -32,6 +32,17 @@ namespace gui {
 
 		uint16_t	focus_pos_;
 		uint16_t	select_pos_;
+		uint16_t	offset_;
+
+		typedef utils::fixed_string<255> STRING;
+
+		struct file_info {
+			STRING		fn;
+			uint32_t	fs;
+			bool		dir;
+			file_info() noexcept : fn(), fs(0), dir(false) { }
+		};
+		file_info	file_info_[DEF_FILER_LOOP];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -42,7 +53,9 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		filer(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
-			widget(loc, str), dlist_(), focus_pos_(0), select_pos_(0)
+			widget(loc, str),
+			dlist_(), focus_pos_(0), select_pos_(0), offset_(0),
+			file_info_{ }
 		{
 			insert_widget(this);
 		}
@@ -99,19 +112,30 @@ namespace gui {
 			const auto& st = get_touch_state();
 			if(st.level_) {
 				if(get_focus()) {
-					auto newpos = st.relative_.y / DEF_FILER_HEIGHT;
+				//	auto newpos = st.relative_.y / DEF_FILER_HEIGHT;
 				//	if(newpos >= static_cast<int16_t>(num_)) newpos = num_ - 1;
 				//	else if(newpos < 0) newpos = 0;
-					focus_pos_ = newpos;
+				//	focus_pos_ = newpos;
 				}
 			}
 			if(st.negative_) {
 				if(get_focus()) {
-					auto newpos = st.relative_.y / DEF_FILER_HEIGHT;
+				//	auto newpos = st.relative_.y / DEF_FILER_HEIGHT;
 				//	if(newpos >= 0 && newpos < static_cast<int16_t>(num_)) {
-						select_pos_ = newpos;
+				//		select_pos_ = newpos;
 				//	}
 				}
+			}
+
+			if(dlist_.probe()) {
+				dlist_.service(DEF_FILER_LOOP,
+					[this](const char* name, const FILINFO* fi, bool dir, void* option) {
+						auto info = static_cast<file_info*>(option);
+						auto idx = dlist_.get_total() % DEF_FILER_LOOP;
+						info[idx].fn = name;
+						info[idx].fs = fi->fsize;
+						info[idx].dir = dir;
+					}, true, file_info_);
 			}
 		}
 	
@@ -125,16 +149,6 @@ namespace gui {
 		{
 		}
 	
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	タイトル更新時処理
-		*/
-		//-----------------------------------------------------------------//
-		void update_title() noexcept override
-		{
-		}
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -155,6 +169,19 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ルートパス設定（取得開始）
+			@param[in] root	ルートパス
+		*/
+		//-----------------------------------------------------------------//
+		void set_root(const char* root) noexcept
+		{
+			dlist_.stop();
+			dlist_.start(root);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	描画
 		*/
 		//-----------------------------------------------------------------//
@@ -162,7 +189,9 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-			uint16_t num = r.size.y / DEF_FILER_HEIGHT;
+			rdr.push_clip();
+			rdr.set_clip(r);
+			uint16_t num = (r.size.y + DEF_FILER_HEIGHT - 1) / DEF_FILER_HEIGHT;
 			r.size.y = DEF_FILER_HEIGHT;
 			for(uint16_t i = 0; i < num; ++i) {
 				uint8_t inten = 64;
@@ -197,6 +226,7 @@ namespace gui {
 #endif
 				r.org.y += DEF_FILER_HEIGHT;
 			}
+			rdr.pop_clip();
 		}
 	};
 }

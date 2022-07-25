@@ -202,6 +202,7 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void start() noexcept
 		{
+			ch0_btn_.set_layer(WIDGET::LAYER::_0);
 			ch0_btn_.set_base_color(CH0_COLOR);
 			ch0_btn_.enable();
 			ch0_btn_.at_select_func() = [=](uint32_t id) {
@@ -215,6 +216,7 @@ namespace dsos {
 				}
 			};
 
+			ch1_btn_.set_layer(WIDGET::LAYER::_0);
 			ch1_btn_.set_base_color(CH1_COLOR);
 			ch1_btn_.enable();
 			ch1_btn_.at_select_func() = [=](uint32_t id) {
@@ -228,6 +230,7 @@ namespace dsos {
 				}
 			};
 
+			smp_btn_.set_layer(WIDGET::LAYER::_0);
 			smp_btn_.set_base_color(SMP_COLOR);
 			smp_btn_.enable();
 			smp_btn_.at_select_func() = [=](uint32_t id) {
@@ -243,7 +246,7 @@ namespace dsos {
 				}
 			};
 
-
+			trg_btn_.set_layer(WIDGET::LAYER::_0);
 			trg_btn_.set_base_color(TRG_COLOR);
 			trg_btn_.enable();
 			trg_btn_.at_select_func() = [=](uint32_t id) {
@@ -255,7 +258,7 @@ namespace dsos {
 				}
 			};
 
-
+			mes_btn_.set_layer(WIDGET::LAYER::_0);
 			mes_btn_.set_base_color(MES_COLOR);
 			mes_btn_.enable();
 			mes_btn_.at_select_func() = [=](uint32_t id) {
@@ -266,8 +269,10 @@ namespace dsos {
 					render_wave_.set_measere(static_cast<MEASERE>(mes_menu_.get_select_pos()));
 				}
 			};
+			mes_menu_.set_layer(WIDGET::LAYER::_0);
 			mes_menu_.set_base_color(MES_COLOR);
 
+			opt_btn_.set_layer(WIDGET::LAYER::_0);
 			opt_btn_.enable();
 			opt_btn_.at_select_func() = [=](uint32_t id) {
 //				bool ena = opt_menu_.get_state() == WIDGET::STATE::ENABLE;
@@ -275,18 +280,25 @@ namespace dsos {
 			};
 
 //			ch0_mult_menu_.set_base_color(CH0_COLOR);
+			ch0_mode_menu_.set_layer(WIDGET::LAYER::_0);
 			ch0_mode_menu_.set_base_color(CH0_COLOR);
+			ch0_volt_menu_.set_layer(WIDGET::LAYER::_0);
 			ch0_volt_menu_.set_base_color(CH0_COLOR);
 //			ch1_mult_menu_.set_base_color(CH1_COLOR);
+			ch1_mode_menu_.set_layer(WIDGET::LAYER::_0);
 			ch1_mode_menu_.set_base_color(CH1_COLOR);
+			ch1_volt_menu_.set_layer(WIDGET::LAYER::_0);
 			ch1_volt_menu_.set_base_color(CH1_COLOR);
+			trg_menu_.set_layer(WIDGET::LAYER::_0);
 			trg_menu_.set_base_color(TRG_COLOR);
 
+			smp_unit_menu_.set_layer(WIDGET::LAYER::_0);
 			smp_unit_menu_.set_base_color(SMP_COLOR);
 			smp_unit_menu_.at_select_func() = [=](uint32_t pos, uint32_t num) {
 				smp_unit_ = pos;
 				setup_smp_fine_();
 			};
+			smp_fine_menu_.set_layer(WIDGET::LAYER::_0);
 			smp_fine_menu_.set_base_color(SMP_COLOR);
 			smp_fine_menu_.at_select_func() = [=](uint32_t pos, uint32_t num) {
 				smp_fine_ = pos;

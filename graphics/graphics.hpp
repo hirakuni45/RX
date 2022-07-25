@@ -14,6 +14,7 @@
 #include "common/intmath.hpp"
 #include "common/circle.hpp"
 #include "common/vtx.hpp"
+#include "common/fixed_stack.hpp"
 
 #include <cmath>
 
@@ -29,6 +30,8 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class GLC, class FONT = font_null>
 	class render {
+
+		static constexpr uint32_t CLIP_STACK_SIZE = 4;  ///< clipping stack size
 
 		GLC&		glc_;
 
@@ -53,6 +56,8 @@ namespace graphics {
 		share_color	fore_color_;
 		share_color	back_color_;
 		vtx::srect	clip_;
+		typedef utils::fixed_stack<vtx::srect, CLIP_STACK_SIZE> CLIP_STACK;
+		CLIP_STACK	clip_stack_;
 
 		uint32_t	stipple_;
 		uint32_t	stipple_mask_;
@@ -95,7 +100,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		render(GLC& glc, FONT& font) noexcept : glc_(glc), font_(font),
 			fore_color_(255, 255, 255), back_color_(0, 0, 0),
-			clip_(0, 0, GLC::width, GLC::height),
+			clip_(0, 0, GLC::width, GLC::height), clip_stack_(),
 			stipple_(-1), stipple_mask_(1), ofs_(0)
 		{
 			fb_ = static_cast<T*>(glc_.get_fbp());
@@ -230,25 +235,49 @@ namespace graphics {
 		void swap_color() noexcept { std::swap(fore_color_, back_color_); }
 
 
-        //-----------------------------------------------------------------//
-        /*!
-            @brief  クリッピング領域の設定
-            @param[in]  clip    クリッピング領域
-        */
-        //-----------------------------------------------------------------//
-        void set_clip(const vtx::srect& clip) noexcept
-        {
-            clip_ = clip;
-        }
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クリッピング領域の設定
+			@param[in]  clip    クリッピング領域
+		*/
+		//-----------------------------------------------------------------//
+		void set_clip(const vtx::srect& clip) noexcept
+		{
+			clip_ = clip;
+		}
 
 
-        //-----------------------------------------------------------------//
-        /*!
-            @brief  クリッピング領域の取得
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クリッピング領域の取得
 			@return クリッピング領域
-        */
-        //-----------------------------------------------------------------//
-        const auto& get_clip() const noexcept { return clip_; }
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_clip() const noexcept { return clip_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クリッピング領域の退避
+		*/
+		//-----------------------------------------------------------------//
+		void push_clip() noexcept
+		{
+			clip_stack_.push(clip_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クリッピング領域の復帰
+		*/
+		//-----------------------------------------------------------------//
+		void pop_clip() noexcept
+		{
+			if(!clip_stack_.empty()) {
+				clip_ = clip_stack_.pop();
+			}
+		}
 
 
 		//-----------------------------------------------------------------//

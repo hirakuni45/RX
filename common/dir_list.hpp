@@ -36,7 +36,7 @@ namespace utils {
 		uint32_t	total_;
 		char		nmb_[256];
 
-		bool		init_;
+		bool		start_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -44,7 +44,7 @@ namespace utils {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		dir_list() noexcept : dir_(), total_(0), nmb_{ 0 }, init_(false) { }
+		dir_list() noexcept : dir_(), total_(0), nmb_{ 0 }, start_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -53,7 +53,7 @@ namespace utils {
 			@return 取得中なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool probe() const noexcept { return init_; }
+		bool probe() const noexcept { return start_; }
 
 
 		//-----------------------------------------------------------------//
@@ -83,7 +83,7 @@ namespace utils {
 				return false;
 			}
 
-			init_ = true;
+			start_ = true;
 
 			return true;
 		}
@@ -97,9 +97,9 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		bool stop() noexcept
 		{
-			if(!init_) return false;
+			if(!start_) return false;
 
-			init_ = false;
+			start_ = false;
 			f_closedir(&dir_);
 			return true;
 		}
@@ -117,13 +117,12 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		bool service(uint32_t num, loop_func func, bool todir = false, void* option = nullptr) noexcept
 		{
-			if(!init_) return false;
+			if(!start_) return false;
 
 			for(uint32_t i = 0; i < num; ++i) {
 				FILINFO fi;
 				// Read a directory item
 				if(f_readdir(&dir_, &fi) != FR_OK) {
-					init_ = false;
 					stop();
 					return false;
 				}

@@ -16,6 +16,7 @@
 #include "dave_driver.h"
 
 #include "common/vtx.hpp"
+#include "common/fixed_stack.hpp"
 
 ///#include "drw2d/box.hpp"
 
@@ -34,6 +35,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class GLC, class FONT>
 	class drw2d_mgr {
+
+		static constexpr uint32_t CLIP_STACK_SIZE = 4;  ///< clipping stack size
+
 	public:
 		typedef uint16_t value_type;
 		typedef graphics::def_color DEF_COLOR;
@@ -58,6 +62,8 @@ namespace device {
 		COLOR		fore_color_;
 		COLOR		back_color_;
 		vtx::srect	clip_;
+		typedef utils::fixed_stack<vtx::srect, CLIP_STACK_SIZE> CLIP_STACK;
+		CLIP_STACK	clip_stack_;
 		int16_t		pen_size_;
 		bool		set_fore_color_;
 		bool		set_back_color_;
@@ -179,7 +185,7 @@ namespace device {
 			stipple_(-1), stipple_mask_(1),
 			d2_(nullptr),
 			fore_color_(DEF_COLOR::White), back_color_(DEF_COLOR::Black),
-			clip_(0, 0, GLC::width, GLC::height),
+			clip_(0, 0, GLC::width, GLC::height), clip_stack_(),
 			pen_size_(16),
 			set_fore_color_(false), set_back_color_(false),
 			set_clip_(false), start_frame_enable_(false),
@@ -400,6 +406,30 @@ namespace device {
 		const auto& get_clip() const noexcept { return clip_; }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クリッピング領域の退避
+		*/
+		//-----------------------------------------------------------------//
+		void push_clip() noexcept
+		{
+			clip_stack_.push(clip_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クリッピング領域の復帰
+		*/
+		//-----------------------------------------------------------------//
+		void pop_clip() noexcept
+		{
+			if(!clip_stack_.empty()) {
+				clip_ = clip_stack_.pop();
+			}
+		}
+ 
+  
         //-----------------------------------------------------------------//
         /*!
             @brief  破線パターンの設定

@@ -27,6 +27,7 @@
 #include "gui/progress.hpp"
 #include "gui/closebox.hpp"
 #include "gui/filer.hpp"
+#include "gui/key_asc.hpp"
 
 namespace gui {
 
@@ -484,6 +485,13 @@ namespace gui {
 				case widget::ID::FILER:
 					{
 						auto* w = dynamic_cast<filer*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::KEY_ASC:
+					{
+						auto* w = dynamic_cast<key_asc*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}
