@@ -125,6 +125,8 @@ namespace app {
 		typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
 		WIDD	widd_;
 
+		typedef gui::widget WIDGET;
+
 		typedef gui::text TEXT;
 		TEXT	album_;
 		TEXT	title_;
@@ -466,46 +468,47 @@ namespace app {
 		//-------------------------------------------------------------//
 		void open() noexcept
 		{
-			album_.enable();
+			album_.set_layer(WIDGET::LAYER::_0);
 			album_.set_base_color(DEF_COLOR::DarkSafeColor);
-			title_.enable();
+			title_.set_layer(WIDGET::LAYER::_0);
 			title_.set_base_color(DEF_COLOR::LightSafeColor);
-			artist_.enable();
+			artist_.set_layer(WIDGET::LAYER::_0);
 			artist_.set_base_color(DEF_COLOR::DarkSafeColor);
-			year_.enable();
+			year_.set_layer(WIDGET::LAYER::_0);
 			year_.set_base_color(DEF_COLOR::LightSafeColor);
-			info_.enable();
+			info_.set_layer(WIDGET::LAYER::_0);
 			info_.set_base_color(DEF_COLOR::DarkSafeColor);
-			time_.enable();
+			time_.set_layer(WIDGET::LAYER::_0);
 			time_.set_base_color(DEF_COLOR::LightSafeColor);
 
 			slider_.enable_read_only();
+			slider_.set_layer(WIDGET::LAYER::_0);
 			slider_.enable(false);
 
-			select_.enable();
+			select_.set_layer(WIDGET::LAYER::_0);
             select_.at_select_func() = [this](uint32_t id) {
 				FILER_BASE::set(FILER_BASE::ctrl::OPEN, ctrl_);
 			};
 
-			rew_.enable();
+			rew_.set_layer(WIDGET::LAYER::_0);
 			rew_.at_select_func() = [this](uint32_t id) {
 				play_rew_.send();
 			};
-			play_.enable();
+			play_.set_layer(WIDGET::LAYER::_0);
 			play_.at_select_func() = [this](uint32_t id) {
 				play_pause_.send();
 			};
-			ff_.enable();
+			ff_.set_layer(WIDGET::LAYER::_0);
 			ff_.at_select_func() = [this](uint32_t id) {
 				play_ff_.send();
 			};
-			level_l_.enable();
+			level_l_.set_layer(WIDGET::LAYER::_0);
 			level_l_.at_draw_func() = [this](const vtx::srect& r) {
 				render_level_(r, peak_level_l_, peak_hold_l_);
 				render_.set_fore_color(graphics::def_color::White);
 				render_.draw_font(vtx::spos(r.org.x+1, r.org.y+2), 'L'); 
 			};
-			level_r_.enable();
+			level_r_.set_layer(WIDGET::LAYER::_0);
 			level_r_.at_draw_func() = [this](const vtx::srect& r) {
 				render_level_(r, peak_level_r_, peak_hold_r_);
 				render_.set_fore_color(graphics::def_color::White);
@@ -522,6 +525,8 @@ namespace app {
 		//-------------------------------------------------------------//
 		void enable(bool ena = true) noexcept
 		{
+			widd_.enable(WIDGET::LAYER::_0, ena);
+#if 0
 			album_.enable(ena);
 			title_.enable(ena);
 			artist_.enable(ena);
@@ -538,6 +543,7 @@ namespace app {
 
 			level_l_.enable(ena);
 			level_r_.enable(ena);
+#endif
 		}
 
 
