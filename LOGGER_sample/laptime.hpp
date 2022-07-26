@@ -69,10 +69,12 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() override
 		{
+			button_.set_layer(gui::widget::LAYER::_0);
 			button_.enable();
 			button_.at_select_func() = [this](uint32_t id) {
 				change_scene(scene_id::root_menu);
 			};
+			slider_.set_layer(gui::widget::LAYER::_0);
 			slider_.enable();
 
 			at_scenes_base().at_cmt().at_task().enable();
