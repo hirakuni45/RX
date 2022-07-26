@@ -24,6 +24,7 @@ namespace app {
 		typedef scenes_base::RENDER RENDER;
 		typedef graphics::def_color DEF_COLOR;
 
+		typedef gui::widget WIDGET;
 		gui::button		button_;
 		gui::check		lap_button_check_;
 
@@ -49,10 +50,12 @@ namespace app {
 		{
 			at_scenes_base().at_render().clear(DEF_COLOR::Black);
 
+			button_.set_layer(WIDGET::LAYER::_0);
 			button_.enable();
 			button_.at_select_func() = [this](uint32_t id) {
 				change_scene(scene_id::root_menu);
 			};
+			lap_button_check_.set_layer(WIDGET::LAYER::_0);
 			lap_button_check_.enable();
 //			check_.at_select_func() = [this](bool ena) {
 //				utils::format("Check: %d\n") % static_cast<int>(ena);

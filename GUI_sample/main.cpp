@@ -12,6 +12,7 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/sci_i2c_io.hpp"
+#include "common/fixed_string.hpp"
 
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
@@ -165,10 +166,15 @@ namespace {
 
 	typedef gui::button BUTTON;	BUTTON	prev_(vtx::srect(5, 272-45, 40, 40), "<", true);
 
+	TEXT		key_text_(vtx::srect(10, 10, 200, 20));
+	typedef gui::key_asc KEY_ASC;
+	KEY_ASC		key_asc_(vtx::srect(0, 60, 0, 0));
+
 	typedef gui::filer FILER;
 	FILER		filer_(vtx::srect(10, 10, 300, 200));
 
 	float		progress_ratio_ = 0.0f;
+	utils::fixed_string<20> key_buff_;
 
 	void setup_gui_()
 	{
@@ -301,9 +307,17 @@ namespace {
 			widd_.enable(WIDGET::LAYER::_1, false);
 		};
 
-		filer_.set_layer(WIDGET::LAYER::_1);
+		key_text_.set_layer(WIDGET::LAYER::_1);
+		key_text_.enable_scroll(false);
+		key_text_.set_title(key_buff_.c_str());
 
+		key_asc_.set_layer(WIDGET::LAYER::_1);
+		key_asc_.at_select_func() = [=](char code) {
+			key_buff_ += code;
+			key_text_.set_update();
+		};
 
+//		filer_.set_layer(WIDGET::LAYER::_1);
 
 		widd_.enable(WIDGET::LAYER::_0);
 	}

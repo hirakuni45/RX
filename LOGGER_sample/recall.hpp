@@ -45,6 +45,7 @@ namespace app {
 		{
 			at_scenes_base().at_render().clear(DEF_COLOR::Black);
 
+			button_.set_layer(gui::widget::LAYER::_0);
 			button_.enable();
 			button_.at_select_func() = [this](uint32_t id) {
 				change_scene(scene_id::root_menu);
