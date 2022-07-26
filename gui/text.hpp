@@ -44,7 +44,7 @@ namespace gui {
 			@param[in]	str		初期文字列
 		*/
 		//-----------------------------------------------------------------//
-		text(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+		text(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
 			widget(loc, str),
 			enable_scroll_(true), text_draw_h_(0), scroll_h_(0),
 			scroll_speed_(SCROLL_SPEED_FRAME), scroll_delay_(0), scroll_wait_(SCROLL_WAIT_FRAME)
