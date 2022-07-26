@@ -312,9 +312,11 @@ namespace {
 		key_text_.set_title(key_buff_.c_str());
 
 		key_asc_.set_layer(WIDGET::LAYER::_1);
-		key_asc_.at_select_func() = [=](char code) {
+		key_asc_.at_select_func() = [=](char code, KEY_ASC::KEY_MAP key_map) {
 			key_buff_ += code;
 			key_text_.set_update();
+			auto map = static_cast<uint16_t>(key_map);
+			utils::format("0x%02X (%d): '%c'\n") % map % map % code; 
 		};
 
 //		filer_.set_layer(WIDGET::LAYER::_1);

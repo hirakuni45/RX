@@ -36,7 +36,76 @@ namespace gui {
 
 		typedef key_asc value_type;
 
-		typedef std::function<void(char)> SELECT_FUNC_TYPE;
+		//=============================================================//
+		/*!
+			@brief	キーマップ型
+		*/
+		//=============================================================//
+		enum class KEY_MAP : uint8_t {
+			ORG,	///< ` ~
+			_1,		///< 1 !
+			_2,		///< 2 @
+			_3,		///< 3 #
+			_4,		///< 4 $
+			_5,		///< 5 %
+			_6,		///< 6 ^
+			_7,		///< 7 &
+			_8,		///< 8 *
+			_9,		///< 9 (
+			_0,		///< 0 )
+			MI_US,	///< - _
+			EQ_PS,	///< = +
+			BS,		///< BackSpace
+			TAB,	///< TAB
+			Q,		///< Q q
+			W,		///< W w
+			E,		///< E e
+			R,		///< R r
+			T,		///< T t
+			Y,		///< Y y
+			U,		///< U u
+			I,		///< I i
+			O,		///< O o
+			P,		///< P p
+			LEFT,	///< [ {
+			RIGHT,	///< ] }
+			BASL,	///< BackSlash |
+			CA_LK,	///< CapsLock
+			A,		///< A a
+			S,		///< S s
+			D,		///< D d
+			F,		///< F f
+			G,		///< G g
+			H,		///< H h
+			J,		///< J j
+			K,		///< K k
+			L,		///< L l
+			COLN,	///< ; :
+			AP_DQ,	///< ' "
+			ENTER,	///< Enter
+			SHIFT_L,	///< ShiftLeft
+			Z,		///< Z Z
+			X,		///< X x
+			C,		///< C c
+			V,		///< V v
+			B,		///< B b
+			N,		///< N n
+			M,		///< M m
+			KA_LI,	///< , <
+			CO_LR,	///< . >
+			SL_QS,	///< / ?
+			SHIFT_R,	///< ShiftRight
+			CTRL,	///< Ctrl
+			ALT,	///< Alt
+			SPACE,	///< Space
+			FN,		///< Function
+			A_LEFT,		///< Arrow Left
+			A_DOWN,		///< Arrow Down
+			A_RIGHT,	///< Arrow Right
+			A_UP		///< Arrow Up
+		};
+
+		typedef std::function<void(char, KEY_MAP)> SELECT_FUNC_TYPE;
 
 	private:
 		static constexpr int16_t space = 2;
@@ -162,7 +231,12 @@ namespace gui {
 
 		SELECT_FUNC_TYPE	select_func_;
 		char	code_;
+		uint8_t	key_map_;
 		bool	shift_;
+		bool	ctrl_;
+		bool	alt_;
+		bool	lock_;
+		bool	fn_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -173,7 +247,8 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		key_asc(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
 			widget(loc, str), key_{ },
-			select_func_(), code_(0), shift_(false)
+			select_func_(), code_(0xff), key_map_(0),
+			shift_(false), ctrl_(false), alt_(false), lock_(false), fn_(false)
 		{
 			at_location().size.x = 13 * sp_x + sz2x + space;
 			at_location().size.y = sp_y * 5;
@@ -243,16 +318,28 @@ namespace gui {
 				k.negative = (!level &&  k.level);
 				k.level = level;
 				if(k.positive) {
+					key_map_ = i;
 					auto code = key_locations_[i].code;
 					if(code == KEY_SHIFT_RIGHT || code == KEY_SHIFT_LEFT) {
 						shift_ = !shift_;
 						all = true;
 					} else if(code == KEY_CAPS_LOCK) {
+						lock_ = !lock_;
+						all = true;
 					} else if(code == KEY_CTRL) {
+						ctrl_ = !ctrl_;
 					} else if(code == KEY_ALT) {
+						alt_ = !alt_;
 					} else if(code == KEY_FN) {
+						fn_ = !fn_;
 					} else {
-						if(shift_) {
+						if(ctrl_) {
+							if(code >= 'A') {
+								code_ = code - 0x40;
+							} else {
+								code_ = code;
+							}
+						} else if(shift_) {
 							code_ = key_locations_[i].shift;
 						} else {
 							code_ = key_locations_[i].code;
@@ -285,11 +372,11 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void exec_select() noexcept override
 		{
-			if(code_ != 0) {
+			if(code_ != 0xff) {
 				if(select_func_) {
-					select_func_(code_);
+					select_func_(code_, static_cast<KEY_MAP>(key_map_));
 				}
-				code_ = 0;
+				code_ = 0xff;
 			}
 		}
 
@@ -430,4 +517,3 @@ namespace gui {
 		}
 	};
 }
-
