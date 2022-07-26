@@ -29,7 +29,6 @@ CSOURCES	=	common/init.c \
 				graphics/picojpeg.c
 
 PSOURCES	=	main.cpp \
-				graphics/font8x16.cpp \
 				common/stdapi.cpp
 
 USER_LIBS	=	supc++ drw2d png m z

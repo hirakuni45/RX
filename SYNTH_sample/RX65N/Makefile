@@ -33,7 +33,6 @@ CSOURCES	=	common/init.c \
 				common/time.c
 
 PSOURCES	=	$(ROOT)/main.cpp \
-				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
 				common/stdapi.cpp \
 				sound/synth/dx7note.cpp \

@@ -21,8 +21,7 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	main.cpp \
-				graphics/font8x16.cpp
+PSOURCES	=	main.cpp
 
 USER_LIBS	=	m
 
