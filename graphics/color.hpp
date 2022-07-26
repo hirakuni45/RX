@@ -93,6 +93,9 @@ namespace graphics {
 		uint16_t	rgb565;
 		color_t		rgba8;
 
+		explicit share_color() noexcept :
+			rgb565(to_565(0, 0, 0)), rgba8(0, 0, 0, 255) { }
+
 		constexpr share_color(uint8_t r, uint8_t g, uint8_t b) noexcept :
 			rgb565(to_565(r, g, b)), rgba8(r, g, b, 255) { }
 
