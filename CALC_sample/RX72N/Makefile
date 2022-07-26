@@ -31,7 +31,6 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	CALC_sample/main.cpp \
 				CALC_sample/resource.cpp \
-				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
 				common/stdapi.cpp
 

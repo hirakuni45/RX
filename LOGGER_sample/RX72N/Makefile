@@ -42,7 +42,6 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	LOGGER_sample/main.cpp \
 				LOGGER_sample/resource.cpp \
-				graphics/font8x16.cpp \
 				common/stdapi.cpp
 
 USER_LIBS	=	supc++ drw2d png z m

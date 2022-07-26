@@ -89,7 +89,6 @@ CSOURCES	=	common/init.c \
 				$(ROOT)/emu/libsnss/libsnss.c
 
 PSOURCES	=	$(ROOT)/main.cpp \
-				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
 				common/stdapi.cpp
 

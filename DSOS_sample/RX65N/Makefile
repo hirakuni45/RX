@@ -34,7 +34,6 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	$(ROOT)/main.cpp \
 				$(ROOT)/resource.cpp \
-				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
 				common/stdapi.cpp
 
