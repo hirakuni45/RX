@@ -33,7 +33,6 @@ CSOURCES	=	common/init.c \
 				common/time.c
 
 PSOURCES	=	$(ROOT)/main.cpp \
-				graphics/font8x16.cpp \
 				$(ROOT)/side/arcade.cpp \
 				$(ROOT)/side/i8080.cpp \
 				$(ROOT)/side/i8080opc.cpp \
