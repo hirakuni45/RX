@@ -23,8 +23,7 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	RAYTRACER_sample/main.cpp \
-				graphics/font8x16.cpp
+PSOURCES	=	RAYTRACER_sample/main.cpp
 
 USER_LIBS	=
 
