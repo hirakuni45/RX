@@ -96,6 +96,26 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	要素を削除する。
+			@param[in] org	先頭位置
+			@param[in] num	個数
+			@return 自分
+		*/
+		//-----------------------------------------------------------------//
+		fixed_string& erase(uint32_t org, uint32_t num) noexcept {
+			if(org < pos_ && (org + num) <= pos_) {
+				for(auto i = org; i < (org + num); ++i) {
+					str_[i] = str_[i + num];
+				}
+				pos_ -= num;
+				str_[pos_] = 0;
+			}
+			return *this;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  配列の先頭
 			@return 配列の先頭
 		*/
