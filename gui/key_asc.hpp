@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ASCII ソフトキーボード
+	@brief	ASCII ソフトキーボード @n
+			タッチ操作で入力する、ソフトキーボード
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -12,15 +13,14 @@
 
 namespace gui {
 
-	namespace key_asc_base {
+	namespace key_asc_base {  // キーの位置、キーコードを保持する構造体
 
 		struct location_t {
 			vtx::srect	rect;
 			char		code;  // normal-code
 			char		shift; // shift-code
-			constexpr location_t(const vtx::srect& r, char c, char s) :
-				rect(r),
-				code(c), shift(s)
+			constexpr location_t(const vtx::srect& r, char c, char s) noexcept :
+				rect(r), code(c), shift(s)
 			{ }
 		};
 
@@ -56,6 +56,7 @@ namespace gui {
 			MI_US,	///< - _
 			EQ_PS,	///< = +
 			BS,		///< BackSpace
+
 			TAB,	///< TAB
 			Q,		///< Q q
 			W,		///< W w
@@ -70,7 +71,8 @@ namespace gui {
 			LEFT,	///< [ {
 			RIGHT,	///< ] }
 			BASL,	///< BackSlash |
-			CA_LK,	///< CapsLock
+
+			CAPS_LOCK,	///< CapsLock
 			A,		///< A a
 			S,		///< S s
 			D,		///< D d
@@ -83,6 +85,7 @@ namespace gui {
 			COLN,	///< ; :
 			AP_DQ,	///< ' "
 			ENTER,	///< Enter
+
 			SHIFT_L,	///< ShiftLeft
 			Z,		///< Z Z
 			X,		///< X x
@@ -95,6 +98,7 @@ namespace gui {
 			CO_LR,	///< . >
 			SL_QS,	///< / ?
 			SHIFT_R,	///< ShiftRight
+
 			CTRL,	///< Ctrl
 			ALT,	///< Alt
 			SPACE,	///< Space
@@ -102,13 +106,14 @@ namespace gui {
 			A_LEFT,		///< Arrow Left
 			A_DOWN,		///< Arrow Down
 			A_RIGHT,	///< Arrow Right
-			A_UP		///< Arrow Up
+			A_UP,		///< Arrow Up
+			NONE,	///< 無効状態
 		};
 
 		typedef std::function<void(char, KEY_MAP)> SELECT_FUNC_TYPE;
 
 	private:
-		static constexpr int16_t space = 2;
+		static constexpr int16_t space = 2;  // 隙間
 
 		static constexpr int16_t sz_x = 30;  // 通常幅
 		static constexpr int16_t sz1x = 43;  // TAB 幅
@@ -137,20 +142,26 @@ namespace gui {
 		static constexpr int16_t sz_y = 30;
 		static constexpr int16_t sp_y = sz_y + space;
 
-		static constexpr char KEY_BACK_SPACE  = 0x08;
-		static constexpr char KEY_TAB         = 0x09;
-		static constexpr char KEY_ENTER       = 0x0D;
+	public:
+		static constexpr int16_t BOARD_WIDTH  = 13 * sp_x + sz2x + space;	///< ボード幅
+		static constexpr int16_t BOARD_HEIGHT = sp_y * 5;					///< ボード高さ
 
-		static constexpr char KEY_CAPS_LOCK   = 0x80;
-		static constexpr char KEY_SHIFT_LEFT  = 0x81;
-		static constexpr char KEY_SHIFT_RIGHT = 0x82;
-		static constexpr char KEY_CTRL        = 0x83;
-		static constexpr char KEY_ALT         = 0x84;
-		static constexpr char KEY_FN          = 0x85;
-		static constexpr char KEY_ARROW_LEFT  = 0x86;
-		static constexpr char KEY_ARROW_DOWN  = 0x87;
-		static constexpr char KEY_ARROW_RIGHT = 0x88;
-		static constexpr char KEY_ARROW_UP    = 0x89;
+		static constexpr char KEY_BACK_SPACE  = 0x08;	///< バックスペースキーのコード
+		static constexpr char KEY_TAB         = 0x09;	///< TAB キーのコード
+		static constexpr char KEY_ENTER       = 0x0D;	///< ENTER キーのコード
+
+		static constexpr char KEY_CAPS_LOCK   = 0x80;	///< CapsLock キーのコード
+		static constexpr char KEY_SHIFT_LEFT  = 0x81;	///< Shift Left キーのコード
+		static constexpr char KEY_SHIFT_RIGHT = 0x82;	///< Shift Right キーのコード
+		static constexpr char KEY_CTRL        = 0x83;	///< CTRL キーのコード
+		static constexpr char KEY_ALT         = 0x84;	///< ALT キーのコード
+		static constexpr char KEY_FN          = 0x85;	///< FN キーのコード
+		static constexpr char KEY_ARROW_LEFT  = 0x86;	///< Left 方向キーのコード
+		static constexpr char KEY_ARROW_DOWN  = 0x87;	///< Down 方向キーのコード
+		static constexpr char KEY_ARROW_RIGHT = 0x88;	///< Right 方向キーのコード
+		static constexpr char KEY_ARROW_UP    = 0x89;	///< Up 方向キーのコード
+
+	private:
 
 		static constexpr key_asc_base::location_t key_locations_[] = {
 			{ { g0_x + sp_x *  0, g0_y + sp_y * 0, sz_x, sz_y }, '`', '~' },
@@ -169,42 +180,42 @@ namespace gui {
 			{ { g0_x + sp_x * 13, g0_y + sp_y * 0, sz2x, sz_y }, KEY_BACK_SPACE, KEY_BACK_SPACE },
 
 			{ { g0_x,             g0_y + sp_y * 1, sz1x, sz_y }, KEY_TAB, KEY_TAB },
-			{ { g1_x + sp_x *  0, g0_y + sp_y * 1, sz_x, sz_y }, 'Q', 'q' },
-			{ { g1_x + sp_x *  1, g0_y + sp_y * 1, sz_x, sz_y }, 'W', 'w' },
-			{ { g1_x + sp_x *  2, g0_y + sp_y * 1, sz_x, sz_y }, 'E', 'e' },
-			{ { g1_x + sp_x *  3, g0_y + sp_y * 1, sz_x, sz_y }, 'R', 'r' },
-			{ { g1_x + sp_x *  4, g0_y + sp_y * 1, sz_x, sz_y }, 'T', 't' },
-			{ { g1_x + sp_x *  5, g0_y + sp_y * 1, sz_x, sz_y }, 'Y', 'y' },
-			{ { g1_x + sp_x *  6, g0_y + sp_y * 1, sz_x, sz_y }, 'U', 'u' },
-			{ { g1_x + sp_x *  7, g0_y + sp_y * 1, sz_x, sz_y }, 'I', 'i' },
-			{ { g1_x + sp_x *  8, g0_y + sp_y * 1, sz_x, sz_y }, 'O', 'o' },
-			{ { g1_x + sp_x *  9, g0_y + sp_y * 1, sz_x, sz_y }, 'P', 'p' },
+			{ { g1_x + sp_x *  0, g0_y + sp_y * 1, sz_x, sz_y }, 'q', 'Q' },
+			{ { g1_x + sp_x *  1, g0_y + sp_y * 1, sz_x, sz_y }, 'w', 'W' },
+			{ { g1_x + sp_x *  2, g0_y + sp_y * 1, sz_x, sz_y }, 'e', 'E' },
+			{ { g1_x + sp_x *  3, g0_y + sp_y * 1, sz_x, sz_y }, 'r', 'R' },
+			{ { g1_x + sp_x *  4, g0_y + sp_y * 1, sz_x, sz_y }, 't', 'T' },
+			{ { g1_x + sp_x *  5, g0_y + sp_y * 1, sz_x, sz_y }, 'y', 'Y' },
+			{ { g1_x + sp_x *  6, g0_y + sp_y * 1, sz_x, sz_y }, 'u', 'U' },
+			{ { g1_x + sp_x *  7, g0_y + sp_y * 1, sz_x, sz_y }, 'i', 'I' },
+			{ { g1_x + sp_x *  8, g0_y + sp_y * 1, sz_x, sz_y }, 'o', 'O' },
+			{ { g1_x + sp_x *  9, g0_y + sp_y * 1, sz_x, sz_y }, 'p', 'P' },
 			{ { g1_x + sp_x * 10, g0_y + sp_y * 1, sz_x, sz_y }, '[', '{' },
 			{ { g1_x + sp_x * 11, g0_y + sp_y * 1, sz_x, sz_y }, ']', '}' },
 			{ { g1_x + sp_x * 12, g0_y + sp_y * 1, sz6x, sz_y }, '\\', '|' },
 
 			{ { g0_x,             g0_y + sp_y * 2, sz3x, sz_y }, KEY_CAPS_LOCK, KEY_CAPS_LOCK },
-			{ { g2_x + sp_x *  0, g0_y + sp_y * 2, sz_x, sz_y }, 'A', 'a' },
-			{ { g2_x + sp_x *  1, g0_y + sp_y * 2, sz_x, sz_y }, 'S', 's' },
-			{ { g2_x + sp_x *  2, g0_y + sp_y * 2, sz_x, sz_y }, 'D', 'd' },
-			{ { g2_x + sp_x *  3, g0_y + sp_y * 2, sz_x, sz_y }, 'F', 'f' },
-			{ { g2_x + sp_x *  4, g0_y + sp_y * 2, sz_x, sz_y }, 'G', 'g' },
-			{ { g2_x + sp_x *  5, g0_y + sp_y * 2, sz_x, sz_y }, 'H', 'h' },
-			{ { g2_x + sp_x *  6, g0_y + sp_y * 2, sz_x, sz_y }, 'J', 'j' },
-			{ { g2_x + sp_x *  7, g0_y + sp_y * 2, sz_x, sz_y }, 'K', 'k' },
-			{ { g2_x + sp_x *  8, g0_y + sp_y * 2, sz_x, sz_y }, 'L', 'l' },
+			{ { g2_x + sp_x *  0, g0_y + sp_y * 2, sz_x, sz_y }, 'a', 'A' },
+			{ { g2_x + sp_x *  1, g0_y + sp_y * 2, sz_x, sz_y }, 's', 'S' },
+			{ { g2_x + sp_x *  2, g0_y + sp_y * 2, sz_x, sz_y }, 'd', 'D' },
+			{ { g2_x + sp_x *  3, g0_y + sp_y * 2, sz_x, sz_y }, 'f', 'F' },
+			{ { g2_x + sp_x *  4, g0_y + sp_y * 2, sz_x, sz_y }, 'g', 'G' },
+			{ { g2_x + sp_x *  5, g0_y + sp_y * 2, sz_x, sz_y }, 'h', 'H' },
+			{ { g2_x + sp_x *  6, g0_y + sp_y * 2, sz_x, sz_y }, 'j', 'J' },
+			{ { g2_x + sp_x *  7, g0_y + sp_y * 2, sz_x, sz_y }, 'k', 'K' },
+			{ { g2_x + sp_x *  8, g0_y + sp_y * 2, sz_x, sz_y }, 'l', 'L' },
 			{ { g2_x + sp_x *  9, g0_y + sp_y * 2, sz_x, sz_y }, ';', ':' },
 			{ { g2_x + sp_x * 10, g0_y + sp_y * 2, sz_x, sz_y }, '\'', '"' },
 			{ { g2_x + sp_x * 11, g0_y + sp_y * 2, sz7x, sz_y }, KEY_ENTER, KEY_ENTER },
 
 			{ { g0_x,             g0_y + sp_y * 3, sz4x, sz_y }, KEY_SHIFT_LEFT, KEY_SHIFT_LEFT },
-			{ { g3_x + sp_x *  0, g0_y + sp_y * 3, sz_x, sz_y }, 'Z', 'z' },
-			{ { g3_x + sp_x *  1, g0_y + sp_y * 3, sz_x, sz_y }, 'X', 'x' },
-			{ { g3_x + sp_x *  2, g0_y + sp_y * 3, sz_x, sz_y }, 'C', 'c' },
-			{ { g3_x + sp_x *  3, g0_y + sp_y * 3, sz_x, sz_y }, 'V', 'v' },
-			{ { g3_x + sp_x *  4, g0_y + sp_y * 3, sz_x, sz_y }, 'B', 'b' },
-			{ { g3_x + sp_x *  5, g0_y + sp_y * 3, sz_x, sz_y }, 'N', 'n' },
-			{ { g3_x + sp_x *  6, g0_y + sp_y * 3, sz_x, sz_y }, 'M', 'm' },
+			{ { g3_x + sp_x *  0, g0_y + sp_y * 3, sz_x, sz_y }, 'z', 'Z' },
+			{ { g3_x + sp_x *  1, g0_y + sp_y * 3, sz_x, sz_y }, 'x', 'X' },
+			{ { g3_x + sp_x *  2, g0_y + sp_y * 3, sz_x, sz_y }, 'c', 'C' },
+			{ { g3_x + sp_x *  3, g0_y + sp_y * 3, sz_x, sz_y }, 'v', 'V' },
+			{ { g3_x + sp_x *  4, g0_y + sp_y * 3, sz_x, sz_y }, 'b', 'B' },
+			{ { g3_x + sp_x *  5, g0_y + sp_y * 3, sz_x, sz_y }, 'n', 'N' },
+			{ { g3_x + sp_x *  6, g0_y + sp_y * 3, sz_x, sz_y }, 'm', 'M' },
 			{ { g3_x + sp_x *  7, g0_y + sp_y * 3, sz_x, sz_y }, ',', '<' },
 			{ { g3_x + sp_x *  8, g0_y + sp_y * 3, sz_x, sz_y }, '.', '>' },
 			{ { g3_x + sp_x *  9, g0_y + sp_y * 3, sz_x, sz_y }, '/', '?' },
@@ -231,12 +242,38 @@ namespace gui {
 
 		SELECT_FUNC_TYPE	select_func_;
 		char	code_;
-		uint8_t	key_map_;
+		KEY_MAP	key_map_;
 		bool	shift_;
 		bool	ctrl_;
 		bool	alt_;
 		bool	lock_;
 		bool	fn_;
+
+		char shift_caps_lock_code_(int idx)
+		{
+			auto code = key_locations_[idx].code;
+			if(shift_) {
+				if(lock_) {
+					if(code >= 'a' && code <= 'z') {
+						return key_locations_[idx].code;
+					} else {
+						return key_locations_[idx].shift;
+					}
+				} else {
+					return key_locations_[idx].shift;
+				}
+			} else {
+				if(lock_) {
+					if(code >= 'a' && code <= 'z') {
+						return key_locations_[idx].shift;
+					} else {
+						return key_locations_[idx].code;
+					}
+				} else {
+					return key_locations_[idx].code;
+				}
+			}
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -247,11 +284,15 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		key_asc(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
 			widget(loc, str), key_{ },
-			select_func_(), code_(0xff), key_map_(0),
+			select_func_(), code_(0xff), key_map_(KEY_MAP::NONE),
 			shift_(false), ctrl_(false), alt_(false), lock_(false), fn_(false)
 		{
-			at_location().size.x = 13 * sp_x + sz2x + space;
-			at_location().size.y = sp_y * 5;
+			if(at_location().size.x <= 0) {
+				at_location().size.x = BOARD_WIDTH;
+			}
+			if(at_location().size.y <= 0) {
+				at_location().size.y = BOARD_HEIGHT;
+			}
 			insert_widget(this);
 		}
 
@@ -305,11 +346,10 @@ namespace gui {
 		{
 			update_touch_def(pos, num);
 
-			auto loc = vtx::srect(get_final_position(), widget::get_location().size);
+			auto locate = vtx::srect(get_final_position(), widget::get_location().size);
 			uint32_t i = 0;
-			bool all = false;
 			for(auto& k : key_) {
-				vtx::srect r(loc.org + key_locations_[i].rect.org, key_locations_[i].rect.size);
+				vtx::srect r(locate.org + key_locations_[i].rect.org, key_locations_[i].rect.size);
 				auto level = false;
 				if(r.is_focus(pos)) {
 					level = num > 0;
@@ -318,32 +358,36 @@ namespace gui {
 				k.negative = (!level &&  k.level);
 				k.level = level;
 				if(k.positive) {
-					key_map_ = i;
+					key_map_ = static_cast<KEY_MAP>(i);
 					auto code = key_locations_[i].code;
-					if(code == KEY_SHIFT_RIGHT || code == KEY_SHIFT_LEFT) {
+					switch(code) {
+					case KEY_SHIFT_RIGHT:
+					case KEY_SHIFT_LEFT:
 						shift_ = !shift_;
-						all = true;
-					} else if(code == KEY_CAPS_LOCK) {
+						break;
+					case KEY_CAPS_LOCK:
 						lock_ = !lock_;
-						all = true;
-					} else if(code == KEY_CTRL) {
+						break;
+					case KEY_CTRL:
 						ctrl_ = !ctrl_;
-					} else if(code == KEY_ALT) {
+						break;
+					case KEY_ALT:
 						alt_ = !alt_;
-					} else if(code == KEY_FN) {
+						break;
+					case KEY_FN:
 						fn_ = !fn_;
-					} else {
+						break;
+					default:
 						if(ctrl_) {
-							if(code >= 'A') {
-								code_ = code - 0x40;
+							if(code >= 0x60 && code <= 0x7f) {
+								code_ = code - 0x60;
 							} else {
 								code_ = code;
 							}
-						} else if(shift_) {
-							code_ = key_locations_[i].shift;
 						} else {
-							code_ = key_locations_[i].code;
+							code_ = shift_caps_lock_code_(i);
 						}
+						break;
 					}
 					k.draw = true;
 				}
@@ -352,12 +396,27 @@ namespace gui {
 				}
 				++i;
 			}
-			if(all) {
+
+			if(key_[static_cast<uint8_t>(KEY_MAP::SHIFT_L)].draw) {
+				key_[static_cast<uint8_t>(KEY_MAP::SHIFT_R)].draw = true;
+			}
+			if(key_[static_cast<uint8_t>(KEY_MAP::SHIFT_R)].draw) {
+				key_[static_cast<uint8_t>(KEY_MAP::SHIFT_L)].draw = true;
+			}
+			// shift, lock キーが変化したら、関係するキーの描画をやり直す必要がある。
+			if(key_[static_cast<uint8_t>(KEY_MAP::SHIFT_L)].draw || key_[static_cast<uint8_t>(KEY_MAP::SHIFT_R)].draw
+				|| key_[static_cast<uint8_t>(KEY_MAP::CAPS_LOCK)].draw) {
 				uint32_t i = 0;
 				for(auto& k : key_) {
 					auto code = key_locations_[i].code;
-					if(code > 0x20 && code < 0x80) {
-						k.draw = true;
+					if(key_[static_cast<uint8_t>(KEY_MAP::CAPS_LOCK)].draw) {
+						if(code >= 'a' && code <= 'z') {
+							k.draw = true;
+						}
+					} else {
+						if(code > 0x20 && code < 0x80) {
+							k.draw = true;
+						}
 					}
 					++i;
 				}
@@ -372,11 +431,11 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void exec_select() noexcept override
 		{
-			if(code_ != 0xff) {
+			if(key_map_ != KEY_MAP::NONE) {
 				if(select_func_) {
-					select_func_(code_, static_cast<KEY_MAP>(key_map_));
+					select_func_(code_, key_map_);
 				}
-				code_ = 0xff;
+				key_map_ = KEY_MAP::NONE;
 			}
 		}
 
@@ -437,77 +496,97 @@ namespace gui {
 					rdr.round_box(rr, 3);
 
 					rdr.set_fore_color(get_font_color());
-					char cha;
-					if(shift_) {
-						cha = key_locations_[i].shift;
-					} else {
-						cha = key_locations_[i].code;
-					}
+					auto cha = shift_caps_lock_code_(i);
 					switch(cha) {
 					case KEY_BACK_SPACE: {
-						vtx::spos sz(8 * 2, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "BS");
+							vtx::spos sz(8 * 2, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "BS");
 						}
 						break;
 					case KEY_TAB: {
-						vtx::spos sz(8 * 3, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "TAB");
+							vtx::spos sz(8 * 3, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "TAB");
 						}
 						break;
 					case KEY_CAPS_LOCK: {
-						vtx::spos sz(8 * 3, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "[A]");
+							vtx::spos sz(8 * 3, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "[A]");
+							if(lock_) {
+								rr.org += 2;
+								rr.size -= 2 * 2;
+								rdr.frame(rr);
+							}
 						}
 						break;
 					case KEY_ENTER: {
-						vtx::spos sz(8 * 5, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "Enter");
+							vtx::spos sz(8 * 5, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Enter");
 						}
 						break;
 					case KEY_SHIFT_LEFT:
 					case KEY_SHIFT_RIGHT: {
-						vtx::spos sz(8 * 5, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "Shift");
+							vtx::spos sz(8 * 5, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Shift");
+							if(shift_) {
+								rr.org += 2;
+								rr.size -= 2 * 2;
+								rdr.frame(rr);
+							}
 						}
 						break;
 					case KEY_CTRL: {
-						vtx::spos sz(8 * 4, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "CTRL");
+							vtx::spos sz(8 * 4, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "CTRL");
+							if(ctrl_) {
+								rr.org += 2;
+								rr.size -= 2 * 2;
+								rdr.frame(rr);
+							}
 						}
 						break;
 					case KEY_ALT: {
-						vtx::spos sz(8 * 3, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "ALT");
+							vtx::spos sz(8 * 3, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "ALT");
+							if(alt_) {
+								rr.org += 2;
+								rr.size -= 2 * 2;
+								rdr.frame(rr);
+							}
 						}
 						break;
 					case KEY_FN: {
-						vtx::spos sz(8 * 2, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "Fn");
+							vtx::spos sz(8 * 2, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Fn");
+							if(fn_) {
+								rr.org += 2;
+								rr.size -= 2 * 2;
+								rdr.frame(rr);
+							}
 						}
 						break;
 					case KEY_ARROW_LEFT: {
-						vtx::spos sz(8 * 2, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "Lt");
+							vtx::spos sz(8 * 2, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Lt");
 						}
 						break;
 					case KEY_ARROW_DOWN: {
-						vtx::spos sz(8 * 2, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "Dn");
+							vtx::spos sz(8 * 2, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Dn");
 						}
 						break;
 					case KEY_ARROW_RIGHT: {
-						vtx::spos sz(8 * 2, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "Ri");
+							vtx::spos sz(8 * 2, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Ri");
 						}
 						break;
 					case KEY_ARROW_UP: {
-						vtx::spos sz(8 * 2, 16);
-						rdr.draw_text(rr.org + (rr.size - sz) / 2, "Up");
+							vtx::spos sz(8 * 2, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Up");
 						}
 						break;
 					default: {
-						vtx::spos sz(8, 16);					
-						rdr.draw_font(rr.org + (rr.size - sz) / 2, cha); 
+							vtx::spos sz(8, 16);					
+							rdr.draw_font(rr.org + (rr.size - sz) / 2, cha); 
 						}
 						break;
 					}
