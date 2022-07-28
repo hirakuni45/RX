@@ -166,7 +166,7 @@ namespace {
 
 	typedef gui::button BUTTON;	BUTTON	prev_(vtx::srect(5, 272-45, 40, 40), "<", true);
 
-	TEXT		key_text_(vtx::srect(10, 10, 200, 20));
+	TEXT		key_text_(vtx::srect(10, 10, 260, 20));
 	typedef gui::key_asc KEY_ASC;
 	KEY_ASC		key_asc_(vtx::srect(0, 60, 0, 0));
 
@@ -174,7 +174,7 @@ namespace {
 	FILER		filer_(vtx::srect(10, 10, 300, 200));
 
 	float		progress_ratio_ = 0.0f;
-	utils::fixed_string<20> key_buff_;
+	utils::fixed_string<32> key_buff_;
 
 	void setup_gui_()
 	{
@@ -313,8 +313,13 @@ namespace {
 
 		key_asc_.set_layer(WIDGET::LAYER::_1);
 		key_asc_.at_select_func() = [=](char code, KEY_ASC::KEY_MAP key_map) {
-			key_buff_ += code;
-			key_text_.set_update();
+			if(code <= 0x7f) {
+				if(key_buff_.capacity() == key_buff_.size()) {
+					key_buff_.erase(0, 1);
+				}
+				key_buff_ += code;
+				key_text_.set_update();
+			}
 			auto map = static_cast<uint16_t>(key_map);
 			utils::format("0x%02X (%d): '%c'\n") % map % map % code; 
 		};
