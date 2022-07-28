@@ -38,7 +38,6 @@ CSOURCES	=	common/init.c \
                 FreeRTOS/Source/timers.c
 
 PSOURCES	=	main.cpp \
-				graphics/font8x16.cpp \
 				resource.cpp \
 				common/stdapi.cpp
 

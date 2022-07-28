@@ -32,7 +32,6 @@ CSOURCES	=	common/init.c \
 				graphics/picojpeg.c
 
 PSOURCES	=	GUI_sample/main.cpp \
-				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
 				common/stdapi.cpp
 

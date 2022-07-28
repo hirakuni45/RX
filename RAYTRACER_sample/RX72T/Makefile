@@ -25,7 +25,6 @@ CSOURCES	=	common/init.c \
 				common/syscalls.c
 
 PSOURCES	=	RAYTRACER_sample/main.cpp \
-				graphics/font8x16.cpp \
 				common/stdapi.cpp
 USER_LIBS	=
 

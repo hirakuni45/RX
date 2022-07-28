@@ -28,7 +28,6 @@ CSOURCES	=	common/init.c \
 				common/time.c
 
 PSOURCES	=	main.cpp \
-				graphics/font8x16.cpp \
 				common/stdapi.cpp
 
 #				graphics/kfont16.cpp

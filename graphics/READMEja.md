@@ -1,15 +1,18 @@
-グラフィックス、GUI Widgets フレームワーク
+グラフィックス、フレームワーク
 =========
 
 [英語版](./README.txt)
 
 ## 概要
 
-- 2D 描画
-- 3D 描画
-- GUI Widgets
+- 2D の基本的な描画
+- 3D の基本的な描画
 - 画像ファイルローダー
-- ファイル選択
+- シンプルなファイル選択
+- シンプルなダイアログ
+- 簡単なメニュー機能
+- ビットマップフォント
+- カラー定義、管理
 - グラフィックス関係の操作
 
 ---
@@ -30,10 +33,9 @@
 |[color.hpp](./color.hpp)|カラー定義|
 |[graphics.hpp](./graphics.hpp)|2D 描画クラス|
 |[monograph.hpp](./monograph.hpp)|2D ビットマップ描画クラス|
-|[filer.hpp](./filer.hpp)|ファイル選択クラス|
-|[simple_dialog.hpp](./simple_dialog.hpp)|シンプルなダイアログ（モーダルフレーム）|
+|[simple_filer.hpp](./simple_filer.hpp)|シンプル・ファイル選択クラス|
+|[simple_dialog.hpp](./simple_dialog.hpp)|シンプル・ダイアログ（モーダルフレーム）|
 |[root_menu.hpp](./root_menu.hpp)|ルートメニュークラス|
-|[term.hpp](./term.hpp)|ターミナルクラス|
 |[img.hpp](./img.hpp)|イメージ定義クラス|
 |[img_in.hpp](./img_in.hpp)|画像定義|
 |[pixel.hpp](./pixel.hpp)|ピクセル定義|
@@ -47,22 +49,6 @@
 |[glmatrix.hpp](./glmatrix.hpp)|OpenGL マトリックスクラス|
 |[tgl.hpp](./tgl.hpp)|TinyGL(Tiny OpenGL) クラス|
 |[shape_3d.hpp](./shape_3d.hpp)|3D シェープ（簡単なモデル）|
-|[widget_director.hpp](./widget_director.hpp)|Widget ディレクター|
-|[widget.hpp](./widget.hpp)|Widget 基本クラス|
-|[group.hpp](./group.hpp)|Widget グループ|
-|[frame.hpp](./frame.hpp)|Widget フレーム|
-|[dialog.hpp](./dialog.hpp)|Widget ダイアログ|
-|[box.hpp](./box.hpp)|Widget ボックス|
-|[text.hpp](./text.hpp)|Widget テキスト|
-|[textbox.hpp](./textbox.hpp)|Widget テキスト・ボックス|
-|[button.hpp](./button.hpp)|Widget ボタン|
-|[check.hpp](./check.hpp)|Widget チェックボックス|
-|[radio.hpp](./radio.hpp)|Widget ラジオボタン|
-|[slider.hpp](./slider.hpp)|Widget スライダー|
-|[menu.hpp](./menu.hpp)|Widget メニュー|
-|[spinbox.hpp](./spinbox.hpp)|Widget スピンボックス|
-|[toggle.hpp](./spinbox.hpp)|Widget トグルスイッチ|
-|[progress.hpp](./spinbox.hpp)|Widget プログレスバー|
    
 ---
 
@@ -109,77 +95,6 @@
 ```
 
 ---
-
-## GUI Widget 概要
-
-- タッチパネルと、グラフィックス画面を使った GUI フレームワーク
-- ソフトウェアー、及びハードウェアー（DRW2D エンジン）レンダリングに適応出来る構成
-- 記憶割り当てを利用しない、スタテック構造（テンプレートパラメーターにより扱う widget 数を定義）
-- リソースの消費を抑えた設計
-- 描画を最適化させる為の仕組み
-- C++ 17 の機能を活用した構造
-
-|ソース|主な機能|
-|---|---|
-|[common/vtx.hap](../common/vtx.hpp)|2D,3D 座標クラス|
-|[RX600/drw2d_mgr.hap](../RX600/drw2d_mgr.hpp)|DRW2D エンジンによる描画クラス|
-|[graphics/graphics.hap](./graphics.hpp)|ソフトによる描画クラス|
-|[graphics/font.hpp](./font.hpp)|フォント設定(ASCII+漢字ビットマップ)|
-|[graphics/afont.hpp](./afont.hpp)|ASCII フォント|
-|[graphics/font8x16.hpp](./font8x16.hpp)|8 x 16 ピクセルフォント定義（ヘッダー）|
-|[graphics/font8x16.cpp](./font8x16.cpp)|8 x 16 ピクセルフォント実態（ソース）|
-|[graphics/kfont.hpp](./kfont.hpp)|漢字フォント|
-|[graphics/kfont16.cpp](./kfont16.cpp)|16 x 16 ピクセル漢字フォント実態|
-|[graphics/color.hpp](./color.hpp)|基本カラー定義|
-|[graphics/widget_director.hpp](./widget_director.hpp)|Widget ディレクター（widget 管理）|
-|[graphics/widget.hpp](./widget.hpp)|widget 基本クラス|
-|[graphics/group.hpp](./group.hpp)|Widget グループ・クラス|
-|[graphics/button.hpp](./button.hpp)|Widget ボタン・クラス|
-|[graphics/check.hpp](./check.hpp)|Widget チェックボックス・クラス|
-|[graphics/radio.hpp](./radio.hpp)|Widget ラジオボタン・クラス|
-|[graphics/slider.hpp](./slider.hpp)|Widget スライダー・クラス|
-|[graphics/menu.hpp](./menu.hpp)|Widget メニュー・クラス|
-|[graphics/text.hpp](./text.hpp)|Widget テキスト・クラス|
-|[graphics/textbox.hpp](./textbox.hpp)|Widget テキスト・ボックス・クラス|
-|[graphics/spinbox.hpp](./spinbox.hpp)|Widget スピン・ボックス・クラス|
-|[graphics/toggle.hpp](./toggle.hpp)|Widget トグル・スイッチ・クラス|
-|[graphics/progress.hpp](./progress.hpp)|Widget プログレス・バー・クラス|
-
----
-
-### widget における座標の設定と大きさの設定
-
-- 座標は、int16_t 型で定義されています。
-- 「vtx::srect(x, y, w, h)」型は、(x)Ｘ座標、(y)Ｙ座標、(w)Ｘサイズ、(h)Ｙサイズになっています。
-
-### ボタン
-
-- widget button は、シンプルな押しボタンの機能を提供します。
-
-定義：
-
-```C++
-	typedef gui::button BUTTON;
-	BUTTON	button_(vtx::srect(10, 10, 80, 32), "OK");
-```
-
-※上記例では、10,10 の位置に、横 80、高さ 32 のボタン、ボタン内文字 "OK" を定義しています。
-
-制御：
-
-```C++
-	button_.enable();
-	button_.at_select_func() = [=](uint32_t id) {
-		utils::format("Select Button: %d\n") % id;
-	};
-```
-
-※ボタンが押される度に、"Select Button: " と、ID 番号がコンソールに出力されます。
-
-
-
-
-
 
 ## TinyGL (Tiny OpenGL)
 

@@ -41,7 +41,6 @@ CSOURCES	=	common/init.c \
                 FreeRTOS/Source/timers.c
 
 PSOURCES	=	AUDIO_sample/main.cpp \
-				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
 				common/stdapi.cpp
 
