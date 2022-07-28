@@ -111,6 +111,7 @@ namespace gui {
 			CLOSEBOX,	///< クローズボックス
 			FILER,		///< ファイラー
 			KEY_ASC,	///< ASCII ソフトキーボード
+			KEY_10,		///< １０ソフトキーボード
 		};
 
 
