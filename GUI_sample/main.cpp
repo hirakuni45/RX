@@ -160,11 +160,11 @@ namespace {
 	typedef gui::progress PROGRESS;
 	PROGRESS	progress_(vtx::srect(240, 220, 150, 0));
 
-	typedef gui::button BUTTON;	BUTTON	next_(vtx::srect(480-45, 272-45, 40, 40), ">", true);  // circle ボタン
+	BUTTON	next_(vtx::srect(480-45, 272-45, 40, 40), ">", BUTTON::STYLE::CIRCLE_WITH_FRAME);
 
 	// --- page 2
 
-	typedef gui::button BUTTON;	BUTTON	prev_(vtx::srect(5, 272-45, 40, 40), "<", true);
+	BUTTON	prev_(vtx::srect(5, 272-45, 40, 40), "<", BUTTON::STYLE::CIRCLE_WITH_FRAME);
 
 	TEXT		key_text_(vtx::srect(10, 10, 260, 20));
 	typedef gui::key_asc KEY_ASC;
@@ -313,7 +313,13 @@ namespace {
 
 		key_asc_.set_layer(WIDGET::LAYER::_1);
 		key_asc_.at_select_func() = [=](char code, KEY_ASC::KEY_MAP key_map) {
-			if(code <= 0x7f) {
+			if(code == KEY_ASC::KEY_BACK_SPACE) {
+				key_buff_.pop_back();
+				key_text_.set_update();
+			} else if(code == KEY_ASC::KEY_ENTER) {
+				key_buff_.clear();
+				key_text_.set_update();
+			} else if(code >= 0x20 && code <= 0x7f) {
 				if(key_buff_.capacity() == key_buff_.size()) {
 					key_buff_.erase(0, 1);
 				}

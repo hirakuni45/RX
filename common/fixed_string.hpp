@@ -104,8 +104,8 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		fixed_string& erase(uint32_t org, uint32_t num) noexcept {
 			if(org < pos_ && (org + num) <= pos_) {
-				for(auto i = org; i < (org + num); ++i) {
-					str_[i] = str_[i + num];
+				for(uint32_t i = 0; i < (pos_ - num); ++i) {
+					str_[org + i] = str_[org + i + num];
 				}
 				pos_ -= num;
 				str_[pos_] = 0;
