@@ -4,7 +4,7 @@
 	@brief	ボックス表示と制御 @n
 			シンプルな描画を行う
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -129,6 +129,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	描画
+			@param[in] rdr	描画インスタンス
 		*/
 		//-----------------------------------------------------------------//
 		template<class RDR>

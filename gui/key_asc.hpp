@@ -146,20 +146,20 @@ namespace gui {
 		static constexpr int16_t BOARD_WIDTH  = 13 * sp_x + sz2x + space;	///< ボード幅
 		static constexpr int16_t BOARD_HEIGHT = sp_y * 5;					///< ボード高さ
 
-		static constexpr char KEY_BACK_SPACE  = 0x08;	///< バックスペースキーのコード
-		static constexpr char KEY_TAB         = 0x09;	///< TAB キーのコード
-		static constexpr char KEY_ENTER       = 0x0D;	///< ENTER キーのコード
+		static constexpr char KEY_BACK_SPACE  = 0x08;	///< バックスペース
+		static constexpr char KEY_TAB         = 0x09;	///< TAB
+		static constexpr char KEY_ENTER       = 0x0D;	///< ENTER
 
-		static constexpr char KEY_CAPS_LOCK   = 0x80;	///< CapsLock キーのコード
-		static constexpr char KEY_SHIFT_LEFT  = 0x81;	///< Shift Left キーのコード
-		static constexpr char KEY_SHIFT_RIGHT = 0x82;	///< Shift Right キーのコード
-		static constexpr char KEY_CTRL        = 0x83;	///< CTRL キーのコード
-		static constexpr char KEY_ALT         = 0x84;	///< ALT キーのコード
-		static constexpr char KEY_FN          = 0x85;	///< FN キーのコード
-		static constexpr char KEY_ARROW_LEFT  = 0x86;	///< Left 方向キーのコード
-		static constexpr char KEY_ARROW_DOWN  = 0x87;	///< Down 方向キーのコード
-		static constexpr char KEY_ARROW_RIGHT = 0x88;	///< Right 方向キーのコード
-		static constexpr char KEY_ARROW_UP    = 0x89;	///< Up 方向キーのコード
+		static constexpr char KEY_CAPS_LOCK   = 0x80;	///< CapsLock
+		static constexpr char KEY_SHIFT_LEFT  = 0x81;	///< Shift Left
+		static constexpr char KEY_SHIFT_RIGHT = 0x82;	///< Shift Right
+		static constexpr char KEY_CTRL        = 0x83;	///< CTRL
+		static constexpr char KEY_ALT         = 0x84;	///< ALT
+		static constexpr char KEY_FN          = 0x85;	///< FN
+		static constexpr char KEY_ARROW_LEFT  = 0x86;	///< Left 方向
+		static constexpr char KEY_ARROW_DOWN  = 0x87;	///< Down 方向
+		static constexpr char KEY_ARROW_RIGHT = 0x88;	///< Right 方向
+		static constexpr char KEY_ARROW_UP    = 0x89;	///< Up 方向
 
 	private:
 
@@ -236,7 +236,7 @@ namespace gui {
 			bool	positive;
 			bool	negative;
 			bool	draw;
-			key_t() noexcept : level(false), positive(false), negative(true), draw(true) { }
+			key_t() noexcept : level(false), positive(false), negative(false), draw(false) { }
 		};
 		key_t	key_[14 + 14 + 13 + 12 + 8];
 
@@ -364,18 +364,23 @@ namespace gui {
 					case KEY_SHIFT_RIGHT:
 					case KEY_SHIFT_LEFT:
 						shift_ = !shift_;
+						code_ = code;
 						break;
 					case KEY_CAPS_LOCK:
 						lock_ = !lock_;
+						code_ = code;
 						break;
 					case KEY_CTRL:
 						ctrl_ = !ctrl_;
+						code_ = code;
 						break;
 					case KEY_ALT:
 						alt_ = !alt_;
+						code_ = code;
 						break;
 					case KEY_FN:
 						fn_ = !fn_;
+						code_ = code;
 						break;
 					default:
 						if(ctrl_) {
@@ -448,8 +453,10 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void enable(bool ena = true) override
 		{
+			auto back = get_state();
 			if(ena) {
 				set_state(STATE::ENABLE);
+				request_redraw();
 			} else {
 				set_state(STATE::DISABLE);
 				reset_touch_state();
@@ -468,21 +475,34 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	再描画をリクエスト
+		*/
+		//-----------------------------------------------------------------//
+		void request_redraw() noexcept
+		{
+			for(auto& k : key_) {
+				k.draw = true;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	描画
+			@param[in] rdr	レンダリングクラス
 		*/
 		//-----------------------------------------------------------------//
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-
 			uint32_t i = 0;
 			for(auto& k : key_) {
 				uint8_t inten = 64;
 				if(k.level) {
 					inten = 192;
 				}
-				if(k.draw) {
+				if(k.draw || get_state() == STATE::STALL) {
 					k.draw = false;
 					graphics::share_color sc;
 					sc.set_color(get_base_color().rgba8, inten);
