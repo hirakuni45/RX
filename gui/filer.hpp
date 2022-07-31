@@ -30,6 +30,7 @@ namespace gui {
 		typedef utils::dir_list DLIST;
 		DLIST		dlist_;
 
+		vtx::spos	touch_org_;
 		uint16_t	focus_pos_;
 		uint16_t	select_pos_;
 		uint16_t	offset_;
@@ -54,7 +55,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		filer(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
 			widget(loc, str),
-			dlist_(), focus_pos_(0), select_pos_(0), offset_(0),
+			dlist_(), touch_org_(), focus_pos_(0), select_pos_(0), offset_(0),
 			file_info_{ }
 		{
 			insert_widget(this);
@@ -110,12 +111,16 @@ namespace gui {
 		{
 			update_touch_def(pos, num, false);
 			const auto& st = get_touch_state();
+			if(st.positive_) {
+				touch_org_ = st.position_;
+			}
 			if(st.level_) {
 				if(get_focus()) {
-				//	auto newpos = st.relative_.y / DEF_FILER_HEIGHT;
-				//	if(newpos >= static_cast<int16_t>(num_)) newpos = num_ - 1;
-				//	else if(newpos < 0) newpos = 0;
-				//	focus_pos_ = newpos;
+					auto d = st.position_ - touch_org_;
+					if(std::abs(d.y) > DEF_FILER_DRAG_TH) {
+						
+					}
+					focus_pos_ = st.relative_.y / DEF_FILER_HEIGHT;
 				}
 			}
 			if(st.negative_) {

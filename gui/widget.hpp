@@ -68,6 +68,7 @@ namespace gui {
 		static constexpr int16_t DEF_PROGRESS_FRAME_WIDTH = 2;	///< 標準、プログレスバー、フレーム幅
 
 		static constexpr int16_t DEF_FILER_HEIGHT         = 20;	///< 標準、ファイラー、アイテムの高さ
+		static constexpr int16_t DEF_FILER_DRAG_TH        = 10; ///< 標準、ファイラー、ドラッグ開始のスレッショルド幅
 		static constexpr uint16_t DEF_FILER_LOOP		  = 2;	///< 標準、１フレームに取得するファイル情報数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -168,6 +169,8 @@ namespace gui {
 			BOTTOM,	///< 下寄せ
 		};
 
+		static constexpr int16_t SIZE_AUTO = 0;		///< 自動で最適なサイズをロードする。
+
 	private:
 
 		widget*		parents_;	///< 親
@@ -228,6 +231,15 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		virtual ID get_id() const = 0; 
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ハイブリッド・タイプか検査
+			@return ハイブリッドの場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		virtual bool hybrid() const noexcept { return false; } 
 
 
 		//-----------------------------------------------------------------//

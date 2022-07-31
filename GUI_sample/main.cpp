@@ -160,21 +160,34 @@ namespace {
 	typedef gui::progress PROGRESS;
 	PROGRESS	progress_(vtx::srect(240, 220, 150, 0));
 
-	BUTTON	next_(vtx::srect(480-45, 272-45, 40, 40), ">", BUTTON::STYLE::CIRCLE_WITH_FRAME);
+	BUTTON		next0_(vtx::srect(480-45, 272-45, 40, 40), ">", BUTTON::STYLE::CIRCLE_WITH_FRAME);
+
+	// --- page 1
+	BUTTON		prev1_(vtx::srect(5, 5, 40, 40), "<", BUTTON::STYLE::CIRCLE_WITH_FRAME);
+	BUTTON		next1_(vtx::srect(480 - 40 - 5, 5, 40, 40), ">", BUTTON::STYLE::CIRCLE_WITH_FRAME);
+
+	TEXT		text_asc_(vtx::srect(70, 0, 260, 20));
+	typedef gui::key_asc KEY_ASC;
+	KEY_ASC		key_asc_(vtx::srect((480 - KEY_ASC::BOARD_WIDTH) / 2, 272 - KEY_ASC::BOARD_HEIGHT, WIDGET::SIZE_AUTO, WIDGET::SIZE_AUTO));
 
 	// --- page 2
+	BUTTON		prev2_(vtx::srect(5, 5, 40, 40), "<", BUTTON::STYLE::CIRCLE_WITH_FRAME);
+	BUTTON		next2_(vtx::srect(480 - 40 - 5, 5, 40, 40), ">", BUTTON::STYLE::CIRCLE_WITH_FRAME);
 
-	BUTTON	prev_(vtx::srect(5, 272-45, 40, 40), "<", BUTTON::STYLE::CIRCLE_WITH_FRAME);
+	TEXT		text_10_(vtx::srect(70, 0, 260, 20));
+	typedef gui::key_10 KEY_10;
+//	KEY_10		key_10_(vtx::srect(240, 0, WIDGET::SIZE_AUTO, WIDGET::SIZE_AUTO));
+	KEY_10		key_10_(vtx::srect(40, 100, WIDGET::SIZE_AUTO, WIDGET::SIZE_AUTO), KEY_10::STYLE::W5_H2);
 
-	TEXT		key_text_(vtx::srect(10, 10, 260, 20));
-	typedef gui::key_asc KEY_ASC;
-	KEY_ASC		key_asc_(vtx::srect(0, 60, 0, 0));
+	// --- page 3
+	BUTTON		prev3_(vtx::srect(5, 5, 40, 40), "<", BUTTON::STYLE::CIRCLE_WITH_FRAME);
 
 	typedef gui::filer FILER;
-	FILER		filer_(vtx::srect(10, 10, 300, 200));
+	FILER		filer_(vtx::srect(80, 10, 320, 240));
 
 	float		progress_ratio_ = 0.0f;
-	utils::fixed_string<32> key_buff_;
+	utils::fixed_string<32> buff_asc_;
+	utils::fixed_string<16> buff_10_;
 
 	void setup_gui_()
 	{
@@ -292,45 +305,90 @@ namespace {
 			return ratio;
 		};
 
-		next_.set_layer(WIDGET::LAYER::_0);
-		next_.at_select_func() = [=](uint32_t id) {
+		// page 0
+		next0_.set_layer(WIDGET::LAYER::_0);
+		next0_.at_select_func() = [=](uint32_t id) {
 			widd_.clear();
 			widd_.enable(WIDGET::LAYER::_0, false);
 			widd_.enable(WIDGET::LAYER::_1);
 		};
 
-		// page 2
-		prev_.set_layer(WIDGET::LAYER::_1);
-		prev_.at_select_func() = [=](uint32_t id) {
+		// page 1
+		prev1_.set_layer(WIDGET::LAYER::_1);
+		prev1_.at_select_func() = [=](uint32_t id) {
 			widd_.clear();
 			widd_.enable(WIDGET::LAYER::_0);
 			widd_.enable(WIDGET::LAYER::_1, false);
 		};
 
-		key_text_.set_layer(WIDGET::LAYER::_1);
-		key_text_.enable_scroll(false);
-		key_text_.set_title(key_buff_.c_str());
+		next1_.set_layer(WIDGET::LAYER::_1);
+		next1_.at_select_func() = [=](uint32_t id) {
+			widd_.clear();
+			widd_.enable(WIDGET::LAYER::_1, false);
+			widd_.enable(WIDGET::LAYER::_2);
+		};
+
+		text_asc_.set_layer(WIDGET::LAYER::_1);
+		text_asc_.enable_scroll(false);
+		text_asc_.set_title(buff_asc_.c_str());
 
 		key_asc_.set_layer(WIDGET::LAYER::_1);
 		key_asc_.at_select_func() = [=](char code, KEY_ASC::KEY_MAP key_map) {
-			if(code == KEY_ASC::KEY_BACK_SPACE) {
-				key_buff_.pop_back();
-				key_text_.set_update();
+			if(code == KEY_ASC::KEY_BACK_SPACE || code == KEY_ASC::KEY_DEL) {
+				buff_asc_.pop_back();
+				text_asc_.set_update();
 			} else if(code == KEY_ASC::KEY_ENTER) {
-				key_buff_.clear();
-				key_text_.set_update();
+				buff_asc_.clear();
+				text_asc_.set_update();
 			} else if(code >= 0x20 && code <= 0x7f) {
-				if(key_buff_.capacity() == key_buff_.size()) {
-					key_buff_.erase(0, 1);
+				if(buff_asc_.capacity() == buff_asc_.size()) {
+					buff_asc_.erase(0, 1);
 				}
-				key_buff_ += code;
-				key_text_.set_update();
+				buff_asc_ += code;
+				text_asc_.set_update();
 			}
 			auto map = static_cast<uint16_t>(key_map);
-			utils::format("0x%02X (%d): '%c'\n") % map % map % code; 
+			utils::format("ASCII Key: 0x%02X (%d): '%c'\n") % map % map % code; 
 		};
 
-//		filer_.set_layer(WIDGET::LAYER::_1);
+		// page 2
+		prev2_.set_layer(WIDGET::LAYER::_2);
+		prev2_.at_select_func() = [=](uint32_t id) {
+			widd_.clear();
+			widd_.enable(WIDGET::LAYER::_1);
+			widd_.enable(WIDGET::LAYER::_2, false);
+		};
+		next2_.set_layer(WIDGET::LAYER::_2);
+		next2_.at_select_func() = [=](uint32_t id) {
+			widd_.clear();
+			widd_.enable(WIDGET::LAYER::_2, false);
+			widd_.enable(WIDGET::LAYER::_3);
+		};
+
+		text_10_.set_layer(WIDGET::LAYER::_2);
+		text_10_.enable_scroll(false);
+		text_10_.set_title(buff_10_.c_str());
+
+		key_10_.set_layer(WIDGET::LAYER::_2);
+		key_10_.at_select_func() = [=](char code, KEY_10::KEY_MAP key_map) {
+			if(buff_10_.capacity() == buff_10_.size()) {
+				buff_10_.erase(0, 1);
+			}
+			buff_10_ += code;
+			text_10_.set_update();
+			auto map = static_cast<uint16_t>(key_map);
+			utils::format("10 Key: 0x%02X (%d): '%c'\n") % map % map % code; 
+		};
+
+		// page 3
+		prev3_.set_layer(WIDGET::LAYER::_3);
+		prev3_.at_select_func() = [=](uint32_t id) {
+			widd_.clear();
+			widd_.enable(WIDGET::LAYER::_2);
+			widd_.enable(WIDGET::LAYER::_3, false);
+		};
+
+		filer_.set_layer(WIDGET::LAYER::_3);
 
 		widd_.enable(WIDGET::LAYER::_0);
 	}

@@ -15,28 +15,33 @@ namespace gui {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	ターミナル・クラス
-		@param[in]	SX		横幅
-		@param[in]	SY		高さ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t SX, uint32_t SY>
 	struct term : public widget {
 
 		typedef term value_type;
 
+		static constexpr uint32_t SX = 80;
+		static constexpr uint32_t SY = 24;
+
 	private:
-		uint8_t		code_[SX * SY];
+		struct cha_t {
+			uint8_t	code;
+			bool	draw;
+			cha_t() noexcept : code(0), draw(false) { }
+		};
+
+		cha_t	cha_[SX * SY];
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		タイトル
 		*/
 		//-----------------------------------------------------------------//
-		term(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
-			widget(loc, str), code_{ 0x20 }
+		term(const vtx::srect& loc = vtx::srect(0)) noexcept :
+			widget(loc, nullptr), cha_{ }
 		{
 			insert_widget(this);
 		}
@@ -108,5 +113,27 @@ namespace gui {
 		{
 		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画
+			@param[in] rdr	レンダリングクラス
+		*/
+		//-----------------------------------------------------------------//
+		template<class RDR>
+		void draw(RDR& rdr) noexcept
+		{
+			auto r = vtx::srect(get_final_position(), get_location().size);
+			for(auto& c : cha_) {
+//				uint8_t inten = 64;
+//				if(c.level) {
+//					inten = 192;
+//				}
+				if(c.draw || get_state() == STATE::STALL) {
+				}
+
+				rdr.fill_box(r);
+			}
+		}
 	};
 }

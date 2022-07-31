@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	ASCII ソフトキーボード @n
 			タッチ操作で入力する、ソフトキーボード
@@ -8,7 +8,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "gui/widget.hpp"
 
 namespace gui {
@@ -27,20 +27,20 @@ namespace gui {
 	}
 
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	ASCII ソフトキー・クラス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct key_asc : public widget {
 
 		typedef key_asc value_type;
 
-		//=============================================================//
+		//=================================================================//
 		/*!
 			@brief	キーマップ型
 		*/
-		//=============================================================//
+		//=================================================================//
 		enum class KEY_MAP : uint8_t {
 			ORG,	///< ` ~
 			_1,		///< 1 !
@@ -86,7 +86,7 @@ namespace gui {
 			AP_DQ,	///< ' "
 			ENTER,	///< Enter
 
-			SHIFT_L,	///< ShiftLeft
+			SHIFT,	///< Shift
 			Z,		///< Z Z
 			X,		///< X x
 			C,		///< C c
@@ -97,25 +97,27 @@ namespace gui {
 			KA_LI,	///< , <
 			CO_LR,	///< . >
 			SL_QS,	///< / ?
-			SHIFT_R,	///< ShiftRight
+			A_UP,	///< Arrow Up
+			DEL,	///< Delete
 
 			CTRL,	///< Ctrl
 			ALT,	///< Alt
 			SPACE,	///< Space
 			FN,		///< Function
+			OPT,	///< Option
 			A_LEFT,		///< Arrow Left
 			A_DOWN,		///< Arrow Down
 			A_RIGHT,	///< Arrow Right
-			A_UP,		///< Arrow Up
+
 			NONE,	///< 無効状態
 		};
 
 		typedef std::function<void(char, KEY_MAP)> SELECT_FUNC_TYPE;
 
 	private:
-		static constexpr int16_t space = 2;  // 隙間
+		static constexpr int16_t spc = 2;  // 隙間
 
-		static constexpr int16_t sz_x = 30;  // 通常幅
+		static constexpr int16_t sz_x = 30;  // 通常キー幅
 		static constexpr int16_t sz1x = 43;  // TAB 幅
 		static constexpr int16_t sz2x = 56;  // バックスペース幅
 		static constexpr int16_t sz3x = 52;  // CAPS LOCK 幅
@@ -126,36 +128,39 @@ namespace gui {
 		static constexpr int16_t sz8x = 56;  // CTRL, ALT, FN 幅
 		static constexpr int16_t sz9x = 150; // SPACE 幅 
 		static constexpr int16_t szax = 35;  // ARROW 幅
+		static constexpr int16_t szbx = 40;  // '/' キー
 
 		static constexpr int16_t g0_x = 0;
-		static constexpr int16_t g1_x = g0_x + sz1x + space;
-		static constexpr int16_t g2_x = g0_x + sz3x + space;
-		static constexpr int16_t g3_x = g0_x + sz4x + space;
-		static constexpr int16_t g4_x = g0_x + sz8x * 2 + sz9x + space * 3;
-		static constexpr int16_t g5_x = g4_x + sz8x + space;
+		static constexpr int16_t g1_x = g0_x + sz1x + spc;
+		static constexpr int16_t g2_x = g0_x + sz3x + spc;
+		static constexpr int16_t g3_x = g0_x + sz4x + spc;
+		static constexpr int16_t g4_x = g0_x + sz8x * 2 + sz9x + spc * 3;
+		static constexpr int16_t g5_x = g4_x + sz8x + spc;
+		static constexpr int16_t g6_x = g3_x + (sz_x + spc) * 9 + spc + szbx;
 
-		static constexpr int16_t sp_x = sz_x + space;
-		static constexpr int16_t sp3x = sz8x + space;
-		static constexpr int16_t sp5x = szax + space;
+		static constexpr int16_t sp_x = sz_x + spc;
+		static constexpr int16_t sp3x = sz8x + spc;
+		static constexpr int16_t sp5x = szax + spc;
 
 		static constexpr int16_t g0_y = 0;
-		static constexpr int16_t sz_y = 30;
-		static constexpr int16_t sp_y = sz_y + space;
+		static constexpr int16_t sz_y = 30;  // キー高さ
+		static constexpr int16_t sp_y = sz_y + spc;
 
 	public:
-		static constexpr int16_t BOARD_WIDTH  = 13 * sp_x + sz2x + space;	///< ボード幅
-		static constexpr int16_t BOARD_HEIGHT = sp_y * 5;					///< ボード高さ
+		static constexpr int16_t BOARD_WIDTH  = 13 * sp_x + sz2x + spc;	///< ボード幅（474）
+		static constexpr int16_t BOARD_HEIGHT = sp_y * 5;					///< ボード高さ（160）
 
 		static constexpr char KEY_BACK_SPACE  = 0x08;	///< バックスペース
 		static constexpr char KEY_TAB         = 0x09;	///< TAB
 		static constexpr char KEY_ENTER       = 0x0D;	///< ENTER
+		static constexpr char KEY_DEL         = 0x7F;	///< DELETE
 
 		static constexpr char KEY_CAPS_LOCK   = 0x80;	///< CapsLock
-		static constexpr char KEY_SHIFT_LEFT  = 0x81;	///< Shift Left
-		static constexpr char KEY_SHIFT_RIGHT = 0x82;	///< Shift Right
-		static constexpr char KEY_CTRL        = 0x83;	///< CTRL
-		static constexpr char KEY_ALT         = 0x84;	///< ALT
-		static constexpr char KEY_FN          = 0x85;	///< FN
+		static constexpr char KEY_SHIFT       = 0x81;	///< Shift
+		static constexpr char KEY_CTRL        = 0x82;	///< CTRL
+		static constexpr char KEY_ALT         = 0x83;	///< ALT
+		static constexpr char KEY_FN          = 0x84;	///< FN
+		static constexpr char KEY_OPT         = 0x85;	///< FN
 		static constexpr char KEY_ARROW_LEFT  = 0x86;	///< Left 方向
 		static constexpr char KEY_ARROW_DOWN  = 0x87;	///< Down 方向
 		static constexpr char KEY_ARROW_RIGHT = 0x88;	///< Right 方向
@@ -208,7 +213,7 @@ namespace gui {
 			{ { g2_x + sp_x * 10, g0_y + sp_y * 2, sz_x, sz_y }, '\'', '"' },
 			{ { g2_x + sp_x * 11, g0_y + sp_y * 2, sz7x, sz_y }, KEY_ENTER, KEY_ENTER },
 
-			{ { g0_x,             g0_y + sp_y * 3, sz4x, sz_y }, KEY_SHIFT_LEFT, KEY_SHIFT_LEFT },
+			{ { g0_x,             g0_y + sp_y * 3, sz4x, sz_y }, KEY_SHIFT, KEY_SHIFT },
 			{ { g3_x + sp_x *  0, g0_y + sp_y * 3, sz_x, sz_y }, 'z', 'Z' },
 			{ { g3_x + sp_x *  1, g0_y + sp_y * 3, sz_x, sz_y }, 'x', 'X' },
 			{ { g3_x + sp_x *  2, g0_y + sp_y * 3, sz_x, sz_y }, 'c', 'C' },
@@ -218,17 +223,18 @@ namespace gui {
 			{ { g3_x + sp_x *  6, g0_y + sp_y * 3, sz_x, sz_y }, 'm', 'M' },
 			{ { g3_x + sp_x *  7, g0_y + sp_y * 3, sz_x, sz_y }, ',', '<' },
 			{ { g3_x + sp_x *  8, g0_y + sp_y * 3, sz_x, sz_y }, '.', '>' },
-			{ { g3_x + sp_x *  9, g0_y + sp_y * 3, sz_x, sz_y }, '/', '?' },
-			{ { g3_x + sp_x * 10, g0_y + sp_y * 3, sz5x, sz_y }, KEY_SHIFT_RIGHT, KEY_SHIFT_RIGHT },
+			{ { g3_x + sp_x *  9, g0_y + sp_y * 3, szbx, sz_y }, '/', '?' },
+			{ { g6_x,             g0_y + sp_y * 3, szax, sz_y }, KEY_ARROW_UP, KEY_ARROW_UP },
+			{ { g6_x + sp5x *  1, g0_y + sp_y * 3, szax, sz_y }, KEY_DEL, KEY_DEL },
 	
 			{ { g0_x + sp3x *  0, g0_y + sp_y * 4, sz8x, sz_y }, KEY_CTRL, KEY_CTRL },
 			{ { g0_x + sp3x *  1, g0_y + sp_y * 4, sz8x, sz_y }, KEY_ALT,  KEY_ALT },
 			{ { g0_x + sp3x *  2, g0_y + sp_y * 4, sz9x, sz_y }, ' ', ' ' },
 			{ { g4_x            , g0_y + sp_y * 4, sz8x, sz_y }, KEY_FN, KEY_FN },
-			{ { g5_x + sp5x *  0, g0_y + sp_y * 4, szax, sz_y }, KEY_ARROW_LEFT,  KEY_ARROW_LEFT  },
-			{ { g5_x + sp5x *  1, g0_y + sp_y * 4, szax, sz_y }, KEY_ARROW_DOWN,  KEY_ARROW_DOWN  },
-			{ { g5_x + sp5x *  2, g0_y + sp_y * 4, szax, sz_y }, KEY_ARROW_RIGHT, KEY_ARROW_RIGHT },
-			{ { g5_x + sp5x *  3, g0_y + sp_y * 4, szax, sz_y }, KEY_ARROW_UP,    KEY_ARROW_UP    }
+			{ { g5_x + sp5x *  0, g0_y + sp_y * 4, szax, sz_y }, KEY_OPT, KEY_OPT  },
+			{ { g5_x + sp5x *  1, g0_y + sp_y * 4, szax, sz_y }, KEY_ARROW_LEFT,  KEY_ARROW_LEFT  },
+			{ { g5_x + sp5x *  2, g0_y + sp_y * 4, szax, sz_y }, KEY_ARROW_DOWN,  KEY_ARROW_DOWN  },
+			{ { g5_x + sp5x *  3, g0_y + sp_y * 4, szax, sz_y }, KEY_ARROW_RIGHT, KEY_ARROW_RIGHT }
 		};
 
 		struct key_t {
@@ -238,7 +244,7 @@ namespace gui {
 			bool	draw;
 			key_t() noexcept : level(false), positive(false), negative(false), draw(false) { }
 		};
-		key_t	key_[14 + 14 + 13 + 12 + 8];
+		key_t	key_[14 + 14 + 13 + 13 + 8];
 
 		SELECT_FUNC_TYPE	select_func_;
 		char	code_;
@@ -248,6 +254,7 @@ namespace gui {
 		bool	alt_;
 		bool	lock_;
 		bool	fn_;
+		bool	opt_;
 
 		char shift_caps_lock_code_(int idx)
 		{
@@ -282,10 +289,10 @@ namespace gui {
 			@param[in]	loc		ロケーション
 		*/
 		//-----------------------------------------------------------------//
-		key_asc(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr) noexcept :
-			widget(loc, str), key_{ },
+		key_asc(const vtx::srect& loc = vtx::srect(0)) noexcept :
+			widget(loc, nullptr), key_{ },
 			select_func_(), code_(0xff), key_map_(KEY_MAP::NONE),
-			shift_(false), ctrl_(false), alt_(false), lock_(false), fn_(false)
+			shift_(false), ctrl_(false), alt_(false), lock_(false), fn_(false), opt_(false)
 		{
 			if(at_location().size.x <= 0) {
 				at_location().size.x = BOARD_WIDTH;
@@ -329,6 +336,15 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ハイブリッド・タイプか検査
+			@return ハイブリッドの場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool hybrid() const noexcept override { return true; } 
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	初期化
 		*/
 		//-----------------------------------------------------------------//
@@ -361,8 +377,7 @@ namespace gui {
 					key_map_ = static_cast<KEY_MAP>(i);
 					auto code = key_locations_[i].code;
 					switch(code) {
-					case KEY_SHIFT_RIGHT:
-					case KEY_SHIFT_LEFT:
+					case KEY_SHIFT:
 						shift_ = !shift_;
 						code_ = code;
 						break;
@@ -380,6 +395,10 @@ namespace gui {
 						break;
 					case KEY_FN:
 						fn_ = !fn_;
+						code_ = code;
+						break;
+					case KEY_OPT:
+						opt_ = !opt_;
 						code_ = code;
 						break;
 					default:
@@ -402,15 +421,8 @@ namespace gui {
 				++i;
 			}
 
-			if(key_[static_cast<uint8_t>(KEY_MAP::SHIFT_L)].draw) {
-				key_[static_cast<uint8_t>(KEY_MAP::SHIFT_R)].draw = true;
-			}
-			if(key_[static_cast<uint8_t>(KEY_MAP::SHIFT_R)].draw) {
-				key_[static_cast<uint8_t>(KEY_MAP::SHIFT_L)].draw = true;
-			}
 			// shift, lock キーが変化したら、関係するキーの描画をやり直す必要がある。
-			if(key_[static_cast<uint8_t>(KEY_MAP::SHIFT_L)].draw || key_[static_cast<uint8_t>(KEY_MAP::SHIFT_R)].draw
-				|| key_[static_cast<uint8_t>(KEY_MAP::CAPS_LOCK)].draw) {
+			if(key_[static_cast<uint8_t>(KEY_MAP::SHIFT)].draw || key_[static_cast<uint8_t>(KEY_MAP::CAPS_LOCK)].draw) {
 				uint32_t i = 0;
 				for(auto& k : key_) {
 					auto code = key_locations_[i].code;
@@ -475,7 +487,7 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	再描画をリクエスト
+			@brief	全体再描画をリクエスト
 		*/
 		//-----------------------------------------------------------------//
 		void request_redraw() noexcept
@@ -543,8 +555,12 @@ namespace gui {
 							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Enter");
 						}
 						break;
-					case KEY_SHIFT_LEFT:
-					case KEY_SHIFT_RIGHT: {
+					case KEY_DEL: {
+							vtx::spos sz(8 * 3, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "DEL");
+						}
+						break;
+					case KEY_SHIFT: {
 							vtx::spos sz(8 * 5, 16);
 							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Shift");
 							if(shift_) {
@@ -578,6 +594,16 @@ namespace gui {
 							vtx::spos sz(8 * 2, 16);
 							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Fn");
 							if(fn_) {
+								rr.org += 2;
+								rr.size -= 2 * 2;
+								rdr.frame(rr);
+							}
+						}
+						break;
+					case KEY_OPT: {
+							vtx::spos sz(8 * 3, 16);
+							rdr.draw_text(rr.org + (rr.size - sz) / 2, "Opt");
+							if(opt_) {
 								rr.org += 2;
 								rr.size -= 2 * 2;
 								rdr.frame(rr);
