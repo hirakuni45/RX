@@ -450,9 +450,9 @@ namespace gui {
 					break;
 				case widget::ID::TERM:
 					{
-//						auto* w = dynamic_cast<term*>(t.w_);
-//						if(w == nullptr) break;
-//						w->draw(rdr_);
+						auto* w = dynamic_cast<term*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
 					}
 					break;
 				case widget::ID::SPINBOX:
