@@ -63,7 +63,7 @@
 // 2 : print warning
 // 3 : print info
 #ifndef CFG_TUSB_DEBUG
-#define CFG_TUSB_DEBUG        3
+#define CFG_TUSB_DEBUG        0
 #endif
 
 // Enable Host stack

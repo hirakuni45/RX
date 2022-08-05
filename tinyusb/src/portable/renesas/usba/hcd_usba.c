@@ -527,7 +527,7 @@ static void process_pipe_brdy(uint8_t rhport, unsigned num)
 bool hcd_init(uint8_t rhport)
 {
   (void)rhport;
-  printf("hcd_init:\n");
+  TU_LOG2("hcd_init: %d\n", (int)rhport);
 
   /* Enable USB0 */
 
@@ -608,7 +608,7 @@ bool hcd_port_connect_status(uint8_t rhport)
 
 void hcd_port_reset(uint8_t rhport)
 {
-	printf("hcd_port_reset:\n");
+  TU_LOG2("hcd_port_reset: %d\n", (int)rhport);
 
   USB0.DCPCTR.WORD = USB_PIPECTR_PID_NAK;
   while (USB0.DCPCTR.BIT.PBUSY) ;
@@ -643,6 +643,7 @@ tusb_speed_t hcd_port_speed_get(uint8_t rhport)
 
 void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
 {
+  TU_LOG2("hcd_device_close: %d, dev_addr: %d\n", (int)rhport, (int)dev_addr);
   (void)rhport;
   uint16_t volatile *ctr;
   TU_ASSERT(dev_addr < 6,); /* USBa can only handle addresses from 0 to 5. */
@@ -672,6 +673,8 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
  *--------------------------------------------------------------------+*/
 bool hcd_setup_send(uint8_t rhport, uint8_t dev_addr, uint8_t const setup_packet[8])
 {
+  TU_LOG2("hcd_setup_send: %d, dev_addr: dev_addr: %d\n", (int)rhport, (int)dev_addr);
+
   (void)rhport;
   //  TU_LOG1("S %d %x\n", dev_addr, USB0.DCPCTR.WORD);
 
@@ -704,6 +707,7 @@ bool hcd_setup_send(uint8_t rhport, uint8_t dev_addr, uint8_t const setup_packet
 
 bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const * ep_desc)
 {
+  TU_LOG2("hcd_edpt_open: %d, dev_addr: %d\n", (int)rhport, (int)dev_addr);
   (void)rhport;
   TU_ASSERT(dev_addr < 6); /* USBa can only handle addresses from 0 to 5. */
 
@@ -721,15 +725,15 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
     *devadd = (TUSB_SPEED_FULL == devtree.speed) ? USB_DEVADD_FULL : USB_DEVADD_LOW;
     _hcd.ctl_mps[dev_addr] = mps;
 
-		printf("edpt_open: epn_ = 0 dev_addr: %d\n", (int)dev_addr);
+		TU_LOG2("  epn_ = 0\n");
 
 		uint16_t reg = *devadd >> 6;
 		if(reg == 0b01) {
-			printf("edpt_open: LOW SPEED\n");
+			TU_LOG2("edpt_open: LOW SPEED\n");
 		} else if(reg == 0b10) {
-			printf("edpt_open: FULL SPEED\n");
+			TU_LOG2("  FULL SPEED\n");
 		} else {
-			printf("edpt_open: INVALID SPEED\n");
+			TU_LOG2("  INVALID SPEED\n");
 		}
 
     return true;
@@ -737,14 +741,12 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
 
 	tusb_speed_t spt = hcd_port_speed_get(rhport);
 	if(spt == TUSB_SPEED_FULL) {
-		printf("edpt_open: FULL SPEED\n");
+		TU_LOG2("  epn_ != 0, FULL SPEED\n");
 	} else if(spt == TUSB_SPEED_LOW) {
-		printf("edpt_open: LOW SPEED\n");
+		TU_LOG2("  epn_ != 0, LOW SPEED\n");
 	} else {
-		printf("edpt_open: INVALID SPEED\n");
+		TU_LOG2("  epn_ != 0, INVALID SPEED\n");
 	}
-
-
 
   const unsigned dir_in = tu_edpt_dir(ep_addr);
   const unsigned xfer   = ep_desc->bmAttributes.xfer;
@@ -787,6 +789,7 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
 
 bool hcd_edpt_xfer(uint8_t rhport, uint8_t dev_addr, uint8_t ep_addr, uint8_t *buffer, uint16_t buflen)
 {
+  TU_LOG2("hcd_edpt_xfer: %d, dev_addr: %d, ep_addr: %d, len: %d\n", rhport, dev_addr, ep_addr, buflen);
   bool r;
   hcd_int_disable(rhport);
   // TU_LOG1("X %d %x %u\n", dev_addr, ep_addr, buflen);
