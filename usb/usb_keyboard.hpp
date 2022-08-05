@@ -369,6 +369,19 @@ namespace usb {
 			fifo_()
 		{ }
 
+		void reset() noexcept
+		{
+			for(uint8_t i = 0; i < KEY_BUFF_NUM; ++i) {
+				key_pad_[i] = 0;
+			}
+			shift_ = false;
+			ctrl_ = false;
+			num_lock_ = false;
+			caps_lock_ = false;
+			scroll_lock_ = false;
+			led_bits_ = 0;
+			fifo_.clear();
+		}
 
 		void injection(const uint8_t* msg, uint16_t len) noexcept
 		{

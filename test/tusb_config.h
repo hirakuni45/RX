@@ -57,8 +57,13 @@
 #define CFG_TUSB_OS           OPT_OS_NONE
 #endif
 
+// CFG_TUSB_DEBUG for debugging
+// 0 : no debug
+// 1 : print error
+// 2 : print warning
+// 3 : print info
 #ifndef CFG_TUSB_DEBUG
-#define CFG_TUSB_DEBUG        0
+#define CFG_TUSB_DEBUG        3
 #endif
 
 // Enable Host stack

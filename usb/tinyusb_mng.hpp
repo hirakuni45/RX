@@ -66,6 +66,12 @@ namespace device {
 			uint8_t		dev_addr;
 			uint8_t		instance;
 			uint8_t		leds_pad;
+
+			holder_t() noexcept : hid_info{}, rpt_info(nullptr),
+				first_id(false), hid_type{ HID_TYPE::NONE }, hid_num(0),
+				key_pad{ 0 }, led_bits(0),
+				send_led(false), dev_addr(0), instance(0), leds_pad(0)
+				{ }
 		};
 		static holder_t holder_;
 
@@ -268,7 +274,7 @@ namespace device {
 		{
 			if(holder_.send_led) {
 				if(!tuh_hid_set_report(holder_.dev_addr, holder_.instance, 0, HID_REPORT_TYPE_OUTPUT, &holder_.led_bits, sizeof(holder_.led_bits))) {
-					format("set report fail...\n");
+					format("tuh_hid_set_report: fail...\n");
 				}
 				holder_.send_led = false;
 			}
@@ -369,16 +375,17 @@ namespace device {
 
 #if CFG_TUH_HID
 			hid_num_ = BASE::holder_.hid_num;
-			auto led_back = holder_.led_bits;
 			for(uint8_t i = 0; i < hid_num_; ++i) {
 				hid_type_[i] = BASE::holder_.hid_type[i];
 				if(hid_type_[i] == HID_TYPE::KEYBOARD) {
 					keyboard_.injection(BASE::holder_.key_pad, sizeof(BASE::holder_.key_pad));
+					auto led_back = holder_.led_bits;
+					holder_.led_bits = keyboard_.get_led_state();
+					if(led_back != holder_.led_bits) {
+						holder_.send_led = true;
+					}
+					break;  // とりあえず、最初の１台だけサービス
 				}
-			}
-			holder_.led_bits = keyboard_.get_led_state();
-			if(led_back != holder_.led_bits) {
-				holder_.send_led = true;
 			}
 			BASE::hid_app_task();
 #endif
