@@ -33,7 +33,6 @@
 #include "usb/usb_io.hpp"
 #include "usb/usb_hmsc.hpp"
 #include "usb/usb_hhid.hpp"
-#include "usb/usb_keyboard.hpp"
 
 // SD カードを併用する場合有効にする
 // #define WITH_SDC
@@ -60,9 +59,6 @@ namespace {
 
 	typedef usb_host::hhid<USB_IO> HHID;
 	HHID		hhid_(usb_io_);
-
-	typedef usb::keyboard KEYBOARD;
-	KEYBOARD	kbd_;
 
 #ifdef WITH_SDC
 	// カード電源制御を使わない場合、「device::NULL_PORT」を指定する。
