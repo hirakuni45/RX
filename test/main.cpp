@@ -17,7 +17,7 @@
 #include "common/command.hpp"
 #include "common/input.hpp"
 
-#define TEST_CMT
+// #define TEST_CMT
 // #ifdef TFU
 // #define OUT_TPU
 // #define OUT_MTU
@@ -25,7 +25,7 @@
 // #define TEST_QSPI
 // #define TEST_MTU
 // #define TEST_TMR
-// #define TINY_USB
+#define TINY_USB
 
 #ifdef OUT_TPU
 #include "common/tpu_io.hpp"
@@ -54,11 +54,7 @@
 #endif
 
 #ifdef TINY_USB
-#include "tusb.h"
-
-extern "C" void cdc_task(void);
-extern "C" void hid_app_task(void);
-
+#include "usb/tinyusb_mng.hpp"
 #endif
 
 #if 0
@@ -116,21 +112,29 @@ namespace {
 	CMD		cmd_;
 
 #ifdef TEST_CMT
+	static const char* module_str_ = { "CMT" };
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
 #endif
 
-#ifdef TEST_USB
+#ifdef TINY_USB
+	static const char* module_str_ = { "USB0" };
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
+
+	// RX72N Envision Kit
+	typedef device::tinyusb_mng<device::USB0, device::port_map::ORDER::SECOND> TINYUSB;
+	TINYUSB	tinyusb_;
 #endif
 
 #ifdef OUT_TPU
+	static const char* module_str_ = { "TPU4" };
 	typedef device::tpu_io<device::TPU4> TPU;
 	TPU		tpu_;
 #endif
 
 #ifdef OUT_MTU
+	static const char* module_str_ = { "MTU4" };
 	typedef device::MTU4 MTU;
 	static const auto PSEL = device::port_map_mtu::ORDER::FIFTH;
 	typedef device::mtu_io<MTU, utils::null_task, utils::null_task, PSEL> MTU_IO;
@@ -140,6 +144,7 @@ namespace {
 
 #ifdef SCI_I2C
 	// RX72N Envision kit touch panel
+	static const char* module_str_ = { "RX72N Envision Kit/Touch Panel" };
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 	typedef utils::fixed_fifo<uint8_t, 64> RB64;
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
@@ -161,6 +166,7 @@ namespace {
 #endif
 
 #ifdef TEST_QSPI
+	static const char* module_str_ = { "QSPI" };
 	device::port_map_qspi::group_t qspi_order_(device::port_map_order::RENESAS::RX72N_ENVISION_KIT);
 	typedef device::qspi_io<device::QSPI> QSPI_IO;
 	QSPI_IO		qspi_io_(qspi_order_);
@@ -170,12 +176,14 @@ namespace {
 #endif
 
 #ifdef TEST_MTU
+	static const char* module_str_ = { "MTU0" };
 	typedef device::MTU0 MTU_CH;
 	typedef device::mtu_io<MTU_CH, utils::null_task> MTU_IO;
 	MTU_IO		mtu_io_;
 #endif
 
 #ifdef TEST_TMR
+	static const char* module_str_ = { "TMR0" };
 	typedef device::TMR0 TMR_CH;
 	typedef device::tmr_mgr<TMR_CH, utils::count_task> TMR_MGR;
 	TMR_MGR		tmr_mgr_;
@@ -206,8 +214,8 @@ extern "C" {
 	{
 		return sci_.recv_length();
 	}
-
 }
+
 
 int main(int argc, char** argv);
 
@@ -220,6 +228,9 @@ int main(int argc, char** argv)
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
 
+		auto iclk = device::clock_profile::ICLK / 1'000'000;
+		utils::format("Start '%s' test for '%s' %d[MHz]\n") % module_str_ % system_str_ % iclk;
+
 		utils::format("SCI Baud rate (set):  %d\n") % sci_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
 		rate *= 100.0f;
@@ -227,9 +238,6 @@ int main(int argc, char** argv)
 	}
 
 	LED::OUTPUT();  // LED ポートを出力に設定
-
-	auto iclk = device::clock_profile::ICLK / 1'000'000;
-	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
 
 #ifdef TEST_CMT
 	{  // タイマー設定
@@ -242,17 +250,6 @@ int main(int argc, char** argv)
 			rate *= 100.0f;
 			utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 		}
-	}
-#endif
-
-#ifdef TEST_USB
-	{  // タイマー設定
-		uint8_t intr = 4;
-		cmt_.start(100, intr);
-		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
-		float rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
-		rate *= 100.0f;
-		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 #endif
 
@@ -342,16 +339,6 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	cmd_.set_prompt("# ");
-
-#if 0
-	if(0) {
-		float a = 1.999999f;
-		// printf("Value: %5.4f\n", (double)a);
-		utils::format("Value: %8.7f\n") % a;
-	}
-#endif
-
 #ifdef TINY_USB
 	{  // タイマー設定
 		uint8_t intr = 4;
@@ -361,11 +348,20 @@ int main(int argc, char** argv)
 		rate *= 100.0f;
 		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
-
-	tusb_init();
+	{
+		uint8_t intr = 5;
+		if(tinyusb_.start(intr)) {
+			utils::format("Start USB: OK!\n");
+		} else {
+			utils::format("Start USB: fail...\n");
+		}
+	}
 #endif
 
-	uint8_t cnt = 0;
+	cmd_.set_prompt("# ");
+
+	uint16_t cnt = 0;
+	uint16_t cnt_max = 50;  // by 100Hz
 	while(1) {
 
 #ifdef TEST_CMT
@@ -375,16 +371,23 @@ int main(int argc, char** argv)
 //-------------------------------
 
 #ifdef TINY_USB
+		cnt_max = 500;
 		cmt_.sync();
 
-		tuh_task();
-#if CFG_TUH_CDC
-		cdc_task();
-#endif
+		tinyusb_.service();
 
-#if CFG_TUH_HID
-		hid_app_task();
-#endif
+		if(tinyusb_.get_hid_type(0) == TINYUSB::HID_TYPE::KEYBOARD) {
+			auto& k = tinyusb_.at_keyboard();
+			if(k.get_num() > 0) {
+				auto t = k.get_key();
+				if(t.code == 0x0d) {
+					utils::format("\n");
+				} else {
+					utils::format("%c") % t.code;
+					utils::format::flush();
+				}
+			}
+		}
 #endif
 
 //------------------------------
@@ -451,10 +454,10 @@ touch_.update();
 
 
 		++cnt;
-		if(cnt >= 50) {
+		if(cnt >= cnt_max) {
 			cnt = 0;
 		}
-		if(cnt < 25) {
+		if(cnt < (cnt_max / 2)) {
 			LED::P = 0;
 		} else {
 			LED::P = 1;
