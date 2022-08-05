@@ -730,6 +730,17 @@ namespace device {
 			else if(opt == ORDER::SECOND_SPI) spi = true;
 
 			switch(t) {
+			case peripheral::USB0:
+				{
+					uint8_t sel = enable ? 0b010010 : 0;
+					PORT1::PMR.B6 = 0;
+					MPC::P16PFS.PSEL = sel;  // USB0_VBUSEN (P16 for RX72N Envision Kit)
+					PORT1::PMR.B6 = enable;
+					PORT1::PMR.B4 = 0;
+					MPC::P14PFS.PSEL = sel;  // USB0_OVRCURA-DS (P14 for RX72N Envision Kit)
+					PORT1::PMR.B4 = enable;
+				}
+				break;
 			case peripheral::SCI0:
 				{
 					if(i2c) {

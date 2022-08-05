@@ -22,9 +22,8 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c
-
-#				tinyusb/src/tusb.c \
+				common/syscalls.c \
+				tinyusb/src/tusb.c \
 				tinyusb/src/common/tusb_fifo.c \
 				tinyusb/src/device/usbd.c \
 				tinyusb/src/device/usbd_control.c \
@@ -40,14 +39,16 @@ CSOURCES	=	common/init.c \
 				tinyusb/src/class/usbtmc/usbtmc_device.c \
 				tinyusb/src/class/video/video_device.c \
 				tinyusb/src/class/vendor/vendor_device.c \
-				hid_app.c \
 				tinyusb/src/class/cdc/cdc_host.c \
 				tinyusb/src/class/hid/hid_host.c \
 				tinyusb/src/class/msc/msc_host.c \
 				tinyusb/src/host/hub.c \
 				tinyusb/src/host/usbh.c \
-				tinyusb/src/host/usbh_control.c \
-				tinyusb/src/portable/ohci/ohci.c
+				tinyusb/src/portable/ohci/ohci.c \
+				tinyusb/src/portable/renesas/usba/hcd_usba.c
+
+#				hid_app.c \
+#				tinyusb/src/portable/renesas/usba/dcd_usba.c
 
 PSOURCES	=	main.cpp
 # 				dcd_usb.cpp \
