@@ -17,6 +17,10 @@ html/
 *.db
 tmp/
 rxlib/src/
+tinyusb/docs/
+tinyusb/examples/
+tinyusb/hw/
+tinyusb/lib/
 tinyusb/src/portable/bridgetek/
 tinyusb/src/portable/chipidea/
 tinyusb/src/portable/dialog/
@@ -28,7 +32,6 @@ tinyusb/src/portable/mindmotion/
 tinyusb/src/portable/nordic/
 tinyusb/src/portable/nuvoton/
 tinyusb/src/portable/nxp/
-tinyusb/src/portable/ohci/
 tinyusb/src/portable/raspberrypi/
 tinyusb/src/portable/sony/
 tinyusb/src/portable/st/
