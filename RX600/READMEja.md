@@ -4,12 +4,9 @@ Renesas RX マイコン・ハードウェアー定義テンプレート
 ## 概要
 
 ルネサス RX シリーズ用ハードウェアー定義 C++ テンプレート・クラス   
-ルネサスが提供する、iodefine.h は C言語の規約に違反している為、特定の環境でしか   
-正しくコンパイルする事が出来ません。(CC-RX)   
-※ビットフィールドの定義は、バイトサイズのみ準拠しますが、１６ビット、又は   
-それ以上は、エンディアンの関係などから、結果はコンパイラに依存します。
 
-- このような実装は「規約違反」であり推奨されません。
+- ルネサス社が提供する、ハードウェアー定義は、環境に強く依存します。
+- 言語規約に違反した実装も多くあり推奨できません。
 - 非常に冗長であり、可読性が悪いです。
 - 「#define」で一般的なキーワードを定義してあり、名前空間内のキーワードを汚染します。
 - RX マイコンにより部分的に異なる為、共有出来ません。
@@ -25,17 +22,17 @@ C++ テンプレートを活用したハードウェアー定義は、C++17 以�
 テンプレートクラスなので、最適化も最大限活用でき、必要なら、さらなる最適化に向け
 た実装の余地もあります。   
    
-C++ の機能を使い、構造的なアクセスなどを行えるようにしてあります。   
+C++ の機能を使い、構造的なアクセスや参照アクセスにより、ハードウェアーが異なる微妙な違いを吸収します。
    
 ## ペリフェラル名
 
  - peripheral.hpp ファイルに定義されています。
  - 各デバイスモジュールを抽象化する為、ペリフェラル名を定義しています。
- - 「ペリフェラル名」は、なるべく、ハードウェアーマニュアルで説明されているキーワード
-を使うようにしています、詳しくは、[peripheral.hpp](peripheral.hpp?ts=4)を参照して下さい。
- - この名称は、省電力切り替え、専用ポート制御、割り込み制御など、多様な場面で、識別子    
-として使われており、ペリフェラル全体で必要な細かい設定を自動化する為に使われます。
-   
+ - 「ペリフェラル名」は、なるべく、ハードウェアーマニュアルで説明されているキーワードを使うようにしています。
+ - この名称は、省電力切り替え、ポート制御、割り込み制御など、多様な場面で、識別子として使われています。
+ - フレームワーク全体で必要な細かい設定を自動化する為に使われます。
+ - ペリフェラル名は、各デバイスで異なる場合があり、各デバイス用に専用のファイルとなっています。
+
 ## 割り込みベクター名
 
  - icu.hpp ファイルに定義されています。
@@ -53,6 +50,8 @@ C++ の機能を使い、構造的なアクセスなどを行えるようにし�
 
  - デバイスの名前空間として「device」を使っています。
    
+---
+
 ## iodefine.h との併用における解決策
 
  - ルネサス社が提供する、サンプルプログラムやドライバーを併用して使いたい場合があります。
@@ -62,7 +61,11 @@ C++ の機能を使い、構造的なアクセスなどを行えるようにし�
  - その場合、「iodefine.h」を当たらない名前に変更し、ルネサス社提供のソースコードを修正する必要があります。
  - C++ テンプレートクラスは名前空間の中に押し込んであり、通常当たらないのですが、「#define」を使われるとどうしようもありません。
  - C++ テンプレートクラス内の「当たる」名前を変更するとなると、大掛かりな修正になると思うので、推奨しません。
-   
+ - 他の方法として、「iodefine.h」を利用するソースと、C++ フレームワークを利用するソースを完全に分離する方法があります。
+ - C ソースから、C++ の関数を呼ぶ場合、「extern "C"」を使って C++ 内の関数を定義します、その場合、C に準拠したプロトタイプとします。
+
+---
+
 ## プロジェクト・リスト
 
 - [RX64M/RX71M ペリフェラル (peripheral.hpp)](peripheral.hpp?ts=4)
@@ -86,50 +89,50 @@ C++ の機能を使い、構造的なアクセスなどを行えるようにし�
 - [D/A 変換クラス](dac_out.hpp?ts=4)
 - [データーフラッシュメモリ入出力](flash_io.hpp?ts=4)
 
-|機能|名称|ファイル|RX24T|RX64M|RX71M|RX65N|RX66T|RX72T|RX72N|
-|----|----|----|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-|システム関係定義|-|[system.hpp](system.hpp?ts=4)|O|O|O|O|O|O|O|
-|電圧検出回路|LVDA|[lvda.hpp](lvda.hpp?ts=4)|O|O|O|O|O|O|O|
-|クロック周波数精度測定回路|CAC|[cac.hpp](cac.hpp?ts=4)|O|O|O|O|O|O|O|
-|メモリプロテクションユニット|MPU|[mpu.hpp](mpu.hpp?ts=4)|O|O|O|O|O|O|O|
-|DMAコントローラ|DMAC0-7|[dmac.hpp](dmac.hpp?ts=4)|O|O|O|O|O|O|O|
-|EXDMAコントローラ|EXDMAC0-1|[exdmac.hpp](exdmac.hpp?ts=4)|O|O|O|O|O|O|O|
-|データトランスファコントローラ|DTC|[dtc.hpp](dtc.hpp?ts=4)|O|O|O|O|O|O|O|
-|イベントリンクコントローラ|ELC|[elc.hpp](elc.hpp?ts=4)|O|O|O|O|O|O|O|
-|I/Oポート|-|[port.hpp](port.hpp?ts=4)|O|O|O|O|O|O|O|
-|マルチファンクションピンコントローラ|MPC|[mpc.hpp](mpc.hpp?ts=4)|O|O|O|O|O|O|O|
-|マルチファンクションタイマパルスユニット 3|MTU0-n|[mtu3.hpp](mtu3.hpp?ts=4)|O|O|O|O|O|O|O|
-|ポートアウトプットイネーブル 3|POE3|[poe3.hpp](poe3.hpp?ts=4)|O|O|O|O|O|O|O|
-|汎用 PWM タイマ|GPTxx|[gpt.hpp](gpt.hpp?ts=4)|O|O|O|O|O|O|O|
-|16 ビットタイマパルスユニット|TPU0-5|[tpu.hpp](tpu.hpp?ts=4)|O|O|O|O|O|O|O|
-|プログラマブルパルスジェネレータ|PPG|[ppg.hpp](ppg.hpp?ts=4)|O|O|O|O|O|O|O|
-|8 ビットタイマ|TMR0-n|[tmr.hpp](tmr.hpp?ts=4)|O|O|O|O|O|O|O|
-|コンペアマッチタイマ|CMT0-3|[cmt.hpp](cmt.hpp?ts=4)|O|O|O|O|O|O|O|
-|コンペアマッチタイマ W|CMTW0-1|[cmtw.hpp](cmtw.hpp?ts=4)|O|O|O|O|O|O|O|
-|リアルタイムクロック|RTC|[rtc.hpp](rtc.hpp?ts=4)|O|O|O|O|O|O|O|
-|ウォッチドッグタイマ|-|[wdta.hpp](wdta.hpp?ts=4)|O|O|O|O|O|O|O|
-|独立ウォッチドッグタイマ|-|[iwdt.hpp](iwdt.hpp?ts=4)|O|O|O|O|O|O|O|
-|機能|名称|ファイル|RX24T|RX64M|RX71M|RX65N|RX66T|RX72T|RX72N|
-|イーサネットコントローラ|ETHERC0-1|[etherc.hpp](etherc.hpp?ts=4)|X|O|O|O|X|X|O|
-|イーサネットコントローラ用 PTP コントローラ|EPTPC|[eptpc.hpp](eptpc.hpp?ts=4)|X|O|O|O|X|X|O|
-|イーサネットコントローラ用 DMA コントローラ|EDMAC|[edmac.hpp](edmac.hpp?ts=4)|X|O|O|O|X|X|O|
-|USB2.0FS ホスト / ファンクションモジュール|USB|[usb.hpp](usb.hpp?ts=4)|X|O|O|O|X|X|O|
-|USB 2.0 High-Speed ホスト / ファンクションモジュール|USBA|[usba.hpp](usba.hpp?ts=4)|X|O|X|X|X|X|X|
-|シリアルコミュニケーションインタフェース|SCIn|[sci.hpp](sci.hpp?ts=4)|O|O|O|O|O|O|O|
-|FIFO 内蔵シリアルコミュニケーションインタフェース|SCIF|[scif.hpp](scif.hpp?ts=4)|X|O|O|X|X|X|X|
-|I2C バスインタフェース|RIICn|[riic.hpp](riic.hpp?ts=4)|O|O|O|O|O|O|O|
-|CAN モジュール|CANn|[can.hpp](can.hpp?ts=4)|X|O|O|O|O|O|O|
-|シリアルペリフェラルインタフェース|RSPIn|[rspi.hpp](rspi.hpp?ts=4)|O|O|O|O|O|O|O|
-|クワッドシリアルペリフェラルインタフェース|QSPI|[qspi.hpp](qspi.hpp?ts=4)|X|O|O|O|X|X|O|
-|CRC 演算器|CRC|[crc.hpp](crc.hpp?ts=4)|O|O|O|O|O|O|O|
-|シリアルサウンドインタフェース|SSI0-1|[ssi.hpp](ssi.hpp?ts=4)|X|O|O|X|X|X|X|
-|拡張シリアルサウンドインタフェース|SSIE0-1|[ssie.hpp](ssie.hpp?ts=4)|X|X|X|X|X|X|O|
-|サンプリングレートコンバータ|SRC|[src.hpp](src.hpp?ts=4)|X|O|O|X|X|X|X|
-|SD ホストインタフェース|(SDHI|[sdhi.hpp](sdhi.hpp?ts=4)|X|O|O|O|X|X|O|
-|パラレルデータキャプチャユニット|PDC|[pdc.hpp](pdc.hpp?ts=4)|X|O|O|O|X|X|O|
-|12 ビット A/D コンバータ|S12AD-1|[s12adc.hpp](s12adc.hpp?ts=4)|O|O|O|O|O|O|O|
-|12 ビット D/A コンバータ|R12DA|[r12da.hpp](r12da.hpp?ts=4)|X|O|O|O|O|O|O|
-|フラッシュメモリ|-|[flash.hpp](flash.hpp?ts=4)|O|O|O|O|O|O|O|
+|機能|名称|ファイル|RX24T|RX64M/71M|RX65N|RX66T/72T|RX72N|
+|----|----|----|:---:|:---:|:---:|:---:|:---:|
+|システム関係定義|-|[system.hpp](system.hpp?ts=4)|✔|✔|✔|✔|✔|
+|電圧検出回路|LVDA|[lvda.hpp](lvda.hpp?ts=4)|✔|✔|✔|✔|✔|
+|クロック周波数精度測定回路|CAC|[cac.hpp](cac.hpp?ts=4)|✔|✔|✔|✔|✔|
+|メモリプロテクションユニット|MPU|[mpu.hpp](mpu.hpp?ts=4)|✔|✔|✔|✔|✔|
+|DMAコントローラ|DMAC0-7|[dmac.hpp](dmac.hpp?ts=4)|✔|✔|✔|✔|✔|
+|EXDMAコントローラ|EXDMAC0-1|[exdmac.hpp](exdmac.hpp?ts=4)|✔|✔|✔|✔|✔|
+|データトランスファコントローラ|DTC|[dtc.hpp](dtc.hpp?ts=4)|✔|✔|✔|✔|✔|
+|イベントリンクコントローラ|ELC|[elc.hpp](elc.hpp?ts=4)|✔|✔|✔|✔|✔|
+|I/Oポート|-|[port.hpp](port.hpp?ts=4)|✔|✔|✔|✔|✔|
+|マルチファンクションピンコントローラ|MPC|[mpc.hpp](mpc.hpp?ts=4)|✔|✔|✔|✔|✔|
+|マルチファンクションタイマパルスユニット 3|MTU0-n|[mtu3.hpp](mtu3.hpp?ts=4)|✔|✔|✔|✔|✔|
+|ポートアウトプットイネーブル 3|POE3|[poe3.hpp](poe3.hpp?ts=4)|✔|✔|✔|✔|✔|
+|汎用 PWM タイマ|GPTxx|[gpt.hpp](gpt.hpp?ts=4)|✔|✔|✔|✔|✔|
+|16 ビットタイマパルスユニット|TPU0-5|[tpu.hpp](tpu.hpp?ts=4)|✔|✔|✔|✔|✔|
+|プログラマブルパルスジェネレータ|PPG|[ppg.hpp](ppg.hpp?ts=4)|✔|✔|✔|✔|✔|
+|8 ビットタイマ|TMR0-n|[tmr.hpp](tmr.hpp?ts=4)|✔|✔|✔|✔|✔|
+|コンペアマッチタイマ|CMT0-3|[cmt.hpp](cmt.hpp?ts=4)|✔|✔|✔|✔|✔|
+|コンペアマッチタイマ W|CMTW0-1|[cmtw.hpp](cmtw.hpp?ts=4)|✔|✔|✔|✔|✔|
+|リアルタイムクロック|RTC|[rtc.hpp](rtc.hpp?ts=4)|✔|✔|✔|✔|✔|
+|ウォッチドッグタイマ|-|[wdta.hpp](wdta.hpp?ts=4)|✔|✔|✔|✔|✔|
+|独立ウォッチドッグタイマ|-|[iwdt.hpp](iwdt.hpp?ts=4)|✔|✔|✔|✔|✔|
+|機能|名称|ファイル|RX24T|RX64M/RX71M|RX65N|RX66T/RX72T|RX72N|
+|イーサネットコントローラ|ETHERC0-1|[etherc.hpp](etherc.hpp?ts=4)|✖|✔|✔|✖|✔|
+|イーサネットコントローラ用 PTP コントローラ|EPTPC|[eptpc.hpp](eptpc.hpp?ts=4)|✖|✔|✔|✖|✔|
+|イーサネットコントローラ用 DMA コントローラ|EDMAC|[edmac.hpp](edmac.hpp?ts=4)|✖|✔|✔|✖|✔|
+|USB2.0FS ホスト / ファンクションモジュール|USB|[usb.hpp](usb.hpp?ts=4)|✖|✔|✔|✖|✔|
+|USB 2.0 High-Speed ホスト / ファンクションモジュール|USBA|[usba.hpp](usba.hpp?ts=4)|✖|✔|✖|✖|✖|
+|シリアルコミュニケーションインタフェース|SCIn|[sci.hpp](sci.hpp?ts=4)|✔|✔|✔|✔|✔|
+|FIFO 内蔵シリアルコミュニケーションインタフェース|SCIF|[scif.hpp](scif.hpp?ts=4)|✖|✔|✖|✖|✖|
+|I2C バスインタフェース|RIICn|[riic.hpp](riic.hpp?ts=4)|✔|✔|✔|✔|✔|
+|CAN モジュール|CANn|[can.hpp](can.hpp?ts=4)|✖|✔|✔|✔|✔|
+|シリアルペリフェラルインタフェース|RSPIn|[rspi.hpp](rspi.hpp?ts=4)|✔|✔|✔|✔|✔|
+|クワッドシリアルペリフェラルインタフェース|QSPI|[qspi.hpp](qspi.hpp?ts=4)|✖|✔|✔|✖|✔|
+|CRC 演算器|CRC|[crc.hpp](crc.hpp?ts=4)|✔|✔|✔|✔|✔|
+|シリアルサウンドインタフェース|SSI0-1|[ssi.hpp](ssi.hpp?ts=4)|✖|✔|✖|✖|✖|
+|拡張シリアルサウンドインタフェース|SSIE0-1|[ssie.hpp](ssie.hpp?ts=4)|✖|✖|✖|✖|✔|
+|サンプリングレートコンバータ|SRC|[src.hpp](src.hpp?ts=4)|✖|✔|✖|✖|✖|
+|SD ホストインタフェース|(SDHI|[sdhi.hpp](sdhi.hpp?ts=4)|✖|✔|✔|✖|✔|
+|パラレルデータキャプチャユニット|PDC|[pdc.hpp](pdc.hpp?ts=4)|✖|✔|✔|✖|✔|
+|12 ビット A/D コンバータ|S12AD-1|[s12adc.hpp](s12adc.hpp?ts=4)|✔|✔|✔|✔|✔|
+|12 ビット D/A コンバータ|R12DA|[r12da.hpp](r12da.hpp?ts=4)|✖|✔|✔|✔|✔|
+|フラッシュメモリ|-|[flash.hpp](flash.hpp?ts=4)|✔|✔|✔|✔|✔|
    
 -----
    
