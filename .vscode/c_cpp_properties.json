@@ -15,6 +15,7 @@
                 "D:/Git/RX",
                 "D:/Git/RX/RX600/drw2d/inc/tes",
 				"D:/Git/RX/FreeRTOS/Source/include",
+				"D:/Git/RX/tinyusb/src",
 				"${workspaceFolder}"
             ],
             "defines": [
