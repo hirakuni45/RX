@@ -77,10 +77,10 @@ namespace device {
 				{
 					uint8_t sel = enable ? 0b010010 : 0;
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = sel;  // USB0_VBUSEN  (P14 LQFP176: 51)
+					MPC::P14PFS.PSEL = sel;  // USB0_OVRCURB (P14 LQFP176: 51)
 					PORT1::PMR.B4 = enable;
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = sel;  // USB0_OVRCURB (P16 LQFP176: 48)
+					MPC::P16PFS.PSEL = sel;  // USB0_VBUSEN (P16 LQFP176: 48)
 					PORT1::PMR.B6 = enable;
 				}
 				break;
