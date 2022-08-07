@@ -28,8 +28,10 @@
 #include "tusb_option.h"
 
 #if CFG_TUH_ENABLED && ( CFG_TUSB_MCU == OPT_MCU_RX63X || \
-                               CFG_TUSB_MCU == OPT_MCU_RX65X || \
-                               CFG_TUSB_MCU == OPT_MCU_RX72N )
+                    	 CFG_TUSB_MCU == OPT_MCU_RX65X || \
+                         CFG_TUSB_MCU == OPT_MCU_RX72N || \
+						 CFG_TUSB_MCU == OPT_MCU_RX66T || \
+						 CFG_TUSB_MCU == OPT_MCU_RX72T )
 #include "host/hcd.h"
 #include "iodefine.h"
 
@@ -384,6 +386,7 @@ static bool process_pipe0_xfer(uint8_t dev_addr, uint8_t ep_addr, void* buffer, 
 {
   (void)dev_addr;
   const unsigned dir_in = tu_edpt_dir(ep_addr);
+  TU_LOG2("process_pipe0_xfer: ep_addr: %d, len: %d, dir: %s\n", ep_addr, buflen, (!dir_in ? "OUT" : "IN"));
 
   /* configure fifo direction and access unit settings */
   if (dir_in) { /* IN, a byte */
@@ -403,7 +406,10 @@ static bool process_pipe0_xfer(uint8_t dev_addr, uint8_t ep_addr, void* buffer, 
     if (!dir_in) { /* OUT */
       TU_ASSERT(USB0.DCPCTR.BIT.BSTS && (USB0.USBREQ.WORD & 0x80));
       pipe0_xfer_out();
-    }
+	} else {
+		TU_LOG2("  UACT: %d, DTLN: %d, PID: %d\n",
+			USB0.DVSTCTR0.BIT.UACT, USB0.D0FIFOCTR.BIT.DTLN, USB0.DCPCTR.BIT.PID);
+	}
   } else { /* ZLP */
     pipe->buf        = NULL;
     if (!dir_in) { /* OUT */
@@ -424,6 +430,9 @@ static bool process_pipe_xfer(uint8_t dev_addr, uint8_t ep_addr, void* buffer, u
   const unsigned epn    = tu_edpt_number(ep_addr);
   const unsigned dir_in = tu_edpt_dir(ep_addr);
   const unsigned num    = _hcd.ep[dev_addr - 1][dir_in][epn - 1];
+
+  TU_LOG2("process_pipe_xfer: ep_addr: %d, len: %d, epn: %d, dir: %s, num: %d\n",
+  	ep_addr, buflen, epn, (dir_in != 0 ? "IN" : "OUT"), num);
 
   TU_ASSERT(num);
 
@@ -517,6 +526,8 @@ static void process_pipe_brdy(uint8_t rhport, unsigned num)
                             pipe->length - pipe->remaining,
                             XFER_RESULT_SUCCESS, true);
     //  TU_LOG1("C %d %d\r\n", num, pipe->length - pipe->remaining);
+  } else {
+	// TU_LOG2("process_pipe_brdy: not completed...: pipe: %d\n", num);
   }
 }
 
@@ -536,6 +547,7 @@ bool hcd_init(uint8_t rhport)
 //  MSTP(USB0) = 0;
 //  SYSTEM.PRCR.WORD = SYSTEM_PRCR_PRKEY;
 //  enable_interrupt(pswi);
+
   USB0.SYSCFG.BIT.SCKE = 1;
   while (!USB0.SYSCFG.BIT.SCKE) ;
   USB0.SYSCFG.BIT.DPRPU = 0;
@@ -549,9 +561,13 @@ bool hcd_init(uint8_t rhport)
   USB0.SYSCFG.BIT.USBE = 1;
 
   USB.DPUSR0R.BIT.FIXPHY0 = 0u;    /* USB0 Transceiver Output fixed */
-#if ( CFG_TUSB_MCU == OPT_MCU_RX72N )
+
+#if ( CFG_TUSB_MCU == OPT_MCU_RX65X || CFG_TUSB_MCU == OPT_MCU_RX72N )
   USB0.PHYSLEW.LONG = 0x5;
   IR(PERIB, INTB128) = 0;  // IR(PERIB, INTB185) = 0;
+#elif ( CFG_TUSB_MCU == OPT_MCU_RX66T || CFG_TUSB_MCU == OPT_MCU_RX72T )
+  USB0.PHYSLEW.LONG = 0x5;
+  IR(USB0, USBI0)   = 0;
 #else
   IR(USB0, USBI0)   = 0;
 #endif
@@ -571,7 +587,7 @@ bool hcd_init(uint8_t rhport)
 void hcd_int_enable(uint8_t rhport)
 {
   (void)rhport;
-#if ( CFG_TUSB_MCU == OPT_MCU_RX72N )
+#if ( CFG_TUSB_MCU == OPT_MCU_RX65X || CFG_TUSB_MCU == OPT_MCU_RX72N )
   IEN(PERIB, INTB128) = 1;  // IEN(PERIB, INTB185) = 1;
 #else
   IEN(USB0, USBI0) = 1;
@@ -581,7 +597,7 @@ void hcd_int_enable(uint8_t rhport)
 void hcd_int_disable(uint8_t rhport)
 {
   (void)rhport;
-#if ( CFG_TUSB_MCU == OPT_MCU_RX72N )
+#if ( CFG_TUSB_MCU == OPT_MCU_RX65X || CFG_TUSB_MCU == OPT_MCU_RX72N )
   IEN(PERIB, INTB128) = 0;  // IEN(PERIB, INTB185) = 0;
 #else
   IEN(USB0, USBI0) = 0;
