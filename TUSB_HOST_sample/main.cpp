@@ -32,6 +32,8 @@ namespace {
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
+	// EX65N Envision Kit: FIRST order -> USB0_VBUSEN, USB0_OVERCURA
+	typedef device::tinyusb_mng<device::USB0, device::port_map::ORDER::FIRST> TINYUSB;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -44,6 +46,7 @@ namespace {
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
+	// RX72N Envision Kit: SECOND order -> USB0_VBUSEN, USB0_OVERCURB
 	typedef device::tinyusb_mng<device::USB0, device::port_map::ORDER::SECOND> TINYUSB;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T" };
@@ -53,8 +56,8 @@ namespace {
 
 	typedef device::system_io<> SYSTEM_IO;
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
+	typedef utils::fixed_fifo<char, 1024> RXB;  // RX (受信) バッファの定義
+	typedef utils::fixed_fifo<char, 2048> TXB;  // TX (送信) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI		sci_;

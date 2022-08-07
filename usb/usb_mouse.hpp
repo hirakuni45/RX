@@ -1,24 +1,25 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	USB/GAMEPAD Class
+	@brief	USB/MOUSE Class
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
+#include "common/fixed_fifo.hpp"
+
 #include "tinyusb/src/class/hid/hid.h"
 
 namespace usb {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  USB/GAMEPAD class
+		@brief  USB/MOUSE class
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class gamepad {
-
+	class mouse {
 
 	public:
 		//-----------------------------------------------------------------//
@@ -26,7 +27,7 @@ namespace usb {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		gamepad() noexcept { }
+		mouse() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -36,12 +37,6 @@ namespace usb {
 		//-----------------------------------------------------------------//
 		void unmount() noexcept
 		{
-		}
-
-
-		void injection(const uint8_t* msg, uint16_t len) noexcept
-		{
-
 		}
 
 	};

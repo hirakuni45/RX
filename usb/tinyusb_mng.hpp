@@ -14,6 +14,7 @@
 #include "tusb.h"
 
 #include "usb/usb_keyboard.hpp"
+#include "usb/usb_mouse.hpp"
 #include "usb/usb_gamepad.hpp"
 
 namespace device {
@@ -28,7 +29,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  HID 接続種別型
+			@brief  HID 接続種別型（ヒューマン・インターフェース・デバイス）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class HID_TYPE : uint8_t {
@@ -304,6 +305,7 @@ namespace device {
 		HID_TYPE		hid_type_[HID_MAX];
 
 		usb::keyboard	keyboard_;
+		usb::mouse		mouse_;
 		usb::gamepad	gamepad_;
 
 
@@ -362,7 +364,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  tinyusb のサービス
+			@brief  tinyusb の統合サービス
 		*/
 		//-----------------------------------------------------------------//
 		void service() noexcept
@@ -375,16 +377,45 @@ namespace device {
 
 #if CFG_TUH_HID
 			hid_num_ = BASE::holder_.hid_num;
-			for(uint8_t i = 0; i < hid_num_; ++i) {
+			for(uint8_t i = 0; i < hid_num_; ++i) {  // HID デバイスのディスパッチ
+				auto back = hid_type_[i];
 				hid_type_[i] = BASE::holder_.hid_type[i];
-				if(hid_type_[i] == HID_TYPE::KEYBOARD) {
-					keyboard_.injection(BASE::holder_.key_pad, sizeof(BASE::holder_.key_pad));
-					auto led_back = holder_.led_bits;
-					holder_.led_bits = keyboard_.get_led_state();
-					if(led_back != holder_.led_bits) {
-						holder_.send_led = true;
+				switch(hid_type_[i]) {
+				case HID_TYPE::KEYBOARD:
+					{
+						keyboard_.injection(BASE::holder_.key_pad, sizeof(BASE::holder_.key_pad));
+						auto led_back = holder_.led_bits;
+						holder_.led_bits = keyboard_.get_led_state();
+						if(led_back != holder_.led_bits) {
+							holder_.send_led = true;
+						}
 					}
-					break;  // とりあえず、最初の１台だけサービス
+					break;
+				case HID_TYPE::MOUSE:
+					break;
+				case HID_TYPE::GENERIC_GAMEPAD:
+					break;
+				default:
+					break;
+				}
+				switch(back) {
+				case HID_TYPE::KEYBOARD:
+					if(hid_type_[i] != HID_TYPE::KEYBOARD) {
+						keyboard_.unmount();
+					}
+					break;
+				case HID_TYPE::MOUSE:
+					if(hid_type_[i] != HID_TYPE::MOUSE) {
+						mouse_.unmount();
+					}
+					break;
+				case HID_TYPE::GENERIC_GAMEPAD:
+					if(hid_type_[i] != HID_TYPE::GENERIC_GAMEPAD) {
+						gamepad_.unmount();
+					}
+					break;
+				default:
+					break;
 				}
 			}
 			BASE::hid_app_task();
@@ -394,17 +425,17 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  HID デバイス数取得（インスタンス）
+			@brief  HID デバイス数取得（インスタンス数）
 			@return HID デバイス数 
 		*/
 		//-----------------------------------------------------------------//
-		uint8_t get_hid_num() const noexcept { return hid_num_; }
+		auto get_hid_num() const noexcept { return hid_num_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  HID デバイスの種別取得
-			@param[in]	instance	HID デバイスのインスタンス
+			@param[in]	instance	HID デバイスのインスタンス（整数）
 			@return HID デバイスの種別 
 		*/
 		//-----------------------------------------------------------------//
@@ -425,6 +456,24 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		auto& at_keyboard() noexcept { return keyboard_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  マウス・クラスの参照
+			@return マウスクラスの参照
+		*/
+		//-----------------------------------------------------------------//
+		auto& at_mouse() noexcept { return mouse_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ゲームパッド・クラスの参照
+			@return ゲームパッドクラスの参照
+		*/
+		//-----------------------------------------------------------------//
+		auto& at_gamepad() noexcept { return gamepad_; }
 	};
 
 //	template <class USB_CH, port_map::ORDER PSEL> volatile uint32_t tinyusb_mng<USB_CH, PSEL>::intr_tick_ = 0;

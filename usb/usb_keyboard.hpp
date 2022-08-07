@@ -230,6 +230,7 @@ namespace usb {
 		bool		num_lock_;
 		bool		caps_lock_;
 		bool		scroll_lock_;
+		bool		probe_;
 		uint8_t		led_bits_;
 
 		FIFO		fifo_;
@@ -365,11 +366,17 @@ namespace usb {
 		//-----------------------------------------------------------------//
 		keyboard() noexcept :
 			key_pad_{ 0 }, shift_(false), ctrl_(false),
-			num_lock_(false), caps_lock_(false), scroll_lock_(false), led_bits_(0),
+			num_lock_(false), caps_lock_(false), scroll_lock_(false), probe_(false), led_bits_(0),
 			fifo_()
 		{ }
 
-		void reset() noexcept
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  unmount（デバイスが、umount されたら呼ぶ）
+		*/
+		//-----------------------------------------------------------------//
+		void unmount() noexcept
 		{
 			for(uint8_t i = 0; i < KEY_BUFF_NUM; ++i) {
 				key_pad_[i] = 0;
@@ -379,9 +386,11 @@ namespace usb {
 			num_lock_ = false;
 			caps_lock_ = false;
 			scroll_lock_ = false;
+			probe_ = false;
 			led_bits_ = 0;
 			fifo_.clear();
 		}
+
 
 		void injection(const uint8_t* msg, uint16_t len) noexcept
 		{
@@ -423,8 +432,18 @@ namespace usb {
 			for(uint8_t i = 0; i < len; ++i) {
 				key_pad_[i] = msg[i];
 			}
+			probe_ = true;
 			// memcpy(key_pad_, msg, len);
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  キーボードが接続されているか検査
+			@return キーボードが接続されている場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool probe() const noexcept { return true; }
 
 
 		//-----------------------------------------------------------------//
