@@ -29,9 +29,20 @@ namespace usb {
 		gamepad() noexcept { }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  unmount（デバイスが、umount されたら呼ぶ）
+		*/
+		//-----------------------------------------------------------------//
+		void unmount() noexcept
+		{
+		}
+
+
 		void injection(const uint8_t* msg, uint16_t len) noexcept
 		{
 
 		}
+
 	};
 }
