@@ -7,3 +7,4 @@ NESEMU_sample/emu/* linguist-vendored
 r_net/driver/* linguist-vendored
 r_net/T4_src/* linguist-vendored
 r_usb/* linguist-vendored
+tinyusb/* linguist-vendored
