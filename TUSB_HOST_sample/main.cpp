@@ -66,6 +66,8 @@ namespace {
 	CMT		cmt_;
 
 	TINYUSB	tinyusb_;
+	typedef usb::keyboard KEYBOARD;
+	typedef usb::mouse MOUSE;
 }
 
 
@@ -115,9 +117,6 @@ int main(int argc, char** argv)
 	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("Start TinyUSB/Host sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
-	LED::DIR = 1;
-	LED::P = 0;
-
 	{
 		utils::format("SCI PCLK: %u\n") % SCI_CH::PCLK;
 		utils::format("SCI Baud rate (set):  %u\n") % sci_.get_baud_rate();
@@ -130,14 +129,17 @@ int main(int argc, char** argv)
 		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
-	{
+	{  // TinyUSB マネージャーの開始
 		uint8_t intr = 5;
 		if(tinyusb_.start(intr)) {
-			utils::format("Start USB: OK!\n");
+			utils::format("Start TinyUSB: OK!\n");
 		} else {
-			utils::format("Start USB: fail...\n");
+			utils::format("Start TinyUSB: fail...\n");
 		}
 	}
+
+	LED::DIR = 1;
+	LED::P = 0;
 
 	uint16_t cnt = 0;
 	while(1) {
@@ -146,6 +148,7 @@ int main(int argc, char** argv)
 
 		tinyusb_.service();
 
+		// キーボードに対するサービス
 		auto& k = tinyusb_.at_keyboard();
 		if(k.get_num() > 0) {
 			auto t = k.get_key();
@@ -154,6 +157,25 @@ int main(int argc, char** argv)
 			} else {
 				utils::format("%c") % t.code;
 				utils::format::flush();
+			}
+		}
+
+		// マウスに対するサービス
+		static vtx::ipos pos;
+		tinyusb_.at_mouse().at_max() = vtx::ipos(4096 * 100);  // 最大領域の設定
+		const auto& m = tinyusb_.at_mouse();
+		if(m.get_state().mount) {
+			auto t = m.get_state();
+			if(t.positive & MOUSE::LEFT_BUTTON) {
+				utils::format("Mouse Left button\n");
+			}
+			if(t.positive & MOUSE::RIGHT_BUTTON) {
+				utils::format("Mouse Right button\n");
+			}
+			vtx::ipos tmp = t.pos / 100;
+			if(tmp != pos) {
+				utils::format("Mouse pos: %d, %d\n") % tmp.x % tmp.y;
+				pos = tmp;
 			}
 		}
 
