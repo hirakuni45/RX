@@ -1,12 +1,10 @@
-Renesas TinyUSB/Host samples
+TinyUSB Manager
 =========
 
 [Japanese](READMEja.md)
 
 ---
 ## License
-
-[TinyUSB: MIT](../tinyusb/LICENCE)
 
 [MyProject: MIT](../LICENSE)
 

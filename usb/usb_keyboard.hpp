@@ -224,6 +224,9 @@ namespace usb {
 	private:
 		static constexpr uint8_t KEY_BUFF_NUM = 8;
 
+		uint16_t	vid_;
+		uint16_t	pid_;
+
 		uint8_t		key_pad_[KEY_BUFF_NUM];
 		bool		shift_;
 		bool		ctrl_;
@@ -365,6 +368,7 @@ namespace usb {
 		*/
 		//-----------------------------------------------------------------//
 		keyboard() noexcept :
+			vid_(0), pid_(0),
 			key_pad_{ 0 }, shift_(false), ctrl_(false),
 			num_lock_(false), caps_lock_(false), scroll_lock_(false), probe_(false), led_bits_(0),
 			fifo_()
@@ -373,11 +377,15 @@ namespace usb {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  unmount（デバイスが、umount されたら呼ぶ）
+			@brief  mount（デバイスが、umount されたら呼ぶ）
+			@param[in]	vid		デバイスの VID
+			@param[in]	pid		デバイスの PID
 		*/
 		//-----------------------------------------------------------------//
-		void unmount() noexcept
+		void mount(uint16_t vid, uint16_t pid) noexcept
 		{
+			vid_ = vid;
+			pid_ = pid;
 			for(uint8_t i = 0; i < KEY_BUFF_NUM; ++i) {
 				key_pad_[i] = 0;
 			}
@@ -388,6 +396,17 @@ namespace usb {
 			scroll_lock_ = false;
 			probe_ = false;
 			led_bits_ = 0;
+			fifo_.clear();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  unmount（デバイスが、umount されたら呼ぶ）
+		*/
+		//-----------------------------------------------------------------//
+		void unmount() noexcept
+		{
 			fifo_.clear();
 		}
 

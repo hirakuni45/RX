@@ -57,21 +57,29 @@ namespace device {
 			hid_info_t hid_info[CFG_TUH_HID];
 			tuh_hid_report_info_t* rpt_info;
 			bool		first_id;
-			HID_TYPE	hid_type[CFG_TUH_HID];
 			uint8_t		hid_num;
+			uint16_t	vid[CFG_TUH_HID];
+			uint16_t	pid[CFG_TUH_HID];
+			uint8_t		dev_addr[CFG_TUH_HID];
+			uint8_t		instance[CFG_TUH_HID];
+			HID_TYPE	hid_type[CFG_TUH_HID];
 
 			uint8_t		key_pad[8];
 			uint8_t		led_bits;
 
+			uint8_t		mouse_pad[5];
+
 			bool		send_led;
-			uint8_t		dev_addr;
-			uint8_t		instance;
-			uint8_t		leds_pad;
+//			uint8_t		leds_pad;
 
 			holder_t() noexcept : hid_info{}, rpt_info(nullptr),
-				first_id(false), hid_type{ HID_TYPE::NONE }, hid_num(0),
+				first_id(false),
+				hid_num(0),
+				vid{ 0 }, pid{ 0 }, dev_addr{ 0 }, instance{ 0 },
+				hid_type{ HID_TYPE::NONE },
 				key_pad{ 0 }, led_bits(0),
-				send_led(false), dev_addr(0), instance(0), leds_pad(0)
+				mouse_pad{ 0 },
+				send_led(false)
 				{ }
 		};
 		static holder_t holder_;
@@ -136,16 +144,19 @@ namespace device {
 				% static_cast<uint16_t>(dev_addr) % static_cast<uint16_t>(instance);
 			format("VID = %04x, PID = %04x\r\n") % vid % pid;
 
+			holder_.dev_addr[instance] = dev_addr;
+			holder_.instance[instance] = instance;
+			holder_.vid[instance] = vid;
+			holder_.pid[instance] = pid;
+
 			holder_.hid_type[instance] = HID_TYPE::NONE;
 
 			auto itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
 			switch (itf_protocol) {
 			case HID_ITF_PROTOCOL_KEYBOARD:
 				format("Detected KEYBOARD\n");
-				holder_.dev_addr = dev_addr;
-				holder_.instance = instance;
 				holder_.hid_type[instance] = HID_TYPE::KEYBOARD;
-				for(uint8_t i = 0; i < 8; ++i) {
+				for(uint8_t i = 0; i < sizeof(holder_.key_pad); ++i) {
 					holder_.key_pad[i] = 0;
 				}
 				break;
@@ -153,6 +164,9 @@ namespace device {
 			case HID_ITF_PROTOCOL_MOUSE:
 				format("Detected MOUSE\n");
 				holder_.hid_type[instance] = HID_TYPE::MOUSE;
+				for(uint8_t i = 0; i < sizeof(holder_.mouse_pad); ++i) {
+					holder_.mouse_pad[i] = 0;
+				}
 				break;
 
 			case HID_ITF_PROTOCOL_NONE:
@@ -228,16 +242,15 @@ namespace device {
 			auto itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
 			switch (itf_protocol) {
 			case HID_ITF_PROTOCOL_KEYBOARD:
-				{
-					if(len <= 8) {
-						memcpy(holder_.key_pad, report, len);
-					}
+				if(len <= sizeof(holder_.key_pad)) {
+					memcpy(holder_.key_pad, report, len);
 				}
 				break;
 
 			case HID_ITF_PROTOCOL_MOUSE:
-				format("Mouse: %d bytes\n") % len;
-				dump_(report, len);
+				if(len <= sizeof(holder_.mouse_pad)) {
+					memcpy(holder_.mouse_pad, report, len);
+				}
 				break;
 
 			default:
@@ -273,12 +286,14 @@ namespace device {
 
 		static void hid_app_task()
 		{
+#if 0
 			if(holder_.send_led) {
 				if(!tuh_hid_set_report(holder_.dev_addr, holder_.instance, 0, HID_REPORT_TYPE_OUTPUT, &holder_.led_bits, sizeof(holder_.led_bits))) {
 					format("tuh_hid_set_report: fail...\n");
 				}
 				holder_.send_led = false;
 			}
+#endif
 		}
 	};
 	template<class _> typename tinyusb_base<_>::holder_t tinyusb_base<_>::holder_;
@@ -296,6 +311,9 @@ namespace device {
 	public:
 		typedef tinyusb_base<void> BASE;
 
+		typedef usb::keyboard KEYBOARD;
+		typedef usb::mouse MOUSE;
+
 		static constexpr uint8_t HID_MAX = CFG_TUH_HID;		///< HID の同時マウント数
 
 	private:
@@ -304,8 +322,8 @@ namespace device {
 		uint8_t			hid_num_;
 		HID_TYPE		hid_type_[HID_MAX];
 
-		usb::keyboard	keyboard_;
-		usb::mouse		mouse_;
+		KEYBOARD		keyboard_;
+		MOUSE			mouse_;
 		usb::gamepad	gamepad_;
 
 
@@ -380,10 +398,14 @@ namespace device {
 			for(uint8_t i = 0; i < hid_num_; ++i) {  // HID デバイスのディスパッチ
 				auto back = hid_type_[i];
 				hid_type_[i] = BASE::holder_.hid_type[i];
+				auto instance = BASE::holder_.instance[i];
 				switch(hid_type_[i]) {
 				case HID_TYPE::KEYBOARD:
+					if(back != HID_TYPE::KEYBOARD) {
+						keyboard_.mount(holder_.vid[instance], holder_.pid[instance]);
+					}
+					keyboard_.injection(BASE::holder_.key_pad, sizeof(BASE::holder_.key_pad));
 					{
-						keyboard_.injection(BASE::holder_.key_pad, sizeof(BASE::holder_.key_pad));
 						auto led_back = holder_.led_bits;
 						holder_.led_bits = keyboard_.get_led_state();
 						if(led_back != holder_.led_bits) {
@@ -392,6 +414,10 @@ namespace device {
 					}
 					break;
 				case HID_TYPE::MOUSE:
+					if(back != HID_TYPE::MOUSE) {
+						mouse_.mount(holder_.vid[instance], holder_.pid[instance]);
+					}
+					mouse_.injection(BASE::holder_.mouse_pad, sizeof(BASE::holder_.mouse_pad));
 					break;
 				case HID_TYPE::GENERIC_GAMEPAD:
 					break;
