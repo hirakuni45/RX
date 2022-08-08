@@ -86,6 +86,8 @@ int main(int argc, char** argv)
 |[/chip](./chip)|I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
 |[/graphics](./graphics/)|グラフィックス描画関係クラス、GUI Widget|
 |[/sound](./sound)|サウンド、オーディオ関係クラス|
+|[/usb](./usb)|USB 関係クラス|
+|[/tinyusb](./tinyusb)|TinyUSB ソースコード|
 |[/rxprog](./rxprog)|RX マイコン、フラッシュプログラム書き込みツール（Windows、OS-X、Linux 対応）|
 |[LICENSE](./LICENSE)|ライセンス表記ファイル|
 
@@ -111,6 +113,7 @@ int main(int argc, char** argv)
 |[/CALC_sample](./CALC_sample)|－|△|△|△|△|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
 |[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
 |[/PSG_sample](./PSG_sample)|△|△|△|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
+|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
 

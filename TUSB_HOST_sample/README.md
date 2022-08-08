@@ -1,4 +1,4 @@
-Renesas TinyUSB/Host サンプル
+Renesas TinyUSB/Host samples
 =========
 
 [Japanese](READMEja.md)

@@ -87,6 +87,8 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |[/chip](./chip)|various device specific control driver libraries such as I2C, SPI, etc|
 |[/graphics](./graphics)|Graphics drawing related classes, GUI Widget|
 |[/sound](./sound)|sound and audio related classes|
+|[/usb](./usb)|USB handler, manage class|
+|[/tinyusb](./tinyusb)|TinyUSB source code|
 |[/rxprog](./rxprog)|RX microcontroller, Flash program writing tool (for Windows, OS-X, Linux)
 |[LICENSE](./LICENSE)|license description file|
 
@@ -112,6 +114,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |[/CALC_sample](./CALC_sample)|－|△|△|△|△|〇|〇|Function calculator samples (gmp, mpfr libraries)|
 |[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|△|〇|Digital Storage Oscilloscope Samples|
 |[/PSG_sample](./PSG_sample)|△|△|△|〇|〇|〇|〇|Pseudo PSG Sound Source Performance Samples|
+|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|〇|〇|TinyUSB/Host Samples|
 
 *Please consider directories and files that are not in the above list but exist when checked out as work in progress.
 
