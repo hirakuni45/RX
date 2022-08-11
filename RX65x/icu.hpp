@@ -1054,10 +1054,10 @@ namespace device {
 			/*!
 				@brief  許可、不許可
 				@param[in]	vec		割り込みベクター
-				@param[in]	ena		許可／不許可
+				@param[in]	ena		不許可の場合「false」
 			*/
 			//-------------------------------------------------------------//
-			void enable(VECTOR vec, bool ena) noexcept
+			void enable(VECTOR vec, bool ena = true) noexcept
 			{
 				auto idx = static_cast<uint8_t>(vec);
 				auto tmp = rd8_(base + (idx >> 3));
