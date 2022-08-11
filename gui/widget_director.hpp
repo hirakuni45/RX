@@ -70,6 +70,8 @@ namespace gui {
 
 		graphics::share_color	back_color_;
 
+		widget*		current_;
+
 
 		// ipass 自分を含めない場合「false」
 		// 「子」のリストを作成
@@ -119,7 +121,8 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		widget_director(RDR& rdr, TOUCH& touch) noexcept :
-			rdr_(rdr), touch_(touch), widgets_(), back_color_(graphics::def_color::Black)
+			rdr_(rdr), touch_(touch), widgets_(),
+			back_color_(graphics::def_color::Black), current_(nullptr)
 		{ }
 
 
@@ -132,6 +135,15 @@ namespace gui {
 		{
 			rdr_.clear(back_color_);
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	カレント widget を取得（最後に操作した widget）
+			@return カレント widget
+		*/
+		//-----------------------------------------------------------------//
+		auto get_current_widget() const noexcept { return current_; }
 
 
 		//-----------------------------------------------------------------//
@@ -331,6 +343,7 @@ namespace gui {
 					if(ts.negative_ || t.exec_request_ != t.w_->get_exec_request()) {
 						t.exec_request_ = t.w_->get_exec_request();
 						t.w_->exec_select();
+						current_ = t.w_;
 						t.draw_ = true;
 						if(t.w_->get_id() == widget::ID::RADIO) {  // ラジオボタン、個別案件の処理
 							widget_t* list[16];

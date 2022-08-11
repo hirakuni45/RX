@@ -121,7 +121,8 @@ namespace {
 	// 標準カラーインスタンス
 	typedef graphics::def_color DEF_COLOR;
 
-	typedef dsos::capture<8192> CAPTURE;
+	// 2MHz x 32768 = 16ms 分
+	typedef dsos::capture<32768> CAPTURE;
 	CAPTURE		capture_;
 
 	FT5206_I2C	ft5206_i2c_;

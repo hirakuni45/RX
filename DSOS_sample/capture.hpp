@@ -5,7 +5,7 @@
 			最大サンプルレート 2MHz (RX65N/RX72N) @n
 			※「GLFW_SIM」を有効にする事で、キャプチャー動作をシュミレートする。
     @author 平松邦仁 (hira@rvf-rc45.net)
-    @copyright  Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+    @copyright  Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
                 Released under the MIT license @n
                 https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,7 +24,7 @@ namespace dsos {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  キャプチャー・クラス
-		@param[in]	CAPN	キャプチャー数
+		@param[in]	CAPN	キャプチャー最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t CAPN>
@@ -43,6 +43,7 @@ namespace dsos {
 #endif
 
 	public:
+		static constexpr uint32_t ADC_QUANTIZE = 2048;  ///< A/D 変換量子化の半分
 		// x:ch0, y:ch1
 		typedef vtx::spos DATA;
 
@@ -54,31 +55,30 @@ namespace dsos {
 		public:
 			DATA				data_[CAPN];
 
-			volatile uint32_t	tic_;
+			volatile uint16_t	tic_;
 			volatile uint16_t	pos_;
 			uint16_t			before_count_;
 			uint16_t			after_count_;
 			volatile int16_t	trg_ref_;
-			volatile int16_t	trg_nois_;
 			volatile TRG_MODE	trg_mode_main_;
 			volatile TRG_MODE	trg_mode_;
 			volatile uint16_t	trg_pos_;
+			volatile uint16_t	cycle_;	
 
 			DATA	min_;
 			DATA	max_;
-			DATA	back_;
 
 #ifdef GLFW_SIM
 			DATA	adv_;
 #endif
 
 			cap_task() noexcept :
-				data_ { { 2048, 2048 } }, tic_(0), pos_(0),
+				data_ { { CAP_OFS, CAP_OFS } }, tic_(0), pos_(0),
 				before_count_(0), after_count_(0),
-				trg_ref_(0), trg_nois_(10),
+				trg_ref_(0),
 				trg_mode_main_(TRG_MODE::NONE), trg_mode_(TRG_MODE::NONE),
 				trg_pos_(0),
-				min_(4096 - 1), max_(0), back_(0)
+				min_(4096 - 1), max_(0)
 			{ }
 
 			void operator() ()
@@ -93,14 +93,15 @@ namespace dsos {
 				switch(trg_mode_) {
 				case TRG_MODE::NONE:
 					break;
-				case TRG_MODE::ONE:
+				case TRG_MODE::SINGLE:
 				case TRG_MODE::RUN:
 					data_[pos_] = t;
 					++pos_;
 					pos_ &= CAPN - 1;
 					if(pos_ == (CAPN - 1)) {
-						if(trg_mode_ == TRG_MODE::ONE) {
+						if(trg_mode_ == TRG_MODE::SINGLE) {
 							trg_mode_ = TRG_MODE::NONE;
+							++cycle_;
 						}
 						trg_pos_ = CAPN / 4;
 						pos_ = 0;
@@ -117,50 +118,79 @@ namespace dsos {
 						trg_mode_ = trg_mode_main_;
 					}
 					break;
+
 				case TRG_MODE::CH0_POS:
 					data_[pos_] = t;
-					if(back_.x < trg_ref_ && trg_ref_ <= t.x) {
-						if(trg_nois_ < std::abs(back_.x - t.x)) {
-							trg_pos_ = pos_;
-							trg_mode_ = TRG_MODE::_TRG_AFTER;
-						}
+					++pos_;
+					pos_ &= CAPN - 1;
+					if(t.x < trg_ref_) {
+						trg_mode_ = TRG_MODE::CH0_POSA;
+					}
+					break;
+				case TRG_MODE::CH0_POSA:
+					data_[pos_] = t;
+					if(t.x >= trg_ref_) {
+						trg_pos_ = pos_;
+						trg_mode_ = TRG_MODE::_TRG_AFTER;
 					}
 					++pos_;
 					pos_ &= CAPN - 1;
 					break;
+
 				case TRG_MODE::CH1_POS:
 					data_[pos_] = t;
-					if(back_.y < trg_ref_ && trg_ref_ <= t.y) {
-						if(trg_nois_ < std::abs(back_.y - t.y)) {
-							trg_pos_ = pos_;
-							trg_mode_ = TRG_MODE::_TRG_AFTER;
-						}
+					++pos_;
+					pos_ &= CAPN - 1;
+					if(t.y < trg_ref_) {
+						trg_mode_ = TRG_MODE::CH1_POSA;
+					}
+					break;
+				case TRG_MODE::CH1_POSA:
+					data_[pos_] = t;
+					if(t.y >= trg_ref_) {
+						trg_pos_ = pos_;
+						trg_mode_ = TRG_MODE::_TRG_AFTER;
 					}
 					++pos_;
 					pos_ &= CAPN - 1;
 					break;
+
 				case TRG_MODE::CH0_NEG:
 					data_[pos_] = t;
-					if(back_.x > trg_ref_ && trg_ref_ >= t.x) {
-						if(trg_nois_ < std::abs(back_.x - t.x)) {
-							trg_pos_ = pos_;
-							trg_mode_ = TRG_MODE::_TRG_AFTER;
-						}
+					++pos_;
+					pos_ &= CAPN - 1;
+					if(t.x > trg_ref_) {
+						trg_mode_ = TRG_MODE::CH0_NEGA;
+					}
+					break;
+				case TRG_MODE::CH0_NEGA:
+					data_[pos_] = t;
+					if(t.x <= trg_ref_) {
+						trg_pos_ = pos_;
+						trg_mode_ = TRG_MODE::_TRG_AFTER;
 					}
 					++pos_;
 					pos_ &= CAPN - 1;
 					break;
+
 				case TRG_MODE::CH1_NEG:
 					data_[pos_] = t;
-					if(back_.y > trg_ref_ && trg_ref_ >= t.y) {
-						if(trg_nois_ < std::abs(back_.y - t.y)) {
-							trg_pos_ = pos_;
-							trg_mode_ = TRG_MODE::_TRG_AFTER;
-						}
+					++pos_;
+					pos_ &= CAPN - 1;
+					if(t.y > trg_ref_) {
+						trg_mode_ = TRG_MODE::CH1_NEGA;
+					}
+					break;
+				case TRG_MODE::CH1_NEGA:
+					data_[pos_] = t;
+					if(t.y <= trg_ref_) {
+						trg_pos_ = pos_;
+						trg_mode_ = TRG_MODE::_TRG_AFTER;
 					}
 					++pos_;
 					pos_ &= CAPN - 1;
 					break;
+
 				case TRG_MODE::_TRG_AFTER:
 					data_[pos_] = t;
 					++pos_;
@@ -169,13 +199,13 @@ namespace dsos {
 						after_count_--;
 					} else {
 						trg_mode_ = TRG_MODE::NONE;
+						++cycle_;
 						++tic_;
 					}
 					break;
 				default:
 					break;
 				}
-				back_ = t;
 			}
 		};
 
@@ -193,8 +223,6 @@ namespace dsos {
 		float		volt_gain_[2];
 
 		TRG_MODE	trg_mode_;
-
-//		DATA		data_[CAPN];
 
 
 		static int16_t limit_(int16_t val) noexcept
@@ -295,6 +323,12 @@ namespace dsos {
 			uint8_t intr_level = 5;
 			if(!tpu0_.start(freq, intr_level)) {
 				utils::format("TPU0 start error...\n");
+			} else {
+				auto vec = tpu0_.get_intr_vec();
+				// スーパーバイザーモード中に、MVTC xxx,FINTV で割り込みベクタアドレスを設定する必要がある。
+//				device::ICU::IER.enable(vec, false);
+//				device::icu_mgr::enable_fast_interrupt(vec);
+//				device::ICU::IER.enable(vec);
 			}
 #endif
 			samplerate_ = freq;
@@ -494,6 +528,15 @@ namespace dsos {
 		*/
 		//-----------------------------------------------------------------//
 		auto get_capture_tic() const noexcept { return get_cap_task().tic_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  キャプチャー・サイクルの取得
+			@return キャプチャー・サイクル
+		*/
+		//-----------------------------------------------------------------//
+		auto get_capture_cycle() const noexcept { return get_cap_task().cycle_; }
 
 
 		//-----------------------------------------------------------------//
