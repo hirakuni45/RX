@@ -3,7 +3,7 @@
 /*! @file
     @brief  描画ベースクラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-    @copyright  Copyright (C) 2020 Kunihito Hiramatsu @n
+    @copyright  Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
                 Released under the MIT license @n
                 https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -27,13 +27,23 @@ namespace dsos {
 		/// 電圧軸サイズ
 		static constexpr int16_t VOLT_SIZE = GRID * 6;
 
-		static constexpr float VOLT_DIV_L =  4.710407f;  ///< 7.77Vp-p
-		static constexpr float VOLT_DIV_H = 49.571428f;  ///< 82Vp-p
+		static constexpr float VOLT_DIV_L = 1.65f;  ///< 1:1 Probe (+-1.65V) Max: +1.65V, Min: -1.65V
 
-#if 0
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  操作ターゲット型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class TARGET : uint8_t {
+			CH0,	///< CH0 電圧軸操作
+			CH1,	///< CH1 電圧軸操作
+			TIME	///< 時間軸操作
+		};
+
+
 		/// チャネル・倍率文字列
 		static constexpr char CH_MULT_STR[] = "X1,X10";
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -41,8 +51,8 @@ namespace dsos {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CH_MULT : uint8_t {
-			X1,
-			X10
+			X1,		///< X1 プローブ
+			X10		///< X10 プローブ
 		};
 
 
@@ -54,7 +64,7 @@ namespace dsos {
 			utils::str::get_word(CH_MULT_STR, n, tmp, sizeof(tmp), ',');
 			return tmp;
 		}
-#endif
+
 
 		/// チャネル・モード文字列
 		static constexpr char CH_MODE_STR[] = "AC,GND,DC,OFF";
@@ -66,10 +76,10 @@ namespace dsos {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CH_MODE : uint8_t {
-			AC,
-			GND,
-			DC,
-			OFF
+			AC,		///< AC モード
+			GND,	///< GND 固定
+			DC,		///< DC モード
+			OFF		///< チャネル OFF
 		};
 
 
@@ -93,28 +103,28 @@ namespace dsos {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CH_VOLT : uint8_t {
-			_10V,
-			_5V,
-			_2V,
-			_1V,
-			_500mV,
-			_200mV,
-			_100mV,
-			_50mV,
-			_10mV
+			_10V,		///< 10V/div
+			_5V,		///<  5V/div
+			_2V,		///<  2V/div
+			_1V,		///<  1V/div
+			_500mV,		///< 500mV/div
+			_200mV,		///< 200mV/div
+			_100mV,		///< 100mV/div
+			_50mV,		///<  50mV/div
+			_10mV		///<  10mV/div
 		};
 
 
-		static constexpr int32_t VOLT_MV[] = {
-		   10000,	///< 10V
-			5000,	///<  5V
-			2000,	///<  2V
-			1000,	///<  1V
-			 500,	///<  0.5V
-			 200,	///<  0.2V
-			 100,	///<  0.1V
-			  50,	///<  0.05V
-			  10	///<  0.01V
+		static constexpr int32_t VOLT_MV[] = {  // ｍV 単位
+		   10000,	///< 10000mV (10.0V)
+			5000,	///<  5000mV (5.0V)
+			2000,	///<  2000mV (2.0V)
+			1000,	///<  1000mV (1.0V)
+			 500,	///<   500mV (0.5V)
+			 200,	///<   200mV (0.2V)
+			 100,	///<   100mV (0.1V)
+			  50,	///<    50mV (0.05V)
+			  10	///<    10mV (0.01V)
 		};
 
 
@@ -128,29 +138,33 @@ namespace dsos {
 		}
 
 
-		static int32_t get_volt(CH_VOLT val)
+		static int32_t get_mvolt(CH_VOLT val)
 		{
 			return VOLT_MV[static_cast<uint8_t>(val)];
 		}
 
 
 		/// トリガー文字列
-		static constexpr char TRG_MODE_STR[] = "None,One,Run,CH0-Pos,CH1-Pos,CH0-Neg,CH1-Neg";
+		static constexpr char TRG_MODE_STR[] = "None,Single,Run,CH0-Pos,CH1-Pos,CH0-Neg,CH1-Neg";
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  チャネル・電圧型
+			@brief  トリガー型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class TRG_MODE : uint8_t {
 			NONE,		///< 何もしない
-			ONE,		///< ワンショット
+			SINGLE,		///< シングル・ショット
 			RUN,		///< フリーランニング
-			CH0_POS,	///< CH0 立ち上がりエッジ
-			CH1_POS,	///< CH1 立ち上がりエッジ
-			CH0_NEG,	///< CH0 立ち下がりエッジ
-			CH1_NEG,	///< CH1 立ち下がりエッジ
+			CH0_POS,	///< CH0 立ち上がりエッジ前
+			CH0_POSA,	///< CH0 立ち上がりエッジ後 
+			CH1_POS,	///< CH1 立ち上がりエッジ前
+			CH1_POSA,	///< CH1 立ち上がりエッジ後
+			CH0_NEG,	///< CH0 立ち下がりエッジ前
+			CH0_NEGA,	///< CH0 立ち下がりエッジ後
+			CH1_NEG,	///< CH1 立ち下がりエッジ前
+			CH1_NEGA,	///< CH1 立ち下がりエッジ後
 
 			_TRG_BEFORE,///< ※内部処理 トリガー前処理
 			_TRG_AFTER,	///< ※内部処理 トリガー後処理
@@ -188,6 +202,16 @@ namespace dsos {
 			  1000,   2000,   5000,
 			 10000,  20000,  50000,
 			100000, 200000, 500000
+		};
+
+		/// A/D 変換基準サンプリングレート（KHz）
+		static constexpr int16_t AD_SAMPLE_RATE[] = {
+			  2000,   2000,   2000,
+			  2000,   2000,   2000,
+			  2000,   2000,   2000,
+			  2000,   2000,   2000,
+			  2000,   2000,   2000,
+			  2000,   2000,   2000,
 		};
 
 		enum class SMP_MODE : uint8_t {
@@ -254,8 +278,12 @@ namespace dsos {
 		}
 
 
-		/// 計測タイプ文字列
+		/// 計測タイプメニュー文字列
 		static constexpr char MES_MODE_STR[] = "Off,Time Sub,CH0 Sub,CH1 Sub,Time Abs,CH0 Abs,CH1 Abs";
+
+		/// オプションメニュー文字列
+		static constexpr char OPTION_STR[] = "NONE,CH0 FFT,CH1 FFT";
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
