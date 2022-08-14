@@ -90,7 +90,7 @@ namespace chip {
 
 		int32_t		t_fine_;
 
-		uint8_t read8_(REG adr) {
+		uint8_t read8_(REG adr) noexcept {
 			uint8_t reg[1];
 			reg[0] = static_cast<uint8_t>(adr);
 			i2c_io_.send(addr_, reg, 1);
@@ -98,7 +98,7 @@ namespace chip {
 			return reg[0];
 		}
 
-		uint16_t read16_(REG adr) {
+		uint16_t read16_(REG adr) noexcept {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(adr);
 			i2c_io_.send(addr_, reg, 1);
@@ -106,7 +106,7 @@ namespace chip {
 			return (reg[0] << 8) | reg[1];
 		}
 
-		uint32_t read24_(REG adr) {
+		uint32_t read24_(REG adr) noexcept {
 			uint8_t reg[3];
 			reg[0] = static_cast<uint8_t>(adr);
 			i2c_io_.send(addr_, reg, 1);
@@ -114,7 +114,7 @@ namespace chip {
 			return (static_cast<uint32_t>(reg[0]) << 16) | (static_cast<uint32_t>(reg[1]) << 8) | reg[2];
 		}
 
-		uint16_t read16le_(REG adr) {
+		uint16_t read16le_(REG adr) noexcept {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(adr);
 			i2c_io_.send(addr_, reg, 1);
@@ -122,14 +122,14 @@ namespace chip {
 			return (reg[1] << 8) | reg[0];
 		}
 
-		void write8_(REG a, uint8_t data) {
+		void write8_(REG a, uint8_t data) noexcept {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(a);
 			reg[1] = data;
 			i2c_io_.send(addr_, reg, 2);
 		}
 
-		void get_coefficients_() {
+		void get_coefficients_() noexcept {
 			calib_.dig_T1 = read16le_(REG::DIG_T1);
 			calib_.dig_T2 = read16le_(REG::DIG_T2);
 			calib_.dig_T3 = read16le_(REG::DIG_T3);
@@ -152,7 +152,7 @@ namespace chip {
 			@param[in]	i2c_io	iica_io クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		BMP280(I2C_IO& i2c_io) : i2c_io_(i2c_io), addr_(0), calib_(), t_fine_(0) { }
+		BMP280(I2C_IO& i2c_io) noexcept : i2c_io_(i2c_io), addr_(0), calib_(), t_fine_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -163,7 +163,7 @@ namespace chip {
 			@return エラーなら「false」を返す
 		 */
 		//-----------------------------------------------------------------//
-		bool start(uint8_t addr = I2C_ADR)
+		bool start(uint8_t addr = I2C_ADR) noexcept
 		{
 			addr_ = addr;
 
@@ -195,7 +195,7 @@ namespace chip {
 			@return 温度
 		 */
 		//-----------------------------------------------------------------//
-		int32_t get_temperature()
+		int32_t get_temperature() noexcept
 		{
 			if(addr_ == 0) return 0;
 
@@ -221,7 +221,7 @@ namespace chip {
 			@return 湿度
 		 */
 		//-----------------------------------------------------------------//
-		float get_humidity()
+		float get_humidity() noexcept
 		{
 			if(addr_ == 0) return 0;
 
@@ -254,7 +254,7 @@ namespace chip {
 			@return 圧力
 		 */
 		//-----------------------------------------------------------------//
-		int32_t get_pressure()
+		int32_t get_pressure() noexcept
 		{
 			if(addr_ == 0) return 0;
 
@@ -294,7 +294,7 @@ namespace chip {
 			@return 高度
 		 */
 		//-----------------------------------------------------------------//
-		float get_altitude(float seaLevelhPa = 1013.25f)
+		float get_altitude(float seaLevelhPa = 1013.25f) noexcept
 		{
 			if(addr_ == 0) return 0.0f;
 

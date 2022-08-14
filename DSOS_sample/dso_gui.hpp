@@ -124,9 +124,6 @@ namespace dsos {
 			case 4:
 				p = SMP_FINE4_STR;
 				break;
-			case 5:
-				p = SMP_FINE5_STR;
-				break;
 			default:
 				break;
 			}
@@ -159,6 +156,11 @@ namespace dsos {
 		void exec_capture_() noexcept
 		{
 			auto trg = static_cast<TRG_MODE>(trg_menu_.get_select_pos());
+			if(trg != CAPTURE::TRG_MODE::NONE) {
+				auto idx = smp_unit_menu_.get_select_pos() * 3 + smp_fine_menu_.get_select_pos(); 
+				uint32_t sr = AD_SAMPLE_RATE[idx];
+				capture_.set_samplerate(sr * 1000);
+			}
 			capture_.set_trg_mode(trg, render_wave_.get_trg_value());
 		}
 
@@ -291,7 +293,14 @@ namespace dsos {
 			opt_btn_.enable();
 			opt_btn_.at_select_func() = [=](uint32_t id) {
 				bool ena = opt_menu_.get_state() == WIDGET::STATE::ENABLE;
+				opt_menu_.enable(!ena);
 				side_button_stall_(opt_btn_, !ena);
+				if(ena) {
+					auto opt = static_cast<OPT_MODE>(opt_menu_.get_select_pos());
+					if(opt != OPT_MODE::NONE) {
+
+					}
+				}
 			};
 			opt_menu_.set_layer(WIDGET::LAYER::_0);
 
@@ -398,8 +407,8 @@ namespace dsos {
 				++n;
 			} else if(mes_menu_.get_state() == gui::widget::STATE::ENABLE) {
 				++n;
-//			} else if(opt_menu_.get_state() == gui::widget::STATE::ENABLE) {
-//				++n;
+			} else if(opt_menu_.get_state() == gui::widget::STATE::ENABLE) {
+				++n;
 			}
 
 			if(n == 0) {  // メニュー選択時はバイパスする。

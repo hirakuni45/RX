@@ -489,25 +489,19 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
-					※RX64M、RX71M には無いので仮想レジスタとしてダミーを定義
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) 
 		*/
 		//-----------------------------------------------------------------//
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-		typedef ro32_t<0xFFFFFFE8> UIDR0_;  ///< in VECTOR 
-		typedef ro32_t<0xFFFFFFEC> UIDR1_;  ///< in VECTOR 
-		typedef ro32_t<0xFFFFFFF0> UIDR2_;  ///< in VECTOR 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
+		typedef ro32_t<0x007FB174> UIDR0_;
+		typedef ro32_t<0x007FB1E4> UIDR1_;
+		typedef ro32_t<0x007FB1E8> UIDR2_;
 		typedef ro32_t<0xFFFFFFF4> UIDR3_;  ///< in VECTOR 
 #elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		typedef ro32_t<0xFE7F7D90> UIDR0_;
 		typedef ro32_t<0xFE7F7D94> UIDR1_;
 		typedef ro32_t<0xFE7F7D98> UIDR2_;
 		typedef ro32_t<0xFE7F7D9C> UIDR3_;
-#elif defined(SIG_RX66T) || defined(SIG_RX72T)
-		typedef ro32_t<0x007FB174> UIDR0_;
-		typedef ro32_t<0x007FB1E4> UIDR1_;
-		typedef ro32_t<0x007FB1E8> UIDR2_;
-		typedef ro32_t<0xFFFFFFF4> UIDR3_;  ///< in VECTOR 
 #endif
 		static UIDR0_ UIDR0;
 		static UIDR1_ UIDR1;
@@ -579,7 +573,7 @@ namespace device {
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR3_  flash_t<dsize, idnum>::UIDR3;
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef flash_t<65536, 0> FLASH;
+	typedef flash_t<65536, 3> FLASH;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef flash_t<32768, 3> FLASH;
 #elif defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)

@@ -55,15 +55,14 @@ namespace dsos {
 		public:
 			DATA				data_[CAPN];
 
-			volatile uint16_t	tic_;
-			volatile uint16_t	pos_;
-			uint16_t			before_count_;
-			uint16_t			after_count_;
+			volatile uint32_t	pos_;
+			volatile uint32_t	before_count_;
+			volatile uint32_t	after_count_;
+			volatile uint16_t	cycle_;	
 			volatile int16_t	trg_ref_;
+			volatile uint32_t	trg_pos_;
 			volatile TRG_MODE	trg_mode_main_;
 			volatile TRG_MODE	trg_mode_;
-			volatile uint16_t	trg_pos_;
-			volatile uint16_t	cycle_;	
 
 			DATA	min_;
 			DATA	max_;
@@ -73,11 +72,10 @@ namespace dsos {
 #endif
 
 			cap_task() noexcept :
-				data_ { { CAP_OFS, CAP_OFS } }, tic_(0), pos_(0),
-				before_count_(0), after_count_(0),
-				trg_ref_(0),
+				data_ { { CAP_OFS, CAP_OFS } }, pos_(0),
+				before_count_(0), after_count_(0), cycle_(0),
+				trg_ref_(0), trg_pos_(0),
 				trg_mode_main_(TRG_MODE::NONE), trg_mode_(TRG_MODE::NONE),
-				trg_pos_(0),
 				min_(4096 - 1), max_(0)
 			{ }
 
@@ -101,11 +99,10 @@ namespace dsos {
 					if(pos_ == (CAPN - 1)) {
 						if(trg_mode_ == TRG_MODE::SINGLE) {
 							trg_mode_ = TRG_MODE::NONE;
-							++cycle_;
 						}
 						trg_pos_ = CAPN / 4;
 						pos_ = 0;
-						++tic_;
+						++cycle_;
 					}
 					break;
 				case TRG_MODE::_TRG_BEFORE:
@@ -200,7 +197,6 @@ namespace dsos {
 					} else {
 						trg_mode_ = TRG_MODE::NONE;
 						++cycle_;
-						++tic_;
 					}
 					break;
 				default:
@@ -219,6 +215,7 @@ namespace dsos {
 #endif
 
 		uint32_t	samplerate_;
+		uint32_t	capture_samplerate_;
 
 		float		volt_gain_[2];
 
@@ -307,13 +304,15 @@ namespace dsos {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		capture() noexcept : samplerate_(2'000'000), volt_gain_{ VOLT_DIV_L, VOLT_DIV_L },
-			trg_mode_(TRG_MODE::NONE) { }
+		capture() noexcept : samplerate_(2'000'000), capture_samplerate_(2'000'000),
+			volt_gain_{ VOLT_DIV_L, VOLT_DIV_L },
+			trg_mode_(TRG_MODE::NONE)
+		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サンプルレートの設定
+			@brief  サンプリング周波数の設定
 			@param[in]	freq	サンプリング周波数
 		*/
 		//-----------------------------------------------------------------//
@@ -337,11 +336,11 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サンプルレートの取得
-			@return	サンプリング周波数
+			@brief  キャプチャーしたサンプリング周波数の取得
+			@return	キャプチャーしたサンプリング周波数
 		*/
 		//-----------------------------------------------------------------//
-		auto get_samplerate() const noexcept { return samplerate_; }
+		auto get_capture_samplerate() const noexcept { return capture_samplerate_; }
 
 
 		//-----------------------------------------------------------------//
@@ -467,7 +466,25 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  トリガー型設定
+			@brief  トリガー前キャプチャー数の取得
+			@return トリガー前キャプチャー数
+		*/
+		//-----------------------------------------------------------------//
+		auto get_before_count() const noexcept { return CAP_NUM / 4; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  トリガー後キャプチャー数の取得
+			@return トリガー後キャプチャー数
+		*/
+		//-----------------------------------------------------------------//
+		auto get_after_count() const noexcept { return CAPN / 2 + CAPN / 4; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  トリガー型設定（キャプチャー開始）
 			@param[in]	trg		トリガー型
 			@param[in]	ref		トリガー基準値
 		*/
@@ -476,8 +493,8 @@ namespace dsos {
 		{
 			at_cap_task().trg_ref_ = limit_(ref);
 			at_cap_task().pos_ = 0;
-			at_cap_task().before_count_ = CAP_NUM / 4;
-			at_cap_task().after_count_  = CAPN / 2 + CAPN / 4;
+			at_cap_task().before_count_ = get_before_count();
+			at_cap_task().after_count_  = get_after_count();
 			at_cap_task().trg_mode_main_ = trg_mode;
 			trg_mode_ = trg_mode;
 			if(trg_mode == TRG_MODE::CH0_POS || trg_mode == TRG_MODE::CH1_POS
@@ -486,6 +503,7 @@ namespace dsos {
 			} else {
 				at_cap_task().trg_mode_ = trg_mode;
 			}
+			capture_samplerate_ = samplerate_;
 		}
 
 
@@ -519,15 +537,6 @@ namespace dsos {
 			utils::str::get_word(TRG_MODE_STR, pos, tmp, sizeof(tmp), ',');
 			return tmp;
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  タスク・カウンタの取得
-			@return タスク・カウンタ
-		*/
-		//-----------------------------------------------------------------//
-		auto get_capture_tic() const noexcept { return get_cap_task().tic_; }
 
 
 		//-----------------------------------------------------------------//
@@ -573,11 +582,10 @@ namespace dsos {
 			@param[in]	ch1		CH1 波形型
 		*/
 		//-----------------------------------------------------------------//
-		void make_wave(uint32_t freq, float ppv, uint32_t num, PWAVE_TYPE ch0, PWAVE_TYPE ch1)
-		noexcept
+		void make_wave(uint32_t freq, float ppv, uint32_t num, PWAVE_TYPE ch0, PWAVE_TYPE ch1) noexcept
 		{
 			static int32_t count = 0;
-			auto smpl = get_samplerate();
+			auto smpl = samplerate_;
 			auto& task = at_cap_task();
 			auto unit = static_cast<float>(smpl) / static_cast<float>(freq);
 			auto vgain0 = voltage_to_value(0, ppv);
@@ -629,8 +637,8 @@ namespace dsos {
 				ch1.update(get(i).y, i);
 				if(ch0.probe() && ch1.probe()) break;
 			}
-			ch0.build(get_samplerate());
-			ch1.build(get_samplerate());
+			ch0.build(get_capture_samplerate());
+			ch1.build(get_capture_samplerate());
 		}
 	};
 }
