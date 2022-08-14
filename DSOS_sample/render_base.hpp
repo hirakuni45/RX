@@ -99,7 +99,7 @@ namespace dsos {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  チャネル・電圧型
+			@brief  電圧レンジ型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CH_VOLT : uint8_t {
@@ -182,7 +182,7 @@ namespace dsos {
 
 
 		/// サンプリング・ユニット文字列
-		static constexpr char SMP_UNIT_STR[] = "1us,10us,100us,1ms,10ms,100ms";
+		static constexpr char SMP_UNIT_STR[] = "1us,10us,100us,1ms,10ms";
 
 		/// サンプリング・ファイン文字列
 		static constexpr char SMP_FINE0_STR[] = "1us,2us,5us";
@@ -190,7 +190,6 @@ namespace dsos {
 		static constexpr char SMP_FINE2_STR[] = "100us,200us,500us";
 		static constexpr char SMP_FINE3_STR[] = "1ms,2ms,5ms";
 		static constexpr char SMP_FINE4_STR[] = "10ms,20ms,50ms";
-		static constexpr char SMP_FINE5_STR[] = "100ms,200ms,500ms";
 
 		static constexpr uint8_t SMP_FINE_NUM = 3;
 
@@ -200,39 +199,15 @@ namespace dsos {
 			    10,     20,     50,
 			   100,    200,    500,
 			  1000,   2000,   5000,
-			 10000,  20000,  50000,
-			100000, 200000, 500000
-		};
-
-		/// A/D 変換基準サンプリングレート（KHz）
-		static constexpr int16_t AD_SAMPLE_RATE[] = {
-			  2000,   2000,   2000,
-			  2000,   2000,   2000,
-			  2000,   2000,   2000,
-			  2000,   2000,   2000,
-			  2000,   2000,   2000,
-			  2000,   2000,   2000,
+			 10000,  20000,  50000
 		};
 
 		enum class SMP_MODE : uint8_t {
-			_1us,
-			_2us,
-			_5us,
-			_10us,
-			_20us,
-			_50us,
-			_100us,
-			_200us,
-			_500us,
-			_1ms,
-			_2ms,
-			_5ms,
-			_10ms,
-			_20ms,
-			_50ms,
-			_100ms,
-			_200ms,
-			_500ms
+			  _1us,   _2us,   _5us,
+			 _10us,  _20us,  _50us,
+			_100us, _200us, _500us,
+			  _1ms,   _2ms,   _5ms,
+			 _10ms,  _20ms,  _50ms
 		};
 
 		static const char* get_smp_str(SMP_MODE smp)
@@ -257,9 +232,6 @@ namespace dsos {
 			case 4:
 				unit = SMP_FINE4_STR;
 				break;
-			case 5:
-				unit = SMP_FINE5_STR;
-				break;
 			default:
 				break;
 			}
@@ -278,11 +250,33 @@ namespace dsos {
 		}
 
 
-		/// 計測タイプメニュー文字列
+		/// A/D 変換サンプリングレート（KHz）
+		static constexpr int16_t AD_SAMPLE_RATE[] = {
+			  2000,   2000,   2000, 
+			  2000,   2000,   2000,
+			  2000,   2000,   2000,
+			  1000,    500,    200,
+			   100,     50,     20
+		};
+
+
+		/// 計測メニュー文字列
 		static constexpr char MES_MODE_STR[] = "Off,Time Sub,CH0 Sub,CH1 Sub,Time Abs,CH0 Abs,CH1 Abs";
 
 		/// オプションメニュー文字列
 		static constexpr char OPTION_STR[] = "NONE,CH0 FFT,CH1 FFT";
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  オプション型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class OPT_MODE : uint8_t {
+			NONE,		///< 何もしない
+			CH0_FFT,	///< CH0 FFT
+			CH1_FFT,	///< CH1 FFT
+		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -404,18 +398,13 @@ namespace dsos {
 
 		typedef graphics::def_color DEF_COLOR;
 
-		const graphics::share_color&	CH0_COLOR;	///< チャネル０カラー
-		const graphics::share_color&	CH1_COLOR;	///< チャネル１カラー
-		const graphics::share_color&	TRG_COLOR;	///< トリガーカラー
-		const graphics::share_color&	SMP_COLOR;	///< サンプルカラー
-		const graphics::share_color&	MES_COLOR;	///< 計測カラー
+		static constexpr graphics::share_color	CH0_COLOR = DEF_COLOR::Yellow;		///< チャネル０カラー
+		static constexpr graphics::share_color	CH1_COLOR = DEF_COLOR::Fuchsi;		///< チャネル１カラー
+		static constexpr graphics::share_color	TRG_COLOR = DEF_COLOR::Orange;		///< トリガーカラー
+		static constexpr graphics::share_color	SMP_COLOR = DEF_COLOR::SafeColor;	///< サンプルカラー
+		static constexpr graphics::share_color	MES_COLOR = DEF_COLOR::Green;		///< 計測カラー
 
-		render_base() noexcept :
-			CH0_COLOR(DEF_COLOR::Yellow),
-			CH1_COLOR(DEF_COLOR::Fuchsi),
-			TRG_COLOR(DEF_COLOR::Orange),
-			SMP_COLOR(DEF_COLOR::SafeColor),
-			MES_COLOR(DEF_COLOR::Green)
+		render_base() noexcept 
 		{ }
 	};
 }

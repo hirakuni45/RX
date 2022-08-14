@@ -87,7 +87,7 @@ namespace dsos {
 		uint16_t	trg_wait_;
 		uint32_t	trg_update_;
 
-		uint32_t	cap_tic_;
+		uint32_t	cap_cycle_;
 		SMP_MODE	cur_smp_mode_;
 		typedef typename CAPTURE::wave_info WAVE_INFO;
 		WAVE_INFO	wave_info0_;
@@ -105,8 +105,8 @@ namespace dsos {
 		};
 		AREA		area_;
 
-		int16_t		cap_win_org_;
-		int16_t		cap_win_end_;
+		int32_t		cap_win_org_;
+		int32_t		cap_win_end_;
 		vtx::spos	volt_min_[2];
 		vtx::spos	volt_max_[2];
 
@@ -175,16 +175,13 @@ namespace dsos {
 
 		void make_rate_(int16_t val, int32_t unit_us, char* str, uint32_t len) noexcept
 		{
-			int32_t n = val * unit_us / GRID;
-			int32_t div = 1;
-			const char* units = "us";
-			if(std::abs(n) >= 1000) {
-				div = 1000;
-				n /= div;
-				units = "ms";
+			float n = static_cast<float>(val * unit_us) / static_cast<float>(GRID);
+			if(std::abs(n) >= 1000.0f) {
+				n /= 1000.0f;
+				utils::sformat("%3.2fms", str, len) % n;
+			} else {
+				utils::sformat("%3.2fus", str, len) % n;
 			}
-			int32_t m = std::abs(val * unit_us * 100 / div / GRID) % 100;
-			utils::sformat("%d.%d%s", str, len) % n % m % units;
 		}
 
 
@@ -283,7 +280,7 @@ namespace dsos {
 			mes_time_0_org_(220), mes_time_0_pos_(220), mes_time_1_org_(220), mes_time_1_pos_(220),
 			mes_volt_0_org_(272/2), mes_volt_0_pos_(272/2), mes_volt_1_org_(272/2), mes_volt_1_pos_(272/2),
 			touch_num_(0), trg_wait_(0), trg_update_(0),
-			cap_tic_(0), cur_smp_mode_(SMP_MODE::_1us), wave_info0_(), wave_info1_(),
+			cap_cycle_(0), cur_smp_mode_(SMP_MODE::_1us), wave_info0_(), wave_info1_(),
 			ch_info_count_(0),
 			area_(AREA::NONE),
 			cap_win_org_(0), cap_win_end_(0), volt_min_(), volt_max_()
@@ -334,6 +331,7 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void set_ch0_volt(CH_VOLT volt) noexcept {
 			ch0_volt_ = volt;
+			// CH0 分圧ハードを選択して、ゲインを設定
 #if 0
 			if((static_cast<float>(get_mvolt(ch0_volt_)) * 1e-3) < VOLT_DIV_H) {
 				capture_.set_voltage_gain(0, VOLT_DIV_H);
@@ -361,6 +359,7 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void set_ch1_volt(CH_VOLT volt) noexcept {
 			ch1_volt_ = volt;
+			// CH1 分圧ハードを選択して、ゲインを設定
 #if 0
 			if((static_cast<float>(get_mvolt(ch1_volt_)) * 1e-3) < VOLT_DIV_H) {
 				capture_.set_voltage_gain(1, VOLT_DIV_H);
@@ -443,24 +442,18 @@ namespace dsos {
 			switch(measere_) {
 			case MEASERE::OFF:
 				{
-#if 0
-					bool disp = true;
-					if(capture_.get_trg_mode(true) != TRG_MODE::NONE) {
-						++trg_wait_;
-						if(trg_wait_ >= 30) {
-							trg_wait_ = 0;
-						}
-						if(trg_wait_ < 10) {
-							disp = false;
-						}
-					}
-					if(disp) {
-					}
-#endif
 					auto trg = capture_.get_trg_mode();
-					char tmp[16];
+					char tmp[32];
 					utils::sformat("%s/div, ", tmp, sizeof(tmp)) % get_smp_str(smp_mode_);
 					auto x = render_.draw_text(vtx::spos(0, 0), tmp);
+					auto sr = capture_.get_capture_samplerate() / 1000;  // KHz
+					if(sr >= 1000) {
+						sr /= 1000;
+						utils::sformat("%dMHz/sec, ", tmp, sizeof(tmp)) % sr;
+					} else {
+						utils::sformat("%dKHz/sec, ", tmp, sizeof(tmp)) % sr;
+					}
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
 					x = render_.draw_text(vtx::spos(x, 0), capture_.get_trigger_str());
 					if(trg == TRG_MODE::CH0_POS || trg == TRG_MODE::CH0_NEG) {
 						x = render_.draw_text(vtx::spos(x, 0), ": ");
@@ -472,6 +465,22 @@ namespace dsos {
 						auto v = ch1_vpos_ - trg_pos_;
 						make_volt_(v, get_mvolt(ch1_volt_), tmp, sizeof(tmp));
 						x = render_.draw_text(vtx::spos(x, 0), tmp);
+					}
+
+					// vpos の位置、time_pos の位置を表示
+					if(touch_.get_touch_pos(0).event == TOUCH::EVENT::CONTACT) {  // タッチ（ドラッグしている）
+						if(target_ == TARGET::CH0) {
+							auto v = ch0_vpos_ - 272 / 2;
+							make_volt_(-v, get_mvolt(ch0_volt_), tmp, sizeof(tmp));
+							x = render_.draw_text(vtx::spos(x + 8, 0), tmp);
+						} else if(target_ == TARGET::CH1) {
+							auto v = ch1_vpos_ - 272 / 2;
+							make_volt_(-v, get_mvolt(ch1_volt_), tmp, sizeof(tmp));
+							x = render_.draw_text(vtx::spos(x + 8, 0), tmp);
+						} else if(target_ == TARGET::TIME) {
+							make_rate_(time_pos_, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
+							x = render_.draw_text(vtx::spos(x + 8, 0), tmp);
+						}
 					}
 				}
 				break;
@@ -555,7 +564,7 @@ namespace dsos {
 
 				render_.set_fore_color(CH0_COLOR);
 				if(ch_info_count_ < (60*2*3)) {
-					utils::sformat("0.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch0_mult_)
+					utils::sformat("%s %s %s/div ", tmp, sizeof(tmp)) % get_ch_mult_str(ch0_mult_)
 						% get_ch_mode_str(ch0_mode_) % get_ch_volt_str(ch0_volt_);
 					auto x = render_.draw_text(vtx::spos(0, 272 - 16 + 1), tmp);
 					make_freq_(wave_info0_.freq_, tmp, sizeof(tmp));
@@ -572,7 +581,7 @@ namespace dsos {
 
 				render_.set_fore_color(CH1_COLOR);
 				if(ch_info_count_ < (60*2*3)) {
-					utils::sformat("1.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch1_mult_)
+					utils::sformat("%s %s %s/div ", tmp, sizeof(tmp)) % get_ch_mult_str(ch1_mult_)
 						% get_ch_mode_str(ch1_mode_) % get_ch_volt_str(ch1_volt_);
 					auto x = render_.draw_text(vtx::spos(240, 272 - 16 + 1), tmp);
 					make_freq_(wave_info1_.freq_, tmp, sizeof(tmp));
@@ -682,7 +691,7 @@ namespace dsos {
 					}
 					draw = true;
 				}
-			} else if(num == 2) {  // 二本タッチによるズーム
+			} else if(num == 2) {  // 二本タッチの場合
 				const auto& p2 = touch_.get_touch_pos(1);
 #if 0
 				if(measere_ == MEASERE::TIME) {
@@ -721,7 +730,7 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  アップ・デート（再描画）
+			@brief  アップ・デート（波形の描画）
 		*/
 		//-----------------------------------------------------------------//
 		void update() noexcept
@@ -731,14 +740,12 @@ namespace dsos {
 
 			draw_grid(0, 16, 440, 240, CAPTURE::GRID);
 
-			auto sr = static_cast<float>(get_smp_rate(smp_mode_) * 1e-6
-				/ static_cast<float>(GRID));
-			auto step = sr / (1.0f / static_cast<float>(capture_.get_samplerate()));
-			auto istep = static_cast<int32_t>(step * 65536.0f);
+			auto sr = static_cast<float>(get_smp_rate(smp_mode_) * 1e-6 / static_cast<float>(GRID));
+			auto step = sr / (1.0f / static_cast<float>(capture_.get_capture_samplerate()));
+			auto istep = static_cast<int32_t>(step * 16384.0f);
 			int32_t pos = 0;
-			auto iofs = static_cast<int16_t>(static_cast<float>(time_pos_) * -step);
+			auto tofs = static_cast<int32_t>(static_cast<float>(time_pos_) * -step);
 
-			// VOLT_DIV_L/H
 			auto ch0 = static_cast<float>(get_mvolt(ch0_volt_)) * 1e-3;  // mV to V
 			auto ch1 = static_cast<float>(get_mvolt(ch1_volt_)) * 1e-3;  // mV to V
 			auto grid = static_cast<float>(GRID);
@@ -748,41 +755,49 @@ namespace dsos {
 			if(ch0_mult_ == CH_MULT::X10) gain0 *= 10.0f;
 			auto gain1 = capture_.get_voltage_gain(1);
 			if(ch1_mult_ == CH_MULT::X10) gain1 *= 10.0f;
-			int32_t ich0 = gain0 / ch0 * 65536.0f / static_cast<float>(CAPTURE::ADC_QUANTIZE);
-			int32_t ich1 = gain1 / ch1 * 65536.0f / static_cast<float>(CAPTURE::ADC_QUANTIZE);
-			int16_t p0;
+			int32_t ich0 = gain0 / ch0 * 16384.0f / static_cast<float>(CAPTURE::ADC_QUANTIZE);
+			int32_t ich1 = gain1 / ch1 * 16384.0f / static_cast<float>(CAPTURE::ADC_QUANTIZE);
+			int32_t p0;
 			int16_t ch0_y;
 			int16_t ch1_y;
-			for(int16_t x = 0; x < (TIME_SIZE - 1); ++x) {
+			for(int16_t x = 0; x < (TIME_SIZE - 1); ++x) {  // ピクセル単位
 				if(x == 0) {
-					p0 = iofs + (pos >> 16);
+					p0 = tofs + (pos >> 14);
 					cap_win_org_ = p0;
 				}
 				const auto& d0 = capture_.get(p0);
-				pos += istep;
-				int16_t p1 = iofs + (pos >> 16);
+				int32_t p1 = tofs + (pos >> 14);
 				const auto& d1 = capture_.get(p1);
+				pos += istep;
 				auto d1x = d1.x;
 				auto d1y = d1.y;
+				bool clipout = false;
+				if(p0 <= -static_cast<int32_t>(capture_.get_before_count()) || p0 >= static_cast<int32_t>(capture_.get_after_count())) {
+					clipout = true;
+				}
 				p0 = p1;
 				if(ch0_mode_ != CH_MODE::OFF) {
 					if(x == 0) {
-						ch0_y = (static_cast<int32_t>(-d0.x) * ich0) >> 16;
+						ch0_y = (static_cast<int32_t>(-d0.x) * ich0) >> 14;
 					}
-					int16_t y1 = (static_cast<int32_t>(-d1x) * ich0) >> 16;
-					render_.set_fore_color(CH0_COLOR);
-					int16_t ofs = ch0_vpos_;
-					render_.line(vtx::spos(x, ofs + ch0_y), vtx::spos(x + 1, ofs + y1));
+					int16_t y1 = (static_cast<int32_t>(-d1x) * ich0) >> 14;
+					if(!clipout) {
+						render_.set_fore_color(CH0_COLOR);
+						int16_t ofs = ch0_vpos_;
+						render_.line(vtx::spos(x, ofs + ch0_y), vtx::spos(x + 1, ofs + y1));
+					}
 					ch0_y = y1;
 				}
 				if(ch1_mode_ != CH_MODE::OFF) {
 					if(x == 0) {
-						ch1_y = (static_cast<int32_t>(-d0.y) * ich1) >> 16;
+						ch1_y = (static_cast<int32_t>(-d0.y) * ich1) >> 14;
 					}
-					int16_t y1 = (static_cast<int32_t>(-d1y) * ich1) >> 16;
-					render_.set_fore_color(CH1_COLOR);
-					int16_t ofs = ch1_vpos_;
-					render_.line(vtx::spos(x, ofs + ch1_y), vtx::spos(x + 1, ofs + y1));
+					int16_t y1 = (static_cast<int32_t>(-d1y) * ich1) >> 14;
+					if(!clipout) {
+						render_.set_fore_color(CH1_COLOR);
+						int16_t ofs = ch1_vpos_;
+						render_.line(vtx::spos(x, ofs + ch1_y), vtx::spos(x + 1, ofs + y1));
+					}
 					ch1_y = y1;
 				}
 			}
@@ -799,10 +814,10 @@ namespace dsos {
 			}
 
 			{  // キャプチャー動作が更新した場合を検出
-				auto tic = capture_.get_capture_tic();
+				auto cycle = capture_.get_capture_cycle();
 				// キャプチャー更新、サンプリング周期変更？
-				if(tic != cap_tic_ || smp_mode_ != cur_smp_mode_) {
-					cap_tic_ = tic;
+				if(cycle != cap_cycle_ || smp_mode_ != cur_smp_mode_) {
+					cap_cycle_ = cycle;
 					cur_smp_mode_ = smp_mode_;
 					// 見えている倍の領域をスキャン
 					auto end = cap_win_end_ + (cap_win_end_ - cap_win_org_);
@@ -890,6 +905,7 @@ namespace dsos {
 					float d = static_cast<float>(ch0_vpos_ - trg_pos_) * get_mvolt(ch0_volt_);
 					d /= static_cast<float>(GRID);
 					val = capture_.voltage_to_value(0, d * 1e-3);
+					if(ch0_mult_ == CH_MULT::X10) val /= 10;
 				}
 				break;
 			case TRG_MODE::CH1_POS:
@@ -898,6 +914,7 @@ namespace dsos {
 					float d = static_cast<float>(ch1_vpos_ - trg_pos_) * get_mvolt(ch1_volt_);
 					d /= static_cast<float>(GRID);
 					val = capture_.voltage_to_value(1, d * 1e-3);
+					if(ch1_mult_ == CH_MULT::X10) val /= 10;
 				}
 				break;
 			default:

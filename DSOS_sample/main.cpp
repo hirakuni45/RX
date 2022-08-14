@@ -121,8 +121,8 @@ namespace {
 	// 標準カラーインスタンス
 	typedef graphics::def_color DEF_COLOR;
 
-	// 2MHz x 32768 = 16ms 分
-	typedef dsos::capture<32768> CAPTURE;
+	// 2MHz x 32768 = 8ms 分
+	typedef dsos::capture<16384> CAPTURE;
 	CAPTURE		capture_;
 
 	FT5206_I2C	ft5206_i2c_;
@@ -284,8 +284,8 @@ int main(int argc, char** argv)
 	}
 
 	{  // キャプチャー開始
-		uint32_t freq = 2000000;  // 2 MHz
-//		uint32_t freq = 100000;  // 100 KHz
+		uint32_t freq = 2'000'000;  // 2 MHz
+//		uint32_t freq = 100'000;  // 100 KHz
 		if(!capture_.start(freq)) {
 			utils::format("Capture not start...\n");
 		}
