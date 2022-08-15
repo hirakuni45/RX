@@ -7,4 +7,12 @@ NESEMU_sample/emu/* linguist-vendored
 r_net/driver/* linguist-vendored
 r_net/T4_src/* linguist-vendored
 r_usb/* linguist-vendored
-tinyusb/* linguist-vendored
+tinyusb/src/* linguist-vendored
+tinyusb/src/class/* linguist-vendored
+tinyusb/src/common/* linguist-vendored
+tinyusb/src/device/* linguist-vendored
+tinyusb/src/host/* linguist-vendored
+tinyusb/src/osal/* linguist-vendored
+tinyusb/src/portable/* linguist-vendored
+TUSB_sample/RX65N/iodefine.h linguist-vendored
+TUSB_sample/RX72N/iodefine.h linguist-vendored
