@@ -1,24 +1,29 @@
-Renesas RX65N/RX72N Envision Kit ガジェット
+Renesas RX65N/RX72N Envision Kit / デジタル・ストレージ・オシロスコープ
 =========
 
-[English](README.md)
+[英語版](README.md)
 
 <img src="../docs/DSOS_SQUARE.jpg" width="50%"><img src="../docs/DSOS_SIN.jpg" width="50%">
 
-**RX65N Envision Kit の場合、ダブルバッファが物理的に出来ない為、操作性に難があります。**   
+**RX65N Envision Kit は、ダブルバッファが物理的に出来ない為、一応動作しますが、レガシーとします。**   
 **RX72N Envision Kit で利用下さい。**
 
+---
+
 ## 概要
+
  - RX72N Envision Kit で実現するデジタルストレージオシロスコープ
  - 最大サンプリング速度 500 [ns] (2MHz)
  - 最大２チャネル同時
  - 内蔵１２ビット A/D コンバータ利用（４０９６段階）
  - タッチパネルを使った操作
- - 1:1 プローブ専用（1Mオーム）
+ - 参考回路、基板用 KiCAD 関係ファイルも公開（RX72N Envision Kit 用）
+ - ソースコードは MIT ライセンスで公開しているので、自分で、機能を付加する事も可能。
 
 ---
 
 ## プロジェクト・リスト
+
  - main.cpp
  - capture.hpp
  - render_base.hpp
@@ -34,13 +39,14 @@ Renesas RX65N/RX72N Envision Kit ガジェット
 ---
 
 ## ハードウェアーの準備
- - SD カードインターフェースの準備（キャプチャー波形を書き込む場合）
- - アナログ入力の接続
 
-|ターゲット        | CH0  | CH1  |
-|------------------|------|------|
-|RX65N Envision Kit|AIN000|AIN114|
-|RX72N Envision Kit|AIN007|AIN108|
+ - アナログ入力の接続
+ - KiCAD の回路は、RX72N Envision Kit 用です。
+
+|ターゲット        | CH0  | CH1  |RefClk|
+|---|---|---|---|
+|RX65N Envision Kit|AIN000|AIN114||
+|RX72N Envision Kit|AIN007|AIN108||
 
 ---
 
@@ -55,17 +61,19 @@ Renesas RX65N/RX72N Envision Kit ガジェット
 チャネル動作切り替：
 AC,GND,DC,OFF
 
+チャネル倍率切り替：
+X1,X10
+
 サンプリング周期（グリッド）：
 1us,2us,5us
 10us,20us,50us
 100us,200us,500us
 1ms,2ms,5ms
 10ms,20ms,50ms
-100ms,200ms,500ms
 
 トリガー条件：
 None
-One
+Single
 Run
 CH0-Pos
 CH1-Pos
@@ -81,18 +89,29 @@ Time Abs
 CH0 Abs
 CH1 Abs
 
+オプション：
+None
+CH0 FFT
+CH1 FFT
+
 基準波の出力：
 10KHz の矩形波
 
 ---
 
 ## ビルド方法
+
  - make する。
  - dsos_sample.mot ファイルをターゲットに書き込む。
 
+---
+
 ## 操作方法
-    
------
+
+
+
+
+---
    
 License
 ----
