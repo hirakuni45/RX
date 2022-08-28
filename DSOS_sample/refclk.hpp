@@ -26,11 +26,11 @@ namespace dsos {
 
 #ifndef GLFW_SIM
 #if defined(SIG_RX65N)
-	// CN13 (1): PD1_AN109_IRQ1
+	// CN13 (1): PD1_AN109_IRQ1 (MTIOC4B)
 	typedef device::MTU4 MTU;
 	static constexpr auto PSEL = device::port_map_mtu::ORDER::FIFTH;
 #elif defined(SIG_RX72N)
-	// Pmod2 (8): PD1_RESET
+	// Pmod2 (8): PD1_RESET (MTIOC4B)
 	typedef device::MTU4 MTU;
 	static constexpr auto PSEL = device::port_map_mtu::ORDER::FIFTH;
 #endif
@@ -55,14 +55,14 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  開始 10KHz の出力
+			@brief  開始（1KHz の出力）
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
 		bool start() noexcept
 		{
 #ifndef GLFW_SIM
-			uint32_t freq = 10'000;
+			uint32_t freq = 1'000;
 			auto ret = mtu_io_.start_normal(MTU::CHANNEL::B, MTU_IO::OUTPUT::TOGGLE, freq);
 			return ret;
 #else

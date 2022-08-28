@@ -36,19 +36,57 @@ namespace dsos {
 #if defined(SIG_RX65N)
 		static constexpr auto ADC_CH0 = ADC0::ANALOG::AIN000;  ///< P40 CN10(1)
 		static constexpr auto ADC_CH1 = ADC1::ANALOG::AIN114;  ///< P90 CN10(5)
+		typedef device::PORT<device::PORT6, device::bitpos::B0> CH0_SA;
+		typedef device::PORT<device::PORT6, device::bitpos::B1> CH0_SB;
+		typedef device::PORT<device::PORT6, device::bitpos::B2> CH0_DC;
+		typedef device::PORT<device::PORT3, device::bitpos::B6> CH1_SA;
+		typedef device::PORT<device::PORT3, device::bitpos::B7> CH1_SB;
+		typedef device::PORT<device::PORT5, device::bitpos::B3> CH1_DC;
 #elif defined(SIG_RX72N)
 		static constexpr auto ADC_CH0 = ADC0::ANALOG::AIN007;  ///< P47 Pmod2(10) CN6
 		static constexpr auto ADC_CH1 = ADC1::ANALOG::AIN108;  ///< PD0 Pmod2( 7) CN6
+		typedef device::PORT<device::PORT9, device::bitpos::B0> CH0_SA;		///< P90 Pmod2( 2) CN6
+		typedef device::PORT<device::PORT9, device::bitpos::B1> CH0_SB;		///< P91 Pmod2( 4) CN6
+		typedef device::PORT<device::PORT9, device::bitpos::B2> CH0_DC;		///< P92 Pmod2( 3) CN6
+		typedef device::PORT<device::PORT5, device::bitpos::B1> CH1_SA;		///< P51 Pmod1( 4) CN5
+		typedef device::PORT<device::PORT5, device::bitpos::B4> CH1_SB;		///< P54 Pmod1( 1) CN5
+		typedef device::PORT<device::PORT5, device::bitpos::B5> CH1_DC;		///< P55 Pmod1( 7) CN5
 #endif
 #endif
 
+		enum class DIVIDER : uint8_t {
+			HIGH,		///<  1/1 1:1 +-1.65V, 10:1 +-16.5V
+			MIDDLE,		///<  1/4 1:1 +-6.60V, 10:1 +-66.6V
+			LOW,		///< 1/20 1:1 +-33.0V, 10:1 +-330V
+			GND,		///< GND(0V) level
+		};
+
+		static void select_divider_ch0_(DIVIDER n) noexcept
+		{
+			CH0_SA::P =  static_cast<uint8_t>(n) & 1;
+			CH0_SB::P = (static_cast<uint8_t>(n) >> 1) & 1;
+		}
+
+		static void select_divider_ch1_(DIVIDER n) noexcept
+		{
+			CH1_SA::P =  static_cast<uint8_t>(n) & 1;
+			CH1_SB::P = (static_cast<uint8_t>(n) >> 1) & 1;
+		}
+
 	public:
+
+		static constexpr float VOLT_GAIN_HIGH   =  1.65f;	///< 1:1 Probe (+-1.65V) Max: +1.65V, Min: -1.65V
+		static constexpr float VOLT_GAIN_MIDDLE =  6.6f;	///< 1:1 Probe (+-6.60V) Max: +1.65V, Min: -6.60V
+		static constexpr float VOLT_GAIN_LOW    = 33.0f;	///< 1:1 Probe (+-33.0V) Max: +33.0V, Min: -33.0V
+
 		static constexpr uint32_t ADC_QUANTIZE = 2048;  ///< A/D 変換量子化の半分
+		static constexpr int16_t ADC_MAX =  2047 - 5;	///< 扱える最高値（オーバーレンジの検出）
+		static constexpr int16_t ADC_MIN = -2048 + 5;	///< 扱える最低値（オーバーレンジの検出）
 		// x:ch0, y:ch1
 		typedef vtx::spos DATA;
 
 		static constexpr uint32_t CAP_NUM = CAPN;	///< キャプチャー数
-		static constexpr int16_t CAP_OFS = 2048;	///< 12bit A/D offset
+		static constexpr int16_t CAP_OFS  = 2048;	///< 12bit A/D offset（中間）
 
 		// キャプチャー・タスク
 		class cap_task {
@@ -63,6 +101,8 @@ namespace dsos {
 			volatile uint32_t	trg_pos_;
 			volatile TRG_MODE	trg_mode_main_;
 			volatile TRG_MODE	trg_mode_;
+			DIVIDER				divider_ch0_;
+			DIVIDER				divider_ch1_;
 
 			DATA	min_;
 			DATA	max_;
@@ -75,7 +115,8 @@ namespace dsos {
 				data_ { { CAP_OFS, CAP_OFS } }, pos_(0),
 				before_count_(0), after_count_(0), cycle_(0),
 				trg_ref_(0), trg_pos_(0),
-				trg_mode_main_(TRG_MODE::NONE), trg_mode_(TRG_MODE::NONE),
+				trg_mode_main_(TRG_MODE::STOP), trg_mode_(TRG_MODE::STOP),
+				divider_ch0_(DIVIDER::LOW), divider_ch1_(DIVIDER::LOW),
 				min_(4096 - 1), max_(0)
 			{ }
 
@@ -85,26 +126,41 @@ namespace dsos {
 				DATA t = adv_;
 #else
 				DATA t(ADC0::ADDR(ADC_CH0) - CAP_OFS, ADC1::ADDR(ADC_CH1) - CAP_OFS);
+				// プリアンプで、入力信号を反転しているので、元に戻す。
+				t.x = -t.x;
+				t.y = -t.y;
 				ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
 				ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
 #endif
 				switch(trg_mode_) {
-				case TRG_MODE::NONE:
+				case TRG_MODE::STOP:
+					// オートゲイン制御
+					if(t.x >= ADC_MAX || t.x <= ADC_MIN) {  // Over voltage CH0
+//						select_divider_ch0_(DIVIDER::LOW);
+//						divider_ch0_ = DIVIDER::LOW;
+					}
+					if(t.y >= ADC_MAX || t.y <= ADC_MIN) {  // Over voltage CH1
+						select_divider_ch1_(DIVIDER::LOW);
+						divider_ch1_ = DIVIDER::LOW;
+					}
+					break;
+				case TRG_MODE::_BEFORE:  // 入力されている電圧を監視して、セレクタを切り替える。
 					break;
 				case TRG_MODE::SINGLE:
-				case TRG_MODE::RUN:
+				case TRG_MODE::AUTO:
 					data_[pos_] = t;
 					++pos_;
 					pos_ &= CAPN - 1;
 					if(pos_ == (CAPN - 1)) {
 						if(trg_mode_ == TRG_MODE::SINGLE) {
-							trg_mode_ = TRG_MODE::NONE;
+							trg_mode_ = TRG_MODE::STOP;
 						}
 						trg_pos_ = CAPN / 4;
 						pos_ = 0;
 						++cycle_;
 					}
 					break;
+
 				case TRG_MODE::_TRG_BEFORE:
 					data_[pos_] = t;
 					++pos_;
@@ -121,10 +177,10 @@ namespace dsos {
 					++pos_;
 					pos_ &= CAPN - 1;
 					if(t.x < trg_ref_) {
-						trg_mode_ = TRG_MODE::CH0_POSA;
+						trg_mode_ = TRG_MODE::_CH0_POSA;
 					}
 					break;
-				case TRG_MODE::CH0_POSA:
+				case TRG_MODE::_CH0_POSA:
 					data_[pos_] = t;
 					if(t.x >= trg_ref_) {
 						trg_pos_ = pos_;
@@ -139,10 +195,10 @@ namespace dsos {
 					++pos_;
 					pos_ &= CAPN - 1;
 					if(t.y < trg_ref_) {
-						trg_mode_ = TRG_MODE::CH1_POSA;
+						trg_mode_ = TRG_MODE::_CH1_POSA;
 					}
 					break;
-				case TRG_MODE::CH1_POSA:
+				case TRG_MODE::_CH1_POSA:
 					data_[pos_] = t;
 					if(t.y >= trg_ref_) {
 						trg_pos_ = pos_;
@@ -157,10 +213,10 @@ namespace dsos {
 					++pos_;
 					pos_ &= CAPN - 1;
 					if(t.x > trg_ref_) {
-						trg_mode_ = TRG_MODE::CH0_NEGA;
+						trg_mode_ = TRG_MODE::_CH0_NEGA;
 					}
 					break;
-				case TRG_MODE::CH0_NEGA:
+				case TRG_MODE::_CH0_NEGA:
 					data_[pos_] = t;
 					if(t.x <= trg_ref_) {
 						trg_pos_ = pos_;
@@ -175,10 +231,10 @@ namespace dsos {
 					++pos_;
 					pos_ &= CAPN - 1;
 					if(t.y > trg_ref_) {
-						trg_mode_ = TRG_MODE::CH1_NEGA;
+						trg_mode_ = TRG_MODE::_CH1_NEGA;
 					}
 					break;
-				case TRG_MODE::CH1_NEGA:
+				case TRG_MODE::_CH1_NEGA:
 					data_[pos_] = t;
 					if(t.y <= trg_ref_) {
 						trg_pos_ = pos_;
@@ -195,7 +251,7 @@ namespace dsos {
 					if(after_count_ > 0) {
 						after_count_--;
 					} else {
-						trg_mode_ = TRG_MODE::NONE;
+						trg_mode_ = TRG_MODE::STOP;
 						++cycle_;
 					}
 					break;
@@ -216,9 +272,6 @@ namespace dsos {
 
 		uint32_t	samplerate_;
 		uint32_t	capture_samplerate_;
-
-		float		volt_gain_[2];
-
 		TRG_MODE	trg_mode_;
 
 
@@ -298,6 +351,7 @@ namespace dsos {
 			return ret;
 		}
 
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -305,8 +359,7 @@ namespace dsos {
 		*/
 		//-----------------------------------------------------------------//
 		capture() noexcept : samplerate_(2'000'000), capture_samplerate_(2'000'000),
-			volt_gain_{ VOLT_DIV_L, VOLT_DIV_L },
-			trg_mode_(TRG_MODE::NONE)
+			trg_mode_(TRG_MODE::STOP)
 		{ }
 
 
@@ -345,24 +398,70 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  電圧ゲインの設定
-			@param[in]	ch		チャネル
-			@param[in]	gain	電圧ゲイン
-		*/
-		//-----------------------------------------------------------------//
-		void set_voltage_gain(uint32_t ch, float gain) noexcept {
-			volt_gain_[ch & 1] = gain;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  電圧ゲインの取得
 			@param[in]	ch		チャネル
 			@return 電圧ゲイン
 		*/
 		//-----------------------------------------------------------------//
-		auto get_voltage_gain(uint32_t ch) const noexcept { return volt_gain_[ch & 1]; }
+		auto get_voltage_gain(uint32_t ch) const noexcept {
+			DIVIDER divider = DIVIDER::GND;
+			if(ch == 0) {
+				divider = get_cap_task().divider_ch0_;
+			} else {
+				divider = get_cap_task().divider_ch1_;
+			}
+			float gain = VOLT_GAIN_LOW;
+			switch(divider) {
+			case DIVIDER::HIGH:   gain = VOLT_GAIN_HIGH; break;
+			case DIVIDER::MIDDLE: gain = VOLT_GAIN_MIDDLE; break;
+			default:
+				break;
+			}
+			return gain;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  直流、交流、GND の切り替え
+			@param[in]	ch		チャネル
+			@param[in]	mode	チャネルモード
+		*/
+		//-----------------------------------------------------------------//
+		void turn_ch_mode(uint32_t ch, CH_MODE mode) noexcept
+		{
+			if(ch == 0) {
+				if(mode == CH_MODE::DC) {
+					CH0_DC::P = 1;
+// select_divider_ch0_(DIVIDER::MIDDLE);
+// at_cap_task().divider_ch0_ = DIVIDER::MIDDLE;
+select_divider_ch0_(DIVIDER::HIGH);
+at_cap_task().divider_ch0_ = DIVIDER::HIGH;
+				} else if(mode == CH_MODE::AC) {
+					CH0_DC::P = 0;
+// select_divider_ch0_(DIVIDER::MIDDLE);
+// at_cap_task().divider_ch0_ = DIVIDER::MIDDLE;
+select_divider_ch0_(DIVIDER::HIGH);
+at_cap_task().divider_ch0_ = DIVIDER::HIGH;
+				} else if(mode == CH_MODE::GND) {
+					CH0_DC::P = 0;  // GND 時 AC に切り替える。
+					select_divider_ch0_(DIVIDER::GND);
+				}
+			} else {
+				if(mode == CH_MODE::DC) {
+					CH1_DC::P = 1;
+select_divider_ch1_(DIVIDER::HIGH);
+at_cap_task().divider_ch1_ = DIVIDER::HIGH;
+				} else if(mode == CH_MODE::AC) {
+					CH1_DC::P = 0;
+select_divider_ch1_(DIVIDER::HIGH);
+at_cap_task().divider_ch1_ = DIVIDER::HIGH;
+				} else if(mode == CH_MODE::GND) {
+					CH1_DC::P = 0;  // GND 時 AC に切り替える。
+					select_divider_ch1_(DIVIDER::GND);
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -374,8 +473,6 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t freq) noexcept
 		{
-			set_samplerate(freq);
-
 #ifndef GLFW_SIM
 			{  // A/D 設定
 				device::power_mgr::turn(ADC0::PERIPHERAL);
@@ -395,19 +492,21 @@ namespace dsos {
 				ADC1::ADCSR.ADCS = 0b01;
 			}
 #endif
+			CH0_SA::OUTPUT();
+			CH0_SB::OUTPUT();
+			select_divider_ch0_(DIVIDER::GND);
+			CH0_DC::OUTPUT();
+			CH0_DC::P = 0;  // AC
 
-#if 0
-			{  // DMAC マネージャー開始
-				uint8_t intr_level = 4;
-				auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-					reinterpret_cast<uint32_t>(sound_out_.get_wave()),
-					DAC::DADR0.address(),
-					sound_out_.size(), intr_level);
-				if(!ret) {
-					utils::format("DMAC Not start...\n");
-				}
-			}
-#endif
+			CH1_SA::OUTPUT();
+			CH1_SB::OUTPUT();
+			select_divider_ch1_(DIVIDER::GND);
+			CH1_DC::OUTPUT();
+			CH1_DC::P = 0;  // AC
+
+			// 順番が重要！（A/D の初期化後に呼ぶ事）
+			set_samplerate(freq);
+
 			return true;
 		}
 
@@ -550,12 +649,41 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  波形を取得
+			@brief  波形値を取得（A/D 変換された値、０～４０９６）
+			@return 波形値
 		*/
 		//-----------------------------------------------------------------//
 		const auto& get(uint32_t pos) const noexcept
 		{
 			return get_cap_task().data_[(pos + get_cap_task().trg_pos_) & (CAP_NUM - 1)];
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  自動トリガー解析(CH0)
+		*/
+		//-----------------------------------------------------------------//
+		void auto_analize() noexcept
+		{
+			DATA min;
+			DATA max;
+			uint32_t org = 0;
+			uint32_t end = CAP_NUM / 4;
+			get_min_max(org, end, min, max);
+
+			auto th = (min.x + max.x) / 2;
+			bool next = false;
+			for(uint32_t i = CAP_NUM / 4; i < CAP_NUM; ++i) {
+				if(!next) {
+					if(th > get_cap_task().data_[i].x) next = true;
+				} else {
+					if(th < get_cap_task().data_[i].x) {
+						at_cap_task().trg_pos_ = i;
+						break;
+					}
+				}
+			}
 		}
 
 

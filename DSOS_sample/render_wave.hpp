@@ -29,9 +29,13 @@ namespace dsos {
 	template <class RENDER, class TOUCH, class CAPTURE>
 	class render_wave : public render_base {
 
-		static constexpr float   GRID_SCALE       = 1.0f / static_cast<float>(CAPTURE::GRID);
+		static constexpr int16_t GRID = 40;					///< グリッド単位数
+		static constexpr int16_t TIME_SIZE = GRID * 11;		///< 時間軸サイズ(440)
+		static constexpr int16_t VOLT_SIZE = GRID * 6;		///< 電圧軸サイズ(240)
+
+		static constexpr float   GRID_SCALE       = 1.0f / static_cast<float>(GRID);
 		static constexpr int16_t MENU_SIZE        = 40;
-		static constexpr int16_t TIME_SCROLL_AREA = RENDER::font_type::height + CAPTURE::GRID;
+		// static constexpr int16_t TIME_SCROLL_AREA = RENDER::font_type::height + GRID;
 		static constexpr int16_t CH0_MOVE_AREA    = (RENDER::glc_type::width - MENU_SIZE) / 2;
 		static constexpr int16_t CH1_MOVE_AREA    = RENDER::glc_type::width - MENU_SIZE;
 		static constexpr int16_t TIME_BEGIN_POS   = RENDER::font_type::height;
@@ -39,13 +43,16 @@ namespace dsos {
 		static constexpr int16_t VOLT_BEGIN_POS   = 0;
 		static constexpr int16_t VOLT_LIMIT_POS   = RENDER::glc_type::width - MENU_SIZE;
 
-		static constexpr vtx::srect WAVE_AREA  = { 0, 16, 440-20, 272-16-16 };
-		static constexpr vtx::srect TRG_AREA  = { 440-20, 16, 20, 272-16*2 };
+		static constexpr int16_t VOLT_OFS = 16 + VOLT_SIZE / 2;		///< 電圧軸オフセット（画像の中心）
 
-		static constexpr vtx::srect MES_AREA_TIME_0 = { 0, 0, 440, 16+20 };
-		static constexpr vtx::srect MES_AREA_TIME_1 = { 0, 272-16-20, 440, 16+20 };
-		static constexpr vtx::srect MES_AREA_VOLT_0 = { 0, 16, 40, 272-16*2 };
-		static constexpr vtx::srect MES_AREA_VOLT_1 = { 440-20, 16, 40, 272-16*2 };
+		static constexpr int16_t ARROW_AREA_W   = 24;  ///< 矢印を操作する幅
+		static constexpr vtx::srect WAVE_AREA  = { 0, 16, TIME_SIZE - ARROW_AREA_W, VOLT_SIZE };  // 上下の文字枠を除く
+		static constexpr vtx::srect TRG_AREA  = { TIME_SIZE - ARROW_AREA_W, 16, ARROW_AREA_W, VOLT_SIZE };
+
+		static constexpr vtx::srect MES_AREA_TIME_0 = { 0, 0, TIME_SIZE, 16 + 20 };
+		static constexpr vtx::srect MES_AREA_TIME_1 = { 0, 272 - 16 - 20, TIME_SIZE, 16 + 20 };
+		static constexpr vtx::srect MES_AREA_VOLT_0 = { 0, 16, 30, VOLT_SIZE };
+		static constexpr vtx::srect MES_AREA_VOLT_1 = { TIME_SIZE - 30, 16, 30, VOLT_SIZE };
 
 		RENDER&		render_;
 		TOUCH&		touch_;
@@ -148,10 +155,10 @@ namespace dsos {
 					if(target_ == TARGET::CH0) {
 						ch0_vorg_ = ch0_vpos_;
 						trg_org_ = trg_pos_;
+						time_org_ = time_pos_;
 					} else if(target_ == TARGET::CH1) {
 						ch1_vorg_ = ch1_vpos_;
 						trg_org_ = trg_pos_;
-					} else if(target_ == TARGET::TIME) {
 						time_org_ = time_pos_;
 					}
 				} else {
@@ -248,9 +255,44 @@ namespace dsos {
 
 		void draw_ch_arrow_(int16_t vpos) noexcept
 		{
-				if(vpos < 16) vpos = 16;
-				else if(vpos >= (272 - 16)) vpos = 272 - 16 - 1;
+			if(vpos < 16) {
+				vpos = 16;
+				render_.draw_mobj(vtx::spos(0, vpos), resource::bitmap::dir_3_, false);
+			} else if(vpos >= (272 - 16)) {
+				vpos = 272 - 16 - 1;
+				render_.draw_mobj(vtx::spos(0, vpos - 14), resource::bitmap::dir_1_, false);
+			} else {
 				render_.draw_mobj(vtx::spos(0, vpos - 7), resource::bitmap::dir_2_, false);
+			}
+		}
+
+
+		void draw_trg_gate_(int16_t vpos) noexcept
+		{
+			if(vpos < 16) {
+				render_.draw_mobj(vtx::spos(440 - 14, 16), resource::bitmap::dir_3_, false);
+			} else if(vpos >= (272 - 16)) {
+				vpos = 272 - 16 - 1;
+				render_.draw_mobj(vtx::spos(440 - 14, vpos - 14), resource::bitmap::dir_1_, false);
+			} else {
+				if(area_ == AREA::TRG) {  // トリガー電圧操作中に基準ラインを引く
+					render_.line(vtx::spos(0, trg_pos_), vtx::spos(440, trg_pos_));
+				}
+				render_.draw_mobj(vtx::spos(440 - 14, vpos - 7), resource::bitmap::dir_0_, false);
+			}
+		}
+
+
+		void draw_time_gate_(int16_t pos) noexcept
+		{
+			if(pos < 0) {
+				render_.draw_mobj(vtx::spos(0, 16), resource::bitmap::dir_0_, false);
+			} else if(pos >= TIME_SIZE) {
+				render_.draw_mobj(vtx::spos(440 - 14, 16), resource::bitmap::dir_2_, false);
+			} else {
+				render_.draw_mobj(vtx::spos(pos - 7, 16), resource::bitmap::dir_1_, false);
+				render_.line(vtx::spos(pos, 16), vtx::spos(pos, 272-16));
+			}
 		}
 
 	public:
@@ -265,10 +307,10 @@ namespace dsos {
 		render_wave(RENDER& render, TOUCH& touch, CAPTURE& capture) noexcept :
 			render_(render), touch_(touch), capture_(capture),
 			target_(TARGET::CH0),
-			time_org_(0), time_pos_(0),
-			ch0_vorg_(272/2), ch0_vpos_(272/2),
-			ch1_vorg_(272/2), ch1_vpos_(272/2),
-			trg_org_(272/2), trg_pos_(272/2),
+			time_org_(TIME_SIZE / 2), time_pos_(TIME_SIZE / 2),
+			ch0_vorg_(VOLT_OFS), ch0_vpos_(VOLT_OFS),
+			ch1_vorg_(VOLT_OFS), ch1_vpos_(VOLT_OFS),
+			trg_org_(VOLT_OFS), trg_pos_(VOLT_OFS),
 			ch0_mult_(CH_MULT::X1),
 			ch0_mode_(CH_MODE::AC), ch0_mode_back_(CH_MODE::AC),
 			ch0_volt_(CH_VOLT::_10V),
@@ -277,8 +319,10 @@ namespace dsos {
 			ch1_volt_(CH_VOLT::_10V),
 			smp_mode_(SMP_MODE::_1us),
 			measere_(MEASERE::OFF),
-			mes_time_0_org_(220), mes_time_0_pos_(220), mes_time_1_org_(220), mes_time_1_pos_(220),
-			mes_volt_0_org_(272/2), mes_volt_0_pos_(272/2), mes_volt_1_org_(272/2), mes_volt_1_pos_(272/2),
+			mes_time_0_org_(TIME_SIZE / 2), mes_time_0_pos_(TIME_SIZE / 2),
+			mes_time_1_org_(TIME_SIZE / 2), mes_time_1_pos_(TIME_SIZE / 2),
+			mes_volt_0_org_(VOLT_OFS), mes_volt_0_pos_(VOLT_OFS),
+			mes_volt_1_org_(VOLT_OFS), mes_volt_1_pos_(VOLT_OFS),
 			touch_num_(0), trg_wait_(0), trg_update_(0),
 			cap_cycle_(0), cur_smp_mode_(SMP_MODE::_1us), wave_info0_(), wave_info1_(),
 			ch_info_count_(0),
@@ -329,17 +373,7 @@ namespace dsos {
 			@param[in]	volt	電圧レンジ型
 		*/
 		//-----------------------------------------------------------------//
-		void set_ch0_volt(CH_VOLT volt) noexcept {
-			ch0_volt_ = volt;
-			// CH0 分圧ハードを選択して、ゲインを設定
-#if 0
-			if((static_cast<float>(get_mvolt(ch0_volt_)) * 1e-3) < VOLT_DIV_H) {
-				capture_.set_voltage_gain(0, VOLT_DIV_H);
-			} else {
-				capture_.set_voltage_gain(0, VOLT_DIV_L);
-			}
-#endif 
-		}
+		void set_ch0_volt(CH_VOLT volt) noexcept { ch0_volt_ = volt; }
 
 
 		//-----------------------------------------------------------------//
@@ -357,17 +391,7 @@ namespace dsos {
 			@param[in]	volt	電圧レンジ型
 		*/
 		//-----------------------------------------------------------------//
-		void set_ch1_volt(CH_VOLT volt) noexcept {
-			ch1_volt_ = volt;
-			// CH1 分圧ハードを選択して、ゲインを設定
-#if 0
-			if((static_cast<float>(get_mvolt(ch1_volt_)) * 1e-3) < VOLT_DIV_H) {
-				capture_.set_voltage_gain(1, VOLT_DIV_H);
-			} else {
-				capture_.set_voltage_gain(1, VOLT_DIV_L);
-			}
-#endif
-		}
+		void set_ch1_volt(CH_VOLT volt) noexcept { ch1_volt_ = volt; }
 
 
 		//-----------------------------------------------------------------//
@@ -468,16 +492,17 @@ namespace dsos {
 					}
 
 					// vpos の位置、time_pos の位置を表示
-					if(touch_.get_touch_pos(0).event == TOUCH::EVENT::CONTACT) {  // タッチ（ドラッグしている）
+					if(area_ == AREA::WAVE) {
 						if(target_ == TARGET::CH0) {
 							auto v = ch0_vpos_ - 272 / 2;
 							make_volt_(-v, get_mvolt(ch0_volt_), tmp, sizeof(tmp));
+							x = render_.draw_text(vtx::spos(x + 8, 0), tmp);
+							make_rate_(time_pos_, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
 							x = render_.draw_text(vtx::spos(x + 8, 0), tmp);
 						} else if(target_ == TARGET::CH1) {
 							auto v = ch1_vpos_ - 272 / 2;
 							make_volt_(-v, get_mvolt(ch1_volt_), tmp, sizeof(tmp));
 							x = render_.draw_text(vtx::spos(x + 8, 0), tmp);
-						} else if(target_ == TARGET::TIME) {
 							make_rate_(time_pos_, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
 							x = render_.draw_text(vtx::spos(x + 8, 0), tmp);
 						}
@@ -571,7 +596,9 @@ namespace dsos {
 					render_.draw_text(vtx::spos(x, 272 - 16 + 1), tmp);
 				} else {
 					auto gain = capture_.get_voltage_gain(0);
-					if(ch0_mult_ == CH_MULT::X10) gain *= 10.0f;
+					if(ch0_mult_ == CH_MULT::X10) {
+						gain *= 10.0f;
+					}
 					make_ch_voltage_(wave_info0_, gain, tmp, sizeof(tmp));
 					render_.draw_text(vtx::spos(0, 272 - 16 + 1), tmp);
 				}
@@ -588,7 +615,9 @@ namespace dsos {
 					render_.draw_text(vtx::spos(x, 272 - 16 + 1), tmp);
 				} else {
 					auto gain = capture_.get_voltage_gain(1);
-					if(ch1_mult_ == CH_MULT::X10) gain *= 10.0f;
+					if(ch1_mult_ == CH_MULT::X10) {
+						gain *= 10.0f;
+					}
 					make_ch_voltage_(wave_info1_, gain, tmp, sizeof(tmp));
 					render_.draw_text(vtx::spos(240, 272 - 16 + 1), tmp);
 				}
@@ -618,12 +647,12 @@ namespace dsos {
 			bool draw = false;
 			// チャネルモードが変更になったら、vpos をリセットする。
 			if(ch0_mode_back_ != ch0_mode_) {
-				ch0_vpos_ = 272/2;
+				ch0_vpos_ = VOLT_OFS;
 				draw = true;
 			}
 			ch0_mode_back_ = ch0_mode_;
 			if(ch1_mode_back_ != ch1_mode_) {
-				ch1_vpos_ = 272/2;
+				ch1_vpos_ = VOLT_OFS;
 				draw = true;
 			}
 			ch1_mode_back_ = ch1_mode_;
@@ -651,13 +680,13 @@ namespace dsos {
 							if(trg == TRG_MODE::CH0_POS || trg == TRG_MODE::CH0_NEG) {
 								trg_pos_ = trg_org_ + d.y;
 							}
+							time_pos_ = time_org_ + d.x;
 						} else if(target_ == TARGET::CH1) {
 							ch1_vpos_ = ch1_vorg_ + d.y;
 							auto trg = capture_.get_trg_mode();
 							if(trg == TRG_MODE::CH1_POS || trg == TRG_MODE::CH1_NEG) {
 								trg_pos_ = trg_org_ + d.y;
 							}
-						} else if(target_ == TARGET::TIME) {
 							time_pos_ = time_org_ + d.x;
 						}
 						break;
@@ -669,12 +698,12 @@ namespace dsos {
 					case AREA::MES_TIME_0:
 						mes_time_0_pos_ = mes_time_0_org_ + d.x;
 						if(mes_time_0_pos_ < 0) mes_time_0_pos_ = 0;
-						else if(mes_time_0_pos_ >= 440) mes_time_0_pos_ = 440;
+						else if(mes_time_0_pos_ >= TIME_SIZE) mes_time_0_pos_ = TIME_SIZE;
 						break;
 					case AREA::MES_TIME_1:
 						mes_time_1_pos_ = mes_time_1_org_ + d.x;
 						if(mes_time_1_pos_ < 0) mes_time_1_pos_ = 0;
-						else if(mes_time_1_pos_ >= 440) mes_time_1_pos_ = 440;
+						else if(mes_time_1_pos_ >= TIME_SIZE) mes_time_1_pos_ = TIME_SIZE;
 						break;
 					case AREA::MES_VOLT_0:
 						mes_volt_0_pos_ = mes_volt_0_org_ + d.y;
@@ -738,7 +767,7 @@ namespace dsos {
 			render_.set_fore_color(DEF_COLOR::Black);
 			render_.fill_box(vtx::srect(0, 16, 440, 240));
 
-			draw_grid(0, 16, 440, 240, CAPTURE::GRID);
+			draw_grid(0, 16, 440, 240, GRID);
 
 			auto sr = static_cast<float>(get_smp_rate(smp_mode_) * 1e-6 / static_cast<float>(GRID));
 			auto step = sr / (1.0f / static_cast<float>(capture_.get_capture_samplerate()));
@@ -752,9 +781,13 @@ namespace dsos {
 			ch0 /= grid;
 			ch1 /= grid;
 			auto gain0 = capture_.get_voltage_gain(0);
-			if(ch0_mult_ == CH_MULT::X10) gain0 *= 10.0f;
+			if(ch0_mult_ == CH_MULT::X10) {
+				gain0 *= 10.0f;
+			}
 			auto gain1 = capture_.get_voltage_gain(1);
-			if(ch1_mult_ == CH_MULT::X10) gain1 *= 10.0f;
+			if(ch1_mult_ == CH_MULT::X10) {
+				gain1 *= 10.0f;
+			}
 			int32_t ich0 = gain0 / ch0 * 16384.0f / static_cast<float>(CAPTURE::ADC_QUANTIZE);
 			int32_t ich1 = gain1 / ch1 * 16384.0f / static_cast<float>(CAPTURE::ADC_QUANTIZE);
 			int32_t p0;
@@ -778,54 +811,56 @@ namespace dsos {
 				p0 = p1;
 				if(ch0_mode_ != CH_MODE::OFF) {
 					if(x == 0) {
-						ch0_y = (static_cast<int32_t>(-d0.x) * ich0) >> 14;
+						ch0_y = (static_cast<int32_t>(d0.x) * ich0) >> 14;
 					}
-					int16_t y1 = (static_cast<int32_t>(-d1x) * ich0) >> 14;
+					int16_t y1 = (static_cast<int32_t>(d1x) * ich0) >> 14;
 					if(!clipout) {
 						render_.set_fore_color(CH0_COLOR);
 						int16_t ofs = ch0_vpos_;
-						render_.line(vtx::spos(x, ofs + ch0_y), vtx::spos(x + 1, ofs + y1));
+						render_.line(vtx::spos(x, ofs - ch0_y), vtx::spos(x + 1, ofs - y1));
 					}
 					ch0_y = y1;
 				}
 				if(ch1_mode_ != CH_MODE::OFF) {
 					if(x == 0) {
-						ch1_y = (static_cast<int32_t>(-d0.y) * ich1) >> 14;
+						ch1_y = (static_cast<int32_t>(d0.y) * ich1) >> 14;
 					}
-					int16_t y1 = (static_cast<int32_t>(-d1y) * ich1) >> 14;
+					int16_t y1 = (static_cast<int32_t>(d1y) * ich1) >> 14;
 					if(!clipout) {
 						render_.set_fore_color(CH1_COLOR);
 						int16_t ofs = ch1_vpos_;
-						render_.line(vtx::spos(x, ofs + ch1_y), vtx::spos(x + 1, ofs + y1));
+						render_.line(vtx::spos(x, ofs - ch1_y), vtx::spos(x + 1, ofs - y1));
 					}
 					ch1_y = y1;
 				}
 			}
 			cap_win_end_ = p0;
 
-			// チャネルアローの描画
-			if(target_ == TARGET::CH0) {
-				render_.set_fore_color(CH0_COLOR);
-				draw_ch_arrow_(ch0_vpos_);
-
-			} else if(target_ == TARGET::CH1) {
-				render_.set_fore_color(CH1_COLOR);
-				draw_ch_arrow_(ch1_vpos_);
-			}
-
-			{  // キャプチャー動作が更新した場合を検出
-				auto cycle = capture_.get_capture_cycle();
-				// キャプチャー更新、サンプリング周期変更？
-				if(cycle != cap_cycle_ || smp_mode_ != cur_smp_mode_) {
-					cap_cycle_ = cycle;
-					cur_smp_mode_ = smp_mode_;
-					// 見えている倍の領域をスキャン
-					auto end = cap_win_end_ + (cap_win_end_ - cap_win_org_);
-					capture_.analize(cap_win_org_, end, wave_info0_, wave_info1_);
+			// 最後に押されたボタン（CH0,CH1,SMP）により操作対象が変化する、それに合わせて、表示（ゲート）を切り替える。
+			switch(target_) {
+			case TARGET::CH0:
+				render_.set_fore_color(SMP_COLOR);
+				draw_time_gate_(time_pos_);
+				if(ch0_mode_ != CH_MODE::OFF) {
+					render_.set_fore_color(CH0_COLOR);
+					draw_ch_arrow_(ch0_vpos_);
 				}
+				render_.set_fore_color(SMP_COLOR);
+				draw_time_gate_(time_pos_);
+				break;
+			case TARGET::CH1:
+				render_.set_fore_color(SMP_COLOR);
+				draw_time_gate_(time_pos_);
+				if(ch1_mode_ != CH_MODE::OFF) {
+					render_.set_fore_color(CH1_COLOR);
+					draw_ch_arrow_(ch1_vpos_);
+				}
+				render_.set_fore_color(SMP_COLOR);
+				draw_time_gate_(time_pos_);
+				break;
 			}
 
-			switch(measere_) {
+			switch(measere_) {  // 計測モードの場合
 			case MEASERE::TIME_SUB:
 				render_.set_fore_color(MES_COLOR);
 				render_.draw_mobj(vtx::spos(mes_time_0_pos_ - 7, 16), resource::bitmap::dir_1_, false);
@@ -852,24 +887,26 @@ namespace dsos {
 				render_.draw_mobj(vtx::spos(0, mes_volt_0_pos_ - 7), resource::bitmap::dir_2_, false);
 				render_.line(vtx::spos(14, mes_volt_0_pos_), vtx::spos(440, mes_volt_0_pos_));
 				break;
-			default:
-				// トリガー位置
+			default:  // 計測モード以外
+				// トリガー位置調整
 				render_.set_fore_color(TRG_COLOR);
-				render_.draw_mobj(vtx::spos(440-14, trg_pos_ - 7), resource::bitmap::dir_0_, false);
+				draw_trg_gate_(trg_pos_);
 				break;
 			}
 
-			{  // 時間表示（トリガー位置)
-				auto pos = time_pos_;
-				if(pos >= 0 && pos < TIME_SIZE) {
-					render_.set_fore_color(SMP_COLOR);
-					render_.draw_mobj(vtx::spos(pos - 7, 16), resource::bitmap::dir_1_, false);
-					render_.draw_mobj(vtx::spos(pos - 7, 272-16-14), resource::bitmap::dir_3_, false);
-					render_.line(vtx::spos(pos, 16), vtx::spos(pos, 272-16));
+			draw_sampling_info();
+
+			{  // キャプチャー動作完了を検出したら、基本解析を行う
+				auto cycle = capture_.get_capture_cycle();
+				// キャプチャー更新、カレントのサンプリング周期変更？
+				if(cycle != cap_cycle_ || smp_mode_ != cur_smp_mode_) {
+					cap_cycle_ = cycle;
+					cur_smp_mode_ = smp_mode_;
+					// 見えている倍の領域をスキャン
+					auto end = cap_win_end_ + (cap_win_end_ - cap_win_org_);
+					capture_.analize(cap_win_org_, end, wave_info0_, wave_info1_);
 				}
 			}
-
-			draw_sampling_info();
 		}
 
 
@@ -896,7 +933,7 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		int16_t get_trg_value() const noexcept
 		{
-			int16_t val = 0;
+			float val = 0;
 			auto trg = capture_.get_trg_mode();
 			switch(trg) {
 			case TRG_MODE::CH0_POS:
@@ -905,7 +942,9 @@ namespace dsos {
 					float d = static_cast<float>(ch0_vpos_ - trg_pos_) * get_mvolt(ch0_volt_);
 					d /= static_cast<float>(GRID);
 					val = capture_.voltage_to_value(0, d * 1e-3);
-					if(ch0_mult_ == CH_MULT::X10) val /= 10;
+					if(ch0_mult_ == CH_MULT::X10) {
+						val /= 10.0f;
+					}
 				}
 				break;
 			case TRG_MODE::CH1_POS:
@@ -914,7 +953,9 @@ namespace dsos {
 					float d = static_cast<float>(ch1_vpos_ - trg_pos_) * get_mvolt(ch1_volt_);
 					d /= static_cast<float>(GRID);
 					val = capture_.voltage_to_value(1, d * 1e-3);
-					if(ch1_mult_ == CH_MULT::X10) val /= 10;
+					if(ch1_mult_ == CH_MULT::X10) {
+						val /= 10.0f;
+					}
 				}
 				break;
 			default:
@@ -932,6 +973,5 @@ namespace dsos {
 		*/
 		//-----------------------------------------------------------------//
 		auto get_trg_update() const noexcept { return trg_update_; }
-
 	};
 }

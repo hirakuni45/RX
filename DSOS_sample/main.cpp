@@ -283,14 +283,6 @@ int main(int argc, char** argv)
 		sdh_.start();
 	}
 
-	{  // キャプチャー開始
-		uint32_t freq = 2'000'000;  // 2 MHz
-//		uint32_t freq = 100'000;  // 100 KHz
-		if(!capture_.start(freq)) {
-			utils::format("Capture not start...\n");
-		}
-	}
-
 	utils::format("\r%s Start for Digital Storage Oscilloscope\n") % sys_msg_;
 
 	{  // GLCDC の初期化
@@ -347,6 +339,13 @@ int main(int argc, char** argv)
 	LED::OUTPUT();
 
 	cmd_.set_prompt("# ");
+
+	{  // キャプチャー開始
+		uint32_t freq = 2'000'000;  // 2 MHz
+		if(!capture_.start(freq)) {
+			utils::format("Capture not start...\n");
+		}
+	}
 
 	while(1) {
 		render_.sync_frame();
