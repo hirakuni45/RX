@@ -19,17 +19,6 @@ namespace dsos {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct render_base {
 
-		/// グリッド単位数
-		static constexpr int16_t GRID = 40;
-
-		/// 時間軸サイズ
-		static constexpr int16_t TIME_SIZE = GRID * 11;
-		/// 電圧軸サイズ
-		static constexpr int16_t VOLT_SIZE = GRID * 6;
-
-		static constexpr float VOLT_DIV_L = 1.65f;  ///< 1:1 Probe (+-1.65V) Max: +1.65V, Min: -1.65V
-
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  操作ターゲット型
@@ -38,7 +27,6 @@ namespace dsos {
 		enum class TARGET : uint8_t {
 			CH0,	///< CH0 電圧軸操作
 			CH1,	///< CH1 電圧軸操作
-			TIME	///< 時間軸操作
 		};
 
 
@@ -94,7 +82,7 @@ namespace dsos {
 
 
 		/// チャネル・電圧文字列
-		static constexpr char CH_VOLT_STR[] = "10V,5V,2V,1V,500mV,200mV,100mV,50mV,10mV";
+		static constexpr char CH_VOLT_STR[] = "10V,5V,2V,1V,500mV,200mV,100mV,50mV,25mV";
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -111,7 +99,7 @@ namespace dsos {
 			_200mV,		///< 200mV/div
 			_100mV,		///< 100mV/div
 			_50mV,		///<  50mV/div
-			_10mV		///<  10mV/div
+			_25mV		///<  25mV/div
 		};
 
 
@@ -124,7 +112,7 @@ namespace dsos {
 			 200,	///<   200mV (0.2V)
 			 100,	///<   100mV (0.1V)
 			  50,	///<    50mV (0.05V)
-			  10	///<    10mV (0.01V)
+			  25	///<    25mV (0.025V)
 		};
 
 
@@ -145,27 +133,29 @@ namespace dsos {
 
 
 		/// トリガー文字列
-		static constexpr char TRG_MODE_STR[] = "None,Single,Run,CH0-Pos,CH1-Pos,CH0-Neg,CH1-Neg";
+		static constexpr char TRG_MODE_STR[] = "Stop,Single,Auto,CH0-Pos,CH0-Neg,CH1-Pos,CH1-Neg";
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  トリガー型
+			@brief  トリガー型 @n
+					'_' が前にある型は、capture クラスが内部的に利用している。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class TRG_MODE : uint8_t {
-			NONE,		///< 何もしない
+			STOP,		///< 何もしない
 			SINGLE,		///< シングル・ショット
-			RUN,		///< フリーランニング
-			CH0_POS,	///< CH0 立ち上がりエッジ前
-			CH0_POSA,	///< CH0 立ち上がりエッジ後 
-			CH1_POS,	///< CH1 立ち上がりエッジ前
-			CH1_POSA,	///< CH1 立ち上がりエッジ後
-			CH0_NEG,	///< CH0 立ち下がりエッジ前
-			CH0_NEGA,	///< CH0 立ち下がりエッジ後
-			CH1_NEG,	///< CH1 立ち下がりエッジ前
-			CH1_NEGA,	///< CH1 立ち下がりエッジ後
+			AUTO,		///< オートモード
+			CH0_POS,	///< CH0 立ち上がりエッジ
+			CH0_NEG,	///< CH0 立ち下がりエッジ
+			CH1_POS,	///< CH1 立ち上がりエッジ
+			CH1_NEG,	///< CH1 立ち下がりエッジ
 
+			_CH0_POSA,	///< CH0 立ち上がりエッジ後 
+			_CH1_POSA,	///< CH1 立ち上がりエッジ後
+			_CH0_NEGA,	///< CH0 立ち下がりエッジ後
+			_CH1_NEGA,	///< CH1 立ち下がりエッジ後
+			_BEFORE,	///< 前処理（電圧ディバイダーを設定する）
 			_TRG_BEFORE,///< ※内部処理 トリガー前処理
 			_TRG_AFTER,	///< ※内部処理 トリガー後処理
 		};
@@ -263,21 +253,6 @@ namespace dsos {
 		/// 計測メニュー文字列
 		static constexpr char MES_MODE_STR[] = "Off,Time Sub,CH0 Sub,CH1 Sub,Time Abs,CH0 Abs,CH1 Abs";
 
-		/// オプションメニュー文字列
-		static constexpr char OPTION_STR[] = "NONE,CH0 FFT,CH1 FFT";
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  オプション型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class OPT_MODE : uint8_t {
-			NONE,		///< 何もしない
-			CH0_FFT,	///< CH0 FFT
-			CH1_FFT,	///< CH1 FFT
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -295,9 +270,27 @@ namespace dsos {
 		};
 
 
+		/// オプションメニュー文字列
+		static constexpr char OPTION_STR[] = "NONE,Capture,Save-WAV,CH0-FFT,CH1-FFT";
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  波形型
+			@brief  オプション型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class OPT_MODE : uint8_t {
+			NONE,		///< 何もしない
+			CAPTURE,	///< 画面をキャプチャーして画像ファイルとしてセーブ（４８０ｘ２７２）
+			SAVE_WAVE,	///< 波形を WAV 形式でセーブ	
+			CH0_FFT,	///< CH0 FFT
+			CH1_FFT,	///< CH1 FFT
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  波形型（テスト波形生成）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PWAVE_TYPE : uint8_t {

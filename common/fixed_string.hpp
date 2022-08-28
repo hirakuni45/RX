@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	固定サイズ文字列クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -189,7 +189,6 @@ namespace utils {
 		/*!
 			@brief  交換
 			@param[in]	src	ソース
-			@return 自分
 		*/
 		//-----------------------------------------------------------------//
 		void swap(fixed_string& src) noexcept {

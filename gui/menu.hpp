@@ -39,7 +39,7 @@ namespace gui {
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		ボタン文字列
+			@param[in]	str		メニュー・アイテム文字列（',' で分割）
 			@param[in]	chd		チェック描画を行わない場合「false」
 		*/
 		//-----------------------------------------------------------------//
@@ -53,7 +53,9 @@ namespace gui {
 				at_location().size.y = num_ * DEF_MENU_HEIGHT;
 				item_size_.y = DEF_MENU_HEIGHT;
 			} else {
-				item_size_.y = loc.size.y / num_;
+				if(num_ > 0) {
+					item_size_.y = loc.size.y / num_;
+				}
 			}
 			insert_widget(this);
 		}
@@ -142,7 +144,8 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイトル更新時処理
+			@brief	タイトル更新時処理 @n
+					「タイトル」は、メニューのアイテムとする。
 		*/
 		//-----------------------------------------------------------------//
 		void update_title() noexcept override

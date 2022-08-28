@@ -76,6 +76,7 @@ namespace dsos {
 
 		WIDGET*		last_focus_;
 
+		// メニュー表示を行っている場合に、ルートボタンをストールさせる。
 		void side_button_stall_(BUTTON& mybtn, bool stall) noexcept
 		{
 			if(&mybtn != &ch0_btn_) {
@@ -156,11 +157,13 @@ namespace dsos {
 		void exec_capture_() noexcept
 		{
 			auto trg = static_cast<TRG_MODE>(trg_menu_.get_select_pos());
-			if(trg != CAPTURE::TRG_MODE::NONE) {
+			if(trg != CAPTURE::TRG_MODE::STOP) {
 				auto idx = smp_unit_menu_.get_select_pos() * 3 + smp_fine_menu_.get_select_pos(); 
 				uint32_t sr = AD_SAMPLE_RATE[idx];
 				capture_.set_samplerate(sr * 1000);
 			}
+			capture_.turn_ch_mode(0, static_cast<CH_MODE>(ch0_mode_menu_.get_select_pos()));
+			capture_.turn_ch_mode(1, static_cast<CH_MODE>(ch1_mode_menu_.get_select_pos()));
 			capture_.set_trg_mode(trg, render_wave_.get_trg_value());
 		}
 
@@ -371,29 +374,30 @@ namespace dsos {
 					draw_focus_(w);
 					last_focus_ = w;
 					render_wave_.set_target(TARGET::CH1);
-				} else if(w == &smp_btn_) {
-					draw_focus_(w);
-					last_focus_ = w;
-					render_wave_.set_target(TARGET::TIME);
 				} else if(last_focus_ != nullptr) {
 					draw_focus_(last_focus_);
 				}
 			}
 
-			bool capture = false;
-			if(!wave_last_ && trg_update_ != render_wave_.get_trg_update()) {  // トリガー電圧が変更になった！
-				trg_update_ = render_wave_.get_trg_update();
+			// キャプチャーをやり直す条件
+			if(!wave_last_) {  // 前のトリガー描画が終了した～
+				bool capture = false;
+				if(trg_update_ != render_wave_.get_trg_update()) {  // トリガー電圧が変更になった！
+					trg_update_ = render_wave_.get_trg_update();
+					auto trg = static_cast<TRG_MODE>(trg_menu_.get_select_pos());
+					if(trg == CAPTURE::TRG_MODE::CH0_POS || trg == CAPTURE::TRG_MODE::CH0_NEG
+						|| trg == CAPTURE::TRG_MODE::CH1_POS || trg == CAPTURE::TRG_MODE::CH1_NEG) {
+						capture = true;
+					}
+				}
+				// チャネル倍率変更、チャネルモード変更、チャネル電圧レンジ変更
 				auto trg = static_cast<TRG_MODE>(trg_menu_.get_select_pos());
-				if(trg == CAPTURE::TRG_MODE::CH0_POS || trg == CAPTURE::TRG_MODE::CH0_NEG
-					|| trg == CAPTURE::TRG_MODE::CH1_POS || trg == CAPTURE::TRG_MODE::CH1_NEG) {
+				if(trg != TRG_MODE::STOP && trg != TRG_MODE::SINGLE) {  // トリガーモードが 'NONE', 'SINGLE' 以外は常にキャプチャーを行う。
 					capture = true;
 				}
-			}
-			if(!wave_last_ && static_cast<TRG_MODE>(trg_menu_.get_select_pos()) == TRG_MODE::RUN) {  // トリガーモードが ’RUN' なら、キャプチャーを出し続ける。
-				capture = true;
-			}
-			if(capture) {
-				exec_capture_();
+				if(capture) {
+					exec_capture_();
+				}
 			}
 
 			uint32_t n = 0;
@@ -415,12 +419,18 @@ namespace dsos {
 				bool f = render_wave_.ui_service();  // タッチ操作による画面更新が必要な場合「true」が戻る。
 
 				// 波形をキャプチャーしたら描画
-				auto cycle = capture_.get_capture_cycle();
-				if(cycle != capture_cycle_) {
-					f = true;
+				if(!wave_last_) {
+					auto cycle = capture_.get_capture_cycle();
+					if(cycle != capture_cycle_) {
+						capture_cycle_ = cycle;
+						if(static_cast<TRG_MODE>(trg_menu_.get_select_pos()) == TRG_MODE::AUTO) {  // AUTO の場合、トリガー位置を自動で検出する。
+							capture_.auto_analize();
+						}
+						f = true;
+					}
 				}
+
 				if(f) {
-					capture_cycle_ = cycle;
 					render_wave_.update();
 					wave_last_ = true;
 				} else if(wave_last_) {  // ダブルバッファに書き込む為、同じ描画を行う
