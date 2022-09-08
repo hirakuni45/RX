@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include "graphics/color.hpp"
+#include "common/string_utils.hpp"
 
 namespace dsos {
 

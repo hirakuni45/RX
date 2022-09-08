@@ -39,7 +39,7 @@ namespace device {
 	#else
 		static constexpr bool       TURN_USB    = false;			///< USB を使う場合「true」
 		static constexpr uint32_t	BASE		=  10'000'000;		///< 外部接続クリスタル
-#if 0
+#if 1
 		static constexpr uint32_t	PLL_BASE	= 160'000'000;		///< PLL ベースクロック（最大160MHz）
 
 		static constexpr uint32_t	ICLK		= 160'000'000;		///< ICLK 周波数（最大160MHz）

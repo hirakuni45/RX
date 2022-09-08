@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX72N グループ・ポート・マッピング (SCIx) 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -1338,11 +1338,10 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SCIx、チャネル別ポート切り替え
-			@param[in]	per		周辺機器タイプ型
-			@param[in]	ch		チャネル
+			@param[in]	per		周辺機器タイプ型（SCIx）
+			@param[in]	ch		チャネル（CTS、RTS、RXD、TXD、SCK）
 			@param[in]	ena		無効にする場合「false」
-			@param[in]	order	候補を選択する場合
-			@param[in]	neg		反転入出力の場合「true」
+			@param[in]	order	候補を選択する場合（指定が無い場合「FIRST」）
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
