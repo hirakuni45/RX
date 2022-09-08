@@ -21,6 +21,7 @@
             "defines": [
                 "__GNUC__",
                 "__BYTE_ORDER__=__ORDER_LITTLE_ENDIAN__",
+				"__INT8_TYPE__=char", "__INT16_TYPE__=short", "__INT32_TYPE__=int", "__INT64_TYPE__=long int",
                 "SIG_RX72N",
                 "_DEBUG",
                 "UNICODE",

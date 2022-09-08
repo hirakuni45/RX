@@ -24,7 +24,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class clock_profile {
 	public:
-#if 0
+#if 1
 #ifdef USE_USB
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 		static constexpr uint32_t	BASE		=  16'000'000;		///< 外部接続クリスタル
@@ -51,6 +51,7 @@ namespace device {
 		static constexpr uint32_t	BCLK		=  50'000'000;		///< BCLK 周波数
 #endif
 #else
+// over clock
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 		static constexpr uint32_t	BASE		=  16'000'000;		///< 外部接続クリスタル
 		static constexpr uint32_t	PLL_BASE	= 240'000'000;		///< PLL ベースクロック（最大200MHz）

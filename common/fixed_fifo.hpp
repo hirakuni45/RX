@@ -42,7 +42,7 @@ namespace utils {
 			@return	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		inline uint32_t size() const noexcept { return SIZE; }
+		constexpr uint32_t size() const noexcept { return SIZE; }
 
 
         //-----------------------------------------------------------------//

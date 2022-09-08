@@ -30,7 +30,15 @@ CN2( 6) P62 - Orange: P/S (Parallel, shift switching)
 CN2( 8) P65 - Red: CLK (Clock)   
 CN2(10) P73 - Yellow: OUT (Serial output)   
 <img src="../docs/JoyPad.jpg" width="50%"><img src="../docs/JoyPadCon.jpg" width="50%">
-
+   
+ - RX72N Envision Kit: NES (compatible) pad connection
+For NES Pads:   
+Pmod1( 6) 3V3 - White: Vcc (Power、Usually +5V, but use at +3.3V)   
+Pmod1( 5) GND - Brown: GND (Power、0V)   
+Pmod1( 4) P51 - Orange: P/S (Parallel, shift switching)   
+Pmod1( 3) P52 - Red: CLK (Clock)   
+Pmod1( 2) P50 - Yellow: OUT (Serial output)    
+   
  - RX65N Envision Kit: Audio connection (output from DA0 and DA1, GND level is 1.65V)
 
 <img src="../docs/AudioLead.jpg" width="50%">

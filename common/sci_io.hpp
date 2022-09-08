@@ -17,7 +17,8 @@
 			  uint32_t baud = 115200;    // ボーレート設定(115200) @n
 			  sci_.start(baud, intr_level); @n  
 			Ex: POSIX 関数 (printf など) への通路設定 @n
-              C の関数「sci_putch(), sci_getch()」を定義してリンク可能にする。@n
+              C の関数「sci_putch(), sci_getch()」を定義してリンク可能にする。 @n
+			  syscalls.c ソースをプロジェクトにリンクする。 @n
 			  POSIX read, write 関数が、stdout ディスクリプタに対してアクセスする。 @n
 			  extern "C" { @n
 				void sci_putch(char ch) @n
@@ -29,10 +30,10 @@
 					return sci_.getch(); @n
 				} @n
 			  }; @n
-			// 上記関数を定義しておけば、syscalls.c との連携で、printf が使えるようになる。@n
-			// ※ C++ では printf は推奨しないし使う理由が無い、utils::format を使って下さい。
+			上記関数を定義しておけば、syscalls.c との連携で、printf が使えるようになる。 @n
+			※ C++ では printf は推奨しないし使う理由が無い、utils::format を使って下さい。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -93,6 +94,20 @@ namespace device {
 			B96000  =  96000,	///<  96000 B.P.S.
 			B115200 = 115200,	///< 115200 B.P.S.
 		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	フロー制御型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class FLOW_CTRL : uint8_t {
+			NONE,	///< フロー制御をしない
+			SOFT,	///< ソフトフロー制御
+			HARD,	///< ハードフロー制御（RTS 信号を使う）
+			SOFT_HARD,	///< ソフトフローとハードフロー制御
+			RS485,	///< RS485 における半二重制御として使う
+		};
 	};
 
 
@@ -103,10 +118,10 @@ namespace device {
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
 		@param[in]	PSEL	ポートマップ選択
-		@param[in]	HCTL	半二重通信制御ポート（for RS-485）
+		@param[in]	RTS		制御ポート（RTS/RS-485 制御）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, class HCTL = NULL_PORT>
+	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, class RTS = NULL_PORT>
 	class sci_io : public sci_io_base {
 	public:
 		typedef SCI sci_type;
@@ -123,10 +138,13 @@ namespace device {
 		static RBF	recv_;
 		static SBF	send_;
 
+		static_assert(recv_.size() >= 8, "RECV Buffer too small.");
+		static_assert(send_.size() >= 8, "SEND Buffer too small.");
+
 		uint8_t		level_;
 		bool		auto_crlf_;
 		uint32_t	baud_;
-		static bool		soft_flow_;
+		static FLOW_CTRL			flow_ctrl_;
 		static volatile bool		stop_;
 		static volatile uint16_t	errc_;
 
@@ -152,9 +170,12 @@ namespace device {
 			if(err) {
 				++errc_;
 			} else {
-				if(soft_flow_) {
-					if(recv_.length() >= (recv_.size() - recv_.size() / 8)) {
+				if(flow_ctrl_ == FLOW_CTRL::SOFT || flow_ctrl_ == FLOW_CTRL::HARD || flow_ctrl_ == FLOW_CTRL::SOFT_HARD) {
+					if(recv_.length() >= (recv_.size() - 6)) {
 						stop_ = true;
+						if(flow_ctrl_ == FLOW_CTRL::HARD || flow_ctrl_ == FLOW_CTRL::SOFT_HARD) {
+							RTS::P = 0;
+						}
 					}
 				}
 				recv_.put(data);
@@ -173,7 +194,9 @@ namespace device {
 //				}
 			} else {
 				SCI::SCR.TIE = 0;
-				HCTL::P = 0;
+				if(flow_ctrl_ == FLOW_CTRL::RS485) {
+					RTS::P = 0;
+				}
 			}
 		}
 
@@ -196,14 +219,14 @@ namespace device {
 		/*!
 			@brief  コンストラクター
 			@param[in]	autocrlf	LF 時、自動で CR の送出をしない場合「false」
-			@param[in]	softflow	ソフトフロー制御を無効にする場合「false」
+			@param[in]	flow_ctrl	フロー制御型
 		*/
 		//-----------------------------------------------------------------//
-		sci_io(bool autocrlf = true, bool softflow = true, const port_map_order::sci_port_t& sci_port = port_map_order::sci_port_t()) noexcept :
+		sci_io(bool autocrlf = true, FLOW_CTRL flow_ctrl = FLOW_CTRL::NONE, const port_map_order::sci_port_t& sci_port = port_map_order::sci_port_t()) noexcept :
 			port_map_(sci_port),
 			level_(0),
 			auto_crlf_(autocrlf), baud_(0) {
-			soft_flow_ = softflow;
+			flow_ctrl_ = flow_ctrl;
 			stop_ = false;
 			errc_ = 0;
 		}
@@ -225,15 +248,6 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		void auto_crlf(bool f = true) noexcept { auto_crlf_ = f; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ソフト・フロー制御設定
-			@param[in]	f	「false」なら無効
-		 */
-		//-----------------------------------------------------------------//
-		static void soft_flow(bool f = true) noexcept { soft_flow_ = f; }
 
 
 		//-----------------------------------------------------------------//
@@ -292,8 +306,15 @@ namespace device {
 			}
 
 			// RS-484 半二重制御ポート
-			HCTL::DIR = 1;
-			HCTL::P = 0;  // disable send driver
+			if(flow_ctrl_ != FLOW_CTRL::NONE) {
+				if(flow_ctrl_ == FLOW_CTRL::RS485) {
+					RTS::DIR = 1;
+					RTS::P = 0;  // disable send driver
+				} else if(flow_ctrl_ == FLOW_CTRL::HARD || flow_ctrl_ != FLOW_CTRL::SOFT_HARD) {
+					RTS::DIR = 1;
+					RTS::P = 1;
+				}
+			}
 
 			baud_ = baud;
 			uint32_t brr = SCI::PCLK / 8 / baud;
@@ -405,7 +426,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ボーレートを取得
-			@param[in]	real	「true」にした場合、内部で計算されたリアルな値
+			@param[in]	real	「true」にした場合、内部で設定された実際の値
 			@return ボーレート
 		 */
 		//-----------------------------------------------------------------//
@@ -478,7 +499,9 @@ namespace device {
 				if(SCI::SCR.TIE() == 0) {
 /// この部分を取り除いても問題無いか評価中・・・
 ///					while(SCI::SSR.TEND() == 0) sleep_();
-					HCTL::P = 1;
+					if(flow_ctrl_ == FLOW_CTRL::RS485) {
+						RTS::P = 1;
+					}
 					SCI::SCR.TIE = 1;
 //					if(stop_) {
 //						SCI::TDR = XON;
@@ -489,7 +512,9 @@ namespace device {
 				}
 			} else {
 				while(SCI::SSR.TEND() == 0) sleep_();
-				HCTL::P = 1;
+				if(flow_ctrl_ == FLOW_CTRL::RS485) {
+					RTS::P = 1;
+				}
 				SCI::TDR = ch;
 			}
 		}
@@ -535,9 +560,17 @@ namespace device {
 		//-----------------------------------------------------------------//
 		char getch() noexcept
 		{
-			if(level_ > 0) {
-				while(recv_.length() == 0) sleep_();
-				return recv_.get();
+			if(level_ > 0) {  // 割り込み受信
+				while(recv_.length() == 0) {
+					sleep_();
+				}
+				auto ch = recv_.get();
+				if(flow_ctrl_ == FLOW_CTRL::HARD || flow_ctrl_ == FLOW_CTRL::SOFT_HARD) {
+					if(recv_.length() == 0) {
+						RTS::P = 1;
+					}
+				}
+				return ch;
 			} else {
 				while(recv_length() == 0) sleep_();
 				return SCI::RDR();	///< 受信データ読み出し
@@ -562,14 +595,14 @@ namespace device {
 	};
 
 	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
-		RBF sci_io<SCI, RBF, SBF, PSEL, HCTL>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
-		SBF sci_io<SCI, RBF, SBF, PSEL, HCTL>::send_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
-		bool sci_io<SCI, RBF, SBF, PSEL, HCTL>::soft_flow_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
-		volatile bool sci_io<SCI, RBF, SBF, PSEL, HCTL>::stop_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class HCTL>
-		volatile uint16_t sci_io<SCI, RBF, SBF, PSEL, HCTL>::errc_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
+		RBF sci_io<SCI, RBF, SBF, PSEL, RTS>::recv_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
+		SBF sci_io<SCI, RBF, SBF, PSEL, RTS>::send_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
+		sci_io_base::FLOW_CTRL sci_io<SCI, RBF, SBF, PSEL, RTS>::flow_ctrl_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
+		volatile bool sci_io<SCI, RBF, SBF, PSEL, RTS>::stop_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
+		volatile uint16_t sci_io<SCI, RBF, SBF, PSEL, RTS>::errc_;
 }

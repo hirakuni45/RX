@@ -879,7 +879,6 @@ namespace device {
 			@param[in]	ch		チャネル
 			@param[in]	ena		無効にする場合「false」
 			@param[in]	order	候補を選択する場合
-			@param[in]	neg		反転入出力の場合「true」
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
