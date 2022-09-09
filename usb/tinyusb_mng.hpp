@@ -69,6 +69,8 @@ namespace device {
 
 			uint8_t		mouse_pad[5];
 
+			ICU::VECTOR		ivec;
+
 			bool		send_led;
 //			uint8_t		leds_pad;
 
@@ -107,6 +109,18 @@ namespace device {
 				}
 				if(n != 0) format("\n");
 			}
+		}
+
+
+		static void set_intr(ICU::VECTOR ivec)
+		{
+			holder_.ivec = ivec;
+		}
+
+
+		static void enable_intr(bool ena)
+		{
+			ICU::IER.enable(holder_.ivec, ena);
 		}
 
 
@@ -317,8 +331,6 @@ namespace device {
 		static constexpr uint8_t HID_MAX = CFG_TUH_HID;		///< HID の同時マウント数
 
 	private:
-		ICU::VECTOR		ivec_;
-
 		uint8_t			hid_num_;
 		HID_TYPE		hid_type_[HID_MAX];
 
@@ -344,7 +356,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		tinyusb_mng() noexcept :
-			ivec_(ICU::VECTOR::NONE),
 			hid_num_(0), hid_type_{ HID_TYPE::NONE },
 			keyboard_(), gamepad_()
 		{}
@@ -370,11 +381,16 @@ namespace device {
 				return false;
 			}
 
-			ivec_ = icu_mgr::set_interrupt(USB_CH::I_VEC, i_task_, ilvl);
+			tuh_init(BOARD_TUH_RHPORT);
+
+			{
+				auto ivec = icu_mgr::set_interrupt(USB_CH::I_VEC, i_task_, ilvl);
 //			utils::format("USB clock divider: 0b%04b\n") % static_cast<uint16_t>(device::SYSTEM::SCKCR2.UCK());
 //			utils::format("USB0 interrupt vector: %u\n") % static_cast<uint16_t>(ivec_);
 
-			tuh_init(BOARD_TUH_RHPORT);
+				ICU::IER.enable(ivec, false);
+				set_intr(ivec);
+			}
 
 			return true;
 		}
@@ -507,6 +523,19 @@ namespace device {
 
 
 extern "C" {
+
+#if CFG_TUH_ENABLED
+	void hcd_int_enable(uint8_t rhport)
+	{
+		device::tinyusb_base<void>::enable_intr(true);
+	}
+
+
+	void hcd_int_disable(uint8_t rhport)
+	{
+		device::tinyusb_base<void>::enable_intr(false);
+	}
+#endif
 
 #if CFG_TUH_HID
 	void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_report, uint16_t desc_len)

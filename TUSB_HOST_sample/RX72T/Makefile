@@ -1,17 +1,17 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX65N Makefile
+#   @brief  RX72T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
 TARGET		=	tusb_host_sample
 
-DEVICE		=	R5F565NE
+DEVICE		=	R5F572TK
 
-RX_DEF		=	SIG_RX65N
+RX_DEF		=	SIG_RX72T
 
 BUILD		=	release
 # BUILD		=	debug
@@ -52,7 +52,7 @@ PSOURCES	=	TUSB_HOST_sample/main.cpp \
 
 USER_LIBS	=	supc++
 
-USER_DEFS	=	CFG_TUSB_MCU=OPT_MCU_RX65X
+USER_DEFS	=	CFG_TUSB_MCU=OPT_MCU_RX72T
 
 INC_APP		=	. ../ ../../ ../../tinyusb/src
 
