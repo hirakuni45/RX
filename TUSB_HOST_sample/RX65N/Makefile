@@ -49,7 +49,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	TUSB_HOST_sample/main.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
 USER_DEFS	=	CFG_TUSB_MCU=OPT_MCU_RX65X
 
