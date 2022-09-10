@@ -858,13 +858,13 @@ namespace device {
 			@brief  周辺機器別ポート切り替え
 			@param[in]	per	周辺機器タイプ
 			@param[in]	ena	無効にする場合「false」
-			@param[in]	opt	候補を選択する場合
+			@param[in]	odr	候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral per, bool ena = true, ORDER opt = ORDER::FIRST) noexcept
+		static bool turn(peripheral per, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			if(opt == ORDER::BYPASS) return false;
+			if(odr == ORDER::BYPASS) return false;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -875,45 +875,54 @@ namespace device {
 			case peripheral::SCI1C:
 				clock = true;
 			case peripheral::SCI1:
-				ret = sci1_(opt, ena, clock);
+				ret = sci1_(odr, ena, clock);
 				break;
 			case peripheral::SCI5C:
 				clock = true;
 			case peripheral::SCI5:
-				ret = sci5_(opt, ena, clock);
+				ret = sci5_(odr, ena, clock);
 				break;
 			case peripheral::SCI6C:
 				clock = true;
 			case peripheral::SCI6:
-				ret = sci6_(opt, ena, clock);
+				ret = sci6_(odr, ena, clock);
 				break;
 			case peripheral::SCI8C:
 				clock = true;
 			case peripheral::SCI8:
-				ret = sci8_(opt, ena, clock);
+				ret = sci8_(odr, ena, clock);
 				break;
 			case peripheral::SCI9C:
 				clock = true;
 			case peripheral::SCI9:
-				ret = sci9_(opt, ena, clock);
+				ret = sci9_(odr, ena, clock);
 				break;
 			case peripheral::SCI11C:
 				clock = true;
 			case peripheral::SCI11:
-				ret = sci11_(opt, ena, clock);
+				ret = sci11_(odr, ena, clock);
 				break;
 			case peripheral::SCI12:
-				ret = sci12_(opt, ena, clock);
+				ret = sci12_(odr, ena, clock);
 				break;
 
 			case peripheral::RSPI0:
-				ret = rspi0_(opt, ena);
+				ret = rspi0_(odr, ena);
 				break;
 			case peripheral::RIIC0:
-				ret = riic0_(opt, ena);
+				ret = riic0_(odr, ena);
 				break;
 			case peripheral::CAN0:
-				ret = can0_(opt, ena);
+				ret = can0_(odr, ena);
+				break;
+
+			case peripheral::USB0:
+				if(odr == ORDER::FIRST) {  // RX72N hira_kuni_board
+					ret = turn_usb(USB_PORT::VBUSEN,  ena, ORDER::THIRD);  // PB5
+					if(ret) {
+						ret = turn_usb(USB_PORT::OVRCURB, ena, ORDER::SECOND);  // PB6
+					}
+				}
 				break;
 			default:
 				break;
@@ -928,14 +937,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  MTU3 関係、チャネル別ポート切り替え
-			@param[in]	t	周辺機器タイプ
+			@param[in]	per	周辺機器タイプ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
-			@param[in]	opt	候補を選択する場合
+			@param[in]	odr	候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, channel ch, bool ena = true, ORDER opt = ORDER::FIRST)
+		static bool turn(peripheral per, channel ch, bool ena = true, ORDER odr = ORDER::FIRST)
 			noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
@@ -943,7 +952,7 @@ namespace device {
 
 			bool ret = true;
 			uint8_t sel = 0;
-			switch(t) {
+			switch(per) {
 			case peripheral::MTU0:
 				sel = ena ? 0b00001 : 0;
 				switch(ch) {
@@ -983,12 +992,12 @@ namespace device {
 					break;
 				case channel::CLK_AB:
 					sel = ena ? 0b00010 : 0;
-					if(opt == ORDER::FIRST) {
+					if(odr == ORDER::FIRST) {
 						MPC::P33PFS.PSEL = sel;
 						PORT3::PMR.B3 = ena;
 						MPC::P32PFS.PSEL = sel;
 						PORT3::PMR.B2 = ena;
-					} else if(opt == ORDER::SECOND) {
+					} else if(odr == ORDER::SECOND) {
 						MPC::P21PFS.PSEL = sel;
 						PORT2::PMR.B1 = ena;
 						MPC::P20PFS.PSEL = sel;
@@ -1015,12 +1024,12 @@ namespace device {
 					break;
 				case channel::CLK_AB:
 					sel = ena ? 0b00010 : 0;
-					if(opt == ORDER::FIRST) {
+					if(odr == ORDER::FIRST) {
 						MPC::P33PFS.PSEL = sel;  // 
 						PORT3::PMR.B3 = ena;
 						MPC::P32PFS.PSEL = sel;
 						PORT3::PMR.B2 = ena;
-					} else if(opt == ORDER::SECOND) {
+					} else if(odr == ORDER::SECOND) {
 						MPC::P21PFS.PSEL = sel;
 						PORT2::PMR.B1 = ena;
 						MPC::P20PFS.PSEL = sel;
@@ -1031,17 +1040,17 @@ namespace device {
 					break;
 				case channel::CLK_CD:
 					sel = ena ? 0b00010 : 0;
-					if(opt == ORDER::FIRST) {
+					if(odr == ORDER::FIRST) {
 						MPC::P31PFS.PSEL = sel;
 						PORT3::PMR.B1 = ena;
 						MPC::P30PFS.PSEL = sel;
 						PORT3::PMR.B0 = ena;
-					} else if(opt == ORDER::SECOND) {
+					} else if(odr == ORDER::SECOND) {
 						MPC::P11PFS.PSEL = sel;
 						PORT1::PMR.B1 = ena;
 						MPC::P10PFS.PSEL = sel;
 						PORT1::PMR.B0 = ena;
-					} else if(opt == ORDER::THIRD) {
+					} else if(odr == ORDER::THIRD) {
 						MPC::PE4PFS.PSEL = sel;
 						PORTE::PMR.B4 = ena;
 						MPC::PE3PFS.PSEL = sel;
