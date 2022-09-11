@@ -391,13 +391,13 @@ namespace device {
 			bit_rw_t <io_, bitpos::B31>  MB31;
 
 			void set(uint32_t idx) {
-				auto v = rd32_(io_::address());
+				auto v = rd32_(io_::address);
 				v |= 1 << idx;
-				wr32_(io_::address(), v);
+				wr32_(io_::address, v);
 			}
 
 			bool get(uint32_t idx) {
-				auto v = rd32_(io_::address());
+				auto v = rd32_(io_::address);
 				return (v & (1 << idx)) != 0;
 			}
 		};
@@ -424,7 +424,7 @@ namespace device {
 
 			struct data_t {
 				volatile uint8_t& operator [] (uint32_t n) {
-					return *reinterpret_cast<volatile uint8_t*>(io0_::address() + 6 + n);
+					return *reinterpret_cast<volatile uint8_t*>(io0_::address + 6 + n);
 				}
 			};
 			data_t	DATA;
@@ -440,7 +440,7 @@ namespace device {
 			}
 
 			void clear(uint32_t d = 0) {
-				auto a = io0_::address();
+				auto a = io0_::address;
 				wr32_(a,      d);
 				wr32_(a +  4, d);
 				wr32_(a +  8, d);
@@ -457,24 +457,24 @@ namespace device {
 			}
 
 			void copy(uint32_t idx) {
-				wr32_(io0_::address() +  0, rd32_(base + idx * 16 +  0));
-				wr32_(io0_::address() +  4, rd32_(base + idx * 16 +  4));
-				wr32_(io0_::address() +  8, rd32_(base + idx * 16 +  8));
-				wr32_(io0_::address() + 12, rd32_(base + idx * 16 + 12));
+				wr32_(io0_::address +  0, rd32_(base + idx * 16 +  0));
+				wr32_(io0_::address +  4, rd32_(base + idx * 16 +  4));
+				wr32_(io0_::address +  8, rd32_(base + idx * 16 +  8));
+				wr32_(io0_::address + 12, rd32_(base + idx * 16 + 12));
 			}
 
 			void set(const can_frame& src) {
-				wr32_(io0_::address() +  0, src[0]);
-				wr32_(io0_::address() +  4, src[1]);
-				wr32_(io0_::address() +  8, src[2]);
-				wr32_(io0_::address() + 12, src[3]);
+				wr32_(io0_::address +  0, src[0]);
+				wr32_(io0_::address +  4, src[1]);
+				wr32_(io0_::address +  8, src[2]);
+				wr32_(io0_::address + 12, src[3]);
 			}
 
 			void get(can_frame& dst) {
-				dst[0] = rd32_(io0_::address() +  0);
-				dst[1] = rd32_(io0_::address() +  4);
-				dst[2] = rd32_(io0_::address() +  8);
-				dst[3] = rd32_(io0_::address() + 12);
+				dst[0] = rd32_(io0_::address +  0);
+				dst[1] = rd32_(io0_::address +  4);
+				dst[2] = rd32_(io0_::address +  8);
+				dst[3] = rd32_(io0_::address + 12);
 			}
 
 			mb_t& operator [] (uint32_t idx) {

@@ -1026,7 +1026,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct addr_t {
 			uint16_t operator() (ANALOG an) {
-				return rd16_(base_class::ADDR0.address() + static_cast<uint32_t>(an) * 2);
+				return rd16_(base_class::ADDR0.address + static_cast<uint32_t>(an) * 2);
 			}
 		};
 		typedef addr_t ADDR_;
@@ -1096,7 +1096,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct adsstr_t {
 			void set(ANALOG an, uint8_t v) {
-				wr8_(base_class::ADSSTR0.address() + static_cast<uint32_t>(an), v);
+				wr8_(base_class::ADSSTR0.address + static_cast<uint32_t>(an), v);
 			}
 		};
 		typedef adsstr_t ADSSTR_;

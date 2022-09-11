@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	I/O ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,6 +12,7 @@
 
 namespace device {
 
+	/// RX micro controller address type 
 	typedef uint32_t address_type;
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -94,16 +95,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <address_type adr>
 	struct rw8_t {
+
 		typedef uint8_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -175,16 +170,9 @@ namespace device {
 
 		typedef uint8_t value_type;
 
+		static constexpr auto address = adr;	///< アドレス定義
+
 		static uint32_t index;
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr + index; }
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -254,16 +242,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <address_type adr>
 	struct ro8_t {
+
 		typedef uint8_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -292,16 +274,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <address_type adr>
 	struct wo8_t {
+
 		typedef uint8_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -330,16 +306,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <address_type adr>
 	struct rw16_t {
+
 		typedef uint16_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -407,16 +377,9 @@ namespace device {
 
 		typedef uint16_t value_type;
 
+		static constexpr auto address = adr;	///< アドレス定義
+
 		static uint32_t index;
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr + index; }
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -482,16 +445,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <address_type adr>
 	struct ro16_t {
+
 		typedef uint16_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -520,16 +477,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <address_type adr>
 	struct wo16_t {
+
 		typedef uint16_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -561,14 +512,7 @@ namespace device {
 
 		typedef uint32_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -636,16 +580,9 @@ namespace device {
 
 		typedef uint32_t value_type;
 
+		static constexpr auto address = adr;	///< アドレス定義
+
 		static uint32_t index;
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr + index; }
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -714,16 +651,9 @@ namespace device {
 
 		typedef uint32_t value_type;
 
+		static constexpr auto address = adr;	///< アドレス定義
+
 		static uint32_t	tmp_;
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -789,16 +719,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <address_type adr>
 	struct ro32_t {
+
 		typedef uint32_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -830,14 +754,7 @@ namespace device {
 
 		typedef uint32_t value_type;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief アドレスの取得
-			@return アドレス
-		*/
-		//-----------------------------------------------------------------//
-		static address_type address() noexcept { return adr; }
-
+		static constexpr auto address = adr;	///< アドレス定義
 
 		//-----------------------------------------------------------------//
 		/*!

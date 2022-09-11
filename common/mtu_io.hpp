@@ -100,7 +100,7 @@ namespace device {
 
 			capture_t	cap_;
 
-			task_t() : tgr_adr_(MTUX::TGRA.address()),
+			task_t() : tgr_adr_(MTUX::TGRA.address),
 				ovfw_tick_(0),
 				rate_(0), tgr_(0), shift_(0), out_(OUTPUT::NONE),
 				cap_()
@@ -333,7 +333,7 @@ namespace device {
 			if((match - 1) < MTUX::TCNT()) {
 				MTUX::TCNT = 0;
 			}
-			auto adr = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+			auto adr = MTUX::TGRA.address + static_cast<uint32_t>(ch) * 2;
 			wr16_(adr, match - 1);
 			tt_.tgr_ = match;
 
@@ -367,7 +367,7 @@ namespace device {
 			if((match - 1) < MTUX::TCNT()) {
 				MTUX::TCNT = 0;
 			}
-			auto adr = MTUX::TGRA.address() + static_cast<uint32_t>(channel_) * 2;
+			auto adr = MTUX::TGRA.address + static_cast<uint32_t>(channel_) * 2;
 			wr16_(adr, match - 1);
 			tt_.tgr_ = match;
 
@@ -411,7 +411,7 @@ namespace device {
 			MTUX::TMDR1.MD = 0b0011;  // PWM mode 2
 
 			// 各チャネルに相当するジャネラルレジスタ
-			tt_.tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+			tt_.tgr_adr_ = MTUX::TGRA.address + static_cast<uint32_t>(ch) * 2;
 			wr16_(tt_.tgr_adr_, match - 1);
 			tt_.tgr_ = match;
 
@@ -516,7 +516,7 @@ namespace device {
 			tt_.cap_.clear();
 
 			// 各チャネルに相当するジャネラルレジスタ
-			tt_.tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+			tt_.tgr_adr_ = MTUX::TGRA.address + static_cast<uint32_t>(ch) * 2;
 			wr16_(tt_.tgr_adr_, 0x0000);
 
 			MTUX::TCNT = 0;
@@ -556,7 +556,7 @@ namespace device {
 			MTUX::TMDR1.MD = 0b0100;  // 位相係数 mode 1
 
 			// 各チャネルに相当するジャネラルレジスタ
-			tt_.tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+			tt_.tgr_adr_ = MTUX::TGRA.address + static_cast<uint32_t>(ch) * 2;
 			wr16_(tt_.tgr_adr_, match - 1);
 #endif
 			MTUX::TCNT = 0;
