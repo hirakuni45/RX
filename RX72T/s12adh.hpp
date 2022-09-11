@@ -1026,7 +1026,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct addr_t {
 			uint16_t operator() (ANALOG an) {
-				return rd16_(base_class::ADDR0.address() + static_cast<uint32_t>(an) * 2);
+				return rd16_(base_class::ADDR0.address + static_cast<uint32_t>(an) * 2);
 			}
 		};
 		typedef addr_t ADDR_;
@@ -1096,7 +1096,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct adsstr_t {
 			void set(ANALOG an, uint8_t v) {
-				wr8_(base_class::ADSSTR0.address() + static_cast<uint32_t>(an), v);
+				wr8_(base_class::ADSSTR0.address + static_cast<uint32_t>(an), v);
 			}
 		};
 		typedef adsstr_t ADSSTR_;
@@ -1357,7 +1357,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct addr_t {
 			uint16_t operator() (ANALOG an) {
-				return ro16_(base_class::ADDR0.address() + static_cast<uint32_t>(an) * 2);
+				return ro16_(base_class::ADDR0.address + static_cast<uint32_t>(an) * 2);
 			}
 		};
 		typedef addr_t ADDR_;
@@ -1427,7 +1427,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct adsstr_t {
 			void set(ANALOG an, uint8_t v) {
-				wr8_(base_class::ADSSTR0.address() + static_cast<uint32_t>(an), v);
+				wr8_(base_class::ADSSTR0.address + static_cast<uint32_t>(an), v);
 			}
 		};
 		typedef adsstr_t ADSSTR_;
@@ -1794,7 +1794,7 @@ namespace device {
 		struct addr_t {
 			uint16_t operator() (ANALOG an) {
 				if(an <= ANALOG::AIN217) {
-					return ro16_(base_class::ADDR0.address() + static_cast<uint32_t>(an) * 2);
+					return ro16_(base_class::ADDR0.address + static_cast<uint32_t>(an) * 2);
 				} else if(an == ANALOG::AINT) {
 					return ADTSDR();
 				} else if(an == ANALOG::AINO) {
@@ -1992,12 +1992,12 @@ namespace device {
 		struct adscs_t {
 			void set(ANALOG an, uint8_t v) {
 				if(an == ANALOG::AINT || an == ANALOG::AINO) return;
-				wr8_(base_class::ADSCS0.address() + static_cast<uint32_t>(an), v);
+				wr8_(base_class::ADSCS0.address + static_cast<uint32_t>(an), v);
 			}
 
 			uint8_t get(ANALOG an) {
 				if(an == ANALOG::AINT || an == ANALOG::AINO) return 0x00;
-				return rd8_(base_class::ADSCS0.address() + static_cast<uint32_t>(an));
+				return rd8_(base_class::ADSCS0.address + static_cast<uint32_t>(an));
 			}
 
 			uint8_t operator () (ANALOG an) {
@@ -2153,7 +2153,7 @@ namespace device {
 				} else if(an == ANALOG::AINO) {
 					ADSSTRO = v;
 				} else {
-					wr8_(base_class::ADSSTR0.address() + static_cast<uint32_t>(an), v);
+					wr8_(base_class::ADSSTR0.address + static_cast<uint32_t>(an), v);
 				}
 			}
 		};

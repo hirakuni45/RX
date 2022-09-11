@@ -44,10 +44,12 @@ CSOURCES	=	common/init.c \
 				tinyusb/src/class/msc/msc_host.c \
 				tinyusb/src/host/hub.c \
 				tinyusb/src/host/usbh.c \
-				tinyusb/src/portable/ohci/ohci.c \
-				tinyusb/src/portable/renesas/usba/hcd_usba.c
+				tinyusb/src/portable/ohci/ohci.c
 
-PSOURCES	=	TUSB_HOST_sample/main.cpp
+#				tinyusb/src/portable/renesas/usba/hcd_usba.c
+
+PSOURCES	=	TUSB_HOST_sample/main.cpp \
+				usb/hcd_usb0.cpp
 
 USER_LIBS	=	supc++
 

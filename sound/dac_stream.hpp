@@ -125,7 +125,7 @@ namespace sound {
 			{  // DMAC マネージャー開始
 				bool cpu_intr = true;
 				auto ret = dmac_mgr_.start(itv_io_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-					reinterpret_cast<uint32_t>(sound_out_.get_sample()), DAC::DADR0.address(),
+					reinterpret_cast<uint32_t>(sound_out_.get_sample()), DAC::DADR0.address,
 					sound_out_.get_sample_size(), dmac_intl, cpu_intr);
 				if(!ret) {
 //					utils::format("DMAC Not start...\n");

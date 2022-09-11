@@ -215,7 +215,7 @@ int main(int argc, char** argv)
 		uint8_t intr_level = 4;
 		bool cpu_intr = true;
 		auto ret = dmac_mgr_.start(itvt_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address(), WAVE_NUM, intr_level, cpu_intr);
+			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address, WAVE_NUM, intr_level, cpu_intr);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}

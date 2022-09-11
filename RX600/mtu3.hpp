@@ -1617,17 +1617,17 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				case CHANNEL::C:
-					return TGRC.address();
+					return TGRC.address;
 				case CHANNEL::D:
-					return TGRD.address();
+					return TGRD.address;
 				case CHANNEL::E:
-					return TGRE.address();
+					return TGRE.address;
 				case CHANNEL::F:
-					return TGRF.address();
+					return TGRF.address;
 				}
 				return 0;
 			}
@@ -2032,9 +2032,9 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				}
 				return 0;
 			}
@@ -2385,9 +2385,9 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				}
 				return 0;
 			}
@@ -2784,15 +2784,15 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				case CHANNEL::C:
-					return TGRC.address();
+					return TGRC.address;
 				case CHANNEL::D:
-					return TGRD.address();
+					return TGRD.address;
 				case CHANNEL::E:
-					return TGRE.address();
+					return TGRE.address;
 				}
 				return 0;
 			}
@@ -3206,17 +3206,17 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				case CHANNEL::C:
-					return TGRC.address();
+					return TGRC.address;
 				case CHANNEL::D:
-					return TGRD.address();
+					return TGRD.address;
 				case CHANNEL::E:
-					return TGRE.address();
+					return TGRE.address;
 				case CHANNEL::F:
-					return TGRF.address();
+					return TGRF.address;
 				}
 				return 0;
 			}
@@ -3508,11 +3508,11 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::U:
-					return TGRU.address();
+					return TGRU.address;
 				case CHANNEL::V:
-					return TGRV.address();
+					return TGRV.address;
 				case CHANNEL::W:
-					return TGRW.address();
+					return TGRW.address;
 				}
 				return 0;
 			}
@@ -4117,15 +4117,15 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				case CHANNEL::C:
-					return TGRC.address();
+					return TGRC.address;
 				case CHANNEL::D:
-					return TGRD.address();
+					return TGRD.address;
 				case CHANNEL::E:
-					return TGRE.address();
+					return TGRE.address;
 				}
 				return 0;
 			}
@@ -4536,17 +4536,17 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				case CHANNEL::C:
-					return TGRC.address();
+					return TGRC.address;
 				case CHANNEL::D:
-					return TGRD.address();
+					return TGRD.address;
 				case CHANNEL::E:
-					return TGRE.address();
+					return TGRE.address;
 				case CHANNEL::F:
-					return TGRF.address();
+					return TGRF.address;
 				}
 				return 0;
 			}
@@ -4989,13 +4989,13 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				case CHANNEL::C:
-					return TGRC.address();
+					return TGRC.address;
 				case CHANNEL::D:
-					return TGRD.address();
+					return TGRD.address;
 				}
 				return 0;
 			}
@@ -5398,17 +5398,17 @@ namespace device {
 			{
 				switch(ch) {
 				case CHANNEL::A:
-					return TGRA.address();
+					return TGRA.address;
 				case CHANNEL::B:
-					return TGRB.address();
+					return TGRB.address;
 				case CHANNEL::C:
-					return TGRC.address();
+					return TGRC.address;
 				case CHANNEL::D:
-					return TGRD.address();
+					return TGRD.address;
 				case CHANNEL::E:
-					return TGRE.address();
+					return TGRE.address;
 				case CHANNEL::F:
-					return TGRF.address();
+					return TGRF.address;
 				}
 				return 0;
 			}

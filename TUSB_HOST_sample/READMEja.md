@@ -16,6 +16,7 @@ Renesas TinyUSB/Host サンプル
 - main.cpp
 - RX65N/Makefile（RX65N Envision Kit）
 - RX72N/Makefile（RX72N Envision Kit）
+- RX72T/Makefile (RX72T HiraKuni45 PGA-100 Board)
 
 ---
 

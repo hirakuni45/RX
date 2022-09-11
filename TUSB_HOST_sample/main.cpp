@@ -52,6 +52,8 @@ namespace {
 	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
+	// RX72T hirakuni45 board: VBUSEN, OVERCURA
+	typedef device::tinyusb_mng<device::USB0, device::port_map::ORDER::FIRST> TINYUSB;
 #endif
 
 	typedef device::system_io<> SYSTEM_IO;
