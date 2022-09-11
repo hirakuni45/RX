@@ -35,45 +35,48 @@
 #include "host/hcd.h"
 #include "common/renesas.hpp"
 
+//--------------------------------------------------------------------+
+// MACRO TYPEDEF CONSTANT ENUM DECLARATION
+//--------------------------------------------------------------------+
 static constexpr uint16_t USB_DVSTCTR0_LOW     = (1u);
 static constexpr uint16_t USB_DVSTCTR0_FULL    = (2u);
 
-static constexpr uint16_t USB_FIFOSEL_TX       = ((uint16_t)(1u<<5));
-static constexpr uint16_t USB_FIFOSEL_BIGEND   = ((uint16_t)(1u<<8));
-static constexpr uint16_t USB_FIFOSEL_MBW_8    = ((uint16_t)(0u<<10));
-static constexpr uint16_t USB_FIFOSEL_MBW_16   = ((uint16_t)(1u<<10));
-static constexpr uint16_t USB_IS0_CTSQ         = ((uint16_t)(7u));
-static constexpr uint16_t USB_IS0_DVSQ         = ((uint16_t)(7u<<4));
-static constexpr uint16_t USB_IS0_VALID        = ((uint16_t)(1u<<3));
-static constexpr uint16_t USB_IS0_BRDY         = ((uint16_t)(1u<<8));
-static constexpr uint16_t USB_IS0_NRDY         = ((uint16_t)(1u<<9));
-static constexpr uint16_t USB_IS0_BEMP         = ((uint16_t)(1u<<10));
-static constexpr uint16_t USB_IS0_CTRT         = ((uint16_t)(1u<<11));
-static constexpr uint16_t USB_IS0_DVST         = ((uint16_t)(1u<<12));
-static constexpr uint16_t USB_IS0_SOFR         = ((uint16_t)(1u<<13));
-static constexpr uint16_t USB_IS0_RESM         = ((uint16_t)(1u<<14));
-static constexpr uint16_t USB_IS0_VBINT        = ((uint16_t)(1u<<15));
-static constexpr uint16_t USB_IS1_SACK         = ((uint16_t)(1u<<4));
-static constexpr uint16_t USB_IS1_SIGN         = ((uint16_t)(1u<<5));
-static constexpr uint16_t USB_IS1_EOFERR       = ((uint16_t)(1u<<6));
-static constexpr uint16_t USB_IS1_ATTCH        = ((uint16_t)(1u<<11));
-static constexpr uint16_t USB_IS1_DTCH         = ((uint16_t)(1u<<12));
-static constexpr uint16_t USB_IS1_BCHG         = ((uint16_t)(1u<<14));
-static constexpr uint16_t USB_IS1_OVRCR        = ((uint16_t)(1u<<15));
+static constexpr uint16_t USB_FIFOSEL_TX        = (1u<<5);
+static constexpr uint16_t USB_FIFOSEL_BIGEND    = (1u<<8);
+static constexpr uint16_t USB_FIFOSEL_MBW_8     = (0u<<10);
+static constexpr uint16_t USB_FIFOSEL_MBW_16    = (1u<<10);
+static constexpr uint16_t USB_IS0_CTSQ          = (7u);
+static constexpr uint16_t USB_IS0_DVSQ          = (7u<<4);
+static constexpr uint16_t USB_IS0_VALID         = (1u<<3);
+static constexpr uint16_t USB_IS0_BRDY          = (1u<<8);
+static constexpr uint16_t USB_IS0_NRDY          = (1u<<9);
+static constexpr uint16_t USB_IS0_BEMP          = (1u<<10);
+static constexpr uint16_t USB_IS0_CTRT          = (1u<<11);
+static constexpr uint16_t USB_IS0_DVST          = (1u<<12);
+static constexpr uint16_t USB_IS0_SOFR          = (1u<<13);
+static constexpr uint16_t USB_IS0_RESM          = (1u<<14);
+static constexpr uint16_t USB_IS0_VBINT         = (1u<<15);
+static constexpr uint16_t USB_IS1_SACK          = (1u<<4);
+static constexpr uint16_t USB_IS1_SIGN          = (1u<<5);
+static constexpr uint16_t USB_IS1_EOFERR        = (1u<<6);
+static constexpr uint16_t USB_IS1_ATTCH         = (1u<<11);
+static constexpr uint16_t USB_IS1_DTCH          = (1u<<12);
+static constexpr uint16_t USB_IS1_BCHG          = (1u<<14);
+static constexpr uint16_t USB_IS1_OVRCR         = (1u<<15);
 
-static constexpr uint16_t USB_IS0_CTSQ_MSK     = (7u);
-static constexpr uint16_t USB_IS0_CTSQ_SETUP   = (1u);
-static constexpr uint16_t USB_IS0_DVSQ_DEF     = (1u<<4);
-static constexpr uint16_t USB_IS0_DVSQ_ADDR    = (2u<<4);
-static constexpr uint16_t USB_IS0_DVSQ_SUSP0   = (4u<<4);
-static constexpr uint16_t USB_IS0_DVSQ_SUSP1   = (5u<<4);
-static constexpr uint16_t USB_IS0_DVSQ_SUSP2   = (6u<<4);
-static constexpr uint16_t USB_IS0_DVSQ_SUSP3   = (7u<<4);
+static constexpr uint16_t USB_IS0_CTSQ_MSK      = (7u);
+static constexpr uint16_t USB_IS0_CTSQ_SETUP    = (1u);
+static constexpr uint16_t USB_IS0_DVSQ_DEF      = (1u<<4);
+static constexpr uint16_t USB_IS0_DVSQ_ADDR     = (2u<<4);
+static constexpr uint16_t USB_IS0_DVSQ_SUSP0    = (4u<<4);
+static constexpr uint16_t USB_IS0_DVSQ_SUSP1    = (5u<<4);
+static constexpr uint16_t USB_IS0_DVSQ_SUSP2    = (6u<<4);
+static constexpr uint16_t USB_IS0_DVSQ_SUSP3    = (7u<<4);
 
-static constexpr uint16_t USB_PIPECTR_PID_MSK  = 3u;
-static constexpr uint16_t USB_PIPECTR_PID_NAK  = 0u;
-static constexpr uint16_t USB_PIPECTR_PID_BUF  = 1u;
-static constexpr uint16_t USB_PIPECTR_PID_STALL = 2u;
+static constexpr uint16_t USB_PIPECTR_PID_MSK   = (3u);
+static constexpr uint16_t USB_PIPECTR_PID_NAK   = (0u);
+static constexpr uint16_t USB_PIPECTR_PID_BUF   = (1u);
+static constexpr uint16_t USB_PIPECTR_PID_STALL = (2u);
 static constexpr uint16_t USB_PIPECTR_CCPL      = (1u<<2);
 static constexpr uint16_t USB_PIPECTR_SQMON     = (1u<<6);
 static constexpr uint16_t USB_PIPECTR_SQCLR     = (1u<<8);
@@ -199,10 +202,10 @@ static volatile uint16_t* get_pipectr(unsigned num)
 {
   volatile uint16_t *ctr = nullptr;
   if (num) {
-    ctr = reinterpret_cast<volatile uint16_t*>(device::USB0::PIPE1CTR.address());
+    ctr = reinterpret_cast<volatile uint16_t*>(device::USB0::PIPE1CTR.address);
     ctr += num - 1;
   } else {
-    ctr = reinterpret_cast<volatile uint16_t*>(device::USB0::DCPCTR.address());
+    ctr = reinterpret_cast<volatile uint16_t*>(device::USB0::DCPCTR.address);
   }
   return ctr;
 }
@@ -211,7 +214,7 @@ static volatile reg_pipetre_t* get_pipetre(unsigned num)
 {
   volatile reg_pipetre_t* tre = nullptr;
   if ((1 <= num) && (num <= 5)) {
-    tre = reinterpret_cast<volatile reg_pipetre_t*>(device::USB0::PIPE1TRE.address());
+    tre = reinterpret_cast<volatile reg_pipetre_t*>(device::USB0::PIPE1TRE.address);
     tre += num - 1;
   }
   return tre;
@@ -225,11 +228,11 @@ static volatile uint16_t* addr_to_pipectr(uint8_t dev_addr, unsigned ep_addr)
     const unsigned dir_in = tu_edpt_dir(ep_addr);
     const unsigned num    = _hcd.ep[dev_addr][dir_in][epn - 1];
     if (num) {
-      ctr = reinterpret_cast<volatile uint16_t*>(device::USB0::PIPE1CTR.address());
+      ctr = reinterpret_cast<volatile uint16_t*>(device::USB0::PIPE1CTR.address);
       ctr += num - 1;
     }
   } else {
-    ctr = reinterpret_cast<volatile uint16_t*>(device::USB0::DCPCTR.address());
+    ctr = reinterpret_cast<volatile uint16_t*>(device::USB0::DCPCTR.address);
   }
   return ctr;
 }
@@ -268,23 +271,23 @@ static void pipe_write_packet(void *buf, volatile void *fifo, unsigned len)
 
 static void pipe_read_packet(void *buf, volatile void *fifo, unsigned len)
 {
-  uint8_t *p   = (uint8_t*)buf;
+  uint8_t* p = (uint8_t*)buf;
   volatile uint8_t *reg = (volatile uint8_t*)fifo;  /* byte access is always at base register address */
   while (len--) *p++ = *reg;
 }
 
 static bool pipe0_xfer_in(void)
 {
-  pipe_state_t *pipe = &_hcd.pipe[0];
+  pipe_state_t* pipe = &_hcd.pipe[0];
   const unsigned rem = pipe->remaining;
 
   const unsigned mps = edpt0_max_packet_size();
   const unsigned vld = device::USB0::CFIFOCTR.DTLN();
   const unsigned len = TU_MIN(TU_MIN(rem, mps), vld);
-  void          *buf = pipe->buf;
+  void*          buf = pipe->buf;
   if (len) {
     device::USB0::DCPCTR = USB_PIPECTR_PID_NAK;
-    pipe_read_packet(buf, reinterpret_cast<volatile void*>(device::USB0::CFIFO.address()), len);
+    pipe_read_packet(buf, reinterpret_cast<volatile void*>(device::USB0::CFIFO.address), len);
     pipe->buf = (uint8_t*)buf + len;
   }
   if (len < mps) {
@@ -301,7 +304,7 @@ static bool pipe0_xfer_in(void)
 
 static bool pipe0_xfer_out(void)
 {
-  pipe_state_t *pipe = &_hcd.pipe[0];
+  pipe_state_t* pipe = &_hcd.pipe[0];
   const unsigned rem = pipe->remaining;
   if (!rem) {
     pipe->buf = NULL;
@@ -309,9 +312,9 @@ static bool pipe0_xfer_out(void)
   }
   const unsigned mps = edpt0_max_packet_size();
   const unsigned len = TU_MIN(mps, rem);
-  void          *buf = pipe->buf;
+  void*          buf = pipe->buf;
   if (len) {
-    pipe_write_packet(buf, reinterpret_cast<volatile void*>(device::USB0::CFIFO.address()), len);
+    pipe_write_packet(buf, reinterpret_cast<volatile void*>(device::USB0::CFIFO.address), len);
     pipe->buf = (uint8_t*)buf + len;
   }
   if (len < mps) {
@@ -323,7 +326,7 @@ static bool pipe0_xfer_out(void)
 
 static bool pipe_xfer_in(unsigned num)
 {
-  pipe_state_t  *pipe = &_hcd.pipe[num];
+  pipe_state_t*  pipe = &_hcd.pipe[num];
   const unsigned rem  = pipe->remaining;
 
   device::USB0::D0FIFOSEL = num | USB_FIFOSEL_MBW_8;
@@ -331,9 +334,9 @@ static bool pipe_xfer_in(unsigned num)
   pipe_wait_for_ready(num);
   const unsigned vld  = device::USB0::D0FIFOCTR.DTLN();
   const unsigned len  = TU_MIN(TU_MIN(rem, mps), vld);
-  void          *buf  = pipe->buf;
+  void*          buf  = pipe->buf;
   if (len) {
-    pipe_read_packet(buf, reinterpret_cast<volatile void*>(device::USB0::D0FIFO.address()), len);
+    pipe_read_packet(buf, reinterpret_cast<volatile void*>(device::USB0::D0FIFO.address), len);
     pipe->buf = (uint8_t*)buf + len;
   }
   if (len < mps) {
@@ -351,7 +354,7 @@ static bool pipe_xfer_in(unsigned num)
 
 static bool pipe_xfer_out(unsigned num)
 {
-  pipe_state_t  *pipe = &_hcd.pipe[num];
+  pipe_state_t*  pipe = &_hcd.pipe[num];
   const unsigned rem  = pipe->remaining;
 
   if (!rem) {
@@ -363,9 +366,9 @@ static bool pipe_xfer_out(unsigned num)
   const unsigned mps  = edpt_max_packet_size(num);
   pipe_wait_for_ready(num);
   const unsigned len  = TU_MIN(rem, mps);
-  void          *buf  = pipe->buf;
+  void*          buf  = pipe->buf;
   if (len) {
-    pipe_write_packet(buf, reinterpret_cast<volatile void*>(device::USB0::D0FIFO.address()), len);
+    pipe_write_packet(buf, reinterpret_cast<volatile void*>(device::USB0::D0FIFO.address), len);
     pipe->buf = (uint8_t*)buf + len;
   }
   if (len < mps) {
@@ -392,7 +395,7 @@ static bool process_pipe0_xfer(uint8_t dev_addr, uint8_t ep_addr, void* buffer, 
     while (!(device::USB0::CFIFOSEL() & USB_FIFOSEL_TX)) ;
   }
 
-  pipe_state_t *pipe = &_hcd.pipe[0];
+  pipe_state_t* pipe = &_hcd.pipe[0];
   pipe->ep        = ep_addr;
   pipe->length    = buflen;
   pipe->remaining = buflen;
@@ -431,7 +434,7 @@ static bool process_pipe_xfer(uint8_t dev_addr, uint8_t ep_addr, void* buffer, u
 
   TU_ASSERT(num);
 
-  pipe_state_t *pipe  = &_hcd.pipe[num];
+  pipe_state_t* pipe  = &_hcd.pipe[num];
   pipe->buf       = buffer;
   pipe->length    = buflen;
   pipe->remaining = buflen;
@@ -446,11 +449,13 @@ static bool process_pipe_xfer(uint8_t dev_addr, uint8_t ep_addr, void* buffer, u
       while (device::USB0::D0FIFOSEL.CURPIPE()) ; /* if CURPIPE bits changes, check written value */
     }
   } else {
-    volatile uint16_t     *ctr = get_pipectr(num);
-    volatile reg_pipetre_t *pt = get_pipetre(num);
+    volatile uint16_t*      ctr = get_pipectr(num);
+    volatile reg_pipetre_t* pt = get_pipetre(num);
     if (pt) {
-      const unsigned     mps = edpt_max_packet_size(num);
-      if (*ctr & 0x3) *ctr = USB_PIPECTR_PID_NAK;
+      const unsigned mps = edpt_max_packet_size(num);
+      if (*ctr & 0x3) {
+		*ctr = USB_PIPECTR_PID_NAK;
+	  }
       pt->TRE   = TU_BIT(8);
       pt->TRN   = (buflen + mps - 1) / mps;
       pt->TRENB = 1;
@@ -475,7 +480,7 @@ static void process_pipe0_bemp(uint8_t rhport)
   (void)rhport;
   bool completed = pipe0_xfer_out();
   if (completed) {
-    pipe_state_t *pipe = &_hcd.pipe[0];
+    pipe_state_t* pipe = &_hcd.pipe[0];
     hcd_event_xfer_complete(pipe->dev,
                             tu_edpt_addr(0, TUSB_DIR_OUT),
                             pipe->length - pipe->remaining,
@@ -488,14 +493,14 @@ static void process_pipe_nrdy(uint8_t rhport, unsigned num)
   (void)rhport;
 //  unsigned result;
   xfer_result_t result;
-  uint16_t volatile *ctr = get_pipectr(num);
+  uint16_t volatile* ctr = get_pipectr(num);
   // TU_LOG1("NRDY %d %x\n", num, *ctr);
   switch (*ctr & USB_PIPECTR_PID_MSK) {
     default: return;
     case USB_PIPECTR_PID_STALL: result = XFER_RESULT_STALLED; break;
     case USB_PIPECTR_PID_NAK:   result = XFER_RESULT_FAILED;  break;
   }
-  pipe_state_t *pipe = &_hcd.pipe[num];
+  pipe_state_t* pipe = &_hcd.pipe[num];
   hcd_event_xfer_complete(pipe->dev, pipe->ep,
                           pipe->length - pipe->remaining,
                           result, true);
@@ -504,7 +509,7 @@ static void process_pipe_nrdy(uint8_t rhport, unsigned num)
 static void process_pipe_brdy(uint8_t rhport, unsigned num)
 {
   (void)rhport;
-  pipe_state_t  *pipe   = &_hcd.pipe[num];
+  pipe_state_t*  pipe   = &_hcd.pipe[num];
   const unsigned dir_in = tu_edpt_dir(pipe->ep);
   bool completed;
 
@@ -561,6 +566,8 @@ bool hcd_init(uint8_t rhport)
 
 #if ( CFG_TUSB_MCU == OPT_MCU_RX65X || CFG_TUSB_MCU == OPT_MCU_RX72N )
   device::USB0::PHYSLEW = 0x5;
+
+  // move to 'tinyusb_mng class' (interrupt management)
 ///  IR(PERIB, INTB128) = 0;  // IR(PERIB, INTB185) = 0;
 #elif ( CFG_TUSB_MCU == OPT_MCU_RX66T || CFG_TUSB_MCU == OPT_MCU_RX72T )
   device::USB0::PHYSLEW = 0x5;
@@ -580,6 +587,7 @@ bool hcd_init(uint8_t rhport)
   return true;
 }
 
+// move to 'tinyusb_mng class' (interrupt management)
 #if 0
 void hcd_int_enable(uint8_t rhport)
 {
@@ -634,9 +642,10 @@ void hcd_port_reset(uint8_t rhport)
   hcd_int_enable(rhport);
   /* Reset should be asserted 10-20ms. */
   device::USB0::DVSTCTR0.USBRST = 1;
-  for (volatile int i = 0; i < 2400000; ++i) {
-	asm("nop");
-  }
+  utils::delay::milli_second(20);
+//  for (volatile int i = 0; i < 2400000; ++i) {
+//	asm("nop");
+//  }
   device::USB0::DVSTCTR0.USBRST = 0;
   device::USB0::DVSTCTR0.UACT   = 1;
 
@@ -662,16 +671,15 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
 {
   TU_LOG2("hcd_device_close: %d, dev_addr: %d\n", (int)rhport, (int)dev_addr);
   (void)rhport;
-  uint16_t volatile *ctr;
   TU_ASSERT(dev_addr < 6,); /* USBa can only handle addresses from 0 to 5. */
   if (!dev_addr) return;
   _hcd.ctl_mps[dev_addr] = 0;
-  uint8_t *ep = &_hcd.ep[dev_addr - 1][0][0];
+  uint8_t* ep = &_hcd.ep[dev_addr - 1][0][0];
   for (int i = 0; i < 2 * 15; ++i, ++ep) {
     unsigned num = *ep;
     if (!num || dev_addr != _hcd.pipe[num].dev) continue;
 
-    ctr  = reinterpret_cast<uint16_t volatile*>(device::USB0::PIPE1CTR.address()) + num - 1;
+    uint16_t volatile* ctr  = reinterpret_cast<uint16_t volatile*>(device::USB0::PIPE1CTR.address) + num - 1;
     *ctr = 0;
     device::USB0::NRDYENB &= ~TU_BIT(num);
     device::USB0::BRDYENB &= ~TU_BIT(num);
@@ -735,7 +743,7 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
     device::USB0::DCPCTR = USB_PIPECTR_PID_NAK;
     hcd_devtree_info_t devtree;
     hcd_devtree_get_info(dev_addr, &devtree);
-    uint16_t volatile *devadd = reinterpret_cast<uint16_t volatile *>(device::USB0::DEVADD0.address());
+    uint16_t volatile *devadd = reinterpret_cast<uint16_t volatile *>(device::USB0::DEVADD0.address);
     devadd += dev_addr;
     while (device::USB0::DCPCTR.PBUSY()) ;
     device::USB0::DCPMAXP = (dev_addr << 12) | mps;
