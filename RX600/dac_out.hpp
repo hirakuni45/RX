@@ -125,7 +125,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint32_t get_out0_adr() const noexcept
 		{
-			return DAC::DARD0.get_address();
+			return DAC::DARD0.address;
 		}
 
 
@@ -149,7 +149,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint32_t get_out1_adr() const noexcept
 		{
-			return DAC::DARD1.get_address();
+			return DAC::DARD1.address;
 		}
 	};
 
