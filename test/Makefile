@@ -51,7 +51,8 @@ CSOURCES	=	common/init.c \
 #				tinyusb/src/portable/renesas/usba/dcd_usba.c
 
 PSOURCES	=	main.cpp \
-				usb/hcd_usb0.cpp
+				usb/hcd_usb0.cpp \
+				usb/dcd_usb0.cpp
 
 USER_LIBS	=	supc++
 
