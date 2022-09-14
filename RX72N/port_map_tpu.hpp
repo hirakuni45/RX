@@ -497,7 +497,6 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			uint8_t sel = ena ? 0b000100 : 0;
 			bool ret = true;
 			switch(clk) {
 			// P14
@@ -506,12 +505,12 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = sel;
+					MPC::P14PFS.PSEL = ena ? 0b000100 : 0;
 					PORT1::PMR.B4 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTC::PMR.B2 = 0;
-					MPC::PC2PFS.PSEL = sel;
+					MPC::PC2PFS.PSEL = ena ? 0b000011 : 0;
 					PORTC::PMR.B2 = ena;
 					break;
 				default:
@@ -526,17 +525,17 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
-					MPC::P15PFS.PSEL = sel;
+					MPC::P15PFS.PSEL = ena ? 0b000100 : 0;
 					PORT1::PMR.B5 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = sel;
+					MPC::PA3PFS.PSEL = ena ? 0b000100 : 0;
 					PORTA::PMR.B3 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTC::PMR.B3 = 0;
-					MPC::PC3PFS.PSEL = sel;
+					MPC::PC3PFS.PSEL = ena ? 0b000011 : 0;
 					PORTC::PMR.B3 = ena;
 					break;
 				default:
@@ -551,17 +550,17 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = sel;
+					MPC::P16PFS.PSEL = ena ? 0b000100 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B2 = 0;
-					MPC::PB2PFS.PSEL = sel;
+					MPC::PB2PFS.PSEL = ena ? 0b000100 : 0;
 					PORTB::PMR.B2 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTC::PMR.B0 = 0;
-					MPC::PC0PFS.PSEL = sel;
+					MPC::PC0PFS.PSEL = ena ? 0b000011 : 0;
 					PORTC::PMR.B0 = ena;
 					break;
 				default:
@@ -576,17 +575,17 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
-					MPC::P17PFS.PSEL = sel;
+					MPC::P17PFS.PSEL = ena ? 0b000100 : 0;
 					PORT1::PMR.B7 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B3 = 0;
-					MPC::PB3PFS.PSEL = sel;
+					MPC::PB3PFS.PSEL = ena ? 0b000100 : 0;
 					PORTB::PMR.B3 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTC::PMR.B1 = 0;
-					MPC::PC1PFS.PSEL = sel;
+					MPC::PC1PFS.PSEL = ena ? 0b000011 : 0;
 					PORTC::PMR.B1 = ena;
 					break;
 				default:
