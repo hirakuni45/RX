@@ -1,16 +1,16 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72N グループ・ポート・マッピング (TPU) @n
+	@brief	RX64M/RX71M グループ・ポート・マッピング (TPU) @n
 			・TPU 型に従って、タイマー用ポートを設定 @n
 			TPU0, TPU1, TPU2, TPU3, TPU4, TPU5
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX72N/peripheral.hpp"
+#include "RX64M/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
 #include "RX600/port_map_order.hpp"
@@ -97,18 +97,12 @@ namespace device {
 				}
 				break;
 			// P32
-			// P85
 			case channel::C:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B2 = 0;
 					MPC::P32PFS.PSEL = sel;
 					PORT3::PMR.B2 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT8::PMR.B5 = 0;
-					MPC::P85PFS.PSEL = sel;
-					PORT8::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
