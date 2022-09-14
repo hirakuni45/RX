@@ -9,7 +9,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/peripheral.hpp"
+#include "RX64M/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
 #include "RX600/port_map_order.hpp"

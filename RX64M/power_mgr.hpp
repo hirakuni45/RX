@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/peripheral.hpp"
+#include "RX64M/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX600/bus.hpp"
 
