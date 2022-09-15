@@ -3,7 +3,7 @@ Renesas RX65N/RX72N Envision Kit 関数電卓サンプル
 
 <img src="../docs/calc_sample.jpg" width="50%">
 
-[English](README.md)
+[英語版](README.md)
    
 ## 概要
 
