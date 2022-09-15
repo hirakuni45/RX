@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・16 ビットタイマパルスユニット定義
+	@brief	RX64M/RX71M/RX651/RX65N/RX72N/RX72M 16 ビットタイマパルスユニット定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,30 +14,12 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  16 ビットタイマパルスユニット（TPUa）
+		@brief  16 ビットタイマパルスユニット・ベース（TPUa）
 		@param[in]	base	ベースアドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	intra	割り込み要因Ａ
-		@param[in]	intrb	割り込み要因Ｂ
-		@param[in]	intrc	割り込み要因Ｃ
-		@param[in]	intrd	割り込み要因Ｄ
-		@param[in]	intrv	割り込み要因Ｖ
-		@param[in]	intru	割り込み要因Ｕ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb,
-		ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd,
-		ICU::VECTOR_SELB intrv, ICU::VECTOR_SELB intru>
-	struct tpux_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto RA_INN = intra;	///< 割り込み要因Ａ
-		static constexpr auto RB_INN = intrb;	///< 割り込み要因Ｂ
-		static constexpr auto RC_INN = intrc;	///< 割り込み要因Ｃ
-		static constexpr auto RD_INN = intrd;	///< 割り込み要因Ｄ
-		static constexpr auto RV_INN = intrv;	///< 割り込み要因Ｖ
-		static constexpr auto RU_INN = intru;	///< 割り込み要因Ｕ
+	template <uint32_t base>
+	struct tpu_base_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -98,25 +80,6 @@ namespace device {
 		};
 		typedef tiorh_t TIORH_;
 		static TIORH_ TIORH;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  タイマ I/O コントロールレジスタ（TIORL）
-		*/
-		//-----------------------------------------------------------------//
-		struct tiorl_t : public rw8_t<base + 0x03> {
-			typedef rw8_t<base + 0x03> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 4> IOC;
-			bits_rw_t<io_, bitpos::B4, 4> IOD;
-		};
-		typedef tiorl_t TIORL_;
-		static TIORL_ TIORL;
 
 
 		//-----------------------------------------------------------------//
@@ -198,24 +161,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  タイマジェネラルレジスタ C（TGRC）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x0C> TGRC_;
-		static TGRC_ TGRC;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  タイマジェネラルレジスタ D（TGRD）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x0E> TGRD_;
-		static TGRD_ TGRD;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  タイマスタートレジスタ（TSTR）
 		*/
 		//-----------------------------------------------------------------//
@@ -281,6 +226,85 @@ namespace device {
 		};
 		typedef nfcr_t NFCR_;
 		static NFCR_ NFCR;
+	};
+	template <uint32_t base> typename tpu_base_t<base>::TCR_   tpu_base_t<base>::TCR;
+	template <uint32_t base> typename tpu_base_t<base>::TMDR_  tpu_base_t<base>::TMDR;
+	template <uint32_t base> typename tpu_base_t<base>::TIORH_ tpu_base_t<base>::TIORH;
+	template <uint32_t base> typename tpu_base_t<base>::TIER_  tpu_base_t<base>::TIER;
+	template <uint32_t base> typename tpu_base_t<base>::TSR_   tpu_base_t<base>::TSR;
+	template <uint32_t base> typename tpu_base_t<base>::TCNT_  tpu_base_t<base>::TCNT;
+	template <uint32_t base> typename tpu_base_t<base>::TGRA_  tpu_base_t<base>::TGRA;
+	template <uint32_t base> typename tpu_base_t<base>::TGRB_  tpu_base_t<base>::TGRB;
+	template <uint32_t base> typename tpu_base_t<base>::TSTR_  tpu_base_t<base>::TSTR;
+	template <uint32_t base> typename tpu_base_t<base>::TSYR_  tpu_base_t<base>::TSYR;
+	template <uint32_t base> typename tpu_base_t<base>::NFCR_  tpu_base_t<base>::NFCR;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  16 ビットタイマパルスユニット・ベース（TPUa）TPU0, TPU3
+		@param[in]	base	ベースアドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	intra	割り込み要因Ａ
+		@param[in]	intrb	割り込み要因Ｂ
+		@param[in]	intrc	割り込み要因Ｃ
+		@param[in]	intrd	割り込み要因Ｄ
+		@param[in]	intrv	割り込み要因Ｖ
+		@param[in]	intru	割り込み要因Ｕ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb,
+		ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd,
+		ICU::VECTOR_SELB intrv, ICU::VECTOR_SELB intru>
+	struct tpu_x_t : public tpu_base_t<base> {
+
+		typedef tpu_base_t<base> BASE;
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto RA_INN = intra;	///< 割り込み要因Ａ
+		static constexpr auto RB_INN = intrb;	///< 割り込み要因Ｂ
+		static constexpr auto RC_INN = intrc;	///< 割り込み要因Ｃ
+		static constexpr auto RD_INN = intrd;	///< 割り込み要因Ｄ
+		static constexpr auto RV_INN = intrv;	///< 割り込み要因Ｖ
+		static constexpr auto RU_INN = intru;	///< 割り込み要因Ｕ
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマ I/O コントロールレジスタ（TIORL）
+		*/
+		//-----------------------------------------------------------------//
+		struct tiorl_t : public rw8_t<base + 0x03> {
+			typedef rw8_t<base + 0x03> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> IOC;
+			bits_rw_t<io_, bitpos::B4, 4> IOD;
+		};
+		typedef tiorl_t TIORL_;
+		static TIORL_ TIORL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ C（TGRC）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw16_t<base + 0x0C> TGRC_;
+		static TGRC_ TGRC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ D（TGRD）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw16_t<base + 0x0E> TGRD_;
+		static TGRD_ TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -292,9 +316,9 @@ namespace device {
 		static void enable(bool f = true)
 		{
 			if(f) {
-				TSTR |=  (1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+				BASE::TSTR |=  (1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
 			} else {
-				TSTR &= ~(1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+				BASE::TSTR &= ~(1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
 			}
 		}
 
@@ -308,91 +332,162 @@ namespace device {
 		static void sync(bool f = true)
 		{
 			if(f) {
-				TSYR |=  (1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+				BASE::TSYR |=  (1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
 			} else {
-				TSYR &= ~(1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+				BASE::TSYR &= ~(1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
 			}
 		}
 	};
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCR_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCR;
+		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL_
+		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TMDR_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TMDR;
+		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC_
+		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORH_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORH;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIER_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIER;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSR_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSR;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCNT_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCNT;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRA_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRA;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRB_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRB;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSTR_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSTR;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSYR_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSYR;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
-		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::NFCR_
-		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::NFCR;
+		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD_
+		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
 
 
-	typedef tpux_t<0x00088110, peripheral::TPU0,
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  16 ビットタイマパルスユニット・ベース（TPUa）TPU1, TPU2, TPU4, TPU5
+		@param[in]	base	ベースアドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	intra	割り込み要因Ａ
+		@param[in]	intrb	割り込み要因Ｂ
+		@param[in]	intrc	割り込み要因Ｃ
+		@param[in]	intrd	割り込み要因Ｄ
+		@param[in]	intrv	割り込み要因Ｖ
+		@param[in]	intru	割り込み要因Ｕ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb,
+		ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd,
+		ICU::VECTOR_SELB intrv, ICU::VECTOR_SELB intru>
+	struct tpu_y_t : public tpu_base_t<base> {
+
+		typedef tpu_base_t<base> BASE;
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto RA_INN = intra;	///< 割り込み要因Ａ
+		static constexpr auto RB_INN = intrb;	///< 割り込み要因Ｂ
+		static constexpr auto RC_INN = intrc;	///< 割り込み要因Ｃ
+		static constexpr auto RD_INN = intrd;	///< 割り込み要因Ｄ
+		static constexpr auto RV_INN = intrv;	///< 割り込み要因Ｖ
+		static constexpr auto RU_INN = intru;	///< 割り込み要因Ｕ
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマ I/O コントロールレジスタ（TIORL） @n
+					※ダミーアクセス
+		*/
+		//-----------------------------------------------------------------//
+		struct tiorl_t : public rw8_null_t<base + 0x03> {
+			typedef rw8_null_t<base + 0x03> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> IOC;
+			bits_rw_t<io_, bitpos::B4, 4> IOD;
+		};
+		typedef tiorl_t TIORL_;
+		static TIORL_ TIORL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ C（TGRC） @n
+					※ダミーアクセス
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw16_null_t<base + 0x0C> TGRC_;
+		static TGRC_ TGRC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ D（TGRD） @n
+					※ダミーアクセス
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw16_null_t<base + 0x0E> TGRD_;
+		static TGRD_ TGRD;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマスタートレジスタ（TSTR）のエイリアス
+			@param[in]	f	動作停止にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool f = true)
+		{
+			if(f) {
+				BASE::TSTR |=  (1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+			} else {
+				BASE::TSTR &= ~(1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイマシンクロレジスタ（TSYR）のエイリアス
+			@param[in]	f	同期解除にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void sync(bool f = true)
+		{
+			if(f) {
+				BASE::TSYR |=  (1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+			} else {
+				BASE::TSYR &= ~(1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+			}
+		}
+	};
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL_
+		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC_
+		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD_
+		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
+
+
+	typedef tpu_x_t<0x00088110, peripheral::TPU0,
 		ICU::VECTOR_SELB::TGI0A, ICU::VECTOR_SELB::TGI0B,
 		ICU::VECTOR_SELB::TGI0C, ICU::VECTOR_SELB::TGI0D,
 		ICU::VECTOR_SELB::TGI0V, ICU::VECTOR_SELB::NONE>  TPU0;
-	typedef tpux_t<0x00088120, peripheral::TPU1,
+	typedef tpu_y_t<0x00088120, peripheral::TPU1,
 		ICU::VECTOR_SELB::TGI1A, ICU::VECTOR_SELB::TGI1B,
 		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
 		ICU::VECTOR_SELB::TGI1V, ICU::VECTOR_SELB::TGI1U> TPU1;
-	typedef tpux_t<0x00088130, peripheral::TPU2,
+	typedef tpu_y_t<0x00088130, peripheral::TPU2,
 		ICU::VECTOR_SELB::TGI2A, ICU::VECTOR_SELB::TGI2B,
 		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
 		ICU::VECTOR_SELB::TGI2V, ICU::VECTOR_SELB::TGI2U> TPU2;
-	typedef tpux_t<0x00088140, peripheral::TPU3,
+	typedef tpu_x_t<0x00088140, peripheral::TPU3,
 		ICU::VECTOR_SELB::TGI3A, ICU::VECTOR_SELB::TGI3B,
 		ICU::VECTOR_SELB::TGI3C, ICU::VECTOR_SELB::TGI3D,
 		ICU::VECTOR_SELB::TGI3V, ICU::VECTOR_SELB::NONE>  TPU3;
-	typedef tpux_t<0x00088150, peripheral::TPU4,
+	typedef tpu_y_t<0x00088150, peripheral::TPU4,
 		ICU::VECTOR_SELB::TGI4A, ICU::VECTOR_SELB::TGI4B,
 		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
 		ICU::VECTOR_SELB::TGI4V, ICU::VECTOR_SELB::TGI4U> TPU4;
-	typedef tpux_t<0x00088160, peripheral::TPU5,
+	typedef tpu_y_t<0x00088160, peripheral::TPU5,
 		ICU::VECTOR_SELB::TGI5A, ICU::VECTOR_SELB::TGI5B,
 		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
 		ICU::VECTOR_SELB::TGI5V, ICU::VECTOR_SELB::TGI5U> TPU5;

@@ -542,7 +542,7 @@ namespace device {
 #endif
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSTATR_   flash_t<dsize, idnum>::FSTATR;
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FENTRYR_  flash_t<dsize, idnum>::FENTRYR;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T) || defined(SIG_RX66T)
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPROTR_   flash_t<dsize, idnum>::FPROTR;
 #endif
 	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSUINITR_ flash_t<dsize, idnum>::FSUINITR;

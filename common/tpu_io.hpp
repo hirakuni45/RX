@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65[1N]/RX72[MN] グループ・TPU 制御
+	@brief	RX64M/RX71M/RX65[1N]/RX72[MN] TPU 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,23 +16,22 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  TPU 制御クラス
-		@param[in]	TPU	チャネルクラス
-		@param[in]	TASK	タイマー動作ファンクタ・クラス
+		@brief  TPU 制御ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class TPU, class TASK = utils::null_task>
-	class tpu_io {
+	class tpu_io_base {
 	public:
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマー・タイプ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class TYPE : uint8_t {
-			MATCH_A,	///< TGRA コンペアマッチ
-			MATCH_B,	///< TGRB コンペアマッチ
+			NONE,		///< 無し
+			MATCH_A,	///< TGRA コンペアマッチ（TPU0, TPU1, TPU2, TPU3, TPU4, TPU5）
+			MATCH_B,	///< TGRB コンペアマッチ（TPU0, TPU1, TPU2, TPU3, TPU4, TPU5）
+			MATCH_C,	///< TGRC コンペアマッチ（TPU0, TPU3）
+			MATCH_D,	///< TGRD コンペアマッチ（TPU0, TPU3）
 		};
 
 
@@ -52,7 +51,30 @@ namespace device {
 		};
 
 
-	private:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  入力タイプ（インプットキャプチャ）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class INPUT : uint8_t {
+			NEG  = 0b00,	///< 立ち下がりエッジでカウント
+			POS  = 0b01,	///< 立ち上がりエッジでカウント
+			BOTH = 0b10,	///< 両エッジでカウント
+		};
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  TPU 制御クラス
+		@param[in]	TPU		TPU チャネル・クラス
+		@param[in]	TASK	タイマー動作ファンクタ・クラス
+		@param[in]	ORDER	ポート・マップ候補型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class TPU, class TASK = utils::null_task, port_map_order::ORDER ORDER = port_map_order::ORDER::FIRST>
+	class tpu_io : public tpu_io_base {
+
 		TYPE		type_;
 		uint8_t		level_;
 		uint8_t		shift_;
@@ -74,15 +96,15 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		tpu_io() noexcept : type_(TYPE::MATCH_A), level_(0), shift_(0), rate_(0),
+		tpu_io() noexcept : type_(TYPE::NONE), level_(0), shift_(0), rate_(0),
 			intr_vec_(ICU::VECTOR::NONE)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  タイマー動作開始
-			@param[in]	type	タイプ
+			@brief  コンペアマッチ動作開始
+			@param[in]	type	タイマータイプ型
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル（０ならポーリング）
 			@param[in]	out		出力タイプ
@@ -92,6 +114,16 @@ namespace device {
 		bool start(TYPE type, uint32_t freq, uint8_t level, OUTPUT out = OUTPUT::NONE) noexcept
 		{
 			if(freq == 0) return false;
+
+			// TPU0, TPU3 以外は、MATCH_C, MATCH_D が無いのでエラーとする。
+			if(type == TYPE::MATCH_C || type == TYPE::MATCH_D) {
+				switch(TPU::PERIPHERAL) {
+				case peripheral::TPU0: break;
+				case peripheral::TPU3: break;
+				default:
+					return false;
+				}
+			}
 
 			type_ = type;
 			rate_ = freq;
@@ -163,14 +195,22 @@ namespace device {
 			case TYPE::MATCH_A:  // TGRA のコンペアマッチ
 				TPU::TCR = TPU::TCR.CCLR.b(0b001) | TPU::TCR.TPSC.b(tpsc);
 				TPU::TGRA = cmt - 1;
-				// ※本来「TIORH」は TPU0、TPU3 のレジスタとなっているが、現在の実装では、TPU 共通
 				TPU::TIORH.IOA = static_cast<uint8_t>(out);
 				break;
 			case TYPE::MATCH_B:  // TGRB のコンペアマッチ
 				TPU::TCR = TPU::TCR.CCLR.b(0b010) | TPU::TCR.TPSC.b(tpsc);
 				TPU::TGRB = cmt - 1;
-				// ※本来「TIORH」は TPU0、TPU3 のレジスタとなっているが、現在の実装では、TPU 共通
 				TPU::TIORH.IOB = static_cast<uint8_t>(out);
+				break;
+			case TYPE::MATCH_C:  // TGRC のコンペアマッチ
+				TPU::TCR = TPU::TCR.CCLR.b(0b101) | TPU::TCR.TPSC.b(tpsc);
+				TPU::TGRC = cmt - 1;
+				TPU::TIORL.IOC = static_cast<uint8_t>(out);
+				break;
+			case TYPE::MATCH_D:  // TGRD のコンペアマッチ
+				TPU::TCR = TPU::TCR.CCLR.b(0b110) | TPU::TCR.TPSC.b(tpsc);
+				TPU::TGRD = cmt - 1;
+				TPU::TIORL.IOD = static_cast<uint8_t>(out);
 				break;
 			default:
 				ret = false;
@@ -182,10 +222,16 @@ namespace device {
 				intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
 				switch(type) {
 				case TYPE::MATCH_A:
-					TPU::TIER.TGIEA = 1;  // TGRA interrupt
+					TPU::TIER.TGIEA = 1;
 					break;
 				case TYPE::MATCH_B:
-					TPU::TIER.TGIEB = 1;  // TGRB interrupt
+					TPU::TIER.TGIEB = 1;
+					break;
+				case TYPE::MATCH_C:
+					TPU::TIER.TGIEC = 1;
+					break;
+				case TYPE::MATCH_D:
+					TPU::TIER.TGIED = 1;
 					break;
 				default:
 					break;
@@ -195,25 +241,28 @@ namespace device {
 				TPU::TIER.TGIEB = 0;
 			}
 
-			TPU::enable();
-
-			if(out != OUTPUT::NONE) {
-				switch(type) {
-				case TYPE::MATCH_A:  // TGRA のコンペアマッチ
-//					if(!port_map::turn(per, port_map::channel::A)) {
-//						ret = false;
-//					}
-					break;
-				case TYPE::MATCH_B:  // TGRB のコンペアマッチ
-//					if(!port_map::turn(per, port_map::channel::B)) {
-//						ret = false;
-//					}
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			// 出力設定
+			switch(type) {
+			case TYPE::NONE:  // 出力無し
+				break;
+			case TYPE::MATCH_A:
+				ret = port_map_tpu::turn(per, port_map_tpu::channel::A, true, ORDER);
+				break;
+			case TYPE::MATCH_B:
+				ret = port_map_tpu::turn(per, port_map_tpu::channel::B, true, ORDER);
+				break;
+			case TYPE::MATCH_C:
+				ret = port_map_tpu::turn(per, port_map_tpu::channel::C, true, ORDER);
+				break;
+			case TYPE::MATCH_D:
+				ret = port_map_tpu::turn(per, port_map_tpu::channel::D, true, ORDER);
+				break;
+			default:
+				ret = false;
+				break;
 			}
+
+			TPU::enable();
 
 			return ret;
 		}
@@ -230,6 +279,22 @@ namespace device {
 		bool start(uint32_t freq, uint8_t level) noexcept
 		{
 			return start(TYPE::MATCH_A, freq, level);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  インプットキャプチャー動作開始
+			@param[in]	type	タイマータイプ型
+			@param[in]	level	割り込みレベル（０ならポーリング）
+			@param[in]	inp		入力タイプ
+			@return レンジオーバーなら「false」を返す
+		*/
+		//-----------------------------------------------------------------//
+		bool start(TYPE type, uint8_t level, INPUT inp) noexcept
+		{
+
+			return false;
 		}
 
 
@@ -313,5 +378,5 @@ namespace device {
 		static TASK& at_task() noexcept { return task_; }
 	};
 
-	template <class TPU, class TASK> TASK tpu_io<TPU, TASK>::task_;
+	template <class TPU, class TASK, port_map_order::ORDER PMAP> TASK tpu_io<TPU, TASK, PMAP>::task_;
 }
