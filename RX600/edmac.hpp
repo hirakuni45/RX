@@ -1,20 +1,15 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	イーサネットコントローラ用 DMA コントローラ (EDMACa) @n
-			RX64M/RX71M/RX65N/RX72M/RX72N/RX66N
+	@brief	イーサネットコントローラ用 DMA コントローラ (EDMACa, PTPEDMAC) @n
+			RX64M/RX71M/RX65[1N]/RX72[NM]/RX66[1N]
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/device.hpp"
-
-/// EDMAC モジュールが無いデバイスでエラーとする
-#if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
-#  error "edmac.hpp: This module does not exist"
-#endif
 
 namespace device {
 
@@ -596,7 +591,7 @@ namespace device {
 		typename ptpedmac_t<base, per>::EESIPR_ ptpedmac_t<base, per>::EESIPR;
 
 	typedef edmac_t<0x000C0000, peripheral::EDMAC0, ICU::VECTOR_AL1::EINT0> EDMAC0;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef edmac_t<0x000C0200, peripheral::EDMAC1, ICU::VECTOR_AL1::EINT1> EDMAC1;
 	typedef ptpedmac_t<0x000C0400, peripheral::PTPEDMAC> PTPEDMAC;
 #endif
