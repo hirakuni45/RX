@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	DMAC マネージャー @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  DMAC マネージャー・クラス
-		@param[in]	DMAC	DMA コントローラー
+		@param[in]	DMAC	DMAC コントローラー
 		@param[in]	TASK	DMA 終了割り込みファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -54,10 +54,10 @@ namespace device {
 
 		void set_vector_(ICU::VECTOR vec) const noexcept
 		{
-			if(level_) {
-				set_interrupt_task(dmac_task_, static_cast<uint32_t>(vec));
+			if(level_ > 0) {
+				icu_mgr::set_task(vec, dmac_task_);
 			} else {
-				set_interrupt_task(nullptr, static_cast<uint32_t>(vec));
+				icu_mgr::set_task(vec, nullptr);
 			}
 			icu_mgr::set_level(DMAC::IVEC, level_);
 		}
@@ -80,7 +80,7 @@ namespace device {
 			DMAC::DMAMD = DMAC::DMAMD.DM.b(0b10) | DMAC::DMAMD.SM.b(0b10);
 
 			DMAC::DMTMD = DMAC::DMTMD.DCTG.b(0b00) | DMAC::DMTMD.SZ.b(sz) |
-						  DMAC::DMTMD.DTS.b(0b10) | DMAC::DMTMD.MD.b(0b00);
+						  DMAC::DMTMD.DTS.b(0b10)  | DMAC::DMTMD.MD.b(0b00);
 
 			DMAC::DMSAR = src_adr;
 			DMAC::DMDAR = dst_adr;

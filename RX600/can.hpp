@@ -407,7 +407,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メールボックスレジスタ j （ MB[j] ）（ j = 0 ～ 31 ）
+			@brief  メールボックスレジスタ j （ MB[j] ）（ j = 0 ～ 31 ） @n
+					※MB0 ～ MB31 の定義は冗長なので割愛してある、MB[n] でアクセスの事
 		*/
 		//-----------------------------------------------------------------//
 		struct mb_t {
@@ -431,7 +432,8 @@ namespace device {
 
 			io3_	TS;
 
-			void set_index(uint32_t j) {
+			void set_index(uint32_t j) noexcept
+			{
 				if(j < 32) {
 					io0_::index = j * 16;
 					io1_::index = j * 16;
@@ -439,7 +441,8 @@ namespace device {
 				}
 			}
 
-			void clear(uint32_t d = 0) {
+			void clear(uint32_t d = 0) noexcept
+			{
 				auto a = io0_::address;
 				wr32_(a,      d);
 				wr32_(a +  4, d);
@@ -447,30 +450,30 @@ namespace device {
 				wr32_(a + 12, d);
 			}
 
-			uint32_t get_id() {
+			uint32_t get_id() noexcept {
 				return SID() | (EID() << 11);
 			}
 
-			void set_id(uint32_t id) {
+			void set_id(uint32_t id) noexcept {
 				SID = id & 0x7ff;
 				EID = id >> 11;
 			}
 
-			void copy(uint32_t idx) {
+			void copy(uint32_t idx) noexcept {
 				wr32_(io0_::address +  0, rd32_(base + idx * 16 +  0));
 				wr32_(io0_::address +  4, rd32_(base + idx * 16 +  4));
 				wr32_(io0_::address +  8, rd32_(base + idx * 16 +  8));
 				wr32_(io0_::address + 12, rd32_(base + idx * 16 + 12));
 			}
 
-			void set(const can_frame& src) {
+			void set(const can_frame& src) noexcept {
 				wr32_(io0_::address +  0, src[0]);
 				wr32_(io0_::address +  4, src[1]);
 				wr32_(io0_::address +  8, src[2]);
 				wr32_(io0_::address + 12, src[3]);
 			}
 
-			void get(can_frame& dst) {
+			void get(can_frame& dst) noexcept {
 				dst[0] = rd32_(io0_::address +  0);
 				dst[1] = rd32_(io0_::address +  4);
 				dst[2] = rd32_(io0_::address +  8);
@@ -483,8 +486,7 @@ namespace device {
 			}
 
 		private:
-			void operator = (const mb_t& t) {
-			};
+			void operator = (const mb_t& t) { };  // 代入は禁止
 		};
 		typedef mb_t MB_;
 		static  MB_ MB;

@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=============================================================================//
 /*!	@file
-	@brief	RX600 グループ　EXDMAC 定義 (a)
+	@brief	RX64M, RX71M, RX65[1N], RX66N, RX72[NM] EXDMAC 定義 (EXDMACa)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=============================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -146,10 +146,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0,  4>  DARA;
+			bits_rw_t<io_, bitpos::B0,  5>  DARA;
 
 			bits_rw_t<io_, bitpos::B6,  2>  DM;
-			bits_rw_t<io_, bitpos::B8,  4>  SARA;
+			bits_rw_t<io_, bitpos::B8,  5>  SARA;
 
 			bits_rw_t<io_, bitpos::B14, 2>  SM;
 			bit_rw_t <io_, bitpos::B16>     DIR;
@@ -215,6 +215,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> ESIF;
+
 			bit_rw_t<io_, bitpos::B4> DTIF;
 
 			bit_ro_t<io_, bitpos::B7> ACT;
@@ -281,7 +282,30 @@ namespace device {
 		};
 		typedef edmprf_t<base + 0x22> EDMPRF_;
 		static  EDMPRF_ EDMPRF;
+	};
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMSAR_ exdmac_core_t<base, per>::EDMSAR;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMDAR_ exdmac_core_t<base, per>::EDMDAR;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCRA_ exdmac_core_t<base, per>::EDMCRA;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCRB_ exdmac_core_t<base, per>::EDMCRB;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMTMD_ exdmac_core_t<base, per>::EDMTMD;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMOMD_ exdmac_core_t<base, per>::EDMOMD;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMINT_ exdmac_core_t<base, per>::EDMINT;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMAMD_ exdmac_core_t<base, per>::EDMAMD;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCNT_ exdmac_core_t<base, per>::EDMCNT;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMREQ_ exdmac_core_t<base, per>::EDMREQ;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMSTS_ exdmac_core_t<base, per>::EDMSTS;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMRMD_ exdmac_core_t<base, per>::EDMRMD;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMERF_ exdmac_core_t<base, per>::EDMERF;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMPRF_ exdmac_core_t<base, per>::EDMPRF;
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  exdmac 定義（EXDMAC0、EXDMAC1 共通クラス）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class _>
+	struct exdmac_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -325,39 +349,27 @@ namespace device {
 		typedef rw32_t<0x00082BFC> CLSBR7_;
 		static  CLSBR7_ CLSBR7;
 	};
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMSAR_ exdmac_core_t<base, per>::EDMSAR;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMDAR_ exdmac_core_t<base, per>::EDMDAR;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCRA_ exdmac_core_t<base, per>::EDMCRA;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCRB_ exdmac_core_t<base, per>::EDMCRB;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMTMD_ exdmac_core_t<base, per>::EDMTMD;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMOMD_ exdmac_core_t<base, per>::EDMOMD;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMINT_ exdmac_core_t<base, per>::EDMINT;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMAMD_ exdmac_core_t<base, per>::EDMAMD;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCNT_ exdmac_core_t<base, per>::EDMCNT;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMREQ_ exdmac_core_t<base, per>::EDMREQ;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMSTS_ exdmac_core_t<base, per>::EDMSTS;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMRMD_ exdmac_core_t<base, per>::EDMRMD;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMERF_ exdmac_core_t<base, per>::EDMERF;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMPRF_ exdmac_core_t<base, per>::EDMPRF;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMAST_ exdmac_core_t<base, per>::EDMAST;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR0_ exdmac_core_t<base, per>::CLSBR0;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR1_ exdmac_core_t<base, per>::CLSBR1;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR2_ exdmac_core_t<base, per>::CLSBR2;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR3_ exdmac_core_t<base, per>::CLSBR3;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR4_ exdmac_core_t<base, per>::CLSBR4;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR5_ exdmac_core_t<base, per>::CLSBR5;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR6_ exdmac_core_t<base, per>::CLSBR6;
-	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR7_ exdmac_core_t<base, per>::CLSBR7;
+	template <class _> typename exdmac_t<_>::EDMAST_ exdmac_t<_>::EDMAST;
+	template <class _> typename exdmac_t<_>::CLSBR0_ exdmac_t<_>::CLSBR0;
+	template <class _> typename exdmac_t<_>::CLSBR1_ exdmac_t<_>::CLSBR1;
+	template <class _> typename exdmac_t<_>::CLSBR2_ exdmac_t<_>::CLSBR2;
+	template <class _> typename exdmac_t<_>::CLSBR3_ exdmac_t<_>::CLSBR3;
+	template <class _> typename exdmac_t<_>::CLSBR4_ exdmac_t<_>::CLSBR4;
+	template <class _> typename exdmac_t<_>::CLSBR5_ exdmac_t<_>::CLSBR5;
+	template <class _> typename exdmac_t<_>::CLSBR6_ exdmac_t<_>::CLSBR6;
+	template <class _> typename exdmac_t<_>::CLSBR7_ exdmac_t<_>::CLSBR7;
+
+	typedef exdmac_t<void> EXDMAC;
 
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  edmac 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	ivec	割り込みベクター
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct exdmac0_t : public exdmac_core_t<base, per> {
 
@@ -375,14 +387,14 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename exdmac0_t<base, per, ivec>::EDMOFR_ exdmac0_t<base, per, ivec>::EDMOFR;
 
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  edmac 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	ivec	割り込みベクター
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct exdmac1_t : public exdmac_core_t<base, per> {
 
@@ -390,6 +402,6 @@ namespace device {
 
 	};
 
-	typedef exdmac0_t<0x00082800, peripheral::EXDMAC0, ICU::VECTOR::EXDMAC0I>  EXDMAC0;
-	typedef exdmac1_t<0x00082840, peripheral::EXDMAC1, ICU::VECTOR::EXDMAC1I>  EXDMAC1;
+	typedef exdmac0_t<0x00082800, peripheral::EXDMAC0, ICU::VECTOR::EXDMAC0I> EXDMAC0;
+	typedef exdmac1_t<0x00082840, peripheral::EXDMAC1, ICU::VECTOR::EXDMAC1I> EXDMAC1;
 }

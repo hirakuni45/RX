@@ -961,10 +961,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos>
 	struct bit_rw_t {
-		static bool get() {
+		static bool get() noexcept {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & 1;
 		}
-		static void set(bool v) {
+		static void set(bool v) noexcept {
 			if(v) {
 				T::write(T::read() | (1 << static_cast<typename T::value_type>(pos)));
 			} else {
@@ -972,7 +972,7 @@ namespace device {
 			}
 		}
 
-	    static typename T::value_type b(bool v = true) {
+	    static typename T::value_type b(bool v = true) noexcept {
 			return static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos);
 		}
 
@@ -991,15 +991,15 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos, uint8_t len>
 	struct bits_rw_t {
-		static typename T::value_type get() {
+		static typename T::value_type get() noexcept {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
 		}
-		static void set(typename T::value_type v) {
+		static void set(typename T::value_type v) noexcept {
 			auto m = static_cast<typename T::value_type>(((1 << len) - 1) << static_cast<typename T::value_type>(pos));
 			T::write((T::read() & ~m) | (static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos)));
 		}
 
-	    static typename T::value_type b(typename T::value_type v) {
+	    static typename T::value_type b(typename T::value_type v) noexcept {
 			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
 		}
 
@@ -1018,11 +1018,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos>
 	struct bit_ro_t {
-		static bool get() {
+		static bool get() noexcept {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & 1;
 		}
 
-	    static typename T::value_type b() {
+	    static typename T::value_type b() noexcept {
 			return 1 << static_cast<typename T::value_type>(pos);
 		}
 
@@ -1040,11 +1040,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos, uint8_t len>
 	struct bits_ro_t {
-		static typename T::value_type get() {
+		static typename T::value_type get() noexcept {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
 		}
 
-	    static typename T::value_type b(typename T::value_type v) {
+	    static typename T::value_type b(typename T::value_type v) noexcept {
 			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
 		}
 
