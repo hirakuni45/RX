@@ -39,9 +39,6 @@
 
 namespace {
 
-	// 外部 10MHz クリスタル
-	typedef device::system_io<> SYSTEM_IO;
-
 	// LED インジケーター
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 

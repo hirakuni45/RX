@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -79,6 +79,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2> PLIDIV;
+			bit_rw_t <io_, bitpos::B2>    PLLSRCSEL;
 			bits_rw_t<io_, bitpos::B8, 6> STC;
 		};
 		typedef pllcr_t<0x00080028> PLLCR_t;
@@ -163,6 +164,66 @@ namespace device {
 		};
 		typedef ilococr_t<0x00080035> ILOCOCR_t;
 		static ILOCOCR_t ILOCOCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  高速オンチップオシレータコントロールレジスタ (HOCOCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct hococr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> HCSTP;
+		};
+		typedef hococr_t<0x00080036> HOCOCR_t;
+		static HOCOCR_t HOCOCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  高速オンチップオシレータコントロールレジスタ 2 (HOCOCR2)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct hococr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> HCFRQ;
+		};
+		typedef hococr2_t<0x00080037> HOCOCR2_t;
+		static HOCOCR2_t HOCOCR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  高速オンチップオシレータウェイトコントロールレジスタ (HOCOWTCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct hocowtcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 3> HSTS;
+		};
+		typedef hocowtcr_t<0x000800A5> HOCOWTCR_t;
+		static HOCOWTCR_t HOCOWTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -447,6 +508,9 @@ namespace device {
 	template<class _> typename system_t<_>::MOSCCR_t system_t<_>::MOSCCR;
 	template<class _> typename system_t<_>::LOCOCR_t system_t<_>::LOCOCR;
 	template<class _> typename system_t<_>::ILOCOCR_t system_t<_>::ILOCOCR;
+	template<class _> typename system_t<_>::HOCOCR_t system_t<_>::HOCOCR;
+	template<class _> typename system_t<_>::HOCOCR2_t system_t<_>::HOCOCR2;
+	template<class _> typename system_t<_>::HOCOWTCR_t system_t<_>::HOCOWTCR;
 	template<class _> typename system_t<_>::OSCOVFSR_t system_t<_>::OSCOVFSR;
 	template<class _> typename system_t<_>::OSTDCR_t system_t<_>::OSTDCR;
 	template<class _> typename system_t<_>::OSTDSR_t system_t<_>::OSTDSR;

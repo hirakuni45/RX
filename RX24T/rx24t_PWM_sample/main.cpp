@@ -17,8 +17,6 @@
 
 namespace {
 
-	typedef device::system_io<> SYSTEM_IO;
-
 	device::cmt_mgr<device::CMT0>  cmt_;
 
 	typedef utils::fixed_fifo<char, 128> BUFFER;

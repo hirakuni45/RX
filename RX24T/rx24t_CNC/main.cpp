@@ -27,8 +27,6 @@ namespace {
 
 	static const uint16_t VERSION = 40;
 
-    typedef device::system_io<> SYSTEM_IO;
-
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
 	device::cmt_mgr<device::CMT0, utils::null_task>  cmt_;
