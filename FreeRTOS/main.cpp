@@ -84,7 +84,6 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;

@@ -77,7 +77,6 @@ namespace {
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 2048> SEND_BUFF;

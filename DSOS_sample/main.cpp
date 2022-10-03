@@ -86,7 +86,6 @@ namespace {
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;

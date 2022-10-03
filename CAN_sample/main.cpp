@@ -92,7 +92,6 @@ namespace {
 	typedef device::CAN0 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義

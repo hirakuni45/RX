@@ -166,8 +166,6 @@ namespace {
 
 #endif
 
-	typedef device::system_io<> SYSTEM_IO;
-
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;
 

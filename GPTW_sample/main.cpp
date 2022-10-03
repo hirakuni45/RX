@@ -87,7 +87,6 @@ namespace {
 
 	#define USE_HRPWM
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	// 位相計数モードの実験を行う場合有効にする
 	#define INPUT_PHASE
