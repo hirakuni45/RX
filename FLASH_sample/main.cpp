@@ -72,7 +72,6 @@ namespace {
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 256> RXB;  ///< SCI/RX (RECV) バッファの定義
 	typedef utils::fixed_fifo<char, 512> TXB;  ///< SCI/TX (SEND) バッファの定義

@@ -24,6 +24,22 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class clock_profile {
 	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  発信器タイプ @n
+					HOCO を使う場合、同時に、clock_profile::PLL_BASE に周波数（16,18,20 MHz）を設定します。 @n
+					LOCO は、起動時のモードなので、設定する事は通常無い。
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class OSC_TYPE : uint8_t {
+			XTAL,		///< クリスタル接続
+			EXT,		///< 外部クロック入力
+			HOCO,		///< 内蔵高速オンチップオシレーター
+			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
+		};
+
+		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
+
 #if 1
 #ifdef USE_USB
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」

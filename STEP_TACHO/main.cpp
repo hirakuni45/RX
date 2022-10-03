@@ -18,7 +18,6 @@
 
 namespace {
 
-	typedef device::system_io<> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
 	uint32_t adc_cnt_;

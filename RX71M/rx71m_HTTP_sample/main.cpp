@@ -24,7 +24,6 @@ namespace {
 
 	static const int MAIN_VERSION = 85;
 
-	typedef device::system_io<> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	static const char* system_str_ = { "RX71M" };
 

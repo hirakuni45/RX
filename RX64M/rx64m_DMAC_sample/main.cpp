@@ -77,7 +77,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::system_io<>::boost_master_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（６０Ｈｚ）
 		uint8_t int_level = 4;

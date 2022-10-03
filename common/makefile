@@ -3,9 +3,25 @@
 #   @file
 #   @brief  RX microcontroller share Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
+#=======================================================================
+#  GNU-RX 8.3.0 specific command line options:
+#  --mbig-endian-data
+#  --mlittle-endian-data [default]
+#  --m32bit-doubles [default]
+#  --m64bit-doubles
+#  --muse-conventional-section-names
+#  --muse-renesas-section-names [default]
+#  --msmall-data-limit
+#  --mrelax
+#  --mpid
+#  --mint-register=<value>
+#  --mcpu=<rx100|rx200|rx230|rx600|rx610|rx64m|rx66T|rx71m|rx72T>
+#  --misa=<v1|v2|v3>
+#  --mno-allow-string-insns  --mgcc-abi
+#  --mrx-abi [default]
 #=======================================================================
 
 # System include path for each environment
@@ -34,60 +50,61 @@ PROG_VERIFY = --verify
 
 ifeq ($(RX_DEF),SIG_RX24T)
   RX_CPU = RX24T
-  RX_OPT = v2
+  RX_CHOOSE = -misa=v2
   LDSCRIPT	=	../../RX24T/$(DEVICE).ld
   PROG_VERIFY =
 endif
 
 ifeq ($(RX_DEF),SIG_RX64M)
   RX_CPU = RX64M
-  RX_OPT = v2
+  RX_CHOOSE = -mcpu=rx64m
   LDSCRIPT	=	../../RX64M/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX71M)
-  AS_OPT	+=	--defsym MEMWAIT=1
   RX_CPU = RX71M
-  RX_OPT = v2
+  AS_OPT	+=	--defsym MEMWAIT=1
+  RX_CHOOSE = -mcpu=rx71m
   LDSCRIPT	=	../../RX71M/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX65N)
+  RX_CPU = RX65N
   LIB_ROOT += ../../RX600/drw2d
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
-  RX_CPU = RX65N
-  RX_OPT = v2
+  RX_CHOOSE = -misa=v2
   LDSCRIPT	=	../../RX65x/$(DEVICE).ld
 endif
 
+# The RX66T cpu does not support the 'SAVE' and 'RSTR' instructions.
 ifeq ($(RX_DEF),SIG_RX66T)
   RX_CPU = RX66T
-  RX_OPT = v3
+  RX_CHOOSE = -mcpu=rx66T
   LDSCRIPT	=	../../RX66T/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX72T)
   RX_CPU = RX72T
-  RX_OPT = v3
+  RX_CHOOSE = -mcpu=rx72T
   LDSCRIPT	=	../../RX72T/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX72N)
+  RX_CPU = RX72N
   LIB_ROOT += ../../RX600/drw2d
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
-  RX_CPU = RX72N
-  RX_OPT = v3
+  RX_CHOOSE = -misa=v3
   LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX72M)
+  RX_CPU = RX72M
   LIB_ROOT += ../../RX600/drw2d
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
-  RX_CPU = RX72M
-  RX_OPT = v3
+  RX_CHOOSE = -misa=v3
   LDSCRIPT	=	../../RX72M/$(DEVICE).ld
 endif
 
@@ -101,9 +118,9 @@ ifeq ($(TARGET_ISA_TEXT),)
   CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
   CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc-8.3.0
-  AS_DEFS		=	-misa=$(RX_OPT)
-  CC_DEFS		=	-misa=$(RX_OPT)
-  CP_DEFS		=	-misa=$(RX_OPT)
+  AS_DEFS		=	$(RX_CHOOSE)
+  CC_DEFS		=	$(RX_CHOOSE)
+  CP_DEFS		=	$(RX_CHOOSE)
 endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))

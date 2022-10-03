@@ -104,7 +104,6 @@ namespace {
 	#define USE_SSIE
 
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	FAMIPAD		famipad_;
 

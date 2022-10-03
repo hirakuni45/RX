@@ -27,8 +27,6 @@
 
 namespace {
 
-	typedef device::system_io<> SYSTEM_IO;
-
 	uint32_t adc_cnt_;
 
 	class adc_task {

@@ -17,8 +17,6 @@
 
 namespace {
 
-	typedef device::system_io<> SYSTEM_IO;
-
 	class cmt_task {
 	public:
 		void operator() () {

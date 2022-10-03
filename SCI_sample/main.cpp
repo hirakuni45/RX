@@ -41,37 +41,33 @@ namespace {
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
 	typedef device::SCI9 SCI_CH;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::SCI2 SCI_CH;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
 #endif
-// クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
-	typedef device::system_io<> SYSTEM_IO;
-// 内蔵高速発信器
-//	typedef device::system_io<device::system_base::OSC_TYPE::HOCO> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義

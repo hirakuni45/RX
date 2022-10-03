@@ -53,8 +53,6 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
-	typedef device::system_io<> SYSTEM_IO;
-
 	static const uint32_t CMT_FREQ = 1000;  ///< 計測用タイマー分解能
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;

@@ -20,7 +20,7 @@
 					16MHz のベースクロックを使用する @n
 					P01 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -39,10 +39,12 @@ namespace {
 #elif defined(SIG_RX72M)
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
 #elif defined(SIG_RX72N)
+	// RX72N Envision Kit
 	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ASSERT> LED;
 #elif defined(SIG_RX64M)
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
 #elif defined(SIG_RX65N)
+	// RX65N Envision Kit
 	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ASSERT> LED;
 #elif defined(SIG_RX24T)
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ASSERT> LED;
@@ -51,15 +53,6 @@ namespace {
 #elif defined(SIG_RX72T)
 	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ASSERT> LED;
 #endif
-
-// クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
-// 外部クリスタル接続
-	typedef device::system_io<> SYSTEM_IO;
-// 外部発信器接続
-//	typedef device::system_io<device::system_base::OSC_TYPE::EXT> SYSTEM_IO;
-// 内蔵、高速発信器の利用
-//	typedef device::system_io<device::system_base::OSC_TYPE::HOCO> SYSTEM_IO;
-
 }
 
 int main(int argc, char** argv);
@@ -73,7 +66,7 @@ int main(int argc, char** argv)
 	LED::P = 0;  // 消灯から開始
 
 	while(1) {
-#if 0
+#if 1
 		utils::delay::milli_second(250);
 		LED::P = 1;  // 点灯
 		utils::delay::milli_second(250);

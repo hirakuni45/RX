@@ -59,9 +59,13 @@ namespace device {
 		static volatile uint32_t counter_;
 
 		static INTERRUPT_FUNC void i_task_()
+//		static void i_task_()
 		{
+//			asm("save #0");
 			++counter_;
 			task_();
+//			asm("rstr #0");
+//			asm("rte");
 		}
 
 	public:

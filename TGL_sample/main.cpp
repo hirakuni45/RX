@@ -77,7 +77,6 @@ namespace {
 	uint32_t	tex_id_;
 
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef graphics::def_color DEF_COLOR;
 

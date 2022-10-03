@@ -90,7 +90,6 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義

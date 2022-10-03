@@ -39,7 +39,6 @@
 
 namespace {
 
-	typedef device::system_io<> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
 	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;

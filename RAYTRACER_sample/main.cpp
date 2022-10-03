@@ -159,10 +159,6 @@ namespace {
 	TFT         tft_;
 
 #endif
-// クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
-	typedef device::system_io<> SYSTEM_IO;
-
-
 
 #ifndef USE_GLCDC
 	uint16_t line_[LCD_X];

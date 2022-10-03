@@ -63,7 +63,6 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	typedef device::R12DA DAC;
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義

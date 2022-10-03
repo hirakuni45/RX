@@ -17,6 +17,11 @@ Renesas RX Microcontroller
  - ディレクトリー構成など日々アップデートしています。
  - RX62N(RX621), RX63T は、現在はサポートしていません。(legacy フォルダーにあります。) 
    
+ **他の RX デバイスをサポートして欲しい場合にはリクエストを下さい。（以下条件）**
+ - GitHub のサポートメンバーである事。
+ - サポート要求の RX マイコンが載っているボードを貸し出す事。
+ - 新規に追加された RX マイコンの関連ファイルは MIT ライセンスで公開されます。
+
  プロジェクトは、Makefile、及び、関連ヘッダー、ソースコードからなり、専用のスタートアップ   
  ルーチンやリンカースクリプトで構成されています。
    
@@ -36,8 +41,8 @@ YouTube: NES Emulator for RX65N Envision kit
 #include "common/renesas.hpp"
 
 namespace {
-    typedef device::system_io<> SYSTEM_IO;  // 参照: RXxxx/clock_profile.hpp
-    typedef device::PORT<device::PORT0, device::bitpos::B7> LED;  // LED connection port
+//  typedef device::PORT<device::PORT0, device::bitpos::B7> LED;  // LED connection port, Active HIGH
+    typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;  // LED connection port, Active LOW
 }
 
 int main(int argc, char** argv);
@@ -49,9 +54,9 @@ int main(int argc, char** argv)
     LED::OUTPUT();
     while(1) {
         utils::delay::milli_second(250);
-        LED::P = 0;
-        utils::delay::milli_second(250);
         LED::P = 1;
+        utils::delay::milli_second(250);
+        LED::P = 0;
     }
 }
 ```
@@ -464,7 +469,7 @@ http://www.rvf-rc45.net/Renesas_GNU_Tools/
     git clone https://github.com/hirakuni45/RX.git
 ```
    
-### ＲＸフレームワークが利用している boost のインストール
+### RX フレームワークが利用している boost のインストール
    
 ```
     pacman -S mingw-w64-x86_64-boost
@@ -646,16 +651,15 @@ C++ での実装は、それらに対する一つの回答です、また、コ�
 ---
    
 ☆以下は C++ 的 LED を点滅するプログラム例です。      
-(1) マイコンのクロック設定は、RXxxx/clock_profile.hpp を参照。
-(2) LED の接続ポートは、PORT0、B7   
-(3) 点滅間隔は 0.25 秒      
+- マイコンのクロック設定は、RXxxx/clock_profile.hpp を参照。
+- LED の接続ポートは、PORT0、B7、アクティブ Low（LED を吸い込みで接続）   
+- 点滅間隔は 0.25 秒      
 ※他、シリアル通信、ＳＤカードアクセスなど豊富なサンプルがあります。   
 ```C++
 #include "common/renesas.hpp"
 
 namespace {
-    typedef device::system_io<> SYSTEM_IO;
-    typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+    typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;  // Active-Low
 }
 
 int main(int argc, char** argv);
@@ -667,9 +671,9 @@ int main(int argc, char** argv)
     LED::DIR = 1;
     while(1) {
         utils::delay::milli_second(250);
-        LED::P = 0;
+        LED::P = 1;  // Light On
         utils::delay::milli_second(250);
-        LED::P = 1;
+        LED::P = 0;  // Light Off
     }
 }
 ```
@@ -677,14 +681,16 @@ int main(int argc, char** argv)
 ---
    
 ☆以下は C++ 的 SCI で通信するプログラム例です。   
-(1) SCI の設定に関する部分のみで、他は LED 点滅プログラムと共通です。   
-(2) SCI の標準ポートは、port_map.hpp により定義されており、選択するポートが複数ある場合   
+- SCI の設定に関する部分のみで、他は LED 点滅プログラムと共通です。   
+- SCI の標準ポートは、port_map.hpp により定義されており、選択するポートが複数ある場合   
 「第二候補」や「第三候補」を設定すればよく、面倒な設定を行う必要はありません。   
-(3) ボーレートは整数で設定すれば良く、内部で、設定周波数から自動的に計算されます。   
-(4) 割り込みを使う場合でも、使わない場合（ポーリング）でも使う事が出来ます。   
-(5) 送信、受信は、固定長 FIFO クラスを通して行われ、サイズは、自由に定義する事が出来ます。   
-(6) sci_putch、sci_getch 関数は、POSIX のファイル関数から呼ばれるので、外部からリンクできるようにしておきます。   
-(7) 上記関数は、stdout、stdin、stderr ディスクリプタからアクセスされます、従って、printf 関数も使う事が出来ますが、色々な理由で推奨しません「utils::format」を使って下さい、その方がサイズが小さくなり、自由度が大きく便利で安全です。   
+- ボーレートは整数で設定すれば良く、内部で、設定周波数から自動的に計算されます。   
+- 割り込みを使う場合でも、使わない場合（ポーリング）でも使う事が出来ます。   
+- 送信、受信は、固定長 FIFO クラスを通して行われ、サイズは、自由に定義する事が出来ます。   
+- sci_putch、sci_getch 関数は、POSIX のファイル関数から呼ばれるので、外部からリンクできるようにしておきます。   
+- 上記関数は、stdout、stdin、stderr ディスクリプタからアクセスされます、従って、printf 関数も使う事が出来ます。
+- printf は色々な理由で推奨しません「utils::format」を使って下さい、その方がサイズが小さくなり、自由度が大きく便利で安全です。   
+
 ```C++
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
