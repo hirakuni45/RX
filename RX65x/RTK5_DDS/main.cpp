@@ -34,8 +34,6 @@ namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
-	typedef device::system_io<> SYSTEM_IO;
-
 	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
 	CMT			cmt_;
 

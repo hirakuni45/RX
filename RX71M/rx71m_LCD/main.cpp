@@ -24,7 +24,6 @@
 
 namespace {
 
-	typedef device::system_io<> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 
