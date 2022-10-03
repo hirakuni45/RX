@@ -37,8 +37,8 @@ Due to its functionality, it does not require difficult or complicated settings 
 #include "common/renesas.hpp"
 
 namespace {
-    typedef device::system_io<> SYSTEM_IO;  // see RXxxx/clock_profile.hpp
-    typedef device::PORT<device::PORT0, device::bitpos::B7> LED;  // LED connection port
+//  typedef device::PORT<device::PORT0, device::bitpos::B7> LED;  // LED connection port, Active HIGH
+    typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;  // LED connection port, Active LOW
 }
 
 int main(int argc, char** argv);
@@ -50,9 +50,9 @@ int main(int argc, char** argv)
     LED::OUTPUT();
     while(1) {
         utils::delay::milli_second(250);
-        LED::P = 0;
-        utils::delay::milli_second(250);
         LED::P = 1;
+        utils::delay::milli_second(250);
+        LED::P = 0;
     }
 }
 ```
@@ -566,7 +566,6 @@ There is no need to make complicated settings if you set "second candidate" or "
 #include "common/format.hpp"
 
 namespace {
-    typedef device::system_io<> SYSTEM_IO;  // see RXxxx/clock_profile.hpp
 //  Use SCI9
     typedef device::SCI9 SCI_CH;
 
