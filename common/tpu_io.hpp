@@ -85,7 +85,11 @@ namespace device {
 		static TASK	task_;
 
 		static INTERRUPT_FUNC void tpu_task_() noexcept {
+//		static void tpu_task_() noexcept {
+//			asm("save #0");
 			task_();
+//			asm("rstr #0");
+//			asm("rte");
 		}
 
 		void sleep_() const noexcept { asm("nop"); }
