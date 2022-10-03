@@ -43,7 +43,6 @@ namespace {
 	// RX72N Envision Kit の SDHI ポートは、候補３で指定できる
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 512>  REB;
 	typedef utils::fixed_fifo<char, 1024> SEB;

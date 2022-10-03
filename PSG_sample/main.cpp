@@ -100,10 +100,6 @@ namespace {
 	#define USE_DAC
 
 #endif
-// クロックの定義は、「RXxxx/clock_profile.hpp」を参照。
-	typedef device::system_io<> SYSTEM_IO;
-// 内蔵高速発信器
-//	typedef device::system_io<device::system_base::OSC_TYPE::HOCO> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
