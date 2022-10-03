@@ -26,51 +26,28 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  systen_base クラス
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct system_base {
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  発信器タイプ @n
-					HOCO を使う場合、同時に、clock_profile::PLL_BASE に周波数（16,18,20 MHz）を設定します。 @n
-					LOCO は、起動時のモードなので、敢えて設定する事は無いと思います。
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class OSC_TYPE {
-			XTAL,		///< クリスタル接続
-			EXT,		///< 外部クロック入力
-			HOCO,		///< 内蔵高速オンチップオシレーター
-			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
-		};
-	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
 		@brief  systen_io クラス @n
 				RX71M はスーパーバイザモードでの変更が必要なので、 @n
 				部分的な設定を「start.s」内で行います。 @n
 				RX71M の場合、アセンブラにオプション「--defsym MEMWAIT=1」を渡す。
-		@param[in]	OSC_TYPE	発信器タイプを設定（通常、XTAL）
+		@param[in]	OSCT	発信器種別型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <auto OSC_TYPE_ = system_base::OSC_TYPE::XTAL>
-	class system_io : public system_base 
+	template <clock_profile::OSC_TYPE OSCT>
+	class system_io
 	{
 		static constexpr bool check_base_clock_() noexcept
 		{
 			bool ok = true;
-			if(OSC_TYPE_ == OSC_TYPE::XTAL) {
+			if(OSCT == clock_profile::OSC_TYPE::XTAL) {
 				if(clock_profile::BASE < 8'000'000 || clock_profile::BASE > 24'000'000) ok = false;
-			} else if(OSC_TYPE_ == OSC_TYPE::EXT) {
+			} else if(OSCT == clock_profile::OSC_TYPE::EXT) {
 #if defined(SIG_RX72N) || defined(SIG_RX72M)
 				if(clock_profile::BASE > 30'000'000) ok = false;
 #else
 				if(clock_profile::BASE > 24'000'000) ok = false;
 #endif
-			} else if(OSC_TYPE_ == OSC_TYPE::HOCO) {  // 16MHz, 18MHz, 20MHｚ
+			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {  // 16MHz, 18MHz, 20MHz
 				if(clock_profile::BASE != 16'000'000 && clock_profile::BASE != 18'000'000 && clock_profile::BASE != 20'000'000) ok = false;
 			}
 			return ok;
@@ -153,7 +130,7 @@ namespace device {
 			static_assert(check_base_clock_(), "BASE out of range.");
 
 			// メインクロック強制発振とドライブ能力設定
-			if(OSC_TYPE_ == OSC_TYPE::XTAL) {
+			if(OSCT == clock_profile::OSC_TYPE::XTAL) {
 				uint8_t modrv2 = 0b11;
 				if(clock_profile::BASE > 20'000'000) modrv2 = 0b00;
 				else if(clock_profile::BASE > 16'000'000) modrv2 = 0b01;
@@ -161,10 +138,10 @@ namespace device {
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(modrv2);
 				device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
 				while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) { asm("nop"); }
-			} else if(OSC_TYPE_ == OSC_TYPE::EXT) {
+			} else if(OSCT == clock_profile::OSC_TYPE::EXT) {
 				device::SYSTEM::MOSCCR.MOSTP = 1;		// メインクロック発振器停止
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MOSEL.b();
-			} else if(OSC_TYPE_ == OSC_TYPE::HOCO) {  // 高速オンチップオシレータ
+			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {  // 高速オンチップオシレータ
 				uint8_t frq;
 				if(clock_profile::BASE == 16'000'000) frq = 0b00;
 				else if(clock_profile::BASE == 18'000'000) frq = 0b01;
@@ -234,11 +211,11 @@ namespace device {
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
 
-			if(OSC_TYPE_ == OSC_TYPE::XTAL || OSC_TYPE_ == OSC_TYPE::EXT) {
+			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 				device::SYSTEM::HOCOCR.HCSTP = 1;  ///< 高速オンチップオシレータ停止
 				device::SYSTEM::HOCOPCR.HOCOPCNT = 1;  ///< 高速オンチップオシレーター電源 OFF
-			} else if(OSC_TYPE_ == OSC_TYPE::HOCO) {
+			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 			}
 
@@ -309,3 +286,4 @@ namespace device {
 		device::SYSTEM::PRCR = 0xA500;
 	}
 }
+typedef device::system_io<device::clock_profile::OSCT> SYSTEM_IO;

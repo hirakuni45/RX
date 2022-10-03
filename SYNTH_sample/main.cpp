@@ -155,7 +155,6 @@ namespace {
 	#define USE_DAC
 
 #endif
-	typedef device::system_io<> SYSTEM_IO;
 
 	typedef utils::fixed_fifo<char, 256> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 512> SEND_BUFF;
