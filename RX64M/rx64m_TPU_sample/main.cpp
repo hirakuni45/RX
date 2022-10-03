@@ -56,7 +56,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::system_io<>::boost_master_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
 		uint8_t int_level = 2;

@@ -49,7 +49,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::system_io<>::boost_master_clock();
+	SYSTEM_IO::boost_master_clock();
 
 	// SDRAM 初期化 128M/32bits bus
 	sdram_();
