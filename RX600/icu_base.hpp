@@ -1,9 +1,9 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	ＲＸグループ・ICU ベース定義（共通部分）
+	@brief	RX グループ・ICU ベース定義（共通部分）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
