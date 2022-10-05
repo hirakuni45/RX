@@ -1,35 +1,34 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX72T グループ・クロック。プロファイル @n
             クロックジェネレータで発生させる周波数の定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstdint>
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  クロック・プロファイル・クラス @n
-				・分周器の仕様を超える値を指定しない事 @n
-				・PLL_BASE は、0.5 倍単位 @n
+				・PLL_BASE は、BASE の 0.5 倍単位 @n
 				・他は、PLL_BASE を基数とする整数除算値 @n
+				・選択出来ない値を指定すると、コンパイルエラーとなる @n
 				・詳細はハードウェアーマニュアル参照の事
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class clock_profile {
 	public:
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発信器タイプ @n
-					HOCO を使う場合、同時に、clock_profile::PLL_BASE に周波数（16,18,20 MHz）を設定します。 @n
-					LOCO は、起動時のモードなので、設定する事は通常無い。
+					HOCO を使う場合、BASE に周波数（16,18,20 MHz）を設定します。 @n
+					LOCO は、起動時のモードなので、設定する事は通常行わない。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class OSC_TYPE : uint8_t {
@@ -43,6 +42,7 @@ namespace device {
 
 	#if defined(USE_USB)
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
+
 		static constexpr uint32_t	BASE		=  12'000'000;		///< 外部接続クリスタル
 		static constexpr uint32_t	PLL_BASE	= 144'000'000;		///< PLL ベースクロック（最大160MHz）
 
@@ -55,6 +55,7 @@ namespace device {
 		static constexpr uint32_t	BCLK		=  36'000'000;		///< BCLK 周波数（最大60MHz）
 	#else
 		static constexpr bool       TURN_USB    = false;			///< USB を使う場合「true」
+
 		static constexpr uint32_t	BASE		=  10'000'000;		///< 外部接続クリスタル
 #if 1
 		static constexpr uint32_t	PLL_BASE	= 160'000'000;		///< PLL ベースクロック（最大160MHz）
