@@ -900,6 +900,24 @@ namespace utils {
 			}
 			return false;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  拡張子を識別
+			@param[in]	filename	ファイル名（フルパス）
+			@param[in]	exts		拡張子テーブル（「,」で区切られた文字列）
+			@return 有効な拡張子なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static const char* get_bool_text(bool f) noexcept
+		{
+			if(f) {
+				return "true";
+			} else {
+				return "false";
+			}
+		} 
 	};
 
 
