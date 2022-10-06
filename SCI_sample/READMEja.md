@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
+Renesas RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
 =========
 
 [英語版](README.md)
@@ -14,6 +14,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 ## プロジェクト・リスト
 
 - main.cpp
+- RX62N/Makefile
 - RX24T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
@@ -29,6 +30,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - 各マイコンの、クリスタル周波数、各モジュールの周波数は、RXxxx/clock_profile.hpp を参照して下さい。
 - インジケーター LED を指定のポートに接続する。
 -  USB シリアルとSCI ポートを接続する。
+- RX62N の
 - RX24T の SCI 標準ポートは、「RX24T/port_map.hpp」参照。
 - RX64M/RX71M の SCI 標準ポートは、「RX600/port_map.hpp」参照。
 - RX65x の SCI 標準ポートは、「RX65x/port_map.hpp」参照。
@@ -36,34 +38,38 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - RX66T の SCI 標準ポートは、「RX66T/port_map.hpp」参照。
 - RX72T の SCI 標準ポートは、「RX72T/port_map.hpp」参照。
 
-```
-#if defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+```C++
+#if defined(SIG_RX62N)
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
+	typedef device::SCI0 SCI_CH;
+#elif defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
+	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	static const char* system_str_ = { "RX64M DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
 	typedef device::SCI9 SCI_CH;
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	static const char* system_str_ = { "RX66T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::SCI2 SCI_CH;
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	static const char* system_str_ = { "RX72T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
 #endif
 ```

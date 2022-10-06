@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) sample
+Renesas RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) sample
 =========
 
 [Japanese](READMEja.md)
@@ -13,6 +13,7 @@ SCI (UART) sample program using RX microcontroller
 
 ## Project list
  - main.cpp
+ - RX62N/Makefile
  - RX24T/Makefile
  - RX64M/Makefile
  - RX71M/Makefile
@@ -40,42 +41,39 @@ SCI (UART) sample program using RX microcontroller
  - Refer to RX65x/port_map.hpp for the RX65x SCI standard port.
  - Refer to RX72N/port_map.hpp for the RX72N SCI standard port.
  
-```
-#if defined(SIG_RX64M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX64M" };
-#elif defined(SIG_RX71M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX71M" };
-#elif defined(SIG_RX65N)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
-	static const char* system_str_ = { "RX65N" };
+```C++
+#if defined(SIG_RX62N)
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
+	typedef device::SCI0 SCI_CH;
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	static const char* system_str_ = { "RX24T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX24T" };
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
+	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX64M)
+	static const char* system_str_ = { "RX64M DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
+	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX65N)
+	static const char* system_str_ = { "RX65N Envision Kit" };
+	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
+	typedef device::SCI9 SCI_CH;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	static const char* system_str_ = { "RX66T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX66T" };
 #elif defined(SIG_RX72N)
-	typedef device::system_io<16'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	static const char* system_str_ = { "RX72N Envision Kit" };
+	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::SCI2 SCI_CH;
-	static const char* system_str_ = { "RX72N" };
 #elif defined(SIG_RX72T)
-	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	static const char* system_str_ = { "RX72T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX72T" };
 #endif
 ```
 
