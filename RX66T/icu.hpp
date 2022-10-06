@@ -20,7 +20,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
-	struct icuc_t : public icu_base {
+	struct icuc_t : public ICU_BASE {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -704,6 +704,30 @@ namespace device {
 		static IPR_ IPR;
 
 
+		/// @brief DTC 転送要求許可レジスタ  (DTCER)
+		typedef dtcer_t<0x00087100, VECTOR> DTCER_;
+		static DTCER_ DTCER;
+
+
+		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
+		typedef rw8_t<0x00087400> DMRSR0_;
+		static DMRSR0_ DMRSR0;
+		typedef rw8_t<0x00087404> DMRSR1_;
+		static DMRSR1_ DMRSR1;
+		typedef rw8_t<0x00087408> DMRSR2_;
+		static DMRSR2_ DMRSR2;
+		typedef rw8_t<0x0008740C> DMRSR3_;
+		static DMRSR3_ DMRSR3;
+		typedef rw8_t<0x00087410> DMRSR4_;
+		static DMRSR4_ DMRSR4;
+		typedef rw8_t<0x00087414> DMRSR5_;
+		static DMRSR5_ DMRSR5;
+		typedef rw8_t<0x00087418> DMRSR6_;
+		static DMRSR6_ DMRSR6;
+		typedef rw8_t<0x0008741C> DMRSR7_;
+		static DMRSR7_ DMRSR7;
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  グループ割り込み要求レジスタ
@@ -980,6 +1004,16 @@ namespace device {
 	template<class _> typename icuc_t<_>::IR_ icuc_t<_>::IR;
 	template<class _> typename icuc_t<_>::IER_ icuc_t<_>::IER;
 	template<class _> typename icuc_t<_>::IPR_ icuc_t<_>::IPR;
+
+	template<class _> typename icuc_t<_>::DTCER_ icuc_t<_>::DTCER;
+	template<class _> typename icuc_t<_>::DMRSR0_ icuc_t<_>::DMRSR0;
+	template<class _> typename icuc_t<_>::DMRSR1_ icuc_t<_>::DMRSR1;
+	template<class _> typename icuc_t<_>::DMRSR2_ icuc_t<_>::DMRSR2;
+	template<class _> typename icuc_t<_>::DMRSR3_ icuc_t<_>::DMRSR3;
+	template<class _> typename icuc_t<_>::DMRSR4_ icuc_t<_>::DMRSR4;
+	template<class _> typename icuc_t<_>::DMRSR5_ icuc_t<_>::DMRSR5;
+	template<class _> typename icuc_t<_>::DMRSR6_ icuc_t<_>::DMRSR6;
+	template<class _> typename icuc_t<_>::DMRSR7_ icuc_t<_>::DMRSR7;
 
 	template<class _> typename icuc_t<_>::GRPBE0_ icuc_t<_>::GRPBE0;
 	template<class _> typename icuc_t<_>::GRPBL0_ icuc_t<_>::GRPBL0;

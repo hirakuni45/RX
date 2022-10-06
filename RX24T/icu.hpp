@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,7 +19,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
-	struct icu_t : public icu_base {
+	struct icu_t : public ICU_BASE {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -495,10 +495,16 @@ namespace device {
 		};
 		typedef ipr_t<0x00087300> IPR_;
 		static IPR_ IPR;
+
+
+		/// @brief DTC 転送要求許可レジスタ  (DTCER)
+		typedef dtcer_t<0x00087100, VECTOR> DTCER_;
+		static DTCER_ DTCER;
 	};
 	typedef icu_t<void> ICU;
 
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
 	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
 	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
+	template<class _> typename icu_t<_>::DTCER_ icu_t<_>::DTCER;
 }

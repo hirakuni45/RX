@@ -19,7 +19,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
-	struct icu_t : public icu_base {
+	struct icu_t : public ICU_BASE {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -27,118 +27,118 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR : uint8_t {
-			NONE         = 0,   ///< ベクター０
+			NONE		= 0,   ///< ベクター０
 
-			BUSERR       = 16,  ///< BSC
-			GROUPIE0	 = 17,	///< ICU
-			RAMERR       = 18,  ///< RAM
+			BUSERR		= 16,  ///< BSC
+			GROUPIE0	= 17,	///< ICU
+			RAMERR		= 18,  ///< RAM
 
-			FIFERR       = 21,  ///< FCU
+			FIFERR		= 21,  ///< FCU
 
-			FRDYI        = 23,  ///< FCU
+			FRDYI		= 23,  ///< FCU
 
-			SWINT2       = 26,  // ICU
-			SWINT        = 27,  // ICU
-			CMI0         = 28,  // CMT0
-			CMI1         = 29,  // CMT1
-			CMWI0        = 30,  // CMTW0
-			CMWI1        = 31,  // CMTW1
+			SWINT2		= 26,  // ICU
+			SWINT		= 27,  // ICU
+			CMI0		= 28,  // CMT0
+			CMI1		= 29,  // CMT1
+			CMWI0		= 30,  // CMTW0
+			CMWI1		= 31,  // CMTW1
 
-			D0FIFO0      = 34,  // USB0
-			D1FIFO0      = 35,  // USB0
+			D0FIFO0		= 34,  // USB0
+			D1FIFO0		= 35,  // USB0
 
-			SPRI0        = 38,  // RSPI0
-			SPTI0        = 39,  // RSPI0
-			SPRI1        = 40,  // RSPI1
-			SPTI1        = 41,  // RSPI1
-			SPRI         = 42,  // QSPI
-			SPTI         = 43,  // QSPI
-			SBFAI        = 44,  // SDHI
-			MBFAI        = 45,  // MMCIF
-			SSITXI0      = 46,  // SSIE0 シリアルサウンドインタフェース
-			SSIRXI0      = 47,  // SSIE0 シリアルサウンドインタフェース
-			SSIRTI1      = 48,  // SSIE1 シリアルサウンドインタフェース
+			SPRI0		= 38,  // RSPI0
+			SPTI0		= 39,  // RSPI0
+			SPRI1		= 40,  // RSPI1
+			SPTI1		= 41,  // RSPI1
+			SPRI		= 42,  // QSPI
+			SPTI		= 43,  // QSPI
+			SBFAI		= 44,  // SDHI
+			MBFAI		= 45,  // MMCIF
+			SSITXI0		= 46,  // SSIE0 シリアルサウンドインタフェース
+			SSIRXI0		= 47,  // SSIE0 シリアルサウンドインタフェース
+			SSIRTI1		= 48,  // SSIE1 シリアルサウンドインタフェース
 
-			ICRXI1    = 50,  // RIIC1 RXI
-			ICTXI1    = 51,	// RIIC1 TXI
-			ICRXI0    = 52,  // RIIC0 RXI
-			ICTXI0    = 53,	// RIIC0 TXI
-			ICRXI2    = 54,  // RIIC2 RXI
-			ICTXI2    = 55,	// RIIC2 TXI
+			ICRXI1		= 50,  // RIIC1 RXI
+			ICTXI1		= 51,	// RIIC1 TXI
+			ICRXI0		= 52,  // RIIC0 RXI
+			ICTXI0		= 53,	// RIIC0 TXI
+			ICRXI2		= 54,  // RIIC2 RXI
+			ICTXI2		= 55,	// RIIC2 TXI
 
-			RXI0         = 58,  // SCI0
-			TXI0         = 59,
-			RXI1         = 60,  // SCI1
-			TXI1         = 61,
-			RXI2         = 62,  // SCI2
-			TXI2         = 63, 
+			RXI0		= 58,  // SCI0
+			TXI0		= 59,
+			RXI1		= 60,  // SCI1
+			TXI1		= 61,
+			RXI2		= 62,  // SCI2
+			TXI2		= 63, 
 
-			IRQ0         = 64,  // ICU
-			IRQ1         = 65,
-			IRQ2         = 66,
-			IRQ3         = 67,
-			IRQ4         = 68,
-			IRQ5         = 69,
-			IRQ6         = 70,
-			IRQ7         = 71,
-			IRQ8         = 72,
-			IRQ9         = 73,
-			IRQ10        = 74,
-			IRQ11        = 75,
-			IRQ12        = 76,
-			IRQ13        = 77,
-			IRQ14        = 78,
-			IRQ15        = 79,
+			IRQ0		= 64,  // ICU
+			IRQ1		= 65,
+			IRQ2		= 66,
+			IRQ3		= 67,
+			IRQ4		= 68,
+			IRQ5		= 69,
+			IRQ6		= 70,
+			IRQ7		= 71,
+			IRQ8		= 72,
+			IRQ9		= 73,
+			IRQ10		= 74,
+			IRQ11		= 75,
+			IRQ12		= 76,
+			IRQ13		= 77,
+			IRQ14		= 78,
+			IRQ15		= 79,
 
-			RXI3         = 80,  // SCI3
-			TXI3         = 81,
-			RXI4         = 82,  // SCI4
-			TXI4         = 83,
-			RXI5         = 84,  // SCI5
-			TXI5         = 85,
-			RXI6         = 86,  // SCI6
-			TXI6         = 87,
-			LVD1         = 88,  // LVD1
-			LVD2         = 89,  // LVD2
-			USBR0        = 90,  // USB0
+			RXI3		= 80,  // SCI3
+			TXI3		= 81,
+			RXI4		= 82,  // SCI4
+			TXI4		= 83,
+			RXI5		= 84,  // SCI5
+			TXI5		= 85,
+			RXI6		= 86,  // SCI6
+			TXI6		= 87,
+			LVD1		= 88,  // LVD1
+			LVD2		= 89,  // LVD2
+			USBR0		= 90,  // USB0
 
-			ALM          = 92,  // RTC
-			PRD          = 93,
+			ALM			= 92,  // RTC
+			PRD			= 93,
 
-			IWUNI        = 95,  // IWDT
-			WUNI		 = 96,	// WDT
-			PCDFI        = 97,  // PDC
-			RXI7         = 98,  // SCI7
-			TXI7         = 99,
-			RXI8         = 100, // SCI8
-			TXI8         = 101,
-			RXI9         = 102, // SCI9
-			TXI9         = 103,
-			RXI10        = 104, // SCI10
-			TXI10        = 105,
-			GROUPBE0     = 106,  // ICU
-			GROUPBL2	 = 107,  // ICU
-			SPRI2		 = 108,  // RSPI2
-			SPTI2		 = 109,  // RSPI2
-			GROUPBL0	 = 110,  // ICU
-			GROUPBL1	 = 111,  // ICU
-			GROUPAL0	 = 112,  // ICU
-			GROUPAL1	 = 113,  // ICU
-			RXI11		 = 114,  // SCI11
-			TXI11		 = 115,
-			RXI12   	 = 116,  // SCI12
-			TXI12   	 = 117,
+			IWUNI		= 95,  // IWDT
+			WUNI		= 96,	// WDT
+			PCDFI		= 97,  // PDC
+			RXI7		= 98,  // SCI7
+			TXI7		= 99,
+			RXI8		= 100, // SCI8
+			TXI8		= 101,
+			RXI9		= 102, // SCI9
+			TXI9		= 103,
+			RXI10		= 104, // SCI10
+			TXI10		= 105,
+			GROUPBE0	= 106,  // ICU
+			GROUPBL2	= 107,  // ICU
+			SPRI2		= 108,  // RSPI2
+			SPTI2		= 109,  // RSPI2
+			GROUPBL0	= 110,  // ICU
+			GROUPBL1	= 111,  // ICU
+			GROUPAL0	= 112,  // ICU
+			GROUPAL1	= 113,  // ICU
+			RXI11		= 114,  // SCI11
+			TXI11		= 115,
+			RXI12   	= 116,  // SCI12
+			TXI12   	= 117,
 
-			DMAC0I  	 = 120,  // DMAC
-			DMAC1I  	 = 121,
-			DMAC2I  	 = 122,
-			DMAC3I  	 = 123,
-			DMAC74I 	 = 124,
-			OSTDI    	 = 125,  // OST
-			EXDMAC0I 	 = 126,  // EXDMAC
-			EXDMAC1I 	 = 127,
+			DMAC0I  	= 120,  // DMAC
+			DMAC1I  	= 121,
+			DMAC2I  	= 122,
+			DMAC3I  	= 123,
+			DMAC74I 	= 124,
+			OSTDI    	= 125,  // OST
+			EXDMAC0I 	= 126,  // EXDMAC
+			EXDMAC1I 	= 127,
 
-			INTB128  	 = 128,
+			INTB128  	= 128,
 			INTB129,
 			INTB130,
 			INTB131,
@@ -219,7 +219,7 @@ namespace device {
 			INTB206,
 			INTB207,
 
-			INTA208  = 208,
+			INTA208		= 208,
 			INTA209,
 			INTA210,
 			INTA211,
@@ -829,6 +829,30 @@ namespace device {
 		static IPR_ IPR;
 
 
+		/// @brief DTC 転送要求許可レジスタ  (DTCER)
+		typedef dtcer_t<0x00087100, VECTOR> DTCER_;
+		static DTCER_ DTCER;
+
+
+		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
+		typedef rw8_t<0x00087400> DMRSR0_;
+		static DMRSR0_ DMRSR0;
+		typedef rw8_t<0x00087404> DMRSR1_;
+		static DMRSR1_ DMRSR1;
+		typedef rw8_t<0x00087408> DMRSR2_;
+		static DMRSR2_ DMRSR2;
+		typedef rw8_t<0x0008740C> DMRSR3_;
+		static DMRSR3_ DMRSR3;
+		typedef rw8_t<0x00087410> DMRSR4_;
+		static DMRSR4_ DMRSR4;
+		typedef rw8_t<0x00087414> DMRSR5_;
+		static DMRSR5_ DMRSR5;
+		typedef rw8_t<0x00087418> DMRSR6_;
+		static DMRSR6_ DMRSR6;
+		typedef rw8_t<0x0008741C> DMRSR7_;
+		static DMRSR7_ DMRSR7;
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  グループ割り込み要求レジスタ
@@ -1160,75 +1184,6 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef icu_utils::slixr_t<0x00087700, VECTOR, VECTOR_SELB> SLIBR_;
 		static SLIBR_ SLIBR;
-#if 0
-		static rw8_t<0x00087790> SLIBR144;
-		static rw8_t<0x00087791> SLIBR145;
-		static rw8_t<0x00087792> SLIBR146;
-		static rw8_t<0x00087793> SLIBR147;
-		static rw8_t<0x00087794> SLIBR148;
-		static rw8_t<0x00087795> SLIBR149;
-		static rw8_t<0x00087796> SLIBR150;
-		static rw8_t<0x00087797> SLIBR151;
-		static rw8_t<0x00087798> SLIBR152;
-		static rw8_t<0x00087799> SLIBR153;
-		static rw8_t<0x0008779A> SLIBR154;
-		static rw8_t<0x0008779B> SLIBR155;
-		static rw8_t<0x0008779C> SLIBR156;
-		static rw8_t<0x0008779D> SLIBR157;
-		static rw8_t<0x0008779E> SLIBR158;
-		static rw8_t<0x0008779F> SLIBR159;
-
-		static rw8_t<0x000877A0> SLIBR160;
-		static rw8_t<0x000877A1> SLIBR161;
-		static rw8_t<0x000877A2> SLIBR162;
-		static rw8_t<0x000877A3> SLIBR163;
-		static rw8_t<0x000877A4> SLIBR164;
-		static rw8_t<0x000877A5> SLIBR165;
-		static rw8_t<0x000877A6> SLIBR166;
-		static rw8_t<0x000877A7> SLIBR167;
-		static rw8_t<0x000877A8> SLIBR168;
-		static rw8_t<0x000877A9> SLIBR169;
-		static rw8_t<0x000877AA> SLIBR170;
-		static rw8_t<0x000877AB> SLIBR171;
-		static rw8_t<0x000877AC> SLIBR172;
-		static rw8_t<0x000877AD> SLIBR173;
-		static rw8_t<0x000877AE> SLIBR174;
-		static rw8_t<0x000877AF> SLIBR175;
-
-		static rw8_t<0x000877B0> SLIBR176;
-		static rw8_t<0x000877B1> SLIBR177;
-		static rw8_t<0x000877B2> SLIBR178;
-		static rw8_t<0x000877B3> SLIBR179;
-		static rw8_t<0x000877B4> SLIBR180;
-		static rw8_t<0x000877B5> SLIBR181;
-		static rw8_t<0x000877B6> SLIBR182;
-		static rw8_t<0x000877B7> SLIBR183;
-		static rw8_t<0x000877B8> SLIBR184;
-		static rw8_t<0x000877B9> SLIBR185;
-		static rw8_t<0x000877BA> SLIBR186;
-		static rw8_t<0x000877BB> SLIBR187;
-		static rw8_t<0x000877BC> SLIBR188;
-		static rw8_t<0x000877BD> SLIBR189;
-		static rw8_t<0x000877BE> SLIBR190;
-		static rw8_t<0x000877BF> SLIBR191;
-
-		static rw8_t<0x000877C0> SLIBR192;
-		static rw8_t<0x000877C1> SLIBR193;
-		static rw8_t<0x000877C2> SLIBR194;
-		static rw8_t<0x000877C3> SLIBR195;
-		static rw8_t<0x000877C4> SLIBR196;
-		static rw8_t<0x000877C5> SLIBR197;
-		static rw8_t<0x000877C6> SLIBR198;
-		static rw8_t<0x000877C7> SLIBR199;
-		static rw8_t<0x000877C8> SLIBR200;
-		static rw8_t<0x000877C9> SLIBR201;
-		static rw8_t<0x000877CA> SLIBR202;
-		static rw8_t<0x000877CB> SLIBR203;
-		static rw8_t<0x000877CC> SLIBR204;
-		static rw8_t<0x000877CD> SLIBR205;
-		static rw8_t<0x000877CE> SLIBR206;
-		static rw8_t<0x000877CF> SLIBR207;
-#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1238,64 +1193,22 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef icu_utils::slixr_t<0x00087900, VECTOR, VECTOR_SELA> SLIAR_;
 		static SLIAR_ SLIAR;
-#if 0
-		static rw8_t<0x000879D0> SLIAR208;
-		static rw8_t<0x000879D1> SLIAR209;
-		static rw8_t<0x000879D2> SLIAR210;
-		static rw8_t<0x000879D3> SLIAR211;
-		static rw8_t<0x000879D4> SLIAR212;
-		static rw8_t<0x000879D5> SLIAR213;
-		static rw8_t<0x000879D6> SLIAR214;
-		static rw8_t<0x000879D7> SLIAR215;
-		static rw8_t<0x000879D8> SLIAR216;
-		static rw8_t<0x000879D9> SLIAR217;
-		static rw8_t<0x000879DA> SLIAR218;
-		static rw8_t<0x000879DB> SLIAR219;
-		static rw8_t<0x000879DC> SLIAR220;
-		static rw8_t<0x000879DD> SLIAR221;
-		static rw8_t<0x000879DE> SLIAR222;
-		static rw8_t<0x000879DF> SLIAR223;
-
-		static rw8_t<0x000879E0> SLIAR224;
-		static rw8_t<0x000879E1> SLIAR225;
-		static rw8_t<0x000879E2> SLIAR226;
-		static rw8_t<0x000879E3> SLIAR227;
-		static rw8_t<0x000879E4> SLIAR228;
-		static rw8_t<0x000879E5> SLIAR229;
-		static rw8_t<0x000879E6> SLIAR230;
-		static rw8_t<0x000879E7> SLIAR231;
-		static rw8_t<0x000879E8> SLIAR232;
-		static rw8_t<0x000879E9> SLIAR233;
-		static rw8_t<0x000879EA> SLIAR234;
-		static rw8_t<0x000879EB> SLIAR235;
-		static rw8_t<0x000879EC> SLIAR236;
-		static rw8_t<0x000879ED> SLIAR237;
-		static rw8_t<0x000879EE> SLIAR238;
-		static rw8_t<0x000879EF> SLIAR239;
-
-		static rw8_t<0x000879F0> SLIAR240;
-		static rw8_t<0x000879F1> SLIAR241;
-		static rw8_t<0x000879F2> SLIAR242;
-		static rw8_t<0x000879F3> SLIAR243;
-		static rw8_t<0x000879F4> SLIAR244;
-		static rw8_t<0x000879F5> SLIAR245;
-		static rw8_t<0x000879F6> SLIAR246;
-		static rw8_t<0x000879F7> SLIAR247;
-		static rw8_t<0x000879F8> SLIAR248;
-		static rw8_t<0x000879F9> SLIAR249;
-		static rw8_t<0x000879FA> SLIAR250;
-		static rw8_t<0x000879FB> SLIAR251;
-		static rw8_t<0x000879FC> SLIAR252;
-		static rw8_t<0x000879FD> SLIAR253;
-		static rw8_t<0x000879FE> SLIAR254;
-		static rw8_t<0x000879FF> SLIAR255;
-#endif
 	};
 	typedef icu_t<void> ICU;
 
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
 	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
 	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
+
+	template<class _> typename icu_t<_>::DTCER_ icu_t<_>::DTCER;
+	template<class _> typename icu_t<_>::DMRSR0_ icu_t<_>::DMRSR0;
+	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
+	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
+	template<class _> typename icu_t<_>::DMRSR3_ icu_t<_>::DMRSR3;
+	template<class _> typename icu_t<_>::DMRSR4_ icu_t<_>::DMRSR4;
+	template<class _> typename icu_t<_>::DMRSR5_ icu_t<_>::DMRSR5;
+	template<class _> typename icu_t<_>::DMRSR6_ icu_t<_>::DMRSR6;
+	template<class _> typename icu_t<_>::DMRSR7_ icu_t<_>::DMRSR7;
 
 	template<class _> typename icu_t<_>::GRPIE0_ icu_t<_>::GRPIE0;
 	template<class _> typename icu_t<_>::GRPBE0_ icu_t<_>::GRPBE0;
