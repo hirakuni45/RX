@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ルネサス RX デバイス選択
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,9 +16,18 @@
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 
-#if defined(SIG_RX24T)
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+#include "RX62x/system.hpp"
+#include "RX62x/system_io.hpp"
+#include "RX62x/port.hpp"
+
+#elif defined(SIG_RX24T)
 #include "RX24T/system.hpp"
 #include "RX24T/system_io.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/port.hpp"
+#include "RX600/mtu3.hpp"
+#include "RX600/poe3.hpp"
 #include "RX600/gpt.hpp"
 #include "RX24T/s12ad.hpp"
 #include "RX24T/adc_in.hpp"
@@ -28,13 +37,15 @@
 #include "RX24T/flash_io.hpp"
 #include "RX24T/dac_out.hpp"
 #include "RX600/crc.hpp"
-
-#elif defined(SIG_RX621) || defined(SIG_RX62N)
-#include "RX62x/system.hpp"
+#include "RX600/doc.hpp"
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/port.hpp"
+#include "RX600/mtu3.hpp"
+#include "RX600/poe3.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/elc.hpp"
 #include "RX600/exdmac.hpp"
@@ -72,11 +83,16 @@
 #include "RX600/ssi_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/crc.hpp"
+#include "RX600/doc.hpp"
 
 #elif defined(SIG_RX72M) || defined(SIG_RX72N)
 
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/port.hpp"
+#include "RX600/mtu3.hpp"
+#include "RX600/poe3.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/elc.hpp"
 #include "RX600/exdmac.hpp"
@@ -123,10 +139,15 @@
 
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/crca.hpp"
+#include "RX600/doc.hpp"
 
 #elif defined(SIG_RX65N)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/port.hpp"
+#include "RX600/mtu3.hpp"
+#include "RX600/poe3.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/elc.hpp"
 #include "RX600/exdmac.hpp"
@@ -162,10 +183,15 @@
 #include "RX600/drw2d_mgr.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/crca.hpp"
+#include "RX600/doc.hpp"
 
 #elif defined(SIG_RX66T)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/port.hpp"
+#include "RX600/mtu3.hpp"
+#include "RX600/poe3.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/elc.hpp"
 #include "RX600/mpc.hpp"
@@ -183,10 +209,15 @@
 #include "RX600/cmpc.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/crca.hpp"
+#include "RX600/doc.hpp"
 
 #elif defined(SIG_RX72T)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/port.hpp"
+#include "RX600/mtu3.hpp"
+#include "RX600/poe3.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/elc.hpp"
 #include "RX600/mpc.hpp"
@@ -204,17 +235,14 @@
 #include "RX600/cmpc.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/crca.hpp"
+#include "RX600/doc.hpp"
 
 #else
 #  error "renesas.hpp: Requires SIG_XXX to be defined"
 #endif
 
 // RX マイコン共通ペリフェラル
-#include "RX600/cac.hpp"
 #include "RX600/dtc.hpp"
-#include "RX600/port.hpp"
-#include "RX600/mtu3.hpp"
-#include "RX600/poe3.hpp"
 #include "RX600/tmr.hpp"
 #include "RX600/cmt.hpp"
 #include "RX600/iwdt.hpp"
@@ -222,4 +250,3 @@
 #include "RX600/riic.hpp"
 #include "RX600/rspi.hpp"
 #include "RX600/mpu.hpp"
-#include "RX600/doc.hpp"

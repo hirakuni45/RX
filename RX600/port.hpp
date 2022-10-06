@@ -199,8 +199,41 @@ namespace device {
 	};
 	template <uint32_t base> typename odr_ox_t<base>::ODR0_ ODR0;
 
-
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+//  ODR0  o  o  o  o  x  x  x  o  o  o  o  o  x  o  o  -  -  -
+//  ODR1  x  x  o  x  x  x  x  o  x  o  o  o  x  o  o  -  -  -
+	typedef port_t<0x0008C000, odr_ox_t<0x0008C080> > PORT0;
+	typedef port_t<0x0008C001, odr_ox_t<0x0008C082> > PORT1;
+	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
+	typedef port_t<0x0008C003, odr_ox_t<0x0008C086> > PORT3;
+	typedef port_t<0x0008C004, odr_xx_t<0x0008C088> > PORT4;
+	typedef port_t<0x0008C005, odr_xx_t<0x0008C08A> > PORT5;
+	typedef port_t<0x0008C006, odr_xx_t<0x0008C08C> > PORT6;
+	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
+	typedef port_t<0x0008C008, odr_ox_t<0x0008C090> > PORT8;
+	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
+	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
+	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
+	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
+	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+#elif defined(SIG_RX24T)
+//  ODR0  o  o  o  o  x  x  x  o  o  o  o  o  x  o  o  -  -  -
+//  ODR1  x  x  o  x  x  x  x  o  x  o  o  o  x  o  o  -  -  -
+	typedef port_t<0x0008C000, odr_ox_t<0x0008C080> > PORT0;
+	typedef port_t<0x0008C001, odr_ox_t<0x0008C082> > PORT1;
+	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
+	typedef port_t<0x0008C003, odr_ox_t<0x0008C086> > PORT3;
+	typedef port_t<0x0008C004, odr_xx_t<0x0008C088> > PORT4;
+	typedef port_t<0x0008C005, odr_xx_t<0x0008C08A> > PORT5;
+	typedef port_t<0x0008C006, odr_xx_t<0x0008C08C> > PORT6;
+	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
+	typedef port_t<0x0008C008, odr_ox_t<0x0008C090> > PORT8;
+	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
+	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
+	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
+	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
+	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
 	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
 	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
@@ -264,23 +297,6 @@ namespace device {
 	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
 	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
 	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
-#elif defined(SIG_RX24T)
-//  ODR0  o  o  o  o  x  x  x  o  o  o  o  o  x  o  o  -  -  -
-//  ODR1  x  x  o  x  x  x  x  o  x  o  o  o  x  o  o  -  -  -
-	typedef port_t<0x0008C000, odr_ox_t<0x0008C080> > PORT0;
-	typedef port_t<0x0008C001, odr_ox_t<0x0008C082> > PORT1;
-	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
-	typedef port_t<0x0008C003, odr_ox_t<0x0008C086> > PORT3;
-	typedef port_t<0x0008C004, odr_xx_t<0x0008C088> > PORT4;
-	typedef port_t<0x0008C005, odr_xx_t<0x0008C08A> > PORT5;
-	typedef port_t<0x0008C006, odr_xx_t<0x0008C08C> > PORT6;
-	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
-	typedef port_t<0x0008C008, odr_ox_t<0x0008C090> > PORT8;
-	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
-	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
-	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
-	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
 #elif defined(SIG_RX66T)
 	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
 	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;

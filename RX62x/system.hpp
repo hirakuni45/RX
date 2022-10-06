@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX621/RX62N グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,12 @@ namespace device {
 		@brief  システム定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class _>
 	struct system_t {
+
+		//
+		//===== クロック発生回路
+		//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -39,7 +44,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B23>    PSTOP1;
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 		};
-		static sckcr_t<0x00080020> SCKCR;
+		typedef sckcr_t<0x00080020> SCKCR_;
+		static SCKCR_ SCKCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -58,33 +64,35 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> BCLKDIV;
 		};
-		static bckcr_t<0x00080030> BCKCR;
+		typedef bckcr_t<0x00080030> BCKCR_;
+		static BCKCR_ BCKCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  発振停止検出ステータスレジスタ（OSTDSR）
+			@brief  発振停止検出コントロールレジスタ（OSTDCR）
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct ostdsr_t : public rw16_t<base> {
+		struct ostdcr_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B6>     OSTDF;
-			bit_rw_t <io_, bitpos::B7>     OSTDE;
-			bits_rw_t<io_, bitpos::B8, 8>  KEY;
+			bit_rw_t <io_, bitpos::B6>    OSTDF;
+			bit_rw_t <io_, bitpos::B7>    OSTDE;
+			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		static ostdsr_t<0x00080040> OSTDSR;
+		typedef ostdcr_t<0x00080040> OSTDCR_;
+		static OSTDCR_ OSTDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  サブクロック発振器コントロールレジスタ（ SUBOSCCR ）
+			@brief  サブクロック発振器コントロールレジスタ（SUBOSCCR）
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -96,13 +104,15 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>   SUBSTOP;
+			bit_rw_t<io_, bitpos::B0> SUBSTOP;
 		};
-		static subosccr_t<0x0008C28A> SUBOSCCR;
+		typedef subosccr_t<0x0008C28A> SUBOSCCR_;
+		static SUBOSCCR_ SUBOSCCR;
 
 
-//-----------------------------------------------------------------------------//
-
+		//
+		//===== 消費電力低減機能
+		//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -122,7 +132,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>	   OPE;
 			bit_rw_t <io_, bitpos::B15>	   SSBY;
 		};
-		static sbycr_t<0x0008000C> SBYCR;
+		typedef sbycr_t<0x0008000C> SBYCR_;
+		static SBYCR_ SBYCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -162,7 +173,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B31>	ACSE;
 		};
-		static mstpcra_t<0x00080010> MSTPCRA;
+		typedef mstpcra_t<0x00080010> MSTPCRA_;
+		static MSTPCRA_ MSTPCRA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -200,7 +212,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B30>	MSTPB30;
 			bit_rw_t<io_, bitpos::B31>	MSTPB31;
 		};
-		static mstpcrb_t<0x00080014> MSTPCRB;
+		typedef mstpcrb_t<0x00080014> MSTPCRB_;
+		static MSTPCRB_ MSTPCRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -220,7 +233,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>	MSTPC0;
 			bit_rw_t<io_, bitpos::B1>	MSTPC1;
 		};
-		static mstpcrc_t<0x00080018> MSTPCRC;
+		typedef mstpcrc_t<0x00080018> MSTPCRC_;
+		static MSTPCRC_ MSTPCRC;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -243,7 +257,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  IOKEEP;
 			bit_rw_t<io_, bitpos::B7>  DPSBY;
 		};
-		static dpsbycr_t<0x0008C280> DPSBYCR;
+		typedef dpsbycr_t<0x0008C280> DPSBYCR_;
+		static DPSBYCR_ DPSBYCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -261,7 +276,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>  WTSTS;
 		};
-		static dpswcr_t<0x0008C281> DPSWCR;
+		typedef dpswcr_t<0x0008C281> DPSWCR_;
+		static DPSWCR_ DPSWCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -286,7 +302,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  DUSBE;
 			bit_rw_t<io_, bitpos::B7>  DNMIE;
 		};
-		static dpsier_t<0x0008C282> DPSIER;
+		typedef dpsier_t<0x0008C282> DPSIER_;
+		static DPSIER_ DPSIER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -311,7 +328,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  DUSBF;
 			bit_rw_t<io_, bitpos::B7>  DNMIF;
 		};
-		static dpsifr_t<0x0008C283> DPSIFR;
+		typedef dpsifr_t<0x0008C283> DPSIFR_;
+		static DPSIFR_ DPSIFR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -334,7 +352,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  DNMIEG;
 		};
-		static dpsiegr_t<0x0008C284> DPSIEGR;
+		typedef dpsiegr_t<0x0008C284> DPSIEGR_;
+		static DPSIEGR_ DPSIEGR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -356,7 +375,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  DPSRSTF;
 		};
-		static rstsr_t<0x0008C285> RSTSR;
+		typedef rstsr_t<0x0008C285> RSTSR_;
+		static RSTSR_ RSTSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -396,4 +416,23 @@ namespace device {
 		static rw8_t<0x0008C2AD>  DPSBKR29;
 		static rw8_t<0x0008C2AE>  DPSBKR30;
 		static rw8_t<0x0008C2AF>  DPSBKR31;
+
+	};
+	typedef system_t<void> SYSTEM;
+
+	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
+	template<class _> typename system_t<_>::BCKCR_ system_t<_>::BCKCR;
+	template<class _> typename system_t<_>::OSTDCR_ system_t<_>::OSTDCR;
+	template<class _> typename system_t<_>::SUBOSCCR_ system_t<_>::SUBOSCCR;
+
+	template<class _> typename system_t<_>::SBYCR_ system_t<_>::SBYCR;
+	template<class _> typename system_t<_>::MSTPCRA_ system_t<_>::MSTPCRA;
+	template<class _> typename system_t<_>::MSTPCRB_ system_t<_>::MSTPCRB;
+	template<class _> typename system_t<_>::MSTPCRC_ system_t<_>::MSTPCRC;
+	template<class _> typename system_t<_>::DPSBYCR_ system_t<_>::DPSBYCR;
+	template<class _> typename system_t<_>::DPSWCR_ system_t<_>::DPSWCR;
+	template<class _> typename system_t<_>::DPSIER_ system_t<_>::DPSIER;
+	template<class _> typename system_t<_>::DPSIFR_ system_t<_>::DPSIFR;
+	template<class _> typename system_t<_>::DPSIEGR_ system_t<_>::DPSIEGR;
+	template<class _> typename system_t<_>::RSTSR_ system_t<_>::RSTSR;
 }

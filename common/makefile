@@ -48,6 +48,18 @@ INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
 PROG_VERIFY = --verify
 
+ifeq ($(RX_DEF),SIG_RX621)
+  RX_CPU = RX621
+  RX_CHOOSE = -mcpu=RX600
+  LDSCRIPT	=	../../RX62x/$(DEVICE).ld
+endif
+
+ifeq ($(RX_DEF),SIG_RX62N)
+  RX_CPU = RX62N
+  RX_CHOOSE = -mcpu=RX600
+  LDSCRIPT	=	../../RX62x/$(DEVICE).ld
+endif
+
 ifeq ($(RX_DEF),SIG_RX24T)
   RX_CPU = RX24T
   RX_CHOOSE = -misa=v2

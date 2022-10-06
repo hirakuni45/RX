@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX65N, RX71M, RX66T, RX72T, RX72N LED flashing sample
+Renesas RX62N, RX24T, RX64M, RX65N, RX71M, RX66T, RX72T, RX72N LED flashing sample
 =========
 
 [Japanese](READMEja.md)
@@ -7,8 +7,10 @@ Renesas RX24T, RX64M, RX65N, RX71M, RX66T, RX72T, RX72N LED flashing sample
 Sample program of LED blinking using RX microcontroller
    
 ---
+
 ## Description
 - main.cpp
+- RX62N/Makefile (BlueBoard-RX62N_100pin)
 - RX24T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
@@ -18,6 +20,7 @@ Sample program of LED blinking using RX microcontroller
 - RX72N/Makefile
 
 ---
+
 ## Hardware preparation
 - If the base crystal is different, change the typedef parameters.
 - The Makefile declares a set frequency for each module.
@@ -32,38 +35,66 @@ Sample program of LED blinking using RX microcontroller
 - Connect the LED to the specified port.
    
 ```C++
-#if defined(SIG_RX71M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-#elif defined(SIG_RX72M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-#elif defined(SIG_RX72N)
-	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-#elif defined(SIG_RX64M)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-#elif defined(SIG_RX65N)
-	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-#elif defined(SIG_RX63T)
-	typedef device::system_io<12'000'000, 96'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORTB, device::bitpos::B7> LED;
+/// LED connection port definition
+/// LED_ASSERT = 0 when the LED is to be turned on with "Inhale: Output 0
+/// LED_ASSERT = 1 if the LED is to be turned on at output 1
+/// Memo:
+// Port outputs have different capabilities when current is drawn (suction) and when current is swept (discharge).
+// In general, "sucking in" often allows more current to flow, and it is customary to follow that convention and connect with "sucking in".
+#if defined(SIG_RX62N)
+	// BlueBoard-RX62N_100pin
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ASSERT> LED;
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	// DIY RX24T board
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ASSERT> LED;
+#elif defined(SIG_RX71M)
+	// DIY RX72M board
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
+#elif defined(SIG_RX72M)
+	// 工事中
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
+#elif defined(SIG_RX72N)
+	// RX72N Envision Kit
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ASSERT> LED;
+#elif defined(SIG_RX64M)
+	// DIY RX64M board
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
+#elif defined(SIG_RX65N)
+	// RX65N Envision Kit
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ASSERT> LED;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	// DIY RX66T board
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ASSERT> LED;
 #elif defined(SIG_RX72T)
-	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	// DIY RX72T board
+	static constexpr bool LED_ASSERT = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ASSERT> LED;
 #endif
 ```
+- For BlueBoard-RX62N_100pin,  use the red LED (D2) on the board.
 - For RX65N Envision kit, use the blue LED on the board.
 - For RX72N Envision kit, use the blue LED on the board.
-   
+
+---
+
+## Boost the master clock
+- Boost the internal instruction clock to maximum speed once the operation is transferred to the main function.
+- Also set the clock for the internal device. (The setting is in RXxxx/clock_profile.hpp)
+
+```C++
+    SYSTEM_IO::boost_master_clock();
+```
+
+---
+
 ## Resource preparation
 - None
    
@@ -77,7 +108,11 @@ Sample program of LED blinking using RX microcontroller
 ## Remarks
 - This project is basic and includes minimum settings etc. Please refer to it when starting a new project.   
    
------
+---
+
+Translated with www.DeepL.com/Translator (free version)
+
+---
    
 License
 ----

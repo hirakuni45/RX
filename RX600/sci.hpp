@@ -14,25 +14,12 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCI 定義基底クラス
+		@brief  SCI core クラス（初期の RX マイコンに備わっていた SCI）
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	txv		送信割り込みベクター
-		@param[in]	rxv		受信割り込みベクター
-		@param[in]	INT		送信終了割り込みベクター型
-		@param[in]	tev		送信終了割り込みベクター
-		@param[in]	pclk	PCLK 周波数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT tev, uint32_t pclk>
-	struct sci_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+	template <uint32_t base>
+	struct sci_core_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -45,15 +32,11 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  レシーブデータレジスタ H 、 L 、 HL (RDRH 、 RDRL 、 RDRHL)
+			@brief  トランスミットデータレジスタ (TDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro8_t<base + 0x10> RDRH_;
-		static RDRH_ RDRH;
-		typedef ro8_t<base + 0x11> RDRL_;
-		static RDRL_ RDRL;
-		typedef ro16_t<base + 0x10> RDRHL_;
-		static RDRHL_ RDRHL;
+		typedef rw8_t<base + 0x03> TDR_;
+		static TDR_ TDR;
 
 
 		//-----------------------------------------------------------------//
@@ -70,6 +53,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
+			// 非スマートカードインタフェースモード
 			bits_rw_t<io_, bitpos::B0, 2> CKS;
 			bit_rw_t <io_, bitpos::B2>	  MP;
 			bit_rw_t <io_, bitpos::B3>	  STOP;
@@ -78,30 +62,13 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  CHR;
 			bit_rw_t <io_, bitpos::B7>	  CM;
 
+			// スマートカードインタフェースモード
 			bits_rw_t<io_, bitpos::B2, 2> BCP;
 			bit_rw_t <io_, bitpos::B6>	  BLK;
 			bit_rw_t <io_, bitpos::B7>	  GM;
 		};
 		typedef smr_t<base + 0x00> SMR_;
 		static SMR_ SMR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ビットレートレジスタ (BRR)
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x01> BRR_;
-		static BRR_ BRR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	モジュレーションデューティレジスタ（MDDR）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x12> MDDR_;
-		static MDDR_ MDDR;
 
 
 		//-----------------------------------------------------------------//
@@ -132,15 +99,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  トランスミットデータレジスタ (TDR)
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x03> TDR_;
-		static TDR_ TDR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  シリアルステータスレジスタ (SSR)
 			@param[in]	ofs		レジスタ・オフセット
 		*/
@@ -166,28 +124,13 @@ namespace device {
 		static SSR_ SSR;
 
 
- 		//-----------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
-			@brief  スマートカードモードレジスタ (SCMR)
-			@param[in]	ofs		レジスタ・オフセット
+			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct scmr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> SMIF;
-			bit_rw_t<io_, bitpos::B2> SINV;
-			bit_rw_t<io_, bitpos::B3> SDIR;
-			bit_rw_t<io_, bitpos::B4> CHR1;
-			bit_rw_t<io_, bitpos::B7> BCP2;
-		};
-		typedef scmr_t<base + 0x06> SCMR_;
-		static SCMR_ SCMR;
+		typedef rw8_t<base + 0x01> BRR_;
+		static BRR_ BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -205,14 +148,140 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> ACS0;
-			bit_rw_t<io_, bitpos::B2> BRME;
+			bit_rw_t<io_, bitpos::B2> BRME;		// sci[g]
+
 			bit_rw_t<io_, bitpos::B4> ABCS;
-			bit_rw_t<io_, bitpos::B5> NFEN;
-			bit_rw_t<io_, bitpos::B6> BGDM;
-			bit_rw_t<io_, bitpos::B7> RXDESEL;
+			bit_rw_t<io_, bitpos::B5> NFEN;		// sci[g]
+			bit_rw_t<io_, bitpos::B6> BGDM;		// sci[g]
+			bit_rw_t<io_, bitpos::B7> RXDESEL;	// sci[g]
 		};
 		typedef semr_t<base + 0x07> SEMR_;
 		static SEMR_ SEMR;
+	};
+	template <uint32_t base> typename sci_core_t<base>::RDR_ sci_core_t<base>::RDR;
+	template <uint32_t base> typename sci_core_t<base>::TDR_ sci_core_t<base>::TDR;
+	template <uint32_t base> typename sci_core_t<base>::SMR_ sci_core_t<base>::SMR;
+	template <uint32_t base> typename sci_core_t<base>::SCR_ sci_core_t<base>::SCR;
+	template <uint32_t base> typename sci_core_t<base>::SSR_ sci_core_t<base>::SSR;
+	template <uint32_t base> typename sci_core_t<base>::BRR_ sci_core_t<base>::BRR;
+	template <uint32_t base> typename sci_core_t<base>::SEMR_ sci_core_t<base>::SEMR;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCIa 定義クラス
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	txv		送信ベクター
+		@param[in]	rxv		受信ベクター
+		@param[in]	tev		送信終了ベクター
+		@param[in]	pclk	PCLK 周波数
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
+		typename INT, INT tev, uint32_t pclk>
+	struct scia_t : public sci_core_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr auto PCLK = pclk;	///< PCLK 周波数
+
+		static constexpr bool SEMR_BRME = false;	///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = false;	///< BGDM（ボーレート倍速）
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	モジュレーションデューティレジスタ（MDDR）ダミー
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_null_t<0x00000000> MDDR_;
+		static MDDR_ MDDR;
+
+
+ 		//-----------------------------------------------------------------//
+		/*!
+			@brief  スマートカードモードレジスタ (SCMR)
+			@param[in]	ofs		レジスタ・オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct scmr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> SMIF;
+
+			bit_rw_t<io_, bitpos::B2> SINV;
+			bit_rw_t<io_, bitpos::B3> SDIR;
+
+			bit_rw_t<io_, bitpos::B7> BCP2;
+		};
+		typedef scmr_t<base + 0x06> SCMR_;
+		static SCMR_ SCMR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCI core2 クラス
+		@param[in]	base	ベース・アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct sci_core2_t {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  レシーブデータレジスタ H 、 L 、 HL (RDRH 、 RDRL 、 RDRHL)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro8_t<base + 0x10> RDRH_;
+		static RDRH_ RDRH;
+		typedef ro8_t<base + 0x11> RDRL_;
+		static RDRL_ RDRL;
+		typedef ro16_t<base + 0x10> RDRHL_;
+		static RDRHL_ RDRHL;
+
+
+ 		//-----------------------------------------------------------------//
+		/*!
+			@brief  スマートカードモードレジスタ (SCMR)
+			@param[in]	ofs		レジスタ・オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct scmr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> SMIF;
+
+			bit_rw_t<io_, bitpos::B2> SINV;
+			bit_rw_t<io_, bitpos::B3> SDIR;
+			bit_rw_t<io_, bitpos::B4> CHR1;
+
+			bit_rw_t<io_, bitpos::B7> BCP2;
+		};
+		typedef scmr_t<base + 0x06> SCMR_;
+		static SCMR_ SCMR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	モジュレーションデューティレジスタ（MDDR）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<base + 0x12> MDDR_;
+		static MDDR_ MDDR;
 
 
 		//-----------------------------------------------------------------//
@@ -347,42 +416,17 @@ namespace device {
 		typedef spmr_t<base + 0x0D> SPMR_;
 		static SPMR_ SPMR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::RDR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::RDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRH_ sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRH;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRL_ sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRL;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRHL_ sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRHL;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SMR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SMR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::BRR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::BRR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::MDDR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::MDDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SCR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::TDR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::TDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SSR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SCMR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SCMR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SEMR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SEMR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SNFR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SNFR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR1_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR2_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR3_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR3;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SISR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SISR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
-		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SPMR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SPMR;
+	template <uint32_t base> typename sci_core2_t<base>::RDRH_ sci_core2_t<base>::RDRH;
+	template <uint32_t base> typename sci_core2_t<base>::RDRL_ sci_core2_t<base>::RDRL;
+	template <uint32_t base> typename sci_core2_t<base>::RDRHL_ sci_core2_t<base>::RDRHL;
+	template <uint32_t base> typename sci_core2_t<base>::SCMR_ sci_core2_t<base>::SCMR;
+	template <uint32_t base> typename sci_core2_t<base>::MDDR_ sci_core2_t<base>::MDDR;
+	template <uint32_t base> typename sci_core2_t<base>::SNFR_ sci_core2_t<base>::SNFR;
+	template <uint32_t base> typename sci_core2_t<base>::SIMR1_ sci_core2_t<base>::SIMR1;
+	template <uint32_t base> typename sci_core2_t<base>::SIMR2_ sci_core2_t<base>::SIMR2;
+	template <uint32_t base> typename sci_core2_t<base>::SIMR3_ sci_core2_t<base>::SIMR3;
+	template <uint32_t base> typename sci_core2_t<base>::SISR_ sci_core2_t<base>::SISR;
+	template <uint32_t base> typename sci_core2_t<base>::SPMR_ sci_core2_t<base>::SPMR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -398,7 +442,16 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
 		typename INT, INT tev, uint32_t pclk>
-	struct scih_t : public sci_t<base, per, txv, rxv, INT, tev, pclk> {
+	struct scih_t : public sci_core_t<base>, sci_core2_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+
+		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -415,7 +468,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> ESME;
 		};
-		static esmer_t ESMER;
+		typedef esmer_t ESMER_;
+		static ESMER_ ESMER;
 
 
 		//-----------------------------------------------------------------//
@@ -435,8 +489,13 @@ namespace device {
 			bit_ro_t<io_, bitpos::B2> RXDSF;
 			bit_rw_t<io_, bitpos::B3> BRME;
 		};
-		static cr0_t CR0;
+		typedef cr0_t CR0_;
+		static CR0_ CR0;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename scih_t<base, per, txv, rxv, INT, tev, pclk>::ESMER_ scih_t<base, per, txv, rxv, INT, tev, pclk>::ESMER;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename scih_t<base, per, txv, rxv, INT, tev, pclk>::CR0_ scih_t<base, per, txv, rxv, INT, tev, pclk>::CR0;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -452,7 +511,16 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
 		typename INT, INT tev, uint32_t pclk>
-	struct scii_t : public sci_t<base, per, txv, rxv, INT, tev, pclk> {
+	struct scii_t : public sci_core_t<base>, sci_core2_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+
+		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -471,7 +539,8 @@ namespace device {
 			bit_ro_t <io_, bitpos::B13>	  ORER;
 			bit_ro_t <io_, bitpos::B14>	  RDF;
 		};
-		static frdr_t FRDR;
+		typedef frdr_t FRDR_;
+		static FRDR_ FRDR;
 
 
 		//-----------------------------------------------------------------//
@@ -486,8 +555,13 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 9> TDAT;
 			bit_rw_t <io_, bitpos::B9>	  MPBT;
 		};
-		static ftdr_t FTDR;
+		typedef ftdr_t FTDR_;
+		static FTDR_ FTDR;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename scii_t<base, per, txv, rxv, INT, tev, pclk>::FRDR_ scii_t<base, per, txv, rxv, INT, tev, pclk>::FRDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename scii_t<base, per, txv, rxv, INT, tev, pclk>::FTDR_ scii_t<base, per, txv, rxv, INT, tev, pclk>::FTDR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -503,7 +577,16 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
 		typename INT, INT tev, uint32_t pclk>
-	struct scig_t : public sci_t<base, per, txv, rxv, INT, tev, pclk> {
+	struct scig_t : public sci_core_t<base>, sci_core2_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+
+		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
 	};
 
 
@@ -520,11 +603,33 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
 		typename INT, INT tev, uint32_t pclk>
-	struct scij_t : public sci_t<base, per, txv, rxv, INT, tev, pclk> {
+	struct scij_t : public sci_core_t<base>, sci_core2_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+
+		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
 	};
 
 
-#if defined(SIG_RX24T)
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef scia_t<0x00088240, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
+		ICU::VECTOR, ICU::VECTOR::TEI0, clock_profile::PCLK> SCI0;
+	typedef scia_t<0x00088248, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+		ICU::VECTOR, ICU::VECTOR::TEI1, clock_profile::PCLK> SCI1;
+	typedef scia_t<0x00088250, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
+		ICU::VECTOR, ICU::VECTOR::TEI2, clock_profile::PCLK> SCI2;
+	typedef scia_t<0x00088258, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
+		ICU::VECTOR, ICU::VECTOR::TEI3, clock_profile::PCLK> SCI3;
+	typedef scia_t<0x00088268, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+		ICU::VECTOR, ICU::VECTOR::TEI5, clock_profile::PCLK> SCI5;
+	typedef scia_t<0x00088270, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+		ICU::VECTOR, ICU::VECTOR::TEI6, clock_profile::PCLK> SCI6;
+#elif defined(SIG_RX24T)
 	typedef scig_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR, ICU::VECTOR::TEI1, clock_profile::PCLKB> SCI1;
 	typedef scig_t<0x0008A020, peripheral::SCI1C, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,

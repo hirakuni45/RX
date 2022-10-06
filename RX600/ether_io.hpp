@@ -684,14 +684,14 @@ namespace device {
 		{
 			if(flag) {
 				// Set Ethernet interrupt level and enable
-				ICU::IPR.GROUPAL1 = intr_level_;
-				ICU::IER.GROUPAL1 = 1;
+				ICU::IPR[ICU::VECTOR::GROUPAL1] = intr_level_;
+				ICU::IER.enable(ICU::VECTOR::GROUPAL1);
 				ICU::GENAL1.EN4   = 1;
 			} else {
 				// Disable Ethernet interrupt.
 				ICU::GENAL1.EN4   = 0;
-				ICU::IER.GROUPAL1 = 0;
-				ICU::IPR.GROUPAL1 = 0;  // intr level
+				ICU::IER.enable(ICU::VECTOR::GROUPAL1, false);
+				ICU::IPR[ICU::VECTOR::GROUPAL1] = 0;
 			}
 		}
 
@@ -1060,8 +1060,8 @@ namespace device {
 		{
 			// Disable Ethernet interrupt.
 			ICU::GENAL1.EN4 = 0;
-			ICU::IER.GROUPAL1 = 0;
-			ICU::IPR.GROUPAL1 = 0;  // intr level
+			ICU::IER.enable(ICU::VECTOR::GROUPAL1, false);
+			ICU::IPR[ICU::VECTOR::GROUPAL1] = 0;  // intr level
 
 			// Disable TE and RE
 			ETHRC::ECMR = 0x00000000;

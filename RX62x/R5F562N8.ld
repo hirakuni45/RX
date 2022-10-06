@@ -1,7 +1,8 @@
+/* -*- tab-width : 4 -*- */
 /*!	@file
-	@brief	RX621/RX62N R5F56218 リンカー・スクリプト
+	@brief	RX62N R5F562N8 リンカー・スクリプト
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -13,12 +14,12 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX600 chip.  */
+/* This memory layout corresponds to the smallest predicted RX62N8 chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00017E00 /* 96K - 512(USP + SP) */
-	USTACK (w) : ORIGIN = 0x00017EC0, LENGTH = 4 /* ustack 448 bytes */
-	ISTACK (w) : ORIGIN = 0x00018000, LENGTH = 4 /* istack 64 bytes  */
-	ROM (w)    : ORIGIN = 0xFFF80000, LENGTH = 0x0007FFD0 /* 512k - 0x30(.fvectors) */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00017A00 /* 96K - stack_size (0x600) */
+	USTACK (w) : ORIGIN = 0x00017E00, LENGTH = 4 /* ustack 1024 bytes */
+	ISTACK (w) : ORIGIN = 0x00018000, LENGTH = 4 /* istack 512 bytes  */
+	ROM (w)    : ORIGIN = 0xFFF80000, LENGTH = 0x0007FFD0 /* 512K */
 }
 
 SECTIONS
@@ -109,6 +110,8 @@ SECTIONS
     PROVIDE (edata = .);
     PROVIDE (__dataend = .);
   } > RAM AT> ROM
+
+  PROVIDE (__mainramend = ORIGIN(RAM) + LENGTH(RAM));
 
   /* Note that __romdatacopysize may be ZERO for the simulator, which
      knows how to intialize RAM directly.  It should ONLY be used for

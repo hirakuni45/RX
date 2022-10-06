@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	IRQ マネージャー @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,36 +42,36 @@ namespace device {
 		{
 			switch(PER) {
 			case peripheral::IRQ0:
-				ICU::IER.IRQ0 = 0;
-				ICU::IR.IRQ0  = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ0, false);
+				ICU::IR[ICU::VECTOR::IRQ0] = 0;
 				break;
 			case peripheral::IRQ1:
-				ICU::IER.IRQ1 = 0;
-				ICU::IR.IRQ1  = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ1, false);
+				ICU::IR[ICU::VECTOR::IRQ1] = 0;
 				break;
 			case peripheral::IRQ2:
-				ICU::IER.IRQ2 = 0;
-				ICU::IR.IRQ2  = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ2, false);
+				ICU::IR[ICU::VECTOR::IRQ2] = 0;
 				break;
 			case peripheral::IRQ3:
-				ICU::IER.IRQ3 = 0;
-				ICU::IR.IRQ3  = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ3, false);
+				ICU::IR[ICU::VECTOR::IRQ3] = 0;
 				break;
 			case peripheral::IRQ4:
-				ICU::IER.IRQ4 = 0;
-				ICU::IR.IRQ4  = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ4, false);
+				ICU::IR[ICU::VECTOR::IRQ4] = 0;
 				break;
 			case peripheral::IRQ5:
-				ICU::IER.IRQ5 = 0;
-				ICU::IR.IRQ5  = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ5, false);
+				ICU::IR[ICU::VECTOR::IRQ5] = 0;
 				break;
 			case peripheral::IRQ6:
-				ICU::IER.IRQ6 = 0;
-				ICU::IR.IRQ6  = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ6, false);
+				ICU::IR[ICU::VECTOR::IRQ6] = 0;
 				break;
 			case peripheral::IRQ7:
-				ICU::IER.IRQ7 = 0;
-				ICU::IR.IRQ7  = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ7, false);
+				ICU::IR[ICU::VECTOR::IRQ7] = 0;
 				break;
 			}
 			task_();
@@ -158,37 +158,37 @@ namespace device {
 		{
 			switch(PER) {
 			case peripheral::IRQ0:
-				ICU::IR.IRQ0  = 0;
-				ICU::IER.IRQ0 = ena;
+				ICU::IR[ICU::VECTOR::IRQ0] = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ0, ena);
 				break;
 			case peripheral::IRQ1:
-				ICU::IR.IRQ1  = 0;
-				ICU::IER.IRQ1 = ena;
+				ICU::IR[ICU::VECTOR::IRQ1] = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ1, ena);
 				break;
 			case peripheral::IRQ2:
-				ICU::IR.IRQ2  = 0;
-				ICU::IER.IRQ2 = ena;
+				ICU::IR[ICU::VECTOR::IRQ2] = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ2, ena);
 				break;
 			case peripheral::IRQ3:
-				ICU::IR.IRQ3  = 0;
-				ICU::IER.IRQ3 = ena;
+				ICU::IR[ICU::VECTOR::IRQ3] = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ3, ena);
 				break;
 			case peripheral::IRQ4:
-				ICU::IR.IRQ4  = 0;
+				ICU::IR[ICU::VECTOR::IRQ4] = 0;
 				ICU::IRQFLTE0.FLTEN4 = 1;
-				ICU::IER.IRQ4 = ena;
+				ICU::IER.enable(ICU::VECTOR::IRQ4, ena);
 				break;
 			case peripheral::IRQ5:
-				ICU::IR.IRQ5  = 0;
-				ICU::IER.IRQ5 = ena;
+				ICU::IR[ICU::VECTOR::IRQ5] = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ5, ena);
 				break;
 			case peripheral::IRQ6:
-				ICU::IR.IRQ6  = 0;
-				ICU::IER.IRQ6 = ena;
+				ICU::IR[ICU::VECTOR::IRQ6] = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ6, ena);
 				break;
 			case peripheral::IRQ7:
-				ICU::IR.IRQ7  = 0;
-				ICU::IER.IRQ7 = ena;
+				ICU::IR[ICU::VECTOR::IRQ7] = 0;
+				ICU::IER.enable(ICU::VECTOR::IRQ7, ena);
 				break;
 			}
 		}

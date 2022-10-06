@@ -58,16 +58,16 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PROTOCOL : uint8_t {
-			B7_N_1S,	///< 7 ビット、No-Parity、1 Stop Bit
+			B7_N_1S,	///< 7 ビット、No-Parity、 1 Stop Bit
 			B7_E_1S,	///< 7 ビット、Even(偶数)、1 Stop Bit
 			B7_O_1S,	///< 7 ビット、Odd (奇数)、1 Stop Bit
-			B7_N_2S,	///< 7 ビット、No-Parity、2 Stop Bits
+			B7_N_2S,	///< 7 ビット、No-Parity、 2 Stop Bits
 			B7_E_2S,	///< 7 ビット、Even(偶数)、2 Stop Bits
 			B7_O_2S,	///< 7 ビット、Odd (奇数)、2 Stop Bits
-			B8_N_1S,	///< 8 ビット、No-Parity、1 Stop Bit
+			B8_N_1S,	///< 8 ビット、No-Parity、 1 Stop Bit
 			B8_E_1S,	///< 8 ビット、Even(偶数)、1 Stop Bit
 			B8_O_1S,	///< 8 ビット、Odd (奇数)、1 Stop Bit
-			B8_N_2S,	///< 8 ビット、No-Parity、2 Stop Bits
+			B8_N_2S,	///< 8 ビット、No-Parity、 2 Stop Bits
 			B8_E_2S,	///< 8 ビット、Even(偶数)、2 Stop Bits
 			B8_O_2S,	///< 8 ビット、Odd (奇数)、2 Stop Bits
 		};
@@ -317,59 +317,79 @@ namespace device {
 			}
 
 			baud_ = baud;
-			uint32_t brr = SCI::PCLK / 8 / baud;
+			// BGDM が使える場合、1/8 スタート
+			uint32_t mtx = 8;
+			uint32_t limit = 1024;
+			if(!SCI::SEMR_BGDM) {  // BGDM が使えない場合 1/16 スタート
+				mtx = 16;
+				limit = 512;
+			}
+			uint32_t brr = SCI::PCLK / mtx / baud;
 			uint8_t cks = 0;
-			while(brr > 1024) {
+			while(brr > limit) {
 				brr >>= 2;
 				++cks;
+				if(cks >= 4) {  // 範囲外の速度
+					port_map::turn(SCI::PERIPHERAL, false, PSEL);
+					power_mgr::turn(SCI::PERIPHERAL, false);
+					return false;
+				}
 			}
-			uint32_t mtx = 8;
+
+			// BGDM フラグの設定
 			bool bgdm = true;
-			if(brr >= 512) { brr >>= 1; bgdm = false; mtx <<= 1; }
+			if(SCI::SEMR_BGDM) {
+				if(brr > 512) { brr >>= 1; bgdm = false; mtx <<= 1; }
+			} else {
+				bgdm = false;
+			}
 			bool abcs = true;
-			if(brr >= 256) { brr >>= 1; abcs = false; mtx <<= 1;}
-			uint32_t rate = SCI::PCLK / mtx / brr / (1 << (cks * 2));
-			uint32_t mddr = (baud_ << 9) / rate;
-			++mddr;
-			mddr >>= 1;
+			if(brr > 256) { brr >>= 1; abcs = false; mtx <<= 1; }
 
 			set_intr_(level_);
 
 			bool stop = 0;
 			bool pm = 0;
 			bool pe = 0;
+			bool seven = 0;
 			switch(prot) {
 			case PROTOCOL::B7_N_1S:
+				seven = 1;
 			case PROTOCOL::B8_N_1S:
 				stop = 0;
 				pm = 0;
 				pe = 0;
 				break;
 			case PROTOCOL::B7_E_1S:
+				seven = 1;
 			case PROTOCOL::B8_E_1S:
 				stop = 0;
 				pm = 0;
 				pe = 1;
 				break;
 			case PROTOCOL::B7_O_1S:
+				seven = 1;
 			case PROTOCOL::B8_O_1S:
 				stop = 0;
 				pm = 1;
 				pe = 1;
 				break;
 			case PROTOCOL::B7_N_2S:
+				seven = 1;
 			case PROTOCOL::B8_N_2S:
 				stop = 1;
 				pm = 0;
 				pe = 0;
 				break;
 			case PROTOCOL::B7_E_2S:
+				seven = 1;
 			case PROTOCOL::B8_E_2S:
 				stop = 1;
 				pm = 0;
 				pe = 1;
 				break;
 			case PROTOCOL::B7_O_2S:
+				seven = 1;
 			case PROTOCOL::B8_O_2S:
 				stop = 1;
 				pm = 1;
@@ -378,16 +398,25 @@ namespace device {
 			default:
 				return false;
 			}
-			bool seven = 0;
-			if(static_cast<uint8_t>(prot) < 6) seven = 1;
 			SCI::SMR = SCI::SMR.CKS.b(cks) | SCI::SMR.STOP.b(stop)
 					 | SCI::SMR.PM.b(pm) | SCI::SMR.PE.b(pe) | SCI::SMR.CHR.b(seven);
+
 			bool brme = false;
-			if(mddr >= 128 && mddr < 256) brme = true;
+			if(SCI::SEMR_BRME) {  // 微調整機能が使える場合
+				uint32_t rate = SCI::PCLK / mtx / brr / (1 << (cks * 2));
+				uint32_t mddr = (baud_ << 9) / rate;
+				if(mddr >= 128 && mddr < 256) {  // 微調整を行う場合
+					++mddr;
+					mddr >>= 1;
+					SCI::MDDR = mddr;
+					brme = true;
+				}
+			}
+
 			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b(brme) | SCI::SEMR.BGDM.b(bgdm);
-			if(brr) --brr;
+
+			if(brr > 0) --brr;
 			SCI::BRR = brr;
-			SCI::MDDR = mddr;
 
 			if(level > 0) {
 				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b();
@@ -436,10 +465,14 @@ namespace device {
 				uint32_t brr = SCI::BRR();
 				uint32_t cks = 1 << (SCI::SMR.CKS() * 2);
 				uint32_t mtx = 8;
-				if(!SCI::SEMR.BGDM()) mtx <<= 1;
+				if(SCI::SEMR_BGDM) {
+					if(!SCI::SEMR.BGDM()) mtx <<= 1;
+				} else {
+					mtx <<= 1;
+				}
 				if(!SCI::SEMR.ABCS()) mtx <<= 1;
 				auto baud = SCI::PCLK / mtx / cks / (brr + 1);
-				if(SCI::SEMR.BRME()) {
+				if(SCI::SEMR_BRME && SCI::SEMR.BRME()) {
 					baud *= SCI::MDDR();
 					baud /= 256;
 				}

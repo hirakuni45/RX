@@ -1,9 +1,9 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	ＲＸグループ・ICU ベース定義（共通部分）
+	@brief	RX グループ・ICU ベース定義（共通部分）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,11 +12,11 @@
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  RX 割り込みコントローラ・ベース・クラス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
 	struct icu_base_t {
 
@@ -34,8 +34,8 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0,  8>  FVCT;
-			bit_rw_t <io_, bitpos::B15>     FIEN;
+			bits_rw_t<io_, bitpos::B0, 8> FVCT;
+			bit_rw_t <io_, bitpos::B15>   FIEN;
 		};
 		typedef fir_t<0x000872F0> FIR_;
 		static FIR_ FIR;
@@ -55,35 +55,74 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>     SWINT;
+			bit_rw_t <io_, bitpos::B0>  SWINT;
 		};
 		typedef swintr_t<0x000872E0> SWINTR_;
 		static SWINTR_ SWINTR;
 
 
-#if defined(RX_DMAC_)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	DTC 転送要求許可レジスタ n (DTCERn)
+			@param[in]	base	ベースアドレス
+			@param[in]	T		ベクター型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base, typename T>
+		struct dtcer_t : public rw8_index_t<base> {
+			typedef rw8_index_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  DTCE;
+
+			void set_index(T vector)
+			{
+				io_::index_ = static_cast<uint32_t>(vector);
+			}
+
+			dtcer_t& operator[] (T vector)
+			{
+				set_index(vector);
+				return *this;
+			}
+
+		private:
+			void operator = (const dtcer_t& t) { };  // 代入は禁止
+		};
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  DMAC 起動要因選択レジスタ m（DMRSRm）（m = DMAC チャネル番号）
+			@param[in]	base	ベースアドレス
+			@param[in]	num		最大数
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00087400> DMRSR0_;
-		static DMRSR0_ DMRSR0;
-		typedef rw8_t<0x00087404> DMRSR1_;
-		static DMRSR1_ DMRSR1;
-		typedef rw8_t<0x00087408> DMRSR2_;
-		static DMRSR2_ DMRSR2;
-		typedef rw8_t<0x0008740C> DMRSR3_;
-		static DMRSR3_ DMRSR3;
-		typedef rw8_t<0x00087410> DMRSR4_;
-		static DMRSR4_ DMRSR4;
-		typedef rw8_t<0x00087414> DMRSR5_;
-		static DMRSR5_ DMRSR5;
-		typedef rw8_t<0x00087418> DMRSR6_;
-		static DMRSR6_ DMRSR6;
-		typedef rw8_t<0x0008741C> DMRSR7_;
-		static DMRSR7_ DMRSR7;
-#endif
+		template <uint32_t base, uint32_t num>
+		struct dmrsr_t : public rw8_index_t<base> {
+			typedef rw8_index_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t index)
+			{
+				io_::index_ = index;
+			}
+
+			dmrsr_t& operator[] (uint32_t index)
+			{
+				set_index(index);
+				return *this;
+			}
+
+		private:
+			void operator = (const dmrsr_t& t) { };  // 代入は禁止
+		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -381,17 +420,6 @@ namespace device {
 	template<class _> typename icu_base_t<_>::FIR_ icu_base_t<_>::FIR;
 	template<class _> typename icu_base_t<_>::SWINTR_ icu_base_t<_>::SWINTR;
 
-#if defined(RX_DMAC_)
-	template<class _> typename icu_base_t<_>::DMRSR0_ icu_base_t<_>::DMRSR0;
-	template<class _> typename icu_base_t<_>::DMRSR1_ icu_base_t<_>::DMRSR1;
-	template<class _> typename icu_base_t<_>::DMRSR2_ icu_base_t<_>::DMRSR2;
-	template<class _> typename icu_base_t<_>::DMRSR3_ icu_base_t<_>::DMRSR3;
-	template<class _> typename icu_base_t<_>::DMRSR4_ icu_base_t<_>::DMRSR4;
-	template<class _> typename icu_base_t<_>::DMRSR5_ icu_base_t<_>::DMRSR5;
-	template<class _> typename icu_base_t<_>::DMRSR6_ icu_base_t<_>::DMRSR6;
-	template<class _> typename icu_base_t<_>::DMRSR7_ icu_base_t<_>::DMRSR7;
-#endif
-
 	template<class _> typename icu_base_t<_>::IRQCR0_ icu_base_t<_>::IRQCR0;
 	template<class _> typename icu_base_t<_>::IRQCR1_ icu_base_t<_>::IRQCR1;
 	template<class _> typename icu_base_t<_>::IRQCR2_ icu_base_t<_>::IRQCR2;
@@ -419,5 +447,5 @@ namespace device {
 	template<class _> typename icu_base_t<_>::NMIFLTE_ icu_base_t<_>::NMIFLTE;
 	template<class _> typename icu_base_t<_>::NMIFLTC_ icu_base_t<_>::NMIFLTC;
 
-	typedef icu_base_t<void> icu_base;
+	typedef icu_base_t<void> ICU_BASE;
 }
