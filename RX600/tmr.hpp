@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・8 ビットタイマ（TMR）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,16 +21,17 @@ namespace device {
 		@param[in]	cmia	CMIA 型割り込みベクター
 		@param[in]	cmib	CMIB 型割り込みベクター
 		@param[in]	ovi		OVI 型割り込みベクター
+		@param[in]	clk		駆動クロック
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
 	struct tmr_t {
 
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto CMIA_VEC = cmia;		///< CMIA 割り込みベクタ
-		static constexpr auto CMIB_VEC = cmib;		///< CMIB 割り込みベクタ
-		static constexpr auto OVI_VEC  = ovi;		///< OVI 割り込みベクタ
-		static constexpr auto PCLK = clock_profile::PCLKB;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto CMIA_VEC = cmia;	///< CMIA 割り込みベクタ
+		static constexpr auto CMIB_VEC = cmib;	///< CMIB 割り込みベクタ
+		static constexpr auto OVI_VEC  = ovi;	///< OVI 割り込みベクタ
+		static constexpr auto PCLK = clk;		///< PCLK 周波数
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -103,16 +104,16 @@ namespace device {
 		typedef tccr_t<base + 0x0A> TCCR_;
 		static  TCCR_ TCCR;
 	};
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi>::TCNT_ tmr_t<base, per, INT, cmia, cmib, ovi>::TCNT;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi>::TCORA_ tmr_t<base, per, INT, cmia, cmib, ovi>::TCORA;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi>::TCORB_ tmr_t<base, per, INT, cmia, cmib, ovi>::TCORB;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi>::TCR_ tmr_t<base, per, INT, cmia, cmib, ovi>::TCR;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi>::TCCR_ tmr_t<base, per, INT, cmia, cmib, ovi>::TCCR;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCNT_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCNT;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCORA_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCORA;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCORB_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCORB;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCR_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCR;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCCR_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCCR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -124,10 +125,11 @@ namespace device {
 		@param[in]	cmia	CMIA 型割り込みベクター
 		@param[in]	cmib	CMIB 型割り込みベクター
 		@param[in]	ovi		OVI 型割り込みベクター
+		@param[in]	clk		駆動クロック
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-	struct tmr0246_t : public tmr_t<base, per, INT, cmia, cmib, ovi> {
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+	struct tmr0246_t : public tmr_t<base, per, INT, cmia, cmib, ovi, clk> {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -177,14 +179,14 @@ namespace device {
 		typedef tcsr_t<base + 0x02> TCSR_;
 		static  TCSR_ TCSR;
 	};
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr0246_t<base, per, INT, cmia, cmib, ovi>::TCNT16_ tmr0246_t<base, per, INT, cmia, cmib, ovi>::TCNT16;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr0246_t<base, per, INT, cmia, cmib, ovi>::TCORA16_ tmr0246_t<base, per, INT, cmia, cmib, ovi>::TCORA16;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr0246_t<base, per, INT, cmia, cmib, ovi>::TCORB16_ tmr0246_t<base, per, INT, cmia, cmib, ovi>::TCORB16;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr0246_t<base, per, INT, cmia, cmib, ovi>::TCSR_ tmr0246_t<base, per, INT, cmia, cmib, ovi>::TCSR;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCNT16_ tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCNT16;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCORA16_ tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCORA16;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCORB16_ tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCORB16;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR_ tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -196,10 +198,11 @@ namespace device {
 		@param[in]	cmia	CMIA 型割り込みベクター
 		@param[in]	cmib	CMIB 型割り込みベクター
 		@param[in]	ovi		OVI 型割り込みベクター
+		@param[in]	clk		駆動クロック
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-	struct tmr1357_t : public tmr_t<base, per, INT, cmia, cmib, ovi> {
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+	struct tmr1357_t : public tmr_t<base, per, INT, cmia, cmib, ovi, clk> {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -221,37 +224,43 @@ namespace device {
 		typedef tcsr_t<base + 0x02> TCSR_;
 		static  TCSR_ TCSR;
 	};
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi>
-		typename tmr1357_t<base, per, INT, cmia, cmib, ovi>::TCSR_ tmr1357_t<base, per, INT, cmia, cmib, ovi>::TCSR;
+	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
+		typename tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR_ tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR;
 
-
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR_SELB,
-		ICU::VECTOR_SELB::CMIA0, ICU::VECTOR_SELB::CMIB0, ICU::VECTOR_SELB::OVI0> TMR0;
-	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR_SELB,
-		ICU::VECTOR_SELB::CMIA1, ICU::VECTOR_SELB::CMIB1, ICU::VECTOR_SELB::OVI1> TMR1;
-	typedef tmr0246_t<0x00088210, peripheral::TMR2, ICU::VECTOR_SELB,
-		ICU::VECTOR_SELB::CMIA2, ICU::VECTOR_SELB::CMIB2, ICU::VECTOR_SELB::OVI2> TMR2;
-	typedef tmr1357_t<0x00088211, peripheral::TMR3, ICU::VECTOR_SELB,
-		ICU::VECTOR_SELB::CMIA3, ICU::VECTOR_SELB::CMIB3, ICU::VECTOR_SELB::OVI3> TMR3;
-#endif
-
-#if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#if defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR,
-		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0> TMR0;
+		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLK> TMR0;
 	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR,
-		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1> TMR1;
+		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1, clock_profile::PCLK> TMR1;
 	typedef tmr0246_t<0x00088210, peripheral::TMR2, ICU::VECTOR,
-		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2> TMR2;
+		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLK> TMR2;
 	typedef tmr1357_t<0x00088211, peripheral::TMR3, ICU::VECTOR,
-		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3> TMR3;
+		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLK> TMR3;
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR_SELB,
+		ICU::VECTOR_SELB::CMIA0, ICU::VECTOR_SELB::CMIB0, ICU::VECTOR_SELB::OVI0, clock_profile::PCLKB> TMR0;
+	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR_SELB,
+		ICU::VECTOR_SELB::CMIA1, ICU::VECTOR_SELB::CMIB1, ICU::VECTOR_SELB::OVI1, clock_profile::PCLKB> TMR1;
+	typedef tmr0246_t<0x00088210, peripheral::TMR2, ICU::VECTOR_SELB,
+		ICU::VECTOR_SELB::CMIA2, ICU::VECTOR_SELB::CMIB2, ICU::VECTOR_SELB::OVI2, clock_profile::PCLKB> TMR2;
+	typedef tmr1357_t<0x00088211, peripheral::TMR3, ICU::VECTOR_SELB,
+		ICU::VECTOR_SELB::CMIA3, ICU::VECTOR_SELB::CMIB3, ICU::VECTOR_SELB::OVI3, clock_profile::PCLKB> TMR3;
+#elif defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR,
+		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
+	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR,
+		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1, clock_profile::PCLKB> TMR1;
+	typedef tmr0246_t<0x00088210, peripheral::TMR2, ICU::VECTOR,
+		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLKB> TMR2;
+	typedef tmr1357_t<0x00088211, peripheral::TMR3, ICU::VECTOR,
+		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLKB> TMR3;
 	typedef tmr0246_t<0x00088220, peripheral::TMR4, ICU::VECTOR,
-		ICU::VECTOR::CMIA4, ICU::VECTOR::CMIB4, ICU::VECTOR::OVI4> TMR4;
+		ICU::VECTOR::CMIA4, ICU::VECTOR::CMIB4, ICU::VECTOR::OVI4, clock_profile::PCLKB> TMR4;
 	typedef tmr1357_t<0x00088221, peripheral::TMR5, ICU::VECTOR,
-		ICU::VECTOR::CMIA5, ICU::VECTOR::CMIB5, ICU::VECTOR::OVI5> TMR5;
+		ICU::VECTOR::CMIA5, ICU::VECTOR::CMIB5, ICU::VECTOR::OVI5, clock_profile::PCLKB> TMR5;
 	typedef tmr0246_t<0x00088230, peripheral::TMR6, ICU::VECTOR,
-		ICU::VECTOR::CMIA6, ICU::VECTOR::CMIB6, ICU::VECTOR::OVI6> TMR6;
+		ICU::VECTOR::CMIA6, ICU::VECTOR::CMIB6, ICU::VECTOR::OVI6, clock_profile::PCLKB> TMR6;
 	typedef tmr1357_t<0x00088231, peripheral::TMR7, ICU::VECTOR,
-		ICU::VECTOR::CMIA7, ICU::VECTOR::CMIB7, ICU::VECTOR::OVI7> TMR7;
+		ICU::VECTOR::CMIA7, ICU::VECTOR::CMIB7, ICU::VECTOR::OVI7, clock_profile::PCLKB> TMR7;
 #endif
 }

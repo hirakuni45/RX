@@ -19,14 +19,16 @@ namespace device {
 		@param[in]	per		ペリフェラル
 		@param[in]	VEC		割り込みベクター型
 		@param[in]	ivec	割り込みベクター
+		@param[in]	clk		駆動クロック
+
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec, uint32_t clk>
 	struct cmt_t {
 
-		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
-		static constexpr auto IVEC = ivec;					///< 割り込みベクター
-		static constexpr auto PCLK = clock_profile::PCLKB;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto IVEC = ivec;		///< 割り込みベクター
+		static constexpr auto PCLK = clk;		///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -133,27 +135,32 @@ namespace device {
 			} 			
 		}
 	};
-	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
-		typename cmt_t<base, per, VEC, ivec>::CMSTR0_ cmt_t<base, per, VEC, ivec>::CMSTR0;
-	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
-		typename cmt_t<base, per, VEC, ivec>::CMSTR1_ cmt_t<base, per, VEC, ivec>::CMSTR1;
-	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
-		typename cmt_t<base, per, VEC, ivec>::CMCR_ cmt_t<base, per, VEC, ivec>::CMCR;
-	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
-		typename cmt_t<base, per, VEC, ivec>::CMCNT_ cmt_t<base, per, VEC, ivec>::CMCNT;
-	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
-		typename cmt_t<base, per, VEC, ivec>::CMCOR_ cmt_t<base, per, VEC, ivec>::CMCOR;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec, uint32_t clk>
+		typename cmt_t<base, per, VEC, ivec, clk>::CMSTR0_ cmt_t<base, per, VEC, ivec, clk>::CMSTR0;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec, uint32_t clk>
+		typename cmt_t<base, per, VEC, ivec, clk>::CMSTR1_ cmt_t<base, per, VEC, ivec, clk>::CMSTR1;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec, uint32_t clk>
+		typename cmt_t<base, per, VEC, ivec, clk>::CMCR_ cmt_t<base, per, VEC, ivec, clk>::CMCR;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec, uint32_t clk>
+		typename cmt_t<base, per, VEC, ivec, clk>::CMCNT_ cmt_t<base, per, VEC, ivec, clk>::CMCNT;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec, uint32_t clk>
+		typename cmt_t<base, per, VEC, ivec, clk>::CMCOR_ cmt_t<base, per, VEC, ivec, clk>::CMCOR;
 
 
-#if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0> CMT0;
-	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1> CMT1;
-	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2> CMT2;
-	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3> CMT3;
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLK> CMT0;
+	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLK> CMT1;
+	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2, clock_profile::PCLK> CMT2;
+	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3, clock_profile::PCLK> CMT3;
+#elif defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
+	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
+	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2, clock_profile::PCLKB> CMT2;
+	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3, clock_profile::PCLKB> CMT3;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0> CMT0;
-	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1> CMT1;
-	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI2> CMT2;
-	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI3> CMT3;
+	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
+	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
+	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI2, clock_profile::PCLKB> CMT2;
+	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI3, clock_profile::PCLKB> CMT3;
 #endif
 }
