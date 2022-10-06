@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・IWDT 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -135,8 +135,9 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
 		typename iwdt_t<base, per, ivec, pclk>::IWDTCSTPR_ iwdt_t<base, per, ivec, pclk>::IWDTCSTPR;
 
-
-#if defined(SIG_RX24T)
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef iwdt_t<0x00088030, peripheral::IWDT, ICU::VECTOR::NONE, 125'000> IWDT;
+#elif defined(SIG_RX24T)
 	// interrupt vector: for NMI vector
 	typedef iwdt_t<0x00088030, peripheral::IWDT, ICU::VECTOR::NONE,  15'000> IWDT;
 #else
