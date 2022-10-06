@@ -10,10 +10,15 @@
 //=====================================================================//
 #include "common/io_utils.hpp"
 
-#if defined(SIG_RX62N)
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+#include "RX62x/clock_profile.hpp"
+#include "RX62x/peripheral.hpp"
 #include "RX62x/system.hpp"
+#include "RX62x/power_mgr.hpp"
 #include "RX62x/icu.hpp"
 #include "RX62x/icu_mgr.hpp"
+#include "RX62x/port_map.hpp"
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX24T)
 #include "RX24T/clock_profile.hpp"
@@ -27,7 +32,6 @@
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX64M)
-#define RX_DMAC_
 #include "RX64M/clock_profile.hpp"
 #include "RX64M/peripheral.hpp"
 #include "RX600/system.hpp"
@@ -41,7 +45,6 @@
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX71M)
-#define RX_DMAC_
 #include "RX71M/clock_profile.hpp"
 #include "RX64M/peripheral.hpp"
 #include "RX600/system.hpp"
@@ -55,7 +58,6 @@
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72M)
-#define RX_DMAC_
 #include "RX72M/clock_profile.hpp"
 #include "RX72M/peripheral.hpp"
 #include "RX600/system.hpp"
@@ -67,7 +69,6 @@
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72N)
-#define RX_DMAC_
 #include "RX72N/clock_profile.hpp"
 #include "RX72N/peripheral.hpp"
 #include "RX600/system.hpp"
@@ -83,8 +84,7 @@
 #include "RX72N/port_map_ether.hpp"
 #include "RX600/rx_dsp_inst.h"
 
-#elif defined(SIG_RX65N)
-#define RX_DMAC_
+#elif defined(SIG_RX651) || defined(SIG_RX65N)
 #include "RX65x/clock_profile.hpp"
 #include "RX65x/peripheral.hpp"
 #include "RX600/system.hpp"
@@ -97,7 +97,6 @@
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX66T)
-#define RX_DMAC_
 #include "RX66T/clock_profile.hpp"
 #include "RX66T/peripheral.hpp"
 #include "RX600/system.hpp"
@@ -110,7 +109,6 @@
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72T)
-#define RX_DMAC_
 #include "RX72T/clock_profile.hpp"
 #include "RX72T/peripheral.hpp"
 #include "RX600/system.hpp"
