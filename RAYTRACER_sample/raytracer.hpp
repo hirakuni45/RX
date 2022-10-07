@@ -34,7 +34,11 @@ static inline float sqrtf_(float x)
     );
     return x;
 }
+#else
+static inline float sqrtf_(float x) { return sqrtf(x); }
+#endif
 
+#if defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 static inline int ceilf_(float x)
 {
     int y;
@@ -49,7 +53,6 @@ static inline int ceilf_(float x)
     return y;
 }
 #else
-static inline float sqrtf_(float x) { return sqrtf(x); }
 static inline int ceilf_(float x) { return ceilf(x); }
 #endif
 
