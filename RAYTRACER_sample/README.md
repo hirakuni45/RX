@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Ray tracer sample
+Renesas RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Ray tracer sample
 =========
    
 [Japanese](READMEja.md)
@@ -17,6 +17,7 @@ Ray tracing rendering program using RX microcontroller
 ## Project list
 - main.cpp
 - raytracer.hpp
+- RX62N/Makefile
 - RX24T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
@@ -69,15 +70,16 @@ Ray tracing rendering program using RX microcontroller
    
 ## Rendering time 320x240, sampling number: 1
    
-|Microcontroller  |Core|Frequency [MHz]|Drawing method         |Time [ms]   |
-|----------|----|------------|-----------------|------------|
-|RX24T     |RXv2|80          |8 bits, port-bus |1224        |
-|RX65N     |RXv2|120         |Frame Memory     |784         |
-|RX64M     |RXv2|120         |16 bits, port-bus|751         |
-|RX66T     |RXv3|160         |8 bits, port-bus |602         |
-|RX72T     |RXv3|192         |8 bits, port-bus |464         |
-|RX71M     |RXv2|240         |16 bits, port-bus|439         |
-|RX72N     |RXv3|240         |Frame Memory     |361         |
+|Microcontroller|Core|fsqrt|Frequency [MHz]|Drawing method|Time [ms]|
+|-------|----|:---:|:---:|---|:---:|
+|RX62N  |RX600|X|96    |8 bits, port-bus |1860    |
+|RX24T  |RXv2|O|80     |8 bits, port-bus |1224     |
+|RX65N  |RXv2|O|120    |Frame Memory     |784      |
+|RX64M  |RXv2|O|120    |16 bits, port-bus|751      |
+|RX66T  |RXv3|O|160    |8 bits, port-bus |602      |
+|RX72T  |RXv3|O|192    |8 bits, port-bus |464      |
+|RX71M  |RXv2|O|240    |16 bits, port-bus|439      |
+|RX72N  |RXv3|O|240    |Frame Memory     |361      |
    
 ---
    

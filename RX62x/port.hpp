@@ -301,6 +301,58 @@ namespace device {
 		typename PORT<PORTX, BPOS, ASSERT>::P_ PORT<PORTX, BPOS, ASSERT>::P;
 
 
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ８ビット・ポート定義
+		@param[in]	PORTx	ポート・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class PORTx>
+	struct PORT_BYTE {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート方向レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<PORTx::base_address_ + 0x00> DIR_;
+		static DIR_ DIR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  プルアップ制御・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<PORTx::base_address_ + 0xC0> PU_;
+		static PU_ PU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート・レジスタ @n
+					※ポート出力と、ポート入力が異なる
+		*/
+		//-----------------------------------------------------------------//
+		struct port_t {
+			typedef rw8_t<PORTx::base_address_ + 0x20> PO_;
+			static PO_ PO;	// ポート出力用
+			typedef ro8_t<PORTx::base_address_ + 0x40> PI_;
+			static PI_ PI;  // ポート入力用
+
+			void operator = (uint8_t val) { PO = val; }
+			uint8_t operator () () { return PI(); }
+		};
+		typedef port_t P_;
+		static P_ P;
+	};
+	template <class PORTx> typename PORT_BYTE<PORTx>::DIR_ PORT_BYTE<PORTx>::DIR;
+	template <class PORTx> typename PORT_BYTE<PORTx>::PU_  PORT_BYTE<PORTx>::PU;
+	template <class PORTx> typename PORT_BYTE<PORTx>::P_::PO_  PORT_BYTE<PORTx>::P_::PO;
+	template <class PORTx> typename PORT_BYTE<PORTx>::P_::PI_  PORT_BYTE<PORTx>::P_::PI;
+	template <class PORTx> typename PORT_BYTE<PORTx>::P_   PORT_BYTE<PORTx>::P;
+
+
 	template <class _>
 	struct mpc_t {
 		//-----------------------------------------------------------------//
