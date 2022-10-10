@@ -52,5 +52,8 @@ namespace device {
 		static constexpr uint32_t	PCLKC		= 0;				///< RX24T では PCLKC は無いが、互換性の為定義してある
 		static constexpr uint32_t   PCLKD		= 40'000'000;		///< PCLKD 周波数（最大40MHz）
 		static constexpr uint32_t   FCLK		= 20'000'000;		///< FCLK 周波数（最大32MHz）
+
+		static constexpr uint32_t	DELAY_MS	= ICLK / 4444444;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr bool		DELAY_T1	= false;				///< 微調整として、「nop」を１つ追加
 	};
 }
