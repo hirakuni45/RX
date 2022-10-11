@@ -20,7 +20,8 @@
     "files.associations": {
 		"functional": "cpp",
 		"*.ipp": "cpp",
-		"tuple": "cpp"
+		"tuple": "cpp",
+		"cstdint": "cpp"
 	},
     "editor.detectIndentation": false,
     "editor.insertSpaces": false

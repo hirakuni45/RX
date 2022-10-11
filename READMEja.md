@@ -11,11 +11,11 @@ Renesas RX Microcontroller
    
  現在は、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
  複数の環境で、開発が出来るようになっています。   
- - 現在サポートされ、動作確認済みデバイスは RX24T、RX66T, RX72T、RX64M、RX71M, RX65N, RX72N となっており、   
+ - 現在サポートされ、動作確認済みデバイスは RX62N、RX24T、RX66T, RX72T、RX64M、RX71M, RX65N, RX72N となっており、   
  デバイスクラスを日々拡張しています。
  - 今後のサポート予定として、RX72M があります。
  - ディレクトリー構成など日々アップデートしています。
- - RX62N(RX621), RX63T は、現在はサポートしていません。(legacy フォルダーにあります。) 
+ - RX63T は、現在はサポートしていません。(legacy フォルダーにあります。) 
    
  **他の RX デバイスをサポートして欲しい場合にはリクエストを下さい。（以下条件）**
  - GitHub のサポートメンバーである事。
@@ -79,9 +79,10 @@ int main(int argc, char** argv)
 |[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr ライブラリ|
 |[/RX600](./RX600)|RX マイコン共通デバイス定義クラス|
 |[/RX24T](./RX24T)|RX24T 専用デバイス定義クラス、リンカースクリプト|
+|[/RX62x](./RX62x)|RX621/RX62N 専用デバイス定義クラス、リンカースクリプト|
 |[/RX64M](./RX64M)|RX64M 専用デバイス定義クラス、リンカースクリプト|
 |[/RX71M](./RX71M)|RX71M 専用デバイス定義クラス、リンカースクリプト|
-|[/RX65x](./RX65x)|RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
+|[/RX65x](./RX65x)|RX651/RX65N 専用デバイス定義クラス、リンカースクリプト|
 |[/RX66T](./RX66T)|RX66T 専用デバイス定義クラス、リンカースクリプト|
 |[/RX72T](./RX72T)|RX72T 専用デバイス定義クラス、リンカースクリプト|
 |[/RX72N](./RX72N)|RX72N 専用デバイス定義クラス、リンカースクリプト|
@@ -100,25 +101,25 @@ int main(int argc, char** argv)
 
 ### サンプル・プロジェクト（アプリケーション）
 
-|ディレクトリ|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
+|ディレクトリ|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
-|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
-|[/CAN_sample](./CAN_sample)|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
-|[/FLASH_sample](./FLASH_sample)|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
-|[/GPTW_sample](./GPTW_sample)|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
-|[/I2C_sample](./I2C_sample)|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
+|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
+|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
+|[/CAN_sample](./CAN_sample)|－|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
+|[/FLASH_sample](./FLASH_sample)|－|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
+|[/GPTW_sample](./GPTW_sample)|－|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
+|[/I2C_sample](./I2C_sample)|－|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
 |[/RAYTRACER_sample](./RAYTRACER_sample)|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
-|[/SDCARD_sample](./SDCARD_sample)|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
-|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
-|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
-|[/GUI_sample](./GUI_sample)|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (ソフトレンダリング、DRW2D エンジン利用)|
-|[/AUDIO_sample](./AUDIO_sample)|－|－|－|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
-|[/SYNTH_sample](./SYNTH_sample)|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
-|[/CALC_sample](./CALC_sample)|－|△|△|△|△|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
-|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
-|[/PSG_sample](./PSG_sample)|△|△|△|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
-|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
+|[/SDCARD_sample](./SDCARD_sample)|－|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
+|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
+|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
+|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (ソフトレンダリング、DRW2D エンジン利用)|
+|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
+|[/SYNTH_sample](./SYNTH_sample)|－|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
+|[/CALC_sample](./CALC_sample)|－|－|△|△|△|△|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
+|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
+|[/PSG_sample](./PSG_sample)|－|△|△|△|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
+|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
 
@@ -196,7 +197,7 @@ int main(int argc, char** argv)
 
 ---
 
-## Renesas GNU-RX のインストールと機能紹介
+## Renesas GNU-RX (8.3.0) のインストールと機能紹介
    
 以前の KPIT による GNU ツールチェインのサポートに代わり、[Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/) が新たに、RX マイコン用 GNU ツールを提供しています。   
    
@@ -208,11 +209,12 @@ RX マイコン用 最新（2020/07 現在）GNU ツールチェインとして�
 
 をベースとしたＲＸマイコン用ツールチェインをダウンロード可能となっています。   
    
-このツールは、登録すれば誰でもダウンロードする事が出来、バイナリー制限もありません。   
+このツールは、登録すれば誰でもダウンロードする事が出来、容量制限もありません。   
 また、ＲＸマイコンにおける最適化や、最新のコアに対するサポートも行っているようです。   
-※gcc は 8.3.0 ベースなので、C++17 に対応しています。   
-※通常の gcc より深い最適化と、最新 CPU コアに対応しています。   
-※ここで公開している C++ フレームワークを使ったプロジェクトも全てコンパイル可能となっています。   
+
+- gcc は 8.3.0 ベースなので、C++17 に対応しています。
+- 通常の gcc より深い最適化と、最新 CPU コアに対応しています。
+- ここで公開している C++ フレームワークを使ったプロジェクトも全てコンパイル可能となっています。
 
 サポートも行っているようです。（CyberTHOR Studios Limited）   
 
@@ -228,14 +230,15 @@ Renesas GNU-RX 8.3.0 に搭載された機能：
 
 - RXv3 コアサポート
 - 倍精度浮動小数点命令の生成
-- RX72T/RX72N 内蔵 TFU（三角関数演算器）のサポート
+- RX66T/RX72T/RX72N/RX72M 内蔵 TFU（三角関数演算器）のサポート
 
 ---
 
 CC-RX との違い：   
+
 - コンパイラの最適化において、CoreMark によるベンチマークでは、CC-RX は、GNU-RX よりかなり優秀なようです。   
 - 普通に考えると、このような大きな差が生まれる理由は考え辛いですが、CPU 内部の構造を知っていれば、達成出来るのかもしれません・・
-- 良く調べていませんが、CC-RX では、整数を使った行列計算を DSP 命令に置き換える事が出来るのかもしれません。   
+- 良く調べていませんが、CC-RX では、整数を使った行列計算における積和演算を DSP 命令に置き換える事が出来るのかもしれません。   
    
 |コンパイラ|RXコア|CoreMark (MHz)|比率|
 |---------|------|--------------|---|
@@ -245,13 +248,16 @@ CC-RX との違い：
 |CC-RX (V3.02)|RX65N|4.37|1|
 |GNU-RX (8.3.x)|RX65N|3.22|0.74|
    
-上記の数値は、かなり刺激的な値ですが、実際のアプリを動かした場合、感覚的にこのような大きな差は感じません。   
+上記の数値は、かなり刺激的な値ですが、実際のアプリを動かした場合、感覚的にこのような大きな差は感じません。  
+- この数値だけ見て、やはり gcc は駄目なコンパイラだと言う人がいますが、適切な評価をしていません。 
 - 掛け算や割り算などの比較的 CPU サイクルが多い命令を多用したアプリの場合に大きな差が生まれるようです。   
 - 浮動小数点命令などが多いアプリの場合には、GNU-RX の方が速い場合もあるようです。
    
 - CC-RX がどんなに優れていても、「有償」では、ホビーにはコスト的に見合わないと思われます。
-- 上記のベンチマークは、CoreMark での事なので、実際のアプリで評価しないと本当のパフォーマンスは判りません。   
+- 海外の組み込みマイコンを販売しているメーカー（主に ARM 系）は、gcc や LLVM ベースのオープンソースを使ったコンパイラを公開しています。
+- 上記のベンチマークは、CoreMark での事なので、実際のアプリで評価しないと本当のパフォーマンスは判りません。
 - C++11 もサポート出来ないとなると、オープンソース系 C++ ライブラリ、ツールキットもコンパイル出来ません。
+- C++ 以前に POSIX 系の C 言語ベースのオープンソースも、そのままではコンパイル出来ません。（ソースにかなり手を入れる必要がある）
    
 ---
 ## RX 開発環境準備（Windows、MSYS2）
@@ -263,43 +269,112 @@ CC-RX との違い：
 ※MINGW32 は gcc の例外モデルが Borland 特許の関係で SEH ではなく dwarf な i686 向け環境。   
 ※MINGW64 は Windows 系アプリケーション開発の環境。
  - マイクロソフト製ウィルス対策ソフト以外をインストールしている場合は無効にして下さい。
-※ gcc 構築に異常に時間がかかったり、ビルドに失敗する場合があります。   
+ - gcc 構築に異常に時間がかかったり（数十分で終わる事が１日かかる場合もある）、ビルドに失敗する場合があります。   
+ - 最新の MSYS2 環境（2022 年10月）では、生成した実行バイナリーをより詳しく精査する為か、より多くの時間がかかるようです。
+   
+---
    
  - msys2 のアップグレード
 
 ```
-   pacman -Sy pacman
-   pacman -Syu
+pacman -Sy pacman
+pacman -Syu
 ```
 
  - コンソールを開きなおす。（コンソールを開きなおすように、メッセージが表示されるはずです）
 
 ```
-   pacman -Su
+pacman -Su
 ```
  - アップデートは、複数回行われ、その際、コンソールの指示に従う事。
  - ※複数回、コンソールを開きなおす必要がある。
 
  - gcc、texinfo、gmp、mpfr、mpc、diffutils、automake、zlib、tar、make、unzip、git コマンドなどをインストール
+ - 必ず、一つづつ進めて下さい
 ```
-   pacman -S gcc
-   pacman -S texinfo
-   pacman -S mpc-devel
-   pacman -S diffutils
-   pacman -S automake
-   pacman -S zlib
-   pacman -S tar
-   pacman -S make
-   pacman -S unzip
-   pacman -S zlib-devel
-   pacman -S git
+pacman -S gcc
+pacman -S texinfo
+pacman -S mpc-devel
+pacman -S diffutils
+pacman -S automake
+pacman -S zlib
+pacman -S tar
+pacman -S make
+pacman -S unzip
+pacman -S zlib-devel
+pacman -S git
 ```
    
+### VSCode のインストールをお勧め
+
+- テキストエディターは、好みの問題があり、未だに古い手慣れた物を使っている人がいます
+- それが悪いとは言いませんが「最高」だとは言えないと思います
+- 新しい最新の環境は優れているものです
+- vi、emacs 派などは非常に嗜好が強いアプリケーションですが、拡張機能を導入する事で、ほぼ同じキーバインドに出来ます
+- C# や、Windows アプリのプログラミングで Visual Studio を好む人もいます
+- Unity の editor が最高だと言う人もいます
+- どれも、フリーで利用出来るアプリです
+- 自分は、vscode が色々な意味で優れていると感じますので、お勧めします
+- R8C/RL78/RX マイコンのフレームワークを使った開発では、ある程度インテリセンスが利き、便利です
+- github のアーカイブには、vscode の環境ファイルも含まれています
+- マークダウンをプレビューしたり、色々な拡張機能が豊富で、インストールも簡単です
+- MSYS2 のコンソールを直接ドッキングして操作する事が出来ます（make を直接実行できます）
+
+### git 関係コマンドは何を使うべきか？
+
+- windows に MSYS2 環境をインストールした場合、MSYS2 に git も入れると思います
+- ですが、それとは別に、「Git For Windows」もあります
+- MSYS2 の git と併用が可能です
+- MSYS2 に敢えて git を入れずに、Git For Windows をメインに使う事も考えられます
+- どの選択が正しいか、現在、まだ判断が出来ません、自分は併用しています
+- 併用した場合の注意として、クローンしたり新規に作成したリポジトリの操作は、統一する必要があります
+- クローンを MSYS2 で行い、コミットを Git For Windows で行うなどは決してやっては駄目です
+- Git For Windows をインストールすると、MSYS2 とは異なるコンソールも増えて多少複雑になります
+- vscode は git の存在が標準なので、vscode を使う場合、標準で、Git For Windows をインストールする必要もあります
+
+### MSYS2 環境の修正
+
+- 素の MSYS2 環境は、何かと使いづらい事もあるので、以下の修正を行うとより良く使えると思います
+- 環境ファイルは、/c/msys64/home/ユーザー名 にあります。
+
+```
+Uranus-W10.~ % ls -a
+./  ../  .bash_history  .bash_logout  .bash_profile  .bashrc  .inputrc  .lesshst  .profile
+```
+
+- テキストファイルの修正は、最近では VSCode で行っています
+
+
+- .bashrc の修正
+- コメントの '#' を外して有効にします
+   
+- ls コマンドの出力をカラー化する
+- 好みの環境を選択して下さい
+
+```
+# Some shortcuts for different directory listings
+alias ls='ls -hF --color=tty'                 # classify files in colour
+# alias dir='ls --color=auto --format=vertical'
+# alias vdir='ls --color=auto --format=long'
+# alias ll='ls -l'                              # long list
+# alias la='ls -A'                              # all but . and ..
+# alias l='ls -CF' 
+```
+
+- .bash_profile の末尾に追加する
+- カレントディレクトリが表示される
+
+```
+# prompt
+PS1='\h.\w % '
+```
+
 ---
 ## RX 開発環境準備（OS-X）
 
  - OS-X では、事前に macports をインストールしておきます。（brew は柔軟性が低いのでお勧めしません）
  - OS−X のバージョンによっては、事前に X−Code、Command Line Tools などのインストールが必要になるかもしれません）
+ - 最近の OS-X 環境を知らないので、情報が古く、アップデートしていません
 
  - macports のアップグレード
 
@@ -311,10 +386,10 @@ CC-RX との違い：
  - しかしながら、現状では llvm では、gcc のクロスコンパイラをビルドする事は出来ません。
  - そこで、macports で gcc をインストールします、バージョンは５系を使う事とします。
 ```
-   sudo port install gcc5
-   sudo ln -sf /opt/local/bin/gcc-mp-5  /usr/local/bin/gcc
-   sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/g++
-   sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/c++
+sudo port install gcc5
+sudo ln -sf /opt/local/bin/gcc-mp-5  /usr/local/bin/gcc
+sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/g++
+sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/c++
 ```
  - 再起動が必要かもしれません。
  - 一応、確認してみて下さい。
@@ -323,20 +398,20 @@ CC-RX との違い：
 ```
    
 ```
-   gcc (MacPorts gcc5 5.4.0_0) 5.4.0
-   Copyright (C) 2015 Free Software Foundation, Inc.
-   This is free software; see the source for copying conditions.  There is NO
-   warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+gcc (MacPorts gcc5 5.4.0_0) 5.4.0
+Copyright (C) 2015 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
    
  - texinfo、gmp、mpfr、mpc、diffutils、automake コマンドなどをインストール
 ```
-   sudo port install texinfo
-   sudo port install gmp
-   sudo port install mpfr
-   sudo port install libmpc
-   sudo port install diffutils
-   sudo port install automake
+sudo port install texinfo
+sudo port install gmp
+sudo port install mpfr
+sudo port install libmpc
+sudo port install diffutils
+sudo port install automake
 ```
 
 ---
@@ -346,13 +421,13 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 
  - texinfo、gmp、mpfr、mpc、diffutils、automake コマンドなどをインストール
 ```
-   sudo apt-get install texinfo
-   sudo apt-get install libgmp-dev
-   sudo apt-get install libmpfr-dev
-   sudo apt-get install libmpc-dev
-   sudo apt-get install diffutils
-   sudo apt-get install automake
-   sudo apt-get install zlib1g-dev
+sudo apt-get install texinfo
+sudo apt-get install libgmp-dev
+sudo apt-get install libmpfr-dev
+sudo apt-get install libmpc-dev
+sudo apt-get install diffutils
+sudo apt-get install automake
+sudo apt-get install zlib1g-dev
 ```
 
 ---
@@ -367,68 +442,84 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
  - この不具合は、ルネサスのネットワークスタック（net_T4）を使った場合に起こります。
  - 何故そのような動作不良を起こすのかは、原因を特定出来ていません。
  - 現状で調査した組み合わせを列挙しておきます。
-```
-   binutils-2.27, gcc-4.9.4, newlib-2.2.0 ---> OK
-   binutils-2.27, gcc-5.5.0, newlib-2.2.0 ---> OK
-   binutils-2.27, gcc-5.5.0, newlib-2.4.0 ---> OK
-   binutils-2.27, gcc-6.4.0, newlib-2.4.0 ---> OK
-   binutils-2.28, gcc-6.4.0, newlib-2.4.0 ---> OK
-   binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK (old current)
-   binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG
-   binutils-2.34, gcc-7.5.0, newlib-2.4.0 ---> OK (new current)
+
+
+|binutils|gcc|newlib|結果|
+|---|---|---|---|
+|binutils-2.27|gcc-4.9.4|newlib-2.2.0|OK|
+|binutils-2.27|gcc-5.5.0|newlib-2.2.0|OK|
+|binutils-2.27|gcc-5.5.0|newlib-2.4.0|OK|
+|binutils-2.27|gcc-6.4.0|newlib-2.4.0|OK|
+|binutils-2.28|gcc-6.4.0|newlib-2.4.0|OK|
+|binutils-2.30|gcc-6.4.0|newlib-2.4.0|OK (old current)|
+|binutils-2.30|gcc-6.4.0|newlib-3.0.0|NG|
+|binutils-2.34|gcc-7.5.0|newlib-2.4.0|OK (new current)|
+
 ```
  - 最新の gcc を使った方がより高速なコードになるようで、C++ の場合に特に効果が大きいです。
    
 ---
    
 #### binutils-2.34 をビルド
+
 ```
-   cd
-   tar xfvz binutils-2.34.tar.gz
-   cd binutils-2.34
-   mkdir rx_build
-   cd rx_build
-   ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls
-   make
-   make install     OS-X,Linux: (sudo make install)
+cd
+tar xfvz binutils-2.34.tar.gz
+cd binutils-2.34
+mkdir rx_build
+cd rx_build
+../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls
+make
+make install     OS-X,Linux: (sudo make install)
 ```
 
  -  /usr/local/rx-elf/bin へパスを通す（.bash_profile を編集して、パスを追加）
 
 ```
-   PATH=$PATH:/usr/local/rx-elf/bin
+PATH=$PATH:/usr/local/rx-elf/bin
 ```
 
  -  コンソールを開きなおす。
 
 ```
-   rx-elf-as --version
+rx-elf-as --version
+```
+   
+```
+GNU assembler (GNU Binutils) 2.34
+Copyright (C) 2020 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or later.
+This program has absolutely no warranty.
+This assembler was configured for a target of `rx-elf'.
 ```
 
  -  アセンブラコマンドを実行してみて、パスが有効か確かめる。
   
 #### C コンパイラをビルド
+
 ```
-    cd
-    tar xfvz gcc-7.5.0.tar.gz
-    cd gcc-7.5.0
-    mkdir rx_build
-	cd rx_build
-    ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto
-    make
-    make install     OS-X,Linux: (sudo make install)
+cd
+tar xfvz gcc-7.5.0.tar.gz
+cd gcc-7.5.0
+mkdir rx_build
+cd rx_build
+../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto
+make
+make install     OS-X,Linux: (sudo make install)
 ```
   
 #### newlib をビルド
+
 ```
-    cd
-    tar xfvz newlib-2.4.0.tar.gz
-	cd newlib-2.4.0
-    mkdir rx_build
-    cd rx_build
-    ../configure --target=rx-elf --prefix=/usr/local/rx-elf
-	make
-    make install     OS-X: (sudo make install)
+cd
+tar xfvz newlib-2.4.0.tar.gz
+cd newlib-2.4.0
+mkdir rx_build
+cd rx_build
+../configure --target=rx-elf --prefix=/usr/local/rx-elf
+make
+make install     OS-X: (sudo make install)
 ```
  - Linux 環境では、sudo コマンドで、ローカルで設定した binutils のパスを認識しないので、
 「make install」が失敗します、その為、以下のようなスクリプトを書いて実行します。
@@ -441,19 +532,19 @@ make install
 ```
    
 ```
-    sudo rx_install.sh
+sudo rx_install.sh
 ```
    
 ---
      
 #### C++ コンパイラをビルド
 ```
-    cd
-    cd gcc-7.5.0
-    cd rx_build
-    ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
-    make
-    make install     OS-X,Linux: (sudo make install)
+cd
+cd gcc-7.5.0
+cd rx_build
+../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
+make
+make install     OS-X,Linux: (sudo make install)
 ```
 
 ---
@@ -466,19 +557,26 @@ http://www.rvf-rc45.net/Renesas_GNU_Tools/
 ## RX フレームワークのソースコードを取得
    
 ```
-    git clone https://github.com/hirakuni45/RX.git
+git clone https://github.com/hirakuni45/RX.git
 ```
    
 ### RX フレームワークが利用している boost のインストール
-   
+
+- 以前は、boost のインストールにおいて、MSYS2 環境では、pacman を使って、mingw64 用の boost をインストールしていました。
+- しかし、boost のバージョンが進んで、この boost では、不具合が発生する事が判りました。
+- そこで、boost のアーカイブを、適切な位置に入れて扱うようにします。
+- この方法は MSYS2 環境の場合に発生します。
+- boost は、1.74.0 を使いますので、事前にダウンロード（D:￥Download へ配置）して下さい。（boost_1_74_0.tar.gz）
+
 ```
-    pacman -S mingw-w64-x86_64-boost
+cd /c/
+tar xfvz /d/Download/boost_1_74_0.tar.gz
 ```
    
 ## RX 全プロジェクトのビルド
    
 ```
-    sh all_project_build.sh [clean]
+sh all_project_build.sh [clean]
 ```
    
 --- 
@@ -519,23 +617,17 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
  - 現在のバージョンでは、消去、書き込み、比較 の動作のみ実装されています。
  - コードプロテクトの ID 設定や比較などは未実装です。
  - RX24T、RX63T では、接続が確立した時に、消去が自動で行われる為、消去動作は無視されます。
- - rx_prog のビルドには「boost」が必要です。（通常最新バージョンを使う）
- - boost はヘッダーのみ利用なので、ビルドの必要はありません。
- - mingw64 環境などに pacman を使い boost をインストールして使っています。
-
-``` 
-    pacman -S mingw-w64-x86_64-boost   
-```
-
+ - rx_prog のビルドには「boost_1_74_0」が必要です。（boost インストール項目を参照）
  - rxprog のビルド（MSYS2）
  - ビルドした実行ファイルは、/usr/local/bin に配置します。
 
 ```
-    cd rxprog
-    make
-    make install
-　　※/usr/local/bin にパスを通しておく。
+cd rxprog
+make
+make install
 ```
+
+ - /usr/local/bin にパスを通しておく。
  - rx_prog.conf を編集して、接続する COM ポート、ボーレートの設定をする。
  - /dev/ttyS10 -> COM11 に相当します。（数字に＋１する）
  - 「rx_prog.conf」には、標準のシリアルポートを記述できます、自分の環境に合わせて設定しておくと良いでしょう。
@@ -554,8 +646,8 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
 - 以前に発売された、RX65N Envision Kit に比べて、色々な面で高機能で高性能となっています。
 - CPU のコアが Rxv2 から RXv3 になり、最大クロックが 120MHz から 240MHz になりました。
 - 内蔵メモリの大幅増量（ROM: 4MB、RAM: 512K+512K）
-- RXv3 コアでは、倍精度浮動小数点演算をサポートしています。（コンパイラのサポートが必要）
-- 三角関数演算器が追加されました。（コンパイラのサポートが必要）
+- RXv3 コアでは、倍精度浮動小数点演算をサポートしています。（GNU-RX 8.3.0 が必要）
+- 三角関数演算器が追加されました。（GNU-RX 8.3.0 が必要）
 - D2 オーディオデバイスにより、48KHz/16ビットステレオのオーディオ出力をサポート
 - ESP32 による、WiFi、Bluetooth 無線接続が可能
 - SDHI インターフェースによる SD カードアクセスが可能(マイクロ SD コネクター装備)
@@ -563,23 +655,24 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
 - ステレオデジタルマイク
 - 照度センサ
 
-※価格は据え置き
-※Chip One Stop: 4600円
+~~※価格は据え置き~~
+~~※Chip One Stop: 4600円~~
 
 ---
 ## 何故、独自の開発環境（フレームワーク）を使うのか？
 
-ルネサス社の純正コンパイラ CC-RX は、現段階では、C++11 でさえ対応していません。
-又、ルネサス社が提供する gcc ベースの IDE 環境を使う事が出来ますが、私は、IDE が嫌いです。       
+ルネサス社の純正コンパイラ CC-RX は、現段階では、C++11 でさえ対応していません。   
+又、ルネサス社が提供する gcc ベースの IDE 環境を使う事が出来ますが、私は、IDE が嫌いです。   
 ※ルネサス社には独自の「開発環境」に対する考え方がありますが、必ずしも、それが、自分のス   
 タイルに合うとは限りません。   
    
 自分は、昔ながらの CUI 環境の方が手っ取り早く、操作性や見通しが良く扱いやすいです。   
-emacs (VSC)、gcc、make、があれば十分なのです。   
+VSC、gcc、make、があれば十分なのです。   
 また、歴史的に、開発ツールは「有償であるべきである」との考えがあります。（サポートも含む）   
 しかしながら、現代においては、数十万円のコンパイラに投資して製品を開発する事が出来るのは   
 大量生産が可能な機器に絞られると思います、それゆえ、gcc で開発をするのは、当然の結果と言   
 えるのだと思えます。   
+他社は、当たり前のように gcc や LLVM などの高品質コンパイラを無償公開しており、それが当然の流れになっています。
 ※公開してある「Makefile」には独自の工夫がしてあり、最小限の編集で、プロジェクトをビルド   
 出来るように自動化の為のスクリプトが入れてあります。   
 ※通常の「Makefile」は、従属規則を書くのは「自動」ではありません、新規にファイルを追加し   
@@ -593,7 +686,7 @@ emacs (VSC)、gcc、make、があれば十分なのです。
 ユーザーは、ターゲット名、リンクするソースを適宜編集するだけです。   
 後は「make」と打てば、従属規則（どのソースがどのヘッダーをインクルードしているか？）は自動   
 で生成します。   
-また C++ では、ヘッダーと実装を分ける必要がほぼ無くなる為、Makefile を編集してソースを追加
+また新しい C++ では、ヘッダーと実装を分ける必要がほぼ無くなる為、Makefile を編集してソースを追加
 する事がほぼ無くなります。   
    
 ---
