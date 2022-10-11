@@ -81,7 +81,7 @@ endif
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
-LOCAL_PATH  =   /mingw64
+LOCAL_PATH  =   /c/boost_1_74_0
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)
@@ -95,7 +95,7 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   $(LOCAL_PATH)
 
 INC_APP		=	. ../ \
 				../RX600/drw2d/inc/tes \

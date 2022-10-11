@@ -44,8 +44,6 @@
 // DRW2D エンジンを使う場合
 // #define USE_DRW2D
 
-#include "graphics/tgl.hpp"
-
 #include "RX600/drw2d_mgr.hpp"
 
 namespace {
