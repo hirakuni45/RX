@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX71M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -73,7 +73,7 @@ endif
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
-LOCAL_PATH  =   /mingw64
+LOCAL_PATH  =   /c/boost_1_74_0
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)

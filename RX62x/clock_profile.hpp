@@ -40,5 +40,10 @@ namespace device {
 		static constexpr uint32_t   ICLK		= 96'000'000;		///< ICLK 周波数（最大 8~100MHz）
 		static constexpr uint32_t   PCLK		= 48'000'000;		///< PCLK 周波数（最大 8~50MHz）
 		static constexpr uint32_t   BCLK		= 48'000'000;		///< BCLK 周波数（最大 8~50MHz）
+
+		// RXv2 コア（最大 100MHz）
+		// ※96MHz 動作、10uS で調整
+		static constexpr uint32_t	DELAY_MS	= ICLK / 5333333;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr bool		DELAY_T1	= true;				///< 微調整として、「nop」を１つ追加
 	};
 }

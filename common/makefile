@@ -28,23 +28,23 @@
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
 # C++.boost root
-LOCAL_PATH  =   /mingw64
+LOCAL_PATH  =   /c/boost_1_74_0
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)
     SYSTEM := LINUX
-    LOCAL_PATH = /usr/local
+    LOCAL_PATH = /usr/local/include
   endif
   ifeq ($(UNAME),Darwin)
     SYSTEM := OSX
     OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
-    LOCAL_PATH = /opt/local
+    LOCAL_PATH = /opt/local/include
   endif
 endif
 
 LIB_ROOT    =   ../../rxlib/lib
 
-INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
+INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)
 
 PROG_VERIFY = --verify
 
