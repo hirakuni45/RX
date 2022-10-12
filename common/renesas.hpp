@@ -20,6 +20,7 @@
 #include "RX62x/system.hpp"
 #include "RX62x/system_io.hpp"
 #include "RX62x/port.hpp"
+#include "RX600/can.hpp"
 
 #elif defined(SIG_RX24T)
 #include "RX24T/system.hpp"
@@ -86,7 +87,6 @@
 #include "RX600/doc.hpp"
 
 #elif defined(SIG_RX72M) || defined(SIG_RX72N)
-
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
 #include "RX600/cac.hpp"

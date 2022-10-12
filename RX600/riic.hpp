@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T/RX66T/RX64M/RX71M/RX65N RIICa 定義
+	@brief	RX621/RX62N RIIC 定義 @n
+			RX24T/RX66T/RX64M/RX71M/RX65N RIICa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,23 +17,10 @@ namespace device {
 	/*!
 		@brief  I 2 C バスインタフェース 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	INT		割り込みベクター型
-		@param[in]	eev		「通信エラー、通信イベント」ベクター
-		@param[in]	rxv		「受信データフル」ベクター
-		@param[in]	txv		「送信データエンプティ」ベクター
-		@param[in]	tev		「送信終了」ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev>
-	struct riic_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto EE_VEC = eev;		///< 通信エラー、イベント割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+	template<uint32_t base>
+	struct riic_core_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -76,6 +64,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> ST;
 			bit_rw_t<io_, bitpos::B2> RS;
 			bit_rw_t<io_, bitpos::B3> SP;
+
 			bit_rw_t<io_, bitpos::B5> TRS;
 			bit_rw_t<io_, bitpos::B6> MST;
 			bit_rw_t<io_, bitpos::B7> BBSY;
@@ -197,7 +186,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> SAR1E;
 			bit_rw_t<io_, bitpos::B2> SAR2E;
 			bit_rw_t<io_, bitpos::B3> GCAE;
+
 			bit_rw_t<io_, bitpos::B5> DIDE;
+
 			bit_rw_t<io_, bitpos::B7> HOAE;
 		};
 		typedef icser_t<base + 0x06> ICSER_;
@@ -247,7 +238,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> AAS1;
 			bit_rw_t<io_, bitpos::B2> AAS2;
 			bit_rw_t<io_, bitpos::B3> GCA;
+
 			bit_rw_t<io_, bitpos::B5> DID;
+
 			bit_rw_t<io_, bitpos::B7> HOA;
 		};
 		typedef icsr1_t<base + 0x08> ICSR1_;
@@ -382,96 +375,123 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef rw8_t<base + 0x13> ICDRR_;
 		static ICDRR_ ICDRR;
+	};
+	template <uint32_t base> typename riic_core_t<base>::ICCR1_ riic_core_t<base>::ICCR1;
+	template <uint32_t base> typename riic_core_t<base>::ICCR2_ riic_core_t<base>::ICCR2;
+	template <uint32_t base> typename riic_core_t<base>::ICMR1_ riic_core_t<base>::ICMR1;
+	template <uint32_t base> typename riic_core_t<base>::ICMR2_ riic_core_t<base>::ICMR2;
+	template <uint32_t base> typename riic_core_t<base>::ICMR3_ riic_core_t<base>::ICMR3;
+	template <uint32_t base> typename riic_core_t<base>::ICFER_ riic_core_t<base>::ICFER;
+	template <uint32_t base> typename riic_core_t<base>::ICSER_ riic_core_t<base>::ICSER;
+	template <uint32_t base> typename riic_core_t<base>::ICIER_ riic_core_t<base>::ICIER;
+	template <uint32_t base> typename riic_core_t<base>::ICSR1_ riic_core_t<base>::ICSR1;
+	template <uint32_t base> typename riic_core_t<base>::ICSR2_ riic_core_t<base>::ICSR2;
+	template <uint32_t base> typename riic_core_t<base>::SARL0_ riic_core_t<base>::SARL0;
+	template <uint32_t base> typename riic_core_t<base>::SARL1_ riic_core_t<base>::SARL1;
+	template <uint32_t base> typename riic_core_t<base>::SARL2_ riic_core_t<base>::SARL2;
+	template <uint32_t base> typename riic_core_t<base>::SARU0_ riic_core_t<base>::SARU0;
+	template <uint32_t base> typename riic_core_t<base>::SARU1_ riic_core_t<base>::SARU1;
+	template <uint32_t base> typename riic_core_t<base>::SARU2_ riic_core_t<base>::SARU2;
+	template <uint32_t base> typename riic_core_t<base>::ICBRL_ riic_core_t<base>::ICBRL;
+	template <uint32_t base> typename riic_core_t<base>::ICBRH_ riic_core_t<base>::ICBRH;
+	template <uint32_t base> typename riic_core_t<base>::ICDRT_ riic_core_t<base>::ICDRT;
+	template <uint32_t base> typename riic_core_t<base>::ICDRR_ riic_core_t<base>::ICDRR;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  I 2 C バスインタフェース 定義（IICAa 型）
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	eev		「通信エラー、通信イベント」ベクター
+		@param[in]	rxv		「受信データフル」ベクター
+		@param[in]	txv		「送信データエンプティ」ベクター
+		@param[in]	tev		「送信終了」ベクター
+		@param[in]	pclk	クロック元
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR eev, ICU::VECTOR tev, uint32_t pclk>
+	struct riic_t : riic_core_t<base> {
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto EE_VEC = eev;		///< 通信エラー、イベント割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr auto PCLK   = pclk;	///< クロック周波数
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  チャネルを返す
-			@return チャネル
+			@brief  タイムアウト 内部カウンタ（TMOCNTL）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static uint32_t get_chanel() {
-			return (base >> 5) & 1;
-		}
-	};
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICCR1_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICCR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICCR2_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICCR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICMR1_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICMR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICMR2_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICMR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICMR3_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICMR3;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICFER_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICFER;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICSER_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICSER;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICIER_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICIER;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICSR1_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICSR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICSR2_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICSR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::SARL0_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::SARL0;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::SARL1_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::SARL1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::SARL2_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::SARL2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::SARU0_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::SARU0;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::SARU1_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::SARU1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::SARU2_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::SARU2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICBRL_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICBRL;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICBRH_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICBRH;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICDRT_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICDRT;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT eev, INT tev> typename riic_t<base, per, txv, rxv, INT, eev, tev>::ICDRR_
-		riic_t<base, per, txv, rxv, INT, eev, tev>::ICDRR;
+		typedef rw8_t<base + 0x0A> TMOCNTL_;
+		static TMOCNTL_ TMOCNTL;
 
-#if defined(SIG_RX24T)
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タイムアウト 内部カウンタ（TMOCNTU）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef rw8_t<base + 0x0B> TMOCNTU_;
+		static TMOCNTU_ TMOCNTU;
+	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR eev, ICU::VECTOR tev, uint32_t pclk>
+		typename riic_t<base, per, txv, rxv, eev, tev, pclk>::TMOCNTL_ riic_t<base, per, txv, rxv, eev, tev, pclk>::TMOCNTL;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR eev, ICU::VECTOR tev, uint32_t pclk>
+		typename riic_t<base, per, txv, rxv, eev, tev, pclk>::TMOCNTU_ riic_t<base, per, txv, rxv, eev, tev, pclk>::TMOCNTU;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  I 2 C バスインタフェース 定義（IICAa 型）
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込みベクター型
+		@param[in]	eev		「通信エラー、通信イベント」ベクター
+		@param[in]	rxv		「受信データフル」ベクター
+		@param[in]	txv		「送信データエンプティ」ベクター
+		@param[in]	tev		「送信終了」ベクター
+		@param[in]	pclk	クロック元
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT eev, INT tev, uint32_t pclk>
+	struct riica_t : riic_core_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto EE_VEC = eev;		///< 通信エラー、イベント割り込みベクター
+		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
+		static constexpr auto PCLK   = pclk;	///< クロック周波数
+	};
+
+
+#if defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
-		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0> RIIC0;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
-		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0> RIIC0;
-	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
-		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2> RIIC2;
-#elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
-		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0> RIIC0;
+		ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLK> RIIC0;
 	typedef riic_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
-		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI1, ICU::VECTOR_BL1::TEI1> RIIC1;
-	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
-		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2> RIIC2;
+		ICU::VECTOR::ICEEI1, ICU::VECTOR::ICTEI1, clock_profile::PCLK> RIIC1;
+#elif defined(SIG_RX24T)
+	typedef riica_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
+#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+	typedef riica_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0, clock_profile::PCLKB> RIIC0;
+	typedef riica_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2, clock_profile::PCLKB> RIIC2;
+#elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
+	typedef riica_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0, clock_profile::PCLKB> RIIC0;
+	typedef riica_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI1, ICU::VECTOR_BL1::TEI1, clock_profile::PCLKB> RIIC1;
+	typedef riica_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2, clock_profile::PCLKB> RIIC2;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
-		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0> RIIC0;
+	typedef riica_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0, clock_profile::PCLKB> RIIC0;
 #endif
 }

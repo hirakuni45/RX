@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CAN 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -850,7 +850,7 @@ namespace device {
 	template <uint32_t base, peripheral per> typename can_t<base, per>::TCR_ can_t<base, per>::TCR;
 
 
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
+#if defined(SIG_RX621) || defined(SIG_RX62N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	CAN モジュール（CAN 通常割り込み型）
@@ -864,9 +864,38 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
+		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::VECTOR ers>
+	struct can_norm_t : can_t<base, per> {
+
+		static constexpr auto PCLK = clock_profile::PCLK;	///< クロック周波数
+		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
+		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
+		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
+		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
+		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
+	};
+	typedef can_norm_t<0x00090200, peripheral::CAN,
+		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
+		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::VECTOR::ERS0> CAN;
+
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	CAN モジュール（CAN 通常割り込み型 + グループ割り込み BE0）
+		@param[in]	base	ベースアドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	rxf		受信 FIFO 割り込み
+		@param[in]	txf		送信 FIFO 割り込み
+		@param[in]	rxm		メールボックス受信割り込み
+		@param[in]	txm		メールボックス送信割り込み
+		@param[in]	ers		エラー割り込み（BE0 グループ割り込み）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per,
 		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::VECTOR_BE0 ers>
 	struct can_norm_t : can_t<base, per> {
 
+		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
 		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
 		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
 		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
@@ -876,27 +905,25 @@ namespace device {
 	typedef can_norm_t<0x00090200, peripheral::CAN0,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
 		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
-#endif
 
-
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	CAN モジュール（CAN 選択割り込み型）
+		@brief	CAN モジュール（CAN 選択割り込み型 + グループ割り込み BE0）
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	rxf		受信 FIFO 割り込み
 		@param[in]	txf		送信 FIFO 割り込み
 		@param[in]	rxm		メールボックス受信割り込み
 		@param[in]	txm		メールボックス送信割り込み
-		@param[in]	ers		エラー割り込み
+		@param[in]	ers		エラー割り込み（BE0 グループ割り込み）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB rxf, ICU::VECTOR_SELB txf, ICU::VECTOR_SELB rxm, ICU::VECTOR_SELB txm,
-		ICU::VECTOR_BE0 ers>
+		ICU::VECTOR_SELB rxf, ICU::VECTOR_SELB txf, ICU::VECTOR_SELB rxm, ICU::VECTOR_SELB txm, ICU::VECTOR_BE0 ers>
 	struct can_seli_t : can_t<base, per> {
 
+		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
 		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
 		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
 		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター

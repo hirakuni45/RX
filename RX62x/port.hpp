@@ -377,10 +377,31 @@ namespace device {
 		};
 		typedef pffsci_t<0x0008C10F> PFFSCI_;
 		static PFFSCI_ PFFSCI;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートファンクションレジスタ J（PFJCAN）
+			@param[in] base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pfjcan_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B0> CAN0E;
+		};
+		typedef pfjcan_t<0x0008C113> PFJCAN_;
+		static PFJCAN_ PFJCAN;
 	};
 	typedef mpc_t<void> MPC;
 
 	template <class _> typename mpc_t<_>::PFFSCI_ mpc_t<_>::PFFSCI;
+	template <class _> typename mpc_t<_>::PFJCAN_ mpc_t<_>::PFJCAN;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
