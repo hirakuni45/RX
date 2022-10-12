@@ -246,13 +246,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  受信（リード）
-			@param[in] address スレーブアドレス（７ビット）
-			@param[out]	dst	先
-			@param[in]	num	数
+			@param[in] address	スレーブアドレス（７ビット）
+			@param[out]	dst		先
+			@param[in]	num		数
 			@return 失敗なら「false」が返る
 		*/
 		//-----------------------------------------------------------------//
-		bool recv(uint8_t address, uint8_t* dst, uint8_t num) noexcept {
+		bool recv(uint8_t address, void* dst, uint8_t num) noexcept {
 			start_();
 			write_((address << 1) | 1, false);
 			if(ack_()) {
@@ -261,8 +261,9 @@ namespace device {
 				return false;
 			}
 
+			uint8_t* p = static_cast<uint8_t*>(dst);
 			for(uint8_t n = 0; n < num; ++n) {
-				if(!read_(*dst, true)) {
+				if(!read_(*p, true)) {
 					stop_();
 					error_ = ERROR::RECV_DATA;
 					return false;
@@ -270,7 +271,7 @@ namespace device {
 				bool f = 0;
 				if(n == (num - 1)) f = 1;
 				out_ack_(f);
-				++dst;
+				++p;
 			}
 			stop_();
 			return true;
@@ -286,7 +287,7 @@ namespace device {
 			@return 失敗なら「false」が返る
 		*/
 		//-----------------------------------------------------------------//
-		bool send(uint8_t address, const uint8_t* src, uint8_t num) noexcept {
+		bool send(uint8_t address, const void* src, uint8_t num) noexcept {
 			start_();
 			write_(address << 1, false);
 			if(ack_()) {
@@ -295,7 +296,7 @@ namespace device {
 				return false;
 			}
 
-			if(!write_(src, num)) {
+			if(!write_(static_cast<const uint8_t*>(src), num)) {
 				stop_();
 				error_ = ERROR::SEND_DATA;
 				return false;
@@ -315,7 +316,7 @@ namespace device {
 			@return 失敗なら「false」が返る
 		*/
 		//-----------------------------------------------------------------//
-		bool send(uint8_t address, uint8_t first, const uint8_t* src, uint8_t num) noexcept
+		bool send(uint8_t address, uint8_t first, const void* src, uint8_t num) noexcept
 		{
 			start_();
 			write_(address << 1, false);
@@ -331,7 +332,7 @@ namespace device {
 				return false;
 			}
 
-			if(!write_(src, num)) {
+			if(!write_(static_cast<const uint8_t*>(src), num)) {
 				stop_();
 				error_ = ERROR::SEND_DATA;
 				return false;
@@ -352,7 +353,7 @@ namespace device {
 			@return 失敗なら「false」が返る
 		*/
 		//-----------------------------------------------------------------//
-		bool send(uint8_t address, uint8_t first, uint8_t second, const uint8_t* src, uint8_t num) {
+		bool send(uint8_t address, uint8_t first, uint8_t second, const void* src, uint8_t num) {
 			start_();
 			write_(address << 1, false);
 			if(ack_()) {
@@ -371,7 +372,7 @@ namespace device {
 				error_ = ERROR::SEND_DATA;
 				return false;
 			}
-			if(!write_(src, num)) {
+			if(!write_(static_cast<const uint8_t*>(src), num)) {
 				stop_();
 				error_ = ERROR::SEND_DATA;
 				return false;
