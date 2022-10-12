@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N, RX72T I2C サンプル
+Renesas RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N, RX72T I2C サンプル
 =========
 
 [英語版](README.md)

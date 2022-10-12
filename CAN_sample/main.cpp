@@ -4,21 +4,7 @@
 			シリアルターミナルを接続して、対話式で、通信を行う @n
 			※使い方は、コマンド「help」を参照 @n
 			「MULTI」を有効にするとマルチチャネルサポート @n
-			「LEGACY」モードの場合、メールボックス直接操作 @n
-			RX64M, RX71M: @n
-					12MHz のベースクロックを使用する @n
-			　　　　P07 ピンにLEDを接続する @n
-			RX66T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
-			RX72N: (Renesas Envision kit RX72N) @n
-					16MHz のベースクロックを使用する @n
-					P40 ピンにLEDを接続する @n
-					SCI2 を使用する @n
-			RX72T: @n
-					16MHz のベースクロックを使用する @n
-					P01 ピンにLEDを接続する @n
-					SCI1 を使用する。
+			「LEGACY」モードの場合、メールボックス直接操作
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -51,7 +37,13 @@ namespace {
 
 	static constexpr uint32_t can_cmd_ver_ = 89;
 
-#if defined(SIG_RX71M)
+#if defined(SIG_RX62N)
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
+	typedef device::SCI0 SCI_CH;
+	typedef device::CAN CAN0_CH;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
+#elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
