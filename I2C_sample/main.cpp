@@ -1,41 +1,13 @@
 //=====================================================================//
 /*! @file
     @brief  I2C サンプル @n
-			対話形式で接続された I2C デバイスを操作する。@n
-			RX24T: @n
-					RX24T/clock_profile.hpp を参照 @n
-					P00 ピンにLEDを接続する @n
-					SCI1 を使用する @n
-			RX66T: @n
-					RX66T/clock_profile.hpp を参照 @n
-					P00 ピンにLEDを接続する @n
-					SCI1 を使用する @n
-			RX72T: @n
-					RX72T/clock_profile.hpp を参照 @n
-					P01 ピンにLEDを接続する @n
-					SCI1 を使用する @n
-			RX64M: @n
-					RX64M/clock_profile.hpp を参照 @n
-					P07 ピンにLEDを接続する @n
-					SCI1 を使用する @n
-			RX71M: @n
-					RX71M/clock_profile.hpp を参照 @n
-					P07 ピンにLEDを接続する @n
-					SCI1 を使用する @n
-			RX65N (RX65N Envision kit): @n
-					RX65x/clock_profile.hpp を参照 @n
-					P70 に接続された LED を利用する @n
-					SCI9 を使用する @n
-			RX72N: (RX72N Envision kit) @n
-					RX72N/clock_profile.hpp を参照 @n
-					P40 ピンにLEDを接続する @n
-					SCI2 を使用する @n
+			対話形式で接続された I2C デバイスを操作する。 @n
 			接続想定デバイス： @n
 					・24C32 (EEPROM, DS3231 ボードに内蔵) @n
 					・DS3231 (RTC) @n
 					・BMP280 (温度、圧力センサ)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -69,8 +41,21 @@ namespace {
 
 	static constexpr int VERSION = 50;
 
-#if defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
+#if defined(SIG_RX62N)
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
+	typedef device::SCI0 SCI_CH;
+
+// #define SOFT_I2C
+#ifdef SOFT_I2C
+	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
+	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
+	typedef device::si2c_io<SDA, SCL> I2C_IO;
+#else
+	typedef device::iica_io<device::RIIC0> I2C_IO;
+#endif
+#elif defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 #ifdef SOFT_I2C
@@ -81,35 +66,35 @@ namespace {
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 #endif
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
+	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
+	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
+	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N" };
+	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
 	typedef device::SCI9 SCI_CH;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision kit" };
+	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::SCI2 SCI_CH;
 	typedef device::SCI4 I2C_CH;
@@ -125,7 +110,7 @@ namespace {
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
 	#define TOUCH_I2C
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T hirakuni45" };
+	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
 

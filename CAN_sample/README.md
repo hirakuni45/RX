@@ -1,4 +1,4 @@
-Renesas RX64M, RX71M, RX66T, RX72N CAN sample
+Renesas RX62N, RX64M, RX71M, RX66T, RX72N CAN sample
 =========
 
 [Japanese](READMEja.md)
@@ -12,6 +12,7 @@ The environment variable "MULTI" is enabled in "main.cpp".
 
 ## Description
 - main.cpp
+- RX62N/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
 - RX66T/Makefile
@@ -24,11 +25,6 @@ The environment variable "MULTI" is enabled in "main.cpp".
 
 - If the base crystal is different, change the typedef parameters.
 - The RXxxx/clock_profile.hpp declares a set frequency for each module.
-- RX64M: 120MHz (12MHz)
-- RX71M: 240MHz (12MHz)
-- RX66T: 160MHz (10MHz)
-- RX72T: 192MHz (16MHz)
-- RX72N: 240MHz (16MHz) for 'RX72N Envision Kit'
 - Connect the LED to the specified port.
 - In the case of the RX72N Envision kit, it utilizes the blue LED on the board.
 - Connect the CAN bus transceiver to the CAN port.
@@ -48,7 +44,7 @@ See the following sources for the ports to connect the CAN bus transceiver.
 |RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
    
 For RX64M (port_map.hpp FIRST candidate)
-```
+```C++
             case peripheral::CAN0:
                 {
                     uint8_t sel = enable ? 0b010000 : 0;

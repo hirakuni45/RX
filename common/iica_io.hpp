@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・IICA 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,13 +19,59 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  IICA 制御クラス（I2C)
-		@param[in]	IICA	IICA 定義基底クラス 
+		@brief  IICA 制御クラス（I2C) @n
+				※ポートは候補が１つしか無い為、候補指定がありません。
+		@param[in]	IICA	IICA 定義基底クラス
+		@param[in]	TPSZ	テンポラリーバッファサイズ（I2C 通信で行う最大サイズを指定）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class IICA>
+	template<class IICA, uint32_t TPSZ = 256>
 	class iica_io : public i2c_base {
 
+		struct clock_t {
+			uint8_t	CKS;
+			uint8_t ICBRL;
+			uint8_t ICBRH;
+			constexpr clock_t(uint8_t cks, uint8_t l, uint8_t h) :
+				CKS(cks), ICBRL(l), ICBRH(h) { }
+		};
+
+		static constexpr clock_t clock_tables_[] = {
+			{ 0b100, 17, 20 },  //   50Kbps, PCLK:33MHz
+			{ 0b011, 16, 19 },  //  100Kbps, PCLK:33MHz
+			{ 0b010, 15, 18 },  //  200Kbps, PCLK:33MHz
+			{ 0b001,  9, 21 },  //  400Kbps, PCLK:33MHz
+			{ 0b000,  8, 16 },  // 1000Kbps, PCLK:33MHz
+
+			{ 0b100, 21, 24 },  //   50Kbps, PCLK:40MHz
+			{ 0b011, 19, 23 },  //  100Kbps, PCLK:40MHz
+			{ 0b010, 17, 22 },  //  200Kbps, PCLK:40MHz
+			{ 0b001, 11, 25 },  //  400Kbps, PCLK:40MHz
+			{ 0b000, 10, 20 },  // 1000Kbps, PCLK:40MHz
+
+			{ 0b100, 26, 31 },  //   50Kbps, PCLK:50MHz
+			{ 0b011, 24, 29 },  //  100Kbps, PCLK:50MHz
+			{ 0b010, 22, 27 },  //  200Kbps, PCLK:50MHz
+			{ 0b010,  7, 16 },  //  400Kbps, PCLK:50MHz
+			{ 0b000, 12, 24 },  // 1000Kbps, PCLK:50MHz
+
+			{ 0b101, 15, 18 },  //   50Kbps, PCLK:60MHz
+			{ 0b100, 14, 17 },  //  100Kbps, PCLK:60MHz
+			{ 0b011, 13, 16 },  //  200Kbps, PCLK:60MHz
+			{ 0b010,  8, 19 },  //  400Kbps, PCLK:60MHz
+			{ 0b000, 15, 29 },  // 1000Kbps, PCLK:60MHz
+		};
+		static constexpr uint32_t PCLK_33 = 5 * 0;
+		static constexpr uint32_t PCLK_40 = 5 * 1;
+		static constexpr uint32_t PCLK_50 = 5 * 2;
+		static constexpr uint32_t PCLK_60 = 5 * 3;
+		static constexpr uint32_t CLOCK_OFS_50K   = 0;
+		static constexpr uint32_t CLOCK_OFS_100K  = 1;
+		static constexpr uint32_t CLOCK_OFS_200K  = 2;
+		static constexpr uint32_t CLOCK_OFS_400K  = 3;
+		static constexpr uint32_t CLOCK_OFS_1000K = 4;
+
+		static constexpr uint32_t BUS_BUSY_MS  = 500;  // バス占有状態待機ループ
 		static constexpr uint32_t WAIT_LOOP_MS = 500;  // 500uS
 
 		uint8_t		level_;
@@ -42,6 +88,7 @@ namespace device {
 		};
 
 		struct intr_t {
+			uint8_t				buff_[TPSZ];
 			volatile event		event_;
 			volatile uint8_t	firstb_;
 			volatile bool		dummy_recv_;
@@ -52,7 +99,7 @@ namespace device {
 			volatile uint16_t	send_id_back_;
 			volatile uint16_t	recv_id_;
 			volatile uint16_t	recv_id_back_;
-			intr_t() : event_(event::NONE), firstb_(0), dummy_recv_(false),
+			intr_t() : buff_{ }, event_(event::NONE), firstb_(0), dummy_recv_(false),
 				src_(nullptr), dst_(nullptr), len_(0),
 				send_id_(0), send_id_back_(0), recv_id_(0), recv_id_back_(0) { }
 		};
@@ -147,8 +194,6 @@ namespace device {
 
 		static INTERRUPT_FUNC void tend_itask_() { tend_ntask_(); }
 
-		static uint32_t intr_vec_(ICU::VECTOR v) { return static_cast<uint32_t>(v); }
-
 		void sleep_() noexcept
 		{
 			asm("nop");
@@ -158,17 +203,10 @@ namespace device {
 		bool setup_start_() noexcept
 		{
 			uint32_t loop = 0;
-			while(IICA::ICCR2.BBSY() != 0) {
-#if 0
-				if(IICA::ICSR2.TMOF()) {
-					IICA::ICSR2.TMOF = 0;
-					error_ = error::bus_open;
-					return false;
-				}
-#endif
+			while(IICA::ICCR2.BBSY() != 0) {  // I2C バス占有状態判定
 				utils::delay::micro_second(1);
 				++loop;
-				if(loop >= WAIT_LOOP_MS) {
+				if(loop >= BUS_BUSY_MS) {
 					return false;
 				}
 			}
@@ -199,10 +237,11 @@ namespace device {
 			@param[in]	mode	動作モード
 			@param[in]	spd		スピード・タイプ
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
+			@param[in]	nf		ノイズフィルター型
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(MODE mode, SPEED spd, uint8_t level = 0) noexcept
+		bool start(MODE mode, SPEED spd, uint8_t level = 0, NF nf = NF::PH1) noexcept
 		{
 			level_ = level;
 
@@ -220,40 +259,60 @@ namespace device {
 			IICA::SARL2 = 0x00;
 			IICA::SARU2 = 0x00;
 
+			uint32_t idx_base = 0;
+			if(IICA::PCLK <= 33'000'000) idx_base = PCLK_33;
+			else if(IICA::PCLK <= 40'000'000) idx_base = PCLK_40;
+			else if(IICA::PCLK <= 50'000'000) idx_base = PCLK_50;
+			else idx_base = PCLK_60;
 			switch(spd) {
-			case SPEED::STANDARD:	///< 100K b.p.s. (Standard mode)
-				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b011) | IICA::ICMR1.BCWP.b();
-				IICA::ICBRH = 0b11100000 | 19;
-				IICA::ICBRL = 0b11100000 | 23;
+			case SPEED::_50K:  // 50K b.p.s.
+				idx_base += CLOCK_OFS_50K;
 				break;
-			case SPEED::FAST:		///< (50 clock) 400K b.p.s. (Fast mode)
-				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b001) | IICA::ICMR1.BCWP.b();
-				IICA::ICBRH = 0b11100000 | 11;
-				IICA::ICBRL = 0b11100000 | 25;
+			case SPEED::STANDARD:	// 100K b.p.s. (Standard mode)
+			case SPEED::_150K:
+				idx_base += CLOCK_OFS_100K;
 				break;
-			case SPEED::FAST_PLUS:	///< (40 clock) 1M b.p.s. (Fast plus mode)
-				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b000) | IICA::ICMR1.BCWP.b();
-				IICA::ICBRH = 0b11100000 | 10;
-				IICA::ICBRL = 0b11100000 | 21;
+			case SPEED::_200K:
+			case SPEED::_250K:
+			case SPEED::_300K:
+			case SPEED::_350K:
+				idx_base += CLOCK_OFS_200K;
+				break;
+			case SPEED::FAST:		// 400K b.p.s. (Fast mode)
+				idx_base += CLOCK_OFS_400K;
+				break;
+			case SPEED::FAST_PLUS:	// 1M b.p.s. (Fast plus mode)
+				idx_base += CLOCK_OFS_1000K;
 				break;
 			default:
-				error_ = ERROR::START;
+				error_ = ERROR::CLOCK_DIVIDE;
 				port_map::turn(IICA::PERIPHERAL, false);
 				power_mgr::turn(IICA::PERIPHERAL, false);
 				return false;
+			}
+			IICA::ICMR1 = IICA::ICMR1.CKS.b(clock_tables_[idx_base].CKS) | IICA::ICMR1.BCWP.b();
+			IICA::ICBRL = 0b11100000 | clock_tables_[idx_base].ICBRL;
+			IICA::ICBRH = 0b11100000 | clock_tables_[idx_base].ICBRH;
+
+			if(nf == NF::NONE) {
+				IICA::ICFER.NFE = 0;
+			} else {
+				IICA::ICMR3.NF = static_cast<uint8_t>(nf);
+				IICA::ICFER.NFE = 1;
 			}
 
 ///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
 			if(level_ > 0) {
-				icu_mgr::set_interrupt(IICA::RX_VEC, recv_itask_,  level_);
-				icu_mgr::set_interrupt(IICA::TX_VEC, send_itask_,  level_);
-				if(icu_mgr::get_group_vector(IICA::EE_VEC) == ICU::VECTOR::NONE) {
+				icu_mgr::set_interrupt(IICA::RX_VEC, recv_itask_, level_);
+				icu_mgr::set_interrupt(IICA::TX_VEC, send_itask_, level_);
+
+				if(icu_mgr::get_group_vector(IICA::EE_VEC) == ICU::VECTOR::NONE) {  // 通常割り込みの場合
 					icu_mgr::set_interrupt(IICA::EE_VEC, event_itask_, level_);
 				} else {
 					icu_mgr::set_interrupt(IICA::EE_VEC, event_ntask_, level_);	// グループ割り込みの場合、通常の関数を登録
 				}
-				if(icu_mgr::get_group_vector(IICA::TE_VEC) == ICU::VECTOR::NONE) {
+				if(icu_mgr::get_group_vector(IICA::TE_VEC) == ICU::VECTOR::NONE) {  // 通常割り込みの場合
 					icu_mgr::set_interrupt(IICA::TE_VEC, tend_itask_, level_);
 				} else {
 					icu_mgr::set_interrupt(IICA::TE_VEC, tend_ntask_, level_);  // グループ割り込みの場合、通常の関数を登録
@@ -292,24 +351,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	送信
-			@param[in]	adr	I2C ７ビットアドレス
-			@param[in]	src	転送先
-			@param[in]	len	送信バイト数
+			@brief	送信 @n
+					割り込み動作で「非同期」の場合、メモリソースの保護が必要
+			@param[in]	adr		I2C ７ビットアドレス
+			@param[in]	src		転送先
+			@param[in]	len		送信バイト数
 			@param[in]	sync	非同期の場合「false」
 			@return 送信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool send(uint8_t adr, const void* src, uint16_t len, bool sync = true) noexcept
+		bool send(uint8_t adr, const void* src, uint32_t len, bool sync = true) noexcept
 		{
-			if(len == 0) return false;
+			if(len == 0 || len > TPSZ) {
+				error_ = ERROR::BUFF_SIZE;
+				return false;
+			}
 
-			error_ = ERROR::NONE;
-
-			if(!setup_start_()) {
+			if(!setup_start_()) {  // 開始時 I2C バスがビジーの場合、失敗する。
 				error_ = ERROR::START;
 				return false;
 			}
+
+			error_ = ERROR::NONE;
 
 			const uint8_t* ptr = static_cast<const uint8_t*>(src);
 
@@ -324,7 +387,9 @@ namespace device {
 				IICA::ICIER = IICA::ICIER() | IICA::ICIER.NAKIE.b() | IICA::ICIER.TIE.b();
 				IICA::ICCR2.ST = 1;
 				if(sync) {
-					while(intr_.send_id_back_ == intr_.send_id_) sleep_();
+					while(intr_.send_id_back_ == intr_.send_id_) {
+						sleep_();
+					}
 					if(intr_.event_ != event::NONE) {
 						error_ = ERROR::SEND_DATA;
 						ret = false;
@@ -438,22 +503,26 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	受信
-			@param[in]	adr	７ビットアドレス
-			@param[out]	dst	転送先
-			@param[in]	len	受信バイト数
+			@param[in]	adr		７ビットアドレス
+			@param[out]	dst		転送先
+			@param[in]	len		受信バイト数
+			@param[in]	sync	転送同期を行わない場合「false」
 			@return 受信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool recv(uint8_t adr, void* dst, uint16_t len) noexcept
+		bool recv(uint8_t adr, void* dst, uint16_t len, bool sync = true) noexcept
 		{
-			if(len == 0) return false;
+			if(len == 0 || len > TPSZ) {
+				error_ = ERROR::BUFF_SIZE;
+				return false;
+			}
 
-			error_ = ERROR::NONE;
-
-			if(!setup_start_()) {
+			if(!setup_start_()) {  // 開始時 I2C バスがビジーの場合、失敗する。
 				error_ = ERROR::START;
 				return false;
 			}
+
+			error_ = ERROR::NONE;
 
 			uint8_t* ptr = static_cast<uint8_t*>(dst);
 
@@ -558,5 +627,5 @@ namespace device {
 		}
 	};
 
-	template<class IICA> typename iica_io<IICA>::intr_t iica_io<IICA>::intr_;
+	template<class IICA, uint32_t TPSZ> typename iica_io<IICA, TPSZ>::intr_t iica_io<IICA, TPSZ>::intr_;
 }

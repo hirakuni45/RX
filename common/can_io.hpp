@@ -206,7 +206,7 @@ namespace device {
 			// より大きい値で適合した値を選択
 			uint32_t tq = 25;
 			while(1) {
-				if((device::clock_profile::PCLKB % (static_cast<uint32_t>(speed) * tq)) == 0) {
+				if((CAN::PCLK % (static_cast<uint32_t>(speed) * tq)) == 0) {
 					break;
 				}
 				tq--;
@@ -227,7 +227,7 @@ namespace device {
 			}
 
 			// 動作クロックの設定
-			uint32_t brp = device::clock_profile::PCLKB / (static_cast<uint32_t>(speed) * tq);
+			uint32_t brp = CAN::PCLK / (static_cast<uint32_t>(speed) * tq);
 			uint32_t tseg1 = 16;
 			uint32_t tseg2 = 8;
 			uint32_t sjw = 4;  // とりあえず固定
@@ -427,7 +427,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  BRP カウントを返す（レジスタの値ではない）
+			@brief  BRP カウントを返す（レジスタの値 + 1）
 			@return TSEG1 カウント
 		*/
 		//-----------------------------------------------------------------//
@@ -436,7 +436,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  TSEG1 カウントを返す（レジスタの値ではない）
+			@brief  TSEG1 カウントを返す（レジスタの値 + 1）
 			@return TSEG1 カウント
 		*/
 		//-----------------------------------------------------------------//
@@ -445,7 +445,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  TSEG2 カウントを返す（レジスタの値ではない）
+			@brief  TSEG2 カウントを返す（レジスタの値 + 1）
 			@return TSEG2 カウント
 		*/
 		//-----------------------------------------------------------------//
@@ -454,7 +454,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  SJW カウントを返す（レジスタの値ではない）
+			@brief  SJW カウントを返す（レジスタの値 + 1）
 			@return SJW カウント
 		*/
 		//-----------------------------------------------------------------//
@@ -468,7 +468,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_speed() const noexcept {
-			return device::clock_profile::PCLKB
+			return CAN::PCLK
 				/ (get_bcr_brp() * (1 + get_bcr_tseg1() + get_bcr_tseg2()));
 		}
 
@@ -503,8 +503,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void reset_mb(uint32_t idx) noexcept
 		{
-			CAN::MCTL[idx] = 0;
-			CAN::MCTL[idx] = 0;
+			if(idx < 32) {
+				CAN::MCTL[idx] = 0;
+				CAN::MCTL[idx] = 0;
+			}
 		}
 
 
@@ -517,7 +519,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool probe_mb(uint32_t idx) noexcept
 		{
-			return CAN::MCTL[idx].TRMREQ() | CAN::MCTL[idx].RECREQ();
+			if(idx < 32) {
+				return CAN::MCTL[idx].TRMREQ() | CAN::MCTL[idx].RECREQ();
+			} else {
+				return 0;
+			}
 		}
 
 
@@ -531,10 +537,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool send_mb(uint32_t idx, bool one = 0) noexcept
 		{
-			reset_mb(idx);
-			while(CAN::MCTL[idx]() != 0) sleep_();
-			CAN::MCTL[idx] = CAN::MCTL.TRMREQ.b(1) | CAN::MCTL.ONESHOT.b(one);
-			return true;
+			if(idx < 32) {
+				reset_mb(idx);
+				while(CAN::MCTL[idx]() != 0) sleep_();
+				CAN::MCTL[idx] = CAN::MCTL.TRMREQ.b(1) | CAN::MCTL.ONESHOT.b(one);
+				return true;
+			} else {
+				return 0;
+			}
 		}
 
 
@@ -548,10 +558,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool recv_mb(uint32_t idx, bool one = 0) noexcept
 		{
-			reset_mb(idx);
-			while(CAN::MCTL[idx]() != 0) sleep_();
-			CAN::MCTL[idx] = CAN::MCTL.RECREQ.b(1) | CAN::MCTL.ONESHOT.b(one);
-			return true;
+			if(idx < 32) {
+				reset_mb(idx);
+				while(CAN::MCTL[idx]() != 0) sleep_();
+				CAN::MCTL[idx] = CAN::MCTL.RECREQ.b(1) | CAN::MCTL.ONESHOT.b(one);
+				return true;
+			} else {
+				return 0;
+			}
 		}
 
 
@@ -564,7 +578,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint8_t stat_mb(uint32_t idx) noexcept
 		{
-			return CAN::MCTL[idx]();
+			if(idx < 32) {
+				return CAN::MCTL[idx]();
+			} else {
+				return 0;
+			}
 		}
 
 
@@ -577,8 +595,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void set_mb(uint32_t idx, const can_frame& frm) noexcept
 		{
-			auto& mb = CAN::MB[idx];
-			mb.set(frm);
+			if(idx < 32) {
+				auto& mb = CAN::MB[idx];
+				mb.set(frm);
+			}
 		}
 
 

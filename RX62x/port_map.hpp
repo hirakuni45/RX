@@ -1,8 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX621/RX62N グループ・ポート・マッピング @n
-			コメントのピン番号は、LQFP100 パッケージの場合
+	@brief	RX621/RX62N グループ・ポート・マッピング
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -64,6 +63,25 @@ namespace device {
 			case peripheral::SCI6:
 				MPC::PFFSCI.SCI6S = 0;
 				PORT0::ICR.B1 = enable;  ///< RxD6-A
+				break;
+
+			/// SCL0: P12
+			/// SDA0: P13
+			case peripheral::RIIC0:
+				// 設定は特に無し（SCL/SDA 出力として扱う）
+				break;
+
+			/// SCL1: P21
+			/// SDA1: P20
+			case peripheral::RIIC1:
+				// 設定は特に無し（SCL/SDA 出力として扱う）
+				break;
+
+			/// CTX0: P32
+			/// CRX0: P33
+			case peripheral::CAN:
+				MPC::PFJCAN.CAN0E = enable;
+				PORT3::ICR.B3 = enable;  ///< CRX0
 				break;
 
 			default:
