@@ -2,7 +2,7 @@
 /*!	@file
 	@brief	Renesas RX Series Programmer (Flash Writer)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "1.30";
+	const std::string version_ = "1.40";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -185,7 +185,7 @@ namespace {
 		std::string c = utils::get_file_base(cmd);
 
 		cout << "Renesas RX Series Programmer Version " << version_ << endl;
-		cout << "Copyright (C) 2016,2020 Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
+		cout << "Copyright (C) 2016, 2022 Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
 		cout << "usage:" << endl;
 		cout << c << " [options] [mot file] ..." << endl;
 		cout << endl;
@@ -413,26 +413,26 @@ int main(int argc, char* argv[])
 	rx.verbose_ = opts.verbose;
 	rx.cpu_type_ = opts.device;
 
-	if(rx.cpu_type_ == "RX63T") {
+	if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N" || rx.cpu_type_ == "RX63T") {
 		// rx.master_ = 1200;  // 12.00MHz
 		// rx.sys_div_ = 8;    // x8 (96MHz)
 		// rx.ext_div_ = 4;    // x4 (48MHz)
 		auto devt = conf_in_.get_device();
 		int32_t val = 0;;
 		if(!utils::string_to_int(devt.clock_, val)) {
-			std::cerr << "RX63T 'clock' tag conversion error: '" << devt.clock_ << '\'' << std::endl;
+			std::cerr << rx.cpu_type_ << " 'clock' tag conversion error: '" << devt.clock_ << '\'' << std::endl;
 			return -1;
 		}
 		rx.master_ = val;
 
 		if(!utils::string_to_int(devt.divide_sys_, val)) {
-			std::cerr << "RX63T 'divide_sys' tag conversion error: '" << devt.divide_sys_ << '\'' << std::endl;
+			std::cerr << rx.cpu_type_ << " 'divide_sys' tag conversion error: '" << devt.divide_sys_ << '\'' << std::endl;
 			return -1;
 		}
 		rx.sys_div_ = val;
 
 		if(!utils::string_to_int(devt.divide_ext_, val)) {
-			std::cerr << "RX63T 'divide_ext' tag conversion error: '" << devt.divide_ext_ << '\'' << std::endl;
+			std::cerr << rx.cpu_type_ << " 'divide_ext' tag conversion error: '" << devt.divide_ext_ << '\'' << std::endl;
 			return -1;
 		}
 		rx.ext_div_ = val;
