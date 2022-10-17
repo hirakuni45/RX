@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ルネサス RX デバイス選択
+	@brief	ルネサス RX ペリフェラル／デバイス選択
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -13,16 +13,33 @@
 #include "common/delay.hpp"
 #include "common/device.hpp"
 
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+#include "RX62x/lvd.hpp"
+#include "RX62x/bus.hpp"
+#include "RX62x/system.hpp"
+#include "RX62x/system_io.hpp"
+#include "RX600/dmac.hpp"
+#include "RX600/exdmac.hpp"
+#include "RX62x/port.hpp"
+#include "RX62x/mtu2.hpp"
+#include "RX62x/poe2.hpp"
+#include "RX600/ppg.hpp"
+// RTC
+#include "RX62x/wdt.hpp"
+#include "RX600/etherc.hpp"
+#include "RX600/edmac.hpp"
+// USB
+#include "RX600/crc.hpp"
+#include "RX600/can.hpp"
+#include "RX62x/s12ad.hpp"
+#include "RX62x/ad.hpp"
+#include "RX62x/da.hpp"
+#include "RX62x/flash.hpp"
+
+#elif defined(SIG_RX24T)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 
-#if defined(SIG_RX621) || defined(SIG_RX62N)
-#include "RX62x/system.hpp"
-#include "RX62x/system_io.hpp"
-#include "RX62x/port.hpp"
-#include "RX600/can.hpp"
-
-#elif defined(SIG_RX24T)
 #include "RX24T/system.hpp"
 #include "RX24T/system_io.hpp"
 #include "RX600/cac.hpp"
@@ -41,6 +58,9 @@
 #include "RX600/doc.hpp"
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
+#include "RX600/lvda.hpp"
+#include "RX600/bus.hpp"
+
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
 #include "RX600/cac.hpp"
@@ -86,7 +106,57 @@
 #include "RX600/crc.hpp"
 #include "RX600/doc.hpp"
 
+#elif defined(SIG_RX65N)
+#include "RX600/lvda.hpp"
+#include "RX600/bus.hpp"
+
+#include "RX600/system.hpp"
+#include "RX600/system_io.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/port.hpp"
+#include "RX600/mtu3.hpp"
+#include "RX600/poe3.hpp"
+#include "RX600/dmac.hpp"
+#include "RX600/elc.hpp"
+#include "RX600/exdmac.hpp"
+#include "RX600/mpc.hpp"
+#include "RX600/tpu.hpp"
+#include "RX600/ppg.hpp"
+#include "RX600/cmtw.hpp"
+#include "RX600/qspi.hpp"
+#include "RX600/can.hpp"
+#include "RX600/s12adf.hpp"
+#include "RX600/adc_in.hpp"
+#include "RX600/r12da.hpp"
+#include "RX600/dac_out.hpp"
+#include "RX600/sdram.hpp"
+#include "RX600/etherc.hpp"
+#include "RX600/edmac.hpp"
+#include "RX600/usb.hpp"
+#include "RX600/rtc.hpp"
+#include "RX600/rtc_io.hpp"
+#include "RX600/wdta.hpp"
+#include "RX600/flash.hpp"
+#include "RX600/flash_io.hpp"
+#include "RX600/ether_io.hpp"
+#include "RX600/sdhi.hpp"
+#include "RX600/sdhi_io.hpp"
+#include "RX600/sdsi.hpp"
+#include "RX600/mmcif.hpp"
+#include "RX600/pdc.hpp"
+#include "RX600/standby_ram.hpp"
+#include "RX600/glcdc.hpp"
+#include "RX600/glcdc_mgr.hpp"
+#include "RX600/drw2d.hpp"
+#include "RX600/drw2d_mgr.hpp"
+#include "RX600/dmac_mgr.hpp"
+#include "RX600/crca.hpp"
+#include "RX600/doc.hpp"
+
 #elif defined(SIG_RX72M) || defined(SIG_RX72N)
+#include "RX600/lvda.hpp"
+#include "RX600/bus.hpp"
+
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
 #include "RX600/cac.hpp"
@@ -141,77 +211,10 @@
 #include "RX600/crca.hpp"
 #include "RX600/doc.hpp"
 
-#elif defined(SIG_RX65N)
-#include "RX600/system.hpp"
-#include "RX600/system_io.hpp"
-#include "RX600/cac.hpp"
-#include "RX600/port.hpp"
-#include "RX600/mtu3.hpp"
-#include "RX600/poe3.hpp"
-#include "RX600/dmac.hpp"
-#include "RX600/elc.hpp"
-#include "RX600/exdmac.hpp"
-#include "RX600/mpc.hpp"
-#include "RX600/tpu.hpp"
-#include "RX600/ppg.hpp"
-#include "RX600/cmtw.hpp"
-#include "RX600/qspi.hpp"
-#include "RX600/can.hpp"
-#include "RX600/s12adf.hpp"
-#include "RX600/adc_in.hpp"
-#include "RX600/r12da.hpp"
-#include "RX600/dac_out.hpp"
-#include "RX600/sdram.hpp"
-#include "RX600/etherc.hpp"
-#include "RX600/edmac.hpp"
-#include "RX600/usb.hpp"
-#include "RX600/rtc.hpp"
-#include "RX600/rtc_io.hpp"
-#include "RX600/wdta.hpp"
-#include "RX600/flash.hpp"
-#include "RX600/flash_io.hpp"
-#include "RX600/ether_io.hpp"
-#include "RX600/sdhi.hpp"
-#include "RX600/sdhi_io.hpp"
-#include "RX600/sdsi.hpp"
-#include "RX600/mmcif.hpp"
-#include "RX600/pdc.hpp"
-#include "RX600/standby_ram.hpp"
-#include "RX600/glcdc.hpp"
-#include "RX600/glcdc_mgr.hpp"
-#include "RX600/drw2d.hpp"
-#include "RX600/drw2d_mgr.hpp"
-#include "RX600/dmac_mgr.hpp"
-#include "RX600/crca.hpp"
-#include "RX600/doc.hpp"
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+#include "RX600/lvda.hpp"
+#include "RX600/bus.hpp"
 
-#elif defined(SIG_RX66T)
-#include "RX600/system.hpp"
-#include "RX600/system_io.hpp"
-#include "RX600/cac.hpp"
-#include "RX600/port.hpp"
-#include "RX600/mtu3.hpp"
-#include "RX600/poe3.hpp"
-#include "RX600/dmac.hpp"
-#include "RX600/elc.hpp"
-#include "RX600/mpc.hpp"
-#include "RX600/gptw.hpp"
-#include "RX600/hrpwm.hpp"
-#include "RX600/poeg.hpp"
-#include "RX600/can.hpp"
-#include "RX72T/s12adh.hpp"
-#include "RX600/r12da.hpp"
-#include "RX600/dac_out.hpp"
-#include "RX600/usb.hpp"
-#include "RX600/wdta.hpp"
-#include "RX600/flash.hpp"
-#include "RX600/flash_io.hpp"
-#include "RX600/cmpc.hpp"
-#include "RX600/dmac_mgr.hpp"
-#include "RX600/crca.hpp"
-#include "RX600/doc.hpp"
-
-#elif defined(SIG_RX72T)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
 #include "RX600/cac.hpp"
@@ -238,7 +241,7 @@
 #include "RX600/doc.hpp"
 
 #else
-#  error "renesas.hpp: Requires SIG_XXX to be defined"
+#  error "renesas.hpp: Requires SIG_RXxxx to be defined"
 #endif
 
 // RX マイコン共通ペリフェラル

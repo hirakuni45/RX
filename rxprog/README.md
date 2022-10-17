@@ -19,10 +19,12 @@ Tool to write program to flash memory of RX microcontroller using serial interfa
  - rx_prog.hpp
  - rx_protocol.hpp
  - rx24t_protocol.hpp
+ - rx62x_protocol.hpp
  - rx63t_protocol.hpp
  - rx64m_protocol.hpp
  - rx65x_protocol.hpp
  - rx66t_protocol.hpp
+ - rx72t_protocol.hpp
  - sjis_utf16.cpp
  - sjis_utf16.hpp
  - string_utils.cpp

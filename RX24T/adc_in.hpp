@@ -65,7 +65,7 @@ namespace device {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(typename ADCU::analog ana, uint8_t level = 0)
+		bool start(typename ADCU::ANALOG ana, uint8_t level = 0)
 		{
 			level_ = level;
 
@@ -126,7 +126,7 @@ namespace device {
 			@return 変換結果（上位１０ビットが有効な値）
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t get(typename ADCU::analog an) const {
+		uint16_t get(typename ADCU::ANALOG an) const {
 			return ADCU::ADDR(an);
 		}
 	};

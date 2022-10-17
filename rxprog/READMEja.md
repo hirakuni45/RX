@@ -17,6 +17,7 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
  - rx_prog.hpp
  - rx_protocol.hpp
  - rx24t_protocol.hpp
+ - rx62x_protocol.hpp
  - rx63t_protocol.hpp
  - rx64m_protocol.hpp
  - rx65x_protocol.hpp
@@ -56,13 +57,13 @@ RX/README.md、RX/READMEja.md の開発環境準備を参照
    
 ---
 ## 接続端子一覧
-|端子|RX24T(100)|RX66T(100)|RX64M (176)|RX71M(176)|RX65N(176)|RX72T(144)
-|---|---|---|---|---|---|---|
-|UB|X|UB/P00(4)|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|UB/P00(9)|
-|MD|MD(6)|MD/FINED(6)|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|MD?FINED(11)|
-|EMLE|X|EMLE(2)|EMLE(10)|EMLE(10)|EMLE(10)|EMLE(7)|
-|RXD|PD5/RXD1(20)|PD5/RXD1(20)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PD5/RXD1(25)|
-|TXD|PD3/TXD1(22)|PD3/TXD1(22)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PD3/TXD1(27)|
+|端子|RX62N(144)|RX24T(100)|RX66T(100)|RX64M (176)|RX71M(176)|RX65N(176)|RX72T(144)
+|---|---|---|---|---|---|---|---|
+|UB||X|UB/P00(4)|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|UB/P00(9)|
+|MD||MD(6)|MD/FINED(6)|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|MD?FINED(11)|
+|EMLE||X|EMLE(2)|EMLE(10)|EMLE(10)|EMLE(10)|EMLE(7)|
+|RXD||PD5/RXD1(20)|PD5/RXD1(20)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PD5/RXD1(25)|
+|TXD||PD3/TXD1(22)|PD3/TXD1(22)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PD3/TXD1(27)|
    
 - UB、MD、EMLE 端子は、抵抗（4.7K 程度）でプルアップ、又はプルダウン。
 - XTAL、EXTAL に適切なクリスタルを接続。

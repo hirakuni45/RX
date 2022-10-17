@@ -355,9 +355,11 @@ namespace device {
 		@brief  edmac 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	IT		割り込み型
+		@param[in]	eint	割り込み番号
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
+	template <uint32_t base, peripheral per, typename IT, IT eint>
 	struct edmac_t : public edmac_core_t<base, per> {
 
 		static constexpr auto EINT = eint;
@@ -491,14 +493,14 @@ namespace device {
 		typedef iosr_t<base + 0x6C> IOSR_;
 		static  IOSR_ IOSR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
-		typename edmac_t<base, per, eint>::EESR_ edmac_t<base, per, eint>::EESR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
-		typename edmac_t<base, per, eint>::EESIPR_ edmac_t<base, per, eint>::EESIPR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
-		typename edmac_t<base, per, eint>::TRSCER_ edmac_t<base, per, eint>::TRSCER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
-		typename edmac_t<base, per, eint>::IOSR_ edmac_t<base, per, eint>::IOSR;
+	template <uint32_t base, peripheral per, typename IT, IT eint>
+		typename edmac_t<base, per, IT, eint>::EESR_ edmac_t<base, per, IT, eint>::EESR;
+	template <uint32_t base, peripheral per, typename IT, IT eint>
+		typename edmac_t<base, per, IT, eint>::EESIPR_ edmac_t<base, per, IT, eint>::EESIPR;
+	template <uint32_t base, peripheral per, typename IT, IT eint>
+		typename edmac_t<base, per, IT, eint>::TRSCER_ edmac_t<base, per, IT, eint>::TRSCER;
+	template <uint32_t base, peripheral per, typename IT, IT eint>
+		typename edmac_t<base, per, IT, eint>::IOSR_ edmac_t<base, per, IT, eint>::IOSR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -590,9 +592,13 @@ namespace device {
 	template <uint32_t base, peripheral per>
 		typename ptpedmac_t<base, per>::EESIPR_ ptpedmac_t<base, per>::EESIPR;
 
-	typedef edmac_t<0x000C0000, peripheral::EDMAC0, ICU::VECTOR_AL1::EINT0> EDMAC0;
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef edmac_t<0x000C0000, peripheral::EDMAC, ICU::VECTOR, ICU::VECTOR::EINT> EDMAC;
+#else
+	typedef edmac_t<0x000C0000, peripheral::EDMAC0, ICU::VECTOR_AL1, ICU::VECTOR_AL1::EINT0> EDMAC0;
+#endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)
-	typedef edmac_t<0x000C0200, peripheral::EDMAC1, ICU::VECTOR_AL1::EINT1> EDMAC1;
+	typedef edmac_t<0x000C0200, peripheral::EDMAC1, ICU::VECTOR_AL1, ICU::VECTOR_AL1::EINT1> EDMAC1;
 	typedef ptpedmac_t<0x000C0400, peripheral::PTPEDMAC> PTPEDMAC;
 #endif
 }

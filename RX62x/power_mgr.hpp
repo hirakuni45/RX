@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T グループ・電力制御 @n
+	@brief	RX621/RX62N グループ・電力制御 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -61,6 +61,8 @@ namespace device {
 				pad &= ~(1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org)));
 			}
 		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  モジュール・ストップ機能を設定
@@ -139,11 +141,17 @@ namespace device {
 				break;
 
 			case peripheral::DTC:
-			case peripheral::DMACA:
-				SYSTEM::MSTPCRA.MSTPA28 = f;
+			case peripheral::DMAC0:
+			case peripheral::DMAC1:
+			case peripheral::DMAC2:
+			case peripheral::DMAC3:
+				sr_(ena, pad_.dmac_, peripheral::DTC, per);
+				SYSTEM::MSTPCRA.MSTPA28 = (pad_.dmac_ == 0);
 				break;
-			case peripheral::EXDMAC:
-				SYSTEM::MSTPCRA.MSTPA29 = f;
+			case peripheral::EXDMAC0:
+			case peripheral::EXDMAC1:
+				sr_(ena, pad_.exdmac_, peripheral::EXDMAC0, per);
+				SYSTEM::MSTPCRA.MSTPA29 = (pad_.exdmac_ == 0);
 				break;
 
 			case peripheral::CAN:

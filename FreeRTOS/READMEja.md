@@ -1,9 +1,9 @@
-Renesas RX マイコン FreeRTOS カーネル (V202011.00)
+Renesas RX マイコン FreeRTOS カーネル (V10.4.6)
 =========
 
 <img src="../docs/Logo_freeRTOS.png" width="50%">
 
-[English](README.md)
+[英語版](README.md)
 
 ## 概要
 
@@ -36,6 +36,7 @@ RX24T/Makefile の環境変数の設定で、このサイズを変更出来ま�
 - READMEja.md
 - README.md
 - Source (FreeRTOS Kernel sources)
+- [RX62N/Makefile](RX62N/Makefile)
 - [RX24T/Makefile](RX24T/Makefile)
 - [RX64M/Makefile](RX64M/Makefile)
 - [RX71M/Makefile](RX71M/Makefile)

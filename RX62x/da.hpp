@@ -1,26 +1,24 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・D/A 定義
+	@brief	RX621/RX62N グループ・D/A 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  D/A コンバータ（DA, DAa）@n
-				※チップバージョンＡとＢでチャネル数が異なる
-		@param[in]	base	ベース・アドレス
+		@brief  D/A コンバータ（DA）
 		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <peripheral per>
 	struct da_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
@@ -30,7 +28,7 @@ namespace device {
 			@brief  D/A データレジスタ 0（DADR0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000880C0> DADR0_;
+		typedef rw16_t<0x0008'80C0> DADR0_;
 		static DADR0_ DADR0;
 
 
@@ -39,7 +37,7 @@ namespace device {
 			@brief  D/A データレジスタ 1（DADR1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000880C2> DADR1_;
+		typedef rw16_t<0x0008'80C2> DADR1_;
 		static DADR1_ DADR1;
 
 
@@ -57,10 +55,11 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
+			bit_rw_t<io_, bitpos::B5> DAE;
 			bit_rw_t<io_, bitpos::B6> DAOE0;
 			bit_rw_t<io_, bitpos::B7> DAOE1;
 		};
-		typedef dacr_t<0x000880C4> DACR_;
+		typedef dacr_t<0x0008'80C4> DACR_;
 		static DACR_ DACR;
 
 
@@ -80,13 +79,13 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DPSEL;
 		};
-		typedef dadpr_t<0x000880C5> DADPR_;
+		typedef dadpr_t<0x0008'80C5> DADPR_;
 		static DADPR_ DADPR;
 	};
-	template <uint32_t base, peripheral per> typename da_t<base, per>::DADR0_ da_t<base, per>::DADR0;
-	template <uint32_t base, peripheral per> typename da_t<base, per>::DADR1_ da_t<base, per>::DADR1;
-	template <uint32_t base, peripheral per> typename da_t<base, per>::DACR_  da_t<base, per>::DACR;
-	template <uint32_t base, peripheral per> typename da_t<base, per>::DADPR_ da_t<base, per>::DADPR;
+	template <peripheral per> typename da_t<per>::DADR0_ da_t<per>::DADR0;
+	template <peripheral per> typename da_t<per>::DADR1_ da_t<per>::DADR1;
+	template <peripheral per> typename da_t<per>::DACR_  da_t<per>::DACR;
+	template <peripheral per> typename da_t<per>::DADPR_ da_t<per>::DADPR;
 
-	typedef da_t<0x000880C0, peripheral::DA> DA;
+	typedef da_t<peripheral::DA> DA;
 }

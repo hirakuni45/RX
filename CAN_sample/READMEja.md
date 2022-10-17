@@ -27,7 +27,7 @@ CAN が複数チャネルある場合、チャネルを切り替えて通信す�
 - RXxxx/clock_profile.h で、各モジュール別の設定周波数を宣言している。
 - LED を指定のポートに接続する。
 - RX72N Envision kit の場合は、ボード上の青色 LED を利用する。
-- CAN ポートに、CAN バス・トランシーバーを接続します。
+- CAN ポートに、CAN バス・トランシーバーを接続します。(CTX0, CRX0)
 - CAN バス・トランシーバーには適切なターミネーター抵抗を接続します。
 - CAN バス・トランシーバーは、3.3V で動作する品種が必要です。
    
@@ -45,7 +45,7 @@ CAN バス・トランシーバーを接続するポートは、以下のソー�
 |RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
    
 RX64M の場合 (port_map.hpp FIRST 候補)
-```
+```C++
             case peripheral::CAN0:
                 {
                     uint8_t sel = enable ? 0b010000 : 0;
@@ -72,7 +72,15 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 ### CAN バス・トランシーバーの代表的な品種
 
 [Texas Instruments: SN65HVD23x](https://www.ti.com/jp/lit/ds/symlink/sn65hvd230.pdf?ts=1604189973572&ref_url=https%253A%252F%252Fwww.google.com%252F)
-※ 3.3V で動作させる場合の候補
+- 3.3V 動作
+- 5V 不可
+
+[NXP Semiconductors: TJA1441](https://www.nxp.com/docs/en/data-sheet/TJA1441.pdf)
+- 電源 5V
+- I/O 3.3V、5V 選択可
+- 最大 5 Mbit/s
+
+---
 
 ### RX64M/RX71M の場合
 

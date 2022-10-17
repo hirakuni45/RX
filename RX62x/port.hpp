@@ -152,23 +152,23 @@ namespace device {
 	template <uint32_t base> typename portx_t<base>::ODR_  portx_t<base>::ODR;
 
 
-	typedef portx_t<0x0008C000> PORT0;
-	typedef portx_t<0x0008C001> PORT1;
-	typedef portx_t<0x0008C002> PORT2;
-	typedef portx_t<0x0008C003> PORT3;
-	typedef portx_t<0x0008C004> PORT4;
-	typedef portx_t<0x0008C005> PORT5;
-	typedef portx_t<0x0008C006> PORT6;
-	typedef portx_t<0x0008C007> PORT7;
-	typedef portx_t<0x0008C008> PORT8;
-	typedef portx_t<0x0008C009> PORT9;
-	typedef portx_t<0x0008C00A> PORTA;
-	typedef portx_t<0x0008C00B> PORTB;
-	typedef portx_t<0x0008C00C> PORTC;
-	typedef portx_t<0x0008C00D> PORTD;
-	typedef portx_t<0x0008C00E> PORTE;
-	typedef portx_t<0x0008C00F> PORTF;
-	typedef portx_t<0x0008C010> PORTG;
+	typedef portx_t<0x0008'C000> PORT0;
+	typedef portx_t<0x0008'C001> PORT1;
+	typedef portx_t<0x0008'C002> PORT2;
+	typedef portx_t<0x0008'C003> PORT3;
+	typedef portx_t<0x0008'C004> PORT4;
+	typedef portx_t<0x0008'C005> PORT5;
+	typedef portx_t<0x0008'C006> PORT6;
+	typedef portx_t<0x0008'C007> PORT7;
+	typedef portx_t<0x0008'C008> PORT8;
+	typedef portx_t<0x0008'C009> PORT9;
+	typedef portx_t<0x0008'C00A> PORTA;
+	typedef portx_t<0x0008'C00B> PORTB;
+	typedef portx_t<0x0008'C00C> PORTC;
+	typedef portx_t<0x0008'C00D> PORTD;
+	typedef portx_t<0x0008'C00E> PORTE;
+	typedef portx_t<0x0008'C00F> PORTF;
+	typedef portx_t<0x0008'C010> PORTG;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -375,7 +375,7 @@ namespace device {
 
 			bit_rw_t<io, bitpos::B6> SCI6S;
 		};
-		typedef pffsci_t<0x0008C10F> PFFSCI_;
+		typedef pffsci_t<0x0008'C10F> PFFSCI_;
 		static PFFSCI_ PFFSCI;
 
 
@@ -395,7 +395,7 @@ namespace device {
 
 			bit_rw_t<io, bitpos::B0> CAN0E;
 		};
-		typedef pfjcan_t<0x0008C113> PFJCAN_;
+		typedef pfjcan_t<0x0008'C113> PFJCAN_;
 		static PFJCAN_ PFJCAN;
 	};
 	typedef mpc_t<void> MPC;

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・RSPI[abc] 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -29,7 +29,6 @@ namespace device {
 		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
 		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
 		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -352,17 +351,6 @@ namespace device {
 		static SPCMD5_ SPCMD5;
 		static SPCMD6_ SPCMD6;
 		static SPCMD7_ SPCMD7;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  チャンネルを返す
-			@return チャネル
-		*/
-		//-----------------------------------------------------------------//
-		int get_chanel() const {
-			return (base >> 5) & 3;
-		}
 	};
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
 		typename rspi_t<base, per, txv, rxv, pclk>::SPCR_ rspi_t<base, per, txv, rxv, pclk>::SPCR;
@@ -443,8 +431,12 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
 		typename rspi_c_t<base, per, txv, rxv, pclk>::SPDCR2_ rspi_c_t<base, per, txv, rxv, pclk>::SPDCR2;
 
-
-#if defined(SIG_RX24T)
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef rspi_t<0x00088380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
+		clock_profile::PCLK>  RSPI0;
+	typedef rspi_t<0x000883A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
+		clock_profile::PCLK>  RSPI1;
+#elif defined(SIG_RX24T)
 	typedef rspi_t<0x00088380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKB>  RSPI0;
 #elif defined(SIG_RX64M)

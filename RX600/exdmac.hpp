@@ -402,6 +402,11 @@ namespace device {
 
 	};
 
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef exdmac0_t<0x00082800, peripheral::EXDMAC0, ICU::VECTOR::EXDMACI0> EXDMAC0;
+	typedef exdmac1_t<0x00082840, peripheral::EXDMAC1, ICU::VECTOR::EXDMACI1> EXDMAC1;
+#else
 	typedef exdmac0_t<0x00082800, peripheral::EXDMAC0, ICU::VECTOR::EXDMAC0I> EXDMAC0;
 	typedef exdmac1_t<0x00082840, peripheral::EXDMAC1, ICU::VECTOR::EXDMAC1I> EXDMAC1;
+#endif
 }

@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 

@@ -156,6 +156,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   CURPIPE;
 
 			bit_rw_t <io_, bitpos::B5>	    ISEL;
+
 			bit_rw_t <io_, bitpos::B8>	    BIGEND;
 
 			bit_rw_t <io_, bitpos::B10>	    MBW;
