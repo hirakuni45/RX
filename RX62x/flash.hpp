@@ -41,7 +41,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4> FRDMD;
 		};
-		typedef fmodr_t<0x007FC402> FMODR_;
+		typedef fmodr_t<0x007F'C402> FMODR_;
 		static FMODR_ FMODR;
 
 
@@ -67,7 +67,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7> ROMAE;
 		};
-		typedef fastat_t<0x007FC410> FASTAT_;
+		typedef fastat_t<0x007F'C410> FASTAT_;
 		static FASTAT_ FASTAT;
 
 
@@ -93,7 +93,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7> ROMAEIE;
 		};
-		typedef faeint_t<0x007FC411> FAEINT_;
+		typedef faeint_t<0x007F'C411> FAEINT_;
 		static FAEINT_ FAEINT;
 
 
@@ -115,7 +115,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef fcurame_t<0x007FC454> FCURAME_;
+		typedef fcurame_t<0x007F'C454> FCURAME_;
 		static FCURAME_ FCURAME;
 
 
@@ -139,7 +139,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  ILGERR;
 			bit_rw_t<io_, bitpos::B7>  FRDY;
 		};
-		typedef fstatr0_t<0x007FFFB0> FSTATR0_;
+		typedef fstatr0_t<0x007F'FFB0> FSTATR0_;
 		static FSTATR0_ FSTATR0;
 
 
@@ -158,7 +158,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  FCUERR;
 		};
-		typedef fstatr1_t<0x007FFFB1> FSTATR1_;
+		typedef fstatr1_t<0x007F'FFB1> FSTATR1_;
 		static FSTATR1_ FSTATR1;
 
 
@@ -178,7 +178,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  FRDYIE;
 		};
-		typedef frdyie_t<0x007FC412> FRDYIE_;
+		typedef frdyie_t<0x007F'C412> FRDYIE_;
 		static FRDYIE_ FRDYIE;
 
 
@@ -200,7 +200,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef fprotr_t<0x007FFFB4> FPROTR_;
+		typedef fprotr_t<0x007F'FFB4> FPROTR_;
 		static FPROTR_ FPROTR;
 
 
@@ -222,7 +222,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef fresetr_t<0x007FFFB6> FRESETR_;
+		typedef fresetr_t<0x007F'FFB6> FRESETR_;
 		static FRESETR_ FRESETR;
 
 
@@ -241,7 +241,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> CMDR;
 		};
-		typedef fcmdr_t<0x007FFFBA> FCMDR_;
+		typedef fcmdr_t<0x007F'FFBA> FCMDR_;
 		static FCMDR_ FCMDR;
 
 
@@ -261,7 +261,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>    ESUSPMD;
 		};
-		typedef fcpsr_t<0x007FFFC8> FCPSR_;
+		typedef fcpsr_t<0x007F'FFC8> FCPSR_;
 		static FCPSR_ FCPSR;
 
 
@@ -278,7 +278,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8> PEERRST;
 		};
-		typedef fpestat_t<0x007FFFCC> FPESTAT_;
+		typedef fpestat_t<0x007F'FFCC> FPESTAT_;
 		static FPESTAT_ FPESTAT;
 
 
@@ -298,7 +298,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8> PCKA;
 		};
-		typedef pckar_t<0x007FFFE8> PCKAR_;
+		typedef pckar_t<0x007F'FFE8> PCKAR_;
 		static PCKAR_ PCKAR;
 
 
@@ -318,7 +318,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8> FLWE;
 		};
-		typedef fweprcr_t<0x0008C289> FWEPROR_;
+		typedef fweprcr_t<0x0008'C289> FWEPROR_;
 		static FWEPROR_ FWEPROR;
 
 
@@ -346,7 +346,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBRE07;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef dflre0_t<0x007FC440> DFLRE0_;
+		typedef dflre0_t<0x007F'C440> DFLRE0_;
 		static DFLRE0_ DFLRE0;
 
 
@@ -374,7 +374,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBRE15;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef dflre1_t<0x007FC442> DFLRE1_;
+		typedef dflre1_t<0x007F'C442> DFLRE1_;
 		static DFLRE1_ DFLRE1;
 
 
@@ -402,7 +402,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBWE07;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef dflwe0_t<0x007FC450> DFLWE0_;
+		typedef dflwe0_t<0x007F'C450> DFLWE0_;
 		static DFLWE0_ DFLWE0;
 
 
@@ -430,7 +430,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBWE15;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef dflwe1_t<0x007FC452> DFLWE1_;
+		typedef dflwe1_t<0x007F'C452> DFLWE1_;
 		static DFLWE1_ DFLWE1;
 
 
@@ -453,7 +453,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef fentryr_t<0x007FFFB2> FENTRYR_;
+		typedef fentryr_t<0x007F'FFB2> FENTRYR_;
 		static FENTRYR_ FENTRYR;
 
 
@@ -475,7 +475,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B3, 8> BCADR;
 		};
-		typedef dflbccnt_t<0x007FFFCA> DFLBCCNT_;
+		typedef dflbccnt_t<0x007F'FFCA> DFLBCCNT_;
 		static DFLBCCNT_ DFLBCCNT;
 
 
@@ -492,7 +492,7 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B0>    BCST;
 		};
-		typedef dflbcstat_t<0x007FFFCE> DFLBCSTAT_;
+		typedef dflbcstat_t<0x007F'FFCE> DFLBCSTAT_;
 		static DFLBCSTAT_ DFLBCSTAT;
 
 
@@ -502,10 +502,10 @@ namespace device {
 					ROM 0xFFFF'FFC0 to 0xFFFF'FFCF
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<0xFFFFFFC0> UIDR0_;
-		typedef ro32_t<0xFFFFFFC4> UIDR1_;
-		typedef ro32_t<0xFFFFFFC8> UIDR2_;
-		typedef ro32_t<0xFFFFFFCC> UIDR3_;
+		typedef ro32_t<0xFFFF'FFC0> UIDR0_;
+		typedef ro32_t<0xFFFF'FFC4> UIDR1_;
+		typedef ro32_t<0xFFFF'FFC8> UIDR2_;
+		typedef ro32_t<0xFFFF'FFCC> UIDR3_;
 		static UIDR0_ UIDR0;
 		static UIDR1_ UIDR1;
 		static UIDR2_ UIDR2;

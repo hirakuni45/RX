@@ -44,7 +44,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B23>    PSTOP1;
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 		};
-		typedef sckcr_t<0x00080020> SCKCR_;
+		typedef sckcr_t<0x0008'0020> SCKCR_;
 		static SCKCR_ SCKCR;
 
 
@@ -64,7 +64,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> BCLKDIV;
 		};
-		typedef bckcr_t<0x00080030> BCKCR_;
+		typedef bckcr_t<0x0008'0030> BCKCR_;
 		static BCKCR_ BCKCR;
 
 
@@ -86,7 +86,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    OSTDE;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef ostdcr_t<0x00080040> OSTDCR_;
+		typedef ostdcr_t<0x0008'0040> OSTDCR_;
 		static OSTDCR_ OSTDCR;
 
 
@@ -106,7 +106,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SUBSTOP;
 		};
-		typedef subosccr_t<0x0008C28A> SUBOSCCR_;
+		typedef subosccr_t<0x0008'C28A> SUBOSCCR_;
 		static SUBOSCCR_ SUBOSCCR;
 
 
@@ -132,7 +132,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>	   OPE;
 			bit_rw_t <io_, bitpos::B15>	   SSBY;
 		};
-		typedef sbycr_t<0x0008000C> SBYCR_;
+		typedef sbycr_t<0x0008'000C> SBYCR_;
 		static SBYCR_ SBYCR;
 
 
@@ -173,7 +173,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B31>	ACSE;
 		};
-		typedef mstpcra_t<0x00080010> MSTPCRA_;
+		typedef mstpcra_t<0x0008'0010> MSTPCRA_;
 		static MSTPCRA_ MSTPCRA;
 
 
@@ -212,7 +212,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B30>	MSTPB30;
 			bit_rw_t<io_, bitpos::B31>	MSTPB31;
 		};
-		typedef mstpcrb_t<0x00080014> MSTPCRB_;
+		typedef mstpcrb_t<0x0008'0014> MSTPCRB_;
 		static MSTPCRB_ MSTPCRB;
 
 
@@ -233,7 +233,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>	MSTPC0;
 			bit_rw_t<io_, bitpos::B1>	MSTPC1;
 		};
-		typedef mstpcrc_t<0x00080018> MSTPCRC_;
+		typedef mstpcrc_t<0x0008'0018> MSTPCRC_;
 		static MSTPCRC_ MSTPCRC;
 
 
@@ -257,7 +257,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  IOKEEP;
 			bit_rw_t<io_, bitpos::B7>  DPSBY;
 		};
-		typedef dpsbycr_t<0x0008C280> DPSBYCR_;
+		typedef dpsbycr_t<0x0008'C280> DPSBYCR_;
 		static DPSBYCR_ DPSBYCR;
 
 
@@ -276,7 +276,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>  WTSTS;
 		};
-		typedef dpswcr_t<0x0008C281> DPSWCR_;
+		typedef dpswcr_t<0x0008'C281> DPSWCR_;
 		static DPSWCR_ DPSWCR;
 
 
@@ -302,7 +302,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  DUSBE;
 			bit_rw_t<io_, bitpos::B7>  DNMIE;
 		};
-		typedef dpsier_t<0x0008C282> DPSIER_;
+		typedef dpsier_t<0x0008'C282> DPSIER_;
 		static DPSIER_ DPSIER;
 
 
@@ -328,7 +328,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  DUSBF;
 			bit_rw_t<io_, bitpos::B7>  DNMIF;
 		};
-		typedef dpsifr_t<0x0008C283> DPSIFR_;
+		typedef dpsifr_t<0x0008'C283> DPSIFR_;
 		static DPSIFR_ DPSIFR;
 
 
@@ -352,7 +352,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  DNMIEG;
 		};
-		typedef dpsiegr_t<0x0008C284> DPSIEGR_;
+		typedef dpsiegr_t<0x0008'C284> DPSIEGR_;
 		static DPSIEGR_ DPSIEGR;
 
 
@@ -375,7 +375,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  DPSRSTF;
 		};
-		typedef rstsr_t<0x0008C285> RSTSR_;
+		typedef rstsr_t<0x0008'C285> RSTSR_;
 		static RSTSR_ RSTSR;
 
 
@@ -384,38 +384,38 @@ namespace device {
 			@brief  ディープスタンバイバックアップレジスタ（ DPSBKRy ）（ y = 0 ～ 31 ）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x0008C290>  DPSBKR0;
-		static rw8_t<0x0008C291>  DPSBKR1;
-		static rw8_t<0x0008C292>  DPSBKR2;
-		static rw8_t<0x0008C293>  DPSBKR3;
-		static rw8_t<0x0008C294>  DPSBKR4;
-		static rw8_t<0x0008C295>  DPSBKR5;
-		static rw8_t<0x0008C296>  DPSBKR6;
-		static rw8_t<0x0008C297>  DPSBKR7;
-		static rw8_t<0x0008C298>  DPSBKR8;
-		static rw8_t<0x0008C299>  DPSBKR9;
-		static rw8_t<0x0008C29A>  DPSBKR10;
-		static rw8_t<0x0008C29B>  DPSBKR11;
-		static rw8_t<0x0008C29C>  DPSBKR12;
-		static rw8_t<0x0008C29D>  DPSBKR13;
-		static rw8_t<0x0008C29E>  DPSBKR14;
-		static rw8_t<0x0008C29F>  DPSBKR15;
-		static rw8_t<0x0008C2A0>  DPSBKR16;
-		static rw8_t<0x0008C2A1>  DPSBKR17;
-		static rw8_t<0x0008C2A2>  DPSBKR18;
-		static rw8_t<0x0008C2A3>  DPSBKR19;
-		static rw8_t<0x0008C2A4>  DPSBKR20;
-		static rw8_t<0x0008C2A5>  DPSBKR21;
-		static rw8_t<0x0008C2A6>  DPSBKR22;
-		static rw8_t<0x0008C2A7>  DPSBKR23;
-		static rw8_t<0x0008C2A8>  DPSBKR24;
-		static rw8_t<0x0008C2A9>  DPSBKR25;
-		static rw8_t<0x0008C2AA>  DPSBKR26;
-		static rw8_t<0x0008C2AB>  DPSBKR27;
-		static rw8_t<0x0008C2AC>  DPSBKR28;
-		static rw8_t<0x0008C2AD>  DPSBKR29;
-		static rw8_t<0x0008C2AE>  DPSBKR30;
-		static rw8_t<0x0008C2AF>  DPSBKR31;
+		static rw8_t<0x0008'C290>  DPSBKR0;
+		static rw8_t<0x0008'C291>  DPSBKR1;
+		static rw8_t<0x0008'C292>  DPSBKR2;
+		static rw8_t<0x0008'C293>  DPSBKR3;
+		static rw8_t<0x0008'C294>  DPSBKR4;
+		static rw8_t<0x0008'C295>  DPSBKR5;
+		static rw8_t<0x0008'C296>  DPSBKR6;
+		static rw8_t<0x0008'C297>  DPSBKR7;
+		static rw8_t<0x0008'C298>  DPSBKR8;
+		static rw8_t<0x0008'C299>  DPSBKR9;
+		static rw8_t<0x0008'C29A>  DPSBKR10;
+		static rw8_t<0x0008'C29B>  DPSBKR11;
+		static rw8_t<0x0008'C29C>  DPSBKR12;
+		static rw8_t<0x0008'C29D>  DPSBKR13;
+		static rw8_t<0x0008'C29E>  DPSBKR14;
+		static rw8_t<0x0008'C29F>  DPSBKR15;
+		static rw8_t<0x0008'C2A0>  DPSBKR16;
+		static rw8_t<0x0008'C2A1>  DPSBKR17;
+		static rw8_t<0x0008'C2A2>  DPSBKR18;
+		static rw8_t<0x0008'C2A3>  DPSBKR19;
+		static rw8_t<0x0008'C2A4>  DPSBKR20;
+		static rw8_t<0x0008'C2A5>  DPSBKR21;
+		static rw8_t<0x0008'C2A6>  DPSBKR22;
+		static rw8_t<0x0008'C2A7>  DPSBKR23;
+		static rw8_t<0x0008'C2A8>  DPSBKR24;
+		static rw8_t<0x0008'C2A9>  DPSBKR25;
+		static rw8_t<0x0008'C2AA>  DPSBKR26;
+		static rw8_t<0x0008'C2AB>  DPSBKR27;
+		static rw8_t<0x0008'C2AC>  DPSBKR28;
+		static rw8_t<0x0008'C2AD>  DPSBKR29;
+		static rw8_t<0x0008'C2AE>  DPSBKR30;
+		static rw8_t<0x0008'C2AF>  DPSBKR31;
 
 	};
 	typedef system_t<void> SYSTEM;

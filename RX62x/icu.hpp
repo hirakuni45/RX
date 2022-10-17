@@ -40,7 +40,7 @@ namespace device {
 			CMI1    = 29,   ///< CMT1
 			CMI2    = 30,   ///< CMT2
 			CMI3    = 31,   ///< CMT3
-			EINT    = 32,	///< Ethernet
+			EINT    = 32,	///< EDMAC (ETHERC)
 
 			D0FIFO0	= 36,	///< USB0
 			D1FIFO0	= 37,	///< USB0
@@ -266,7 +266,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x00087000> IR_;
+		typedef ir_t<0x0008'7000> IR_;
 		static IR_ IR;
 
 
@@ -313,7 +313,7 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		typedef ier_t<0x00087200> IER_;
+		typedef ier_t<0x0008'7200> IER_;
 		static IER_ IER;
 
 
@@ -545,23 +545,23 @@ namespace device {
 			}
 
 		};
-		typedef ipr_t<0x00087300> IPR_;
+		typedef ipr_t<0x0008'7300> IPR_;
 		static IPR_ IPR;
 
 
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
-		typedef dtcer_t<0x00087100, VECTOR> DTCER_;
+		typedef dtcer_t<0x0008'7100, VECTOR> DTCER_;
 		static DTCER_ DTCER;
 
 
 		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
-		typedef rw8_t<0x00087400> DMRSR0_;
+		typedef rw8_t<0x0008'7400> DMRSR0_;
 		static DMRSR0_ DMRSR0;
-		typedef rw8_t<0x00087404> DMRSR1_;
+		typedef rw8_t<0x0008'7404> DMRSR1_;
 		static DMRSR1_ DMRSR1;
-		typedef rw8_t<0x00087408> DMRSR2_;
+		typedef rw8_t<0x0008'7408> DMRSR2_;
 		static DMRSR2_ DMRSR2;
-		typedef rw8_t<0x0008740C> DMRSR3_;
+		typedef rw8_t<0x0008'740C> DMRSR3_;
 		static DMRSR3_ DMRSR3;
 	};
 	typedef icu_t<void> ICU;
