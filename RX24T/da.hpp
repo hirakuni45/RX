@@ -10,11 +10,6 @@
 //=====================================================================//
 #include "common/device.hpp"
 
-/// DA モジュールが無いデバイスでエラーとする
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
-#  error "da.hpp: This module does not exist"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -41,6 +36,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  D/A データレジスタ 1（DADR1）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw16_t<0x000880C2> DADR1_;
+		static DADR1_ DADR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  D/A 制御レジスタ（DACR）
 			@param[in]	ofs	オフセット
 		*/
@@ -54,6 +58,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B6> DAOE0;
+			bit_rw_t<io_, bitpos::B7> DAOE1;
 		};
 		typedef dacr_t<0x000880C4> DACR_;
 		static DACR_ DACR;
@@ -79,6 +84,7 @@ namespace device {
 		static DADPR_ DADPR;
 	};
 	template <uint32_t base, peripheral per> typename da_t<base, per>::DADR0_ da_t<base, per>::DADR0;
+	template <uint32_t base, peripheral per> typename da_t<base, per>::DADR1_ da_t<base, per>::DADR1;
 	template <uint32_t base, peripheral per> typename da_t<base, per>::DACR_  da_t<base, per>::DACR;
 	template <uint32_t base, peripheral per> typename da_t<base, per>::DADPR_ da_t<base, per>::DADPR;
 

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX72T グループ・S12ADH 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -936,6 +936,7 @@ namespace device {
 	struct s12ad_t : public s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> {
 
 		static constexpr uint32_t UNIT_NO = 0;		///< 変換ユニット番号
+		static constexpr uint32_t ANALOG_NUM = 8;	///< アナログ入力数
 
 		typedef s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> base_class;
 
@@ -954,14 +955,6 @@ namespace device {
 			AIN006,
 			AIN007,
 		};
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	アナログ入力数
-		*/
-		//-----------------------------------------------------------------//		
-		static constexpr uint32_t analog_num = 8;
 
 
 		//-----------------------------------------------------------------//

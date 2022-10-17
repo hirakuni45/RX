@@ -456,13 +456,14 @@ namespace device {
 	struct s12ad0_t : public s12adc_t<base, per, cmpi> {
 
 		typedef s12adc_t<base, per, cmpi> base_class;
+		static constexpr uint32_t ANALOG_NUM = 8;	///< アナログ入力数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  アナログ入力型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class analog : uint8_t {
+		enum class ANALOG : uint8_t {
 			AIN000,
 			AIN001,
 			AIN002,
@@ -476,53 +477,45 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	アナログ入力数
-		*/
-		//-----------------------------------------------------------------//		
-		static constexpr uint32_t analog_num_ = 8;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	ポート設定と解除
 			@param[in]	an	アナログ入力型
 			@param[in]	f	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static void enable(analog an, bool f = true) {
+		static void enable(ANALOG an, bool f = true) {
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			switch(an) {
-			case analog::AIN000:
+			case ANALOG::AIN000:
 				PORT4::PDR.B0 = 0;
 				MPC::P40PFS.ASEL = f;
 				break;
-			case analog::AIN001:
+			case ANALOG::AIN001:
 				PORT4::PDR.B1 = 0;
 				MPC::P41PFS.ASEL = f;
 				break;
-			case analog::AIN002:
+			case ANALOG::AIN002:
 				PORT4::PDR.B2 = 0;
 				MPC::P42PFS.ASEL = f;
 				break;
-			case analog::AIN003:
+			case ANALOG::AIN003:
 				PORT4::PDR.B3 = 0;
 				MPC::P43PFS.ASEL = f;
 				break;
-			case analog::AIN004:
+			case ANALOG::AIN004:
 				PORT4::PDR.B4 = 0;
 				MPC::P44PFS.ASEL = f;
 				break;
-			case analog::AIN005:
+			case ANALOG::AIN005:
 				PORT4::PDR.B5 = 0;
 				MPC::P45PFS.ASEL = f;
 				break;
-			case analog::AIN006:
+			case ANALOG::AIN006:
 				PORT4::PDR.B6 = 0;
 				MPC::P46PFS.ASEL = f;
 				break;
-			case analog::AIN007:
+			case ANALOG::AIN007:
 				PORT4::PDR.B7 = 0;
 				MPC::P47PFS.ASEL = f;
 				break;
@@ -543,11 +536,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct addr_t {
 
-			uint32_t get_address(analog an) {
+			uint32_t get_address(ANALOG an) {
 				return base + 0x20 + static_cast<uint32_t>(an) * 2;
 			}
 
-			uint16_t operator() (analog an) {
+			uint16_t operator() (ANALOG an) {
 				return rd16_(get_address(an));
 			}
 
@@ -591,7 +584,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
 		struct adans_t {
-			void set(analog an, bool f = true) {
+			void set(ANALOG an, bool f = true) {
 				uint32_t n = static_cast<uint32_t>(an);
 				if(f) {
 					wr16_(ofs, rd16_(ofs) |  (static_cast<uint16_t>(1) << n));
@@ -600,7 +593,7 @@ namespace device {
 				}
 			}
 
-			bool operator() (analog an) const {
+			bool operator() (ANALOG an) const {
 				uint32_t n = static_cast<uint32_t>(an);
 				return (rd16_(ofs) >> n) & 1;
 			}
@@ -685,7 +678,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct adsstr_t {
-			void set(analog an, uint8_t v) {
+			void set(ANALOG an, uint8_t v) {
 				wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
 			}
 		};
@@ -819,13 +812,14 @@ namespace device {
 	struct s12ad1_t : public s12adc_t<base, per, cmpi> {
 
 		typedef s12adc_t<base,per, cmpi> base_class;
+		static constexpr uint32_t ANALOG_NUM = 20;	///< アナログ入力数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  アナログ入力型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class analog : uint8_t {
+		enum class ANALOG : uint8_t {
 			AIN100,
 			AIN101,
 			AIN102,
@@ -854,105 +848,97 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	アナログ入力数
-		*/
-		//-----------------------------------------------------------------//		
-		static constexpr uint32_t analog_num_ = 20;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	ポート設定と解除
 			@param[in]	an	アナログ入力型
 			@param[in]	f	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static void enable(analog an, bool f = true) {
+		static void enable(ANALOG an, bool f = true) {
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			switch(an) {
-			case analog::AIN100:
+			case ANALOG::AIN100:
 				PORTE::PDR.B2 = 0;
 				MPC::PE2PFS.ASEL = f;
 				break;
-			case analog::AIN101:
+			case ANALOG::AIN101:
 				PORTE::PDR.B3 = 0;
 				MPC::PE3PFS.ASEL = f;
 				break;
-			case analog::AIN102:
+			case ANALOG::AIN102:
 				PORTE::PDR.B4 = 0;
 				MPC::PE4PFS.ASEL = f;
 				break;
-			case analog::AIN103:
+			case ANALOG::AIN103:
 				PORTE::PDR.B5 = 0;
 				MPC::PE5PFS.ASEL = f;
 				break;
-			case analog::AIN104:
+			case ANALOG::AIN104:
 				PORTE::PDR.B6 = 0;
 				MPC::PE6PFS.ASEL = f;
 				break;
-			case analog::AIN105:
+			case ANALOG::AIN105:
 				PORTE::PDR.B7 = 0;
 				MPC::PE7PFS.ASEL = f;
 				break;
-			case analog::AIN106:
+			case ANALOG::AIN106:
 				PORTD::PDR.B6 = 0;
 				MPC::PD6PFS.ASEL = f;
 				break;
-			case analog::AIN107:
+			case ANALOG::AIN107:
 				PORTD::PDR.B7 = 0;
 				MPC::PD7PFS.ASEL = f;
 				break;
-			case analog::AIN108:
+			case ANALOG::AIN108:
 				PORTD::PDR.B0 = 0;
 				MPC::PD0PFS.ASEL = f;
 				break;
-			case analog::AIN109:
+			case ANALOG::AIN109:
 				PORTD::PDR.B1 = 0;
 				MPC::PD1PFS.ASEL = f;
 				break;
-			case analog::AIN110:
+			case ANALOG::AIN110:
 				PORTD::PDR.B2 = 0;
 				MPC::PD2PFS.ASEL = f;
 				break;
-			case analog::AIN111:
+			case ANALOG::AIN111:
 				PORTD::PDR.B3 = 0;
 				MPC::PD3PFS.ASEL = f;
 				break;
-			case analog::AIN112:
+			case ANALOG::AIN112:
 				PORTD::PDR.B4 = 0;
 				MPC::PD4PFS.ASEL = f;
 				break;
-			case analog::AIN113:
+			case ANALOG::AIN113:
 				PORTD::PDR.B5 = 0;
 				MPC::PD5PFS.ASEL = f;
 				break;
-			case analog::AIN114:
+			case ANALOG::AIN114:
 				PORT9::PDR.B0 = 0;
 				MPC::P90PFS.ASEL = f;
 				break;
-			case analog::AIN115:
+			case ANALOG::AIN115:
 				PORT9::PDR.B1 = 0;
 				MPC::P91PFS.ASEL = f;
 				break;
-			case analog::AIN116:
+			case ANALOG::AIN116:
 				PORT9::PDR.B2 = 0;
 				MPC::P92PFS.ASEL = f;
 				break;
-			case analog::AIN117:
+			case ANALOG::AIN117:
 				PORT9::PDR.B3 = 0;
 				MPC::P93PFS.ASEL = f;
 				break;
-			case analog::AIN118:
+			case ANALOG::AIN118:
 				PORT0::PDR.B0 = 0;
 				MPC::P00PFS.ASEL = f;
 				break;
-			case analog::AIN119:
+			case ANALOG::AIN119:
 				PORT0::PDR.B1 = 0;
 				MPC::P01PFS.ASEL = f;
 				break;
-			case analog::AIN120:
+			case ANALOG::AIN120:
 				PORT0::PDR.B2 = 0;
 				MPC::P02PFS.ASEL = f;
 				break;
@@ -1106,7 +1092,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct addr_t {
-			uint16_t operator() (analog an) {
+			uint16_t operator() (ANALOG an) {
 				return rd16_(base + 0x20 + static_cast<uint32_t>(an) * 2);
 			}
 		};
@@ -1181,7 +1167,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
 		struct adans_t {
-			void set(analog an, bool f = true) {
+			void set(ANALOG an, bool f = true) {
 				uint32_t n = static_cast<uint32_t>(an);
 				uint32_t ros = ofs;
 				if(n >= 16) {
@@ -1195,7 +1181,7 @@ namespace device {
 				}
 			}
 
-			bool operator() (analog an) const {
+			bool operator() (ANALOG an) const {
 				uint32_t n = static_cast<uint32_t>(an);
 				uint32_t ros = ofs;
 				if(n >= 16) {
@@ -1423,7 +1409,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct adsstr_t {
-			void set(analog an, uint8_t v) {
+			void set(ANALOG an, uint8_t v) {
 				wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
 			}
 		};

@@ -37,8 +37,8 @@ namespace {
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI		sci_;
 
-	typedef device::S12AD adc;
-	typedef device::adc_in<adc, adc_task> ADC_IN;
+	typedef device::S12AD ADC;
+	typedef device::adc_in<ADC, adc_task> ADC_IN;
 	ADC_IN	adc_in_;
 }
 
@@ -77,10 +77,10 @@ int main(int argc, char** argv)
 	// A/D 設定
 	{
 		uint8_t intr_level = 1;
-		if(!adc_in_.start(adc::analog::AIN000, intr_level)) {
+		if(!adc_in_.start(ADC::ANALOG::AIN000, intr_level)) {
 			utils::format("A/D start fail AIN000\n");
 		}
-		if(!adc_in_.start(adc::analog::AIN001, intr_level)) {
+		if(!adc_in_.start(ADC::ANALOG::AIN001, intr_level)) {
 			utils::format("A/D start fail AIN001\n");
 		}
 	}
