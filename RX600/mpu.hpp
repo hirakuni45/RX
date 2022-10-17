@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ MPU 定義
+	@brief	RX600 グループ メモリプロテクションユニット（MPU）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -313,7 +313,6 @@ namespace device {
 	template <class _> typename mpu_t<_>::MPOPI_ mpu_t<_>::MPOPI;
 	template <class _> typename mpu_t<_>::MHIHI_ mpu_t<_>::MHIHI;
 	template <class _> typename mpu_t<_>::MHITD_ mpu_t<_>::MHITD;
-
 
 	typedef mpu_t<void> MPU;
 }

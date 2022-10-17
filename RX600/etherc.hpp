@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ　ETHERC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,15 +14,12 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ETHERC 定義
+		@brief  ETHERC ベース定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
-	struct etherc_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+	template <uint32_t base>
+	struct etherc_base_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -431,36 +428,53 @@ namespace device {
 		typedef rw32_t<base + 0xF8> MAFCR_;
 		static  MAFCR_ MAFCR;
 	};
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::ECMR_ etherc_t<base, per>::ECMR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::RFLR_ etherc_t<base, per>::RFLR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::ECSR_ etherc_t<base, per>::ECSR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::ECSIPR_ etherc_t<base, per>::ECSIPR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::PIR_ etherc_t<base, per>::PIR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::PSR_ etherc_t<base, per>::PSR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::RDMLR_ etherc_t<base, per>::RDMLR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::IPGR_ etherc_t<base, per>::IPGR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::APR_ etherc_t<base, per>::APR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::MPR_ etherc_t<base, per>::MPR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::RFCF_ etherc_t<base, per>::RFCF;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::TPAUSER_ etherc_t<base, per>::TPAUSER;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::TPAUSECR_ etherc_t<base, per>::TPAUSECR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::BCFRR_ etherc_t<base, per>::BCFRR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::MAHR_ etherc_t<base, per>::MAHR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::MALR_ etherc_t<base, per>::MALR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::TROCR_ etherc_t<base, per>::TROCR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::CDCR_ etherc_t<base, per>::CDCR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::LCCR_ etherc_t<base, per>::LCCR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::CNDCR_ etherc_t<base, per>::CNDCR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::CEFCR_ etherc_t<base, per>::CEFCR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::FRECR_ etherc_t<base, per>::FRECR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::TSFRCR_ etherc_t<base, per>::TSFRCR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::TLFRCR_ etherc_t<base, per>::TLFRCR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::RFCR_ etherc_t<base, per>::RFCR;
-	template <uint32_t base, peripheral per> typename etherc_t<base, per>::MAFCR_ etherc_t<base, per>::MAFCR;
+	template <uint32_t base> typename etherc_base_t<base>::ECMR_ etherc_base_t<base>::ECMR;
+	template <uint32_t base> typename etherc_base_t<base>::RFLR_ etherc_base_t<base>::RFLR;
+	template <uint32_t base> typename etherc_base_t<base>::ECSR_ etherc_base_t<base>::ECSR;
+	template <uint32_t base> typename etherc_base_t<base>::ECSIPR_ etherc_base_t<base>::ECSIPR;
+	template <uint32_t base> typename etherc_base_t<base>::PIR_ etherc_base_t<base>::PIR;
+	template <uint32_t base> typename etherc_base_t<base>::PSR_ etherc_base_t<base>::PSR;
+	template <uint32_t base> typename etherc_base_t<base>::RDMLR_ etherc_base_t<base>::RDMLR;
+	template <uint32_t base> typename etherc_base_t<base>::IPGR_ etherc_base_t<base>::IPGR;
+	template <uint32_t base> typename etherc_base_t<base>::APR_ etherc_base_t<base>::APR;
+	template <uint32_t base> typename etherc_base_t<base>::MPR_ etherc_base_t<base>::MPR;
+	template <uint32_t base> typename etherc_base_t<base>::RFCF_ etherc_base_t<base>::RFCF;
+	template <uint32_t base> typename etherc_base_t<base>::TPAUSER_ etherc_base_t<base>::TPAUSER;
+	template <uint32_t base> typename etherc_base_t<base>::TPAUSECR_ etherc_base_t<base>::TPAUSECR;
+	template <uint32_t base> typename etherc_base_t<base>::BCFRR_ etherc_base_t<base>::BCFRR;
+	template <uint32_t base> typename etherc_base_t<base>::MAHR_ etherc_base_t<base>::MAHR;
+	template <uint32_t base> typename etherc_base_t<base>::MALR_ etherc_base_t<base>::MALR;
+	template <uint32_t base> typename etherc_base_t<base>::TROCR_ etherc_base_t<base>::TROCR;
+	template <uint32_t base> typename etherc_base_t<base>::CDCR_ etherc_base_t<base>::CDCR;
+	template <uint32_t base> typename etherc_base_t<base>::LCCR_ etherc_base_t<base>::LCCR;
+	template <uint32_t base> typename etherc_base_t<base>::CNDCR_ etherc_base_t<base>::CNDCR;
+	template <uint32_t base> typename etherc_base_t<base>::CEFCR_ etherc_base_t<base>::CEFCR;
+	template <uint32_t base> typename etherc_base_t<base>::FRECR_ etherc_base_t<base>::FRECR;
+	template <uint32_t base> typename etherc_base_t<base>::TSFRCR_ etherc_base_t<base>::TSFRCR;
+	template <uint32_t base> typename etherc_base_t<base>::TLFRCR_ etherc_base_t<base>::TLFRCR;
+	template <uint32_t base> typename etherc_base_t<base>::RFCR_ etherc_base_t<base>::RFCR;
+	template <uint32_t base> typename etherc_base_t<base>::MAFCR_ etherc_base_t<base>::MAFCR;
 
 
-	typedef etherc_t<0x000C0100, peripheral::ETHERC0> ETHERC0;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef etherc_t<0x000C0300, peripheral::ETHERC1> ETHERC1;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ETHERC 定義
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per>
+	struct etherc_t : public etherc_base_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+
+	};
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef etherc_t<0x000C'0100, peripheral::ETHERC> ETHERC;
+#else
+	typedef etherc_t<0x000C'0100, peripheral::ETHERC0> ETHERC0;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)
+	typedef etherc_t<0x000C'0300, peripheral::ETHERC1> ETHERC1;
+#endif
 #endif
 }

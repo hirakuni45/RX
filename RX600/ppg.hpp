@@ -399,7 +399,6 @@ namespace device {
 	template <peripheral per, uint32_t ch> typename ppg1_t<per, ch>::PODRH_ ppg1_t<per, ch>::PODRH;
 	template <peripheral per, uint32_t ch> typename ppg1_t<per, ch>::PODRL_ ppg1_t<per, ch>::PODRL;
 
-
 	typedef ppg0_t<peripheral::PPG0, 0> PPG0;
 	typedef ppg1_t<peripheral::PPG1, 1> PPG1;
 }
