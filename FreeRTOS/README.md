@@ -1,5 +1,5 @@
 
-Renesas RX microcontroller FreeRTOS kernel (V202011.00)
+Renesas RX microcontroller FreeRTOS kernel (V10.4.6)
 =========
 
 <img src="../docs/Logo_freeRTOS.png" width="50%">
@@ -39,6 +39,7 @@ Other microcontrollers use malloc/free memory allocation, so memory is allocated
 - READMEja.md
 - README.md
 - Source (FreeRTOS Kernel sources)
+- [RX62N/Makefile](RX62N/Makefile)
 - [RX24T/Makefile](RX24T/Makefile)
 - [RX64M/Makefile](RX64M/Makefile)
 - [RX71M/Makefile](RX71M/Makefile)

@@ -27,7 +27,7 @@ The environment variable "MULTI" is enabled in "main.cpp".
 - The RXxxx/clock_profile.hpp declares a set frequency for each module.
 - Connect the LED to the specified port.
 - In the case of the RX72N Envision kit, it utilizes the blue LED on the board.
-- Connect the CAN bus transceiver to the CAN port.
+- Connect the CAN bus transceiver to the CAN port. (CTX0, CRX0)
 - Connect the appropriate terminator resistor to the CAN bus transceiver.
 - The CAN bus transceiver must be of the 3.3 V operating variety.
    
@@ -37,6 +37,7 @@ See the following sources for the ports to connect the CAN bus transceiver.
 
 |microcontroller|file|CAN0 Alternate|CAN1 Alternate|
 |-------|--------|:---:|:---:|
+|RX62N  |[RX62x/port_map.hpp](../RX62x/port_map.hpp)|FIRST|X|
 |RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|
@@ -71,7 +72,14 @@ For RX64M (port_map.hpp FIRST candidate)
 ### Typical varieties of CAN bus transceivers
 
 [Texas Instruments: SN65HVD23x](https://www.ti.com/lit/ds/symlink/sn65hvd234.pdf?ts=1604192672378&ref_url=https%253A%252F%252Fwww.google.com%252F)
-Candidate for operation at 3.3V
+- Candidate for operation at 3.3V
+
+[NXP Semiconductors: TJA1441](https://www.nxp.com/docs/en/data-sheet/TJA1441.pdf)
+- Power 5V
+- I/O 3.3V、5V selectable
+- Max 5 Mbit/s
+
+---
 
 ### In the case of RX64M/RX71M
 

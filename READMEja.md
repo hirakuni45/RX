@@ -105,8 +105,9 @@ int main(int argc, char** argv)
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
 |[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
 |[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
-|[/CAN_sample](./CAN_sample)|－|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
+|[/CAN_sample](./CAN_sample)|〇|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
 |[/FLASH_sample](./FLASH_sample)|－|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
+|[/FreeRTOS](./FreeRTOS)|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS 基本動作確認サンプル|
 |[/GPTW_sample](./GPTW_sample)|－|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
 |[/I2C_sample](./I2C_sample)|－|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
 |[/RAYTRACER_sample](./RAYTRACER_sample)|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
