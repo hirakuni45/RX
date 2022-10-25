@@ -355,6 +355,53 @@ namespace device {
 
 	template <class _>
 	struct mpc_t {
+	
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートファンクションレジスタ C（PFCMTU）
+			@param[in] base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pfcmtu_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B2> MTUS2;
+			bit_rw_t<io, bitpos::B3> MTUS3;
+			bit_rw_t<io, bitpos::B4> MTUS4;
+			bit_rw_t<io, bitpos::B5> MTUS5;
+			bit_rw_t<io, bitpos::B6> MTUS6;
+			bit_rw_t<io, bitpos::B7> TCLKS;
+		};
+		typedef pfcmtu_t<0x0008'C10C> PFCMTU_;
+		static PFCMTU_ PFCMTU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートファンクションレジスタ D（PFDMTU）
+			@param[in] base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pfdmtu_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B6> MTUS6;
+			bit_rw_t<io, bitpos::B7> TCLKS;
+		};
+		typedef pfdmtu_t<0x0008'C10D> PFDMTU_;
+		static PFDMTU_ PFDMTU;
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートファンクションレジスタ F（PFFSCI）
@@ -398,10 +445,12 @@ namespace device {
 		typedef pfjcan_t<0x0008'C113> PFJCAN_;
 		static PFJCAN_ PFJCAN;
 	};
-	typedef mpc_t<void> MPC;
-
+	template <class _> typename mpc_t<_>::PFCMTU_ mpc_t<_>::PFCMTU;
+	template <class _> typename mpc_t<_>::PFDMTU_ mpc_t<_>::PFDMTU;
 	template <class _> typename mpc_t<_>::PFFSCI_ mpc_t<_>::PFFSCI;
 	template <class _> typename mpc_t<_>::PFJCAN_ mpc_t<_>::PFJCAN;
+
+	typedef mpc_t<void> MPC;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
