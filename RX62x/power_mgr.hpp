@@ -94,15 +94,16 @@ namespace device {
 			case peripheral::MTU4:
 			case peripheral::MTU5:
 				sr_(ena, pad_.mtu0_, peripheral::MTU0, per);
-				SYSTEM::MSTPCRA.MSTPA9 = (pad_.mtu1_ == 0);
+				SYSTEM::MSTPCRA.MSTPA9 = (pad_.mtu0_ == 0);
 				break;
 			case peripheral::MTU6:
 			case peripheral::MTU7:
+			case peripheral::MTU8:
 			case peripheral::MTU9:
 			case peripheral::MTU10:
 			case peripheral::MTU11:
 				sr_(ena, pad_.mtu1_, peripheral::MTU6, per);
-				SYSTEM::MSTPCRA.MSTPA8 = (pad_.mtu0_ == 0);
+				SYSTEM::MSTPCRA.MSTPA8 = (pad_.mtu1_ == 0);
 				break;
 
 			case peripheral::PPG1:
