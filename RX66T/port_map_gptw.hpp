@@ -21,19 +21,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_gptw : public port_map_order {
-	public:
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  GPTW チャネル型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CHANNEL : uint8_t {
-			A,		///< GPTWx A (GTIOCxA)
-			B,		///< GPTWx B (GTIOCxB)
-		};
-
-	private:
 		static bool gptw0_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
 			bool ret = true;

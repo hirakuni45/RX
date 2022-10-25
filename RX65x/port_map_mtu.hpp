@@ -1,15 +1,15 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX65N グループ・ポート・マッピング (MTU) @n
+	@brief	RX651/RX65N グループ・ポート・マッピング (MTU3a) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX65x/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
@@ -24,28 +24,6 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_mtu : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タイマー系・チャネル型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CHANNEL : uint8_t {
-			A,		///< MTUx A (MTIOCxA)
-			B,		///< MTUx B (MTIOCxB)
-			C,		///< MTUx C (MTIOCxC)
-			D,		///< MTUx D (MTIOCxD)
-			U,		///< MTU5 U (MTIC5U)
-			V,		///< MTU5 V (MTIC5V)
-			W,		///< MTU5 W (MTIC5W)
-			CLK_A,	///< MTCLKA
-			CLK_B,	///< MTCLKB
-			CLK_C,	///< MTCLKC
-			CLK_D,	///< MTCLKD
-			NONE,	///< 無効なチャネル
-		};
-
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマー系・クロック・グループ @n

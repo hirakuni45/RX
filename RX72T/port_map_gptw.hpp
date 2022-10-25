@@ -21,24 +21,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_gptw : public port_map_order {
-	public:
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  GPTW チャネル型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CHANNEL : uint8_t {
-			A,		///< GPTWx A (GTIOCxA)
-			B,		///< GPTWx B (GTIOCxB)
-
-			RA,		///< GTETRGA
-			RB,		///< GTETRGB
-			RC,		///< GTETRGC
-			RD,		///< GTETRGD
-		};
-
-	private:
 		static bool gptw0_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
 			bool ret = true;
@@ -752,6 +735,7 @@ namespace device {
 		static bool gptw_(CHANNEL ch, bool ena, ORDER order) noexcept
 		{
 			bool ret = true;
+#if 0
 			switch(ch) {
 			case CHANNEL::RA:
 				switch(order) {
@@ -783,6 +767,7 @@ namespace device {
 				ret = false;
 				break;
 			}
+#endif
 			return ret;
 		}
 
@@ -806,6 +791,7 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
+#if 0
 			if(ch == CHANNEL::RA || ch == CHANNEL::RB || ch == CHANNEL::RC || ch == CHANNEL::RD) {
 				switch(per) {
 				case peripheral::GPTW0:
@@ -824,6 +810,7 @@ namespace device {
 					break;
 				}
 			} else {
+#endif
 				switch(per) {
 				case peripheral::GPTW0:
 					ret = gptw0_(ch, ena, neg, order);
@@ -858,7 +845,7 @@ namespace device {
 				default:
 					break;
 				}
-			}
+//			}
 
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
