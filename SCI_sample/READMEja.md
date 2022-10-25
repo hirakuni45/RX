@@ -30,7 +30,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - 各マイコンの、クリスタル周波数、各モジュールの周波数は、RXxxx/clock_profile.hpp を参照して下さい。
 - インジケーター LED を指定のポートに接続する。
 -  USB シリアルとSCI ポートを接続する。
-- RX62N の
+- RX62N の SCI 標準ポートは、「RX62x/port_map.hpp」参照。
 - RX24T の SCI 標準ポートは、「RX24T/port_map.hpp」参照。
 - RX64M/RX71M の SCI 標準ポートは、「RX600/port_map.hpp」参照。
 - RX65x の SCI 標準ポートは、「RX65x/port_map.hpp」参照。
@@ -40,9 +40,19 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 
 ```C++
 #if defined(SIG_RX62N)
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ 出版社)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::SCI0 SCI_CH;
+  #else
+    // BlueBoard-RX62N_100pin
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI0 SCI_CH;
+  #endif
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
@@ -74,77 +84,89 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 #endif
 ```
 
- - RX65N Envision kit の場合、インジケーター LED はボード上の青色を利用する。
- - RX72N Envision kit の場合、インジケーター LED はボード上の青色を利用する。
+- BlueBoard-RX62N_100pin の場合、ボード上の D2 LED を利用する。（赤色） 
+- FRK-RX62N の場合、ボード上の LED1 を利用する。（黄色） 
+- RX65N Envision kit の場合、インジケーター LED はボード上の青色を利用する。
+- RX72N Envision kit の場合、インジケーター LED はボード上の青色を利用する。
 
 ---
 
 ## ハードウェアーリソースの準備
- - SCI に指定されたポートに USB シリアルなどの変換器を使い PC と接続する。
- - マイコン側の RXD 端子と、USB シリアルの TXD を接続。
- - マイコン側の TXD 端子と、USB シリアルの RXD を接続。
- - RX72N Envision kit は、ボード上の CN8 マイクロ USB と PC を接続。
+- SCI に指定されたポートに USB シリアルなどの変換器を使い PC と接続する。
+- マイコン側の RXD 端子と、USB シリアルの TXD を接続。
+- マイコン側の TXD 端子と、USB シリアルの RXD を接続。
+- RX72N Envision kit は、ボード上の CN8 マイクロ USB と PC を接続。
 
 ---
 
 ## ビルド方法
- - 各プラットホームディレクトリーに移動、make する。
- - sci_sample.mot ファイルを書き込む。
+- 各プラットホームディレクトリーに移動、make する。
+- sci_sample.mot ファイルを書き込む。
+- FRK-RX62N は、R5F562N7(FlashRom: 374KB) の為、Makefile のデバイスを変更する。
+- CQ_FRK 変数（コンパイル時定数）を有効にする事で、基板依存の切り替えを行う。
+
+```
+# BlueBoard-RX62N_100pin
+#DEVICE		=	R5F562N8
+# FRK-RX62N (CQ出版)
+DEVICE		=	R5F562N7
+USER_DEFS	=	CQ_FRK
+```
 
 ---
 
 ## 動作
- - LED が 0.25 秒間隔で点滅する。
- - SCI に指定されたポートで、TX（送信）、RX（受信）を行う。
- - TeraTerm などで確認。
- - TeraTerm のシリアル設定：１１５２００ボー、８ビットデータ、１ストップ、パリティ無し。
- - main.cpp の中、SCI の初期化でボーレートは自由に設定できる。
- - ボーレート設定出来ない「値」の場合、初期化が失敗する。（極端に遅い、速い）
- - utils::command クラスにより、１行入力機能をサービス。
- - 受け取った文字をパースして表示。
+- LED が 0.25 秒間隔で点滅する。
+- SCI に指定されたポートで、TX（送信）、RX（受信）を行う。
+- TeraTerm などで確認。
+- TeraTerm のシリアル設定：１１５２００ボー、８ビットデータ、１ストップ、パリティ無し。
+- main.cpp の中、SCI の初期化でボーレートは自由に設定できる。
+- ボーレート設定出来ない「値」の場合、初期化が失敗する。（極端に遅い、速い）
+- utils::command クラスにより、１行入力機能をサービス。
+- 受け取った文字をパースして表示。
     
 ---
 
 ## 備考
- - FIFO バッファは、受信側 256 バイト、送信側 512 バイトとなっています。
- - ボーレート、受信頻度、送信頻度などを考慮して、適切な値に調整します。
- - 最小は 16 バイト程度が必要です。
- - FIFO バッファより大きい文字列を送る場合、バッファが空くまで待機する事になります。
- - 受信時、バッファからの取り出し速度が、受信速度を下回ると、オーバーフローして、文字を紛失します。
- - SCI のチャネルを変更する場合「main.cpp」で「typedef」してある定義を変更します。
- - SCIx とポート接続の関係性は、RXxxx/port_map.hpp を参照して下さい。
- - ピン番号以外は、144ピン、100ピン、デバイスでも同じように機能する。
- - 第二候補を選択する場合は、sci_io の typedef で、「device::port_map::ORDER::SECOND」を追加する。
- - 別プログラムによって、雑多な設定を自動化してソースコードを生成する試みを行っているアプリケーションがありますが、それは、基本的に間違った方法だと思えます、設定の修正が必要な場合、必ず生成プログラムに戻って、生成からやり直す必要があります。
- - C++ テンプレートは、チャネルの違いや、ポートの違い、デバイスの違いをうまく吸収して、柔軟で、判りやすい方法で実装できます。
+- FIFO バッファは、受信側 256 バイト、送信側 512 バイトとなっています。
+- ボーレート、受信頻度、送信頻度などを考慮して、適切な値に調整します。
+- 最小は 16 バイト程度が必要です。
+- FIFO バッファより大きい文字列を送る場合、バッファが空くまで待機する事になります。
+- 受信時、バッファからの取り出し速度が、受信速度を下回ると、オーバーフローして、文字を紛失します。
+- SCI のチャネルを変更する場合「main.cpp」で「typedef」してある定義を変更します。
+- SCIx とポート接続の関係性は、RXxxx/port_map.hpp を参照して下さい。
+- ピン番号以外は、144ピン、100ピン、デバイスでも同じように機能する。
+- 第二候補を選択する場合は、sci_io の typedef で、「device::port_map::ORDER::SECOND」を追加する。
+- 別プログラムによって、雑多な設定を自動化してソースコードを生成する試みを行っているアプリケーションがありますが、それは、基本的に間違った方法だと思えます、設定の修正が必要な場合、必ず生成プログラムに戻って、生成からやり直す必要があります。
+- C++ テンプレートは、チャネルの違いや、ポートの違い、デバイスの違いをうまく吸収して、柔軟で、判りやすい方法で実装できます。
    
 ---
 
 ## 標準出力の対応
- - main.cpp には、標準出力（printf）に対応する事が出来る「枝」を出してあります。
- - 「sci_putch」などですが、これらの関数は、POSIX 関数、write などから、特定のディスクリプタ（stdout）で呼ばれるような仕組みが実装されています。 [common/syscalls.c](../common/syscalls.c)
- - なので、printf 関数は普通に使えるのですが、C++ では推奨しません。（使う理由が無い）
- - printf は、引数が可変引数になっていて、スタック経由なので、format 文と引数に反故がある場合、クラッシュする事もあります、コンパイラのチェックでは完全に「反故」を見つける事は困難です、従って、どんなに便利でも使ってはいけません。
- - 代わりに、utils::format クラスを利用して下さい、printf とほぼ同じように使えて、間違った引数でもクラッシュする事はありません。
- - C++ の標準出力機能「std::cout」は、メモリを大量に消費し、実質的に利用出来ない為非推奨としています。
- - std::string などの STL を使いたい場合、Makefile の USER_LIBS に、stdc++ などの STL ライブラリを追加します。
- - STL を使う場合、記憶割り当てを多用するので、十分な RAM が必要です。
+- main.cpp には、標準出力（printf）に対応する事が出来る「枝」を出してあります。
+- 「sci_putch」などですが、これらの関数は、POSIX 関数、write などから、特定のディスクリプタ（stdout）で呼ばれるような仕組みが実装されています。 [common/syscalls.c](../common/syscalls.c)
+- なので、printf 関数は普通に使えるのですが、C++ では推奨しません。（使う理由が無い）
+- printf は、引数が可変引数になっていて、スタック経由なので、format 文と引数に反故がある場合、クラッシュする事もあります、コンパイラのチェックでは完全に「反故」を見つける事は困難です、従って、どんなに便利でも使ってはいけません。
+- 代わりに、utils::format クラスを利用して下さい、printf とほぼ同じように使えて、間違った引数でもクラッシュする事はありません。
+- C++ の標準出力機能「std::cout」は、メモリを大量に消費し、実質的に利用出来ない為非推奨としています。
+- std::string などの STL を使いたい場合、Makefile の USER_LIBS に、stdc++ などの STL ライブラリを追加します。
+- STL を使う場合、記憶割り当てを多用するので、十分な RAM が必要です。
 
  ---
 
  ## POSIX 関数と文字出力のしくみと考察
- - 通常、printf や、iostream の cout に文字出力を行った場合、内部では、POSIX 関数を経由して行います。   
- - これは、歴史的な背景や、シンプルな構造に対する考え方などがベースにあります。
- - アプリケーションが起動すると、３つの特別なファイルがオープンされた状態になっています。
- - これは、それぞれ、stdin(0)、stdout(1)、stderr(2) です。
- - アプリケーションは、この決められたファイルハンドルを使って、通常のファイルと同じようにアクセスする事で、文字の入出力を行います。
- - この C++ フレームワークでも、その仕組みを使います。
- - [common/syscalls.c](../common/syscalls.c) にその実装があります。（POSIX 関数郡）
- - その中で、write 関数では、stdout、stderr、宛に出力を行った場合、sci_putch 関数を呼び出します。
- - read 関数では、stdin から、sci_getch 関数からデータを受け取ります。(データが来るまでブロックされます)
- - [main.cpp](main.cpp) には、SCI の入出力と、POSIX 関数を繋ぐ為、sci_putch、sci_getch 関数を定義してあります。
- - 従って、文字の入出力を行うアプリケーションを実装する場合、syscalls.c を必ずリンクする必要があります。
- - ちなみに、SD カードアクセスを行う場合も POSIX 関数を実装する事で、標準関数を使ってファイルのやりとりが行えます。
+- 通常、printf や、iostream の cout に文字出力を行った場合、内部では、POSIX 関数を経由して行います。   
+- これは、歴史的な背景や、シンプルな構造に対する考え方などがベースにあります。
+- アプリケーションが起動すると、３つの特別なファイルがオープンされた状態になっています。
+- これは、それぞれ、stdin(0)、stdout(1)、stderr(2) です。
+- アプリケーションは、この決められたファイルハンドルを使って、通常のファイルと同じようにアクセスする事で、文字の入出力を行います。
+- この C++ フレームワークでも、その仕組みを使います。
+- [common/syscalls.c](../common/syscalls.c) にその実装があります。（POSIX 関数郡）
+- その中で、write 関数では、stdout、stderr、宛に出力を行った場合、sci_putch 関数を呼び出します。
+- read 関数では、stdin から、sci_getch 関数からデータを受け取ります。(データが来るまでブロックされます)
+- [main.cpp](main.cpp) には、SCI の入出力と、POSIX 関数を繋ぐ為、sci_putch、sci_getch 関数を定義してあります。
+- 従って、文字の入出力を行うアプリケーションを実装する場合、syscalls.c を必ずリンクする必要があります。
+- ちなみに、SD カードアクセスを行う場合も POSIX 関数を実装する事で、標準関数を使ってファイルのやりとりが行えます。
 
 syscalls.c 内、write 関数の sci_putch 呼び出し：   
 

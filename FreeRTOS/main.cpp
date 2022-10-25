@@ -2,7 +2,7 @@
 /*! @file
     @brief  FreeRTOS sample（Flash LED, Output SCI）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,9 +28,19 @@
 namespace {
 
 #if defined(SIG_RX62N)
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ 出版社)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::SCI0 SCI_CH;
+  #else
+    // BlueBoard-RX62N_100pin
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI0 SCI_CH;
+  #endif
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;

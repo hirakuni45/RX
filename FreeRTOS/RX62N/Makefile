@@ -8,7 +8,11 @@
 #=======================================================================
 TARGET		=	rtos_sample
 
-DEVICE		=	R5F562N8
+# BlueBoard-RX62N_100pin
+#DEVICE		=	R5F562N8
+# FRK-RX62N (CQ出版)
+DEVICE		=	R5F562N7
+USER_DEFS	=	CQ_FRK
 
 RX_DEF		=	SIG_RX62N
 
@@ -36,7 +40,7 @@ PSOURCES	=	FreeRTOS/main.cpp
 
 USER_LIBS	=
 
-USER_DEFS   =	RTOS RTOS_HEAP_SIZE=10
+USER_DEFS   +=	RTOS RTOS_HEAP_SIZE=10
 
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
