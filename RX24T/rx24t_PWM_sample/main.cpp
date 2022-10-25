@@ -3,7 +3,7 @@
     @brief  RX24T ファースト・サンプル @n
 			・P00(4) ピンに赤色LED（VF:1.9V）を吸い込みで接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,13 +22,11 @@ namespace {
 	typedef utils::fixed_fifo<char, 128> BUFFER;
 	device::sci_io<device::SCI1, BUFFER, BUFFER> sci_;
 
-	typedef device::MTU0 MTU0;
-	typedef device::mtu_io<MTU0> MTU0_IO;
-	MTU0_IO mtu0_io_;
+	typedef device::mtu_io<device::MTU0> MTU0;
+	MTU0 	mtu0_;
 
-	typedef device::MTU1 MTU1;
-	typedef device::mtu_io<MTU1> MTU1_IO;
-	MTU1_IO mtu1_io_;
+	typedef device::mtu_io<device::MTU1> MTU1;
+	MTU1 	mtu1_;
 }
 
 extern "C" {
@@ -62,7 +60,7 @@ int main(int argc, char** argv)
 	// MTU0 設定
 	{
 		uint32_t frq = 10000;
-		if(!mtu0_io_.start_pwm2(MTU0::CHANNEL::A, MTU0_IO::OUTPUT::LOW_TO_HIGH, frq)) {
+		if(!mtu0_.start_pwm2(MTU0::CHANNEL::A, frq, MTU0::pwm_port_t(MTU0::CHANNEL::B, MTU0::OUTPUT::LOW_TO_HIGH))) {
 			utils::format("MTU0 input capture start fail...\n");
 		}
 	}
@@ -70,7 +68,7 @@ int main(int argc, char** argv)
 	// MTU1 設定
 	{
 		uint32_t frq = 10000;
-		if(!mtu1_io_.start_pwm2(MTU1::CHANNEL::A, MTU1_IO::OUTPUT::HIGH_TO_LOW, frq)) {
+		if(!mtu1_.start_pwm2(MTU1::CHANNEL::A, frq, MTU1::pwm_port_t(MTU1::CHANNEL::B, MTU1::OUTPUT::HIGH_TO_LOW))) {
 			utils::format("MTU1 output start fail...\n");
 		}
 	}
