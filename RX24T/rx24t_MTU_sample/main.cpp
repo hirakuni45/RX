@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 	// MTU1 設定
 	{
 		uint32_t frq = 1000;
-		if(!mtu1_io_.start_normal(MTU1::CHANNEL::A, MTU1_IO::OUTPUT::TOGGLE, frq)) {
+		if(!mtu1_io_.start_normal(MTU1::CHANNEL::A, frq, MTU1_IO::OUTPUT::TOGGLE)) {
 			utils::format("MTU1 output start fail...\n");
 		}
 	}

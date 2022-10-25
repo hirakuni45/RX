@@ -1,20 +1,16 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
-#	RX62N Makefile
+#	RX24T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	sci_sample
+TARGET		=	mtu_sample
 
-# BlueBoard-RX62N_100pin
-#DEVICE		=	R5F562N8
-# FRK-RX62N (CQ出版)
-DEVICE		=	R5F562N7
-USER_DEFS	=	CQ_FRK
+DEVICE		=	R5F524TA
 
-RX_DEF		=	SIG_RX62N
+RX_DEF		=	SIG_RX24T
 
 BUILD		=	release
 # BUILD		=	debug
@@ -27,24 +23,15 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	SCI_sample/main.cpp
+PSOURCES	=	MTU_sample/main.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
-USER_DEFS   +=
+USER_DEFS   =
 
 INC_APP		=	. ../ ../../
 
 AS_OPT		=
-
-CP_OPT		=	-Wall -Werror \
-				-Wno-unused-variable \
-				-Wno-unused-function \
-				-fno-exceptions
-
-CC_OPT		=	-Wall -Werror \
-				-Wno-unused-variable \
-				-fno-exceptions
 
 ifeq ($(BUILD),debug)
     CC_OPT += -g -DDEBUG

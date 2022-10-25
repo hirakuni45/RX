@@ -79,6 +79,27 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  タイマー・チャネル型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class CHANNEL : uint8_t {
+			A,		///< MTUx A (MTIOCxA), GPTWx A (GTIOCxA)
+			B,		///< MTUx B (MTIOCxB), GPTWx B (GTIOCxB)
+			C,		///< MTUx C (MTIOCxC)
+			D,		///< MTUx D (MTIOCxD)
+			U,		///< MTUy U (MTICyU)
+			V,		///< MTUy V (MTICyV)
+			W,		///< MTUy W (MTICyW)
+			CLK_A,	///< MTCLKA
+			CLK_B,	///< MTCLKB
+			CLK_C,	///< MTCLKC
+			CLK_D,	///< MTCLKD
+			NONE,	///< 無効なチャネル
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  USB ポート型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -18,6 +18,7 @@
 #include "RX62x/icu.hpp"
 #include "RX62x/icu_mgr.hpp"
 #include "RX62x/port_map.hpp"
+#include "RX62x/port_map_mtu.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX24T)

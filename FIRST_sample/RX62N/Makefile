@@ -8,7 +8,11 @@
 #=======================================================================
 TARGET		=	led_sample
 
-DEVICE		=	R5F562N8
+# BlueBoard-RX62N_100pin
+#DEVICE		=	R5F562N8
+# FRK-RX62N (CQ出版)
+DEVICE		=	R5F562N7
+USER_DEFS	=	CQ_FRK
 
 RX_DEF		=	SIG_RX62N
 
@@ -26,7 +30,7 @@ PSOURCES	=	FIRST_sample/main.cpp
 
 USER_LIBS	=
 
-USER_DEFS   =
+USER_DEFS   +=
 
 INC_APP		=	. ../ ../../
 

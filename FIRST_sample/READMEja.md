@@ -13,7 +13,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 
 ## プロジェクト・リスト
 - main.cpp
-- RX62N/Makefile (BlueBoard-RX62N_100pin)
+- RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
 - RX24T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
@@ -40,7 +40,11 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 #if defined(SIG_RX62N)
 	// BlueBoard-RX62N_100pin
 	static constexpr bool LED_ASSERT = 0;
+  #if defined(CQ_FRK)
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ASSERT> LED;
+  #else
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ASSERT> LED;
+  #endif
 #elif defined(SIG_RX24T)
 	// DIY RX24T board
 	static constexpr bool LED_ASSERT = 0;
@@ -76,7 +80,8 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 #endif
 ```
 
- - BlueBoard-RX62N_100pin の場合、ボード上の D2 赤色 LED を利用する。 
+ - BlueBoard-RX62N_100pin の場合、ボード上の D2 LED を利用する。（赤色） 
+ - FRK-RX62N の場合、ボード上の LED1 を利用する。（黄色） 
  - Envision kit RX65N の場合、インジケーター LED はボード上の青色 LED を利用する。
  - Envision kit RX72N の場合、インジケーター LED はボード上の青色 LED を利用する。
 
@@ -96,8 +101,19 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - 特に無し
    
 ## ビルド方法
+
 - 各プラットホームディレクトリーに移動、make する。
 - led_sample.mot ファイルをマイコンに書き込む。
+- FRK-RX62N は、R5F562N7(FlashRom: 374KB) の為、Makefile のデバイスを変更する。
+- CQ_FRK 変数（コンパイル時定数）を有効にする事で、基板依存の切り替えを行う。
+
+```
+# BlueBoard-RX62N_100pin
+#DEVICE		=	R5F562N8
+# FRK-RX62N (CQ出版)
+DEVICE		=	R5F562N7
+USER_DEFS	=	CQ_FRK
+```
    
 ## 動作
 - LED が 0.25 秒間隔で点滅する。（ソフトウェアーによる遅延ループなので正確ではありません）

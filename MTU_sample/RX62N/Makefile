@@ -6,7 +6,7 @@
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	sci_sample
+TARGET		=	mtu_sample
 
 # BlueBoard-RX62N_100pin
 #DEVICE		=	R5F562N8
@@ -27,7 +27,7 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	SCI_sample/main.cpp
+PSOURCES	=	MTU_sample/main.cpp
 
 USER_LIBS	=
 

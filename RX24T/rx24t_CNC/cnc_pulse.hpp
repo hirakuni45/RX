@@ -469,7 +469,7 @@ namespace cnc {
 			uint8_t intr = 4;
 			auto ch = device::MTU0::CHANNEL::A;
 			auto ot = MTU::OUTPUT::NONE;
-			auto f = mtu_.start_normal(ch, ot, 100, intr);
+			auto f = mtu_.start_normal(ch, 100, ot, intr);
 
 			return f;
 		}
