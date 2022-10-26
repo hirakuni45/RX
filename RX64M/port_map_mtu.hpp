@@ -885,12 +885,14 @@ namespace device {
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
 			@param[in]	odr	候補を選択する場合
+			@param[in]	neg	反転入出力の場合「true」（サポートしない）
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
 		{
 			if(odr == ORDER::BYPASS) return true;
+			if(neg) return false;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
