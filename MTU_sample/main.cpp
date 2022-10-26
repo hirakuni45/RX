@@ -36,41 +36,51 @@ namespace {
   #endif
 	// See 'RX62x/port_map_mtu.hpp' J6_6
 	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
 	typedef device::SCI9 SCI_CH;
-	
+	// CN13 (1): PD1_AN109_IRQ1 (MTIOC4B)
+	typedef device::MTU4 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIFTH;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::SCI2 SCI_CH;
-
+	// Pmod2 (8): PD1_RESET (MTIOC4B)
+	typedef device::MTU4 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIFTH;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
@@ -84,7 +94,7 @@ namespace {
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
 
-	typedef device::mtu_io<MTU_CH> MTU;
+	typedef device::mtu_io<MTU_CH, utils::null_task, utils::null_task, MTU_ORDER> MTU;
 	MTU		mtu_;
 
 	typedef utils::command<256> CMD;
