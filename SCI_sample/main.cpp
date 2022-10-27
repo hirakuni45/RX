@@ -25,13 +25,13 @@ namespace {
 	static const char* system_str_ = { "RX62N FRK-RX62N" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI0 SCI_CH;
+	typedef device::SCI1 SCI_CH;
   #else
     // BlueBoard-RX62N_100pin
 	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI0 SCI_CH;
+	typedef device::SCI1 SCI_CH;
   #endif
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
@@ -53,14 +53,14 @@ namespace {
 	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
-	typedef device::SCI2 SCI_CH;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX72N)
+	static const char* system_str_ = { "RX72N Envision Kit" };
+	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
+	typedef device::SCI2 SCI_CH;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義

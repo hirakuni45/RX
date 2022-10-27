@@ -37,8 +37,17 @@ namespace {
 	FONT		font_(afont_, kfont_);
 
 #if defined(SIG_RX62N)
-	static const char* system_str_ = { "RX62N" };
-	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ 出版社)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
+  #else
+    // BlueBoard-RX62N_100pin
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+  #endif
 	typedef device::SCI0 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;

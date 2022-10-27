@@ -46,18 +46,21 @@ LIB_ROOT    =   ../../rxlib/lib
 
 INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)
 
+PROG_ERASE = --erase
 PROG_VERIFY = --verify
 
 ifeq ($(RX_DEF),SIG_RX621)
   RX_CPU = RX621
   RX_CHOOSE = -misa=v1
   LDSCRIPT	=	../../RX62x/$(DEVICE).ld
+  PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX62N)
   RX_CPU = RX62N
   RX_CHOOSE = -misa=v1
   LDSCRIPT	=	../../RX62x/$(DEVICE).ld
+  PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX24T)
@@ -241,4 +244,4 @@ bin: $(TARGET).bin
 # Serial Flash write 
 run:
 	$(MAKE)
-	rx_prog -d $(RX_CPU) --progress --erase --write $(PROG_VERIFY) $(TARGET).mot
+	rx_prog -d $(RX_CPU) --progress $(PROG_ERASE) --write $(PROG_VERIFY) $(TARGET).mot

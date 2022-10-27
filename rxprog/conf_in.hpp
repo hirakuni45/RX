@@ -161,8 +161,10 @@ namespace utils {
 				bool err = false;
 				for(const auto& u : us) {
 					if(u.symbol_ == "group") group_ = u.body_;
-					else if(u.symbol_ == "clock") clock_ = u.body_;
-					else if(u.symbol_ == "divide_sys") divide_sys_ = u.body_;
+					else if(u.symbol_ == "clock") {
+						clock_ = u.body_;
+//						std::cerr << u.symbol_ << "," << u.body_ << std::endl;
+					} else if(u.symbol_ == "divide_sys") divide_sys_ = u.body_;
 					else if(u.symbol_ == "divide_ext") divide_ext_ = u.body_;
 					else if(u.symbol_ == "rom") rom_ = u.body_;
 					else if(u.symbol_ == "data") data_ = u.body_;

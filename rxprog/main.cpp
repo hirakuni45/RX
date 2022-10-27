@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "1.40";
+	const std::string version_ = "1.50";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -413,10 +413,13 @@ int main(int argc, char* argv[])
 	rx.verbose_ = opts.verbose;
 	rx.cpu_type_ = opts.device;
 
+	// 接続されたクロック周波数が必要
 	if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N" || rx.cpu_type_ == "RX63T") {
-		// rx.master_ = 1200;  // 12.00MHz
-		// rx.sys_div_ = 8;    // x8 (96MHz)
-		// rx.ext_div_ = 4;    // x4 (48MHz)
+#if 1
+		rx.master_ = 1200;  // 12.00MHz
+		rx.sys_div_ = 8;    // x8 (96MHz)
+		rx.ext_div_ = 4;    // x4 (48MHz)
+#else
 		auto devt = conf_in_.get_device();
 		int32_t val = 0;;
 		if(!utils::string_to_int(devt.clock_, val)) {
@@ -436,6 +439,7 @@ int main(int argc, char* argv[])
 			return -1;
 		}
 		rx.ext_div_ = val;
+#endif
 	}
 
 	//============================ 接続
