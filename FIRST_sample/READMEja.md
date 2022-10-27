@@ -8,6 +8,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
    
 - マスタークロックのブースト
 - LED の点滅
+- ソフトウェアーディレーによる遅延
 
 ---
 
@@ -15,12 +16,12 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - main.cpp
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
 - RX24T/Makefile
+- RX66T/Makefile
+- RX72T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
 - RX65N/Makefile (for RX65N Envision Kit)
-- RX66T/Makefile
 - RX72N/Makefile (for RX72N Envision Kit)
-- RX72T/Makefile
 
 ---
 
@@ -32,51 +33,51 @@ RX マイコンを使った LED 点滅のサンプルプログラム
    
 ```C++
 /// LED 接続ポートの定義
-/// LED を「吸い込み：出力０で点灯させる場合」LED_ASSERT = 0
-/// LED を「吐き出し：出力１で点灯させる場合」LED_ASSERT = 1
+/// LED を「吸い込み：出力０で点灯させる場合」LED_ACTIVE = 0
+/// LED を「吐き出し：出力１で点灯させる場合」LED_ACTIVE = 1
 // Memo:
 //    ポート出力は、電流を引いた（吸い込み）場合と、電流を掃き出した（吐き出し）場合で、能力が異なります。
 //    一般的に、「吸い込み」の方が電流を多く流せる場合が多く、その慣例に従って、「吸い込み」で接続する場合が通例です。
 #if defined(SIG_RX62N)
 	// BlueBoard-RX62N_100pin
-	static constexpr bool LED_ASSERT = 0;
+	static constexpr bool LED_ACTIVE = 0;
   #if defined(CQ_FRK)
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ASSERT> LED;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
   #else
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ASSERT> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
   #endif
 #elif defined(SIG_RX24T)
 	// DIY RX24T board
-	static constexpr bool LED_ASSERT = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ASSERT> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX71M)
 	// DIY RX72M board
-	static constexpr bool LED_ASSERT = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX72M)
 	// 工事中
-	static constexpr bool LED_ASSERT = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX72N)
 	// RX72N Envision Kit
-	static constexpr bool LED_ASSERT = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ASSERT> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX64M)
 	// DIY RX64M board
-	static constexpr bool LED_ASSERT = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ASSERT> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX65N)
 	// RX65N Envision Kit
-	static constexpr bool LED_ASSERT = 0;
-	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ASSERT> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX66T)
 	// DIY RX66T board
-	static constexpr bool LED_ASSERT = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ASSERT> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX72T)
 	// DIY RX72T board
-	static constexpr bool LED_ASSERT = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ASSERT> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
 #endif
 ```
 
@@ -88,18 +89,53 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 ---
 
 ## マスタークロックのブースト
-- main 関数に動作が移行したら、内部インストラクションクロックを最大速度にブーストします。
-- 内部デバイス用クロックも設定します。（RXxxx/clock_profile.hpp に設定があります）
+- main 関数に動作が移行したら、内部インストラクションクロック（ICLK ）を最大速度にブーストします。
+- 内部デバイス用クロックも設定しています。（RXxxx/clock_profile.hpp に設定があります）
    
 ```C++
     SYSTEM_IO::boost_master_clock();
 ```
+---
+
+## LED 接続ポートを「出力」に設定
+
+```C++
+	LED::OUTPUT();  // LED ポートを出力に設定
+```
+
+## 点滅
+
+```C++
+	while(1) {
+		utils::delay::milli_second(250);
+		LED::P = 1;  // 点灯
+		utils::delay::milli_second(250);
+		LED::P = 0;  // 消灯
+	}
+```
 
 ---
 
-## リソースの準備
-- 特に無し
-   
+## LED の制限抵抗
+
+- LED に直列に入れる制限抵抗値の目安は以下の表を参照の事。
+- 制限抵抗は、Vcc 側でも、Vss(GND) 側、どちらでも良いです。
+
+1mA 程度の電流を流す場合：
+|電源電圧|赤色(Vf)|黄色(Vf)|青色(Vf)|
+|:---:|:---:|:---:|:---:|
+|3.3V|2K (1.4V)|1.2K (2.1V)|300 (3.0V)|
+|5V|3.6K (1.4V)|3K (2.1V)|2K (3.0V)|
+
+計算式：   
+   （「電源電圧」－「LED の Vf」）／ 「LED に流す電流」   
+
+- 表の LED の Vf は目安です、流す電流や、LED により異なります。
+- Vf が大きい場合、制限抵抗はより小さくなるので、ポートに流れる電流が制限を超えないように配慮して下さい。
+- ポートに流す事が出来る最大電流は、ハードウェアーマニュアルの「電気的特性」「出力許容電流」を参照して下さい。
+
+---
+
 ## ビルド方法
 
 - 各プラットホームディレクトリーに移動、make する。
@@ -119,7 +155,7 @@ USER_DEFS	=	CQ_FRK
 - LED が 0.25 秒間隔で点滅する。（ソフトウェアーによる遅延ループなので正確ではありません）
     
 ## 備考
-- このプロジェクトが基本で最低限の設定などが含まれます、新しいプロジェクトを始める場合の参考にして下さい。   
+- このプロジェクトが基本で最低限の設定などが含まれます、新しいプロジェクトを始める場合のテンプレートにして下さい。   
    
 -----
    
