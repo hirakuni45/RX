@@ -43,9 +43,19 @@ SCI (UART) sample program using RX microcontroller
  
 ```C++
 #if defined(SIG_RX62N)
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ Publishing Co.,Ltd.)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+  #else
+    // BlueBoard-RX62N_100pin
 	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
-	typedef device::SCI0 SCI_CH;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+  #endif
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;

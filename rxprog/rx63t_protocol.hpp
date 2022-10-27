@@ -719,8 +719,8 @@ namespace rx63t {
 			put16_big_(&cmd[2], nbr);
 			put16_big_(&cmd[4], rx.master_);
 			cmd[6] = 0x02;
-			cmd[7] = rx.sys_div_;
-			cmd[8] = rx.ext_div_;
+			cmd[7] = rx.iclk_multi_;
+			cmd[8] = rx.pclk_multi_;
 			cmd[9] = sum_(cmd, 9);
 			if(!write_(cmd, 10)) {
 				return false;

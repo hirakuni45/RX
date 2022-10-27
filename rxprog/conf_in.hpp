@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	conf ファイルのパース
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -126,6 +126,7 @@ namespace utils {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct device_t {
+			std::string		name_;
 			std::string		group_;
 			std::string		clock_;
 			std::string		divide_sys_;
@@ -194,11 +195,12 @@ namespace utils {
 				return true;
 			}
 		};
+		typedef std::vector<device_t> DEVICE_LIST;
 
 	private:
 		default_t		default_;
 		programmer_t	programmer_;
-		device_t		device_;
+		DEVICE_LIST		device_list_;
 
 		enum class ana_mode {
 			name,
@@ -214,8 +216,6 @@ namespace utils {
 		std::string body_;
 
 		units		units_;
-
-		utils::strings	device_list_;
 
 		void reset_ana_() {
 			ana_mode_ = ana_mode::name;
@@ -400,23 +400,14 @@ namespace utils {
 					}
 					if(ana_mode_ == ana_mode::fin) {
 						std::string ins;
-						if(default_.device_ == name_) {
-							if(!device_.analize(units_)) {
-								break;
-							}
-							ins += " (RAM: " + device_.ram_;
-							ins += ", Program-Flash: " + device_.rom_;
-							if(!device_.data_.empty()) ins += ", Data-Flash: " + device_.data_;
-						} else {
-							device_t device;
-							if(!device.analize(units_)) {
-								break;
-							}
-							ins += " (RAM: " + device.ram_;
-							ins += ", Program-Flash: " + device.rom_;
-							if(!device.data_.empty()) ins += ", Data-Flash: " + device.data_;
+						device_t device;
+						device.name_ = name_;
+						if(!device.analize(units_)) {
+							std::cerr << "(" << lno << ") ";
+							std::cerr << "Device analize error: '" << line << "'" << std::endl; 
+							break;
 						}
-						device_list_.push_back(name_ + ins + ")");
+						device_list_.push_back(device);
 						reset_ana_();
 					}
 				}
@@ -447,19 +438,10 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	[DEVICE]の取得
-			@return [DEVICE]情報
-		*/
-		//-----------------------------------------------------------------//
-		const device_t& get_device() const { return device_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	デバイス・リストの取得
 			@return デバイス・リスト
 		*/
 		//-----------------------------------------------------------------//
-		const utils::strings& get_device_list() const { return device_list_; }
+		const auto& get_device_list() const { return device_list_; }
 	};
 }

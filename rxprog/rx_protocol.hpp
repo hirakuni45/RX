@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -163,7 +163,7 @@ namespace rx {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	rx_t 構造体 @n
-					※ RX63T 標準設定：　12.00MHz、8(96MHz)、4(48MHz)
+					※ RX62x, RX63T 標準設定：　12.00MHz、8(96MHz)、4(48MHz)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct rx_t {
@@ -171,9 +171,9 @@ namespace rx {
 
 			std::string	cpu_type_;		///< CPU タイプ
 
-			uint32_t	master_ = 1200;	///< マスター・クロック（MHz 単位で、小数第２位、１００倍）
-			uint32_t	sys_div_ = 8;	///< システム・ディバイダー設定
-			uint32_t	ext_div_ = 4;	///< 周辺ディバイダー設定
+			uint32_t	master_ = 1200;		///< マスター・クロック（MHz 単位で、小数第２位、１００倍）
+			uint32_t	iclk_multi_ = 8;	///< インストラクション・マルチプライヤー設定
+			uint32_t	pclk_multi_ = 4;	///< 周辺機器・マルチプライヤー設定
 		};
 	};
 }

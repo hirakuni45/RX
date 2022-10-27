@@ -12,7 +12,7 @@ I am currently using Renesas GNU-RX gcc 8.3.0 as my main development tool.
 Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
 Development is now possible in multiple environments.   
    
-- Currently supported and tested devices are RX24T, RX66T, RX72T, RX64M, RX65N, RX71M, RX72N.   
+- Currently supported and tested devices are RX62[1N], RX24T, RX66T, RX72T, RX64M, RX65N, RX71M, RX72N.   
 I extend the device class daily.
 - The RX72M are scheduled to be supported in the future.
 - I update it daily including directory configuration.   
@@ -101,6 +101,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |---------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
 |[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|Serial Communication Sample Program|
 |[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|serial communication Sample Program|
+|[/MTU_sample](./MTU_sample)|〇|〇|〇|〇|〇|〇|〇|〇|Multi-Function Timer Pulse Unit Sample Program|
 |[/CAN_sample](./CAN_sample)|〇|－|〇|〇|〇|〇|△|〇|CAN Communication Sample Program|
 |[/FLASH_sample](./FLASH_sample)|－|〇|〇|〇|〇|〇|〇|〇|Internal data flash operation sample|
 |[/FreeRTOS](./FreeRTOS)|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS Basic operation sample|

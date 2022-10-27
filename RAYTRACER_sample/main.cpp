@@ -42,13 +42,14 @@ namespace {
 	static const char* system_str_ = { "RX62N FRK-RX62N" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
   #else
     // BlueBoard-RX62N_100pin
 	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+    typedef device::SCI1 SCI_CH;
   #endif
-	typedef device::SCI0 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORTE, device::bitpos::B4> RD;
