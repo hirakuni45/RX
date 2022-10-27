@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
 		auto defa = conf_in_.get_default();
 		opts.device = defa.device_;
 #ifdef __CYGWIN__
-		opts.platform = "Cygwin";
+		opts.platform = "Cygwin(MSYS2)";
 		opts.com_path = defa.port_win_;
 		opts.com_speed = defa.speed_win_;
 #endif
@@ -264,22 +264,26 @@ int main(int argc, char* argv[])
 	for(int i = 1; i < argc; ++i) {
 		const std::string p = argv[i];
 		if(p[0] == '-') {
-			if(p == "--verbose") opts.verbose = true;
-			else if(p == "-s") opts.br = true;
-			else if(p.find("--speed=") == 0) {
+			if(p == "--verbose") {
+				opts.verbose = true;
+			} else if(p == "-s") {
+				opts.br = true;
+			} else if(p.find("--speed=") == 0) {
 				opts.com_speed = &p[std::strlen("--speed=")];
-			} else if(p == "-d") opts.dv = true;
-			else if(p.find("--device=") == 0) {
+			} else if(p == "-d") {
+				opts.dv = true;
+			} else if(p.find("--device=") == 0) {
 				opts.device = &p[std::strlen("--device=")];
-			} else if(p == "-P") opts.dp = true;
-			else if(p.find("--port=") == 0) {
+			} else if(p == "-P") {
+				opts.dp = true;
+			} else if(p.find("--port=") == 0) {
 				opts.com_path = &p[std::strlen("--port=")];
-///			} else if(p == "-a") {
-///				opts.area = true;
-///			} else if(p.find("--area=") == 0) {
-///				if(!opts.set_area_(&p[7])) {
-///					opterr = true;
-///				}
+//			} else if(p == "-a") {
+//				opts.area = true;
+//			} else if(p.find("--area=") == 0) {
+//				if(!opts.set_area_(&p[7])) {
+//					opterr = true;
+//				}
 //			} else if(p == "-r" || p == "--read") {
 //				opts.read = true;
 //			} else if(p == "-i") {
@@ -336,7 +340,7 @@ int main(int argc, char* argv[])
 	if(opts.verbose) {
 		std::cout << "# Platform: '" << opts.platform << '\'' << std::endl;
 		std::cout << "# Configuration file path: '" << conf_path << '\'' << std::endl;
-		std::cout << "# Device: '" << opts.device << '\'' << std::endl;
+		std::cout << "# Group: '" << opts.device << '\'' << std::endl;
 		std::cout << "# Serial port path: '" << opts.com_path << '\'' << std::endl;
 		std::cout << "# Serial port speed: " << opts.com_speed << std::endl;
 		std::cout << "# Erase Page Wait: " << erase_page_wait << " [uS]" << std::endl;
@@ -345,7 +349,16 @@ int main(int argc, char* argv[])
 
 	// デバイス・リスト表示
 	if(!conf_path.empty() && opts.device_list) {
-		for(const auto& s : conf_in_.get_device_list()) {
+		for(const auto& t : conf_in_.get_device_list()) {
+			std::string s;
+			s += (boost::format("%s (%s):") % t.name_ % t.group_).str();
+			s += (boost::format(" RAM: %5s") % t.ram_).str();
+			s += (boost::format(", Program-Flash: %5s") % t.rom_).str();
+			if(!t.data_.empty()) {
+				s += (boost::format(", Data-Flash: %3s") % t.data_).str();
+			} else {
+				s += (boost::format(", Data-Flash: ---")).str();
+			}
 			std::cout << s << std::endl;
 		}
 		return 0;
@@ -413,33 +426,47 @@ int main(int argc, char* argv[])
 	rx.verbose_ = opts.verbose;
 	rx.cpu_type_ = opts.device;
 
-	// 接続されたクロック周波数が必要
+	// 接続されたクロック周波数が必要なグループ
 	if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N" || rx.cpu_type_ == "RX63T") {
-#if 1
-		rx.master_ = 1200;  // 12.00MHz
-		rx.sys_div_ = 8;    // x8 (96MHz)
-		rx.ext_div_ = 4;    // x4 (48MHz)
-#else
-		auto devt = conf_in_.get_device();
-		int32_t val = 0;;
-		if(!utils::string_to_int(devt.clock_, val)) {
-			std::cerr << rx.cpu_type_ << " 'clock' tag conversion error: '" << devt.clock_ << '\'' << std::endl;
-			return -1;
-		}
-		rx.master_ = val;
+		std::string name;
+		for(const auto& t : conf_in_.get_device_list()) {
+			if(t.group_ != rx.cpu_type_) continue;
 
-		if(!utils::string_to_int(devt.divide_sys_, val)) {
-			std::cerr << rx.cpu_type_ << " 'divide_sys' tag conversion error: '" << devt.divide_sys_ << '\'' << std::endl;
-			return -1;
-		}
-		rx.sys_div_ = val;
+			int32_t val = 0;;
+			if(!utils::string_to_int(t.clock_, val)) {
+				std::cerr << rx.cpu_type_ << " 'clock' tag conversion error: '" << t.clock_ << '\'' << std::endl;
+				return -1;
+			}
+			rx.master_ = val;
 
-		if(!utils::string_to_int(devt.divide_ext_, val)) {
-			std::cerr << rx.cpu_type_ << " 'divide_ext' tag conversion error: '" << devt.divide_ext_ << '\'' << std::endl;
-			return -1;
+			if(!utils::string_to_int(t.divide_sys_, val)) {
+				std::cerr << rx.cpu_type_ << " 'divide_sys' tag conversion error: '" << t.divide_sys_ << '\'' << std::endl;
+				return -1;
+			}
+			rx.iclk_multi_ = val;
+
+			if(!utils::string_to_int(t.divide_ext_, val)) {
+				std::cerr << rx.cpu_type_ << " 'divide_ext' tag conversion error: '" << t.divide_ext_ << '\'' << std::endl;
+				return -1;
+			}
+			rx.pclk_multi_ = val;
+			name = t.name_;
+			break;
 		}
-		rx.ext_div_ = val;
-#endif
+		if(opts.verbose) {
+			std::cout << boost::format("# Device: %s (first find)") % name << std::endl; 
+			std::cout << boost::format("#   Master clock: %d.%02d MHz") % (rx.master_ / 100) % (rx.master_ % 100) << std::endl;
+			{
+				int val = (rx.master_ * rx.iclk_multi_) / 100;
+				int mod = (rx.master_ * rx.iclk_multi_) % 100;
+				std::cout << boost::format("#   ICLK multiplier: %d (%d.%02d MHz)") % rx.iclk_multi_ % val % mod << std::endl;
+			}
+			{
+				int val = (rx.master_ * rx.pclk_multi_) / 100;
+				int mod = (rx.master_ * rx.pclk_multi_) % 100;
+				std::cout << boost::format("#   PCLK multiplier: %d (%d.%02d MHz)") % rx.pclk_multi_ % val % mod << std::endl;
+			}
+		}
 	}
 
 	//============================ 接続
@@ -482,7 +509,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	//=====================================
+	//=============================== 書き込み
 	if(opts.write) {  // write
 		auto areas = motsx_.create_area_map();
 		if(!areas.empty()) {
@@ -525,7 +552,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	//=====================================
+	//================================ ベリファイ
 	if(opts.verify) {  // verify
 		auto areas = motsx_.create_area_map();
 		if(opts.progress) {
