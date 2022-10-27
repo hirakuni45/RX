@@ -11,7 +11,7 @@ Renesas RX Microcontroller
    
  現在は、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
  複数の環境で、開発が出来るようになっています。   
- - 現在サポートされ、動作確認済みデバイスは RX62N、RX24T、RX66T, RX72T、RX64M、RX71M, RX65N, RX72N となっており、   
+ - 現在サポートされ、動作確認済みデバイスは RX62[1N]、RX24T、RX66T, RX72T、RX64M、RX71M, RX65N, RX72N となっており、   
  デバイスクラスを日々拡張しています。
  - 今後のサポート予定として、RX72M があります。
  - ディレクトリー構成など日々アップデートしています。
@@ -105,6 +105,7 @@ int main(int argc, char** argv)
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
 |[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
 |[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
+|[/MTU_sample](./MTU_sample)|〇|〇|〇|〇|〇|〇|〇|〇|MTU サンプルプログラム|
 |[/CAN_sample](./CAN_sample)|〇|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
 |[/FLASH_sample](./FLASH_sample)|－|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
 |[/FreeRTOS](./FreeRTOS)|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS 基本動作確認サンプル|
