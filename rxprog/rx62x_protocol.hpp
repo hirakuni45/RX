@@ -14,6 +14,7 @@
 #include "rs232c_io.hpp"
 #include "rx_protocol.hpp"
 #include <vector>
+#include <boost/format.hpp>
 
 namespace rx62x {
 
@@ -155,7 +156,7 @@ namespace rx62x {
 				return false;
 			}
 			if(verbose_) {
-				std::cout << "Connection OK." << std::endl;
+				std::cout << "Connection OK. (RX62x)" << std::endl;
 			}
 
 			// サポート・デバイス問い合わせ
@@ -235,12 +236,12 @@ namespace rx62x {
 			// ボーレート変更
 			{
 				if(!change_speed(rx, brate)) {
-					std::cerr << "Can't change speed." << std::endl;
+					std::cerr << "Can't change baud rate speed." << std::endl;
 					return false;
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect << "Change baud rate: " << std::endl;
+					std::cout << sect << "Change baud rate: " << baud_speed_ << std::endl;
 				}
 			}
 
@@ -301,7 +302,7 @@ namespace rx62x {
 				if(verbose_) {
 					auto sz = get_prog_size();
 					auto sect = out_section_(1, 1);
-					std::cout << sect << (boost::format("Program size: %04X") % sz) << std::endl;
+					std::cout << sect << (boost::format("Program size: %u Bytes") % sz) << std::endl;
 				}
 			}
 
@@ -437,6 +438,7 @@ namespace rx62x {
 			if(!connection_) return false;
 
 			if(!command_(0x20)) {
+				std::cerr << "(Inquiry) First command error." << std::endl;
 				return false;
 			}
 			uint8_t head[3];
@@ -444,19 +446,35 @@ namespace rx62x {
 			// head[1]: サイズ
 			// head[2]: デバイス数
 			if(!read_(head, 3)) {
+				std::cerr << "(Inquiry) Read head error." << std::endl;
 				return false;
 			}
 			if(head[0] != 0x30) {
+				std::cerr << "(Inquiry) Read status error." << std::endl;
 				return false;
 			}
 			uint32_t total = head[1];
 
+//			std::cout << boost::format("Size: %d") % total << std::endl;
+//			std::cout << boost::format("Num:  %d") % static_cast<int>(head[2]) << std::endl;
+
 			uint8_t tmp[total];
 			if(!read_(tmp, total)) {
+				std::cerr << "(Inquiry) Read body error." << std::endl;
 				return false;
 			}
 
-			if(sum_(tmp, total - 1) != tmp[total - 1]) {
+//			for(uint32_t i = 0; i < total; ++i) {
+//				std::cout << boost::format("0x%02X ") % static_cast<uint16_t>(tmp[i]);
+//			}
+//			std::cout << std::endl;
+
+			uint8_t sum = sum_(tmp, total - 1);
+			sum -= head[0] + head[1] + head[2];
+			if(sum != tmp[total - 1]) { 
+				std::cerr << boost::format("(Inquiry) Body sum error. (0x%02X : 0x%02X)")
+					% static_cast<uint16_t>(sum) % static_cast<uint16_t>(tmp[total - 1]);
+				std::cerr << std::endl;
 				return false;
 			}
 
@@ -706,6 +724,11 @@ namespace rx62x {
 		{
 			if(!connection_) return false;
 
+			// RX62x では、最大１１５２００ボーまでとする（誤差が大きい為）
+			if(speed > 115200) {
+				speed = 115200;
+			}
+
 			uint32_t nbr;
 			switch(speed) {
 			case 19200:
@@ -729,6 +752,7 @@ namespace rx62x {
 				baud_rate_ = B230400;
 				break;
 			default:
+				std::cerr << "(Change speed) Invalid baud rate error." << std::endl;
 				return false;
 			}
 			baud_speed_ = speed; 
@@ -743,10 +767,12 @@ namespace rx62x {
 			cmd[8] = rx.ext_div_;
 			cmd[9] = sum_(cmd, 9);
 			if(!write_(cmd, 10)) {
+				std::cerr << "(Change speed) Write command error." << std::endl;
 				return false;
 			}
 			uint8_t res[1];
 			if(!read_(res, 1)) {
+				std::cerr << "(Change speed) Read respons error." << std::endl;
 				return false;
 			}
 			if(res[0] == 0xbf) {  // エラーレスポンス
@@ -757,6 +783,14 @@ namespace rx62x {
 				// 0x26: 逓倍エラー
 				// 0x27: 動作周波数エラー
 				last_error_ = res[0];  // エラーコード
+				std::cerr << boost::format("(Change speed) Respons error. (0x%02X)")
+					% static_cast<uint16_t>(res[0]) << std::endl;
+				if(res[0] == 0x24) {
+					std::cerr << boost::format("Change speed select error: %u") % speed << std::endl;
+				} else {
+					std::cerr << boost::format("(Change speed) Respons error. (0x%02X)")
+						% static_cast<uint16_t>(res[0]) << std::endl;
+				}
 				return false;
 			} else if(res[0] != 0x06) {  // 正常レスポンス
 				return false;
@@ -765,6 +799,7 @@ namespace rx62x {
 			usleep(25000);	// 25[ms]
 
 			if(!rs232c_.change_speed(baud_rate_)) {
+				std::cerr << "(Change speed) Serial speed change error." << std::endl;
 				return false;
 			}
 
@@ -1264,7 +1299,7 @@ namespace rx62x {
 			cmd[0] = 0x50;
 ///			std::cout << boost::format("Address: %08X") % address << std::endl;			
 			if(address != 0xffff'ffff) {
-				put32_big_(&cmd[1], address & 0xff'ffff);
+				put32_big_(&cmd[1], address);
 				std::memcpy(&cmd[5], src, 256);
 				cmd[5 + 256] = sum_(cmd, 5 + 256);
 
@@ -1301,7 +1336,7 @@ namespace rx62x {
 				return false;
 			}
 			if(head[0] != 0x06) {
-				std::cout << "Respons error" << std::endl;
+				std::cout << "(Write page) Respons error" << std::endl;
 				select_write_area_ = false;
 				if(head[0] != 0xd0) {
 					return false;

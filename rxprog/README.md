@@ -34,9 +34,16 @@ Tool to write program to flash memory of RX microcontroller using serial interfa
    
 ---
 ## Preparation of build (compilation) environment (Windows)
- - MSYS2 setup
- - gcc related installation
- - Install boost (use pacman to install for mingw64 environment)
+- MSYS2 setup
+- gcc related installation
+- Install boost 
+- Since boost uses 1.74.0, please download it in advance (place it in D:\Download). (boost_1_74_0.tar.gz)
+- Extract to the root of the C drive
+
+```
+cd /c/
+tar xfvz /d/Download/boost_1_74_0.tar.gz
+```
    
 See development environment preparation of 'RX/README.md'
    
@@ -59,13 +66,13 @@ See development environment preparation of 'RX/README.md'
    
 ---
 ## Connection terminal list
-|Terminal|RX24T(100)|RX66T(100)|RX64M (176)|RX71M(176)|RX65N(176)|RX72T(144)
-|---|---|---|---|---|---|---|
-|UB|X|UB/P00(4)|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|UB/P00(9)|
-|MD|MD(6)|MD/FINED(6)|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|MD?FINED(11)|
-|EMLE|X|EMLE(2)|EMLE(10)|EMLE(10)|EMLE(10)|EMLE(7)|
-|RXD|PD5/RXD1(20)|PD5/RXD1(20)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PD5/RXD1(25)|
-|TXD|PD3/TXD1(22)|PD3/TXD1(22)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PD3/TXD1(27)|
+|Terminal|RX62N(144)|RX24T(100)|RX66T(100)|RX64M (176)|RX71M(176)|RX65N(176)|RX72T(144)|
+|---|---|---|---|---|---|---|---|
+|UB|MD0(16)|X|UB/P00(4)|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|UB/P00(9)|
+|MD|MD1(15)|MD(6)|MD/FINED(6)|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|MD?FINED(11)|
+|EMLE|EMLE(10)|X|EMLE(2)|EMLE(10)|EMLE(10)|EMLE(10)|EMLE(7)|
+|RXD|P30/RXD1(29)|PD5/RXD1(20)|PD5/RXD1(20)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PD5/RXD1(25)|
+|TXD|P26/TXD1(31)|PD3/TXD1(22)|PD3/TXD1(22)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PD3/TXD1(27)|
    
 - UB, MD, and EMLE terminals are pulled up or down with a resistor (approximately 4.7K).
 - Connect appropriate crystals to XTAL and EXTAL.
@@ -106,6 +113,7 @@ Options :
  - Describe the settings of each device, port, baud rate, and so on.
  - You can specify the serial device port path individually so that settings can be shared between platforms.
  - Set the port name, baud rate, etc. according to your environment.
+ - For the RX62x, the error is limited to 115200 for high baud rates.
    
 rx_prog.conf configuration example
 ```
@@ -137,6 +145,10 @@ rx_prog.conf is scanned and loaded in the following order:
 Supported device list display
 ```
 rx_prog --device-list
+R5F56217 (RAM: 64K, Program-Flash: 384K, Data-Flash: 32K)
+R5F56218 (RAM: 96K, Program-Flash: 512K, Data-Flash: 32K)
+R5F562N7 (RAM: 64K, Program-Flash: 384K, Data-Flash: 32K)
+R5F562N8 (RAM: 96K, Program-Flash: 512K, Data-Flash: 32K)
 R5F563T6 (RAM: 8K, Program-Flash: 64K, Data-Flash: 8K)
 R5F524T8 (RAM: 16K, Program-Flash: 128K, Data-Flash: 8K)
 R5F524TA (RAM: 16K, Program-Flash: 256K, Data-Flash: 8K)

@@ -34,7 +34,13 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
 ## ビルド（コンパイル）環境の準備（Windows）
  - MSYS2 のセットアップ
  - gcc 関係のインストール
- - boost のインストール（pacman を使って、mingw64 環境用をインストールする）
+ - boost は、1.74.0 を使いますので、事前にダウンロード（D:￥Download へ配置）して下さい。（boost_1_74_0.tar.gz）
+ - C ドライブのルートに展開します
+
+```
+cd /c/
+tar xfvz /d/Download/boost_1_74_0.tar.gz
+```
    
 RX/README.md、RX/READMEja.md の開発環境準備を参照
    
@@ -57,15 +63,16 @@ RX/README.md、RX/READMEja.md の開発環境準備を参照
    
 ---
 ## 接続端子一覧
-|端子|RX62N(144)|RX24T(100)|RX66T(100)|RX64M (176)|RX71M(176)|RX65N(176)|RX72T(144)
+|端子|RX62N(144)|RX24T(100)|RX66T(100)|RX64M (176)|RX71M(176)|RX65N(176)|RX72T(144)|
 |---|---|---|---|---|---|---|---|
-|UB||X|UB/P00(4)|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|UB/P00(9)|
-|MD||MD(6)|MD/FINED(6)|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|MD?FINED(11)|
-|EMLE||X|EMLE(2)|EMLE(10)|EMLE(10)|EMLE(10)|EMLE(7)|
-|RXD||PD5/RXD1(20)|PD5/RXD1(20)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PD5/RXD1(25)|
-|TXD||PD3/TXD1(22)|PD3/TXD1(22)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PD3/TXD1(27)|
+|UB|MD0(16)|X|UB/P00(4)|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|UB/P00(9)|
+|MD|MD1(15)|MD(6)|MD/FINED(6)|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|MD?FINED(11)|
+|EMLE|EMLE(10)|X|EMLE(2)|EMLE(10)|EMLE(10)|EMLE(10)|EMLE(7)|
+|RXD|P30/RXD1(29)|PD5/RXD1(20)|PD5/RXD1(20)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PD5/RXD1(25)|
+|TXD|P26/TXD1(31)|PD3/TXD1(22)|PD3/TXD1(22)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PD3/TXD1(27)|
    
 - UB、MD、EMLE 端子は、抵抗（4.7K 程度）でプルアップ、又はプルダウン。
+- RX62N では、MD0/MD1 により切り替え（ハードウェアーマニュアル参照）。
 - XTAL、EXTAL に適切なクリスタルを接続。
 - VSS、VCC、AVSS、AVCC 等電源を全て接続、バイパスコンデンサを入れる。
 - USB_VSS、USB_VCC などの USB 電源を適切に接続する。
@@ -80,8 +87,8 @@ RX/README.md、RX/READMEja.md の開発環境準備を参照
  - rx_prog を実行して、動作する事を確認（help がリストされる）
 ```
 rx_prog
-Renesas RX Series Programmer Version 1.10b
-Copyright (C) 2016,2019 Hiramatsu Kunihito (hira@rvf-rc45.net)
+Renesas RX Series Programmer Version 1.50
+Copyright (C) 2016, 2022 Hiramatsu Kunihito (hira@rvf-rc45.net)
 usage:
 rx_prog [options] [mot file] ...
 
@@ -99,11 +106,24 @@ Options :
     --verbose                  Verbose output
     -h, --help                 Display this
 ```
-   
+
+### --erase コマンドの有無
+
+- RX62x では、ID 検査が行われない場合、内部フラッシュは、自動的に消去される為、「--erase」を必要としません。
+- 現在のバージョンでは、ID 検査、ID 設定コマンドを実装していません。
+
+### --verify コマンドの有無
+
+- RX63T では、verify を書き込み後、自動で行うので、--verify コマンドを必要としません。
+
+---
+
 ### rx_prog.conf 設定
- - 各デバイスの設定、ポート、ボーレートの設定などを記述する。
- - 各プラットホームで設定を共有出来るように、シリアルデバイスのポートパスを個別に指定できる。
- - 自分の環境に合わせてポート名、ボーレートなど設定しておく。
+
+ - 各デバイスの設定、ポート、ボーレートの設定などを記述します。
+ - 各プラットホームで設定を共有出来るように、シリアルデバイスのポートパスを個別に指定できます。
+ - 自分の環境に合わせてポート名、ボーレートなど設定しておきます。
+ - RX62x では、高ボーレートの場合に誤差が大きくなる為、115200 に制限されます。
    
 rx_prog.conf 設定例
 ```
@@ -135,6 +155,10 @@ rx_prog.conf は、以下の順番にスキャンされ、ロードされます�
 対応デバイス・リスト表示
 ```
 rx_prog --device-list
+R5F56217 (RAM: 64K, Program-Flash: 384K, Data-Flash: 32K)
+R5F56218 (RAM: 96K, Program-Flash: 512K, Data-Flash: 32K)
+R5F562N7 (RAM: 64K, Program-Flash: 384K, Data-Flash: 32K)
+R5F562N8 (RAM: 96K, Program-Flash: 512K, Data-Flash: 32K)
 R5F563T6 (RAM: 8K, Program-Flash: 64K, Data-Flash: 8K)
 R5F524T8 (RAM: 16K, Program-Flash: 128K, Data-Flash: 8K)
 R5F524TA (RAM: 16K, Program-Flash: 256K, Data-Flash: 8K)
