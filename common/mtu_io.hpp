@@ -43,6 +43,7 @@ namespace device {
 			POSITIVE,	///< 立ち上がり
 			NEGATIVE,	///< 立下り
 			DUAL,		///< 両エッジ
+			
 		};
 
 
@@ -607,6 +608,9 @@ namespace device {
 		}
 
 
+
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ベース・クロック（インプット・キャプチャ）の設定 @n
@@ -643,7 +647,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_capture(typename MTUX::CHANNEL ch, CAPTURE cap, uint8_t lvl) noexcept
+		bool start_capture(CHANNEL ch, CAPTURE cap, uint8_t lvl) noexcept
 		{
 			if(lvl == 0) return false;
 
@@ -656,7 +660,9 @@ namespace device {
 
 			intr_level_ = lvl;
 			bool pena = true;
-			port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL);
+			bool neg = false;
+			bool inp = true;
+			port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL, neg, inp);
 
 			uint8_t ctd = 0;
 			switch(cap) {
@@ -685,8 +691,7 @@ namespace device {
 			tt_.cap_.clear();
 
 			// 各チャネルに相当するジャネラルレジスタ
-			tt_.tgr_adr_ = MTUX::TGRA.address + static_cast<uint32_t>(ch) * 2;
-			wr16_(tt_.tgr_adr_, 0x0000);
+			MTUX::TGRA[ch] = 0x0000;
 
 			MTUX::TCNT = 0;
 			MTUX::enable();
