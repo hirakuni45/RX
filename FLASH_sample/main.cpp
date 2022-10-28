@@ -1,30 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  CPU 内蔵 Data Flash 操作サンプル @n
-			RX64M, RX71M: @n
-				12MHz のベースクロックを使用する @n
-				P07 ピンにLEDを接続する @n
-				Size: 64K, Block: 64, Word: 4, ID: - @n
-			RX65N (Renesas Envision kit RX65N): @n
-				12MHz のベースクロックを使用する @n
-				P70 に接続された LED を利用する @n
-				Size: 32K, Block: 64, Word: 4, ID: 4 @n
-			RX24T: @n
-				10MHz のベースクロックを使用する @n
-				P00 ピンにLEDを接続する @n
-				Size: 8K, Block: 64, Word: 1, ID: 4 @n
-			RX66T: @n
-				10MHz のベースクロックを使用する @n
-				P00 ピンにLEDを接続する @n
-				Size: 32K, Block: 64, Word: 4, ID: 3 @n
-			RX72T: @n
-				16MHz のベースクロックを使用する @n
-				P01 ピンにLEDを接続する @n
-				Size: 32K, Block: 64, Word: 4, ID: 3 @n
-			RX72N (Renesas Envision kit RX72N): @n
-				16MHz のベースクロックを使用する @n
-				P40 ピンにLEDを接続する @n
-				Size: 32K, Block: 64, Word: 4, ID: 4
+    @brief  CPU 内蔵 Data Flash 操作サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -42,12 +18,25 @@
 
 namespace {
 
-#if defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
+#if defined(SIG_RX62N)
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ 出版社)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
+  #else
+    // BlueBoard-RX62N_100pin
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+  #endif
+	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
+	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
@@ -55,16 +44,16 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 #elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
+	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	#define SINGLE
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
+	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
+	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
