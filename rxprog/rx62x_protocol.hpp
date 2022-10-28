@@ -44,6 +44,7 @@ namespace rx62x {
 //		rx::protocol::areas			data_areas_;
 		bool						id_protect_ = false;
 		bool						pe_turn_on_ = false;
+		bool						erase_select_ = false;
 		bool						select_write_area_ = false;
 
 		uint32_t	   				baud_speed_ = 0;
@@ -1150,10 +1151,8 @@ namespace rx62x {
 		//-----------------------------------------------------------------//
 		bool erase_page(uint32_t address) noexcept
 		{
-			// ID コードチェックを行わない場合、自動で全面消去がされるので、バイパス
-#if 0
 			if(!connection_) return false;
-			if(!verification_) return false;
+//			if(!verification_) return false;
 
 			if(!erase_select_) {  // 消去選択
 				if(!command_(0x48)) {
@@ -1172,19 +1171,38 @@ namespace rx62x {
 				erase_select_ = true;
 			}
 
-			// ブロック消去
+			// ブロック消去コマンド発行
 			uint8_t cmd[4];
 			cmd[0] = 0x58;
 			cmd[1] = 0x01;  // size 固定値１
 			cmd[2] = (address >> 14) & 0xff;
 			cmd[3] = sum_(cmd, 3);
-			if(!write_(cmd, 10)) {
+			if(!write_(cmd, 4)) {
 				return false;
 			}
-			if(rs232c_.send(buff, 4) != 4) {
-				return false;
+
+			{
+				timeval tv;
+				tv.tv_sec  = 10;
+				tv.tv_usec = 0;
+				uint8_t tmp[1];
+				if(!read_(tmp, 1, tv)) {  // レスポンス
+					return false;
+				}
+				if(tmp[0] == 0xD8) {
+					if(!read_(tmp, 1, tv)) {  // エラーコード
+						return false;
+					}
+					// 0x11: サムチェックエラー
+					// 0x29: ブロック番号エラー
+					// 0x51: 消去エラーが発生
+					last_error_ = tmp[0];  // エラーコード
+					return false;
+				} else if(tmp[0] != 0x06) {
+					return false;
+				}
 			}
-#endif
+
 			return true;
 		}
 
@@ -1366,7 +1384,5 @@ namespace rx62x {
 			select_write_area_ = false;
 			return rs232c_.close();
 		}
-
 	};
-
 }
