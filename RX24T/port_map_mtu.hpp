@@ -634,10 +634,11 @@ namespace device {
 			@param[in]	odr	候補選択
 			@param[in]	neg	反転入出力の場合「true」@n
 						B バージョンチップのみサポート、A バージョンでは設定不可
+			@param[in]	inp	入力として利用する場合「true」（無視される）
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false, bool inp = false) noexcept
 		{
 			if(odr == ORDER::BYPASS) return true;
 
