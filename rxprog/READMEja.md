@@ -51,7 +51,9 @@ RX/README.md、RX/READMEja.md の開発環境準備を参照
  - /usr/local/bin にパスを通す
    
 ---
+
 ## 接続準備（シリアル接続）
+
 - マイコン側の VSS 端子と、USB シリアルの GND を接続。
 - マイコン側の RXD1 端子と、USB シリアルの TXD を接続。
 - マイコン側の TXD1 端子と、USB シリアルの RXD を接続。
@@ -60,20 +62,50 @@ RX/README.md、RX/READMEja.md の開発環境準備を参照
 - EMLE 端子がある場合プルダウンする。（4.7K)
 - MD 端子を「Low レベル」にして「リセット」信号を入れる。
 - 内臓プログラムを実行する場合は MD 端子を「High レベル」にして、リセット信号を入れる。
-   
+- MDE(13) は 0 (リトルエンディアンとする)
+
 ---
 ## 接続端子一覧
-|端子|RX62N(144)|RX24T(100)|RX66T(100)|RX64M (176)|RX71M(176)|RX65N(176)|RX72T(144)|
-|---|---|---|---|---|---|---|---|
-|UB|MD0(16)|X|UB/P00(4)|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|UB/P00(9)|
-|MD|MD1(15)|MD(6)|MD/FINED(6)|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|MD?FINED(11)|
-|EMLE|EMLE(10)|X|EMLE(2)|EMLE(10)|EMLE(10)|EMLE(10)|EMLE(7)|
-|RXD|P30/RXD1(29)|PD5/RXD1(20)|PD5/RXD1(20)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PD5/RXD1(25)|
-|TXD|P26/TXD1(31)|PD3/TXD1(22)|PD3/TXD1(22)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PD3/TXD1(27)|
+
+|端子|RX62N (144)|
+|---|---|
+|MD0|MD0(16)|
+|MD1|MD1(15)|
+|EMLE|EMLE(10)|
+|RXD|P30/RXD1(29)|
+|TXD|P26/TXD1(31)|
    
-- UB、MD、EMLE 端子は、抵抗（4.7K 程度）でプルアップ、又はプルダウン。
-- RX62N では、MD0/MD1 により切り替え（ハードウェアーマニュアル参照）。
+|モード|MD0|MD1|
+|---|---|---|
+|シリアルブート|1|0|
+|USB ブート|0|1|
+|シングルチップ|1|1|
+
+---
+
+|端子|RX63T (64)|RX24T (100)|RX66T (100)|RX72T (144)|
+|---|---|---|---|------|
+|UB|X|X|UB/P00(4)|UB/P00(9)|
+|MD|MD(5)|MD(6)|MD/FINED(6)|MD/FINED(11)|
+|EMLE|EMLE(1)|X|EMLE(2)|EMLE(7)|
+|RXD|PD5/RXD1(14)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(25)|
+|TXD|PD3/TXD1(16)|PD3/TXD1(22)|PD3/TXD1(22)|PD3/TXD1(27)|
+
+---
+
+|端子|RX64M (176)|RX71M (176)|RX65N (176)|
+|---|---|---|---|
+|UB|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|
+|MD|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|
+|EMLE|EMLE(10)|EMLE(10)|EMLE(10)|
+|RXD|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|
+|TXD|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|
+
+---
+
+- MD0、MD1、UB、MD、EMLE 端子は、抵抗（4.7K 程度）でプルアップ、又はプルダウン。
 - XTAL、EXTAL に適切なクリスタルを接続。
+- VCL に規定のコンデンサを接続。
 - VSS、VCC、AVSS、AVCC 等電源を全て接続、バイパスコンデンサを入れる。
 - USB_VSS、USB_VCC などの USB 電源を適切に接続する。
    
@@ -151,42 +183,60 @@ write_page_wait = 5000
 rx_prog.conf は、以下の順番にスキャンされ、ロードされます。   
 - カレント・ディレクトリ
 - コマンド・ディレクトリ（通常、/usr/local/bin）
-   
-対応デバイス・リスト表示
+- RX621/RX62N では、高いボーレートで誤差が大きく、シリアル速度を内部で 115200 に制限しています。
+- RX621/RX62N, RX63T などのデバイスでは、接続時、外部接続クリスタル周波数、倍率設定が必要です。
+- 以下のように、設定ファイルで行います。
+- group 名が同一の設定が複数ある場合、最初に見つけたグループ内設定が有効になります。
+
 ```
-rx_prog --device-list
-R5F56217 (RAM: 64K, Program-Flash: 384K, Data-Flash: 32K)
-R5F56218 (RAM: 96K, Program-Flash: 512K, Data-Flash: 32K)
-R5F562N7 (RAM: 64K, Program-Flash: 384K, Data-Flash: 32K)
-R5F562N8 (RAM: 96K, Program-Flash: 512K, Data-Flash: 32K)
-R5F563T6 (RAM: 8K, Program-Flash: 64K, Data-Flash: 8K)
-R5F524T8 (RAM: 16K, Program-Flash: 128K, Data-Flash: 8K)
-R5F524TA (RAM: 16K, Program-Flash: 256K, Data-Flash: 8K)
-R5F564MF (RAM: 512K, Program-Flash: 2048K, Data-Flash: 64K)
-R5F5671F (RAM: 512K, Program-Flash: 2048K, Data-Flash: 64K)
-R5F564MG (RAM: 512K, Program-Flash: 2560K, Data-Flash: 64K)
-R5F571MG (RAM: 512K, Program-Flash: 2560K, Data-Flash: 64K)
-R5F564MJ (RAM: 512K, Program-Flash: 3072K, Data-Flash: 64K)
-R5F571MJ (RAM: 512K, Program-Flash: 3072K, Data-Flash: 64K)
-R5F564ML (RAM: 512K, Program-Flash: 4096K, Data-Flash: 64K)
-R5F571ML (RAM: 512K, Program-Flash: 4096K, Data-Flash: 64K)
-R5F565NE (RAM: 640K, Program-Flash: 2048K, Data-Flash: 32K)
-R5F566TA (RAM: 64K, Program-Flash: 256K, Data-Flash: 32K)
-R5F566TE (RAM: 64K, Program-Flash: 512K, Data-Flash: 32K)
-R5F566TF (RAM: 128K, Program-Flash: 512K, Data-Flash: 32K)
-R5F566TK (RAM: 128K, Program-Flash: 1024K, Data-Flash: 32K)
-R5F572MD (RAM: 1024K, Program-Flash: 2048K, Data-Flash: 32K)
-R5F572MN (RAM: 1024K, Program-Flash: 4096K, Data-Flash: 32K)
-R5F572TF (RAM: 128K, Program-Flash: 512K, Data-Flash: 32K)
-R5F572TK (RAM: 128K, Program-Flash: 1024K, Data-Flash: 32K)
-R5F572ND (RAM: 1024K, Program-Flash: 2048K, Data-Flash: 32K)
-R5F572NN (RAM: 1024K, Program-Flash: 4096K, Data-Flash: 32K)
+R5F56217 {
+	group = "RX621"
+	clock = 1200
+	divide_sys = 8
+	divide_ext = 4
 ```
-   
+
+---
+
+### 対応デバイス・リスト表示
+
+```
+ % rx_prog --device-list
+R5F56217 (RX621): RAM:   64K, Program-Flash:  384K, Data-Flash: 32K
+R5F56218 (RX621): RAM:   96K, Program-Flash:  512K, Data-Flash: 32K
+R5F562N7 (RX62N): RAM:   64K, Program-Flash:  384K, Data-Flash: 32K
+R5F562N8 (RX62N): RAM:   96K, Program-Flash:  512K, Data-Flash: 32K
+R5F563T6 (RX63T): RAM:    8K, Program-Flash:   64K, Data-Flash:  8K
+R5F524T8 (RX24T): RAM:   16K, Program-Flash:  128K, Data-Flash:  8K
+R5F524TA (RX24T): RAM:   16K, Program-Flash:  256K, Data-Flash:  8K
+R5F564MF (RX64M): RAM:  512K, Program-Flash: 2048K, Data-Flash: 64K
+R5F5671F (RX71M): RAM:  512K, Program-Flash: 2048K, Data-Flash: 64K
+R5F564MG (RX64M): RAM:  512K, Program-Flash: 2560K, Data-Flash: 64K
+R5F571MG (RX71M): RAM:  512K, Program-Flash: 2560K, Data-Flash: 64K
+R5F564MJ (RX64M): RAM:  512K, Program-Flash: 3072K, Data-Flash: 64K
+R5F571MJ (RX71M): RAM:  512K, Program-Flash: 3072K, Data-Flash: 64K
+R5F564ML (RX64M): RAM:  512K, Program-Flash: 4096K, Data-Flash: 64K
+R5F571ML (RX71M): RAM:  512K, Program-Flash: 4096K, Data-Flash: 64K
+R5F5651E (RX651): RAM:  640K, Program-Flash: 2048K, Data-Flash: 32K
+R5F565NE (RX65N): RAM:  640K, Program-Flash: 2048K, Data-Flash: 32K
+R5F566TA (RX66T): RAM:   64K, Program-Flash:  256K, Data-Flash: 32K
+R5F566TE (RX66T): RAM:   64K, Program-Flash:  512K, Data-Flash: 32K
+R5F566TF (RX66T): RAM:  128K, Program-Flash:  512K, Data-Flash: 32K
+R5F566TK (RX66T): RAM:  128K, Program-Flash: 1024K, Data-Flash: 32K
+R5F572MD (RX72M): RAM: 1024K, Program-Flash: 2048K, Data-Flash: 32K
+R5F572MN (RX72M): RAM: 1024K, Program-Flash: 4096K, Data-Flash: 32K
+R5F572TF (RX72T): RAM:  128K, Program-Flash:  512K, Data-Flash: 32K
+R5F572TK (RX72T): RAM:  128K, Program-Flash: 1024K, Data-Flash: 32K
+R5F572ND (RX72N): RAM: 1024K, Program-Flash: 2048K, Data-Flash: 32K
+R5F572NN (RX72N): RAM: 1024K, Program-Flash: 4096K, Data-Flash: 32K
+```
+
+---
+
 ### コネクション検査
 ![R5F564ML](../docs/RX_boards.jpg)
 ```
-rx_prog -d RX71M --verbose
+ % rx_prog -d RX71M --verbose
 # Platform: 'Cygwin'
 # Configuration file path: '/usr/local/bin/rx_prog.conf'
 # Device: 'RX71M'
@@ -207,15 +257,18 @@ rx_prog -d RX71M --verbose
 #01/01: ID: Disable
 ```
    
+---
+
 ### 消去、書き込み、比較（プログレスバー付、「test_sample.mot」ファイルの場合）
 ```
-rx_prog -d RX71M --progress --write --verify test_sample.mot
+ % rx_prog -d RX71M --progress --write --verify test_sample.mot
 Erase:  #################################################
 Write:  #################################################
 Verify: #################################################
 ```
-   
+
 ---
+
 ### 不必要なシリアルポートの削除（Windows）
 ```
 set devmgr_show_nonpresent_devices=1
@@ -232,6 +285,7 @@ start devmgmt.msc
 ※専用ツールの利用に関して、デバイスメーカーのＨＰで確認下さい。
    
 ---
+
 ### FT232RL, FT231XS と CP2102 の違い
 FT231XS, FT232RL:
 ```
@@ -259,7 +313,59 @@ sys     0m0.187s
    
 ※FTDI のデバイスはシリコンラボ製デバイスに比べて低速なようです。
    
------
+---
+
+## RX62N の刻印と容量
+
+- FRK-RX62N 搭載の「R5F562N7」は、カタログ上は、FlashROM:384K、RAM:64K 品となっています。
+- しかし、接続テストを行うと、下記のように、通常存在しない FlashROM エリアを報告します。
+
+```
+ % rx_prog -d RX62N --verbose
+# Platform: 'Cygwin'
+# Configuration file path: 'rx_prog.conf'
+# Device: 'RX62N'
+# Serial port path: 'COM7'
+# Serial port speed: 230400
+# Erase Page Wait: 2000 [uS]
+# Write Page Wait: 5000 [uS]
+# Serial port alias: COM7 ---> /dev/ttyS6
+# Serial port path: '/dev/ttyS6'
+Connection OK. (RX62x)
+#01/01: Device: RX600 Series
+#01/01: Device ID: 0x35307936
+#01/01: Clock Mode: 0x00
+#01/02: Multiplier: 1, 2, 4, 8
+#02/02: Multiplier: 1, 2, 4, 8
+#01/02: Frequency Min: 8 MHz, Max: 100 MHz
+#02/02: Frequency Min: 8 MHz, Max: 50 MHz
+#01/01: Change baud rate: 115200
+#01/01: Boot Area: FF7FC000, FF7FFFFF
+#01/01: Area: FFF80000, FFFFFFFF
+#01/54: Area: FFFFF000, FFFFFFFF
+#02/54: Area: FFFFE000, FFFFEFFF
+#03/54: Area: FFFFD000, FFFFDFFF
+#04/54: Area: FFFFC000, FFFFCFFF
+#05/54: Area: FFFFB000, FFFFBFFF
+#06/54: Area: FFFFA000, FFFFAFFF
+#07/54: Area: FFFF9000, FFFF9FFF
+#08/54: Area: FFFF8000, FFFF8FFF
+
+...
+
+#50/54: Area: 00102000, 001027FF
+#51/54: Area: 00101800, 00101FFF
+#52/54: Area: 00101000, 001017FF
+#53/54: Area: 00100800, 00100FFF
+#54/54: Area: 00100000, 001007FF
+#01/01: Program size: 256 Bytes
+#01/01: ID Protect: false
+```
+
+- R5F562N8 と同じく、FlashROM は、FFF80000 から 512K バイト、RAM は、96K バイト利用可能なようです。
+- 実際にプログラムが出来、動作も確認しました。
+
+---
    
 License
 ----
