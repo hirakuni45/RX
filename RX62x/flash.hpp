@@ -20,10 +20,12 @@ namespace device {
 	template<class _>
 	struct flash_t {
 
-		static constexpr auto DATA_SIZE = 32768;
-		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;
-		static constexpr uint32_t DATA_WORD_SIZE = 8;
-		static constexpr auto ID_NUM = 0;
+		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
+		static constexpr uint32_t DATA_FLASH_SIZE = 32768;		///< データ・フラッシュ、サイズ
+		static constexpr uint32_t DATA_FLASH_BLOCK = 2048;		///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 8;			///< データ・フラッシュ最小書き込みサイズ
+
+		static constexpr auto ID_NUM = 0;						///< 個別識別子数
 
 		//-----------------------------------------------------------------//
 		/*!
