@@ -1,6 +1,8 @@
 Renesas RX Microcontroller Library
 =========
 
+rx-elf-gcc.exe (GCC_Build_20200327) 8.3.0.202002-GNURX 20190222
+
 ## libmad
 
 compile: RXv1, RXv2
