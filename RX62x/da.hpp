@@ -23,6 +23,18 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入出力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class analog : uint8_t {
+			DA0,
+			DA1,
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  D/A データレジスタ 0（DADR0）
@@ -81,6 +93,26 @@ namespace device {
 		};
 		typedef dadpr_t<0x0008'80C5> DADPR_;
 		static DADPR_ DADPR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	f	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(analog an, bool f = true)
+		{
+			switch(an) {
+			case analog::DA0:  // P03
+				break;
+			case analog::DA1:  // P05
+				break;
+			default:
+				break;
+			}
+		}
 	};
 	template <peripheral per> typename da_t<per>::DADR0_ da_t<per>::DADR0;
 	template <peripheral per> typename da_t<per>::DADR1_ da_t<per>::DADR1;
