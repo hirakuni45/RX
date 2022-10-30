@@ -1,28 +1,8 @@
 //=====================================================================//
 /*! @file
-    @brief  関数電卓・サンプル @n
-			RX64M, RX71M: @n
-					12MHz のベースクロックを使用する @n
-			　　　　P07 ピンにLEDを接続する @n
-					SCI1 を使用する。@n
-			RX65N (Renesas Envision kit RX65N): @n
-					12MHz のベースクロックを使用する @n
-			　　　　P70 に接続された LED を利用する @n
-					SCI9 を使用する。@n
-			RX24T, RX66T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
-					SCI1 を使用する。@n
-			RX72N: (Renesas Envision kit RX72N) @n
-					16MHz のベースクロックを使用する @n
-					P40 に接続された LED を利用する @n
-					SCI2 を使用する。 @n
-			RX72T: @n
-					16MHz のベースクロックを使用する @n
-					P01 ピンにLEDを接続する @n
-					SCI1 を使用する。
+    @brief  関数電卓・サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020,2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -49,16 +29,30 @@
 
 namespace {
 
-#if defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
+#if defined(SIG_RX62N)
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ 出版社)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+  #else
+    // BlueBoard-RX62N_100pin
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+  #endif
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
+	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N" };
+	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 
@@ -68,7 +62,7 @@ namespace {
     typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
     SDC		sdc_;
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N" };
+	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 
@@ -78,15 +72,15 @@ namespace {
     typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
     SDC		sdc_;
 #elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
+	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
+	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
+	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 #endif

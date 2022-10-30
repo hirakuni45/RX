@@ -35,6 +35,9 @@
 #include "RX62x/ad.hpp"
 #include "RX62x/da.hpp"
 #include "RX62x/flash.hpp"
+#include "RX62x/flash_io.hpp"
+#include "RX24T/dac_out.hpp"
+#include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX24T)
 #include "RX600/lvda.hpp"

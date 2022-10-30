@@ -114,9 +114,9 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|〇|〇|GUI Sample、Graphics User Interface (Soft rendering, using DRW2D engine)|
 |[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|〇|△|〇|〇|MP3/WAV Audio Player (FreeRTOS)|
 |[/SYNTH_sample](./SYNTH_sample)|－|〇|〇|〇|〇|〇|〇|〇|FM sound synthesizer emulator|
-|[/CALC_sample](./CALC_sample)|－|－|△|△|△|△|〇|〇|Function calculator samples (gmp, mpfr libraries)|
+|[/CALC_sample](./CALC_sample)|〇|－|〇|〇|〇|〇|〇|〇|Function calculator samples (gmp, mpfr libraries)|
 |[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|△|〇|Digital Storage Oscilloscope Samples|
-|[/PSG_sample](./PSG_sample)|－|△|△|△|〇|〇|〇|〇|Pseudo PSG Sound Source Performance Samples|
+|[/PSG_sample](./PSG_sample)|〇|－|〇|〇|〇|〇|〇|〇|Pseudo PSG Sound Source Performance Samples|
 |[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|〇|〇|TinyUSB/Host Samples|
 
 *Please consider directories and files that are not in the above list but exist when checked out as work in progress.

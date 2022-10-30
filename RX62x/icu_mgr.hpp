@@ -76,6 +76,37 @@ namespace device {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DMAC 要因の設定
+			@param[in]	dma_per	DMAC ペリフェラル
+			@param[in]	target	DMA 要因のベクター番号
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool set_dmac(peripheral dma_per, ICU::VECTOR target) noexcept
+		{
+			switch(dma_per) {
+			case peripheral::DMAC0:
+				ICU::DMRSR0 = static_cast<uint8_t>(target);
+				break;
+			case peripheral::DMAC1:
+				ICU::DMRSR1 = static_cast<uint8_t>(target);
+				break;
+			case peripheral::DMAC2:
+				ICU::DMRSR2 = static_cast<uint8_t>(target);
+				break;
+			case peripheral::DMAC3:
+				ICU::DMRSR3 = static_cast<uint8_t>(target);
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  グループ割り込みに対するベクタを返すダミー

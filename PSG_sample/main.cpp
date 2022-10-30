@@ -23,8 +23,30 @@
 
 namespace {
 
-#if defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
+#if defined(SIG_RX62N)
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ 出版社)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+  #else
+    // BlueBoard-RX62N_100pin
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+  #endif
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+	typedef device::DA DAC;
+
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -33,9 +55,10 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
+	typedef device::R12DA DAC;
 
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
+	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -44,9 +67,10 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
+	typedef device::R12DA DAC;
 
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N" };
+	static const char* system_str_ = { "RX65N DIY" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, false> SW2;
 	typedef device::SCI9 SCI_CH;
@@ -56,15 +80,16 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
+	typedef device::R12DA DAC;
 	#define USE_SW2
 
 #elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
+	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
+	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -73,9 +98,10 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
+	typedef device::R12DA DAC;
 
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N" };
+	static const char* system_str_ = { "RX72N DIY" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
 	typedef device::SCI2 SCI_CH;
@@ -89,7 +115,7 @@ namespace {
 	#define USE_SW2
 
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
+	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -98,6 +124,7 @@ namespace {
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
+	typedef device::R12DA DAC;
 
 #endif
 
@@ -125,9 +152,9 @@ namespace {
 	PSG_MNG		psg_mng_;
 
 #ifdef USE_DAC
-//	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
-	typedef sound::dac_stream<device::R12DA, device::MTU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
-//	typedef sound::dac_stream<device::R12DA, device::CMT1, device::DMAC0, SOUND_OUT> DAC_STREAM;
+//	typedef sound::dac_stream<DAC, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+	typedef sound::dac_stream<DAC, device::MTU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+//	typedef sound::dac_stream<DAC, device::CMT1, device::DMAC0, SOUND_OUT> DAC_STREAM;
 	DAC_STREAM	dac_stream_(sound_out_);
 
 	void start_audio_()
