@@ -23,26 +23,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_mtu : public port_map_order {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タイマー系・クロック・グループ @n
-					※タイマーのクロック系は、MTU 共通なので、識別子としてグループを使う
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class GROUP : uint8_t {
-			MTU0,	///< MTU0 系グループ
-			MTU1,	///< MTU1 系グループ
-			MTU2,	///< MTU2 系グループ
-			MTU3,	///< MTU3 系グループ
-			MTU4,	///< MTU4 系グループ
-			MTU5,	///< MTU5 系グループ
-			MTU6,	///< MTU6 系グループ
-			MTU7,	///< MTU7 系グループ
-			NONE,	///< 無効なグループ
-		};
 
-	private:
 		static bool mtu0_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -792,6 +773,144 @@ namespace device {
 			return ret;
 		}
 
+
+		static bool clk_a_(ORDER odr, bool ena, bool neg) noexcept
+		{
+			// P21 ( 68/100), (100/144)
+			// P33 ( 58/100), ( 86/144)
+			// PA7 (---/100), ( 52/144)
+			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = sel;  // ok
+				PORT2::PMR.B1 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT3::PMR.B3 = 0;
+				MPC::P33PFS.PSEL = sel;  // ok
+				PORT3::PMR.B3 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B6 = 0;
+				MPC::PA6PFS.PSEL = ena ? (neg ? 0b000011 : 0b000001) : 0;  // ok
+				PORTA::PMR.B6 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_b_(ORDER odr, bool ena, bool neg) noexcept
+		{
+			// P20 ( 69/100), (101/144)
+			// P32 ( 59/100), ( 87/144)
+			// PA6 (---/100), ( 53/144)
+			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = sel;  // ok
+				PORT2::PMR.B0 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT3::PMR.B2 = 0;
+				MPC::P32PFS.PSEL = sel;  // ok
+				PORT3::PMR.B2 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B6 = 0;
+				MPC::PA6PFS.PSEL = ena ? (neg ? 0b000011 : 0b000001) : 0;  // ok
+				PORTA::PMR.B6 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_c_(ORDER odr, bool ena, bool neg) noexcept
+		{
+			// P11 ( 99/100), (140/144)
+			// P31 ( 61/100), ( 89/144)
+			// PA7 (---/100), ( 52/144)
+			// PE4 (  8/100), ( 13/144)
+			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B1 = 0;
+				MPC::P11PFS.PSEL = sel;  // ok
+				PORT1::PMR.B1 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT3::PMR.B1 = 0;
+				MPC::P31PFS.PSEL = sel;  // ok
+				PORT3::PMR.B1 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B7 = 0;
+				MPC::PA7PFS.PSEL = sel;  // ok
+				PORTA::PMR.B7 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTE::PMR.B4 = 0;
+				MPC::PE4PFS.PSEL = sel;  // ok
+				PORTE::PMR.B4 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_d_(ORDER odr, bool ena, bool neg) noexcept
+		{
+			// P10 (100/100), (141/144)
+			// P22 ( 67/100), ( 97/144)
+			// P30 ( 63/100), ( 91/144)
+			// PA6 (---/100), ( 53/144)
+			// PE3 (  9/100), ( 14/144)
+			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B0 = 0;
+				MPC::P10PFS.PSEL = sel;  // ok
+				PORT1::PMR.B0 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // ok
+				PORT2::PMR.B2 = ena;
+				break;
+			case ORDER::THIRD:
+				PORT3::PMR.B0 = 0;
+				MPC::P30PFS.PSEL = sel;  // ok
+				PORT3::PMR.B0 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTA::PMR.B6 = 0;
+				MPC::PA6PFS.PSEL = sel;  // ok
+				PORTA::PMR.B6 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTE::PMR.B3 = 0;
+				MPC::PE3PFS.PSEL = sel;  // ok
+				PORTE::PMR.B3 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -855,15 +974,41 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマー系、クロックポート切り替え
-			@param[in]	grp	チャネル・グループ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
+			@param[in]	odr	候補選択
+			@param[in]	neg	反転入出力の場合「true」
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_clock(GROUP grp, CHANNEL ch, bool ena = true) noexcept
+		static bool turn_clock(CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
 		{
 			bool ret = true;
+
+			if(odr == ORDER::BYPASS) return true;
+
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			switch(ch) {
+			case CHANNEL::CLK_A:
+				ret = clk_a_(odr, ena, neg);
+				break;
+			case CHANNEL::CLK_B:
+				ret = clk_b_(odr, ena, neg);
+				break;
+			case CHANNEL::CLK_C:
+				ret = clk_c_(odr, ena, neg);
+				break;
+			case CHANNEL::CLK_D:
+				ret = clk_d_(odr, ena, neg);
+				break;
+			default:
+				ret = false;
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return ret;
 		}
