@@ -691,7 +691,7 @@ namespace device {
 			tt_.cap_.clear();
 
 			// 各チャネルに相当するジャネラルレジスタ
-			MTUX::TGRA[ch] = 0x0000;
+			MTUX::TGR[ch] = 0x0000;
 
 			MTUX::TCNT = 0;
 			MTUX::enable();

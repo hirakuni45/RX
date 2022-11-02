@@ -99,6 +99,84 @@ namespace {
 
 	typedef utils::command<256> CMD;
 	CMD 	cmd_;
+
+
+	enum class COMMAND : uint8_t {
+		NONE,
+		FREQ,
+		PWM_C,
+		PWM_D
+	};
+
+	uint32_t	freq_;
+	float		pwm_duty_c_;
+	float		pwm_duty_d_;
+
+	void command_analize_()
+	{
+		if(!cmd_.service()) {
+			return;
+		}
+
+		uint32_t cmdn = cmd_.get_words();
+		uint32_t n = 0;
+		auto command = COMMAND::NONE;
+		while(n < cmdn) {
+			char tmp[256];
+			switch(command) {
+			case COMMAND::FREQ:
+				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
+					if((utils::input(tmp, "%d") % freq_).status()) {
+						if(freq_ < 1) freq_ = 1;
+						mtu_.set_freq(MTU::CHANNEL::A, freq_);
+					}
+				}
+				command = COMMAND::NONE;
+				break;
+			case COMMAND::PWM_C:
+				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
+					if((utils::input(tmp, "%f") % pwm_duty_c_).status()) {
+						if(pwm_duty_c_ < 0.0f) pwm_duty_c_ = 0.0f;
+						else if(pwm_duty_c_ > 1.0f) pwm_duty_c_ = 1.0f;
+						auto d = static_cast<int32_t>(pwm_duty_c_ * 65535.0f);
+						mtu_.set_pwm_duty(MTU::CHANNEL::A, d);
+					}
+				}
+				command = COMMAND::NONE;
+				break;
+			case COMMAND::PWM_D:
+				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
+					if((utils::input(tmp, "%f") % pwm_duty_d_).status()) {
+						if(pwm_duty_d_ < 0.0f) pwm_duty_d_ = 0.0f;
+						else if(pwm_duty_d_ > 1.0f) pwm_duty_d_ = 1.0f;
+						auto d = static_cast<int32_t>(pwm_duty_d_ * 65535.0f);
+						mtu_.set_pwm_duty(MTU::CHANNEL::A, d);
+					}
+				}
+				command = COMMAND::NONE;
+				break;
+			default:
+				if(cmd_.cmp_word(n, "set") == 0) {
+					utils::format("Frequency: %u Hz\n") % freq_;
+					utils::format("PWM duty C: %3.2f\n") % pwm_duty_c_;
+					utils::format("PWM duty D: %3.2f\n") % pwm_duty_d_;
+				} else if(cmd_.cmp_word(n, "freq") == 0) {
+					command = COMMAND::FREQ;
+				} else if(cmd_.cmp_word(n, "pwm-c") == 0) {
+					command = COMMAND::PWM_C;
+				} else if(cmd_.cmp_word(n, "pwm-d") == 0) {
+					command = COMMAND::PWM_D;
+				} else if(cmd_.cmp_word(n, "help") == 0) {
+					utils::format("Report setting: set\n");
+					utils::format("Set refarence frequency: freq x (1 to n Hz)\n");
+					utils::format("Set PWM duty C: pwm-c y (0.0 to 1.0)\n");
+					utils::format("Set PWM duty D: pwm-d y (0.0 to 1.0)\n");
+				}
+				break;
+			}
+			++n;
+		}
+	}
 }
 
 
@@ -151,20 +229,23 @@ int main(int argc, char** argv)
 	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("\nStart MTU sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
-	{  // MTU の開始（インターバルタイマー、トグル出力）
-		uint32_t freq = 10'000;  // 10KHz
-//		if(!mtu_it_.start_normal(MTU_IT::CHANNEL::A, MTU_IT::OUTPUT::TOGGLE, freq)) {
-//		if(!mtu_it_.start_pwm2(MTU_IT::CHANNEL::A, freq, MTU_IT::CHANNEL::D, MTU_IT::OUTPUT::LOW_TO_HIGH)) {
+	{  // MTU の開始
+		freq_ = 10'000;  // 10KHz
+//		if(!mtu_.start_normal(MTU::CHANNEL::A, MTU::OUTPUT::TOGGLE, freq)) {
+
+		// PWM2 C(H->L), D(L->H) 出力
 		static constexpr MTU::pwm_port_t pwmout[2] = {
-			{ MTU::CHANNEL::D, MTU::OUTPUT::LOW_TO_HIGH },
-			{ MTU::CHANNEL::C, MTU::OUTPUT::HIGH_TO_LOW }
+			{ MTU::CHANNEL::C, MTU::OUTPUT::HIGH_TO_LOW },
+			{ MTU::CHANNEL::D, MTU::OUTPUT::LOW_TO_HIGH }
 		};
-		if(!mtu_.start_pwm2(MTU::CHANNEL::A, freq, pwmout[0], pwmout[1])) {
+		if(!mtu_.start_pwm2(MTU::CHANNEL::A, freq_, pwmout[0], pwmout[1])) {
 			utils::format("MTU can't start...\n");
 		}
 	}
-	mtu_.set_pwm_duty(MTU::CHANNEL::D, 16384);
+	pwm_duty_c_ = 0.25f;
 	mtu_.set_pwm_duty(MTU::CHANNEL::C, 16384);
+	pwm_duty_d_ = 0.25f;
+	mtu_.set_pwm_duty(MTU::CHANNEL::D, 16384);
 
 
 	{  // SCI/CMT/MTU の設定レポート表示
@@ -194,17 +275,7 @@ int main(int argc, char** argv)
 
 		cmt_.sync();
 
-		if(cmd_.service()) {
-			uint32_t cmdn = cmd_.get_words();
-			uint32_t n = 0;
-			while(n < cmdn) {
-				char tmp[256];
-				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
-					utils::format("Param%d: '%s'\n") % n % tmp;
-				}
-				++n;
-			}
-		}
+		command_analize_();
 
 		++cnt;
 		if(cnt >= 50) {

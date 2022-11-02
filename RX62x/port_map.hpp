@@ -68,13 +68,31 @@ namespace device {
 			/// SCL0: P12
 			/// SDA0: P13
 			case peripheral::RIIC0:
-				// 設定は特に無し（SCL/SDA 出力として扱う）
+				// 設定は特に無し（SCL/SDA 入出力として扱う）
 				break;
-
 			/// SCL1: P21
 			/// SDA1: P20
 			case peripheral::RIIC1:
-				// 設定は特に無し（SCL/SDA 出力として扱う）
+				// 設定は特に無し（SCL/SDA 入出力として扱う）
+				break;
+
+			/// RSPCKA-A: PC5
+			/// MOSIA-A:  PC6
+			/// MISOA-A:  PC7
+			case peripheral::RSPI0:
+				MPC::PFGSPI.RSPIS = 0;
+				MPC::PFGSPI.RSPCKE = enable;
+				MPC::PFGSPI.MOSIE = enable;
+				MPC::PFGSPI.MISOE = enable;
+				break;
+			/// RSPCKB-A: P27
+			/// MOSIB-A:  P26
+			/// MISOB-A:  P30
+			case peripheral::RSPI1:
+				MPC::PFHSPI.RSPIS = 0;
+				MPC::PFHSPI.RSPCKE = enable;
+				MPC::PFHSPI.MOSIE = enable;
+				MPC::PFHSPI.MISOE = enable;
 				break;
 
 			/// CTX0: P32
@@ -122,6 +140,25 @@ namespace device {
 			case peripheral::SCI6:
 				MPC::PFFSCI.SCI6S = 1;
 				PORT3::ICR.B3 = enable;  ///< RxD6-B
+				break;
+
+			/// RSPCKA-B: PA5
+			/// MOSIA-B:  PA6
+			/// MISOA-B:  PA7
+			case peripheral::RSPI0:
+				MPC::PFGSPI.RSPIS = 1;
+				MPC::PFGSPI.RSPCKE = enable;
+				MPC::PFGSPI.MOSIE = enable;
+				MPC::PFGSPI.MISOE = enable;
+				break;
+			/// RSPCKB-B: PE5
+			/// MOSIB-B:  PE6
+			/// MISOB-B:  PE7
+			case peripheral::RSPI1:
+				MPC::PFHSPI.RSPIS = 1; 
+				MPC::PFHSPI.RSPCKE = enable;
+				MPC::PFHSPI.MOSIE = enable;
+				MPC::PFHSPI.MISOE = enable;
 				break;
 			default:
 				return false;

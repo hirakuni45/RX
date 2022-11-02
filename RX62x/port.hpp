@@ -428,6 +428,35 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ポートファンクションレジスタ G（PFGSPI）
+			@param[in] base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pfxspi_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B0> RSPIS;
+			bit_rw_t<io, bitpos::B1> RSPCKE;
+			bit_rw_t<io, bitpos::B2> MOSIE;
+			bit_rw_t<io, bitpos::B3> MISOE;
+			bit_rw_t<io, bitpos::B4> SSL0E;
+			bit_rw_t<io, bitpos::B5> SSL1E;
+			bit_rw_t<io, bitpos::B6> SSL2E;
+			bit_rw_t<io, bitpos::B7> SSL3E;
+		};
+		typedef pfxspi_t<0x0008'C110> PFGSPI_;
+		static PFGSPI_ PFGSPI;
+		typedef pfxspi_t<0x0008'C111> PFHSPI_;
+		static PFHSPI_ PFHSPI;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートファンクションレジスタ J（PFJCAN）
 			@param[in] base	ベースアドレス
 		*/
@@ -448,6 +477,8 @@ namespace device {
 	template <class _> typename mpc_t<_>::PFCMTU_ mpc_t<_>::PFCMTU;
 	template <class _> typename mpc_t<_>::PFDMTU_ mpc_t<_>::PFDMTU;
 	template <class _> typename mpc_t<_>::PFFSCI_ mpc_t<_>::PFFSCI;
+	template <class _> typename mpc_t<_>::PFGSPI_ mpc_t<_>::PFGSPI;
+	template <class _> typename mpc_t<_>::PFHSPI_ mpc_t<_>::PFHSPI;
 	template <class _> typename mpc_t<_>::PFJCAN_ mpc_t<_>::PFJCAN;
 
 	typedef mpc_t<void> MPC;
