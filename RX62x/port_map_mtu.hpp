@@ -21,31 +21,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_mtu : public port_map_order {
 	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タイマー系・クロック・グループ @n
-					※タイマーのクロック系は、MTU 共通なので、識別子としてグループを使う
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class GROUP : uint8_t {
-			MTU0,	///< MTU0 系グループ
-			MTU1,	///< MTU1 系グループ
-			MTU2,	///< MTU2 系グループ
-			MTU3,	///< MTU3 系グループ
-			MTU4,	///< MTU4 系グループ
-			MTU5,	///< MTU5 系グループ
-			MTU6,	///< MTU6 系グループ
-			MTU7,	///< MTU7 系グループ
-			NONE,	///< 無効なグループ
-		};
-
-	private:
-
-	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  MTU2 関係、チャネル別ポート切り替え
-			@param[in]	t	周辺機器タイプ
+			@param[in]	per	周辺機器タイプ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
 			@param[in]	odr	候補を選択する場合
@@ -54,14 +33,15 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false, bool inp = false) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false, bool inp = false) noexcept
 		{
 			if(odr == ORDER::BYPASS) return true;
 
 			if(neg) return false;
+			if(odr != ORDER::FIRST && odr != ORDER::SECOND) return false;
 
 			bool ret = true;
-			switch(t) {
+			switch(per) {
 			case peripheral::MTU0:
 				switch(ch) {
 				case CHANNEL::A:  // P34
@@ -294,18 +274,202 @@ namespace device {
 		}
 
 
+		static bool clk_a_(ORDER odr, bool ena) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:   // P24 MTCLKA-A
+				MPC::PFCMTU.TCLKS = 0;
+				PORT2::ICR.B4 = ena;
+				break;
+			case ORDER::SECOND:  // PC6 MTCLKA-B
+				MPC::PFCMTU.TCLKS = 1;
+				PORTC::ICR.B6 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_b_(ORDER odr, bool ena) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:   // P25 MTCLKB-A
+				MPC::PFCMTU.TCLKS = 0;
+				PORT2::ICR.B5 = ena;
+				break;
+			case ORDER::SECOND:  // PC7 MTCLKB-B
+				MPC::PFCMTU.TCLKS = 1;
+				PORTC::ICR.B7 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_c_(ORDER odr, bool ena) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:   // P22 MTCLKC-A
+				MPC::PFCMTU.TCLKS = 0;
+				PORT2::ICR.B2 = ena;
+				break;
+			case ORDER::SECOND:  // PC4 MTCLKC-B
+				MPC::PFCMTU.TCLKS = 1;
+				PORTC::ICR.B4 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_d_(ORDER odr, bool ena) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:   // P23 MTCLKD-A
+				MPC::PFCMTU.TCLKS = 0;
+				PORT2::ICR.B3 = ena;
+				break;
+			case ORDER::SECOND:  // PC5 MTCLKD-B
+				MPC::PFCMTU.TCLKS = 1;
+				PORTC::ICR.B5 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+		static bool clk_e_(ORDER odr, bool ena) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:   // PC2 MTCLKE-A
+				MPC::PFDMTU.TCLKS = 0;
+				PORTC::ICR.B2 = ena;
+				break;
+			case ORDER::SECOND:  // PB4 MTCLKE-B
+				MPC::PFDMTU.TCLKS = 1;
+				PORTB::ICR.B4 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_f_(ORDER odr, bool ena) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:   // PC3 MTCLKF-A
+				MPC::PFDMTU.TCLKS = 0;
+				PORTC::ICR.B3 = ena;
+				break;
+			case ORDER::SECOND:  // PB5 MTCLKF-B
+				MPC::PFDMTU.TCLKS = 1;
+				PORTB::ICR.B5 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_g_(ORDER odr, bool ena) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:   // PC0 MTCLKG-A
+				MPC::PFDMTU.TCLKS = 0;
+				PORTC::ICR.B0 = ena;
+				break;
+			case ORDER::SECOND:  // PB2 MTCLKG-B
+				MPC::PFDMTU.TCLKS = 1;
+				PORTB::ICR.B2 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_h_(ORDER odr, bool ena) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:   // PC1 MTCLKH-A
+				MPC::PFDMTU.TCLKS = 0;
+				PORTC::ICR.B1 = ena;
+				break;
+			case ORDER::SECOND:  // PB3 MTCLKH-B
+				MPC::PFDMTU.TCLKS = 1;
+				PORTB::ICR.B3 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマー系、クロックポート切り替え
-			@param[in]	grp	チャネル・グループ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
+			@param[in]	odr	候補選択
+			@param[in]	neg	反転入出力の場合「true」
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_clock(GROUP grp, CHANNEL ch, bool ena = true) noexcept
+		static bool turn_clock(CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
 		{
+			if(neg) return false;
+
 			bool ret = true;
+
+			switch(ch) {
+			case CHANNEL::CLK_A:
+				ret = clk_a_(odr, ena);
+				break;
+			case CHANNEL::CLK_B:
+				ret = clk_b_(odr, ena);
+				break;
+			case CHANNEL::CLK_C:
+				ret = clk_c_(odr, ena);
+				break;
+			case CHANNEL::CLK_D:
+				ret = clk_d_(odr, ena);
+				break;
+			case CHANNEL::CLK_E:
+				ret = clk_e_(odr, ena);
+				break;
+			case CHANNEL::CLK_F:
+				ret = clk_f_(odr, ena);
+				break;
+			case CHANNEL::CLK_G:
+				ret = clk_g_(odr, ena);
+				break;
+			case CHANNEL::CLK_H:
+				ret = clk_h_(odr, ena);
+				break;
+			default:
+				ret = false;
+				break;
+			}
 
 			return ret;
 		}

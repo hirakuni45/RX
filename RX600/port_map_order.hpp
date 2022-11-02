@@ -94,6 +94,10 @@ namespace device {
 			CLK_B,	///< MTCLKB
 			CLK_C,	///< MTCLKC
 			CLK_D,	///< MTCLKD
+			CLK_E,	///< MTCLKE (MTU2 系)
+			CLK_F,	///< MTCLKF (MTU2 系)
+			CLK_G,	///< MTCLKG (MTU2 系)
+			CLK_H,	///< MTCLKH (MTU2 系)
 			NONE,	///< 無効なチャネル
 		};
 

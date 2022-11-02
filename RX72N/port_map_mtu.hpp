@@ -25,26 +25,6 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_mtu : public port_map_order {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タイマー系・クロック・グループ @n
-					※タイマーのクロック系は、MTU 共通なので、識別子としてグループを使う
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class GROUP : uint8_t {
-			AREA0,	///< エリア０
-			AREA1,	///< エリア１
-			AREA2,	///< エリア２
-			AREA3,	///< エリア３
-			AREA4,	///< エリア４
-			AREA5,	///< 
-			AREA6,	///< 
-			AREA7,	///< 
-			NONE,	///< 無効なグループ
-		};
-
-	private:
 
 		static bool mtu0_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
@@ -901,6 +881,144 @@ namespace device {
 			return ret;
 		}
 
+
+		static bool clk_a_(ORDER odr, bool ena) noexcept
+		{
+			// P14 ( 51/176) ( 43/144)
+			// P24 ( 40/176) ( 33/144)
+			// PA4 (109/176) ( 92/144)
+			// PC6 ( 77/176) ( 61/144)
+			// PD5 (147/176) (121/144)
+			uint8_t sel = ena ? 0b000010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B4 = 0;
+				MPC::P14PFS.PSEL = sel;  // ok
+				PORT1::PMR.B4 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B4 = 0;
+				MPC::P24PFS.PSEL = sel;  // ok
+				PORT2::PMR.B4 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B4 = 0;
+				MPC::PA4PFS.PSEL = sel;  // ok
+				PORTA::PMR.B4 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTC::PMR.B6 = 0;
+				MPC::PC6PFS.PSEL = sel;  // ok
+				PORTC::PMR.B6 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTD::PMR.B5 = 0;
+				MPC::PD5PFS.PSEL = sel;  // ok
+				PORTD::PMR.B5 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_b_(ORDER odr, bool ena) noexcept
+		{
+			// P15 ( 50/176) ( 42/144)
+			// P25 ( 38/176) ( 32/144)
+			// PA6 (107/176) ( 89/144)
+			// PC7 ( 76/176) ( 60/144)
+			uint8_t sel = ena ? 0b000010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B5 = 0;
+				MPC::P15PFS.PSEL = sel;  // ok
+				PORT1::PMR.B5 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = sel;  // ok
+				PORT2::PMR.B5 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B6 = 0;
+				MPC::PA6PFS.PSEL = sel;  // ok
+				PORTA::PMR.B6 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTC::PMR.B7 = 0;
+				MPC::PC7PFS.PSEL = sel;  // ok
+				PORTC::PMR.B7 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_c_(ORDER odr, bool ena) noexcept
+		{
+			// P22 ( 43/176) ( 35/144)
+			// PA1 (114/176) ( 96/144)
+			// PC4 ( 82/176) ( 66/144)
+			uint8_t sel = ena ? 0b000010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // ok
+				PORT2::PMR.B2 = ena;
+				break;
+			case ORDER::SECOND:
+				PORTA::PMR.B1 = 0;
+				MPC::PA1PFS.PSEL = sel;  // ok
+				PORTA::PMR.B1 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = sel;  // ok
+				PORTC::PMR.B4 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool clk_d_(ORDER odr, bool ena) noexcept
+		{
+			// P23 ( 42/176) ( 34/144)
+			// PA3 (110/176) ( 94/144)
+			// PC5 ( 78/176) ( 62/144)
+			uint8_t sel = ena ? 0b000010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;  // ok
+				PORT2::PMR.B3 = ena;
+				break;
+			case ORDER::SECOND:
+				PORTA::PMR.B3 = 0;
+				MPC::PA3PFS.PSEL = sel;  // ok
+				PORTA::PMR.B3 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTC::PMR.B5 = 0;
+				MPC::PC5PFS.PSEL = sel;  // ok
+				PORTC::PMR.B5 = ena;
+				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -966,151 +1084,35 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマー系、クロックポート切り替え
-			@param[in]	grp	チャネル・グループ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
+			@param[in]	odr	候補選択
+			@param[in]	neg	反転入出力の場合「true」
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_clock(GROUP grp, CHANNEL ch, bool ena = true) noexcept
+		static bool turn_clock(CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
 		{
+			bool ret = true;
+
+			if(odr == ORDER::BYPASS) return true;
+			if(neg) return false;
+
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			uint8_t sel = ena ? 0b000010 : 0;
-			bool ret = true;
-			switch(grp) {
-			/// P15 ( 50)  MTIOC0B / MTCLKB
-			/// PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
-			/// PA3 (110)  MTIOC0D / MTCLKD
-			case GROUP::AREA0:
-				switch(ch) {
-				case CHANNEL::CLK_B:
-					PORT1::PMR.B5 = 0;
-					MPC::P15PFS.PSEL = sel;
-					PORT1::PMR.B5 = ena;
-					break;
-				case CHANNEL::CLK_C:
-					PORTA::PMR.B1 = 0;
-					MPC::PA1PFS.PSEL = sel;
-					PORTA::PMR.B1 = ena;
-					break;
-				case CHANNEL::CLK_D:
-					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = sel;
-					PORTA::PMR.B3 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			switch(ch) {
+			case CHANNEL::CLK_A:
+				ret = clk_a_(odr, ena);
 				break;
-			/// P14 ( 51)  MTIOC3A / MTCLKA
-			/// PC7 ( 76)  MTIOC3A / MTCLKB
-			/// P22 ( 43)  MTIOC3B / MTCLKC
-			/// PC5 ( 78)  MTIOC3B / MTCLKD
-			case GROUP::AREA1:
-				switch(ch) {
-				case CHANNEL::CLK_A:
-					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = sel;
-					PORT1::PMR.B4 = ena;
-					break;
-				case CHANNEL::CLK_B:
-					PORTC::PMR.B7 = 0;
-					MPC::PC7PFS.PSEL = sel;
-					PORTC::PMR.B7 = ena;
-					break;
-				case CHANNEL::CLK_C:
-					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = sel;
-					PORT2::PMR.B2 = ena;
-					break;
-				case CHANNEL::CLK_D:
-					PORTC::PMR.B5 = 0;
-					MPC::PC5PFS.PSEL = sel;
-					PORTC::PMR.B5 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			case CHANNEL::CLK_B:
+				ret = clk_b_(odr, ena);
 				break;
-			/// PC6 ( 77)  MTIOC3C / MTCLKA
-			/// P23 ( 42)  MTIOC3D / MTCLKD
-			/// PC4 ( 82)  MTIOC3D / MTCLKC
-			case GROUP::AREA2:
-				switch(ch) {
-				case CHANNEL::CLK_A:
-					PORTC::PMR.B6 = 0;
-					MPC::PC6PFS.PSEL = sel;
-					PORTC::PMR.B6 = ena;
-					break;
-				case CHANNEL::CLK_C:
-					PORT2::PMR.B3 = 0;
-					MPC::P23PFS.PSEL = sel;
-					PORT2::PMR.B3 = ena;
-					break;
-				case CHANNEL::CLK_D:
-					PORTC::PMR.B4 = 0;
-					MPC::PC4PFS.PSEL = sel;
-					PORTC::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			case CHANNEL::CLK_C:
+				ret = clk_c_(odr, ena);
 				break;
-			/// P24 ( 40)  MTIOC4A / MTCLKA
-			/// P25 ( 38)  MTIOC4C / MTCLKB
-			case GROUP::AREA3:
-				switch(ch) {
-				case CHANNEL::CLK_A:
-					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = sel;
-					PORT2::PMR.B4 = ena;
-					break;
-				case CHANNEL::CLK_B:
-					PORT2::PMR.B5 = 0;
-					MPC::P25PFS.PSEL = sel;
-					PORT2::PMR.B5 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			/// PA4 (109)  MTIC5U / MTCLKA
-			/// PA6 (107)  MTIC5V / MTCLKB
-			case GROUP::AREA4:
-				switch(ch) {
-				case CHANNEL::CLK_A:
-					PORTA::PMR.B4 = 0;
-					MPC::PA4PFS.PSEL = sel;
-					PORTA::PMR.B4 = ena;
-					break;
-				case CHANNEL::CLK_B:
-					PORTA::PMR.B6 = 0;
-					MPC::PA6PFS.PSEL = sel;
-					PORTA::PMR.B6 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			/// PD5 (147)  MTIC5W / MTIOC8C / MTCLKA
-			case GROUP::AREA5:
-				switch(ch) {
-				case CHANNEL::CLK_A:
-					PORTD::PMR.B5 = 0;
-					MPC::PD5PFS.PSEL = sel;
-					PORTD::PMR.B5 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			case CHANNEL::CLK_D:
+				ret = clk_d_(odr, ena);
 				break;
 			default:
 				ret = false;
