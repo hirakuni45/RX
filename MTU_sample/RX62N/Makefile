@@ -29,7 +29,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	MTU_sample/main.cpp
 
-USER_LIBS	=
+USER_LIBS	=	m
 
 USER_DEFS   +=
 
