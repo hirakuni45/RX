@@ -25,6 +25,18 @@ namespace device {
 #else
 		static constexpr auto PCLK = clock_profile::PCLKA;
 #endif
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  TYPE 型（全体の種別なので、チャネルとは異なる）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class TYPE : uint8_t {
+			MTU2,	///< MTU2:  RX621 / RX62N
+			MTU3,	///< MTU3:  RX63T
+			MTU3a,	///< MTU3a: RX64M / RX71M / RX651 / RX65N / RX72N / RX72M
+			MTU3d,	///< MTU3d: RX24T / RX66T / RX72T
+		};
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1830,6 +1842,8 @@ namespace device {
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
 
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2107,6 +2121,8 @@ namespace device {
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
 
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2381,6 +2397,8 @@ namespace device {
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
 
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2579,6 +2597,8 @@ namespace device {
 		static constexpr auto TCIV = INT::TCIV3;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2833,6 +2853,8 @@ namespace device {
 		static constexpr auto TCIV = INT::TCIV4;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3168,6 +3190,8 @@ namespace device {
 		static constexpr auto TCIV = INT::NONE;		///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3535,6 +3559,8 @@ namespace device {
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
 
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -3816,6 +3842,8 @@ namespace device {
 		static constexpr auto TCIV = INT::TCIV7;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -4152,6 +4180,8 @@ namespace device {
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
 
+		static constexpr bool TGR32 = true;		///< TGR register 32 bits word
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -4374,6 +4404,8 @@ namespace device {
 		static constexpr auto TCIV = INT::TCIV9;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+
+		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -20,7 +20,9 @@ namespace device {
 	template <class _>
 	struct mtu_base_t {
 
-		static constexpr auto PCLK = clock_profile::PCLK;
+		static constexpr auto PCLK = clock_profile::PCLK;	///< MTU master clock
+
+		static constexpr bool TGR32 = false;	///< 32 ビットカウンタ機能（全チャネル利用不可）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

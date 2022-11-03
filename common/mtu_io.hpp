@@ -292,6 +292,10 @@ namespace device {
 			tt_.rate_ = freq;
 			tt_.shift_ = 0;
 			match = MTUX::PCLK / freq;
+			if(MTUX::TGR32) {
+				return true;
+			}
+
 			while(match > 65535) {
 				++tt_.shift_;
 				match /= 2;
