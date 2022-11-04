@@ -36,7 +36,7 @@ SCI (UART) sample program using RX microcontroller
  - RX72N: 240MHz (16MHz)
  - Connect the indicator LED to the specified port.
  - Connect the USB serial and SCI ports.
- - Refer to RX600/port_map.hpp for the RX64M/RX71M SCI standard port.
+ - Refer to RX64M/port_map.hpp for the RX64M/RX71M SCI standard port.
  - Refer to RX24T/port_map.hpp for the RX24T SCI standard port.
  - Refer to RX65x/port_map.hpp for the RX65x SCI standard port.
  - Refer to RX72N/port_map.hpp for the RX72N SCI standard port.
