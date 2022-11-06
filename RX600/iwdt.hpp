@@ -135,7 +135,8 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
 		typename iwdt_t<base, per, ivec, pclk>::IWDTCSTPR_ iwdt_t<base, per, ivec, pclk>::IWDTCSTPR;
 
-#if defined(SIG_RX621) || defined(SIG_RX62N)
+
+#if defined(SIG_RX63T) || defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef iwdt_t<0x00088030, peripheral::IWDT, ICU::VECTOR::NONE, 125'000> IWDT;
 #elif defined(SIG_RX24T)
 	// interrupt vector: for NMI vector
