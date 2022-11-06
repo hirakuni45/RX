@@ -49,6 +49,13 @@ INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)
 PROG_ERASE = --erase
 PROG_VERIFY = --verify
 
+ifeq ($(RX_DEF),SIG_RX63T)
+  RX_CPU = RX63T
+  RX_CHOOSE = -misa=v1
+  LDSCRIPT	=	../../RX63T/$(DEVICE).ld
+  PROG_ERASE =
+endif
+
 ifeq ($(RX_DEF),SIG_RX621)
   RX_CPU = RX621
   RX_CHOOSE = -misa=v1
