@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX63T グループ・フラッシュ 定義
+	@brief	RX63T グループ・フラッシュ 定義 @n
+			R5F563T[ECB]: 32K @n
+			R5F563T[654]:  8K
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -20,21 +22,24 @@ namespace device {
 	template<class _>
 	struct flash_t {
 
-		static constexpr uint32_t DATA_FLASH_ORG   = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
-		static constexpr uint32_t DATA_FLASH_SIZE  = 32768;			///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_FLASH_BLOCK = 1024;			///< データ・フラッシュ、ブロックサイズ
-		static constexpr uint32_t DATA_WORD_SIZE   = 8;				///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
+//		static constexpr uint32_t DATA_FLASH_SIZE  = 32768;		///< データ・フラッシュ、サイズ
+//		static constexpr uint32_t DATA_FLASH_BLOCK = 1024;		///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_FLASH_SIZE  = 8192;		///< データ・フラッシュ、サイズ
+		static constexpr uint32_t DATA_FLASH_BLOCK = 256;		///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 2;			///< データ・フラッシュ最小書き込みサイズ
 
-		static constexpr auto ID_NUM = 0;							///< 個別識別子数
+		static constexpr auto ID_NUM = 0;						///< 個別識別子数
+
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  フラッシュ P/E プロテクトレジスタ（FWEPROR）
+			@brief  フラッシュライトイレースプロテクトレジスタ（FWEPROR）
 			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fmepror_t : public rw8_t<base> {
+		struct fwepror_t : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -43,7 +48,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> FLWE;
 		};
-		typedef fmepror_t<0x0008'C296> FWEPROR_;
+		typedef fwepror_t<0x0008'C296> FWEPROR_;
 		static FWEPROR_ FWEPROR;
 
 
@@ -141,7 +146,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  E2 データフラッシュ読み出し許可レジスタ 0（DFLRE0）
+			@brief  データフラッシュ読み出し許可レジスタ 0（DFLRE0）
 			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
@@ -161,7 +166,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>    DBRE05;
 			bit_rw_t <io_, bitpos::B6>    DBRE06;
 			bit_rw_t <io_, bitpos::B7>    DBRE07;
-
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
 		typedef dflre0_t<0x007F'C440> DFLRE0_;
@@ -170,7 +174,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  E2 データフラッシュ読み出し許可レジスタ 1（DFLRE1）
+			@brief  データフラッシュ読み出し許可レジスタ 1（DFLRE1）
 			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
@@ -190,7 +194,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>    DBRE13;
 			bit_rw_t <io_, bitpos::B6>    DBRE14;
 			bit_rw_t <io_, bitpos::B7>    DBRE15;
-
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
 		typedef dflre1_t<0x007F'C442> DFLRE1_;
@@ -199,7 +202,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  E2 データフラッシュ P/E 許可レジスタ 0（DFLWE0）
+			@brief  データフラッシュ書き込み／消去許可レジスタ 0（DFLWE0）
 			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
@@ -219,7 +222,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>    DBWE05;
 			bit_rw_t <io_, bitpos::B6>    DBWE06;
 			bit_rw_t <io_, bitpos::B7>    DBWE07;
-
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
 		typedef dflwe0_t<0x007F'C450> DFLWE0_;
@@ -228,7 +230,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  E2 データフラッシュ P/E 許可レジスタ 1（DFLWE1）
+			@brief  データフラッシュ書き込み／消去許可レジスタ 1（DFLWE1）
 			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
@@ -248,7 +250,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>    DBWE13;
 			bit_rw_t <io_, bitpos::B6>    DBWE14;
 			bit_rw_t <io_, bitpos::B7>    DBWE15;
-
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
 		typedef dflwe1_t<0x007F'C452> DFLWE1_;
@@ -312,8 +313,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>     FRDYIE;
-			bits_rw_t<io_, bitpos::B8, 8>  FEKEY;
+			bit_rw_t <io_, bitpos::B0>    FENTRY0;
+
+			bit_rw_t <io_, bitpos::B7>    FENTRYD;
+			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
 		typedef fentryr_t<0x007F'FFB2> FENTRYR_;
 		static FENTRYR_ FENTRYR;
@@ -335,7 +338,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>    FPROTCN;
 
-			bits_rw_t<io_, bitpos::B8, 8> KEY;
+			bits_rw_t<io_, bitpos::B8, 8> FPKEY;
 		};
 		typedef fprotr_t<0x007F'FFB4> FPROTR_;
 		static FPROTR_ FPROTR;
@@ -357,7 +360,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>    FRESET;
 
-			bits_rw_t<io_, bitpos::B8, 8> KEY;
+			bits_rw_t<io_, bitpos::B8, 8> FRKEY;
 		};
 		typedef fresetr_t<0x007F'FFB6> FRESETR_;
 		static FRESETR_ FRESETR;
@@ -481,6 +484,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
+					ユニークレジスタは無いので、ROM 領域を読み出す @n
 					ROM 0xFFFF'FFC0 to 0xFFFF'FFCF
 		*/
 		//-----------------------------------------------------------------//

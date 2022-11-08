@@ -26,6 +26,20 @@ namespace device {
 		{
 			switch(per) {
 
+			case peripheral::CAN1:
+			// P22/CRX1
+			// P23/CTX1
+				{
+					uint8_t sel = enable ? 0b1'0000 : 0;
+					PORT2::PMR.B2 = 0;
+					PORT2::PMR.B3 = 0;
+					MPC::P22PFS.PSEL = sel;
+					MPC::P23PFS.PSEL = sel;
+					PORT2::PMR.B2 = enable;
+					PORT2::PMR.B3 = enable;
+				}
+				break;
+
 			case peripheral::RIIC0:
 			// PB1/SCL0
 			// PB2/SDA0
@@ -152,6 +166,20 @@ namespace device {
 		static bool sub_2nd_(peripheral per, bool enable) noexcept
 		{
 			switch(per) {
+
+			case peripheral::CAN1:
+			// PB6/CRX1
+			// PB5/CTX1
+				{
+					uint8_t sel = enable ? 0b1'0000 : 0;
+					PORTB::PMR.B6 = 0;
+					PORTB::PMR.B5 = 0;
+					MPC::PB6PFS.PSEL = sel;
+					MPC::PB5PFS.PSEL = sel;
+					PORTB::PMR.B6 = enable;
+					PORTB::PMR.B5 = enable;
+				}
+				break;
 
 			case peripheral::RSPI0:
 			// P24/RSPCKA

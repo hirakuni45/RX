@@ -4638,7 +4638,17 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGR_ mtu9_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::NFCR_ mtu9_t<per, INT>::NFCR;
 
-#if defined(SIG_RX24T)  // MTU3d
+#if defined(SIG_RX63T)  // MTU3
+	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR> MTU0;
+	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR> MTU1;
+	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR> MTU2;
+	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR> MTU3;
+	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR> MTU4;
+	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR> MTU5;
+	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR> MTU6;
+	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR> MTU7;
+
+#elif defined(SIG_RX24T)  // MTU3d
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR> MTU2;

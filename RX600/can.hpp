@@ -850,7 +850,35 @@ namespace device {
 	template <uint32_t base, peripheral per> typename can_t<base, per>::TCR_ can_t<base, per>::TCR;
 
 
-#if defined(SIG_RX621) || defined(SIG_RX62N)
+#if defined(SIG_RX63T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	CAN モジュール（CAN 通常割り込み型）
+		@param[in]	base	ベースアドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	rxf		受信 FIFO 割り込み
+		@param[in]	txf		送信 FIFO 割り込み
+		@param[in]	rxm		メールボックス受信割り込み
+		@param[in]	txm		メールボックス送信割り込み
+		@param[in]	ers		エラー割り込み
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::VECTOR_GROUP0 ers>
+	struct can_norm_t : can_t<base, per> {
+
+		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
+		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
+		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
+		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
+		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
+		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
+	};
+	typedef can_norm_t<0x0009'1200, peripheral::CAN1,
+		ICU::VECTOR::RXF1, ICU::VECTOR::TXF1,
+		ICU::VECTOR::RXM1, ICU::VECTOR::TXM1, ICU::VECTOR_GROUP0::ERS1> CAN1;
+
+#elif defined(SIG_RX621) || defined(SIG_RX62N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	CAN モジュール（CAN 通常割り込み型）
@@ -874,7 +902,7 @@ namespace device {
 		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
 		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
 	};
-	typedef can_norm_t<0x00090200, peripheral::CAN,
+	typedef can_norm_t<0x0009'0200, peripheral::CAN,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
 		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::VECTOR::ERS0> CAN;
 
@@ -902,7 +930,7 @@ namespace device {
 		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
 		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
 	};
-	typedef can_norm_t<0x00090200, peripheral::CAN0,
+	typedef can_norm_t<0x0009'0200, peripheral::CAN0,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
 		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
 
@@ -931,16 +959,16 @@ namespace device {
 		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
 	};
 
-	typedef can_seli_t<0x00090200, peripheral::CAN0,
+	typedef can_seli_t<0x0009'0200, peripheral::CAN0,
 		ICU::VECTOR_SELB::RXF0, ICU::VECTOR_SELB::TXF0,
 		ICU::VECTOR_SELB::RXM0, ICU::VECTOR_SELB::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N)
-	typedef can_seli_t<0x00091200, peripheral::CAN1,
+	typedef can_seli_t<0x0009'1200, peripheral::CAN1,
 		ICU::VECTOR_SELB::RXF1, ICU::VECTOR_SELB::TXF1,
 		ICU::VECTOR_SELB::RXM1, ICU::VECTOR_SELB::TXM1, ICU::VECTOR_BE0::ERS1> CAN1;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N)
-	typedef can_seli_t<0x00092200, peripheral::CAN2,
+	typedef can_seli_t<0x0009'2200, peripheral::CAN2,
 		ICU::VECTOR_SELB::RXF2, ICU::VECTOR_SELB::TXF2,
 		ICU::VECTOR_SELB::RXM2, ICU::VECTOR_SELB::TXM2, ICU::VECTOR_BE0::ERS2> CAN2;
 #endif

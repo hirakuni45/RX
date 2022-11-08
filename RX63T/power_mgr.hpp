@@ -32,7 +32,7 @@ namespace device {
 
 			uint8_t		dmac_;
 
-			uint8_t		can_;
+			uint8_t		dpc_;
 
 			pad_t() :
 				gpt0_(0), gpt1_(0),
@@ -42,7 +42,7 @@ namespace device {
 
 				dmac_(0),
 
-				can_(0)
+				dpc_(0)
 			{ }
 		};
 		static pad_t	pad_;
@@ -145,11 +145,8 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA28 = (pad_.dmac_ == 0);
 				break;
 
-			case peripheral::CAN0:
 			case peripheral::CAN1:
-			case peripheral::CAN2:
-				sr_(ena, pad_.can_, peripheral::CAN0, per);
-				SYSTEM::MSTPCRB.MSTPB1 = (pad_.can_ == 0);
+				SYSTEM::MSTPCRB.MSTPB1 = f;
 				break;
 
 			case peripheral::SCI12:
@@ -193,6 +190,18 @@ namespace device {
 				break;
 			case peripheral::SCI0:
 				SYSTEM::MSTPCRB.MSTPB31 = f;
+				break;
+				
+			case peripheral::CAC:
+				SYSTEM::MSTPCRC.MSTPC19 = f;
+				break;
+
+			case peripheral::DPC0:
+			case peripheral::DPC1:
+			case peripheral::DPC2:
+			case peripheral::DPC3:
+				sr_(ena, pad_.dpc_, peripheral::DPC0, per);
+				SYSTEM::MSTPCRC.MSTPC31 = (pad_.dpc_ == 0);
 				break;
 
 			default:

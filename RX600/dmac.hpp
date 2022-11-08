@@ -265,7 +265,7 @@ namespace device {
 
 		bit_rw_t<io_, bitpos::B0>   DMST;
 	};
-	static dmast_t<0x00082200> DMAST;
+	static dmast_t<0x0008'2200> DMAST;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -284,21 +284,21 @@ namespace device {
 		bit_ro_t<in_, bitpos::B6>   DMIS6;
 		bit_ro_t<in_, bitpos::B7>   DMIS7;
 	};
-	static dmist_t<0x00082204> DMIST;
+	static dmist_t<0x0008'2204> DMIST;
 
-#if defined(SIG_RX621) || defined(SIG_RX62N)
-	typedef dmac_t<0x00082000, peripheral::DMAC0, ICU::VECTOR::DMACI0>    DMAC0;
-	typedef dmac_t<0x00082040, peripheral::DMAC1, ICU::VECTOR::DMACI1>    DMAC1;
-	typedef dmac_t<0x00082080, peripheral::DMAC2, ICU::VECTOR::DMACI2>    DMAC2;
-	typedef dmac_t<0x000820C0, peripheral::DMAC3, ICU::VECTOR::DMACI3>    DMAC3;
+#if defined(SIG_RX63T) || defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef dmac_t<0x0008'2000, peripheral::DMAC0, ICU::VECTOR::DMACI0>   DMAC0;
+	typedef dmac_t<0x0008'2040, peripheral::DMAC1, ICU::VECTOR::DMACI1>   DMAC1;
+	typedef dmac_t<0x0008'2080, peripheral::DMAC2, ICU::VECTOR::DMACI2>   DMAC2;
+	typedef dmac_t<0x0008'20C0, peripheral::DMAC3, ICU::VECTOR::DMACI3>   DMAC3;
 #else
-	typedef dmac_t<0x00082000, peripheral::DMAC0, ICU::VECTOR::DMAC0I>    DMAC0;
-	typedef dmac_t<0x00082040, peripheral::DMAC1, ICU::VECTOR::DMAC1I>    DMAC1;
-	typedef dmac_t<0x00082080, peripheral::DMAC2, ICU::VECTOR::DMAC2I>    DMAC2;
-	typedef dmac_t<0x000820C0, peripheral::DMAC3, ICU::VECTOR::DMAC3I>    DMAC3;
-	typedef dmac_t<0x00082100, peripheral::DMAC4, ICU::VECTOR::DMAC74I>   DMAC4;
-	typedef dmac_t<0x00082140, peripheral::DMAC5, ICU::VECTOR::DMAC74I>   DMAC5;
-	typedef dmac_t<0x00082180, peripheral::DMAC6, ICU::VECTOR::DMAC74I>   DMAC6;
-	typedef dmac_t<0x000821C0, peripheral::DMAC7, ICU::VECTOR::DMAC74I>   DMAC7;
+	typedef dmac_t<0x0008'2000, peripheral::DMAC0, ICU::VECTOR::DMAC0I>   DMAC0;
+	typedef dmac_t<0x0008'2040, peripheral::DMAC1, ICU::VECTOR::DMAC1I>   DMAC1;
+	typedef dmac_t<0x0008'2080, peripheral::DMAC2, ICU::VECTOR::DMAC2I>   DMAC2;
+	typedef dmac_t<0x0008'20C0, peripheral::DMAC3, ICU::VECTOR::DMAC3I>   DMAC3;
+	typedef dmac_t<0x0008'2100, peripheral::DMAC4, ICU::VECTOR::DMAC74I>  DMAC4;
+	typedef dmac_t<0x0008'2140, peripheral::DMAC5, ICU::VECTOR::DMAC74I>  DMAC5;
+	typedef dmac_t<0x0008'2180, peripheral::DMAC6, ICU::VECTOR::DMAC74I>  DMAC6;
+	typedef dmac_t<0x0008'21C0, peripheral::DMAC7, ICU::VECTOR::DMAC74I>  DMAC7;
 #endif
 }
