@@ -16,8 +16,20 @@
 #if defined(SIG_RX63T)
 #include "RX63T/lvda.hpp"
 // #include "RX600/bus.hpp"
-#include "RX63T/system_io.hpp"
+#include "RX600/dmac.hpp"
 #include "RX63T/port.hpp"
+#include "RX600/mtu3.hpp"
+// #include "RX600/poe3.hpp"
+// #include "RX600/gpt.hpp"
+// #include "RX600/usb.hpp"
+#include "RX600/can.hpp"
+
+#include "RX600/crc.hpp"
+
+#include "RX63T/dpc.hpp"
+#include "RX63T/flash.hpp"
+
+#include "RX63T/system_io.hpp"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/lvd.hpp"
