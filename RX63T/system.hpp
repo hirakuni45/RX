@@ -619,6 +619,109 @@ namespace device {
 		};
 		typedef dpsbkr_t<0x0008'C2A0> DPSBKR_;
 		static DPSBKR_ DPSBKR;
+
+
+		//-------- レジスタライトプロテクション機能
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  プロテクトレジスタ（PRCR）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct prcr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>	   PRC0;
+			bit_rw_t <io_, bitpos::B1>	   PRC1;
+
+			bit_rw_t <io_, bitpos::B3>     PRC3;
+			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
+		};
+		typedef prcr_t<0x0008'03FE> PRCR_;
+		static PRCR_ PRCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  リセットステータスレジスタ 0（RSTSR0）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct rstsr0_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  PORF;
+			bit_rw_t <io_, bitpos::B1>  LVD0RF;
+			bit_rw_t <io_, bitpos::B2>  LVD1RF;
+			bit_rw_t <io_, bitpos::B3>  LVD2RF;
+
+			bit_rw_t <io_, bitpos::B7>  DPSRSTF;
+		};
+		typedef rstsr0_t<0x0008'C290> RSTSR0_;
+		static RSTSR0_ RSTSR0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  リセットステータスレジスタ 1（RSTSR1）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct rstsr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  CWSF;
+		};
+		typedef rstsr1_t<0x0008'C291> RSTSR1_;
+		static RSTSR1_ RSTSR1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  リセットステータスレジスタ 2（RSTSR2）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct rstsr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  IWDTRF;
+			bit_rw_t <io_, bitpos::B1>  WDTRF;
+			bit_rw_t <io_, bitpos::B2>  SWRF;
+		};
+		typedef rstsr2_t<0x0008'00C0> RSTSR2_;
+		static RSTSR2_ RSTSR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ソフトウェアリセットレジスタ（SWRR）@n
+					0xA501 を書き込むとリセットされます。
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef rw16_t<0x0008'00C2> SWRR_;
+		static SWRR_ SWRR;
 	};
 	typedef system_t<void> SYSTEM;
 
@@ -645,4 +748,5 @@ namespace device {
 	template<class _> typename system_t<_>::DPSIFR2_ system_t<_>::DPSIFR2;
 	template<class _> typename system_t<_>::DPSIEGR0_ system_t<_>::DPSIEGR0;
 	template<class _> typename system_t<_>::DPSBKR_ system_t<_>::DPSBKR;
+	template<class _> typename system_t<_>::PRCR_ system_t<_>::PRCR;
 }

@@ -76,6 +76,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static bool turn(peripheral per, bool ena = true)
 		{
+			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC1.b();
+
 			bool ret = true;
 			bool f = !ena;
 			switch(per) {
@@ -208,6 +210,7 @@ namespace device {
 				ret = false;
 				break;
 			}
+			device::SYSTEM::PRCR = 0xA500;
 			return ret;
 		}
 	};

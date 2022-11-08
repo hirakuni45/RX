@@ -122,7 +122,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void boost_master_clock() noexcept
 		{
-			device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
+			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC0.b();
 
 			device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
 
@@ -219,8 +219,7 @@ namespace device {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 			}
 
-			// クロック関係書き込み不許可
-			device::SYSTEM::PRCR = 0xA500;
+			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 
 #if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 			// ROM キャッシュを有効（標準）

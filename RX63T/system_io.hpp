@@ -115,6 +115,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void boost_master_clock() noexcept
 		{
+			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC0.b();
+
 			// ベースクロック周波数の検査
 			static_assert(check_base_clock_(), "BASE out of range.");
 
@@ -169,10 +171,12 @@ namespace device {
 			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 			}
+
+			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 		}
 	};
 
-#if 0
+
 	//---------------------------------------------------------------------//
 	/*!
 		@brief  ソフト・リセットの起動
@@ -184,6 +188,5 @@ namespace device {
 		device::SYSTEM::SWRR = 0xA501;
 		device::SYSTEM::PRCR = 0xA500;
 	}
-#endif
 }
 typedef device::system_io<device::clock_profile::OSCT> SYSTEM_IO;
