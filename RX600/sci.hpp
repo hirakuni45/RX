@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・SCI 定義 SCI[ijgh]
+	@brief	RX グループ SCI 定義 SCI[acijgh]
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2015, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2015, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -151,7 +151,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2> BRME;		// sci[g]
 
 			bit_rw_t<io_, bitpos::B4> ABCS;
-			bit_rw_t<io_, bitpos::B5> NFEN;		// sci[g]
+			bit_rw_t<io_, bitpos::B5> NFEN;		// sci[cg]
 			bit_rw_t<io_, bitpos::B6> BGDM;		// sci[g]
 			bit_rw_t<io_, bitpos::B7> RXDESEL;	// sci[g]
 		};
@@ -178,18 +178,18 @@ namespace device {
 		@param[in]	pclk	PCLK 周波数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		typename INT, INT tev, uint32_t pclk>
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR tev, uint32_t pclk>
 	struct scia_t : public sci_core_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static constexpr auto PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto TX_VEC	 = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC	 = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC	 = tev;		///< 送信終了割り込みベクター
+		static constexpr auto PCLK		 = pclk;	///< PCLK 周波数
 
 		static constexpr bool SEMR_BRME = false;	///< BRME（ボーレート微調整）
 		static constexpr bool SEMR_BGDM = false;	///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_NFEN = false;	///< NFEN（ノイズフィルタ）
 
 
 		//-----------------------------------------------------------------//
@@ -225,6 +225,92 @@ namespace device {
 		typedef scmr_t<base + 0x06> SCMR_;
 		static SCMR_ SCMR;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR tev, uint32_t pclk>
+		typename scia_t<base, per, txv, rxv, tev, pclk>::SCMR_ scia_t<base, per, txv, rxv, tev, pclk>::SCMR;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCIc 定義クラス
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	txv		送信ベクター
+		@param[in]	rxv		受信ベクター
+		@param[in]	tev		送信終了ベクター
+		@param[in]	pclk	PCLK 周波数
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR tev, uint32_t pclk>
+	struct scic_t : public sci_core_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto TX_VEC	 = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC	 = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC	 = tev;		///< 送信終了割り込みベクター
+		static constexpr auto PCLK		 = pclk;	///< PCLK 周波数
+
+		static constexpr bool SEMR_BRME = false;	///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = false;	///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_NFEN = true;		///< NFEN（ノイズフィルタ）
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	モジュレーションデューティレジスタ（MDDR）ダミー
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_null_t<0x00000000> MDDR_;
+		static MDDR_ MDDR;
+
+
+ 		//-----------------------------------------------------------------//
+		/*!
+			@brief  スマートカードモードレジスタ (SCMR)
+			@param[in]	ofs		レジスタ・オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct scmr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> SMIF;
+
+			bit_rw_t<io_, bitpos::B2> SINV;
+			bit_rw_t<io_, bitpos::B3> SDIR;
+
+			bit_rw_t<io_, bitpos::B7> BCP2;
+		};
+		typedef scmr_t<base + 0x06> SCMR_;
+		static SCMR_ SCMR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタ設定レジスタ (SNFR)
+			@param[in]	ofs		レジスタ・オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct snfr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 3> NFCS;
+		};
+		typedef snfr_t<base + 0x08> SNFR_;
+		static SNFR_ SNFR;
+	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR tev, uint32_t pclk>
+		typename scic_t<base, per, txv, rxv, tev, pclk>::SCMR_ scic_t<base, per, txv, rxv, tev, pclk>::SCMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR tev, uint32_t pclk>
+		typename scic_t<base, per, txv, rxv, tev, pclk>::SNFR_ scic_t<base, per, txv, rxv, tev, pclk>::SNFR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -444,14 +530,15 @@ namespace device {
 		typename INT, INT tev, uint32_t pclk>
 	struct scih_t : public sci_core_t<base>, sci_core2_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto TX_VEC	 = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC	 = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC	 = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK	 = pclk;	///< PCLK 周波数
 
-		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
-		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_BRME = true;		///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;		///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_NFEN = true;		///< NFEN（ノイズフィルタ）
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -513,14 +600,16 @@ namespace device {
 		typename INT, INT tev, uint32_t pclk>
 	struct scii_t : public sci_core_t<base>, sci_core2_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto TX_VEC	 = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC	 = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC	 = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK	 = pclk;	///< PCLK 周波数
 
-		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
-		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_BRME = true;		///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;		///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_NFEN = true;		///< NFEN（ノイズフィルタ）
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -579,14 +668,15 @@ namespace device {
 		typename INT, INT tev, uint32_t pclk>
 	struct scig_t : public sci_core_t<base>, sci_core2_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto TX_VEC	 = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC	 = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC	 = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK	 = pclk;	///< PCLK 周波数
 
-		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
-		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_BRME = true;		///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;		///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_NFEN = true;		///< NFEN（ノイズフィルタ）
 	};
 
 
@@ -605,143 +695,153 @@ namespace device {
 		typename INT, INT tev, uint32_t pclk>
 	struct scij_t : public sci_core_t<base>, sci_core2_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto TX_VEC	 = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC	 = rxv;		///< 送信割り込みベクター
+		static constexpr auto TE_VEC	 = tev;		///< 送信終了割り込みベクター
+		static constexpr uint32_t PCLK	 = pclk;	///< PCLK 周波数
 
-		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
-		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_BRME = true;		///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;		///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_NFEN = true;		///< NFEN（ノイズフィルタ）
 	};
 
 
 #if defined(SIG_RX621) || defined(SIG_RX62N)
-	typedef scia_t<0x00088240, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
-		ICU::VECTOR, ICU::VECTOR::TEI0, clock_profile::PCLK> SCI0;
-	typedef scia_t<0x00088248, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
-		ICU::VECTOR, ICU::VECTOR::TEI1, clock_profile::PCLK> SCI1;
-	typedef scia_t<0x00088250, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
-		ICU::VECTOR, ICU::VECTOR::TEI2, clock_profile::PCLK> SCI2;
-	typedef scia_t<0x00088258, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
-		ICU::VECTOR, ICU::VECTOR::TEI3, clock_profile::PCLK> SCI3;
-	typedef scia_t<0x00088268, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
-		ICU::VECTOR, ICU::VECTOR::TEI5, clock_profile::PCLK> SCI5;
-	typedef scia_t<0x00088270, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
-		ICU::VECTOR, ICU::VECTOR::TEI6, clock_profile::PCLK> SCI6;
+	typedef scia_t<0x0008'8240, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0, ICU::VECTOR::TEI0,
+		clock_profile::PCLK> SCI0;
+	typedef scia_t<0x0008'8248, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1,
+		clock_profile::PCLK> SCI1;
+	typedef scia_t<0x0008'8250, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2, ICU::VECTOR::TEI2,
+		clock_profile::PCLK> SCI2;
+	typedef scia_t<0x0008'8258, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3, ICU::VECTOR::TEI3,
+		clock_profile::PCLK> SCI3;
+	typedef scia_t<0x0008'8268, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5, ICU::VECTOR::TEI5,
+		clock_profile::PCLK> SCI5;
+	typedef scia_t<0x0008'8270, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6, ICU::VECTOR::TEI6,
+		clock_profile::PCLK> SCI6;
+#elif defined(SIG_RX63T)
+	typedef scic_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0, ICU::VECTOR::TEI0,
+		clock_profile::PCLKB> SCI0;
+	typedef scic_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1,
+		clock_profile::PCLKB> SCI1;
+	typedef scic_t<0x0008'A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2, ICU::VECTOR::TEI2,
+		clock_profile::PCLKB> SCI2;
+	typedef scic_t<0x0008'A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3, ICU::VECTOR::TEI3,
+		clock_profile::PCLKB> SCI3;
 #elif defined(SIG_RX24T)
-	typedef scig_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+	typedef scig_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR, ICU::VECTOR::TEI1, clock_profile::PCLKB> SCI1;
-	typedef scig_t<0x0008A020, peripheral::SCI1C, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+	typedef scig_t<0x0008'A020, peripheral::SCI1C, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR, ICU::VECTOR::TEI1, clock_profile::PCLKB> SCI1C;
-	typedef scig_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+	typedef scig_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
 		ICU::VECTOR, ICU::VECTOR::TEI5, clock_profile::PCLKB> SCI5;
-	typedef scig_t<0x0008A0A0, peripheral::SCI5C, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+	typedef scig_t<0x0008'A0A0, peripheral::SCI5C, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
 		ICU::VECTOR, ICU::VECTOR::TEI5, clock_profile::PCLKB> SCI5C;
-	typedef scig_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+	typedef scig_t<0x0008'A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
 		ICU::VECTOR, ICU::VECTOR::TEI6, clock_profile::PCLKB> SCI6;
-	typedef scig_t<0x0008A0C0, peripheral::SCI6C, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+	typedef scig_t<0x0008'A0C0, peripheral::SCI6C, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
 		ICU::VECTOR, ICU::VECTOR::TEI6, clock_profile::PCLKB> SCI6C;
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef scig_t<0x0008A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
+	typedef scig_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI0, clock_profile::PCLKB> SCI0;
-	typedef scig_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+	typedef scig_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI1, clock_profile::PCLKB> SCI1;
-	typedef scig_t<0x0008A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
+	typedef scig_t<0x0008'A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI2, clock_profile::PCLKB> SCI2;
-	typedef scig_t<0x0008A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
+	typedef scig_t<0x0008'A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI3, clock_profile::PCLKB> SCI3;
-	typedef scig_t<0x0008A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4,
+	typedef scig_t<0x0008'A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI4, clock_profile::PCLKB> SCI4;
-	typedef scig_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+	typedef scig_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI5, clock_profile::PCLKB> SCI5;
-	typedef scig_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+	typedef scig_t<0x0008'A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI6, clock_profile::PCLKB> SCI6;
-	typedef scig_t<0x0008A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7,
+	typedef scig_t<0x0008'A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI7, clock_profile::PCLKB> SCI7;
 
-	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
+	typedef scih_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI12, clock_profile::PCLKB> SCI12;
 
 #elif defined(SIG_RX65N)
-	typedef scig_t<0x0008A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
+	typedef scig_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI0, clock_profile::PCLKB> SCI0;
-	typedef scig_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+	typedef scig_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI1, clock_profile::PCLKB> SCI1;
-	typedef scig_t<0x0008A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
+	typedef scig_t<0x0008'A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI2, clock_profile::PCLKB> SCI2;
-	typedef scig_t<0x0008A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
+	typedef scig_t<0x0008'A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI3, clock_profile::PCLKB> SCI3;
-	typedef scig_t<0x0008A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4,
+	typedef scig_t<0x0008'A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI4, clock_profile::PCLKB> SCI4;
-	typedef scig_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+	typedef scig_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI5, clock_profile::PCLKB> SCI5;
-	typedef scig_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+	typedef scig_t<0x0008'A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI6, clock_profile::PCLKB> SCI6;
-	typedef scig_t<0x0008A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7,
+	typedef scig_t<0x0008'A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI7, clock_profile::PCLKB> SCI7;
-	typedef scig_t<0x0008A100, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
+	typedef scig_t<0x0008'A100, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::TEI8, clock_profile::PCLKB> SCI8;
-	typedef scig_t<0x0008A120, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
+	typedef scig_t<0x0008'A120, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::TEI9, clock_profile::PCLKB> SCI9;
 
-	typedef scii_t<0x000D0040, peripheral::SCI10, ICU::VECTOR::TXI10, ICU::VECTOR::RXI10,
+	typedef scii_t<0x000D'0040, peripheral::SCI10, ICU::VECTOR::TXI10, ICU::VECTOR::RXI10,
 		ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI10, clock_profile::PCLKA> SCI10;
-	typedef scii_t<0x000D0060, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
+	typedef scii_t<0x000D'0060, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
 		ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI11, clock_profile::PCLKA> SCI11;
 
-	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
+	typedef scih_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI12, clock_profile::PCLKB> SCI12;
 
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef scij_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+	typedef scij_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI1, clock_profile::PCLKB> SCI1;
 
-	typedef scij_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+	typedef scij_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI5, clock_profile::PCLKB> SCI5;
-	typedef scij_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+	typedef scij_t<0x0008'A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI6, clock_profile::PCLKB> SCI6;
 
-	typedef scij_t<0x0008A100, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
+	typedef scij_t<0x0008'A100, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::TEI8, clock_profile::PCLKB> SCI8;
-	typedef scij_t<0x0008A120, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
+	typedef scij_t<0x0008'A120, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::TEI9, clock_profile::PCLKB> SCI9;
 
-	typedef scii_t<0x000D0000, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
+	typedef scii_t<0x000D'0000, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
 		ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI11, clock_profile::PCLKA> SCI11;
 
-	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
+	typedef scih_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI12, clock_profile::PCLKB> SCI12;
 
 #elif defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
-	typedef scij_t<0x0008A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
+	typedef scij_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI0, clock_profile::PCLKB> SCI0;
-	typedef scij_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+	typedef scij_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI1, clock_profile::PCLKB> SCI1;
-	typedef scij_t<0x0008A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
+	typedef scij_t<0x0008'A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI2, clock_profile::PCLKB> SCI2;
-	typedef scij_t<0x0008A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
+	typedef scij_t<0x0008'A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI3, clock_profile::PCLKB> SCI3;
-	typedef scij_t<0x0008A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4,
+	typedef scij_t<0x0008'A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI4, clock_profile::PCLKB> SCI4;
-	typedef scij_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+	typedef scij_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI5, clock_profile::PCLKB> SCI5;
-	typedef scij_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+	typedef scij_t<0x0008'A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI6, clock_profile::PCLKB> SCI6;
 
-	typedef scii_t<0x0008A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7,
+	typedef scii_t<0x0008'A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7,
 		ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI7, clock_profile::PCLKA> SCI7;
-	typedef scii_t<0x000D0000, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
+	typedef scii_t<0x000D'0000, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
 		ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI8, clock_profile::PCLKA> SCI8;
-	typedef scii_t<0x000D0020, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
+	typedef scii_t<0x000D'0020, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
 		ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI9, clock_profile::PCLKA> SCI9;
-	typedef scii_t<0x000D0040, peripheral::SCI10, ICU::VECTOR::TXI10, ICU::VECTOR::RXI10,
+	typedef scii_t<0x000D'0040, peripheral::SCI10, ICU::VECTOR::TXI10, ICU::VECTOR::RXI10,
 		ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI10, clock_profile::PCLKA> SCI10;
-	typedef scii_t<0x000D0060, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
+	typedef scii_t<0x000D'0060, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
 		ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI11, clock_profile::PCLKA> SCI11;
 
-	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
+	typedef scih_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI12, clock_profile::PCLKB> SCI12;
 #endif
 }
