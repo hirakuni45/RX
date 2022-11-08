@@ -14,9 +14,11 @@
 #include "RX63T/clock_profile.hpp"
 #include "RX63T/peripheral.hpp"
 #include "RX63T/system.hpp"
-
+#include "RX63T/power_mgr.hpp"
 #include "RX63T/icu.hpp"
-
+#include "RX63T/icu_mgr.hpp"
+#include "RX63T/port_map.hpp"
+// #include "RX63T/port_map_mtu.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)

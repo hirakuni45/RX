@@ -46,7 +46,9 @@ LIB_ROOT    =   ../../rxlib/lib
 
 INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)
 
+# rx_prog erase command
 PROG_ERASE = --erase
+# rx_prog verify command
 PROG_VERIFY = --verify
 
 ifeq ($(RX_DEF),SIG_RX63T)
