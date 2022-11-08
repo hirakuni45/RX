@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・GPTa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -23,10 +23,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマソフトウェアスタートレジスタ (GTSTR)
+			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		struct gtstr_t : public rw16_t<0x000C2000> {
-			typedef rw16_t<0x000C2000> io_;
+		template <uint32_t base>
+		struct gtstr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -37,17 +39,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  CST2;
 			bit_rw_t<io_, bitpos::B3>  CST3;
 		};
-		typedef gtstr_t GTSTR_;
+		typedef gtstr_t<0x000C'2000> GTSTR_;
 		static  GTSTR_ GTSTR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ノイズフィルタ制御レジスタ（NFCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		struct nfcr_t : public rw16_t<0x000C2002> {
-			typedef rw16_t<0x000C2002> io_;
+		template<uint32_t base>
+		struct nfcr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -66,42 +70,46 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> NFCS2;
 			bits_rw_t<io_, bitpos::B14, 2> NFCS3;
 		};
-		typedef nfcr_t NFCR_;
+		typedef nfcr_t<0x000C'2002> NFCR_;
 		static  NFCR_ NFCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマハードウェア要因スタート / ストップ制御レジスタ（GTHSCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		struct gthscr_t : public rw16_t<0x000C2004> {
-			typedef rw16_t<0x000C2004> io_;
+		template<uint32_t base>
+		struct gthscr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 2>  CSHW0;
-			bits_rw_t<io_, bitpos::B2, 2>  CSHW1;
-			bits_rw_t<io_, bitpos::B4, 2>  CSHW2;
-			bits_rw_t<io_, bitpos::B6, 2>  CSHW3;
-			bits_rw_t<io_, bitpos::B8, 2>  CPHW0;
-			bits_rw_t<io_, bitpos::B10, 2> CPHW1;
-			bits_rw_t<io_, bitpos::B12, 2> CPHW2;
-			bits_rw_t<io_, bitpos::B14, 2> CPHW3;
+			bits_rw_t<io_, bitpos::B0,  2>  CSHW0;
+			bits_rw_t<io_, bitpos::B2,  2>  CSHW1;
+			bits_rw_t<io_, bitpos::B4,  2>  CSHW2;
+			bits_rw_t<io_, bitpos::B6,  2>  CSHW3;
+			bits_rw_t<io_, bitpos::B8,  2>  CPHW0;
+			bits_rw_t<io_, bitpos::B10, 2>  CPHW1;
+			bits_rw_t<io_, bitpos::B12, 2>  CPHW2;
+			bits_rw_t<io_, bitpos::B14, 2>  CPHW3;
 		};
-		typedef gthscr_t GTHSCR_;
+		typedef gthscr_t<0x000C'2004> GTHSCR_;
 		static  GTHSCR_ GTHSCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマハードウェア要因クリア制御レジスタ（GTHCCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		struct gthccr_t : public rw16_t<0x000C2006> {
-			typedef rw16_t<0x000C2006> io_;
+		template<uint32_t base>
+		struct gthccr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -111,12 +119,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B2, 2>  CCHW1;
 			bits_rw_t<io_, bitpos::B4, 2>  CCHW2;
 			bits_rw_t<io_, bitpos::B6, 2>  CCHW3;
-			bit_rw_t< io_, bitpos::B8>     CCSW0;
-			bit_rw_t< io_, bitpos::B9>     CCSW1;
-			bit_rw_t< io_, bitpos::B10>    CCSW2;
-			bit_rw_t< io_, bitpos::B11>    CCSW3;
+			bit_rw_t <io_, bitpos::B8>     CCSW0;
+			bit_rw_t <io_, bitpos::B9>     CCSW1;
+			bit_rw_t <io_, bitpos::B10>    CCSW2;
+			bit_rw_t <io_, bitpos::B11>    CCSW3;
 		};
-		typedef gthccr_t GTHCCR_;
+		typedef gthccr_t<0x000C'2006> GTHCCR_;
 		static  GTHCCR_ GTHCCR;
 
 
@@ -389,9 +397,6 @@ namespace device {
 		typedef gtadsmr_t GTADSMR_;
 		static  GTADSMR_ GTADSMR;
 	};
-	typedef gpt_t<void> GPT;
-
-
 	template <class _> typename gpt_t<_>::GTSTR_ gpt_t<_>::GTSTR;
 	template <class _> typename gpt_t<_>::NFCR_ gpt_t<_>::NFCR;
 	template <class _> typename gpt_t<_>::GTHSCR_ gpt_t<_>::GTHSCR;
@@ -408,6 +413,8 @@ namespace device {
 	template <class _> typename gpt_t<_>::GTMDR_ gpt_t<_>::GTMDR;
 	template <class _> typename gpt_t<_>::GTECNFCR_ gpt_t<_>::GTECNFCR;
 	template <class _> typename gpt_t<_>::GTADSMR_ gpt_t<_>::GTADSMR;
+
+	typedef gpt_t<void> GPT;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ　DTCa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,7 +40,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4> RRS;
 		};
-		typedef dtccr_t<0x00082400> DTCCR_;
+		typedef dtccr_t<0x0008'2400> DTCCR_;
 		static  DTCCR_ DTCCR;
 
 
@@ -49,7 +49,7 @@ namespace device {
 			@brief  DTC ベクタベースレジスタ（DTCVBR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x00082404> DTCVBR_;
+		typedef rw32_t<0x0008'2404> DTCVBR_;
 		static  DTCVBR_ DTCVBR;
 
 
@@ -69,7 +69,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SHORT;
 		};
-		typedef dtcadmod_t<0x00082408> DTCADMOD_;
+		typedef dtcadmod_t<0x0008'2408> DTCADMOD_;
 		static  DTCADMOD_ DTCADMOD;
 
 
@@ -89,7 +89,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DTCST;
 		};
-		typedef dtcst_t<0x0008240C> DTCST_;
+		typedef dtcst_t<0x0008'240C> DTCST_;
 		static  DTCST_ DTCST;
 
 
@@ -110,7 +110,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8> VECN;
 			bit_rw_t <io_, bitpos::B15>   ACT;
 		};
-		typedef dtcsts_t<0x0008240E> DTCSTS_;
+		typedef dtcsts_t<0x0008'240E> DTCSTS_;
 		static  DTCSTS_ DTCSTS;
 	};
 	template <peripheral per> typename dtc_t<per>::DTCCR_ dtc_t<per>::DTCCR;
