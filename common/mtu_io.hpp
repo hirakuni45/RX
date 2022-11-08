@@ -351,31 +351,9 @@ namespace device {
 			}
 		}
 
-	public:
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  コンストラクター
-		*/
-		//-----------------------------------------------------------------//
-		mtu_io() noexcept : clk_base_(MTUX::PCLK), channel_(CHANNEL::A),
-			intr_vec_(ICU::VECTOR::NONE), intr_level_(0)
-		{ }
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ノーマル・モード（コンペア・マッチ・タイマー）
-			@param[in]	ch		出力チャネル
-			@param[in]	freq	出力周波数
-			@param[in]	out		出力タイプ
-			@param[in]	lvl		割り込みレベル
-			@return 成功なら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool start_normal(CHANNEL ch, uint32_t freq, OUTPUT out, uint8_t lvl = 0, MODE md = MODE::NORMAL) noexcept
+		bool start_(CHANNEL ch, uint32_t freq, OUTPUT out, uint8_t lvl, MODE md) noexcept
 		{
-			static_assert(MTUX::PERIPHERAL != peripheral::MTU5, "Normal mode cannot select MTU5");
-
 			if(!power_mgr::turn(MTUX::PERIPHERAL)) {
 				return false;
 			}
@@ -421,11 +399,40 @@ namespace device {
 			MTUX::TGR[ch] = match - 1;
 
 			MTUX::TCNT = 0;
-			if(md == MODE::NORMAL) {
-				MTUX::enable();
-			}
 
 			return true;
+		}
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		mtu_io() noexcept : clk_base_(MTUX::PCLK), channel_(CHANNEL::A),
+			intr_vec_(ICU::VECTOR::NONE), intr_level_(0)
+		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノーマル・モード（コンペア・マッチ・タイマー）
+			@param[in]	ch		出力チャネル
+			@param[in]	freq	出力周波数
+			@param[in]	out		出力タイプ
+			@param[in]	lvl		割り込みレベル
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start_normal(CHANNEL ch, uint32_t freq, OUTPUT out, uint8_t lvl = 0) noexcept
+		{
+			static_assert(MTUX::PERIPHERAL != peripheral::MTU5, "Normal mode cannot select MTU5");
+
+			auto ret = start_(ch, freq, out, lvl, MODE::NORMAL);
+			if(ret) {
+				MTUX::enable();
+			}
+			return ret;
 		}
 
 
@@ -445,7 +452,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  周期再設定（コンペア・マッチ・タイマー周期）
+			@brief  コンペア・マッチ・タイマー周期の再設定
 			@param[in]	ch		設定チャネル
 			@param[in]	freq	周波数
 			@return 成功なら「true」
@@ -478,38 +485,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  周期設定（コンペア・マッチ・タイマー周期）カレントチャネル
-			@param[in]	freq		出力周波数
-			@return 成功なら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool set_freq(uint32_t freq) noexcept
-		{
-			uint32_t match;
-			if(!make_clock_(freq, match)) {
-				return false;
-			}
-
-			set_TCR_(channel_);
-
-			if(tt_.out_ == OUTPUT::TOGGLE) {
-				bool mod = match & 1;
-				match /= 2;
-				if(mod) ++match;
-			}
-
-			if((match - 1) < MTUX::TCNT()) {
-				MTUX::TCNT = 0;
-			}
-			MTUX::TGR[channel_] = match - 1;
-			tt_.tgr_ = match;
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  PWM2 開始（１出力）
 			@param[in]	mch		PWM 周期チャネル
 			@param[in]	freq	PWM 周波数
@@ -520,7 +495,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t& po, uint8_t lvl = 0) noexcept
 		{
-			auto ret = start_normal(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);
+			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);
 			if(ret) {
 				if(po.out != OUTPUT::NONE) {
 					bool pena = true;
@@ -547,7 +522,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t& po1, const pwm_port_t& po2, uint8_t lvl = 0) noexcept
 		{
-			auto ret = start_normal(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);  // PWM2 mode
+			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);  // PWM2 mode
 			if(ret) {
 				bool pena = true;
 				if(po1.out != OUTPUT::NONE) {
@@ -579,7 +554,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t po[3], uint8_t lvl = 0) noexcept
 		{
-			auto ret = start_normal(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);
+			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);
 			if(ret) {
 				for(uint32_t i = 0; i < 3; ++i) {
 					if(po[i].out != OUTPUT::NONE) {
