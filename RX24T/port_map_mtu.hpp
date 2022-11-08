@@ -24,26 +24,6 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_mtu : public port_map_order {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タイマー系・クロック・グループ @n
-					※タイマーのクロック系は、MTU 共通なので、識別子としてグループを使う
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class GROUP : uint8_t {
-			MTU0,	///< MTU0 系グループ
-			MTU1,	///< MTU1 系グループ
-			MTU2,	///< MTU2 系グループ
-			MTU3,	///< MTU3 系グループ
-			MTU4,	///< MTU4 系グループ
-			MTU5,	///< MTU5 系グループ
-			MTU6,	///< MTU6 系グループ
-			MTU7,	///< MTU7 系グループ
-			NONE,	///< 無効なグループ
-		};
-
-	private:
 
 		static bool mtu0_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{

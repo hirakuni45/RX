@@ -141,7 +141,7 @@ namespace device {
 			uint32_t n = clock_profile::PLL_BASE / clock_profile::BASE;
 			device::SYSTEM::PLLCR.STC = n - 1;
 			device::SYSTEM::PLLCR2.PLLEN = 0; // PLL 動作
-			utils::delay::loop(1000);  // PLL 起動待ち(LOCO: 125KHz)
+			utils::delay::loop(1500);  // PLL 起動待ち(LOCO: 125KHz)
 
 			// 1/64 以上、分周出来ない設定は不可
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
