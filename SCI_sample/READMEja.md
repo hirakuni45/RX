@@ -32,7 +32,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 -  USB シリアルとSCI ポートを接続する。
 - RX62N の SCI 標準ポートは、「RX62x/port_map.hpp」参照。
 - RX24T の SCI 標準ポートは、「RX24T/port_map.hpp」参照。
-- RX64M/RX71M の SCI 標準ポートは、「RX600/port_map.hpp」参照。
+- RX64M/RX71M の SCI 標準ポートは、「RX64M/port_map.hpp」参照。
 - RX65x の SCI 標準ポートは、「RX65x/port_map.hpp」参照。
 - RX72N の SCI 標準ポートは、「RX72N/port_map.hpp」参照。
 - RX66T の SCI 標準ポートは、「RX66T/port_map.hpp」参照。

@@ -1,9 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T グループ・ポート・マッピング (MTU3d) @n
+	@brief	RX63T グループ・ポート・マッピング (MTU3d) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
-			・A、B バージョンの違いに注意 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU9
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
@@ -11,9 +10,9 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX24T/peripheral.hpp"
+#include "RX63T/peripheral.hpp"
 #include "RX600/port.hpp"
-#include "RX24T/mpc.hpp"
+#include "RX63T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

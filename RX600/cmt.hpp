@@ -1,9 +1,16 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・CMT 定義
+	@brief	RX グループ CMT 定義 @n
+			RX621/RX62N @n
+			RX63T @n
+			RX24T @n
+			RX64M/RX71M @n
+			RX65N @n
+			RX66T/RX72T @n
+			RX72N
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -20,7 +27,6 @@ namespace device {
 		@param[in]	VEC		割り込みベクター型
 		@param[in]	ivec	割り込みベクター
 		@param[in]	clk		駆動クロック
-
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, typename VEC, VEC ivec, uint32_t clk>
@@ -47,7 +53,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> STR0;
 			bit_rw_t<io_, bitpos::B1> STR1;
 		};
-		typedef cmstr0_t<0x00088000> CMSTR0_;
+		typedef cmstr0_t<0x0008'8000> CMSTR0_;
 		static CMSTR0_ CMSTR0;
 
 
@@ -68,7 +74,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> STR2;
 			bit_rw_t<io_, bitpos::B1> STR3;
 		};
-		typedef cmstr1_t<0x00088010> CMSTR1_;
+		typedef cmstr1_t<0x0008'8010> CMSTR1_;
 		static CMSTR1_ CMSTR1;
 
 
@@ -148,19 +154,19 @@ namespace device {
 
 
 #if defined(SIG_RX621) || defined(SIG_RX62N)
-	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLK> CMT0;
-	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLK> CMT1;
-	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2, clock_profile::PCLK> CMT2;
-	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3, clock_profile::PCLK> CMT3;
-#elif defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
-	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
-	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2, clock_profile::PCLKB> CMT2;
-	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3, clock_profile::PCLKB> CMT3;
+	typedef cmt_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLK> CMT0;
+	typedef cmt_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLK> CMT1;
+	typedef cmt_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2, clock_profile::PCLK> CMT2;
+	typedef cmt_t<0x0008'8018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3, clock_profile::PCLK> CMT3;
+#elif defined(SIG_RX63T) || defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+	typedef cmt_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
+	typedef cmt_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
+	typedef cmt_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2, clock_profile::PCLKB> CMT2;
+	typedef cmt_t<0x0008'8018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3, clock_profile::PCLKB> CMT3;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
-	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
-	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI2, clock_profile::PCLKB> CMT2;
-	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI3, clock_profile::PCLKB> CMT3;
+	typedef cmt_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
+	typedef cmt_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
+	typedef cmt_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI2, clock_profile::PCLKB> CMT2;
+	typedef cmt_t<0x0008'8018, peripheral::CMT3, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI3, clock_profile::PCLKB> CMT3;
 #endif
 }

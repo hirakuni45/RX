@@ -4,7 +4,7 @@
 	@brief	RX24T グループ・ポート・マッピング @n
 			コメントのピン番号は、LQFP100 パッケージの場合
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -190,7 +190,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static bool turn(peripheral t, bool f = true, ORDER opt = ORDER::FIRST) noexcept
 		{
-			if(opt == ORDER::BYPASS) return false;
+			if(opt == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可

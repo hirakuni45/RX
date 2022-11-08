@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65N/RX66T/RX72M/RX72N グループ LVDA 定義
+	@brief	RX63T グループ LVDA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -35,7 +35,6 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2>  LVD1IDTSEL;
-			bit_rw_t <io_, bitpos::B2>     LVD1IRQSEL;
 		};
 		typedef lvd1cr1_t<0x0008'00E0>  LVD1CR1_;
 		static  LVD1CR1_ LVD1CR1;
@@ -77,7 +76,6 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2>  LVD2IDTSEL;
-			bit_rw_t <io_, bitpos::B2>     LVD2IRQSEL;
 		};
 		typedef lvd2cr1_t<0x0008'00E2>  LVD2CR1_;
 		static  LVD2CR1_ LVD2CR1;
