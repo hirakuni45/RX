@@ -39,23 +39,23 @@ namespace device {
 			bit_rw_t <io_, bitpos::B12>    MPXEN;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csncr_t<0x00083802> CS0CR_;
+		typedef csncr_t<0x0008'3802> CS0CR_;
 		static CS0CR_ CS0CR;
-		typedef csncr_t<0x00083812> CS1CR_;
+		typedef csncr_t<0x0008'3812> CS1CR_;
 		static CS1CR_ CS1CR;
-		typedef csncr_t<0x00083822> CS2CR_;
+		typedef csncr_t<0x0008'3822> CS2CR_;
 		static CS2CR_ CS2CR;
-		typedef csncr_t<0x00083832> CS3CR_;
+		typedef csncr_t<0x0008'3832> CS3CR_;
 		static CS3CR_ CS3CR;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csncr_t<0x00083842> CS4CR_;
+		typedef csncr_t<0x0008'3842> CS4CR_;
 		static CS4CR_ CS4CR;
-		typedef csncr_t<0x00083852> CS5CR_;
+		typedef csncr_t<0x0008'3852> CS5CR_;
 		static CS5CR_ CS5CR;
-		typedef csncr_t<0x00083862> CS6CR_;
+		typedef csncr_t<0x0008'3862> CS6CR_;
 		static CS6CR_ CS6CR;
-		typedef csncr_t<0x00083872> CS7CR_;
+		typedef csncr_t<0x0008'3872> CS7CR_;
 		static CS7CR_ CS7CR;
 #endif
 
@@ -77,23 +77,23 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 4> WRCV;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csncr_t<0x0008380A> CS0REC_;
+		typedef csncr_t<0x0008'380A> CS0REC_;
 		static CS0REC_ CS0REC;
-		typedef csncr_t<0x0008381A> CS1REC_;
+		typedef csncr_t<0x0008'381A> CS1REC_;
 		static CS1REC_ CS1REC;
-		typedef csncr_t<0x0008382A> CS2REC_;
+		typedef csncr_t<0x0008'382A> CS2REC_;
 		static CS2REC_ CS2REC;
-		typedef csncr_t<0x0008383A> CS3REC_;
+		typedef csncr_t<0x0008'383A> CS3REC_;
 		static CS3REC_ CS3REC;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csncr_t<0x0008384A> CS4REC_;
+		typedef csncr_t<0x0008'384A> CS4REC_;
 		static CS4REC_ CS4REC;
-		typedef csncr_t<0x0008385A> CS5REC_;
+		typedef csncr_t<0x0008'385A> CS5REC_;
 		static CS5REC_ CS5REC;
-		typedef csncr_t<0x0008386A> CS6REC_;
+		typedef csncr_t<0x0008'386A> CS6REC_;
 		static CS6REC_ CS6REC;
-		typedef csncr_t<0x0008387A> CS7REC_;
+		typedef csncr_t<0x0008'387A> CS7REC_;
 		static CS7REC_ CS7REC;
 #endif
 
@@ -129,7 +129,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14> RCVENM6;
 			bit_rw_t<io_, bitpos::B15> RCVENM7;
 		};
-		typedef csrecen_t<0x00083880> CSRECEN_;
+		typedef csrecen_t<0x0008'3880> CSRECEN_;
 		static CSRECEN_ CSRECEN;
 
 
@@ -153,23 +153,23 @@ namespace device {
 			bit_rw_t<io_, bitpos::B15> PRMOD;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnmod_t<0x00083002> CS0MOD_;
+		typedef csnmod_t<0x0008'3002> CS0MOD_;
 		static CS0MOD_ CS0MOD;
-		typedef csnmod_t<0x00083012> CS1MOD_;
+		typedef csnmod_t<0x0008'3012> CS1MOD_;
 		static CS1MOD_ CS1MOD;
-		typedef csnmod_t<0x00083022> CS2MOD_;
+		typedef csnmod_t<0x0008'3022> CS2MOD_;
 		static CS2MOD_ CS2MOD;
-		typedef csnmod_t<0x00083032> CS3MOD_;
+		typedef csnmod_t<0x0008'3032> CS3MOD_;
 		static CS3MOD_ CS3MOD;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnmod_t<0x00083042> CS4MOD_;
+		typedef csnmod_t<0x0008'3042> CS4MOD_;
 		static CS4MOD_ CS4MOD;
-		typedef csnmod_t<0x00083052> CS5MOD_;
+		typedef csnmod_t<0x0008'3052> CS5MOD_;
 		static CS5MOD_ CS5MOD;
-		typedef csnmod_t<0x00083062> CS6MOD_;
+		typedef csnmod_t<0x0008'3062> CS6MOD_;
 		static CS6MOD_ CS6MOD;
-		typedef csnmod_t<0x00083072> CS7MOD_;
+		typedef csnmod_t<0x0008'3072> CS7MOD_;
 		static CS7MOD_ CS7MOD;
 #endif
 
@@ -193,23 +193,23 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 5> CSRWWAIT;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnwcr1_t<0x00083004> CS0WCR1_;
+		typedef csnwcr1_t<0x0008'3004> CS0WCR1_;
 		static CS0WCR1_ CS0WCR1;
-		typedef csnwcr1_t<0x00083014> CS1WCR1_;
+		typedef csnwcr1_t<0x0008'3014> CS1WCR1_;
 		static CS1WCR1_ CS1WCR1;
-		typedef csnwcr1_t<0x00083024> CS2WCR1_;
+		typedef csnwcr1_t<0x0008'3024> CS2WCR1_;
 		static CS2WCR1_ CS2WCR1;
-		typedef csnwcr1_t<0x00083034> CS3WCR1_;
+		typedef csnwcr1_t<0x0008'3034> CS3WCR1_;
 		static CS3WCR1_ CS3WCR1;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnwcr1_t<0x00083044> CS4WCR1_;
+		typedef csnwcr1_t<0x0008'3044> CS4WCR1_;
 		static CS4WCR1_ CS4WCR1;
-		typedef csnwcr1_t<0x00083054> CS5WCR1_;
+		typedef csnwcr1_t<0x0008'3054> CS5WCR1_;
 		static CS5WCR1_ CS5WCR1;
-		typedef csnwcr1_t<0x00083064> CS6WCR1_;
+		typedef csnwcr1_t<0x0008'3064> CS6WCR1_;
 		static CS6WCR1_ CS6WCR1;
-		typedef csnwcr1_t<0x00083074> CS7WCR1_;
+		typedef csnwcr1_t<0x0008'3074> CS7WCR1_;
 		static CS7WCR1_ CS7WCR1;
 #endif
 
@@ -237,23 +237,23 @@ namespace device {
 			bits_rw_t<io_, bitpos::B28, 3> CSON;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnwcr2_t<0x00083008> CS0WCR2_;
+		typedef csnwcr2_t<0x0008'3008> CS0WCR2_;
 		static CS0WCR2_ CS0WCR2;
-		typedef csnwcr2_t<0x00083018> CS1WCR2_;
+		typedef csnwcr2_t<0x0008'3018> CS1WCR2_;
 		static CS1WCR2_ CS1WCR2;
-		typedef csnwcr2_t<0x00083028> CS2WCR2_;
+		typedef csnwcr2_t<0x0008'3028> CS2WCR2_;
 		static CS2WCR2_ CS2WCR2;
-		typedef csnwcr2_t<0x00083038> CS3WCR2_;
+		typedef csnwcr2_t<0x0008'3038> CS3WCR2_;
 		static CS3WCR2_ CS3WCR2;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnwcr2_t<0x00083048> CS4WCR2_;
+		typedef csnwcr2_t<0x0008'3048> CS4WCR2_;
 		static CS4WCR2_ CS4WCR2;
-		typedef csnwcr2_t<0x00083058> CS5WCR2_;
+		typedef csnwcr2_t<0x0008'3058> CS5WCR2_;
 		static CS5WCR2_ CS5WCR2;
-		typedef csnwcr2_t<0x00083068> CS6WCR2_;
+		typedef csnwcr2_t<0x0008'3068> CS6WCR2_;
 		static CS6WCR2_ CS6WCR2;
-		typedef csnwcr2_t<0x00083078> CS7WCR2_;
+		typedef csnwcr2_t<0x0008'3078> CS7WCR2_;
 		static CS7WCR2_ CS7WCR2;
 #endif
 
@@ -374,7 +374,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>    EXENB;
 			bits_rw_t<io_, bitpos::B4, 2> BSIZE;
 		};
-		typedef sdccr_t<0x00083C00> SDCCR_;
+		typedef sdccr_t<0x0008'3C00> SDCCR_;
 		static SDCCR_ SDCCR;
 
 
@@ -393,7 +393,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> EMODE;
 		};
-		typedef sdcmod_t<0x00083C01> SDCMOD_;
+		typedef sdcmod_t<0x0008'3C01> SDCMOD_;
 		static SDCMOD_ SDCMOD;
 
 
@@ -412,7 +412,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> BE;
 		};
-		typedef sdamod_t<0x00083C02> SDAMOD_;
+		typedef sdamod_t<0x0008'3C02> SDAMOD_;
 		static SDAMOD_ SDAMOD;
 
 
@@ -431,7 +431,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> SFEN;
 		};
-		typedef sdself_t<0x00083C10> SDSELF_;
+		typedef sdself_t<0x0008'3C10> SDSELF_;
 		static SDSELF_ SDSELF;
 
 
@@ -451,7 +451,7 @@ namespace device {
 			bits_rw_t <io_, bitpos::B0,  12> RFC;
 			bits_rw_t <io_, bitpos::B12, 4>  REFW;
 		};
-		typedef sdrfcr_t<0x00083C14> SDRFCR_;
+		typedef sdrfcr_t<0x0008'3C14> SDRFCR_;
 		static SDRFCR_ SDRFCR;
 
 
@@ -470,7 +470,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> RFEN;
 		};
-		typedef sdrfen_t<0x00083C16> SDRFEN_;
+		typedef sdrfen_t<0x0008'3C16> SDRFEN_;
 		static SDRFEN_ SDRFEN;
 
 
@@ -489,7 +489,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> INIRQ;
 		};
-		typedef sdicr_t<0x00083C20> SDICR_;
+		typedef sdicr_t<0x0008'3C20> SDICR_;
 		static SDICR_ SDICR;
 
 
@@ -510,7 +510,7 @@ namespace device {
 			bits_rw_t <io_, bitpos::B4, 4> ARFC;
 			bits_rw_t <io_, bitpos::B8, 3> PRC;
 		};
-		typedef sdir_t<0x00083C24> SDIR_;
+		typedef sdir_t<0x0008'3C24> SDIR_;
 		static SDIR_ SDIR;
 
 
@@ -529,7 +529,7 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 2> MXC;
 		};
-		typedef sdadr_t<0x00083C40> SDADR_;
+		typedef sdadr_t<0x0008'3C40> SDADR_;
 		static SDADR_ SDADR;
 
 
@@ -552,7 +552,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> RCD;
 			bits_rw_t<io_, bitpos::B16, 3> RAS;
 		};
-		typedef sdtr_t<0x00083C44> SDTR_;
+		typedef sdtr_t<0x0008'3C44> SDTR_;
 		static SDTR_ SDTR;
 
 
@@ -571,7 +571,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 14> MR;
 		};
-		typedef sdmod_t<0x00083C48> SDMOD_;
+		typedef sdmod_t<0x0008'3C48> SDMOD_;
 		static SDMOD_ SDMOD;
 
 
@@ -592,7 +592,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3> INIST;
 			bit_rw_t<io_, bitpos::B4> SRFST;
 		};
-		typedef sdsr_t<0x00083C50> SDSR_;
+		typedef sdsr_t<0x0008'3C50> SDSR_;
 		static SDSR_ SDSR;
 #endif
 
@@ -612,7 +612,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> STSCLR;
 		};
-		typedef berclr_t<0x00081300> BERCLR_;
+		typedef berclr_t<0x0008'1300> BERCLR_;
 		static BERCLR_ BERCLR;
 
 
@@ -632,7 +632,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> IGAEN;
 			bit_rw_t<io_, bitpos::B1> TOEN;
 		};
-		typedef beren_t<0x00081304> BEREN_;
+		typedef beren_t<0x0008'1304> BEREN_;
 		static BEREN_ BEREN;
 
 
@@ -653,7 +653,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>    TO;
 			bits_rw_t<io_, bitpos::B4, 3> MST;
 		};
-		typedef bersr1_t<0x00081308> BERSR1_;
+		typedef bersr1_t<0x0008'1308> BERSR1_;
 		static BERSR1_ BERSR1;
 
 
@@ -672,7 +672,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B3, 13> ADDR;
 		};
-		typedef bersr2_t<0x0008130A> BERSR2_;
+		typedef bersr2_t<0x0008'130A> BERSR2_;
 		static BERSR2_ BERSR2;
 
 
@@ -697,7 +697,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 2> BPFB;
 			bits_rw_t<io_, bitpos::B12, 2> BPEB;
 		};
-		typedef buspri_t<0x00081310> BUSPRI_;
+		typedef buspri_t<0x0008'1310> BUSPRI_;
 		static BUSPRI_ BUSPRI;
 
 
@@ -729,7 +729,7 @@ namespace device {
 #endif
 			bit_rw_t <io_, bitpos::B31>     PRERR;
 		};
-		typedef ebmapcr_t<0x000C5800> EBMAPCR_;
+		typedef ebmapcr_t<0x000C'5800> EBMAPCR_;
 		static EBMAPCR_ EBMAPCR;
 #endif
 	};

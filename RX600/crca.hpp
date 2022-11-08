@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CRCA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -88,5 +88,5 @@ namespace device {
 		typename crca_t<base, per>::CRCDOR8_  crca_t<base, per>::CRCDOR8;
 
 
-	typedef crca_t<0x00088280, peripheral::CRC> CRCA;
+	typedef crca_t<0x0008'8280, peripheral::CRC> CRCA;
 }

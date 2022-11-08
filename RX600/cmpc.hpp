@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T/RX66T/RX72T グループ・CMPC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -148,16 +148,16 @@ namespace device {
 
 
 #if defined(SIG_RX24T)
-	typedef cmpc_t<0x000A0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
-	typedef cmpc_t<0x000A0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
-	typedef cmpc_t<0x000A0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
-	typedef cmpc_t<0x000A0CE0, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
+	typedef cmpc_t<0x000A'0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
+	typedef cmpc_t<0x000A'0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
+	typedef cmpc_t<0x000A'0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
+	typedef cmpc_t<0x000A'0CE0, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
 #elif defined(SIG_RX66T)
-	typedef cmpc_t<0x000A0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
-	typedef cmpc_t<0x000A0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
-	typedef cmpc_t<0x000A0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
-	typedef cmpc_t<0x000A0CE0, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
-	typedef cmpc_t<0x000A0D00, peripheral::CMPC4, ICU::VECTOR::CMPC4> CMPC4;
-	typedef cmpc_t<0x000A0D20, peripheral::CMPC5, ICU::VECTOR::CMPC5> CMPC5;
+	typedef cmpc_t<0x000A'0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
+	typedef cmpc_t<0x000A'0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
+	typedef cmpc_t<0x000A'0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
+	typedef cmpc_t<0x000A'0CE0, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
+	typedef cmpc_t<0x000A'0D00, peripheral::CMPC4, ICU::VECTOR::CMPC4> CMPC4;
+	typedef cmpc_t<0x000A'0D20, peripheral::CMPC5, ICU::VECTOR::CMPC5> CMPC5;
 #endif
 }

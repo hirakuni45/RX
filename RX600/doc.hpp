@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX24T グループ・DOC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -88,7 +88,7 @@ namespace device {
 		static constexpr auto I_VEC = vec;	///< 割り込みベクター
 
 	};
-	typedef doc_norm_t<0x0008B080, peripheral::DOC, ICU::VECTOR::DOPCF> DOC;
+	typedef doc_norm_t<0x0008'B080, peripheral::DOC, ICU::VECTOR::DOPCF> DOC;
 #endif
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T)
@@ -105,6 +105,6 @@ namespace device {
 		static constexpr auto I_VEC = vec;	///< 割り込みベクター
 
 	};
-	typedef doc_gbl0_t<0x0008B080, peripheral::DOC, ICU::VECTOR_BL0::DOPCI> DOC;
+	typedef doc_gbl0_t<0x0008'B080, peripheral::DOC, ICU::VECTOR_BL0::DOPCI> DOC;
 #endif
 }

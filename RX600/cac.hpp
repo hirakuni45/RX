@@ -47,7 +47,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   CFME;
 		};
-		typedef cacr0_t<0x0008B000> CACR0_;
+		typedef cacr0_t<0x0008'B000> CACR0_;
 		static  CACR0_ CACR0;
 
 
@@ -70,7 +70,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  TCSS;
 			bits_rw_t<io_, bitpos::B6, 2>  EDGES;
 		};
-		typedef cacr1_t<0x0008B001> CACR1_;
+		typedef cacr1_t<0x0008'B001> CACR1_;
 		static  CACR1_ CACR1;
 
 
@@ -93,7 +93,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  RCDS;
 			bits_rw_t<io_, bitpos::B6, 2>  DFS;
 		};
-		typedef cacr2_t<0x0008B002> CACR2_;
+		typedef cacr2_t<0x0008'B002> CACR2_;
 		static  CACR2_ CACR2;
 
 
@@ -119,7 +119,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>   MENDFCL;
 			bit_rw_t<io_, bitpos::B6>   OVFFCL;
 		};
-		typedef caicr_t<0x0008B003> CAICR_;
+		typedef caicr_t<0x0008'B003> CAICR_;
 		static  CAICR_ CAICR;
 
 
@@ -138,7 +138,7 @@ namespace device {
 			bit_ro_t<io_, bitpos::B1>   MENDF;
 			bit_ro_t<io_, bitpos::B2>   OVFF;
 		};
-		typedef castr_t<0x0008B004> CASTR_;
+		typedef castr_t<0x0008'B004> CASTR_;
 		static  CASTR_ CASTR;
 
 
@@ -147,7 +147,7 @@ namespace device {
 			@brief  CAC 上限値設定レジスタ（CAULVR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008B006>  CAULVR_;
+		typedef rw16_t<0x0008'B006>  CAULVR_;
 		static  CAULVR_ CAULVR;
 
 
@@ -156,7 +156,7 @@ namespace device {
 			@brief  CAC 下限値設定レジスタ（CALLVR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008B008>  CALLVR_;
+		typedef rw16_t<0x0008'B008>  CALLVR_;
 		static  CALLVR_ CALLVR;
 
 
@@ -165,7 +165,7 @@ namespace device {
 			@brief  CAC カウンタバッファレジスタ（CACNTBR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008B00A>  CACNTBR_;
+		typedef rw16_t<0x0008'B00A>  CACNTBR_;
 		static  CACNTBR_ CACNTBR;
 	};
 	template <peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::  CACR0_ cac_t<per, INT, ferr, mend, ovff>::CACR0;
