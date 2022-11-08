@@ -552,7 +552,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct pfbcr0_t : public rw8_t<base> {
+		struct pfbcr1_t : public rw8_t<base> {
 			typedef rw8_t<base> io;
 			using io::operator =;
 			using io::operator ();
@@ -562,7 +562,7 @@ namespace device {
 			bits_rw_t<io, bitpos::B0, 2>  WAITS;
 			bit_rw_t <io, bitpos::B2>     ALEOE;
 		};
-		typedef pfbcr0_t<0x0008'C107> PFBCR1_;
+		typedef pfbcr1_t<0x0008'C107> PFBCR1_;
 		static PFBCR1_ PFBCR1;
 
 
