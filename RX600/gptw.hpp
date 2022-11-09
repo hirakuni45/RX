@@ -1,15 +1,15 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX72N/RX72M/RX66T/RX72T 汎用 PWM タイマ（GPTW）定義 @n
 			RX72N/RX72M: GPTW0 - GPTW3 @n
 			RX66T/RX72T: GPTW0 - GPTW9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -1368,46 +1368,46 @@ namespace device {
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR;
 
 #if defined(SIG_RX72N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) 
-	typedef gptw_t<0x000C2000, peripheral::GPTW0,
+	typedef gptw_t<0x000C'2000, peripheral::GPTW0,
 		ICU::VECTOR_SELA::GTCIA0, ICU::VECTOR_SELA::GTCIB0, ICU::VECTOR_SELA::GTCIC0,
 		ICU::VECTOR_SELA::GTCID0, ICU::VECTOR_SELA::GDTE0,  ICU::VECTOR_SELA::GTCIE0,
 		ICU::VECTOR_SELA::GTCIF0, ICU::VECTOR_SELA::GTCIV0, ICU::VECTOR_SELA::GTCIU0> GPTW0;
-	typedef gptw_t<0x000C2100, peripheral::GPTW1,
+	typedef gptw_t<0x000C'2100, peripheral::GPTW1,
 		ICU::VECTOR_SELA::GTCIA1, ICU::VECTOR_SELA::GTCIB1, ICU::VECTOR_SELA::GTCIC1,
 		ICU::VECTOR_SELA::GTCID1, ICU::VECTOR_SELA::GDTE1,  ICU::VECTOR_SELA::GTCIE1,
 		ICU::VECTOR_SELA::GTCIF1, ICU::VECTOR_SELA::GTCIV1, ICU::VECTOR_SELA::GTCIU1> GPTW1;
-	typedef gptw_t<0x000C2200, peripheral::GPTW2,
+	typedef gptw_t<0x000C'2200, peripheral::GPTW2,
 		ICU::VECTOR_SELA::GTCIA2, ICU::VECTOR_SELA::GTCIB2, ICU::VECTOR_SELA::GTCIC2,
 		ICU::VECTOR_SELA::GTCID2, ICU::VECTOR_SELA::GDTE2,  ICU::VECTOR_SELA::GTCIE2,
 		ICU::VECTOR_SELA::GTCIF2, ICU::VECTOR_SELA::GTCIV2, ICU::VECTOR_SELA::GTCIU2> GPTW2;
-	typedef gptw_t<0x000C2300, peripheral::GPTW3,
+	typedef gptw_t<0x000C'2300, peripheral::GPTW3,
 		ICU::VECTOR_SELA::GTCIA3, ICU::VECTOR_SELA::GTCIB3, ICU::VECTOR_SELA::GTCIC3,
 		ICU::VECTOR_SELA::GTCID3, ICU::VECTOR_SELA::GDTE3,  ICU::VECTOR_SELA::GTCIE3,
 		ICU::VECTOR_SELA::GTCIF3, ICU::VECTOR_SELA::GTCIV3, ICU::VECTOR_SELA::GTCIU3> GPTW3;
 #endif
 
 #if defined(SIG_RX66T) || defined(SIG_RX72T) 
-	typedef gptw_t<0x000C2400, peripheral::GPTW4,
+	typedef gptw_t<0x000C'2400, peripheral::GPTW4,
 		ICU::VECTOR_SELA::GTCIA4, ICU::VECTOR_SELA::GTCIB4, ICU::VECTOR_SELA::GTCIC4,
 		ICU::VECTOR_SELA::GTCID4, ICU::VECTOR_SELA::GDTE4,  ICU::VECTOR_SELA::GTCIE4,
 		ICU::VECTOR_SELA::GTCIF4, ICU::VECTOR_SELA::GTCIV4, ICU::VECTOR_SELA::GTCIU4> GPTW4;
-	typedef gptw_t<0x000C2500, peripheral::GPTW5,
+	typedef gptw_t<0x000C'2500, peripheral::GPTW5,
 		ICU::VECTOR_SELA::GTCIA5, ICU::VECTOR_SELA::GTCIB5, ICU::VECTOR_SELA::GTCIC5,
 		ICU::VECTOR_SELA::GTCID5, ICU::VECTOR_SELA::GDTE5,  ICU::VECTOR_SELA::GTCIE5,
 		ICU::VECTOR_SELA::GTCIF5, ICU::VECTOR_SELA::GTCIV5, ICU::VECTOR_SELA::GTCIU5> GPTW5;
-	typedef gptw_t<0x000C2600, peripheral::GPTW6,
+	typedef gptw_t<0x000C'2600, peripheral::GPTW6,
 		ICU::VECTOR_SELA::GTCIA6, ICU::VECTOR_SELA::GTCIB6, ICU::VECTOR_SELA::GTCIC6,
 		ICU::VECTOR_SELA::GTCID6, ICU::VECTOR_SELA::GDTE6,  ICU::VECTOR_SELA::GTCIE6,
 		ICU::VECTOR_SELA::GTCIF6, ICU::VECTOR_SELA::GTCIV6, ICU::VECTOR_SELA::GTCIU6> GPTW6;
-	typedef gptw_t<0x000C2700, peripheral::GPTW7,
+	typedef gptw_t<0x000C'2700, peripheral::GPTW7,
 		ICU::VECTOR_SELA::GTCIA7, ICU::VECTOR_SELA::GTCIB7, ICU::VECTOR_SELA::GTCIC7,
 		ICU::VECTOR_SELA::GTCID7, ICU::VECTOR_SELA::GDTE7,  ICU::VECTOR_SELA::GTCIE7,
 		ICU::VECTOR_SELA::GTCIF7, ICU::VECTOR_SELA::GTCIV7, ICU::VECTOR_SELA::GTCIU7> GPTW7;
-	typedef gptw_t<0x000C2800, peripheral::GPTW8,
+	typedef gptw_t<0x000C'2800, peripheral::GPTW8,
 		ICU::VECTOR_SELA::GTCIA8, ICU::VECTOR_SELA::GTCIB8, ICU::VECTOR_SELA::GTCIC8,
 		ICU::VECTOR_SELA::GTCID8, ICU::VECTOR_SELA::GDTE8,  ICU::VECTOR_SELA::GTCIE8,
 		ICU::VECTOR_SELA::GTCIF8, ICU::VECTOR_SELA::GTCIV8, ICU::VECTOR_SELA::GTCIU8> GPTW8;
-	typedef gptw_t<0x000C2900, peripheral::GPTW9,
+	typedef gptw_t<0x000C'2900, peripheral::GPTW9,
 		ICU::VECTOR_SELA::GTCIA9, ICU::VECTOR_SELA::GTCIB9, ICU::VECTOR_SELA::GTCIC9,
 		ICU::VECTOR_SELA::GTCID9, ICU::VECTOR_SELA::GDTE9,  ICU::VECTOR_SELA::GTCIE9,
 		ICU::VECTOR_SELA::GTCIF9, ICU::VECTOR_SELA::GTCIV9, ICU::VECTOR_SELA::GTCIU9> GPTW9;

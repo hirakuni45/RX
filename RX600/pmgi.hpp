@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX700 グループ　PMGI 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -72,9 +72,9 @@ namespace device {
 		typedef psmr_t<base + 0x04> PSMR_;
 		static  PSMR_ PSMR;
 	};
-	typedef pmgi_t<0x000C5880, peripheral::PMGI0> PMGI0;
-	typedef pmgi_t<0x000C5890, peripheral::PMGI1> PMGI1;
-
 	template <uint32_t base, peripheral per> typename pmgi_t<base, per>::PMGCR_ pmgi_t<base, per>::PMGCR;
 	template <uint32_t base, peripheral per> typename pmgi_t<base, per>::PSMR_ pmgi_t<base, per>::PSMR;
+
+	typedef pmgi_t<0x000C'5880, peripheral::PMGI0> PMGI0;
+	typedef pmgi_t<0x000C'5890, peripheral::PMGI1> PMGI1;
 }

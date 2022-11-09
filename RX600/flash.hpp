@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX64M/RX71M/RX65N/RX66T/RX72T/RX72N/RX72M グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,7 +7,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -43,7 +43,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> FLWE;
 		};
-		typedef fwepror_t<0x0008C296> FWEPROR_;
+		typedef fwepror_t<0x0008'C296> FWEPROR_;
 		static FWEPROR_ FWEPROR;
 
 
@@ -69,7 +69,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  CFAE;
 
 		};
-		typedef fastat_t<0x007FE010> FASTAT_;
+		typedef fastat_t<0x007F'E010> FASTAT_;
 		static FASTAT_ FASTAT;
 
 
@@ -96,7 +96,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  CFAEIE;
 
 		};
-		typedef faeint_t<0x007FE014> FAEINT_;
+		typedef faeint_t<0x007F'E014> FAEINT_;
 		static FAEINT_ FAEINT;
 
 
@@ -116,7 +116,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  FRDYIE;
 		};
-		typedef frdyie_t<0x007FE018> FRDYIE_;
+		typedef frdyie_t<0x007F'E018> FRDYIE_;
 		static FRDYIE_ FRDYIE;
 
 
@@ -125,7 +125,7 @@ namespace device {
 			@brief  FACI コマンド処理開始アドレスレジスタ（FSADDR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x007FE030> FSADDR_;
+		typedef rw32_t<0x007F'E030> FSADDR_;
 		static FSADDR_ FSADDR;
 
 
@@ -134,7 +134,7 @@ namespace device {
 			@brief  FACI コマンド処理終了アドレスレジスタ（FEADDR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x007FE034> FEADDR_;
+		typedef rw32_t<0x007F'E034> FEADDR_;
 		static FEADDR_ FEADDR;
 
 
@@ -157,7 +157,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>     FRAMTRAN;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fcurame_t<0x007FE054> FCURAME_;
+		typedef fcurame_t<0x007F'E054> FCURAME_;
 		static FCURAME_ FCURAME;
 #endif
 
@@ -195,7 +195,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B23>  ILGCOMERR;
 #endif
 		};
-		typedef fstatr_t<0x007FE080> FSTATR_;
+		typedef fstatr_t<0x007F'E080> FSTATR_;
 		static FSTATR_ FSTATR;
 
 
@@ -218,7 +218,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>     FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fentryr_t<0x007FE084> FENTRYR_;
+		typedef fentryr_t<0x007F'E084> FENTRYR_;
 		static FENTRYR_ FENTRYR;
 
 
@@ -240,7 +240,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>     FPROTCN;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fprotr_t<0x007FE088> FPROTR_;
+		typedef fprotr_t<0x007F'E088> FPROTR_;
 		static FPROTR_ FPROTR;
 #endif
 
@@ -263,7 +263,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fsuinitr_t<0x007FE08C> FSUINITR_;
+		typedef fsuinitr_t<0x007F'E08C> FSUINITR_;
 		static FSUINITR_ FSUINITR;
 
 
@@ -284,7 +284,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  FLOCKST;
 		};
-		typedef flkstat_t<0x007FE090> FLKSTAT_;
+		typedef flkstat_t<0x007F'E090> FLKSTAT_;
 		static FLKSTAT_ FLKSTAT;
 #endif
 
@@ -303,7 +303,7 @@ namespace device {
 			bits_ro_t<io_, bitpos::B0, 8>  PCMDR;
 			bits_ro_t<io_, bitpos::B8, 8>  CMDDR;
 		};
-		typedef fcmdr_t<0x007FE0A0> FCMDR_;
+		typedef fcmdr_t<0x007F'E0A0> FCMDR_;
 		static FCMDR_ FCMDR;
 
 
@@ -321,7 +321,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 8>  PEERRST;
 		};
-		typedef fpestat_t<0x007FE0C0> FPESTAT_;
+		typedef fpestat_t<0x007F'E0C0> FPESTAT_;
 		static FPESTAT_ FPESTAT;
 #endif
 
@@ -342,7 +342,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  BCDIR;
 		};
-		typedef fbccnt_t<0x007FE0D0> FBCCNT_;
+		typedef fbccnt_t<0x007F'E0D0> FBCCNT_;
 		static FBCCNT_ FBCCNT;
 
 
@@ -359,7 +359,7 @@ namespace device {
 
 			bit_ro_t<io_, bitpos::B0>  BCST;
 		};
-		typedef fbcstat_t<0x007FE0D4> FBCSTAT_;
+		typedef fbcstat_t<0x007F'E0D4> FBCSTAT_;
 		static FBCSTAT_ FBCSTAT;
 
 
@@ -376,7 +376,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 19>  PSADR;  // RX72N: 17 bits
 		};
-		typedef fpsaddr_t<0x007FE0D8> FPSADDR_;
+		typedef fpsaddr_t<0x007F'E0D8> FPSADDR_;
 		static FPSADDR_ FPSADDR;
 
 
@@ -396,7 +396,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  ESUSPMD;
 		};
-		typedef fcpsr_t<0x007FE0E0> FCPSR_;
+		typedef fcpsr_t<0x007F'E0E0> FCPSR_;
 		static FCPSR_ FCPSR;
 
 
@@ -417,7 +417,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>  PCKA;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fpckar_t<0x007FE0E4> FPCKAR_;
+		typedef fpckar_t<0x007F'E0E4> FPCKAR_;
 		static FPCKAR_ FPCKAR;
 
 
@@ -440,7 +440,7 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B31>      BTFLG;
 		};
-		typedef fawmon_t<0x007FE0DC> FAWMON_;
+		typedef fawmon_t<0x007F'E0DC> FAWMON_;
 		static FAWMON_ FAWMON;
 
 
@@ -462,7 +462,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fsuacr_t<0x007FE0E8> FSUACR_;
+		typedef fsuacr_t<0x007F'E0E8> FSUACR_;
 		static FSUACR_ FSUACR;
 
 
@@ -471,7 +471,7 @@ namespace device {
 			@brief  データフラッシュメモリアクセス周波数設定レジスタ (EEPFCLK)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x007FC040> EEPFCLK_;
+		typedef rw8_t<0x007F'C040> EEPFCLK_;
 		static EEPFCLK_ EEPFCLK;
 #endif
 
@@ -481,9 +481,9 @@ namespace device {
 			@brief  FACIコマンド発行領域 007E 0000h 4バイト
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x007E0000> FACI_CMD_AREA_;
+		typedef rw8_t<0x007E'0000> FACI_CMD_AREA_;
 		static FACI_CMD_AREA_ FACI_CMD_AREA;		///< byte 書き込み
-		typedef rw16_t<0x007E0000> FACI_CMD_AREA16_;
+		typedef rw16_t<0x007E'0000> FACI_CMD_AREA16_;
 		static FACI_CMD_AREA16_ FACI_CMD_AREA16;	///< word(16) 書き込み
 
 
@@ -493,15 +493,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
-		typedef ro32_t<0x007FB174> UIDR0_;
-		typedef ro32_t<0x007FB1E4> UIDR1_;
-		typedef ro32_t<0x007FB1E8> UIDR2_;
-		typedef ro32_t<0xFFFFFFF4> UIDR3_;  ///< in VECTOR 
+		typedef ro32_t<0x007F'B174> UIDR0_;
+		typedef ro32_t<0x007F'B1E4> UIDR1_;
+		typedef ro32_t<0x007F'B1E8> UIDR2_;
+		typedef ro32_t<0xFFFF'FFF4> UIDR3_;  ///< in VECTOR 
 #elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef ro32_t<0xFE7F7D90> UIDR0_;
-		typedef ro32_t<0xFE7F7D94> UIDR1_;
-		typedef ro32_t<0xFE7F7D98> UIDR2_;
-		typedef ro32_t<0xFE7F7D9C> UIDR3_;
+		typedef ro32_t<0xFE7F'7D90> UIDR0_;
+		typedef ro32_t<0xFE7F'7D94> UIDR1_;
+		typedef ro32_t<0xFE7F7'D98> UIDR2_;
+		typedef ro32_t<0xFE7F7'D9C> UIDR3_;
 #endif
 		static UIDR0_ UIDR0;
 		static UIDR1_ UIDR1;

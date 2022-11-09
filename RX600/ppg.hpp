@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX64M/RX71M/RX65N グループ・PPG 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,7 +7,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -40,7 +40,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  PTRSL;
 		};
-		typedef ptrslr_t<0x000881F0> PTRSLR_;
+		typedef ptrslr_t<0x0008'81F0> PTRSLR_;
 		static  PTRSLR_ PTRSLR;
 
 
@@ -67,7 +67,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDR14;
 			bit_rw_t<io_, bitpos::B7>  NDR15;
 		};
-		typedef ndrh_t<0x000881EC + ch * 2> NDRH_;
+		typedef ndrh_t<0x0008'81EC + ch * 2> NDRH_;
 		static  NDRH_ NDRH;
 
 
@@ -94,7 +94,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDR6;
 			bit_rw_t<io_, bitpos::B7>  NDR7;
 		};
-		typedef ndrl_t<0x000881ED + ch * 2> NDRL_;
+		typedef ndrl_t<0x0008'81ED + ch * 2> NDRL_;
 		static  NDRL_ NDRL;
 
 
@@ -117,7 +117,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  G2CMS;
 			bits_rw_t<io_, bitpos::B6, 2>  G3CMS;
 		};
-		typedef pcr_t<0x000881E6 + ch * 0x10> PCR_;
+		typedef pcr_t<0x0008'81E6 + ch * 0x10> PCR_;
 		static  PCR_ PCR;
 
 
@@ -144,7 +144,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  G2INV;
 			bit_rw_t<io_, bitpos::B7>  G3INV;
 		};
-		typedef pmr_t<0x000881E7 + ch * 0x10> PMR_;
+		typedef pmr_t<0x0008'81E7 + ch * 0x10> PMR_;
 		static  PMR_ PMR;
 	};
 
@@ -182,7 +182,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDER14;
 			bit_rw_t<io_, bitpos::B7>  NDER15;
 		};
-		typedef nderh_t<0x000881E8> NDERH_;
+		typedef nderh_t<0x0008'81E8> NDERH_;
 		static  NDERH_ NDERH;
 
 
@@ -209,7 +209,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDER6;
 			bit_rw_t<io_, bitpos::B7>  NDER7;
 		};
-		typedef nderl_t<0x000881E9> NDERL_;
+		typedef nderl_t<0x0008'81E9> NDERL_;
 		static  NDERL_ NDERL;
 
 
@@ -236,7 +236,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  POD14;
 			bit_rw_t<io_, bitpos::B7>  POD15;
 		};
-		typedef podrh_t<0x000881EA> PODRH_;
+		typedef podrh_t<0x0008'81EA> PODRH_;
 		static  PODRH_ PODRH;
 
 
@@ -263,7 +263,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  POD6;
 			bit_rw_t<io_, bitpos::B7>  POD7;
 		};
-		typedef podrl_t<0x000881EB> PODRL_;
+		typedef podrl_t<0x0008'81EB> PODRL_;
 		static  PODRL_ PODRL;
 	};
 
@@ -301,7 +301,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDER30;
 			bit_rw_t<io_, bitpos::B7>  NDER31;
 		};
-		typedef nderh_t<0x000881F8> NDERH_;
+		typedef nderh_t<0x0008'81F8> NDERH_;
 		static  NDERH_ NDERH;
 
 
@@ -328,7 +328,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDER22;
 			bit_rw_t<io_, bitpos::B7>  NDER23;
 		};
-		typedef nderl_t<0x000881F9> NDERL_;
+		typedef nderl_t<0x0008'81F9> NDERL_;
 		static  NDERL_ NDERL;
 
 
@@ -355,7 +355,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  POD30;
 			bit_rw_t<io_, bitpos::B7>  POD31;
 		};
-		typedef podrh_t<0x000881FA> PODRH_;
+		typedef podrh_t<0x0008'81FA> PODRH_;
 		static  PODRH_ PODRH;
 
 
@@ -382,7 +382,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  POD22;
 			bit_rw_t<io_, bitpos::B7>  POD23;
 		};
-		typedef podrl_t<0x000881FB> PODRL_;
+		typedef podrl_t<0x0008'81FB> PODRL_;
 		static  PODRL_ PODRL;
 	};
 	template <peripheral per, uint32_t ch> typename ppg_t<per, ch>::PTRSLR_ ppg_t<per, ch>::PTRSLR;

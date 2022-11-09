@@ -19,7 +19,13 @@
 
 namespace {
 
-#if defined(SIG_RX62N)
+#if defined(SIG_RX63T)
+	// DIY RX63T board
+	static const char* system_str_ = { "RX63T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX62N)
   #if defined(CQ_FRK)
     // FRK-RX62N(CQ 出版社)
 	static const char* system_str_ = { "RX62N FRK-RX62N" };

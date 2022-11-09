@@ -1,4 +1,4 @@
-Renesas RX62N、RX24T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
+Renesas RX63T, RX62N、RX24T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
 =========
    
 [英語版](README.md)
@@ -14,6 +14,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 
 ## プロジェクト・リスト
 - main.cpp
+- RX63T/Makefile
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
 - RX24T/Makefile
 - RX66T/Makefile
@@ -38,7 +39,11 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 // Memo:
 //    ポート出力は、電流を引いた（吸い込み）場合と、電流を掃き出した（吐き出し）場合で、能力が異なります。
 //    一般的に、「吸い込み」の方が電流を多く流せる場合が多く、その慣例に従って、「吸い込み」で接続する場合が通例です。
-#if defined(SIG_RX62N)
+#if defined(SIG_RX63T)
+	// DIY RX63T board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
+#elif defined(SIG_RX62N)
 	// BlueBoard-RX62N_100pin
 	static constexpr bool LED_ACTIVE = 0;
   #if defined(CQ_FRK)
