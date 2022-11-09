@@ -115,17 +115,17 @@ namespace device {
 					PORT2::PMR.B3 = enable;
 				}
 				break;
-			case peripheral::SCI1:
-			// P93/RXD1
-			// P26/TXD1
+			case peripheral::SCI1:  // for BOOT serial port
+			// PD5/RXD1
+			// PD3/TXD1
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORT9::PMR.B3 = 0;
-					PORT2::PMR.B6 = 0;
-					MPC::P93PFS.PSEL = sel;
-					MPC::P26PFS.PSEL = sel;
-					PORT9::PMR.B3 = enable;
-					PORT2::PMR.B6 = enable;
+					PORTD::PMR.B5 = 0;
+					PORTD::PMR.B3 = 0;
+					MPC::PD5PFS.PSEL = sel;
+					MPC::PD3PFS.PSEL = sel;
+					PORTD::PMR.B5 = enable;
+					PORTD::PMR.B3 = enable;
 				}
 				break;
 			case peripheral::SCI2:
@@ -228,16 +228,16 @@ namespace device {
 		{
 			switch(per) {
 			case peripheral::SCI1:
-			// PD5/RXD1
-			// PD3/TXD1
+			// P93/RXD1
+			// P26/TXD1
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORTD::PMR.B5 = 0;
-					PORTD::PMR.B3 = 0;
-					MPC::PD5PFS.PSEL = sel;
-					MPC::PD3PFS.PSEL = sel;
-					PORTD::PMR.B5 = enable;
-					PORTD::PMR.B3 = enable;
+					PORT9::PMR.B3 = 0;
+					PORT2::PMR.B6 = 0;
+					MPC::P93PFS.PSEL = sel;
+					MPC::P26PFS.PSEL = sel;
+					PORT9::PMR.B3 = enable;
+					PORT2::PMR.B6 = enable;
 				}
 				break;
 			default:
