@@ -87,7 +87,7 @@ See development environment preparation of 'RX/README.md'
 
 |Terminal|RX63T (64)|RX24T (100)|RX66T (100)|RX72T (144)|
 |---|---|---|---|------|
-|UB|X|X|UB/P00(4)|UB/P00(9)|
+|UB|P00(2)|X|UB/P00(4)|UB/P00(9)|
 |MD|MD(5)|MD(6)|MD/FINED(6)|MD/FINED(11)|
 |EMLE|EMLE(1)|X|EMLE(2)|EMLE(7)|
 |RXD|PD5/RXD1(14)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(25)|
@@ -172,6 +172,7 @@ rx_prog.conf is scanned and loaded in the following order:
 - Command directory (usually /usr/local/bin)
 - The RX621/RX62N internally limits the serial speed to 115200 due to high baud rate errors.
 - For devices such as RX621/RX62N and RX63T, external connection crystal frequency and multiplier settings are required when connecting.
+- The RX63T internally limits the serial speed to 115200 due to high baud rate errors.
 - This is done in the configuration file as shown below.
 - If there are multiple settings with the same group name, the first setting found in the group will take effect.
 
