@@ -21,7 +21,7 @@ namespace {
 #if defined(SIG_RX63T)
 	// DIY RX63T board
 	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX62N)
 	static constexpr bool LED_ACTIVE = 0;
   #if defined(CQ_FRK)
