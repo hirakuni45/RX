@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・IWDT 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,8 +7,8 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
-#include "common/io_utils.hpp"
+//=========================================================================//
+#include "common/device.hpp"
 
 namespace device {
 

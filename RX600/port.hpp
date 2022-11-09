@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・ポート・レジスター定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 #include <tuple>
 
@@ -202,143 +202,143 @@ namespace device {
 #if defined(SIG_RX621) || defined(SIG_RX62N)
 //  ODR0  o  o  o  o  x  x  x  o  o  o  o  o  x  o  o  -  -  -
 //  ODR1  x  x  o  x  x  x  x  o  x  o  o  o  x  o  o  -  -  -
-	typedef port_t<0x0008C000, odr_ox_t<0x0008C080> > PORT0;
-	typedef port_t<0x0008C001, odr_ox_t<0x0008C082> > PORT1;
-	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
-	typedef port_t<0x0008C003, odr_ox_t<0x0008C086> > PORT3;
-	typedef port_t<0x0008C004, odr_xx_t<0x0008C088> > PORT4;
-	typedef port_t<0x0008C005, odr_xx_t<0x0008C08A> > PORT5;
-	typedef port_t<0x0008C006, odr_xx_t<0x0008C08C> > PORT6;
-	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
-	typedef port_t<0x0008C008, odr_ox_t<0x0008C090> > PORT8;
-	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
-	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
-	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
-	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+	typedef port_t<0x0008'C000, odr_ox_t<0x0008'C080> > PORT0;
+	typedef port_t<0x0008'C001, odr_ox_t<0x0008'C082> > PORT1;
+	typedef port_t<0x0008'C002, odr_oo_t<0x0008'C084> > PORT2;
+	typedef port_t<0x0008'C003, odr_ox_t<0x0008'C086> > PORT3;
+	typedef port_t<0x0008'C004, odr_xx_t<0x0008'C088> > PORT4;
+	typedef port_t<0x0008'C005, odr_xx_t<0x0008'C08A> > PORT5;
+	typedef port_t<0x0008'C006, odr_xx_t<0x0008'C08C> > PORT6;
+	typedef port_t<0x0008'C007, odr_oo_t<0x0008'C08E> > PORT7;
+	typedef port_t<0x0008'C008, odr_ox_t<0x0008'C090> > PORT8;
+	typedef port_t<0x0008'C009, odr_oo_t<0x0008'C092> > PORT9;
+	typedef port_t<0x0008'C00A, odr_oo_t<0x0008'C094> > PORTA;
+	typedef port_t<0x0008'C00B, odr_oo_t<0x0008'C096> > PORTB;
+	typedef port_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
+	typedef port_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
 #elif defined(SIG_RX24T)
 //  ODR0  o  o  o  o  x  x  x  o  o  o  o  o  x  o  o  -  -  -
 //  ODR1  x  x  o  x  x  x  x  o  x  o  o  o  x  o  o  -  -  -
-	typedef port_t<0x0008C000, odr_ox_t<0x0008C080> > PORT0;
-	typedef port_t<0x0008C001, odr_ox_t<0x0008C082> > PORT1;
-	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
-	typedef port_t<0x0008C003, odr_ox_t<0x0008C086> > PORT3;
-	typedef port_t<0x0008C004, odr_xx_t<0x0008C088> > PORT4;
-	typedef port_t<0x0008C005, odr_xx_t<0x0008C08A> > PORT5;
-	typedef port_t<0x0008C006, odr_xx_t<0x0008C08C> > PORT6;
-	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
-	typedef port_t<0x0008C008, odr_ox_t<0x0008C090> > PORT8;
-	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
-	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
-	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
-	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+	typedef port_t<0x0008'C000, odr_ox_t<0x0008'C080> > PORT0;
+	typedef port_t<0x0008'C001, odr_ox_t<0x0008'C082> > PORT1;
+	typedef port_t<0x0008'C002, odr_oo_t<0x0008'C084> > PORT2;
+	typedef port_t<0x0008'C003, odr_ox_t<0x0008'C086> > PORT3;
+	typedef port_t<0x0008'C004, odr_xx_t<0x0008'C088> > PORT4;
+	typedef port_t<0x0008'C005, odr_xx_t<0x0008'C08A> > PORT5;
+	typedef port_t<0x0008'C006, odr_xx_t<0x0008'C08C> > PORT6;
+	typedef port_t<0x0008'C007, odr_oo_t<0x0008'C08E> > PORT7;
+	typedef port_t<0x0008'C008, odr_ox_t<0x0008'C090> > PORT8;
+	typedef port_t<0x0008'C009, odr_oo_t<0x0008'C092> > PORT9;
+	typedef port_t<0x0008'C00A, odr_oo_t<0x0008'C094> > PORTA;
+	typedef port_t<0x0008'C00B, odr_oo_t<0x0008'C096> > PORTB;
+	typedef port_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
+	typedef port_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
-	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
-	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
-	typedef port_t<0x0008C003, odr_oo_t<0x0008C086> > PORT3;
-	typedef port_t<0x0008C004, odr_oo_t<0x0008C088> > PORT4;
-	typedef port_t<0x0008C005, odr_oo_t<0x0008C08A> > PORT5;
-	typedef port_t<0x0008C006, odr_oo_t<0x0008C08C> > PORT6;
-	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
-	typedef port_t<0x0008C008, odr_oo_t<0x0008C090> > PORT8;
-	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
-	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
-	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00C, odr_oo_t<0x0008C098> > PORTC;
-	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
-	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
-	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
-	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
-	typedef port_t<0x0008C012, odr_oo_t<0x0008C0A4> > PORTJ;
+	typedef port_t<0x0008'C000, odr_oo_t<0x0008'C080> > PORT0;
+	typedef port_t<0x0008'C001, odr_oo_t<0x0008'C082> > PORT1;
+	typedef port_t<0x0008'C002, odr_oo_t<0x0008'C084> > PORT2;
+	typedef port_t<0x0008'C003, odr_oo_t<0x0008'C086> > PORT3;
+	typedef port_t<0x0008'C004, odr_oo_t<0x0008'C088> > PORT4;
+	typedef port_t<0x0008'C005, odr_oo_t<0x0008'C08A> > PORT5;
+	typedef port_t<0x0008'C006, odr_oo_t<0x0008'C08C> > PORT6;
+	typedef port_t<0x0008'C007, odr_oo_t<0x0008'C08E> > PORT7;
+	typedef port_t<0x0008'C008, odr_oo_t<0x0008'C090> > PORT8;
+	typedef port_t<0x0008'C009, odr_oo_t<0x0008'C092> > PORT9;
+	typedef port_t<0x0008'C00A, odr_oo_t<0x0008'C094> > PORTA;
+	typedef port_t<0x0008'C00B, odr_oo_t<0x0008'C096> > PORTB;
+	typedef port_t<0x0008'C00C, odr_oo_t<0x0008'C098> > PORTC;
+	typedef port_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
+	typedef port_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
+	typedef port_t<0x0008'C00F, odr_oo_t<0x0008'C09E> > PORTF;
+	typedef port_t<0x0008'C010, odr_oo_t<0x0008'C0A0> > PORTG;
+	typedef port_t<0x0008'C012, odr_oo_t<0x0008'C0A4> > PORTJ;
 #elif defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
-	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
-	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
-	typedef port_t<0x0008C003, odr_oo_t<0x0008C086> > PORT3;
-	typedef port_t<0x0008C004, odr_oo_t<0x0008C088> > PORT4;
-	typedef port_t<0x0008C005, odr_oo_t<0x0008C08A> > PORT5;
-	typedef port_t<0x0008C006, odr_oo_t<0x0008C08C> > PORT6;
-	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
-	typedef port_t<0x0008C008, odr_oo_t<0x0008C090> > PORT8;
-	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
-	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
-	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00C, odr_oo_t<0x0008C098> > PORTC;
-	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
-	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
-	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
-	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
-	typedef port_t<0x0008C011, odr_oo_t<0x0008C0A2> > PORTH;
+	typedef port_t<0x0008'C000, odr_oo_t<0x0008'C080> > PORT0;
+	typedef port_t<0x0008'C001, odr_oo_t<0x0008'C082> > PORT1;
+	typedef port_t<0x0008'C002, odr_oo_t<0x0008'C084> > PORT2;
+	typedef port_t<0x0008'C003, odr_oo_t<0x0008'C086> > PORT3;
+	typedef port_t<0x0008'C004, odr_oo_t<0x0008'C088> > PORT4;
+	typedef port_t<0x0008'C005, odr_oo_t<0x0008'C08A> > PORT5;
+	typedef port_t<0x0008'C006, odr_oo_t<0x0008'C08C> > PORT6;
+	typedef port_t<0x0008'C007, odr_oo_t<0x0008'C08E> > PORT7;
+	typedef port_t<0x0008'C008, odr_oo_t<0x0008'C090> > PORT8;
+	typedef port_t<0x0008'C009, odr_oo_t<0x0008'C092> > PORT9;
+	typedef port_t<0x0008'C00A, odr_oo_t<0x0008'C094> > PORTA;
+	typedef port_t<0x0008'C00B, odr_oo_t<0x0008'C096> > PORTB;
+	typedef port_t<0x0008'C00C, odr_oo_t<0x0008'C098> > PORTC;
+	typedef port_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
+	typedef port_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
+	typedef port_t<0x0008'C00F, odr_oo_t<0x0008'C09E> > PORTF;
+	typedef port_t<0x0008'C010, odr_oo_t<0x0008'C0A0> > PORTG;
+	typedef port_t<0x0008'C011, odr_oo_t<0x0008'C0A2> > PORTH;
 
-	typedef port_t<0x0008C012, odr_oo_t<0x0008C0A4> > PORTJ;
-	typedef port_t<0x0008C013, odr_oo_t<0x0008C0A6> > PORTK;
-	typedef port_t<0x0008C014, odr_oo_t<0x0008C0A8> > PORTL;
-	typedef port_t<0x0008C015, odr_oo_t<0x0008C0AA> > PORTM;
-	typedef port_t<0x0008C016, odr_oo_t<0x0008C0AC> > PORTN;
+	typedef port_t<0x0008'C012, odr_oo_t<0x0008'C0A4> > PORTJ;
+	typedef port_t<0x0008'C013, odr_oo_t<0x0008'C0A6> > PORTK;
+	typedef port_t<0x0008'C014, odr_oo_t<0x0008'C0A8> > PORTL;
+	typedef port_t<0x0008'C015, odr_oo_t<0x0008'C0AA> > PORTM;
+	typedef port_t<0x0008'C016, odr_oo_t<0x0008'C0AC> > PORTN;
 
-	typedef port_t<0x0008C017, odr_oo_t<0x0008C0AE> > PORTQ;
+	typedef port_t<0x0008'C017, odr_oo_t<0x0008'C0AE> > PORTQ;
 #elif defined(SIG_RX63T)
-	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
-	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
-	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
-	typedef port_t<0x0008C003, odr_oo_t<0x0008C086> > PORT3;
-	typedef port_t<0x0008C004, odr_oo_t<0x0008C088> > PORT4;
-	typedef port_t<0x0008C005, odr_oo_t<0x0008C08A> > PORT5;
-	typedef port_t<0x0008C006, odr_oo_t<0x0008C08C> > PORT6;
-	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
-	typedef port_t<0x0008C008, odr_oo_t<0x0008C090> > PORT8;
-	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
-	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
-	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00C, odr_oo_t<0x0008C098> > PORTC;
-	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
-	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
-	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
-	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
+	typedef port_t<0x0008'C000, odr_oo_t<0x0008'C080> > PORT0;
+	typedef port_t<0x0008'C001, odr_oo_t<0x0008'C082> > PORT1;
+	typedef port_t<0x0008'C002, odr_oo_t<0x0008'C084> > PORT2;
+	typedef port_t<0x0008'C003, odr_oo_t<0x0008'C086> > PORT3;
+	typedef port_t<0x0008'C004, odr_oo_t<0x0008'C088> > PORT4;
+	typedef port_t<0x0008'C005, odr_oo_t<0x0008'C08A> > PORT5;
+	typedef port_t<0x0008'C006, odr_oo_t<0x0008'C08C> > PORT6;
+	typedef port_t<0x0008'C007, odr_oo_t<0x0008'C08E> > PORT7;
+	typedef port_t<0x0008'C008, odr_oo_t<0x0008'C090> > PORT8;
+	typedef port_t<0x0008'C009, odr_oo_t<0x0008'C092> > PORT9;
+	typedef port_t<0x0008'C00A, odr_oo_t<0x0008'C094> > PORTA;
+	typedef port_t<0x0008'C00B, odr_oo_t<0x0008'C096> > PORTB;
+	typedef port_t<0x0008'C00C, odr_oo_t<0x0008'C098> > PORTC;
+	typedef port_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
+	typedef port_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
+	typedef port_t<0x0008'C00F, odr_oo_t<0x0008'C09E> > PORTF;
+	typedef port_t<0x0008'C010, odr_oo_t<0x0008'C0A0> > PORTG;
 #elif defined(SIG_RX66T)
-	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
-	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
-	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
-	typedef port_t<0x0008C003, odr_oo_t<0x0008C086> > PORT3;
-	typedef port_t<0x0008C004, odr_oo_t<0x0008C088> > PORT4;
-	typedef port_t<0x0008C005, odr_oo_t<0x0008C08A> > PORT5;
-	typedef port_t<0x0008C006, odr_oo_t<0x0008C08C> > PORT6;
-	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
-	typedef port_t<0x0008C008, odr_oo_t<0x0008C090> > PORT8;
-	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
-	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
-	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00C, odr_oo_t<0x0008C098> > PORTC;
-	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
-	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
-	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
-	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
-	typedef port_t<0x0008C011, odr_oo_t<0x0008C0A2> > PORTH;
+	typedef port_t<0x0008'C000, odr_oo_t<0x0008'C080> > PORT0;
+	typedef port_t<0x0008'C001, odr_oo_t<0x0008'C082> > PORT1;
+	typedef port_t<0x0008'C002, odr_oo_t<0x0008'C084> > PORT2;
+	typedef port_t<0x0008'C003, odr_oo_t<0x0008'C086> > PORT3;
+	typedef port_t<0x0008'C004, odr_oo_t<0x0008'C088> > PORT4;
+	typedef port_t<0x0008'C005, odr_oo_t<0x0008'C08A> > PORT5;
+	typedef port_t<0x0008'C006, odr_oo_t<0x0008'C08C> > PORT6;
+	typedef port_t<0x0008'C007, odr_oo_t<0x0008'C08E> > PORT7;
+	typedef port_t<0x0008'C008, odr_oo_t<0x0008'C090> > PORT8;
+	typedef port_t<0x0008'C009, odr_oo_t<0x0008'C092> > PORT9;
+	typedef port_t<0x0008'C00A, odr_oo_t<0x0008'C094> > PORTA;
+	typedef port_t<0x0008'C00B, odr_oo_t<0x0008'C096> > PORTB;
+	typedef port_t<0x0008'C00C, odr_oo_t<0x0008'C098> > PORTC;
+	typedef port_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
+	typedef port_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
+	typedef port_t<0x0008'C00F, odr_oo_t<0x0008'C09E> > PORTF;
+	typedef port_t<0x0008'C010, odr_oo_t<0x0008'C0A0> > PORTG;
+	typedef port_t<0x0008'C011, odr_oo_t<0x0008'C0A2> > PORTH;
 	
-	typedef port_t<0x0008C013, odr_oo_t<0x0008C0A6> > PORTK;
+	typedef port_t<0x0008'C013, odr_oo_t<0x0008'C0A6> > PORTK;
 #elif defined(SIG_RX72T)
-	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
-	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
-	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
-	typedef port_t<0x0008C003, odr_oo_t<0x0008C086> > PORT3;
-	typedef port_t<0x0008C004, odr_oo_t<0x0008C088> > PORT4;
-	typedef port_t<0x0008C005, odr_oo_t<0x0008C08A> > PORT5;
-	typedef port_t<0x0008C006, odr_oo_t<0x0008C08C> > PORT6;
-	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
-	typedef port_t<0x0008C008, odr_oo_t<0x0008C090> > PORT8;
-	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
-	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
-	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00C, odr_oo_t<0x0008C098> > PORTC;
-	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
-	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
-	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
-	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
-	typedef port_t<0x0008C011, odr_oo_t<0x0008C0A2> > PORTH;
+	typedef port_t<0x0008'C000, odr_oo_t<0x0008'C080> > PORT0;
+	typedef port_t<0x0008'C001, odr_oo_t<0x0008'C082> > PORT1;
+	typedef port_t<0x0008'C002, odr_oo_t<0x0008'C084> > PORT2;
+	typedef port_t<0x0008'C003, odr_oo_t<0x0008'C086> > PORT3;
+	typedef port_t<0x0008'C004, odr_oo_t<0x0008'C088> > PORT4;
+	typedef port_t<0x0008'C005, odr_oo_t<0x0008'C08A> > PORT5;
+	typedef port_t<0x0008'C006, odr_oo_t<0x0008'C08C> > PORT6;
+	typedef port_t<0x0008'C007, odr_oo_t<0x0008'C08E> > PORT7;
+	typedef port_t<0x0008'C008, odr_oo_t<0x0008'C090> > PORT8;
+	typedef port_t<0x0008'C009, odr_oo_t<0x0008'C092> > PORT9;
+	typedef port_t<0x0008'C00A, odr_oo_t<0x0008'C094> > PORTA;
+	typedef port_t<0x0008'C00B, odr_oo_t<0x0008'C096> > PORTB;
+	typedef port_t<0x0008'C00C, odr_oo_t<0x0008'C098> > PORTC;
+	typedef port_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
+	typedef port_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
+	typedef port_t<0x0008'C00F, odr_oo_t<0x0008'C09E> > PORTF;
+	typedef port_t<0x0008'C010, odr_oo_t<0x0008'C0A0> > PORTG;
+	typedef port_t<0x0008'C011, odr_oo_t<0x0008'C0A2> > PORTH;
 
-	typedef port_t<0x0008C013, odr_oo_t<0x0008C0A6> > PORTK;
+	typedef port_t<0x0008'C013, odr_oo_t<0x0008'C0A6> > PORTK;
 #else
 #  error "port.hpp requires SIG_XXX to be defined"
 #endif

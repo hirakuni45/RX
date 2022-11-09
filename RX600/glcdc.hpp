@@ -1,24 +1,24 @@
 #pragma once
-//=====================================================================//
+//=============================================================================//
 /*!	@file
 	@brief	RX600 グループ　GLCDC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
-#include "common/io_utils.hpp"
+//=============================================================================//
+#include "common/device.hpp"
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  GLCDC 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per>
 	struct glcdc_t {
 
@@ -1522,5 +1522,5 @@ namespace device {
 	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::STMON_ glcdc_t<base, per>::STMON;
 	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::PANELCLK_ glcdc_t<base, per>::PANELCLK;
 
-	typedef glcdc_t<0x000E0000, peripheral::GLCDC> GLCDC;
+	typedef glcdc_t<0x000E'0000, peripheral::GLCDC> GLCDC;
 }

@@ -1,14 +1,14 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・ELC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
-#include "common/io_utils.hpp"
+//=========================================================================//
+#include "common/device.hpp"
 
 namespace device {
 
@@ -467,5 +467,5 @@ namespace device {
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSEGR_ elc_t<base, per>::ELSEGR;
 
 
-	typedef elc_t<0x0008B100, peripheral::ELC> ELC;
+	typedef elc_t<0x0008'B100, peripheral::ELC> ELC;
 }

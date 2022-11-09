@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	ポートアウトプットイネーブル 3（POE3）定義 @n
 			RX64M, RX71M, RX65N, RX651, RX66T, RX24T
@@ -8,7 +8,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -2137,8 +2137,8 @@ namespace device {
 #endif
 
 #if defined(SIG_RX24T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	typedef poe3_t<0x0008C4C0, peripheral::POE> POE3;
+	typedef poe3_t<0x0008'C4C0, peripheral::POE> POE3;
 #elif defined(SIG_RX66T)
-	typedef poe3_t<0x0009E400, peripheral::POE> POE3;
+	typedef poe3_t<0x0009'E400, peripheral::POE> POE3;
 #endif
 }

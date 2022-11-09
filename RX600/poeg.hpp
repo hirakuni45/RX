@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	GPTW 用ポートアウトプットイネーブル (POEG)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -138,5 +138,5 @@ namespace device {
 	template <uint32_t base, peripheral per> typename poeg_t<base, per>::GTONCCRC_ poeg_t<base, per>::GTONCCRC;
 	template <uint32_t base, peripheral per> typename poeg_t<base, per>::GTONCCRD_ poeg_t<base, per>::GTONCCRD;
 
-	typedef poeg_t<0x0009E000, peripheral::POEG> POEG;
+	typedef poeg_t<0x0009'E000, peripheral::POEG> POEG;
 }

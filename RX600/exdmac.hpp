@@ -323,7 +323,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DMST;
 		};
-		typedef edmast_t<0x00082A00> EDMAST_;
+		typedef edmast_t<0x0008'2A00> EDMAST_;
 		static  EDMAST_ EDMAST;
 
 
@@ -332,21 +332,21 @@ namespace device {
 			@brief  クラスタバッファレジスタ y（CLSBRy）（y = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x00082BE0> CLSBR0_;
+		typedef rw32_t<0x0008'2BE0> CLSBR0_;
 		static  CLSBR0_ CLSBR0;
-		typedef rw32_t<0x00082BE4> CLSBR1_;
+		typedef rw32_t<0x0008'2BE4> CLSBR1_;
 		static  CLSBR1_ CLSBR1;
-		typedef rw32_t<0x00082BE8> CLSBR2_;
+		typedef rw32_t<0x0008'2BE8> CLSBR2_;
 		static  CLSBR2_ CLSBR2;
-		typedef rw32_t<0x00082BEC> CLSBR3_;
+		typedef rw32_t<0x0008'2BEC> CLSBR3_;
 		static  CLSBR3_ CLSBR3;
-		typedef rw32_t<0x00082BF0> CLSBR4_;
+		typedef rw32_t<0x0008'2BF0> CLSBR4_;
 		static  CLSBR4_ CLSBR4;
-		typedef rw32_t<0x00082BF4> CLSBR5_;
+		typedef rw32_t<0x0008'2BF4> CLSBR5_;
 		static  CLSBR5_ CLSBR5;
-		typedef rw32_t<0x00082BF8> CLSBR6_;
+		typedef rw32_t<0x0008'2BF8> CLSBR6_;
 		static  CLSBR6_ CLSBR6;
-		typedef rw32_t<0x00082BFC> CLSBR7_;
+		typedef rw32_t<0x0008'2BFC> CLSBR7_;
 		static  CLSBR7_ CLSBR7;
 	};
 	template <class _> typename exdmac_t<_>::EDMAST_ exdmac_t<_>::EDMAST;
@@ -403,10 +403,10 @@ namespace device {
 	};
 
 #if defined(SIG_RX621) || defined(SIG_RX62N)
-	typedef exdmac0_t<0x00082800, peripheral::EXDMAC0, ICU::VECTOR::EXDMACI0> EXDMAC0;
-	typedef exdmac1_t<0x00082840, peripheral::EXDMAC1, ICU::VECTOR::EXDMACI1> EXDMAC1;
+	typedef exdmac0_t<0x0008'2800, peripheral::EXDMAC0, ICU::VECTOR::EXDMACI0> EXDMAC0;
+	typedef exdmac1_t<0x0008'2840, peripheral::EXDMAC1, ICU::VECTOR::EXDMACI1> EXDMAC1;
 #else
-	typedef exdmac0_t<0x00082800, peripheral::EXDMAC0, ICU::VECTOR::EXDMAC0I> EXDMAC0;
-	typedef exdmac1_t<0x00082840, peripheral::EXDMAC1, ICU::VECTOR::EXDMAC1I> EXDMAC1;
+	typedef exdmac0_t<0x0008'2800, peripheral::EXDMAC0, ICU::VECTOR::EXDMAC0I> EXDMAC0;
+	typedef exdmac1_t<0x0008'2840, peripheral::EXDMAC1, ICU::VECTOR::EXDMAC1I> EXDMAC1;
 #endif
 }
