@@ -12,7 +12,7 @@ I am currently using Renesas GNU-RX gcc 8.3.0 as my main development tool.
 Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
 Development is now possible in multiple environments.   
    
-- Currently supported and tested devices are RX62[1N], RX24T, RX66T, RX72T, RX64M, RX65N, RX71M, RX72N.   
+- Currently supported and tested devices are RX62[1N], RX63T, RX24T, RX66T, RX72T, RX64M, RX65N, RX71M, RX72N.   
 I extend the device class daily.
 - The RX72M are scheduled to be supported in the future.
 - I update it daily including directory configuration.   
@@ -75,6 +75,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr libraries|
 |[/rx600](./RX600)|RX microcontroller common device definition class|
 |[/RX24T](./RX24T)|RX24T specific device definition class, linker script|
+|[/RX63T](./RX63T)|RX63T specific device definition class, linker script|
 |[/RX62x](./RX62x)|RX621/RX62N dedicated device definition class, linker script|
 |[/RX64M](./RX64M)|RX64M dedicated device definition class, linker script|
 |[/RX71M](./RX71M)|RX71M dedicated device definition class, linker script|
@@ -97,27 +98,27 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 ### Sample Projects (Applications)
 
-|Directory|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|Contents|
-|---------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|Serial Communication Sample Program|
-|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|serial communication Sample Program|
-|[/MTU_sample](./MTU_sample)|〇|〇|〇|〇|〇|〇|〇|〇|Multi-Function Timer Pulse Unit Sample Program|
-|[/CAN_sample](./CAN_sample)|〇|－|〇|〇|〇|〇|△|〇|CAN Communication Sample Program|
-|[/FLASH_sample](./FLASH_sample)|－|〇|〇|〇|〇|〇|〇|〇|Internal data flash operation sample|
-|[/FreeRTOS](./FreeRTOS)|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS Basic operation sample|
-|[/GPTW_sample](./GPTW_sample)|－|△|〇|〇|－|－|△|〇|GPTW PWM Sample Program|
-|[/I2C_sample](./I2C_sample)|〇|〇|〇|〇|〇|〇|〇|〇|I2C Device Access Sample|
-|[/RAYTRACER_sample](./RAYTRACER_sample)|〇|〇|〇|〇|〇|〇|〇|〇|Ray Tracing Benchmark|
-|[/SDCARD_sample](./SDCARD_sample)|－|〇|〇|〇|〇|△|〇|〇|SD Card Operation Sample|
-|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders emulator|
-|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|－|〇|〇|Envision Kit, NES emulator|
-|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|〇|〇|GUI Sample、Graphics User Interface (Soft rendering, using DRW2D engine)|
-|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|〇|△|〇|〇|MP3/WAV Audio Player (FreeRTOS)|
-|[/SYNTH_sample](./SYNTH_sample)|－|〇|〇|〇|〇|〇|〇|〇|FM sound synthesizer emulator|
-|[/CALC_sample](./CALC_sample)|〇|－|〇|〇|〇|〇|〇|〇|Function calculator samples (gmp, mpfr libraries)|
-|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|△|〇|Digital Storage Oscilloscope Samples|
-|[/PSG_sample](./PSG_sample)|〇|－|〇|〇|〇|〇|〇|〇|Pseudo PSG Sound Source Performance Samples|
-|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|〇|〇|TinyUSB/Host Samples|
+|Directory|RX63T|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|Contents|
+|---------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
+|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|Serial Communication Sample Program|
+|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|serial communication Sample Program|
+|[/MTU_sample](./MTU_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|Multi-Function Timer Pulse Unit Sample Program|
+|[/CAN_sample](./CAN_sample)|－|〇|－|〇|〇|〇|〇|△|〇|CAN Communication Sample Program|
+|[/FLASH_sample](./FLASH_sample)|－|－|〇|〇|〇|〇|〇|〇|〇|Internal data flash operation sample|
+|[/FreeRTOS](./FreeRTOS)|－|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS Basic operation sample|
+|[/GPTW_sample](./GPTW_sample)|－|－|△|〇|〇|－|－|△|〇|GPTW PWM Sample Program|
+|[/I2C_sample](./I2C_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|I2C Device Access Sample|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|Ray Tracing Benchmark|
+|[/SDCARD_sample](./SDCARD_sample)|－|－|〇|〇|〇|〇|△|〇|〇|SD Card Operation Sample|
+|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders emulator|
+|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|－|－|〇|〇|Envision Kit, NES emulator|
+|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|－|〇|〇|GUI Sample、Graphics User Interface (Soft rendering, using DRW2D engine)|
+|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|－|〇|△|〇|〇|MP3/WAV Audio Player (FreeRTOS)|
+|[/SYNTH_sample](./SYNTH_sample)|－|－|〇|〇|〇|〇|〇|〇|〇|FM sound synthesizer emulator|
+|[/CALC_sample](./CALC_sample)|－|〇|－|〇|〇|〇|〇|〇|〇|Function calculator samples (gmp, mpfr libraries)|
+|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|－|△|〇|Digital Storage Oscilloscope Samples|
+|[/PSG_sample](./PSG_sample)|－|〇|－|〇|〇|〇|〇|〇|〇|Pseudo PSG Sound Source Performance Samples|
+|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|－|〇|〇|TinyUSB/Host Samples|
 
 *Please consider directories and files that are not in the above list but exist when checked out as work in progress.
 
