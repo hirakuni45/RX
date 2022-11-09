@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX63T プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,6 +11,7 @@
 #include "rs232c_io.hpp"
 #include "rx_protocol.hpp"
 #include <vector>
+#include <boost/format.hpp>
 
 namespace rx63t {
 
@@ -125,7 +126,7 @@ namespace rx63t {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		protocol() { }
+		protocol() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -137,7 +138,7 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool bind(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx)
+		bool bind(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) noexcept
 		{
 			verbose_ = rx.verbose_;
 
@@ -363,7 +364,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(const std::string& path) {
+		bool start(const std::string& path) noexcept
+		{
 			if(!rs232c_.open(path, B9600)) {
 				return false;
 			}
@@ -383,7 +385,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool connection() {
+		bool connection() noexcept
+		{
 			bool ok = false;
 			for(int i = 0; i < 30; ++i) {
 				if(!command_(0x00)) {
@@ -424,27 +427,40 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_device() {
+		bool inquiry_device() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x20)) {
+				std::cerr << "(Inquiry) First command error." << std::endl;
 				return false;
 			}
 			uint8_t head[3];
+			// head[0]: 0x30
+			// head[1]: サイズ
+			// head[2]: デバイス数
 			if(!read_(head, 3)) {
+				std::cerr << "(Inquiry) Read head error." << std::endl;
 				return false;
 			}
 			if(head[0] != 0x30) {
+				std::cerr << "(Inquiry) Read body error." << std::endl;
 				return false;
 			}
 			uint32_t total = head[1];
 
-			uint8_t tmp[256 + 16];
+			uint8_t tmp[total];
 			if(!read_(tmp, total)) {
+				std::cerr << "(Inquiry) Read body error." << std::endl;
 				return false;
 			}
 
-			if(sum_(tmp, total - 1) != tmp[total - 1]) {
+			uint8_t sum = sum_(tmp, total - 1);
+			sum -= head[0] + head[1] + head[2];
+			if(sum != tmp[total - 1]) { 
+				std::cerr << boost::format("(Inquiry) Body sum error. (0x%02X : 0x%02X)")
+					% static_cast<uint16_t>(sum) % static_cast<uint16_t>(tmp[total - 1]);
+				std::cerr << std::endl;
 				return false;
 			}
 
@@ -685,6 +701,11 @@ namespace rx63t {
 		//-----------------------------------------------------------------//
 		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) {
 			if(!connection_) return false;
+
+			// RX63T では、最大１１５２００ボーまでとする（誤差が大きい為）
+			if(speed > 115200) {
+				speed = 115200;
+			}
 
 			uint32_t nbr;
 			switch(speed) {
