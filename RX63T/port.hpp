@@ -350,4 +350,57 @@ namespace device {
 	template <class PORTX, bitpos BPOS, bool ASSERT>
 		typename PORT<PORTX, BPOS, ASSERT>::P_ PORT<PORTX, BPOS, ASSERT>::P;
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  無効ポート定義
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class _>
+	struct NULL_PORT_t {
+
+		static constexpr uint8_t PNO     = 0xff;
+		static constexpr uint8_t BIT_POS = 0xff;
+
+		struct null_t {
+			void operator = (bool f) { }
+			bool operator () () const { return 0; } 
+		};
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート方向レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		static null_t DIR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  プルアップ制御・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		static null_t PU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オープンドレイン制御・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		static null_t OD;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		static null_t P;
+	};
+	typedef NULL_PORT_t<void> NULL_PORT;
+	template <class _> typename NULL_PORT_t<_>::null_t NULL_PORT_t<_>::DIR;
+	template <class _> typename NULL_PORT_t<_>::null_t NULL_PORT_t<_>::PU;
+	template <class _> typename NULL_PORT_t<_>::null_t NULL_PORT_t<_>::OD;
+	template <class _> typename NULL_PORT_t<_>::null_t NULL_PORT_t<_>::P;
 }
