@@ -793,12 +793,6 @@ namespace device {
 		typedef gtsos_t GTSOTR_;
 		static  GTSOTR_ GTSOTR;
 	};
-	typedef gptn_t<0x000C2100, peripheral::GPT0> GPT0;
-	typedef gptn_t<0x000C2180, peripheral::GPT1> GPT1;
-	typedef gptn_t<0x000C2200, peripheral::GPT2> GPT2;
-	typedef gptn_t<0x000C2280, peripheral::GPT3> GPT3;
-
-
 	template <uint32_t base, peripheral per> typename gptn_t<base, per>::GTIOR_ gptn_t<base, per>::GTIOR;
 	template <uint32_t base, peripheral per> typename gptn_t<base, per>::GTINTAD_ gptn_t<base, per>::GTINTAD;
 	template <uint32_t base, peripheral per> typename gptn_t<base, per>::GTCR_ gptn_t<base, per>::GTCR;
@@ -831,6 +825,10 @@ namespace device {
 	template <uint32_t base, peripheral per> typename gptn_t<base, per>::GTSOS_ gptn_t<base, per>::GTSOS;
 	template <uint32_t base, peripheral per> typename gptn_t<base, per>::GTSOTR_ gptn_t<base, per>::GTSOTR;
 
+	typedef gptn_t<0x000C'2100, peripheral::GPT0> GPT0;
+	typedef gptn_t<0x000C'2180, peripheral::GPT1> GPT1;
+	typedef gptn_t<0x000C'2200, peripheral::GPT2> GPT2;
+	typedef gptn_t<0x000C'2280, peripheral::GPT3> GPT3;
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -949,10 +947,6 @@ namespace device {
 		static  GTDBDLW_ GTDBDLW;
 
 	};
-	typedef gptl_t<0x000C2300> GPT01;
-	typedef gptl_t<0x000C2380> GPT23;
-
-
 	template <uint32_t base> typename gptl_t<base>::GTCNTLW_ gptl_t<base>::GTCNTLW;
 	template <uint32_t base> typename gptl_t<base>::GTCCRALW_ gptl_t<base>::GTCCRALW;
 	template <uint32_t base> typename gptl_t<base>::GTCCRBLW_ gptl_t<base>::GTCCRBLW;
@@ -973,4 +967,7 @@ namespace device {
 	template <uint32_t base> typename gptl_t<base>::GTDVDLW_ gptl_t<base>::GTDVDLW;
 	template <uint32_t base> typename gptl_t<base>::GTDBULW_ gptl_t<base>::GTDBULW;
 	template <uint32_t base> typename gptl_t<base>::GTDBDLW_ gptl_t<base>::GTDBDLW;
+
+	typedef gptl_t<0x000C'2300> GPT01;
+	typedef gptl_t<0x000C'2380> GPT23;
 }

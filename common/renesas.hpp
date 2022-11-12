@@ -20,7 +20,7 @@
 #include "RX63T/port.hpp"
 #include "RX600/mtu3.hpp"
 // #include "RX600/poe3.hpp"
-// #include "RX600/gpt.hpp"
+#include "RX63T/gpt.hpp"
 // #include "RX600/usb.hpp"
 #include "RX600/can.hpp"
 
