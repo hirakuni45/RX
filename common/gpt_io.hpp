@@ -1,31 +1,57 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX グループ・GPT I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
+#include "common/intr_utils.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GPT I/O 制御クラス
-		@param[in]	GPT		GPTx デバイス・クラス
-		@param[in]	MTASK	割り込み・メインタスク
+		@brief  GPT 基本クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GPT, class MTASK = utils::null_task>
-	class gpt_io {
+	struct gpt_io_base {
 
-		MTASK		mtask_;
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アウトプット型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class OUTPUT : uint8_t {
+			NONE        = 0,		///< 出力しない
+			LOW_TO_HIGH = 0b001010,	///< 初期０で、マッチで１
+			HIGH_TO_LOW = 0b011001,	///< 初期１で、マッチで０
+		};
+	};
 
-		// ※必要なら、実装する
-		void sleep_() { }
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  GPT I/O 制御クラス
+		@param[in]	GPT		GPTx デバイス・クラス
+		@param[in]	ASEL	GTIOA ポートオーダー
+		@param[in]	BSEL	GTIOB ポートオーダー
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class GPT,
+		port_map_gpt::ORDER ASEL = port_map_gpt::ORDER::FIRST,
+		port_map_gpt::ORDER BSEL = port_map_gpt::ORDER::FIRST>
+	class gpt_io : public gpt_io_base {
+	public:
+		typedef typename GPT::CHANNEL CHANNEL;
+
+	private:
+//		MTASK		mtask_;
+
+		uint32_t	freq_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -33,190 +59,124 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		gpt_io() { }
+		gpt_io() noexcept : freq_(0) { }
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  PWM を開始
-			@param[in]	limit	PWM カウンターのリミット
+			@brief  有効ビットに対する周波数を求める
+			@param[in]	bits	有効ビット数
+			@return	周波数
 		*/
 		//-----------------------------------------------------------------//
-		void start_pwm(uint16_t limit) {
-			uint32_t ch = GPT::get_chanel();
+		static uint32_t bits_to_freq(uint32_t bits) noexcept
+		{
+			return GPT::PCLK / (1 << bits);
+		}
 
-			// 書き込み保護を解除
-			switch(ch) {
-			case 0:
-				GPT::GTWP.WP0 = 0;
-				break;
-			case 1:
-				GPT::GTWP.WP1 = 0;
-				break;
-			case 2:
-				GPT::GTWP.WP2 = 0;
-				break;
-			case 3:
-				GPT::GTWP.WP3 = 0;
-				break;
-			case 4:
-				GPTB::GTWP.WP4 = 0;
-				break;
-			case 5:
-				GPTB::GTWP.WP5 = 0;
-				break;
-			case 6:
-				GPTB::GTWP.WP6 = 0;
-				break;
-			case 7:
-				GPTB::GTWP.WP7 = 0;
-				break;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  開始 (PWM)
+			@param[in]	freq	PWM 周波数[Hz]
+			@param[in]	outa	A 出力タイプ
+			@param[in]	outb	B 出力タイプ
+			@param[in]	intr	割り込みレベル（0: ポーリング）
+			@return エラーが無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(uint32_t freq, OUTPUT outa, OUTPUT outb, uint8_t intr = 0) noexcept
+		{
+			uint32_t pr = GPT::PCLK / freq;
+			uint8_t shift = 0;
+			if(pr > 65535) {
+				pr >>= 1;
+				++shift;
+			}
+			if(pr == 0 || shift > 3) {  // 分周器の能力を超えた場合
+				return false;
 			}
 
-			GPT::GTIOR.GTIOA = 0b011001;
-			GPT::GTONCR = GPT::GTONCR.OAE.b();
+			if(!power_mgr::turn(GPT::PERIPHERAL)) {
+				return false;
+			}
+			freq_ = freq;
+
+			auto ena = outa != OUTPUT::NONE;
+			if(!port_map_gpt::turn(GPT::PERIPHERAL, port_map_gpt::CHANNEL::A, ena, ASEL)) {
+				return false;
+			}
+			auto enb = outb != OUTPUT::NONE;
+			if(!port_map_gpt::turn(GPT::PERIPHERAL, port_map_gpt::CHANNEL::B, enb, BSEL)) {
+				return false;
+			}
+
+			GPT::GTIOR.GTIOA = static_cast<uint8_t>(outa);
+			GPT::GTONCR = GPT::GTONCR.OAE.b(ena);
+			GPT::GTCCRA = 0;
+			GPT::GTIOR.GTIOB = static_cast<uint8_t>(outb);
+			GPT::GTONCR = GPT::GTONCR.OBE.b(enb);
+			GPT::GTCCRB = 0;
+
 			GPT::GTUDC = GPT::GTUDC.UD.b() | GPT::GTUDC.UDF.b(); // UP カウント設定
 
-			// バッファ動作設定
-			switch(ch) {
-			case 0:
-				GPT::GTBDR.BD0_0 = 1;  // GPT0 GTCCR バッファ動作禁止
-				GPT::GTBDR.BD0_1 = 1;  // GPT0 GTPR バッファ動作禁止
-				GPT::GTBDR.BD0_2 = 1;  // GPT0 GTADTR バッファ動作禁止
-				GPT::GTBDR.BD0_3 = 1;  // GPT0 GTDV バッファ動作禁止 
-				break;
-			case 1:
-				GPT::GTBDR.BD1_0 = 1;  // GPT1 GTCCR バッファ動作禁止
-				GPT::GTBDR.BD1_1 = 1;  // GPT1 GTPR バッファ動作禁止
-				GPT::GTBDR.BD1_2 = 1;  // GPT1 GTADTR バッファ動作禁止
-				GPT::GTBDR.BD1_3 = 1;  // GPT1 GTDV バッファ動作禁止 
-				break;
-			case 2:
-				GPT::GTBDR.BD2_0 = 1;  // GPT2 GTCCR バッファ動作禁止
-				GPT::GTBDR.BD2_1 = 1;  // GPT2 GTPR バッファ動作禁止
-				GPT::GTBDR.BD2_2 = 1;  // GPT2 GTADTR バッファ動作禁止
-				GPT::GTBDR.BD2_3 = 1;  // GPT2 GTDV バッファ動作禁止 
-				break;
-			case 3:
-				GPT::GTBDR.BD3_0 = 1;  // GPT3 GTCCR バッファ動作禁止
-				GPT::GTBDR.BD3_1 = 1;  // GPT3 GTPR バッファ動作禁止
-				GPT::GTBDR.BD3_2 = 1;  // GPT3 GTADTR バッファ動作禁止
-				GPT::GTBDR.BD3_3 = 1;  // GPT3 GTDV バッファ動作禁止 
-				break;
-			case 4:
-				GPTB::GTBDR.BD4_0 = 1; // GPT4 GTCCR バッファ動作禁止
-				GPTB::GTBDR.BD4_1 = 1; // GPT4 GTPR バッファ動作禁止
-				GPTB::GTBDR.BD4_2 = 1; // GPT4 GTADTR バッファ動作禁止
-				GPTB::GTBDR.BD4_3 = 1; // GPT4 GTDV バッファ動作禁止 
-				break;
-			case 5:
-				GPTB::GTBDR.BD5_0 = 1; // GPT5 GTCCR バッファ動作禁止
-				GPTB::GTBDR.BD5_1 = 1; // GPT5 GTPR バッファ動作禁止
-				GPTB::GTBDR.BD5_2 = 1; // GPT5 GTADTR バッファ動作禁止
-				GPTB::GTBDR.BD5_3 = 1; // GPT5 GTDV バッファ動作禁止 
-				break;
-			case 6:
-				GPTB::GTBDR.BD6_0 = 1; // GPT6 GTCCR バッファ動作禁止
-				GPTB::GTBDR.BD6_1 = 1; // GPT6 GTPR バッファ動作禁止
-				GPTB::GTBDR.BD6_2 = 1; // GPT6 GTADTR バッファ動作禁止
-				GPTB::GTBDR.BD6_3 = 1; // GPT6 GTDV バッファ動作禁止 
-				break;
-			case 7:
-				GPTB::GTBDR.BD7_0 = 1; // GPT7 GTCCR バッファ動作禁止
-				GPTB::GTBDR.BD7_1 = 1; // GPT7 GTPR バッファ動作禁止
-				GPTB::GTBDR.BD7_2 = 1; // GPT7 GTADTR バッファ動作禁止
-				GPTB::GTBDR.BD7_3 = 1; // GPT7 GTDV バッファ動作禁止 
-				break;
+			uint8_t md = 0b000;
+			GPT::GTCR = GPT::GTCR.MD.b(md) | GPT::GTCR.TPCS.b(shift) | GPT::GTCR.CCLR.b(0);
+			GPT::GTPR = pr - 1;
+
+			if(intr > 0) {
+
 			}
 
-			GPT::GTPR = limit;
-			GPT::GTCCRA = 0;
+			GPT::enable();
 
-			// カウント開始
-			switch(ch) {
-			case 0:
-				GPT::GTSTR.CST0 = 1;
-				break;
-			case 1:
-				GPT::GTSTR.CST1 = 1;
-				break;
-			case 2:
-				GPT::GTSTR.CST2 = 1;
-				break;
-			case 3:
-				GPT::GTSTR.CST3 = 1;
-				break;
-			case 4:
-				GPTB::GTSTR.CST4 = 1;
-				break;
-			case 5:
-				GPTB::GTSTR.CST5 = 1;
-				break;
-			case 6:
-				GPTB::GTSTR.CST6 = 1;
-				break;
-			case 7:
-				GPTB::GTSTR.CST7 = 1;
-				break;
-			}
-		}
-#endif
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  周期レジスター設定
-			@param[in]	n	値
-		*/
-		//-----------------------------------------------------------------//
-		void set_r(uint16_t n) {
-			GPT::GTPR = n;
+			return true;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コンペアキャプチャーＡレジスター設定
+			@brief  Ａレジスター設定
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_a(uint16_t n) { GPT::GTCCRA = n; }
+		void set_a(uint16_t n) noexcept { GPT::GTCCRA = n; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コンペアキャプチャーＢレジスター設定
+			@brief  Ｂレジスター設定
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_b(uint16_t n) { GPT::GTCCRB = n; }
+		void set_b(uint16_t n) noexcept { GPT::GTCCRB = n; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コンペアキャプチャーＣレジスター設定
+			@brief  Ｃレジスター設定
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_c(uint16_t n) { GPT::GTCCRC = n; }
+		void set_c(uint16_t n) noexcept { GPT::GTCCRC = n; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コンペアキャプチャーＤレジスター設定
+			@brief  Ｄレジスター設定
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_d(uint16_t n) { GPT::GTCCRD = n; }
+		void set_d(uint16_t n) noexcept { GPT::GTCCRD = n; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コンペアキャプチャーＥレジスター設定
+			@brief  Ｅレジスター設定
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_e(uint16_t n) { GPT::GTCCRE = n; }
+		void set_e(uint16_t n) noexcept { GPT::GTCCRE = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -225,7 +185,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_f(uint16_t n) { GPT::GTCCRF = n; }
+		void set_f(uint16_t n) noexcept { GPT::GTCCRF = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -234,7 +194,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_ad_a(uint16_t n) { GPT::GTADTRA = n; }
+		void set_ad_a(uint16_t n) noexcept { GPT::GTADTRA = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -243,7 +203,39 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_ad_b(uint16_t n) { GPT::GTADTRB = n; }
+		void set_ad_b(uint16_t n) noexcept { GPT::GTADTRB = n; }
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	周期を取得
+			@param[in]	real	「true」にした場合、実際に設定された周波数
+			@return 周期
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_rate(bool real = false) const noexcept
+		{
+			if(real) {
+				uint32_t rate = (GPT::PCLK >> GPT::GTCR.TPCS()) / (GPT::PR() + 1);
+				return rate;
+			} else {
+				return freq_;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  停止
+		*/
+		//-----------------------------------------------------------------//
+		void stop() noexcept
+		{
+			GPT::enable(false);
+			port_map_gpt::turn(GPT::PERIPHERAL, port_map_gpt::CHANNEL::A, false, ASEL);
+			port_map_gpt::turn(GPT::PERIPHERAL, port_map_gpt::CHANNEL::B, false, BSEL);
+			power_mgr::turn(GPT::PERIPHERAL, false);
+			freq_ = 0;
+		}
 	};
 }

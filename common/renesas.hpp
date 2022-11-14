@@ -30,6 +30,7 @@
 #include "RX63T/flash.hpp"
 
 #include "RX63T/system_io.hpp"
+#include "common/gpt_io.hpp"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/lvd.hpp"

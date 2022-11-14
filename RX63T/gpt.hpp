@@ -14,21 +14,22 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GPT タイマ・クラス
+		@brief  GPT タイマクラス (0, 1, 2, 3)
+		@param[in]	base	ベースアドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
+	template <uint32_t base>
 	struct gpt_t {
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマソフトウェアスタートレジスタ (GTSTR)
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct gtstr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template <uint32_t ofs>
+		struct gtstr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -39,19 +40,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  CST2;
 			bit_rw_t<io_, bitpos::B3>  CST3;
 		};
-		typedef gtstr_t<0x000C'2000> GTSTR_;
+		typedef gtstr_t<base + 0x00> GTSTR_;
 		static  GTSTR_ GTSTR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマハードウェア要因スタート / ストップ制御レジスタ（GTHSCR）
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gthscr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gthscr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -66,19 +67,19 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2>  CPHW2;
 			bits_rw_t<io_, bitpos::B14, 2>  CPHW3;
 		};
-		typedef gthscr_t<0x000C'2004> GTHSCR_;
+		typedef gthscr_t<base + 0x04> GTHSCR_;
 		static  GTHSCR_ GTHSCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマハードウェア要因クリア制御レジスタ（GTHCCR）
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gthccr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gthccr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -93,19 +94,19 @@ namespace device {
 			bit_rw_t <io_, bitpos::B10>    CCSW2;
 			bit_rw_t <io_, bitpos::B11>    CCSW3;
 		};
-		typedef gthccr_t<0x000C'2006> GTHCCR_;
+		typedef gthccr_t<base + 0x06> GTHCCR_;
 		static  GTHCCR_ GTHCCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマハードウェアスタート要因セレクトレジスタ (GTHSSR)
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gthssr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gthssr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -116,19 +117,19 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4>  CSHSL2;
 			bits_rw_t<io_, bitpos::B12, 4>  CSHSL3;
 		};
-		typedef gthssr_t<0x000C'2008> GTHSSR_;
+		typedef gthssr_t<base + 0x08> GTHSSR_;
 		static  GTHSSR_ GTHSSR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマハードウェアストップ / クリア要因セレクトレジスタ（GTHPSR）
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gthpsr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gthpsr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -139,19 +140,19 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4>  CSHPL2;
 			bits_rw_t<io_, bitpos::B12, 4>  CSHPL3;
 		};
-		typedef gthpsr_t<0x000C'200A> GTHPSR_;
+		typedef gthpsr_t<base + 0x0A> GTHPSR_;
 		static  GTHPSR_ GTHPSR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマ書き込み保護レジスタ (GTWP)
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gtwp_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gtwp_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -162,19 +163,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>   WP2;
 			bit_rw_t<io_, bitpos::B3>   WP3;
 		};
-		typedef gtwp_t<0x000C'200C> GTWP_;
+		typedef gtwp_t<base + 0x0C> GTWP_;
 		static  GTWP_ GTWP;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマシンクロレジスタ (GTSYNC)
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gtsync_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gtsync_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -185,19 +186,19 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  2>  SYNC2;
 			bits_rw_t<io_, bitpos::B12, 2>  SYNC3;
 		};
-		typedef gtsync_t<0x000C'200E> GTSYNC_;
+		typedef gtsync_t<base + 0x0E> GTSYNC_;
 		static  GTSYNC_ GTSYNC;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマ外部トリガ入力割り込みレジスタ (GTETINT)
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gtetint_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gtetint_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -209,19 +210,19 @@ namespace device {
 			bit_rw_t< io_, bitpos::B8>      ETIPF;
 			bit_rw_t< io_, bitpos::B9>      ETINF;
 		};
-		typedef gtetint_t<0x000C'2010> GTETINT_;
+		typedef gtetint_t<base + 0x10> GTETINT_;
 		static  GTETINT_ GTETINT;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマバッファ動作禁止レジスタ (GTBDR)
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gtbdr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gtbdr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -244,19 +245,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14>   BD32;
 			bit_rw_t<io_, bitpos::B15>   BD33;
 		};
-		typedef gtbdr_t<0x000C'2014> GTBDR_;
+		typedef gtbdr_t<base + 0x14> GTBDR_;
 		static  GTBDR_ GTBDR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマスタート書き込み保護レジスタ (GTSWP)
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct gtswp_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct gtswp_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -267,19 +268,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  SWP2;
 			bit_rw_t<io_, bitpos::B3>  SWP3;
 		};
-		typedef gtswp_t<0x000C'2018> GTSWP_;
+		typedef gtswp_t<base + 0x18> GTSWP_;
 		static  GTSWP_ GTSWP;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウントコントロールレジスタ（LCCR）
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct lccr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct lccr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -298,19 +299,19 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> TPSC;
 			bits_rw_t<io_, bitpos::B14, 2> LPSC;
 		};
-		typedef lccr_t<0x000C'2080> LCCR_;
+		typedef lccr_t<base + 0x80> LCCR_;
 		static LCCR_ LCCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウントステータスレジスタ（LCST）
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		template<uint32_t base>
-		struct lcst_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template<uint32_t ofs>
+		struct lcst_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -320,250 +321,525 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  LISD;
 			bit_rw_t<io_, bitpos::B2>  LISO;
 		};
-		typedef lcst_t<0x000C'2082> LCST_;
+		typedef lcst_t<base + 0x82> LCST_;
 		static LCST_ LCST;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウント値レジスタ（LCNT）
-			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C'2084> LCNT_;
+		typedef rw16_t<base + 84> LCNT_;
 		static LCNT_ LCNT;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウント結果平均レジスタ（LCNTA）
-			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C'2086> LCNTA_;
+		typedef rw16_t<base + 0x86> LCNTA_;
 		static LCNTA_ LCNTA;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウント結果レジスタ n（LCNTn）(n=00 ～ 15) 
-			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C'2088> LCNT00_;
+		typedef rw16_t<base + 0x88> LCNT00_;
 		static LCNT00_ LCNT00;
-		typedef rw16_t<0x000C'208A> LCNT01_;
+		typedef rw16_t<base + 0x8A> LCNT01_;
 		static LCNT01_ LCNT01;
-		typedef rw16_t<0x000C'208C> LCNT02_;
+		typedef rw16_t<base + 0x8C> LCNT02_;
 		static LCNT02_ LCNT02;
-		typedef rw16_t<0x000C'208E> LCNT03_;
+		typedef rw16_t<base + 0x8E> LCNT03_;
 		static LCNT03_ LCNT03;
-		typedef rw16_t<0x000C'2090> LCNT04_;
+		typedef rw16_t<base + 0x90> LCNT04_;
 		static LCNT04_ LCNT04;
-		typedef rw16_t<0x000C'2092> LCNT05_;
+		typedef rw16_t<base + 0x92> LCNT05_;
 		static LCNT05_ LCNT05;
-		typedef rw16_t<0x000C'2094> LCNT06_;
+		typedef rw16_t<base + 0x94> LCNT06_;
 		static LCNT06_ LCNT06;
-		typedef rw16_t<0x000C'2096> LCNT07_;
+		typedef rw16_t<base + 0x96> LCNT07_;
 		static LCNT07_ LCNT07;
-		typedef rw16_t<0x000C'2098> LCNT08_;
+		typedef rw16_t<base + 0x98> LCNT08_;
 		static LCNT08_ LCNT08;
-		typedef rw16_t<0x000C'209A> LCNT09_;
+		typedef rw16_t<base + 0x9A> LCNT09_;
 		static LCNT09_ LCNT09;
-		typedef rw16_t<0x000C'209C> LCNT10_;
+		typedef rw16_t<base + 0x9C> LCNT10_;
 		static LCNT10_ LCNT10;
-		typedef rw16_t<0x000C'209E> LCNT11_;
+		typedef rw16_t<base + 0x9E> LCNT11_;
 		static LCNT11_ LCNT11;
-		typedef rw16_t<0x000C'20A0> LCNT12_;
+		typedef rw16_t<base + 0xA0> LCNT12_;
 		static LCNT12_ LCNT12;
-		typedef rw16_t<0x000C'20A2> LCNT13_;
+		typedef rw16_t<base + 0xA2> LCNT13_;
 		static LCNT13_ LCNT13;
-		typedef rw16_t<0x000C'20A4> LCNT14_;
+		typedef rw16_t<base + 0xA4> LCNT14_;
 		static LCNT14_ LCNT14;
-		typedef rw16_t<0x000C'20A6> LCNT15_;
+		typedef rw16_t<base + 0xA6> LCNT15_;
 		static LCNT15_ LCNT15;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウント上限／下限許容偏差値レジスタ（LCNTDU、LCNTDL）
-			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C'20A8> LCNTDU_;
+		typedef rw16_t<base + 0xA8> LCNTDU_;
 		static LCNTDU_ LCNTDU;
-		typedef rw16_t<0x000C'20AA> LCNTDL_;
+		typedef rw16_t<base + 0xAA> LCNTDL_;
 		static LCNTDL_ LCNTDL;
 	};
-	template <class _> typename gpt_t<_>::GTSTR_ gpt_t<_>::GTSTR;
-	template <class _> typename gpt_t<_>::GTHSCR_ gpt_t<_>::GTHSCR;
-	template <class _> typename gpt_t<_>::GTHCCR_ gpt_t<_>::GTHCCR;
-	template <class _> typename gpt_t<_>::GTHSSR_ gpt_t<_>::GTHSSR;
-	template <class _> typename gpt_t<_>::GTHPSR_ gpt_t<_>::GTHPSR;
-	template <class _> typename gpt_t<_>::GTWP_ gpt_t<_>::GTWP;
-	template <class _> typename gpt_t<_>::GTSYNC_ gpt_t<_>::GTSYNC;
-	template <class _> typename gpt_t<_>::GTETINT_ gpt_t<_>::GTETINT;
-	template <class _> typename gpt_t<_>::GTBDR_ gpt_t<_>::GTBDR;
-	template <class _> typename gpt_t<_>::GTSWP_ gpt_t<_>::GTSWP;
-	template <class _> typename gpt_t<_>::LCCR_ gpt_t<_>::LCCR;
-	template <class _> typename gpt_t<_>::LCNT_ gpt_t<_>::LCNT;
-	template <class _> typename gpt_t<_>::LCNTA_ gpt_t<_>::LCNTA;
-	template <class _> typename gpt_t<_>::LCNT00_ gpt_t<_>::LCNT00;
-	template <class _> typename gpt_t<_>::LCNT01_ gpt_t<_>::LCNT01;
-	template <class _> typename gpt_t<_>::LCNT02_ gpt_t<_>::LCNT02;
-	template <class _> typename gpt_t<_>::LCNT03_ gpt_t<_>::LCNT03;
-	template <class _> typename gpt_t<_>::LCNT04_ gpt_t<_>::LCNT04;
-	template <class _> typename gpt_t<_>::LCNT05_ gpt_t<_>::LCNT05;
-	template <class _> typename gpt_t<_>::LCNT06_ gpt_t<_>::LCNT06;
-	template <class _> typename gpt_t<_>::LCNT07_ gpt_t<_>::LCNT07;
-	template <class _> typename gpt_t<_>::LCNT08_ gpt_t<_>::LCNT08;
-	template <class _> typename gpt_t<_>::LCNT09_ gpt_t<_>::LCNT09;
-	template <class _> typename gpt_t<_>::LCNT10_ gpt_t<_>::LCNT10;
-	template <class _> typename gpt_t<_>::LCNT11_ gpt_t<_>::LCNT11;
-	template <class _> typename gpt_t<_>::LCNT12_ gpt_t<_>::LCNT12;
-	template <class _> typename gpt_t<_>::LCNT13_ gpt_t<_>::LCNT13;
-	template <class _> typename gpt_t<_>::LCNT14_ gpt_t<_>::LCNT14;
-	template <class _> typename gpt_t<_>::LCNT15_ gpt_t<_>::LCNT15;
-	template <class _> typename gpt_t<_>::LCNTDU_ gpt_t<_>::LCNTDU;
-	template <class _> typename gpt_t<_>::LCNTDL_ gpt_t<_>::LCNTDL;
+	template <uint32_t base> typename gpt_t<base>::GTSTR_ gpt_t<base>::GTSTR;
+	template <uint32_t base> typename gpt_t<base>::GTHSCR_ gpt_t<base>::GTHSCR;
+	template <uint32_t base> typename gpt_t<base>::GTHCCR_ gpt_t<base>::GTHCCR;
+	template <uint32_t base> typename gpt_t<base>::GTHSSR_ gpt_t<base>::GTHSSR;
+	template <uint32_t base> typename gpt_t<base>::GTHPSR_ gpt_t<base>::GTHPSR;
+	template <uint32_t base> typename gpt_t<base>::GTWP_ gpt_t<base>::GTWP;
+	template <uint32_t base> typename gpt_t<base>::GTSYNC_ gpt_t<base>::GTSYNC;
+	template <uint32_t base> typename gpt_t<base>::GTETINT_ gpt_t<base>::GTETINT;
+	template <uint32_t base> typename gpt_t<base>::GTBDR_ gpt_t<base>::GTBDR;
+	template <uint32_t base> typename gpt_t<base>::GTSWP_ gpt_t<base>::GTSWP;
+	template <uint32_t base> typename gpt_t<base>::LCCR_ gpt_t<base>::LCCR;
+	template <uint32_t base> typename gpt_t<base>::LCNT_ gpt_t<base>::LCNT;
+	template <uint32_t base> typename gpt_t<base>::LCNTA_ gpt_t<base>::LCNTA;
+	template <uint32_t base> typename gpt_t<base>::LCNT00_ gpt_t<base>::LCNT00;
+	template <uint32_t base> typename gpt_t<base>::LCNT01_ gpt_t<base>::LCNT01;
+	template <uint32_t base> typename gpt_t<base>::LCNT02_ gpt_t<base>::LCNT02;
+	template <uint32_t base> typename gpt_t<base>::LCNT03_ gpt_t<base>::LCNT03;
+	template <uint32_t base> typename gpt_t<base>::LCNT04_ gpt_t<base>::LCNT04;
+	template <uint32_t base> typename gpt_t<base>::LCNT05_ gpt_t<base>::LCNT05;
+	template <uint32_t base> typename gpt_t<base>::LCNT06_ gpt_t<base>::LCNT06;
+	template <uint32_t base> typename gpt_t<base>::LCNT07_ gpt_t<base>::LCNT07;
+	template <uint32_t base> typename gpt_t<base>::LCNT08_ gpt_t<base>::LCNT08;
+	template <uint32_t base> typename gpt_t<base>::LCNT09_ gpt_t<base>::LCNT09;
+	template <uint32_t base> typename gpt_t<base>::LCNT10_ gpt_t<base>::LCNT10;
+	template <uint32_t base> typename gpt_t<base>::LCNT11_ gpt_t<base>::LCNT11;
+	template <uint32_t base> typename gpt_t<base>::LCNT12_ gpt_t<base>::LCNT12;
+	template <uint32_t base> typename gpt_t<base>::LCNT13_ gpt_t<base>::LCNT13;
+	template <uint32_t base> typename gpt_t<base>::LCNT14_ gpt_t<base>::LCNT14;
+	template <uint32_t base> typename gpt_t<base>::LCNT15_ gpt_t<base>::LCNT15;
+	template <uint32_t base> typename gpt_t<base>::LCNTDU_ gpt_t<base>::LCNTDU;
+	template <uint32_t base> typename gpt_t<base>::LCNTDL_ gpt_t<base>::LCNTDL;
 
-	typedef gpt_t<void> GPT;
+	typedef gpt_t<0x000C'2000> GPT;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GPT タイマ・クラス
+		@brief  GPTB タイマクラス (4, 5, 6, 7)
+		@param[in]	base	ベースアドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
+	template <uint32_t base>
 	struct gptb_t {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  汎用 PWM タイマ外部トリガ入力割り込みレジスタ (GTETINT)
-			@param[in]	base	ベースアドレス
+			@brief  汎用 PWM タイマソフトウェアスタートレジスタ (GTSTR)
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef GPT::gtetint_t<0x000C'2010> GTETINT_;
+		template <uint32_t ofs>
+		struct gtstr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  CST4;
+			bit_rw_t<io_, bitpos::B1>  CST5;
+			bit_rw_t<io_, bitpos::B2>  CST6;
+			bit_rw_t<io_, bitpos::B3>  CST7;
+		};
+		typedef gtstr_t<base + 0x00> GTSTR_;
+		static  GTSTR_ GTSTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマハードウェア要因スタート / ストップ制御レジスタ（GTHSCR）
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct gthscr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2>  CSHW4;
+			bits_rw_t<io_, bitpos::B2,  2>  CSHW5;
+			bits_rw_t<io_, bitpos::B4,  2>  CSHW6;
+			bits_rw_t<io_, bitpos::B6,  2>  CSHW7;
+			bits_rw_t<io_, bitpos::B8,  2>  CPHW4;
+			bits_rw_t<io_, bitpos::B10, 2>  CPHW5;
+			bits_rw_t<io_, bitpos::B12, 2>  CPHW6;
+			bits_rw_t<io_, bitpos::B14, 2>  CPHW7;
+		};
+		typedef gthscr_t<base + 0x04> GTHSCR_;
+		static  GTHSCR_ GTHSCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマハードウェア要因クリア制御レジスタ（GTHCCR）
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct gthccr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>  CCHW4;
+			bits_rw_t<io_, bitpos::B2, 2>  CCHW5;
+			bits_rw_t<io_, bitpos::B4, 2>  CCHW6;
+			bits_rw_t<io_, bitpos::B6, 2>  CCHW7;
+			bit_rw_t <io_, bitpos::B8>     CCSW4;
+			bit_rw_t <io_, bitpos::B9>     CCSW5;
+			bit_rw_t <io_, bitpos::B10>    CCSW6;
+			bit_rw_t <io_, bitpos::B11>    CCSW7;
+		};
+		typedef gthccr_t<base + 0x06> GTHCCR_;
+		static  GTHCCR_ GTHCCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマハードウェアスタート要因セレクトレジスタ (GTHSSR)
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct gthssr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  4>  CSHSL4;
+			bits_rw_t<io_, bitpos::B4,  4>  CSHSL5;
+			bits_rw_t<io_, bitpos::B8,  4>  CSHSL6;
+			bits_rw_t<io_, bitpos::B12, 4>  CSHSL7;
+		};
+		typedef gthssr_t<base + 0x08> GTHSSR_;
+		static  GTHSSR_ GTHSSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマハードウェアストップ / クリア要因セレクトレジスタ（GTHPSR）
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct gthpsr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  4>  CSHPL4;
+			bits_rw_t<io_, bitpos::B4,  4>  CSHPL5;
+			bits_rw_t<io_, bitpos::B8,  4>  CSHPL6;
+			bits_rw_t<io_, bitpos::B12, 4>  CSHPL7;
+		};
+		typedef gthpsr_t<base + 0x0A> GTHPSR_;
+		static  GTHPSR_ GTHPSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマ書き込み保護レジスタ (GTWP)
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct gtwp_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   WP4;
+			bit_rw_t<io_, bitpos::B1>   WP5;
+			bit_rw_t<io_, bitpos::B2>   WP6;
+			bit_rw_t<io_, bitpos::B3>   WP7;
+		};
+		typedef gtwp_t<base + 0x0C> GTWP_;
+		static  GTWP_ GTWP;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマシンクロレジスタ (GTSYNC)
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct gtsync_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2>  SYNC4;
+			bits_rw_t<io_, bitpos::B4,  2>  SYNC5;
+			bits_rw_t<io_, bitpos::B8,  2>  SYNC6;
+			bits_rw_t<io_, bitpos::B12, 2>  SYNC7;
+		};
+		typedef gtsync_t<base + 0x0E> GTSYNC_;
+		static  GTSYNC_ GTSYNC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマ外部トリガ入力割り込みレジスタ (GTETINT)
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct gtetint_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t< io_, bitpos::B0>      ETIPEN;
+			bit_rw_t< io_, bitpos::B1>      ETINEN;
+
+			bit_rw_t< io_, bitpos::B8>      ETIPF;
+			bit_rw_t< io_, bitpos::B9>      ETINF;
+		};
+		typedef gtetint_t<base + 0x10> GTETINT_;
 		static  GTETINT_ GTETINT;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  LOCO カウントコントロールレジスタ（LCCR）
-			@param[in]	base	ベースアドレス
+			@brief  汎用 PWM タイマバッファ動作禁止レジスタ (GTBDR)
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef GPT::lccr_t<0x000C'2880> LCCR_;
+		template<uint32_t ofs>
+		struct gtbdr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>    BD40;
+			bit_rw_t<io_, bitpos::B1>    BD41;
+			bit_rw_t<io_, bitpos::B2>    BD42;
+			bit_rw_t<io_, bitpos::B3>    BD43;
+			bit_rw_t<io_, bitpos::B4>    BD50;
+			bit_rw_t<io_, bitpos::B5>    BD51;
+			bit_rw_t<io_, bitpos::B6>    BD52;
+			bit_rw_t<io_, bitpos::B7>    BD53;
+			bit_rw_t<io_, bitpos::B8>    BD60;
+			bit_rw_t<io_, bitpos::B9>    BD61;
+			bit_rw_t<io_, bitpos::B10>   BD62;
+			bit_rw_t<io_, bitpos::B11>   BD63;
+			bit_rw_t<io_, bitpos::B12>   BD70;
+			bit_rw_t<io_, bitpos::B13>   BD71;
+			bit_rw_t<io_, bitpos::B14>   BD72;
+			bit_rw_t<io_, bitpos::B15>   BD73;
+		};
+		typedef gtbdr_t<base + 0x14> GTBDR_;
+		static  GTBDR_ GTBDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマスタート書き込み保護レジスタ (GTSWP)
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct gtswp_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  SWP4;
+			bit_rw_t<io_, bitpos::B1>  SWP5;
+			bit_rw_t<io_, bitpos::B2>  SWP6;
+			bit_rw_t<io_, bitpos::B3>  SWP7;
+		};
+		typedef gtswp_t<base + 0x18> GTSWP_;
+		static  GTSWP_ GTSWP;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウントコントロールレジスタ（LCCR）
+			@param[in]	ofs		オフセットアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template<uint32_t ofs>
+		struct lccr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     LCNTE;
+			bit_rw_t <io_, bitpos::B1>     LCNTCR;
+			bit_rw_t <io_, bitpos::B2>     LCNTS;
+
+			bit_rw_t <io_, bitpos::B4>     LCINTC;
+			bit_rw_t <io_, bitpos::B5>     LCINTD;
+			bit_rw_t <io_, bitpos::B6>     LCINTO;
+
+			bits_rw_t<io_, bitpos::B8, 3>  LCTO;
+			bit_rw_t <io_, bitpos::B11>    LCNTAT;
+			bits_rw_t<io_, bitpos::B12, 2> TPSC;
+			bits_rw_t<io_, bitpos::B14, 2> LPSC;
+		};
+		typedef lccr_t<base + 0x80> LCCR_;
 		static LCCR_ LCCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウントステータスレジスタ（LCST）
-			@param[in]	base	ベースアドレス
+			@param[in]	ofs		オフセットアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef GPT::lcst_t<0x000C'2882> LCST_;
+		template<uint32_t ofs>
+		struct lcst_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  LISC;
+			bit_rw_t<io_, bitpos::B1>  LISD;
+			bit_rw_t<io_, bitpos::B2>  LISO;
+		};
+		typedef lcst_t<base + 0x82> LCST_;
 		static LCST_ LCST;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウント値レジスタ（LCNT）
-			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C'2884> LCNT_;
+		typedef rw16_t<base + 84> LCNT_;
 		static LCNT_ LCNT;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウント結果平均レジスタ（LCNTA）
-			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C'2886> LCNTA_;
+		typedef rw16_t<base + 0x86> LCNTA_;
 		static LCNTA_ LCNTA;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウント結果レジスタ n（LCNTn）(n=00 ～ 15) 
-			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C'2888> LCNT00_;
+		typedef rw16_t<base + 0x88> LCNT00_;
 		static LCNT00_ LCNT00;
-		typedef rw16_t<0x000C'288A> LCNT01_;
+		typedef rw16_t<base + 0x8A> LCNT01_;
 		static LCNT01_ LCNT01;
-		typedef rw16_t<0x000C'288C> LCNT02_;
+		typedef rw16_t<base + 0x8C> LCNT02_;
 		static LCNT02_ LCNT02;
-		typedef rw16_t<0x000C'288E> LCNT03_;
+		typedef rw16_t<base + 0x8E> LCNT03_;
 		static LCNT03_ LCNT03;
-		typedef rw16_t<0x000C'2890> LCNT04_;
+		typedef rw16_t<base + 0x90> LCNT04_;
 		static LCNT04_ LCNT04;
-		typedef rw16_t<0x000C'2892> LCNT05_;
+		typedef rw16_t<base + 0x92> LCNT05_;
 		static LCNT05_ LCNT05;
-		typedef rw16_t<0x000C'2894> LCNT06_;
+		typedef rw16_t<base + 0x94> LCNT06_;
 		static LCNT06_ LCNT06;
-		typedef rw16_t<0x000C'2896> LCNT07_;
+		typedef rw16_t<base + 0x96> LCNT07_;
 		static LCNT07_ LCNT07;
-		typedef rw16_t<0x000C'2898> LCNT08_;
+		typedef rw16_t<base + 0x98> LCNT08_;
 		static LCNT08_ LCNT08;
-		typedef rw16_t<0x000C'289A> LCNT09_;
+		typedef rw16_t<base + 0x9A> LCNT09_;
 		static LCNT09_ LCNT09;
-		typedef rw16_t<0x000C'289C> LCNT10_;
+		typedef rw16_t<base + 0x9C> LCNT10_;
 		static LCNT10_ LCNT10;
-		typedef rw16_t<0x000C'289E> LCNT11_;
+		typedef rw16_t<base + 0x9E> LCNT11_;
 		static LCNT11_ LCNT11;
-		typedef rw16_t<0x000C'28A0> LCNT12_;
+		typedef rw16_t<base + 0xA0> LCNT12_;
 		static LCNT12_ LCNT12;
-		typedef rw16_t<0x000C'28A2> LCNT13_;
+		typedef rw16_t<base + 0xA2> LCNT13_;
 		static LCNT13_ LCNT13;
-		typedef rw16_t<0x000C'28A4> LCNT14_;
+		typedef rw16_t<base + 0xA4> LCNT14_;
 		static LCNT14_ LCNT14;
-		typedef rw16_t<0x000C'28A6> LCNT15_;
+		typedef rw16_t<base + 0xA6> LCNT15_;
 		static LCNT15_ LCNT15;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  LOCO カウント上限／下限許容偏差値レジスタ（LCNTDU、LCNTDL）
-			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x000C'28A8> LCNTDU_;
+		typedef rw16_t<base + 0xA8> LCNTDU_;
 		static LCNTDU_ LCNTDU;
-		typedef rw16_t<0x000C'28AA> LCNTDL_;
+		typedef rw16_t<base + 0xAA> LCNTDL_;
 		static LCNTDL_ LCNTDL;
 	};
-	template <class _> typename gptb_t<_>::GTETINT_ gptb_t<_>::GTETINT;
-	template <class _> typename gptb_t<_>::LCCR_ gptb_t<_>::LCCR;
-	template <class _> typename gptb_t<_>::LCST_ gptb_t<_>::LCST;
-	template <class _> typename gptb_t<_>::LCNT_ gptb_t<_>::LCNT;
-	template <class _> typename gptb_t<_>::LCNTA_ gptb_t<_>::LCNTA;
-	template <class _> typename gptb_t<_>::LCNT00_ gptb_t<_>::LCNT00;
-	template <class _> typename gptb_t<_>::LCNT01_ gptb_t<_>::LCNT01;
-	template <class _> typename gptb_t<_>::LCNT02_ gptb_t<_>::LCNT02;
-	template <class _> typename gptb_t<_>::LCNT03_ gptb_t<_>::LCNT03;
-	template <class _> typename gptb_t<_>::LCNT04_ gptb_t<_>::LCNT04;
-	template <class _> typename gptb_t<_>::LCNT05_ gptb_t<_>::LCNT05;
-	template <class _> typename gptb_t<_>::LCNT06_ gptb_t<_>::LCNT06;
-	template <class _> typename gptb_t<_>::LCNT07_ gptb_t<_>::LCNT07;
-	template <class _> typename gptb_t<_>::LCNT08_ gptb_t<_>::LCNT08;
-	template <class _> typename gptb_t<_>::LCNT09_ gptb_t<_>::LCNT09;
-	template <class _> typename gptb_t<_>::LCNT10_ gptb_t<_>::LCNT10;
-	template <class _> typename gptb_t<_>::LCNT11_ gptb_t<_>::LCNT11;
-	template <class _> typename gptb_t<_>::LCNT12_ gptb_t<_>::LCNT12;
-	template <class _> typename gptb_t<_>::LCNT13_ gptb_t<_>::LCNT13;
-	template <class _> typename gptb_t<_>::LCNT14_ gptb_t<_>::LCNT14;
-	template <class _> typename gptb_t<_>::LCNT15_ gptb_t<_>::LCNT15;
-	template <class _> typename gptb_t<_>::LCNTDU_ gptb_t<_>::LCNTDU;
-	template <class _> typename gptb_t<_>::LCNTDL_ gptb_t<_>::LCNTDL;
+	template <uint32_t base> typename gptb_t<base>::GTSTR_ gptb_t<base>::GTSTR;
+	template <uint32_t base> typename gptb_t<base>::GTHSCR_ gptb_t<base>::GTHSCR;
+	template <uint32_t base> typename gptb_t<base>::GTHCCR_ gptb_t<base>::GTHCCR;
+	template <uint32_t base> typename gptb_t<base>::GTHSSR_ gptb_t<base>::GTHSSR;
+	template <uint32_t base> typename gptb_t<base>::GTHPSR_ gptb_t<base>::GTHPSR;
+	template <uint32_t base> typename gptb_t<base>::GTWP_ gptb_t<base>::GTWP;
+	template <uint32_t base> typename gptb_t<base>::GTSYNC_ gptb_t<base>::GTSYNC;
+	template <uint32_t base> typename gptb_t<base>::GTETINT_ gptb_t<base>::GTETINT;
+	template <uint32_t base> typename gptb_t<base>::GTBDR_ gptb_t<base>::GTBDR;
+	template <uint32_t base> typename gptb_t<base>::GTSWP_ gptb_t<base>::GTSWP;
+	template <uint32_t base> typename gptb_t<base>::LCCR_ gptb_t<base>::LCCR;
+	template <uint32_t base> typename gptb_t<base>::LCNT_ gptb_t<base>::LCNT;
+	template <uint32_t base> typename gptb_t<base>::LCNTA_ gptb_t<base>::LCNTA;
+	template <uint32_t base> typename gptb_t<base>::LCNT00_ gptb_t<base>::LCNT00;
+	template <uint32_t base> typename gptb_t<base>::LCNT01_ gptb_t<base>::LCNT01;
+	template <uint32_t base> typename gptb_t<base>::LCNT02_ gptb_t<base>::LCNT02;
+	template <uint32_t base> typename gptb_t<base>::LCNT03_ gptb_t<base>::LCNT03;
+	template <uint32_t base> typename gptb_t<base>::LCNT04_ gptb_t<base>::LCNT04;
+	template <uint32_t base> typename gptb_t<base>::LCNT05_ gptb_t<base>::LCNT05;
+	template <uint32_t base> typename gptb_t<base>::LCNT06_ gptb_t<base>::LCNT06;
+	template <uint32_t base> typename gptb_t<base>::LCNT07_ gptb_t<base>::LCNT07;
+	template <uint32_t base> typename gptb_t<base>::LCNT08_ gptb_t<base>::LCNT08;
+	template <uint32_t base> typename gptb_t<base>::LCNT09_ gptb_t<base>::LCNT09;
+	template <uint32_t base> typename gptb_t<base>::LCNT10_ gptb_t<base>::LCNT10;
+	template <uint32_t base> typename gptb_t<base>::LCNT11_ gptb_t<base>::LCNT11;
+	template <uint32_t base> typename gptb_t<base>::LCNT12_ gptb_t<base>::LCNT12;
+	template <uint32_t base> typename gptb_t<base>::LCNT13_ gptb_t<base>::LCNT13;
+	template <uint32_t base> typename gptb_t<base>::LCNT14_ gptb_t<base>::LCNT14;
+	template <uint32_t base> typename gptb_t<base>::LCNT15_ gptb_t<base>::LCNT15;
+	template <uint32_t base> typename gptb_t<base>::LCNTDU_ gptb_t<base>::LCNTDU;
+	template <uint32_t base> typename gptb_t<base>::LCNTDL_ gptb_t<base>::LCNTDL;
 
-	typedef gptb_t<void> GPTB;
+	typedef gptb_t<0x000C'2800> GPTB;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1008,7 +1284,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GPT 定義クラス (m)
+		@brief  GPT[0123] 定義クラス
 		@param[in]	chno	チャネル番号
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1084,11 +1360,106 @@ namespace device {
 		typedef gtdlyrx_t<0x000C'232A + (chno * 2)> GTDLYFB_;
 		static GTDLYFB_ GTDLYFB;
 	};
-	template <uint32_t base> typename gptm_t<base>::GTDLYCR_ gptm_t<base>::GTDLYCR;
-	template <uint32_t base> typename gptm_t<base>::GTDLYRA_ gptm_t<base>::GTDLYRA;
-	template <uint32_t base> typename gptm_t<base>::GTDLYFA_ gptm_t<base>::GTDLYFA;
-	template <uint32_t base> typename gptm_t<base>::GTDLYRB_ gptm_t<base>::GTDLYRB;
-	template <uint32_t base> typename gptm_t<base>::GTDLYFB_ gptm_t<base>::GTDLYFB;
+	template <uint32_t chno> typename gptm_t<chno>::GTDLYCR_ gptm_t<chno>::GTDLYCR;
+	template <uint32_t chno> typename gptm_t<chno>::GTDLYRA_ gptm_t<chno>::GTDLYRA;
+	template <uint32_t chno> typename gptm_t<chno>::GTDLYFA_ gptm_t<chno>::GTDLYFA;
+	template <uint32_t chno> typename gptm_t<chno>::GTDLYRB_ gptm_t<chno>::GTDLYRB;
+	template <uint32_t chno> typename gptm_t<chno>::GTDLYFB_ gptm_t<chno>::GTDLYFB;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  GPT 共通定義
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct gpt_defs {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タイマハードウェアスタート要因型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GTHSCR_CSHW : uint8_t {
+			NONE,		///< スタートしない
+			POSITIVE,	///< 立上りエッジでスタート
+			NEGATIVE,	///< 立下りエッジでスタート
+			BOSE,		///< 両エッジでスタート
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タイマハードウェアストップ要因型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GTHSCR_CPHW : uint8_t {
+			NONE,		///< スタートしない
+			POSITIVE,	///< 立上りエッジでスタート
+			NEGATIVE,	///< 立下りエッジでスタート
+			BOSE,		///< 両エッジでスタート
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タイマハードウェアクリア要因型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GTHCCR_CCHW : uint8_t {
+			NONE,		///< スタートしない
+			POSITIVE,	///< 立上りエッジでスタート
+			NEGATIVE,	///< 立下りエッジでスタート
+			BOSE,		///< 両エッジでスタート
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タイマハードウェアスタート要因選択型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GTHSSR_CSHSL : uint8_t {
+			AN000 = 0b0000,		///< AN000 コンパレーター検出
+			AN001 = 0b0001,		///< AN001 コンパレーター検出
+			AN002 = 0b0010,		///< AN002 コンパレーター検出
+
+			AN100 = 0b0100,		///< AN100 コンパレーター検出
+			AN101 = 0b0101,		///< AN101 コンパレーター検出
+			AN102 = 0b0110,		///< AN102 コンパレーター検出
+
+			INA   = 0b1000,		///< GTIOC3A 端子入力（GPT[4567]: GTIOC7A）
+			INB   = 0b1001,		///< GTIOC3B 端子入力（GPT[4567]: GTIOC7B）
+
+			OUTA  = 0b1010,		///< GTIOC3A 端子出力（GPT[4567]: GTIOC7A）
+			OUTB  = 0b1011,		///< GTIOC3B 端子出力（GPT[4567]: GTIOC7A）
+
+			TRG0  = 0b1100,		///< GTETRG0 端子入力
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タイマハードウェアストップ要因選択型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GTHPSR_CSHPL : uint8_t {
+			AN000 = 0b0000,		///< AN000 コンパレーター検出
+			AN001 = 0b0001,		///< AN001 コンパレーター検出
+			AN002 = 0b0010,		///< AN002 コンパレーター検出
+
+			AN100 = 0b0100,		///< AN100 コンパレーター検出
+			AN101 = 0b0101,		///< AN101 コンパレーター検出
+			AN102 = 0b0110,		///< AN102 コンパレーター検出
+
+			INA   = 0b1000,		///< GTIOC3A 端子入力（GPT[4567]: GTIOC7A）
+			INB   = 0b1001,		///< GTIOC3B 端子入力（GPT[4567]: GTIOC7B）
+
+			OUTA  = 0b1010,		///< GTIOC3A 端子出力（GPT[4567]: GTIOC7A）
+			OUTB  = 0b1011,		///< GTIOC3B 端子出力（GPT[4567]: GTIOC7A）
+
+			TRG0  = 0b1100,		///< GTETRG0 端子入力
+		};
+	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1107,7 +1478,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, uint32_t chno, peripheral per,
 		ICU::VECTOR veca, ICU::VECTOR vecb, ICU::VECTOR vecc, ICU::VECTOR vece, ICU::VECTOR vecv, ICU::VECTOR veci>
-	struct gpt0123_t : public gptn_t<base>, gptm_t<chno> {
+	struct gpt0123_t : public gpt_defs, GPT, gptn_t<base>, gptm_t<chno> {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 		static constexpr auto CHNO = chno;		///< チャネル番号
@@ -1118,6 +1489,234 @@ namespace device {
 		static constexpr auto GTCIE = vece;		///< GTCIE 割り込みベクター
 		static constexpr auto GTCIV = vecv;		///< GTCIV 割り込みベクター
 		static constexpr auto LOCOI = veci;		///< LOCOI 割り込みベクター
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GPT 開始
+			@param[in]	ena		停止の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true) noexcept
+		{
+			switch(CHNO) {
+			case 0: GTSTR.CST0 = ena; break;
+			case 1: GTSTR.CST1 = ena; break;
+			case 2: GTSTR.CST2 = ena; break;
+			case 3: GTSTR.CST3 = ena; break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマハードウェア要因スタートコントロールレジスタ（GTHSCR）
+			@param[in]	cshw	スタート要因
+			@param[in]	cphw	ストップ要因
+		*/
+		//-----------------------------------------------------------------//
+		static void set(GTHSCR_CSHW cshw, GTHSCR_CPHW cphw) noexcept
+		{
+			switch(CHNO) {
+			case 0:
+				GTHSCR = GTHSCR.CSHW0.b(static_cast<uint8_t>(cshw)) | GTHSCR.CPHW0.b(static_cast<uint8_t>(cphw));
+				break;
+			case 1:
+				GTHSCR = GTHSCR.CSHW1.b(static_cast<uint8_t>(cshw)) | GTHSCR.CPHW1.b(static_cast<uint8_t>(cphw));
+				break;
+			case 2:
+				GTHSCR = GTHSCR.CSHW2.b(static_cast<uint8_t>(cshw)) | GTHSCR.CPHW2.b(static_cast<uint8_t>(cphw));
+				break;
+			case 3:
+				GTHSCR = GTHSCR.CSHW3.b(static_cast<uint8_t>(cshw)) | GTHSCR.CPHW3.b(static_cast<uint8_t>(cphw));
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマハードウェア要因クリアコントロールレジスタ（GTHCCR）
+			@param[in]	cshw	クリア要因
+			@param[in]	ena		クリアを行う場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		static void set(GTHCCR_CCHW cchw, bool ena) noexcept
+		{
+			switch(CHNO) {
+			case 0:
+				GTHCCR = GTHCCR.CCHW0.b(static_cast<uint8_t>(cchw)) | GTHCCR.CCSW0.b(ena);
+				break;
+			case 1:
+				GTHCCR = GTHCCR.CCHW1.b(static_cast<uint8_t>(cchw)) | GTHCCR.CCSW1.b(ena);
+				break;
+			case 2:
+				GTHCCR = GTHCCR.CCHW2.b(static_cast<uint8_t>(cchw)) | GTHCCR.CCSW2.b(ena);
+				break;
+			case 3:
+				GTHCCR = GTHCCR.CCHW3.b(static_cast<uint8_t>(cchw)) | GTHCCR.CCSW3.b(ena);
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマハードウェアスタート要因セレクトレジスタ（GTHSSR）
+			@param[in]	cshsl	スタート要因
+		*/
+		//-----------------------------------------------------------------//
+		static void set(GTHSSR_CSHSL cshsl) noexcept
+		{
+			switch(CHNO) {
+			case 0:
+				GTHSSR.CSHSL0 = static_cast<uint8_t>(cshsl);
+				break;
+			case 1:
+				GTHSSR.CSHSL1 = static_cast<uint8_t>(cshsl);
+				break;
+			case 2:
+				GTHSSR.CSHSL2 = static_cast<uint8_t>(cshsl);
+				break;
+			case 3:
+				GTHSSR.CSHSL3 = static_cast<uint8_t>(cshsl);
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマハードウェアストップ・クリア要因セレクトレジスタ（GTHPSR）
+			@param[in]	cshsl	スタート要因
+		*/
+		//-----------------------------------------------------------------//
+		static void set(GTHPSR_CSHPL cshpl) noexcept
+		{
+			switch(CHNO) {
+			case 0:
+				GTHPSR.CSHPL0 = static_cast<uint8_t>(cshpl);
+				break;
+			case 1:
+				GTHPSR.CSHPL1 = static_cast<uint8_t>(cshpl);
+				break;
+			case 2:
+				GTHPSR.CSHPL2 = static_cast<uint8_t>(cshpl);
+				break;
+			case 3:
+				GTHPSR.CSHPL3 = static_cast<uint8_t>(cshpl);
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマ書き込み保護レジスタ（GTWP）
+			@param[in]	ena		保護の場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		static void write_protect(bool ena = true) noexcept
+		{
+			switch(CHNO) {
+			case 0: GTWP.WP0 = ena; break;
+			case 1: GTWP.WP1 = ena; break;
+			case 2: GTWP.WP2 = ena; break;
+			case 3: GTWP.WP3 = ena; break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマシンクロレジスタ（GTSYNC）
+			@param[in]	ch		同期チャネル（０～３）
+		*/
+		//-----------------------------------------------------------------//
+		static void sync(uint8_t ch) noexcept
+		{
+			switch(CHNO) {
+			case 0: GTSYNC.SYNC0 = ch; break;
+			case 1: GTSYNC.SYNC1 = ch; break;
+			case 2: GTSYNC.SYNC2 = ch; break;
+			case 3: GTSYNC.SYNC3 = ch; break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマバッファ動作禁止レジスタ（GTBDR）
+			@param[in]	ccr		GTCCR  バッファを禁止する場合「true」
+			@param[in]	pr		GTPR   バッファを禁止する場合「true」
+			@param[in]	adtr	GTADTR バッファを禁止する場合「true」
+			@param[in]	dv		GTDV   バッファを禁止する場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		static void buffer_disable(bool ccr, bool pr, bool adtr, bool dv) noexcept
+		{
+			switch(CHNO) {
+			case 0:
+				GTBDR.BD00 = ccr;
+				GTBDR.BD01 = pr;
+				GTBDR.BD02 = adtr;
+				GTBDR.BD03 = dv;
+				break;
+			case 1:
+				GTBDR.BD10 = ccr;
+				GTBDR.BD11 = pr;
+				GTBDR.BD12 = adtr;
+				GTBDR.BD13 = dv;
+				break;
+			case 2:
+				GTBDR.BD20 = ccr;
+				GTBDR.BD21 = pr;
+				GTBDR.BD22 = adtr;
+				GTBDR.BD23 = dv;
+				break;
+			case 3:
+				GTBDR.BD30 = ccr;
+				GTBDR.BD31 = pr;
+				GTBDR.BD32 = adtr;
+				GTBDR.BD33 = dv;
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマスタート書き込み保護レジスタ（GTSWP）
+			@param[in]	ena		保護の場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		static void start_protect(bool ena = true) noexcept
+		{
+			switch(CHNO) {
+			case 0: GTSWP.SWP0 = ena; break;
+			case 1: GTSWP.SWP1 = ena; break;
+			case 2: GTSWP.SWP2 = ena; break;
+			case 3: GTSWP.SWP3 = ena; break;
+			default:
+				break;
+			}
+		}
 	};
 	typedef gpt0123_t<0x000C'2100, 0, peripheral::GPT0,
 		ICU::VECTOR::GTCIA0, ICU::VECTOR::GTCIB0, ICU::VECTOR::GTCIC0, ICU::VECTOR::GTCIE0, ICU::VECTOR::GTCIV0, ICU::VECTOR::LOCOI0> GPT0;
@@ -1145,7 +1744,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, uint32_t chno, peripheral per,
 		ICU::VECTOR veca, ICU::VECTOR vecb, ICU::VECTOR vecc, ICU::VECTOR vece, ICU::VECTOR vecv, ICU::VECTOR veci>
-	struct gpt4567_t : public gptn_t<base> {
+	struct gpt4567_t : public gpt_defs, GPTB, gptn_t<base> {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 		static constexpr auto CHNO = chno;		///< チャネル番号
@@ -1156,13 +1755,241 @@ namespace device {
 		static constexpr auto GTCIE = vece;		///< GTCIE 割り込みベクター
 		static constexpr auto GTCIV = vecv;		///< GTCIV 割り込みベクター
 		static constexpr auto LOCOI = veci;		///< LOCOI 割り込みベクター
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GPT 開始
+			@param[in]	ena		停止の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true) noexcept
+		{
+			switch(CHNO) {
+			case 4: GTSTR.CST4 = ena; break;
+			case 5: GTSTR.CST5 = ena; break;
+			case 6: GTSTR.CST6 = ena; break;
+			case 7: GTSTR.CST7 = ena; break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマハードウェア要因スタートコントロールレジスタ（GTHSCR）
+			@param[in]	cshw	スタート要因
+			@param[in]	cphw	ストップ要因
+		*/
+		//-----------------------------------------------------------------//
+		static void set(GTHSCR_CSHW cshw, GTHSCR_CPHW cphw) noexcept
+		{
+			switch(CHNO) {
+			case 4:
+				GTHSCR = GTHSCR.CSHW4.b(static_cast<uint8_t>(cshw)) | GTHSCR.CPHW4.b(static_cast<uint8_t>(cphw));
+				break;
+			case 5:
+				GTHSCR = GTHSCR.CSHW5.b(static_cast<uint8_t>(cshw)) | GTHSCR.CPHW5.b(static_cast<uint8_t>(cphw));
+				break;
+			case 6:
+				GTHSCR = GTHSCR.CSHW6.b(static_cast<uint8_t>(cshw)) | GTHSCR.CPHW6.b(static_cast<uint8_t>(cphw));
+				break;
+			case 7:
+				GTHSCR = GTHSCR.CSHW7.b(static_cast<uint8_t>(cshw)) | GTHSCR.CPHW7.b(static_cast<uint8_t>(cphw));
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマハードウェア要因クリアコントロールレジスタ（GTHCCR）
+			@param[in]	cshw	クリア要因
+			@param[in]	ena		クリアを行う場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		static void set(GTHCCR_CCHW cchw, bool ena) noexcept
+		{
+			switch(CHNO) {
+			case 4:
+				GTHCCR = GTHCCR.CCHW4.b(static_cast<uint8_t>(cchw)) | GTHCCR.CCSW4.b(ena);
+				break;
+			case 5:
+				GTHCCR = GTHCCR.CCHW5.b(static_cast<uint8_t>(cchw)) | GTHCCR.CCSW5.b(ena);
+				break;
+			case 6:
+				GTHCCR = GTHCCR.CCHW6.b(static_cast<uint8_t>(cchw)) | GTHCCR.CCSW6.b(ena);
+				break;
+			case 7:
+				GTHCCR = GTHCCR.CCHW7.b(static_cast<uint8_t>(cchw)) | GTHCCR.CCSW7.b(ena);
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマハードウェアスタート要因セレクトレジスタ（GTHSSR）
+			@param[in]	cshsl	スタート要因
+		*/
+		//-----------------------------------------------------------------//
+		static void set(GTHSSR_CSHSL cshsl) noexcept
+		{
+			switch(CHNO) {
+			case 4:
+				GTHSSR.CSHSL4 = static_cast<uint8_t>(cshsl);
+				break;
+			case 5:
+				GTHSSR.CSHSL5 = static_cast<uint8_t>(cshsl);
+				break;
+			case 6:
+				GTHSSR.CSHSL6 = static_cast<uint8_t>(cshsl);
+				break;
+			case 7:
+				GTHSSR.CSHSL7 = static_cast<uint8_t>(cshsl);
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマハードウェアストップ・クリア要因セレクトレジスタ（GTHPSR）
+			@param[in]	cshsl	スタート要因
+		*/
+		//-----------------------------------------------------------------//
+		static void set(GTHPSR_CSHPL cshpl) noexcept
+		{
+			switch(CHNO) {
+			case 4:
+				GTHPSR.CSHPL4 = static_cast<uint8_t>(cshpl);
+				break;
+			case 5:
+				GTHPSR.CSHPL5 = static_cast<uint8_t>(cshpl);
+				break;
+			case 6:
+				GTHPSR.CSHPL6 = static_cast<uint8_t>(cshpl);
+				break;
+			case 7:
+				GTHPSR.CSHPL7 = static_cast<uint8_t>(cshpl);
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマシンクロレジスタ（GTSYNC）
+			@param[in]	ch		同期チャネル（４～７）
+		*/
+		//-----------------------------------------------------------------//
+		static void sync(uint8_t ch) noexcept
+		{
+			switch(CHNO) {
+			case 4: GTSYNC.SYNC4 = ch; break;
+			case 5: GTSYNC.SYNC5 = ch; break;
+			case 6: GTSYNC.SYNC6 = ch; break;
+			case 7: GTSYNC.SYNC7 = ch; break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマ書き込み保護レジスタ（GTWP）
+			@param[in]	ena		保護の場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		static void write_protect(bool ena = true) noexcept
+		{
+			switch(CHNO) {
+			case 4: GTWP.WP4 = ena; break;
+			case 5: GTWP.WP5 = ena; break;
+			case 6: GTWP.WP6 = ena; break;
+			case 7: GTWP.WP7 = ena; break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマバッファ動作禁止レジスタ（GTBDR）
+			@param[in]	ccr		GTCCR  バッファを禁止する場合「true」
+			@param[in]	pr		GTPR   バッファを禁止する場合「true」
+			@param[in]	adtr	GTADTR バッファを禁止する場合「true」
+			@param[in]	dv		GTDV   バッファを禁止する場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		static void buffer_disable(bool ccr, bool pr, bool adtr, bool dv) noexcept
+		{
+			switch(CHNO) {
+			case 4:
+				GTBDR.BD40 = ccr;
+				GTBDR.BD41 = pr;
+				GTBDR.BD42 = adtr;
+				GTBDR.BD43 = dv;
+				break;
+			case 5:
+				GTBDR.BD50 = ccr;
+				GTBDR.BD51 = pr;
+				GTBDR.BD52 = adtr;
+				GTBDR.BD53 = dv;
+				break;
+			case 6:
+				GTBDR.BD60 = ccr;
+				GTBDR.BD61 = pr;
+				GTBDR.BD62 = adtr;
+				GTBDR.BD63 = dv;
+				break;
+			case 7:
+				GTBDR.BD70 = ccr;
+				GTBDR.BD71 = pr;
+				GTBDR.BD72 = adtr;
+				GTBDR.BD73 = dv;
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマスタート書き込み保護レジスタ（GTSWP）
+			@param[in]	ena		保護の場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		static void start_protect(bool ena = true) noexcept
+		{
+			switch(CHNO) {
+			case 4: GTSWP.SWP4 = ena; break;
+			case 5: GTSWP.SWP5 = ena; break;
+			case 6: GTSWP.SWP6 = ena; break;
+			case 7: GTSWP.SWP7 = ena; break;
+			default:
+				break;
+			}
+		}
 	};
 	typedef gpt4567_t<0x000C'2900, 4, peripheral::GPT4,
 		ICU::VECTOR::GTCIA4, ICU::VECTOR::GTCIB4, ICU::VECTOR::GTCIC4, ICU::VECTOR::GTCIE4, ICU::VECTOR::GTCIV4, ICU::VECTOR::LOCOI4> GPT4;
-	typedef gpt4567_t<0x000C'2980, 4, peripheral::GPT5,
+	typedef gpt4567_t<0x000C'2980, 5, peripheral::GPT5,
 		ICU::VECTOR::GTCIA5, ICU::VECTOR::GTCIB5, ICU::VECTOR::GTCIC5, ICU::VECTOR::GTCIE5, ICU::VECTOR::GTCIV5, ICU::VECTOR::NONE> GPT5;
-	typedef gpt4567_t<0x000C'2A00, 4, peripheral::GPT6,
+	typedef gpt4567_t<0x000C'2A00, 6, peripheral::GPT6,
 		ICU::VECTOR::GTCIA6, ICU::VECTOR::GTCIB6, ICU::VECTOR::GTCIC6, ICU::VECTOR::GTCIE6, ICU::VECTOR::GTCIV6, ICU::VECTOR::NONE> GPT6;
-	typedef gpt4567_t<0x000C'2A80, 4, peripheral::GPT7,
+	typedef gpt4567_t<0x000C'2A80, 7, peripheral::GPT7,
 		ICU::VECTOR::GTCIA7, ICU::VECTOR::GTCIB7, ICU::VECTOR::GTCIC7, ICU::VECTOR::GTCIE7, ICU::VECTOR::GTCIV7, ICU::VECTOR::NONE> GPT7;
 }

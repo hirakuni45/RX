@@ -19,7 +19,7 @@ namespace device {
 		@brief  MTU 基本クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class mtu_base {
+	class mtu_io_base {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -81,7 +81,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class MTUX, class MTASK = utils::null_task, class OTASK = utils::null_task,
 		port_map_mtu::ORDER PSEL = port_map_mtu::ORDER::FIRST>
-	class mtu_io : public mtu_base {
+	class mtu_io : public mtu_io_base {
 	public:
 
 		typedef MTUX mtu_type;
