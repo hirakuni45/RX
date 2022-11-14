@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  電力制御クラス
+		@brief  RX63T 電力制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class _>
@@ -23,8 +23,8 @@ namespace device {
 
 		struct pad_t {
 
-			uint8_t		gpt0_;
-			uint8_t		gpt1_;
+			uint8_t		gpta_;
+			uint8_t		gptb_;
 
 			uint8_t		mtu_;
 
@@ -35,7 +35,7 @@ namespace device {
 			uint8_t		dpc_;
 
 			pad_t() :
-				gpt0_(0), gpt1_(0),
+				gpta_(0), gptb_(0),
 				mtu_(0),
 
 				cmt_(0),
@@ -85,15 +85,15 @@ namespace device {
 			case peripheral::GPT5:
 			case peripheral::GPT6:
 			case peripheral::GPT7:
-				sr_(ena, pad_.gpt1_, peripheral::GPT4, per);
-				SYSTEM::MSTPCRA.MSTPA6 = (pad_.gpt1_ == 0);
+				sr_(ena, pad_.gptb_, peripheral::GPT4, per);
+				SYSTEM::MSTPCRA.MSTPA6 = (pad_.gptb_ == 0);
 				break;
 			case peripheral::GPT0:
 			case peripheral::GPT1:
 			case peripheral::GPT2:
 			case peripheral::GPT3:
-				sr_(ena, pad_.gpt0_, peripheral::GPT0, per);
-				SYSTEM::MSTPCRA.MSTPA7 = (pad_.gpt0_ == 0);
+				sr_(ena, pad_.gpta_, peripheral::GPT0, per);
+				SYSTEM::MSTPCRA.MSTPA7 = (pad_.gpta_ == 0);
 				break;
 
 			case peripheral::MTU0:
