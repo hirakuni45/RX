@@ -121,11 +121,12 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA15 = ((pad_.cmt_ & 0b0011) == 0);
 				break;
 
-			case peripheral::S12AD1:
+			case peripheral::S12ADB1:
 				SYSTEM::MSTPCRA.MSTPA16 = f;
 				SYSTEM::MSTPCRA.MSTPA24 = f;
 				break;
-			case peripheral::S12AD:
+			case peripheral::S12ADB:
+			case peripheral::S12ADB0:
 				SYSTEM::MSTPCRA.MSTPA17 = f;
 				SYSTEM::MSTPCRA.MSTPA24 = f;
 				break;

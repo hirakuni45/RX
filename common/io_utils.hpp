@@ -22,7 +22,7 @@ namespace device {
 		@param[in]	data	書き込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	inline void wr8_(address_type adr, uint8_t data) {
+	inline void wr8_(address_type adr, uint8_t data) noexcept {
 		*reinterpret_cast<volatile uint8_t*>(adr) = data;
 	}
 
@@ -34,7 +34,7 @@ namespace device {
 		@param[in]	data	読み込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	inline uint8_t rd8_(address_type adr) {
+	inline uint8_t rd8_(address_type adr) noexcept {
 		return *reinterpret_cast<volatile uint8_t*>(adr);
 	}
 
@@ -46,7 +46,7 @@ namespace device {
 		@param[in]	data	書き込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	inline void wr16_(address_type adr, uint16_t data) {
+	inline void wr16_(address_type adr, uint16_t data) noexcept {
 		*reinterpret_cast<volatile uint16_t*>(adr) = data;
 	}
 
@@ -58,7 +58,7 @@ namespace device {
 		@param[in]	data	読み込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	inline uint16_t rd16_(address_type adr) {
+	inline uint16_t rd16_(address_type adr) noexcept {
 		return *reinterpret_cast<volatile uint16_t*>(adr);
 	}
 
@@ -70,7 +70,7 @@ namespace device {
 		@param[in]	data	書き込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	inline void wr32_(address_type adr, uint32_t data) {
+	inline void wr32_(address_type adr, uint32_t data) noexcept {
 		*reinterpret_cast<volatile uint32_t*>(adr) = data;
 	}
 
@@ -82,7 +82,7 @@ namespace device {
 		@param[in]	data	読み込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	inline uint32_t rd32_(address_type adr) {
+	inline uint32_t rd32_(address_type adr) noexcept {
 		return *reinterpret_cast<volatile uint32_t*>(adr);
 	}
 
