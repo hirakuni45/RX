@@ -252,8 +252,8 @@ namespace device {
 		typedef adans_t<base + 0x04> ADANS_;
 		static  ADANS_ ADANS;
 	};
-	 template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADDR_  s12ad_t<base, per>::ADDR;
-	 template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADANS_ s12ad_t<base, per>::ADANS;
+	template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADDR_  s12ad_t<base, per>::ADDR;
+	template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADANS_ s12ad_t<base, per>::ADANS;
 
-	typedef s12ad_t<0x00089000, peripheral::S12AD>  S12AD;
+	typedef s12ad_t<0x0008'9000, peripheral::S12AD>  S12AD;
 }
