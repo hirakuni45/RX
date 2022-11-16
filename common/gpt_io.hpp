@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・GPT I/O 制御
+	@brief	RX グループ GPT 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,10 +15,21 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GPT 基本クラス
+		@brief  GPT 定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct gpt_io_base {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  動作型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class TYPE : uint8_t {
+			NORMAL,		///< 標準型
+			BUFFER,		///< A/B バッファー動作
+		};
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -39,19 +50,26 @@ namespace device {
 		@param[in]	GPT		GPTx デバイス・クラス
 		@param[in]	ASEL	GTIOA ポートオーダー
 		@param[in]	BSEL	GTIOB ポートオーダー
+		@param[in]	TASK	GTPR 割り込みタスク（ファンクタ）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class GPT,
 		port_map_gpt::ORDER ASEL = port_map_gpt::ORDER::FIRST,
-		port_map_gpt::ORDER BSEL = port_map_gpt::ORDER::FIRST>
+		port_map_gpt::ORDER BSEL = port_map_gpt::ORDER::FIRST,
+		class TASK = utils::null_task>
 	class gpt_io : public gpt_io_base {
-	public:
-		typedef typename GPT::CHANNEL CHANNEL;
 
-	private:
-//		MTASK		mtask_;
+		static TASK		task_;
 
 		uint32_t	freq_;
+
+		uint8_t		intr_lvl_;
+		ICU::VECTOR	intr_vec_;
+
+		static INTERRUPT_FUNC void pr_task_()
+		{
+			task_();
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -59,12 +77,16 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		gpt_io() noexcept : freq_(0) { }
+		gpt_io() noexcept :
+			freq_(0),
+			intr_lvl_(0), intr_vec_(ICU::VECTOR::NONE)
+		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  有効ビットに対する周波数を求める
+			@brief  有効ビットに対する周波数を求める @n
+					Ex: bits_to_freq(10);  // 10 ビット(1024 分周)に対する周波数
 			@param[in]	bits	有効ビット数
 			@return	周波数
 		*/
@@ -78,6 +100,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始 (PWM)
+			@param[in]	type	動作型
 			@param[in]	freq	PWM 周波数[Hz]
 			@param[in]	outa	A 出力タイプ
 			@param[in]	outb	B 出力タイプ
@@ -85,7 +108,7 @@ namespace device {
 			@return エラーが無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, OUTPUT outa, OUTPUT outb, uint8_t intr = 0) noexcept
+		bool start(TYPE type, uint32_t freq, OUTPUT outa, OUTPUT outb, uint8_t intr = 0) noexcept
 		{
 			uint32_t pr = GPT::PCLK / freq;
 			uint8_t shift = 0;
@@ -111,21 +134,28 @@ namespace device {
 				return false;
 			}
 
-			GPT::GTIOR.GTIOA = static_cast<uint8_t>(outa);
-			GPT::GTONCR = GPT::GTONCR.OAE.b(ena);
-			GPT::GTCCRA = 0;
-			GPT::GTIOR.GTIOB = static_cast<uint8_t>(outb);
-			GPT::GTONCR = GPT::GTONCR.OBE.b(enb);
-			GPT::GTCCRB = 0;
-
-			GPT::GTUDC = GPT::GTUDC.UD.b() | GPT::GTUDC.UDF.b(); // UP カウント設定
+			GPT::GTUDC = 3;
+			GPT::GTUDC = 1; // UP カウント設定
 
 			uint8_t md = 0b000;
 			GPT::GTCR = GPT::GTCR.MD.b(md) | GPT::GTCR.TPCS.b(shift) | GPT::GTCR.CCLR.b(0);
 			GPT::GTPR = pr - 1;
+			GPT::GTCNT = 0;
+			GPT::GTCCRA = 0;
+			GPT::GTCCRB = 0;
+
+			GPT::GTIOR.GTIOA = static_cast<uint8_t>(outa);
+			GPT::GTIOR.GTIOB = static_cast<uint8_t>(outb);
+			GPT::GTONCR = GPT::GTONCR.OBE.b(enb) | GPT::GTONCR.OAE.b(ena);
 
 			if(intr > 0) {
-
+				intr_lvl_ = intr;
+				intr_vec_ = icu_mgr::set_interrupt(GPT::GTCIV, pr_task_, intr_lvl_);
+				if(intr_vec_ != ICU::VECTOR::NONE) {
+					GPT::GTITC.IVTT = 0;  // 間引き回数
+					GPT::GTITC.IVTC = 0b00;
+					GPT::GTINTAD.GTINTPR = 0b01;
+				}
 			}
 
 			GPT::enable();
@@ -208,6 +238,70 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	出力遅延を許可
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable_delay(bool ena = true) noexcept
+		{
+			GPT::GTDLYCR = GPT::GTDLYCR.DLLEN.b(ena) | GPT::GTDLYCR.DLYEN.b(ena); 
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	出力遅延をリセット
+		*/
+		//-----------------------------------------------------------------//
+		void reset_delay() noexcept
+		{
+			GPT::GTDLYCR.DLYRST = 1;
+			GPT::GTDLYRA = 0;
+			GPT::GTDLYFA = 0;
+			GPT::GTDLYRB = 0;
+			GPT::GTDLYFB = 0;
+			GPT::GTDLYCR.DLYRST = 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	出力 A 立ち上がり出力遅延設定
+			@param[in]	n	値（PCLK の 1/n）
+		*/
+		//-----------------------------------------------------------------//
+		void set_positive_delay_a(uint16_t n) noexcept { GPT::GTDLYRA = n; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	出力 A 立ち下がり出力遅延設定
+			@param[in]	n	値（PCLK の 1/n）
+		*/
+		//-----------------------------------------------------------------//
+		void set_negative_delay_a(uint16_t n) noexcept { GPT::GTDLYFA = n; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	出力 B 立ち上がり出力遅延設定
+			@param[in]	n	値（PCLK の 1/n）
+		*/
+		//-----------------------------------------------------------------//
+		void set_positive_delay_b(uint16_t n) noexcept { GPT::GTDLYRB = n; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	出力 B 立ち下がり出力遅延設定
+			@param[in]	n	値（PCLK の 1/n）
+		*/
+		//-----------------------------------------------------------------//
+		void set_negative_delay_b(uint16_t n) noexcept { GPT::GTDLYFB = n; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	周期を取得
 			@param[in]	real	「true」にした場合、実際に設定された周波数
 			@return 周期
@@ -216,7 +310,7 @@ namespace device {
 		uint32_t get_rate(bool real = false) const noexcept
 		{
 			if(real) {
-				uint32_t rate = (GPT::PCLK >> GPT::GTCR.TPCS()) / (GPT::PR() + 1);
+				uint32_t rate = (GPT::PCLK >> GPT::GTCR.TPCS()) / (GPT::GTPR() + 1);
 				return rate;
 			} else {
 				return freq_;
@@ -231,11 +325,15 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void stop() noexcept
 		{
+			GPT::GTINTAD = 0;
 			GPT::enable(false);
+			// icu_mgr::set_interrupt(GPT::GTCIV, , 0);
 			port_map_gpt::turn(GPT::PERIPHERAL, port_map_gpt::CHANNEL::A, false, ASEL);
 			port_map_gpt::turn(GPT::PERIPHERAL, port_map_gpt::CHANNEL::B, false, BSEL);
 			power_mgr::turn(GPT::PERIPHERAL, false);
 			freq_ = 0;
+			intr_lvl_ = 0;
+			intr_vec_ = ICU::VECTOR::NONE;
 		}
 	};
 }

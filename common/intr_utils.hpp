@@ -39,7 +39,7 @@ namespace utils {
 		volatile uint32_t	count_;
 	public:
 
-		count_task() : count_(0) { }
+		count_task() noexcept : count_(0) { }
 
 		//-----------------------------------------------------------------//
 		/*!

@@ -23,14 +23,13 @@
 #include "RX63T/gpt.hpp"
 // #include "RX600/usb.hpp"
 #include "RX600/can.hpp"
-
+#include "RX63T/s12adb.hpp"
 #include "RX600/crc.hpp"
 
 #include "RX63T/dpc.hpp"
 #include "RX63T/flash.hpp"
 
 #include "RX63T/system_io.hpp"
-#include "common/gpt_io.hpp"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/lvd.hpp"
