@@ -28,7 +28,8 @@ namespace device {
 			@param[in]	task	割り込みタスク
 		*/
 		//-----------------------------------------------------------------//
-		static void set_task(ICU::VECTOR vec, utils::TASK task) noexcept {
+		static void set_task(ICU::VECTOR vec, utils::TASK task) noexcept
+		{
 			set_interrupt_task(task, static_cast<uint32_t>(vec));
 		}
 
@@ -56,7 +57,10 @@ namespace device {
 			@return 割り込みレベル
 		*/
 		//-----------------------------------------------------------------//
-		static uint8_t get_level(ICU::VECTOR vec) noexcept { return ICU::IPR[vec]; }
+		static uint8_t get_level(ICU::VECTOR vec) noexcept
+		{
+			return ICU::IPR[vec];
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -107,15 +111,27 @@ namespace device {
 		}
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込みに対するベクタを返すダミー
-			@return グループベクターでは無いので「NONE]を返す。
+			@brief  グループベクターの取得 @n
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR vec) noexcept
-		{
-			return ICU::VECTOR::NONE;
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_GROUP0 ivec) noexcept {
+			return ICU::VECTOR::GROUP0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループベクターの取得 @n
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_GROUP12 ivec) noexcept {
+			return ICU::VECTOR::GROUP12;
 		}
 
 
