@@ -629,7 +629,7 @@ namespace device {
 		static constexpr auto PERIPHERAL = per;  	///< ペリフェラル型
 		static constexpr auto S12ADI = ICU::VECTOR::S12ADI;	///< スキャン終了割り込みベクター
 		static constexpr uint32_t ANALOG_NUM = 4;	///< アナログ入力数
-		static constexpr auto PCLK = clock_profile::PCLKC;	///< A/D 変換クロック元
+		static constexpr auto PCLK = clock_profile::PCLKD;	///< A/D 変換クロック元
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

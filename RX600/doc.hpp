@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・DOC 定義
+	@brief	RX600 グループ・DOC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -40,6 +40,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  OMS;
 			bit_rw_t <io_, bitpos::B2>     DCSEL;
+
 			bit_rw_t <io_, bitpos::B4>     DOPCIE;
 			bit_rw_t <io_, bitpos::B5>     DOPCF;
 			bit_rw_t <io_, bitpos::B6>     DOPCFCL;
@@ -74,7 +75,7 @@ namespace device {
 		typename doc_t<base, per>::DODSR_ doc_t<base, per>::DODSR;
 
 
-#if defined(SIG_RX24T)
+#if defined(SIG_RX63T) || defined(SIG_RX24T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データ演算回路（DOC）
