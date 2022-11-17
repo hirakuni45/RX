@@ -15,7 +15,7 @@
 
 #if defined(SIG_RX63T)
 #include "RX63T/lvda.hpp"
-// #include "RX600/bus.hpp"
+#include "RX63T/bus.hpp"
 #include "RX600/dmac.hpp"
 #include "RX63T/port.hpp"
 #include "RX600/mtu3.hpp"
@@ -23,9 +23,11 @@
 #include "RX63T/gpt.hpp"
 // #include "RX600/usb.hpp"
 #include "RX600/can.hpp"
-#include "RX63T/s12adb.hpp"
 #include "RX600/crc.hpp"
-
+#include "RX63T/s12adb.hpp"
+#include "RX63T/ad.hpp"
+#include "RX63T/da.hpp"
+#include "RX600/doc.hpp"
 #include "RX63T/dpc.hpp"
 #include "RX63T/flash.hpp"
 
