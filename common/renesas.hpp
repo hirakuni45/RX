@@ -43,11 +43,11 @@
 #include "RX62x/poe2.hpp"
 #include "RX600/ppg.hpp"
 #include "RX600/tmr.hpp"
-// RTC
+#include "RX62x/rtc.hpp"
 #include "RX62x/wdt.hpp"
 #include "RX600/etherc.hpp"
 #include "RX600/edmac.hpp"
-// USB
+#include "RX62x/usb.hpp"
 #include "RX600/crc.hpp"
 #include "RX600/can.hpp"
 #include "RX62x/s12ad.hpp"

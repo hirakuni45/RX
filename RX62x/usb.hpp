@@ -1,8 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・USBb 定義 @n
-			RX64M/RX71M/RX651/RX65N/RX72M/RX72N/RX66T/RX72T
+	@brief	RX62X グループ・USB 定義 @n
+			※この USB ペリフェラルは、LowSpeed(1.5Mbps）に対応していない。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -62,7 +62,6 @@ namespace device {
 			bits_ro_t<in_, bitpos::B0, 2>   LNST;
 			bit_ro_t <in_, bitpos::B2>	    IDMON;
 
-			bit_ro_t <in_, bitpos::B5>	    SOFEA;
 			bit_ro_t <in_, bitpos::B6>	    HTACT;
 
 			bits_ro_t<in_, bitpos::B14, 2>  OVCMON;
@@ -106,10 +105,19 @@ namespace device {
 			@param[in]	ofs		オフセット・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x14> CFIFO_;  // MBW: 1
+		template <uint32_t ofs>
+		struct cfifo_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  H;
+			bits_rw_t<io_, bitpos::B8, 8>  L;
+		};
+		typedef cfifo_t<base + 0x14> CFIFO_;
 		static  CFIFO_ CFIFO;
-		typedef rw8_t<base + 0x14> CFIFOL_;  // MBW: 0
-		static  CFIFOL_ CFIFOL;
 
 
 		//-----------------------------------------------------------------//
@@ -117,10 +125,8 @@ namespace device {
 			@brief  D0FIFO ポートレジスタ（D0FIFO）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t <base + 0x18> D0FIFO_;
+		typedef cfifo_t <base + 0x18> D0FIFO_;
 		static  D0FIFO_ D0FIFO;
-		typedef rw8_t <base + 0x18> D0FIFOL_;
-		static  D0FIFOL_ D0FIFOL;
 
 
 		//-----------------------------------------------------------------//
@@ -128,10 +134,8 @@ namespace device {
 			@brief  D1FIFO ポートレジスタ（D1FIFO）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t <base + 0x1C> D1FIFO_;
+		typedef cfifo_t <base + 0x1C> D1FIFO_;
 		static  D1FIFO_ D1FIFO;
-		typedef rw8_t <base + 0x1C> D1FIFOL_;
-		static  D1FIFOL_ D1FIFOL;
 
 
 		//-----------------------------------------------------------------//
@@ -387,8 +391,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>    EDGESTS;
 
 			bit_rw_t<io_, bitpos::B6>    BRDYM;
-
-			bit_rw_t<io_, bitpos::B8>    TRNENSEL;
 		};
 		typedef sofcfg_t<base + 0x3C> SOFCFG_;
 		static  SOFCFG_ SOFCFG;
@@ -1093,29 +1095,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  PHY クロスポイント調整レジスタ（PHYSLEW）
-			@param[in]	ofs		オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct physlew_t : public rw32_t<ofs> {
-			typedef rw32_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  SLEWR00;
-			bit_rw_t<io_, bitpos::B1>  SLEWR01;
-			bit_rw_t<io_, bitpos::B2>  SLEWF00;
-			bit_rw_t<io_, bitpos::B3>  SLEWF01;
-		};
-		typedef physlew_t<base + 0xF0>  PHYSLEW_;
-		static  PHYSLEW_ PHYSLEW;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  ディープスタンバイ USB トランシーバ制御 / 端子モニタレジスタ（DPUSR0R）
 			@param[in]	ofs		オフセット
 		*/
@@ -1129,7 +1108,6 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>   SRPC0;
-			bit_rw_t<io_, bitpos::B1>   RPUE0;
 
 			bit_rw_t<io_, bitpos::B4>   FIXPHY0;
 
@@ -1140,6 +1118,14 @@ namespace device {
 			bit_rw_t<io_, bitpos::B21>  DOVCB0;
 
 			bit_rw_t<io_, bitpos::B23>  DVBSTS0;
+
+			bit_rw_t<io_, bitpos::B24>  DP1;
+			bit_rw_t<io_, bitpos::B24>  DM1;
+
+			bit_rw_t<io_, bitpos::B28>  DOVCA1;
+			bit_rw_t<io_, bitpos::B29>  DOVCB1;
+
+			bit_rw_t<io_, bitpos::B31>  DVBSTS1;
 		};
 		typedef dpusr0r_t<0x000A'0400>  DPUSR0R_;
 		static  DPUSR0R_ DPUSR0R;
@@ -1167,6 +1153,14 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>   DVBSE0;
 
+			bit_rw_t<io_, bitpos::B8>   DPINTE1;
+			bit_rw_t<io_, bitpos::B9>   DMINTE1;
+
+			bit_rw_t<io_, bitpos::B12>  DOVRCRAE1;
+			bit_rw_t<io_, bitpos::B13>  DOVRCRBE1;
+
+			bit_rw_t<io_, bitpos::B15>  DVBSE1;
+
 			bit_rw_t<io_, bitpos::B16>  DPINT0;
 			bit_rw_t<io_, bitpos::B17>  DMINT0;
 
@@ -1174,6 +1168,14 @@ namespace device {
 			bit_rw_t<io_, bitpos::B21>  DOVRCRB0;
 
 			bit_rw_t<io_, bitpos::B23>  DVBINT0;
+
+			bit_rw_t<io_, bitpos::B24>  DPINT1;
+			bit_rw_t<io_, bitpos::B25>  DMINT1;
+
+			bit_rw_t<io_, bitpos::B28>  DOVRCRA1;
+			bit_rw_t<io_, bitpos::B29>  DOVRCRB1;
+
+			bit_rw_t<io_, bitpos::B31>  DVBINT1;
 		};
 		typedef dpusr1r_t<0x000A'0404>  DPUSR1R_;
 		static  DPUSR1R_ DPUSR1R;
@@ -1244,7 +1246,6 @@ namespace device {
 	template <uint32_t base> typename usb_core_t<base>::DEVADD4_    usb_core_t<base>::DEVADD4;
 	template <uint32_t base> typename usb_core_t<base>::DEVADD5_    usb_core_t<base>::DEVADD5;
 	template <uint32_t base> typename usb_core_t<base>::DEVADD_     usb_core_t<base>::DEVADD;
-	template <uint32_t base> typename usb_core_t<base>::PHYSLEW_    usb_core_t<base>::PHYSLEW;
 	template <uint32_t base> typename usb_core_t<base>::DPUSR0R_    usb_core_t<base>::DPUSR0R;
 	template <uint32_t base> typename usb_core_t<base>::DPUSR1R_    usb_core_t<base>::DPUSR1R;
 
@@ -1254,15 +1255,13 @@ namespace device {
 		@brief  USB 定義クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	IVT		割り込みベクター型
 		@param[in]	ivec	USBI 割り込み Vector
 		@param[in]	rvec	USBR 割り込み Vector
 		@param[in]	d0vec	D0 割り込み Vector
 		@param[in]	d1vec	D1 割り込み Vector
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename IVT,
-		IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
 	struct usb_t : public usb_core_t<base> {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
@@ -1273,11 +1272,8 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef usb_t<0x000A0000, peripheral::USB0, ICU::VECTOR,
+	typedef usb_t<0x000A'0000, peripheral::USB0,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
-#else
-	typedef usb_t<0x000A0000, peripheral::USB0, ICU::VECTOR_SELB,
-		ICU::VECTOR_SELB::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
-#endif
+	typedef usb_t<0x000A'0200, peripheral::USB1,
+		ICU::VECTOR::USBI1, ICU::VECTOR::USBR1, ICU::VECTOR::D0FIFO1, ICU::VECTOR::D1FIFO1> USB1;
 }
