@@ -43,7 +43,7 @@
 #include "RX62x/poe2.hpp"
 #include "RX600/ppg.hpp"
 #include "RX600/tmr.hpp"
-// RTC
+#include "RX62x/rtc.hpp"
 #include "RX62x/wdt.hpp"
 #include "RX600/etherc.hpp"
 #include "RX600/edmac.hpp"
