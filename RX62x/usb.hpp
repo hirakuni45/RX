@@ -125,7 +125,7 @@ namespace device {
 			@brief  D0FIFO ポートレジスタ（D0FIFO）
 		*/
 		//-----------------------------------------------------------------//
-		typedef cfifo_t <base + 0x1B> D0FIFO_;
+		typedef cfifo_t <base + 0x18> D0FIFO_;
 		static  D0FIFO_ D0FIFO;
 
 
