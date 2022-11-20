@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・USBb 定義 @n
+	@brief	RX600 グループ・USB[ab] 定義 @n
 			RX64M/RX71M/RX651/RX65N/RX72M/RX72N/RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
@@ -67,7 +67,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B14, 2>  OVCMON;
 		};
-		typedef syssts0_t<base + 0x00> SYSSTS0_;
+		typedef syssts0_t<base + 0x04> SYSSTS0_;
 		static  SYSSTS0_ SYSSTS0;
 
 
@@ -368,30 +368,6 @@ namespace device {
 		};
 		typedef bempenb_t<base + 0x3A> BEMPENB_;
 		static  BEMPENB_ BEMPENB;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  SOF 出力コンフィギュレーションレジスタ（SOFCFG）
-			@param[in]	ofs	オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct sofcfg_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B4>    EDGESTS;
-
-			bit_rw_t<io_, bitpos::B6>    BRDYM;
-
-			bit_rw_t<io_, bitpos::B8>    TRNENSEL;
-		};
-		typedef sofcfg_t<base + 0x3C> SOFCFG_;
-		static  SOFCFG_ SOFCFG;
 
 
 		//-----------------------------------------------------------------//
@@ -1089,6 +1065,169 @@ namespace device {
 		};
 		typedef devadd_t<base + 0xD0>  DEVADD_;
 		static DEVADD_ DEVADD;
+	};
+	template <uint32_t base> typename usb_core_t<base>::SYSCFG_     usb_core_t<base>::SYSCFG;
+	template <uint32_t base> typename usb_core_t<base>::SYSSTS0_    usb_core_t<base>::SYSSTS0;
+	template <uint32_t base> typename usb_core_t<base>::DVSTCTR0_   usb_core_t<base>::DVSTCTR0;
+	template <uint32_t base> typename usb_core_t<base>::CFIFO_      usb_core_t<base>::CFIFO;
+	template <uint32_t base> typename usb_core_t<base>::D0FIFO_     usb_core_t<base>::D0FIFO;
+	template <uint32_t base> typename usb_core_t<base>::D1FIFO_     usb_core_t<base>::D1FIFO;
+	template <uint32_t base> typename usb_core_t<base>::CFIFOSEL_   usb_core_t<base>::CFIFOSEL;
+	template <uint32_t base> typename usb_core_t<base>::D0FIFOSEL_  usb_core_t<base>::D0FIFOSEL;
+	template <uint32_t base> typename usb_core_t<base>::D1FIFOSEL_  usb_core_t<base>::D1FIFOSEL;
+	template <uint32_t base> typename usb_core_t<base>::CFIFOCTR_   usb_core_t<base>::CFIFOCTR;
+	template <uint32_t base> typename usb_core_t<base>::D0FIFOCTR_  usb_core_t<base>::D0FIFOCTR;
+	template <uint32_t base> typename usb_core_t<base>::D1FIFOCTR_  usb_core_t<base>::D1FIFOCTR;
+	template <uint32_t base> typename usb_core_t<base>::INTENB0_    usb_core_t<base>::INTENB0;
+	template <uint32_t base> typename usb_core_t<base>::INTENB1_    usb_core_t<base>::INTENB1;
+	template <uint32_t base> typename usb_core_t<base>::BRDYENB_    usb_core_t<base>::BRDYENB;
+	template <uint32_t base> typename usb_core_t<base>::NRDYENB_    usb_core_t<base>::NRDYENB;
+	template <uint32_t base> typename usb_core_t<base>::BEMPENB_    usb_core_t<base>::BEMPENB;
+	template <uint32_t base> typename usb_core_t<base>::INTSTS0_    usb_core_t<base>::INTSTS0;
+	template <uint32_t base> typename usb_core_t<base>::INTSTS1_    usb_core_t<base>::INTSTS1;
+	template <uint32_t base> typename usb_core_t<base>::BRDYSTS_    usb_core_t<base>::BRDYSTS;
+	template <uint32_t base> typename usb_core_t<base>::NRDYSTS_    usb_core_t<base>::NRDYSTS;
+	template <uint32_t base> typename usb_core_t<base>::BEMPSTS_    usb_core_t<base>::BEMPSTS;
+	template <uint32_t base> typename usb_core_t<base>::FRMNUM_     usb_core_t<base>::FRMNUM;
+	template <uint32_t base> typename usb_core_t<base>::DVCHGR_     usb_core_t<base>::DVCHGR;
+	template <uint32_t base> typename usb_core_t<base>::USBADDR_    usb_core_t<base>::USBADDR;
+	template <uint32_t base> typename usb_core_t<base>::USBREQ_     usb_core_t<base>::USBREQ;
+	template <uint32_t base> typename usb_core_t<base>::USBVAL_     usb_core_t<base>::USBVAL;
+	template <uint32_t base> typename usb_core_t<base>::USBINDX_    usb_core_t<base>::USBINDX;
+	template <uint32_t base> typename usb_core_t<base>::USBLENG_    usb_core_t<base>::USBLENG;
+	template <uint32_t base> typename usb_core_t<base>::DCPCFG_     usb_core_t<base>::DCPCFG;
+	template <uint32_t base> typename usb_core_t<base>::DCPMAXP_    usb_core_t<base>::DCPMAXP;
+	template <uint32_t base> typename usb_core_t<base>::DCPCTR_     usb_core_t<base>::DCPCTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPESEL_    usb_core_t<base>::PIPESEL;
+	template <uint32_t base> typename usb_core_t<base>::PIPECFG_    usb_core_t<base>::PIPECFG;
+	template <uint32_t base> typename usb_core_t<base>::PIPEMAXP_   usb_core_t<base>::PIPEMAXP;
+	template <uint32_t base> typename usb_core_t<base>::PIPEPERI_   usb_core_t<base>::PIPEPERI;
+	template <uint32_t base> typename usb_core_t<base>::PIPE1CTR_   usb_core_t<base>::PIPE1CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE2CTR_   usb_core_t<base>::PIPE2CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE3CTR_   usb_core_t<base>::PIPE3CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE4CTR_   usb_core_t<base>::PIPE4CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE5CTR_   usb_core_t<base>::PIPE5CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE6CTR_   usb_core_t<base>::PIPE6CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE7CTR_   usb_core_t<base>::PIPE7CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE8CTR_   usb_core_t<base>::PIPE8CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE9CTR_   usb_core_t<base>::PIPE9CTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPECTR_    usb_core_t<base>::PIPECTR;
+	template <uint32_t base> typename usb_core_t<base>::PIPE1TRE_   usb_core_t<base>::PIPE1TRE;
+	template <uint32_t base> typename usb_core_t<base>::PIPE2TRE_   usb_core_t<base>::PIPE2TRE;
+	template <uint32_t base> typename usb_core_t<base>::PIPE3TRE_   usb_core_t<base>::PIPE3TRE;
+	template <uint32_t base> typename usb_core_t<base>::PIPE4TRE_   usb_core_t<base>::PIPE4TRE;
+	template <uint32_t base> typename usb_core_t<base>::PIPE5TRE_   usb_core_t<base>::PIPE5TRE;
+	template <uint32_t base> typename usb_core_t<base>::PIPETRE_    usb_core_t<base>::PIPETRE;
+	template <uint32_t base> typename usb_core_t<base>::PIPE1TRN_   usb_core_t<base>::PIPE1TRN;
+	template <uint32_t base> typename usb_core_t<base>::PIPE2TRN_   usb_core_t<base>::PIPE2TRN;
+	template <uint32_t base> typename usb_core_t<base>::PIPE3TRN_   usb_core_t<base>::PIPE3TRN;
+	template <uint32_t base> typename usb_core_t<base>::PIPE4TRN_   usb_core_t<base>::PIPE4TRN;
+	template <uint32_t base> typename usb_core_t<base>::PIPE5TRN_   usb_core_t<base>::PIPE5TRN;
+	template <uint32_t base> typename usb_core_t<base>::PIPETRN_    usb_core_t<base>::PIPETRN;
+	template <uint32_t base> typename usb_core_t<base>::DEVADD0_    usb_core_t<base>::DEVADD0;
+	template <uint32_t base> typename usb_core_t<base>::DEVADD1_    usb_core_t<base>::DEVADD1;
+	template <uint32_t base> typename usb_core_t<base>::DEVADD2_    usb_core_t<base>::DEVADD2;
+	template <uint32_t base> typename usb_core_t<base>::DEVADD3_    usb_core_t<base>::DEVADD3;
+	template <uint32_t base> typename usb_core_t<base>::DEVADD4_    usb_core_t<base>::DEVADD4;
+	template <uint32_t base> typename usb_core_t<base>::DEVADD5_    usb_core_t<base>::DEVADD5;
+	template <uint32_t base> typename usb_core_t<base>::DEVADD_     usb_core_t<base>::DEVADD;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  USBa 定義クラス
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	IVT		割り込みベクター型
+		@param[in]	ivec	USBI 割り込み Vector
+		@param[in]	rvec	USBR 割り込み Vector
+		@param[in]	d0vec	D0 割り込み Vector
+		@param[in]	d1vec	D1 割り込み Vector
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, typename IVT,
+		IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+	struct usb_a_t : public usb_core_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto I_VEC      = ivec;	///< USBI 割り込み Vector
+		static constexpr auto R_VEC      = rvec;	///< USBR 割り込み Vector
+		static constexpr auto D0_VEC     = d0vec;	///< D0 割り込み Vector
+		static constexpr auto D1_VEC     = d1vec;	///< D1 割り込み Vector
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SOF 出力コンフィギュレーションレジスタ（SOFCFGa）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct sofcfg_a_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B4>    EDGESTS;
+
+			bit_rw_t<io_, bitpos::B6>    BRDYM;
+		};
+		typedef sofcfg_a_t<base + 0x3C> SOFCFG_;
+		static  SOFCFG_ SOFCFG;
+	};
+	template <uint32_t base, peripheral per,
+		typename IVT, IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+		typename usb_a_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::SOFCFG_
+		usb_a_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::SOFCFG;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  USBb 定義クラス
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	IVT		割り込みベクター型
+		@param[in]	ivec	USBI 割り込み Vector
+		@param[in]	rvec	USBR 割り込み Vector
+		@param[in]	d0vec	D0 割り込み Vector
+		@param[in]	d1vec	D1 割り込み Vector
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, typename IVT,
+		IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+	struct usb_b_t : public usb_core_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto I_VEC      = ivec;	///< USBI 割り込み Vector
+		static constexpr auto R_VEC      = rvec;	///< USBR 割り込み Vector
+		static constexpr auto D0_VEC     = d0vec;	///< D0 割り込み Vector
+		static constexpr auto D1_VEC     = d1vec;	///< D1 割り込み Vector
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SOF 出力コンフィギュレーションレジスタ（SOFCFGb）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct sofcfg_b_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B4>    EDGESTS;
+
+			bit_rw_t<io_, bitpos::B6>    BRDYM;
+
+			bit_rw_t<io_, bitpos::B8>    TRNENSEL;
+		};
+		typedef sofcfg_b_t<base + 0x3C> SOFCFG_;
+		static  SOFCFG_ SOFCFG;
 
 
 		//-----------------------------------------------------------------//
@@ -1178,106 +1317,32 @@ namespace device {
 		typedef dpusr1r_t<0x000A'0404>  DPUSR1R_;
 		static  DPUSR1R_ DPUSR1R;
 	};
-	template <uint32_t base> typename usb_core_t<base>::SYSCFG_     usb_core_t<base>::SYSCFG;
-	template <uint32_t base> typename usb_core_t<base>::SYSSTS0_    usb_core_t<base>::SYSSTS0;
-	template <uint32_t base> typename usb_core_t<base>::DVSTCTR0_   usb_core_t<base>::DVSTCTR0;
-	template <uint32_t base> typename usb_core_t<base>::CFIFO_      usb_core_t<base>::CFIFO;
-	template <uint32_t base> typename usb_core_t<base>::D0FIFO_     usb_core_t<base>::D0FIFO;
-	template <uint32_t base> typename usb_core_t<base>::D1FIFO_     usb_core_t<base>::D1FIFO;
-	template <uint32_t base> typename usb_core_t<base>::CFIFOSEL_   usb_core_t<base>::CFIFOSEL;
-	template <uint32_t base> typename usb_core_t<base>::D0FIFOSEL_  usb_core_t<base>::D0FIFOSEL;
-	template <uint32_t base> typename usb_core_t<base>::D1FIFOSEL_  usb_core_t<base>::D1FIFOSEL;
-	template <uint32_t base> typename usb_core_t<base>::CFIFOCTR_   usb_core_t<base>::CFIFOCTR;
-	template <uint32_t base> typename usb_core_t<base>::D0FIFOCTR_  usb_core_t<base>::D0FIFOCTR;
-	template <uint32_t base> typename usb_core_t<base>::D1FIFOCTR_  usb_core_t<base>::D1FIFOCTR;
-	template <uint32_t base> typename usb_core_t<base>::INTENB0_    usb_core_t<base>::INTENB0;
-	template <uint32_t base> typename usb_core_t<base>::INTENB1_    usb_core_t<base>::INTENB1;
-	template <uint32_t base> typename usb_core_t<base>::BRDYENB_    usb_core_t<base>::BRDYENB;
-	template <uint32_t base> typename usb_core_t<base>::NRDYENB_    usb_core_t<base>::NRDYENB;
-	template <uint32_t base> typename usb_core_t<base>::BEMPENB_    usb_core_t<base>::BEMPENB;
-	template <uint32_t base> typename usb_core_t<base>::SOFCFG_     usb_core_t<base>::SOFCFG;
-	template <uint32_t base> typename usb_core_t<base>::INTSTS0_    usb_core_t<base>::INTSTS0;
-	template <uint32_t base> typename usb_core_t<base>::INTSTS1_    usb_core_t<base>::INTSTS1;
-	template <uint32_t base> typename usb_core_t<base>::BRDYSTS_    usb_core_t<base>::BRDYSTS;
-	template <uint32_t base> typename usb_core_t<base>::NRDYSTS_    usb_core_t<base>::NRDYSTS;
-	template <uint32_t base> typename usb_core_t<base>::BEMPSTS_    usb_core_t<base>::BEMPSTS;
-	template <uint32_t base> typename usb_core_t<base>::FRMNUM_     usb_core_t<base>::FRMNUM;
-	template <uint32_t base> typename usb_core_t<base>::DVCHGR_     usb_core_t<base>::DVCHGR;
-	template <uint32_t base> typename usb_core_t<base>::USBADDR_    usb_core_t<base>::USBADDR;
-	template <uint32_t base> typename usb_core_t<base>::USBREQ_     usb_core_t<base>::USBREQ;
-	template <uint32_t base> typename usb_core_t<base>::USBVAL_     usb_core_t<base>::USBVAL;
-	template <uint32_t base> typename usb_core_t<base>::USBINDX_    usb_core_t<base>::USBINDX;
-	template <uint32_t base> typename usb_core_t<base>::USBLENG_    usb_core_t<base>::USBLENG;
-	template <uint32_t base> typename usb_core_t<base>::DCPCFG_     usb_core_t<base>::DCPCFG;
-	template <uint32_t base> typename usb_core_t<base>::DCPMAXP_    usb_core_t<base>::DCPMAXP;
-	template <uint32_t base> typename usb_core_t<base>::DCPCTR_     usb_core_t<base>::DCPCTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPESEL_    usb_core_t<base>::PIPESEL;
-	template <uint32_t base> typename usb_core_t<base>::PIPECFG_    usb_core_t<base>::PIPECFG;
-	template <uint32_t base> typename usb_core_t<base>::PIPEMAXP_   usb_core_t<base>::PIPEMAXP;
-	template <uint32_t base> typename usb_core_t<base>::PIPEPERI_   usb_core_t<base>::PIPEPERI;
-	template <uint32_t base> typename usb_core_t<base>::PIPE1CTR_   usb_core_t<base>::PIPE1CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE2CTR_   usb_core_t<base>::PIPE2CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE3CTR_   usb_core_t<base>::PIPE3CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE4CTR_   usb_core_t<base>::PIPE4CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE5CTR_   usb_core_t<base>::PIPE5CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE6CTR_   usb_core_t<base>::PIPE6CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE7CTR_   usb_core_t<base>::PIPE7CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE8CTR_   usb_core_t<base>::PIPE8CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE9CTR_   usb_core_t<base>::PIPE9CTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPECTR_    usb_core_t<base>::PIPECTR;
-	template <uint32_t base> typename usb_core_t<base>::PIPE1TRE_   usb_core_t<base>::PIPE1TRE;
-	template <uint32_t base> typename usb_core_t<base>::PIPE2TRE_   usb_core_t<base>::PIPE2TRE;
-	template <uint32_t base> typename usb_core_t<base>::PIPE3TRE_   usb_core_t<base>::PIPE3TRE;
-	template <uint32_t base> typename usb_core_t<base>::PIPE4TRE_   usb_core_t<base>::PIPE4TRE;
-	template <uint32_t base> typename usb_core_t<base>::PIPE5TRE_   usb_core_t<base>::PIPE5TRE;
-	template <uint32_t base> typename usb_core_t<base>::PIPETRE_    usb_core_t<base>::PIPETRE;
-	template <uint32_t base> typename usb_core_t<base>::PIPE1TRN_   usb_core_t<base>::PIPE1TRN;
-	template <uint32_t base> typename usb_core_t<base>::PIPE2TRN_   usb_core_t<base>::PIPE2TRN;
-	template <uint32_t base> typename usb_core_t<base>::PIPE3TRN_   usb_core_t<base>::PIPE3TRN;
-	template <uint32_t base> typename usb_core_t<base>::PIPE4TRN_   usb_core_t<base>::PIPE4TRN;
-	template <uint32_t base> typename usb_core_t<base>::PIPE5TRN_   usb_core_t<base>::PIPE5TRN;
-	template <uint32_t base> typename usb_core_t<base>::PIPETRN_    usb_core_t<base>::PIPETRN;
-	template <uint32_t base> typename usb_core_t<base>::DEVADD0_    usb_core_t<base>::DEVADD0;
-	template <uint32_t base> typename usb_core_t<base>::DEVADD1_    usb_core_t<base>::DEVADD1;
-	template <uint32_t base> typename usb_core_t<base>::DEVADD2_    usb_core_t<base>::DEVADD2;
-	template <uint32_t base> typename usb_core_t<base>::DEVADD3_    usb_core_t<base>::DEVADD3;
-	template <uint32_t base> typename usb_core_t<base>::DEVADD4_    usb_core_t<base>::DEVADD4;
-	template <uint32_t base> typename usb_core_t<base>::DEVADD5_    usb_core_t<base>::DEVADD5;
-	template <uint32_t base> typename usb_core_t<base>::DEVADD_     usb_core_t<base>::DEVADD;
-	template <uint32_t base> typename usb_core_t<base>::PHYSLEW_    usb_core_t<base>::PHYSLEW;
-	template <uint32_t base> typename usb_core_t<base>::DPUSR0R_    usb_core_t<base>::DPUSR0R;
-	template <uint32_t base> typename usb_core_t<base>::DPUSR1R_    usb_core_t<base>::DPUSR1R;
+	template <uint32_t base, peripheral per,
+		typename IVT, IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+		typename usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::SOFCFG_
+		usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::SOFCFG;
+	template <uint32_t base, peripheral per,
+		typename IVT, IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+		typename usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::PHYSLEW_
+		usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::PHYSLEW;
+	template <uint32_t base, peripheral per,
+		typename IVT, IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+		typename usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::DPUSR0R_
+		usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::DPUSR0R;
+	template <uint32_t base, peripheral per,
+		typename IVT, IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+		typename usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::DPUSR1R_
+		usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::DPUSR1R;
 
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  USB 定義クラス
-		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	IVT		割り込みベクター型
-		@param[in]	ivec	USBI 割り込み Vector
-		@param[in]	rvec	USBR 割り込み Vector
-		@param[in]	d0vec	D0 割り込み Vector
-		@param[in]	d1vec	D1 割り込み Vector
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename IVT,
-		IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
-	struct usb_t : public usb_core_t<base> {
-
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto I_VEC      = ivec;	///< USBI 割り込み Vector
-		static constexpr auto R_VEC      = rvec;	///< USBR 割り込み Vector
-		static constexpr auto D0_VEC     = d0vec;	///< D0 割り込み Vector
-		static constexpr auto D1_VEC     = d1vec;	///< D1 割り込み Vector
-	};
-
-
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef usb_t<0x000A0000, peripheral::USB0, ICU::VECTOR,
+#if defined(SIG_RX63T)
+	typedef usb_a_t<0x000A0000, peripheral::USB0, ICU::VECTOR,
+		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+	typedef usb_b_t<0x000A0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #else
-	typedef usb_t<0x000A0000, peripheral::USB0, ICU::VECTOR_SELB,
+	typedef usb_b_t<0x000A0000, peripheral::USB0, ICU::VECTOR_SELB,
 		ICU::VECTOR_SELB::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #endif
 }
