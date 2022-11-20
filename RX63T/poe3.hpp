@@ -46,6 +46,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 2>  POE0M;
 
 			bit_rw_t <io_, bitpos::B8>     PIE1;
+
 			bit_rw_t <io_, bitpos::B12>    POE0F;
 		};
 		typedef icsr1_t<base + 0x00> ICSR1_;
@@ -69,6 +70,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 2>  POE4M;
 
 			bit_rw_t <io_, bitpos::B8>     PIE2;
+
 			bit_rw_t <io_, bitpos::B12>    POE4F;
 		};
 		typedef icsr2_t<base + 0x04> ICSR2_;
@@ -91,6 +93,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B8>   OIE1;
 			bit_rw_t<io_, bitpos::B9>   OCE1;
+
 			bit_rw_t<io_, bitpos::B15>  OSF1;
 		};
 		typedef ocsr1_t<base + 0x02> OCSR1_;
@@ -113,6 +116,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B8>   OIE2;
 			bit_rw_t<io_, bitpos::B9>   OCE2;
+
 			bit_rw_t<io_, bitpos::B15>  OSF2;
 		};
 		typedef ocsr2_t<base + 0x06> OCSR2_;
