@@ -66,7 +66,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B14, 2>  OVCMON;
 		};
-		typedef syssts0_t<base + 0x00> SYSSTS0_;
+		typedef syssts0_t<base + 0x04> SYSSTS0_;
 		static  SYSSTS0_ SYSSTS0;
 
 
