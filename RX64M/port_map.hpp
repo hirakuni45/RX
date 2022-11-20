@@ -11,7 +11,7 @@
 //=====================================================================//
 #include "RX64M/peripheral.hpp"
 #include "RX600/port.hpp"
-#include "RX600/mpc.hpp"
+#include "RX64M/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
