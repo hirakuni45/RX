@@ -98,12 +98,12 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA5 = ((pad_.tmr_ & 0b0011) == 0);
 				break;
 
-			case peripheral::POE:
+			case peripheral::POE3:
 			case peripheral::GPTW0:
 			case peripheral::GPTW1:
 			case peripheral::GPTW2:
 			case peripheral::GPTW3:
-				sr_(ena, pad_.gptw_, peripheral::POE, t);
+				sr_(ena, pad_.gptw_, peripheral::POE3, t);
 				SYSTEM::MSTPCRA.MSTPA7 = (pad_.gptw_ == 0);
 				break;
 
