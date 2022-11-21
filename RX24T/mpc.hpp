@@ -36,7 +36,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> PFSWE;
 			bit_rw_t<io_, bitpos::B7> B0WI;
 		};
-		typedef pwpr_t<0x0008C11F> PWPR_;
+		typedef pwpr_t<0x0008'C11F> PWPR_;
 		static PWPR_ PWPR;
 
 
@@ -384,8 +384,6 @@ namespace device {
 		static PE4PFS_ PE4PFS;
 		static PE5PFS_ PE5PFS;
 	};
-	typedef mpc_t<void> MPC;
-
 	template<class _> typename mpc_t<_>::PWPR_ mpc_t<_>::PWPR;
 	template<class _> typename mpc_t<_>::P00PFS_ mpc_t<_>::P00PFS;
 	template<class _> typename mpc_t<_>::P01PFS_ mpc_t<_>::P01PFS;
@@ -466,4 +464,6 @@ namespace device {
 	template<class _> typename mpc_t<_>::PE3PFS_ mpc_t<_>::PE3PFS;
 	template<class _> typename mpc_t<_>::PE4PFS_ mpc_t<_>::PE4PFS;
 	template<class _> typename mpc_t<_>::PE5PFS_ mpc_t<_>::PE5PFS;
+
+	typedef mpc_t<void> MPC;
 }

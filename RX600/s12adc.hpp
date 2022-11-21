@@ -10,7 +10,6 @@
 //=====================================================================//
 #include "common/device.hpp"
 #include "RX600/port.hpp"
-#include "RX600/mpc.hpp"
 
 namespace device {
 
