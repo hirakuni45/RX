@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65x/RX66T グループ・R12DA 定義
+	@brief	RX64M/RX71M/RX65x グループ・R12DA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -27,6 +27,7 @@ namespace device {
 	struct r12da_t {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -130,7 +131,7 @@ namespace device {
 			@brief  アナログ入出力型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class analog : uint8_t {
+		enum class ANALOG : uint8_t {
 			DA0,
 			DA1,
 		};
@@ -184,20 +185,18 @@ namespace device {
 			@param[in]	f	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static void enable(analog an, bool f = true)
+		static void enable(ANALOG an, bool f = true)
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 			switch(an) {
-			case analog::DA0:
-				PORT0::PMR.B3 = 0;
+			case ANALOG::DA0:
+				PORT0::PCR.B3 = 0;
 				MPC::P03PFS.ASEL = f;
-				PORT0::PMR.B3 = 1;
 				break;
-			case analog::DA1:
-				PORT0::PMR.B5 = 0;
+			case ANALOG::DA1:
+				PORT0::PCR.B5 = 0;
 				MPC::P05PFS.ASEL = f;
-				PORT0::PMR.B5 = 1;
 				break;
 			default:
 				break;
@@ -227,7 +226,7 @@ namespace device {
 			@brief  アナログ入出力型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class analog : uint8_t {
+		enum class ANALOG : uint8_t {
 			DA0,
 			DA1,
 		};
@@ -263,20 +262,18 @@ namespace device {
 			@param[in]	f	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static void enable(analog an, bool f = true)
+		static void enable(ANALOG an, bool f = true)
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 			switch(an) {
-			case analog::DA0:
-				PORT6::PMR.B4 = 0;
+			case ANALOG::DA0:
+				PORT6::PCR.B4 = 0;
 				MPC::P64PFS.ASEL = 1;
-				PORT6::PMR.B4 = 1;
 				break;
-			case analog::DA1:
-				PORT6::PMR.B5 = 0;
+			case ANALOG::DA1:
+				PORT6::PCR.B5 = 0;
 				MPC::P65PFS.ASEL = 1;
-				PORT6::PMR.B5 = 1;
 				break;
 			default:
 				break;

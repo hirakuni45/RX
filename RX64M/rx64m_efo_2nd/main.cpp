@@ -184,7 +184,7 @@ namespace {
 	M_SCI			m_sci_;
 #endif
 
-	typedef device::dac_out_ DAC;
+	typedef device::dac_out<device::R12DA> DAC;
 	DAC		dac_;
 
 	uint16_t ch0_trg_[1024];
