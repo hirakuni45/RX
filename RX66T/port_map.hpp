@@ -3,14 +3,14 @@
 /*!	@file
 	@brief	RX66T グループ・ポート・マッピング
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "RX600/port.hpp"
-#include "RX600/mpc.hpp"
 #include "RX66T/peripheral.hpp"
+#include "RX66T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

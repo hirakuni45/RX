@@ -15,7 +15,7 @@
 */
 //=====================================================================//
 #include "RX600/port.hpp"
-#include "RX600/mpc.hpp"
+#include "RX66T/mpc.hpp"
 #include "RX72T/peripheral.hpp"
 #include "RX600/port_map_order.hpp"
 
