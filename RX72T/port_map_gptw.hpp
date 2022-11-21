@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "RX72T/peripheral.hpp"
 #include "RX600/port.hpp"
-#include "RX600/mpc.hpp"
+#include "RX66T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -247,9 +247,9 @@ namespace device {
 					break;
 				case ORDER::THIRD:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;
-					PORT8::PMR.B6 = 0;
-					MPC::P86PFS.PSEL = sel;
-					PORT8::PMR.B6 = ena;
+					PORTB::PMR.B6 = 0;
+					MPC::PB6PFS.PSEL = sel;
+					PORTB::PMR.B6 = ena;
 					break;
 				case ORDER::FOURTH:
 					sel = ena ? (neg ? 0b010110 : 0b010100) : 0;

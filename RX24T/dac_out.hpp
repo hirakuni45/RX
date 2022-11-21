@@ -82,11 +82,11 @@ namespace device {
 
 			if(ch0) {
 				DAC::DACR.DAOE0 = 1;
-				DAC::enable(DAC::analog::DA0);
+				DAC::enable(DAC::ANALOG::DA0);
 			}
 			if(ch1) {
 				DAC::DACR.DAOE1 = 1;
-				DAC::enable(DAC::analog::DA1);
+				DAC::enable(DAC::ANALOG::DA1);
 			}
 
 			utils::delay::micro_second(3);  // amp start setup time

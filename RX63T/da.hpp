@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include "common/device.hpp"
+#include "RX63T/mpc.hpp"
 
 namespace device {
 
@@ -28,10 +29,35 @@ namespace device {
 			@brief  アナログ入出力型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class analog : uint8_t {
-			DA0,
-			DA1,
+		enum class ANALOG : uint8_t {
+			DA0,	///< P54/DA0
+			DA1,	///< P55/DA1
 		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  D/A ポートをアナログ出力に設定
+			@param[in]	an		アナログ型
+			@param[in]	ena		不許可の場合は「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(ANALOG an, bool ena = true) noexcept
+		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			switch(an) {
+			case ANALOG::DA0:
+				MPC::P54PFS.ASEL = 1;
+				break;
+			case ANALOG::DA1:
+				MPC::P55PFS.ASEL = 1;
+				break;
+			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -112,26 +138,6 @@ namespace device {
 		};
 		typedef daadscr_t<0x0008'80C6> DAADSCR_;
 		static DAADSCR_ DAADSCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ポート設定と解除
-			@param[in]	an	アナログ入力型
-			@param[in]	f	ポート無効の場合「false」
-		*/
-		//-----------------------------------------------------------------//		
-		static void enable(analog an, bool f = true)
-		{
-			switch(an) {
-			case analog::DA0:  // P03
-				break;
-			case analog::DA1:  // P05
-				break;
-			default:
-				break;
-			}
-		}
 	};
 	template <peripheral per> typename da_t<per>::DADR0_ da_t<per>::DADR0;
 	template <peripheral per> typename da_t<per>::DADR1_ da_t<per>::DADR1;
