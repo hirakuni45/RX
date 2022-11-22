@@ -45,6 +45,7 @@ namespace sound {
 		enum class STATE : uint8_t {
 			IDLE,		///< アイドル状態
 			TAG,		///< TAG パース中
+			INFO,		///< フレーム情報取得中
 			PLAY,		///< プレイ中
 			PAUSE,		///< ポーズ中
 		};

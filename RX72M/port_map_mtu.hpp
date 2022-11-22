@@ -14,7 +14,7 @@
 //=====================================================================//
 #include "RX72M/peripheral.hpp"
 #include "RX600/port.hpp"
-#include "RX72N/mpc.hpp"
+#include "RX72M/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

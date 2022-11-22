@@ -556,11 +556,15 @@ int main(int argc, char** argv)
     }
 
     {
-        uint32_t stack_size = 1024;
-        void* param = nullptr;
-        uint32_t prio = 1;
-        xTaskCreate(main_task_, "Main", stack_size, param, prio, nullptr);
-    }
+#ifdef USE_GLCDC
+		uint32_t stack_size = 4096;
+#else
+		uint32_t stack_size = 1024;
+#endif
+		void* param = nullptr;
+		uint32_t prio = 1;
+		xTaskCreate(main_task_, "Main", stack_size, param, prio, nullptr);
+	}
 
 	vTaskStartScheduler();
 }

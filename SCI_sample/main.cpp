@@ -17,6 +17,11 @@
 #include "common/format.hpp"
 #include "common/input.hpp"
 
+#include "common/monitor.hpp"
+
+// debug monitor を有効にする場合
+#define MEMORY_MONITOR
+
 namespace {
 
 #if defined(SIG_RX63T)
@@ -41,31 +46,38 @@ namespace {
   #endif
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::SCI9 SCI_CH;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::SCI2 SCI_CH;
 #endif
 
@@ -80,8 +92,14 @@ namespace {
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
 
+#ifdef MEMORY_MONITOR
+	static constexpr uint32_t S_NUM = 64;
+	typedef utils::monitor<S_NUM> MONITOR;
+	MONITOR	monitor_;
+#else
 	typedef utils::command<256> CMD;
 	CMD 	cmd_;
+#endif
 }
 
 
@@ -151,13 +169,17 @@ int main(int argc, char** argv)
 		utils::format("  Timer (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
+#ifndef MEMORY_MONITOR
 	cmd_.set_prompt("# ");
+#endif
 
 	uint8_t cnt = 0;
 	while(1) {
 
 		cmt_.sync();
-
+#ifdef MEMORY_MONITOR
+		monitor_.service();
+#else
 		if(cmd_.service()) {
 			uint32_t cmdn = cmd_.get_words();
 			uint32_t n = 0;
@@ -169,7 +191,7 @@ int main(int argc, char** argv)
 				++n;
 			}
 		}
-
+#endif
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
