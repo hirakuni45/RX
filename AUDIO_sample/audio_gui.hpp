@@ -195,8 +195,10 @@ namespace app {
 			auto& tag = play_tag_;
 			render_.set_fore_color(graphics::def_color::Black);
 			render_.fill_box(vtx::srect(0, 0, LCD_X - LCD_Y, 20 * 6));
-			render_.fill_box(vtx::srect(LCD_X - LCD_Y, 0, LCD_Y, LCD_Y));
-			render_.sync_frame(false);
+//			render_.fill_box(vtx::srect(LCD_X - LCD_Y, 0, LCD_Y, LCD_Y));
+			render_.sync_frame();
+
+			auto org_pos = fin.tell();
 
 			scaling_.set_offset(vtx::spos(LCD_X - LCD_Y, 0));
 			if(tag.get_apic().len_ > 0) {
@@ -204,16 +206,13 @@ namespace app {
 					scaling_.set_scale();
 					img_in_.load("/NoImage.jpg");
 				} else {
-					auto pos = fin.tell();
 					fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
 					img::img_info ifo;
 					if(!img_in_.info(fin, ifo)) {
-
 						auto st = img_in_.at_jpeg().get_status();
 						utils::format("JPEG status: %d\n") % static_cast<int>(st);
 
 						scaling_.set_scale();
-						render_.flush();
 						img_in_.load("/NoImage.jpg");
 						render_.swap_color();
 						render_.draw_text(vtx::spos(LCD_X - LCD_Y, 0), "image decode error.");
@@ -221,16 +220,15 @@ namespace app {
 					} else {
 						auto n = std::max(ifo.width, ifo.height);
 						scaling_.set_scale(LCD_Y, n);
-						render_.flush();
 						img_in_.load(fin);
 					}
-					fin.seek(utils::file_io::SEEK::SET, pos);
 				}
 			} else {
 				scaling_.set_scale();
-				render_.flush();
 				img_in_.load("/NoImage.jpg");
 			}
+
+			fin.seek(utils::file_io::SEEK::SET, org_pos);
 
 			album_.set_title(tag.get_album().c_str());
 			album_.reset_scroll();
@@ -279,7 +277,7 @@ namespace app {
 				info_.set_title(info_str_.c_str());
 				info_.reset_scroll();
 			}
-			render_.sync_frame(false);
+			render_.sync_frame();
 		}
 
 
