@@ -1,9 +1,13 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	MP3/ID3 タグ・デコード・クラス
+	@brief	MP3/ID3 タグ・デコード・クラス @n
+			V1 タグはファイルの終端（１２８バイト）にある。 @n
+			V2 タグは、ファイルの前方にある。 @n
+			V1, V2 が両方存在する場合もあり、その場合、V2 が優先される。 @n
+			アルバム画像がある場合、そのファイル位置が保存される。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -433,7 +437,6 @@ namespace sound {
 				return false;
 			}
 
-			fin.seek(utils::file_io::SEEK::SET, org);
 			return true;
 		}
 
@@ -478,7 +481,7 @@ namespace sound {
 
 			if(flag_ & 0b01000000) {  // EXT header
 				if(fin.read(tmp, 4) != 4) {
-					fin.seek(utils::file_io::SEEK::SET, org_pos_);
+					fin.seek(utils::file_io::SEEK::SET, org + size_);
 					return false;
 				}
 				uint32_t size;
