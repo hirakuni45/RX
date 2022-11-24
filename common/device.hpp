@@ -42,6 +42,7 @@
 #include "RX24T/icu_mgr.hpp"
 #include "RX24T/port_map.hpp"
 #include "RX24T/port_map_mtu.hpp"
+#include "RX24T/port_map_gpt.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX64M)
@@ -54,6 +55,7 @@
 #include "RX64M/port_map.hpp"
 #include "RX64M/port_map_sci.hpp"
 #include "RX64M/port_map_mtu.hpp"
+#include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -67,6 +69,7 @@
 #include "RX64M/port_map.hpp"
 #include "RX64M/port_map_sci.hpp"
 #include "RX64M/port_map_mtu.hpp"
+#include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
 #include "RX600/rx_dsp_inst.h"
 
