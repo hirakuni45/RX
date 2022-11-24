@@ -13,9 +13,10 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
  - RX64M/RX72T では、コンソールから操作可能
  - WAV、MP3 形式のオーディオファイルの再生（最大：48KHz、16ビット）
  - ID3 タグ情報、アルバムアートの表示（RX65N/RX72N Envision Kit）
- - 内蔵 D/A の利用（RX64M、RX65N Envision Kit）
+ - 内蔵 D/A の利用（RX64M、RX65N Envision Kit、RX72T）
  - 内蔵デジタルオーディオ出力利用（RX72N Envision Kit)
  - FreeRTOS を使った、マルチタスク処理
+ - libmad を利用した、MP3 コーデックのデコード
 
 ---
 
@@ -25,6 +26,9 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
  - audio_gui.hpp
  - FreeRTOSConfig.h
  - Makefile
+ - sound/sound_out.hpp
+ - sound/dac_stream.hpp
+ - sound/codec_mgr.hpp"
    
 ---
 
@@ -55,7 +59,7 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
 ## ビルド方法
 
  - ターゲットディレクトリーに移動
- - RX64M、RX65N (Envision Kit)、RX72N (Envision Kit)
+ - RX64M、RX65N (Envision Kit)、RX72N (Envision Kit)、RX72T
  - make する。
  - audio_sample.mot ファイルをマイコンに書き込む。
 
@@ -80,6 +84,7 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
 ---
 
 ## ファミコン・パッドでの操作方法（現在は未サポート）
+
  - 「SELECT」ボタンで、ファイラーが有効になる。（もう一度押すと無効）
  - 上下ボタンで、ファイルフォーカス
  - 右ボタンで選択（ディレクトリーの場合、そのディレクトリーへ移動）
@@ -93,10 +98,19 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
 ---
 
 ## MP3、WAV ファイルの対応状況
+
  - WAV 形式の場合、最大 48KHz、16 ビット、ステレオのファイルフォーマットまで対応
  - MP3 形式の場合、320Kbps まで対応 (44.1KHz, 48KHz, 16 Bits)
  - WAV 内タグのパース（一部）
  - ID3V2 タグのパース（ID3V1 タグは未対応）
+
+---
+
+## 不具合
+
+- ファイル再生時、全体時間を取得する際、長い時間がかかる場合がある。（調査中）
+- アルバムアートの表示が途中で途切れる場合がある。（調査中）
+- GUI の描画で、カラーが変わる場合がある。（調査中）
 
 ---
    
@@ -108,3 +122,4 @@ FreeRTOS: (MIT open source license)
 libmad: See libma/libmad/COPYRIGHT (G.P.L. v2)   
 libpng: See libpng/libpng/LICENSE  (libpng license)   
 zlib: (zlib License)   
+picojpeg: 不明
