@@ -25,23 +25,19 @@ namespace device {
 		struct pad_t {
 
 			uint8_t		tmr_;
-			uint8_t		gpt_;
-			uint16_t	mtu_;
 			uint8_t		cmt_;
 			uint8_t		tpu_;
-			uint16_t	dmac_;
 			uint8_t		exdmac_;
+			uint16_t	mtu_;
+			uint16_t	dmac_;
 
 			pad_t() :
 				tmr_(0),
-				gpt_(0),
-				mtu_(0),
-
 				cmt_(0),
 				tpu_(0),
-
-				dmac_(0),
-				exdmac_(0)
+				exdmac_(0),
+				mtu_(0),
+				dmac_(0)
 			{ }
 		};
 		static pad_t	pad_;
@@ -97,14 +93,6 @@ namespace device {
 			case peripheral::TMR1:
 				sr_(ena, pad_.tmr_, peripheral::TMR0, t);
 				SYSTEM::MSTPCRA.MSTPA5 = ((pad_.tmr_ & 0b0011) == 0);
-				break;
-
-			case peripheral::GPT0:
-			case peripheral::GPT1:
-			case peripheral::GPT2:
-			case peripheral::GPT3:
-				sr_(ena, pad_.gpt_, peripheral::GPT0, t);
-				SYSTEM::MSTPCRA.MSTPA7 = (pad_.gpt_ == 0);
 				break;
 
 			case peripheral::MTU0:
