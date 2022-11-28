@@ -263,7 +263,7 @@ namespace fatfs {
 		{
 			if(init_port_) return;
 
-			if(POW::BIT_POS < 32) {  // POW が有効な場合
+			if(POW::BIT_POS != device::bitpos::NONE) {  // POW が有効な場合
 				lock_();
 				POW::DIR = 1;
 				POW::P = 0;  // power off
@@ -541,7 +541,7 @@ namespace fatfs {
 
 			if(cd_ && !cd_back) {  // カードが挿入された！
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
-				if(POW::BIT_POS < 32) {  // POW が有効な場合
+				if(POW::BIT_POS != device::bitpos::NONE) {  // POW が有効な場合
 					lock_();
 					POW::P = 1;
 					SEL::P = 1;
@@ -554,7 +554,7 @@ namespace fatfs {
 				debug_format("Card ditect signal\n");
 			} else if(!cd_ && cd_back) {  // カードが外された！
 				f_mount(nullptr, "", 0);  // 登録抹消（nullptr）
-				if(POW::BIT_POS < 32) {  // POW が有効な場合
+				if(POW::BIT_POS != device::bitpos::NONE) {  // POW が有効な場合
 					lock_();
 					POW::P = 0;
 					SEL::P = 0;
@@ -576,7 +576,7 @@ namespace fatfs {
 					if(st != FR_OK) {
 						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();
-						if(POW::BIT_POS < 32) {  // 電源制御がある場合
+						if(POW::BIT_POS != device::bitpos::NONE) {  // 電源制御がある場合
 							lock_();
 							POW::P = 0;
 							SEL::P = 0;

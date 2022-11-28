@@ -368,7 +368,7 @@ namespace device {
 			// PA2/SCK11 (39/100) (57/144)
 			// PA1/RXD11 (40/100) (58/144)
 			// PA0/TXD11 (41/100) (59/144)
-				sel = enable ? 0b001100 : 0;
+				sel = enable ? 0b001011 : 0;
 				if(clock) {
 					PORTA::PMR.B2 = 0;
 					MPC::PA2PFS.PSEL = sel;
