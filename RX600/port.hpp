@@ -426,19 +426,22 @@ namespace device {
 		@brief  単ポート定義テンプレート
 		@param[in]	PORT	ポート・クラス
 		@param[in]	BPOS	ビット位置
-		@param[in]	ASSERT	アサート論理 @n
+		@param[in]	ASSERT_	アサート論理 @n
 							※反転入力、反転出力として扱う場合「０」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class PORTX, bitpos BPOS, bool ASSERT = 1>
+	template <class PORTX, bitpos BPOS, bool ASSERT_ = 1>
 	struct PORT : public PORT_BASE {
 
-		static constexpr uint8_t PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);
-		static constexpr uint8_t BIT_POS = static_cast<uint8_t>(BPOS);
+		static constexpr auto PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);	///< ポート番号（０～３１）
+		static constexpr auto BIT_POS = BPOS;		///< ポート、ビット位置
+		static constexpr auto ASSERT  = ASSERT_;	///< アサート論理
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポート方向レジスタ
+			@brief  ポート方向レジスタ @n
+					0: 入力 @n
+					1: 出力
 		*/
 		//-----------------------------------------------------------------//
 		typedef bit_rw_t<rw8_t<PORTX::base_address_ + 0x00>, BPOS> DIR_;
@@ -516,10 +519,10 @@ namespace device {
 			static PI_ PI;  // ポート入力用
 
 			void operator = (bool val) {
-				if(ASSERT) { PO = val; } else { PO = !val; }
+				if(ASSERT_) { PO = val; } else { PO = !val; }
 			}
 			bool operator () () {
-				if(ASSERT) { return PI(); } 
+				if(ASSERT_) { return PI(); } 
 				else { return !PI(); }
 			}
 		};
@@ -645,8 +648,9 @@ namespace device {
 	template<class _>
 	struct NULL_PORT_t {
 
-		static constexpr uint8_t PNO     = 0xff;
-		static constexpr uint8_t BIT_POS = 0xff;
+		static constexpr uint8_t PNO  = 0xff;
+		static constexpr auto BIT_POS = bitpos::NONE;  ///< 無効ビット 
+		static constexpr bool ASSERT  = 0;
 
 		struct null_t {
 			void operator = (bool f) { }
@@ -684,11 +688,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static null_t P;
 	};
-	typedef NULL_PORT_t<void> NULL_PORT;
 	template <class _> typename NULL_PORT_t<_>::null_t NULL_PORT_t<_>::DIR;
 	template <class _> typename NULL_PORT_t<_>::null_t NULL_PORT_t<_>::PU;
 	template <class _> typename NULL_PORT_t<_>::null_t NULL_PORT_t<_>::OD;
 	template <class _> typename NULL_PORT_t<_>::null_t NULL_PORT_t<_>::P;
+
+
+	typedef NULL_PORT_t<void> NULL_PORT;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

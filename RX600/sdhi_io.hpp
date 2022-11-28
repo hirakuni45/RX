@@ -800,7 +800,7 @@ namespace fatfs {
 		{
 			if(!SDHI::SDSTS1.SDCDMON()) return RES_NOTRDY;
 			if(disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
-			if(WPRT::BIT_POS < 8) {
+			if(WPRT::BIT_POS != device::bitpos::NONE) {
 				if(WPRT::P()) return RES_WRPRT;
 			}
 

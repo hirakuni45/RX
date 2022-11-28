@@ -345,20 +345,20 @@ level = 0;
 				task_ = sci_i2c_t::TASK::IDLE;
 
 				// RXI, TXI の設定
-				icu_mgr::set_interrupt(SCI::RX_VEC, recv_task_, level_);
-				icu_mgr::set_interrupt(SCI::TX_VEC, send_task_, level_);
+				icu_mgr::set_interrupt(SCI::RXI, recv_task_, level_);
+				icu_mgr::set_interrupt(SCI::TXI, send_task_, level_);
 
 				// TEIx (STI interrupt)
-				auto grp = ICU::get_group_vector(SCI::TE_VEC);
+				auto grp = ICU::get_group_vector(SCI::TEI);
 				if(grp == ICU::VECTOR::NONE) {  // NONE が返ると通常割り込み
 					// 通常ベクターの場合、割り込み関数を登録、
 					// tev がグループベクターの場合にコンパイルエラーになるので回避
-					icu_mgr::set_task(static_cast<ICU::VECTOR>(SCI::TE_VEC), i2c_condition_task_);
-					icu_mgr::set_level(static_cast<ICU::VECTOR>(SCI::TE_VEC), level_);
+					icu_mgr::set_task(static_cast<ICU::VECTOR>(SCI::TEI), i2c_condition_task_);
+					icu_mgr::set_level(static_cast<ICU::VECTOR>(SCI::TEI), level_);
 				} else {
 					// グループベクターの場合、通常関数を登録
 					icu_mgr::set_level(grp, level_);
-					icu_mgr::install_group_task(SCI::TE_VEC, i2c_service_);
+					icu_mgr::install_group_task(SCI::TEI, i2c_service_);
 					utils::format("install group vector for TE (LVL:%d)\n") % static_cast<uint16_t>(level_);
 				}
 			}
