@@ -4,7 +4,6 @@
 	@brief	RX グループ・SCI I/O 制御 @n
 			・DMAC による転送をサポートしていませんが、必要性を感じていません。@n
 			・同期通信で、ブロック転送を行うような場合は、必要かもしれません。@n
-			・RS-485 半二重通信用ポート制御を追加。(作業中) @n
 			Ex: 定義例 @n
 			・受信バッファ、送信バッファの大きさは、最低１６バイトは必要でしょう。@n
 			・ボーレート、サービスする内容に応じて適切に設定して下さい。@n
@@ -31,7 +30,11 @@
 				} @n
 			  }; @n
 			上記関数を定義しておけば、syscalls.c との連携で、printf が使えるようになる。 @n
-			※ C++ では printf は推奨しないし使う理由が無い、utils::format を使って下さい。
+			※ C++ では printf は推奨しないし使う理由が無い、utils::format を使って下さい。 @n
+			RS-485： @n
+			・レシーバーの受信ゲートは常に有効にしておく。 @n
+			・送信が正常に行えたかのケア（送信した文字列と受信した文字列の比較など）は、アプリ側で行う。 @n
+			・レシーバーの送信ゲート制御のみ、ドライバーが行う。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -39,7 +42,6 @@
 */
 //=========================================================================//
 #include "common/renesas.hpp"
-#include "common/vect.h"
 #include "common/fixed_fifo.hpp"
 
 namespace device {
@@ -102,11 +104,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class FLOW_CTRL : uint8_t {
-			NONE,	///< フロー制御をしない
-			SOFT,	///< ソフトフロー制御
-			HARD,	///< ハードフロー制御（RTS 信号を使う）
+			NONE,		///< フロー制御をしない
+			SOFT,		///< ソフトフロー制御
+			HARD,		///< ハードフロー制御（RTS ポートを使う）
 			SOFT_HARD,	///< ソフトフローとハードフロー制御
-			RS485,	///< RS485 における半二重制御として使う
+			RS485,		///< RTS ポートを使い、RS485 レシーバーの DE を制御（送信時「1」となる）
 		};
 	};
 
@@ -117,8 +119,8 @@ namespace device {
 		@param[in]	SCI		SCI 型
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
-		@param[in]	PSEL	ポートマップ選択
-		@param[in]	RTS		制御ポート（RTS/RS-485 制御）
+		@param[in]	PSEL	通常ポート候補
+		@param[in]	RTS		制御ポート（RTS/RS-485_DE）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, class RTS = NULL_PORT>
@@ -147,6 +149,7 @@ namespace device {
 		static FLOW_CTRL			flow_ctrl_;
 		static volatile bool		stop_;
 		static volatile uint16_t	errc_;
+		static volatile uint32_t	ch_count_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept { asm("nop"); }
@@ -166,7 +169,7 @@ namespace device {
 				SCI::SSR.PER = 0;
 				err = true;
 			}
-			volatile uint8_t data = SCI::RDR();
+			volatile uint8_t rd = SCI::RDR();
 			if(err) {
 				++errc_;
 			} else {
@@ -177,8 +180,15 @@ namespace device {
 							RTS::P = 0;
 						}
 					}
+				} else if(flow_ctrl_ == FLOW_CTRL::RS485) {
+					if(ch_count_ > 0) {
+						ch_count_--;
+						if(send_.length() == 0 && ch_count_ == 0 && SCI::SCR.TIE() == 0) {
+							RTS::P = 0;
+						}
+					}
 				}
-				recv_.put(data);
+				recv_.put(rd);
 			}
 		}
 
@@ -186,32 +196,31 @@ namespace device {
 		static INTERRUPT_FUNC void send_task_()
 		{
 			if(send_.length() > 0) {
-//				if(stop_) {
-//					SCI::TDR = XON;
-//					stop_ = false;
-//				} else {
-					SCI::TDR = send_.get();
-//				}
+				++ch_count_;
+				SCI::TDR = send_.get();
 			} else {
 				SCI::SCR.TIE = 0;
-				if(flow_ctrl_ == FLOW_CTRL::RS485) {
-					RTS::P = 0;
-				}
 			}
+		}
+
+
+		static INTERRUPT_FUNC void send_fin_task_()
+		{
+
 		}
 
 
 		void set_intr_(uint8_t level) noexcept
 		{
 			if(level > 0) {
-				icu_mgr::set_task(SCI::RX_VEC, recv_task_);
-				icu_mgr::set_task(SCI::TX_VEC, send_task_);
+				icu_mgr::set_task(SCI::RXI, recv_task_);
+				icu_mgr::set_task(SCI::TXI, send_task_);
 			} else {
-				icu_mgr::set_task(SCI::RX_VEC, nullptr);
-				icu_mgr::set_task(SCI::TX_VEC, nullptr);
+				icu_mgr::set_task(SCI::RXI, nullptr);
+				icu_mgr::set_task(SCI::TXI, nullptr);
 			}
-			icu_mgr::set_level(SCI::RX_VEC, level);
-			icu_mgr::set_level(SCI::TX_VEC, level);
+			icu_mgr::set_level(SCI::RXI, level);
+			icu_mgr::set_level(SCI::TXI, level);
 		}
 
 	public:
@@ -220,9 +229,11 @@ namespace device {
 			@brief  コンストラクター
 			@param[in]	autocrlf	LF 時、自動で CR の送出をしない場合「false」
 			@param[in]	flow_ctrl	フロー制御型
+			@param[in]	sci_port	ポート設定を詳細に行う場合
 		*/
 		//-----------------------------------------------------------------//
-		sci_io(bool autocrlf = true, FLOW_CTRL flow_ctrl = FLOW_CTRL::NONE, const port_map_order::sci_port_t& sci_port = port_map_order::sci_port_t()) noexcept :
+		sci_io(bool autocrlf = true, FLOW_CTRL flow_ctrl = FLOW_CTRL::NONE,
+			const port_map_order::sci_port_t& sci_port = port_map_order::sci_port_t()) noexcept :
 			port_map_(sci_port),
 			level_(0),
 			auto_crlf_(autocrlf), baud_(0) {
@@ -265,6 +276,11 @@ namespace device {
 #if defined(SIG_RX63T)
 			if(level == 0) return false;
 #endif
+			if(flow_ctrl_ == FLOW_CTRL::RS485 && level == 0) {
+				// RS485 では、割り込みを使わない設定は NG
+				return false;
+			}
+
 			level_ = level;
 			stop_ = false;
 			recv_.clear();
@@ -430,7 +446,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ボーレートを設定して、SCI を有効にする
+			@brief  ボーレート型を使い SCI を有効にする
 			@param[in]	baud	ボーレート型
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@param[in]	prot	通信プロトコル（標準は、８ビット、パリティ無し、１ストップ）
@@ -454,7 +470,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ボーレートを取得
+			@brief	設定ボーレートを取得
 			@param[in]	real	「true」にした場合、内部で設定された実際の値
 			@return ボーレート
 		 */
@@ -510,7 +526,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	SCI 文字出力
+			@brief	SCI 文字出力 @n
+					送信バッファの容量が７／８以上の場合は、空になるまで待つ。（フロー制御が無い場合）
 			@param[in]	ch	文字コード
 		 */
 		//-----------------------------------------------------------------//
@@ -524,30 +541,22 @@ namespace device {
 				if(b) {
 					SCI::SSR.ORER = 0;
 				}
-				/// 送信バッファの容量が７／８以上の場合は、空になるまで待つ。
-				if(send_.length() >= (send_.size() * 7 / 8)) {
-					while(send_.length() != 0) sleep_();
+				if(flow_ctrl_ == FLOW_CTRL::NONE) {
+					if(send_.length() >= (send_.size() * 7 / 8)) {
+						while(send_.length() != 0) sleep_();
+					}
 				}
 				send_.put(ch);
 				if(SCI::SCR.TIE() == 0) {
-/// この部分を取り除いても問題無いか評価中・・・
-///					while(SCI::SSR.TEND() == 0) sleep_();
 					if(flow_ctrl_ == FLOW_CTRL::RS485) {
 						RTS::P = 1;
 					}
 					SCI::SCR.TIE = 1;
-//					if(stop_) {
-//						SCI::TDR = XON;
-//						stop_ = false;
-//					} else {
-						SCI::TDR = send_.get();
-//					}
+					++ch_count_;
+					SCI::TDR = send_.get();
 				}
 			} else {
 				while(SCI::SSR.TEND() == 0) sleep_();
-				if(flow_ctrl_ == FLOW_CTRL::RS485) {
-					RTS::P = 1;
-				}
 				SCI::TDR = ch;
 			}
 		}
@@ -638,4 +647,6 @@ namespace device {
 		volatile bool sci_io<SCI, RBF, SBF, PSEL, RTS>::stop_;
 	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
 		volatile uint16_t sci_io<SCI, RBF, SBF, PSEL, RTS>::errc_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
+		volatile uint32_t sci_io<SCI, RBF, SBF, PSEL, RTS>::ch_count_;
 }
