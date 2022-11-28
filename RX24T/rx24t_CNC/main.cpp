@@ -42,7 +42,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 256> RS_SBF;
 	static const device::port_map::ORDER RS_PORT = device::port_map::ORDER::SECOND;
 	typedef device::PORT<device::PORTE, device::bitpos::B1> RS_CTRL;
-	typedef device::sci_io<device::SCI5, RS_RBF, RS_SBF, RS_PORT, RS_CTRL> RS485;
+	typedef device::sci_io<device::SCI5, RS_RBF, RS_SBF, RS_PORT, device::sci_io_base::FLOW_CTRL::RS485, RS_CTRL> RS485;
 	RS485	rs485_;
 
 	typedef utils::command<256> COMMAND;

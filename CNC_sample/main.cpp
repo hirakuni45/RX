@@ -45,8 +45,8 @@ namespace {
 	// P32: MAX3485 /RE, P33: MAX3485 DE
 	typedef device::PORT<device::PORT3, device::bitpos::B2> RS485_NRE;  // for MAX3485 /RE
 	typedef device::PORT<device::PORT3, device::bitpos::B3> RS485_DE;   // for MAX3485 DE
-	typedef device::sci_io<RS485_CH, RS485_RXB, RS485_TXB, device::port_map::ORDER::SECOND, RS485_DE> RS485;
-	RS485	rs485_(true, RS485::FLOW_CTRL::RS485);
+	typedef device::sci_io<RS485_CH, RS485_RXB, RS485_TXB, device::port_map::ORDER::SECOND, device::sci_io_base::FLOW_CTRL::RS485, RS485_DE> RS485;
+	RS485	rs485_;
 }
 
 
