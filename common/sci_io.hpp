@@ -33,8 +33,11 @@
 			※ C++ では printf は推奨しないし使う理由が無い、utils::format を使って下さい。 @n
 			RS-485： @n
 			・レシーバーの受信ゲートは常に有効にしておく。 @n
-			・送信が正常に行えたかのケア（送信した文字列と受信した文字列の比較など）は、アプリ側で行う。 @n
-			・レシーバーの送信ゲート制御のみ、ドライバーが行う。
+			・送信が正常に行えたかのケア（送信した文字列と受信した文字列の比較）は、アプリ側で行う。 @n
+			・レシーバーの送信ゲート制御のみ、ドライバーが行う。 @n
+			Ex: RS-485 を利用する場合の定義例 @n
+			  	typedef device::PORT<device::PORT3, device::bitpos::B3> RS485_DE;   // for MAX3485 DE @n
+				typedef device::sci_io<RS485_CH, RS485_RXB, RS485_TXB, device::port_map::ORDER::SECOND, device::sci_io_base::FLOW_CTRL::RS485, RS485_DE> RS485;
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -120,10 +123,11 @@ namespace device {
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
 		@param[in]	PSEL	通常ポート候補
+		@param[in]	FLCT	フロー制御型
 		@param[in]	RTS		制御ポート（RTS/RS-485_DE）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, class RTS = NULL_PORT>
+	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, typename sci_io_base::FLOW_CTRL FLCT = sci_io_base::FLOW_CTRL::NONE, class RTS = NULL_PORT>
 	class sci_io : public sci_io_base {
 	public:
 		typedef SCI sci_type;
@@ -146,16 +150,14 @@ namespace device {
 		uint8_t		level_;
 		bool		auto_crlf_;
 		uint32_t	baud_;
-		static FLOW_CTRL			flow_ctrl_;
 		static volatile bool		stop_;
 		static volatile uint16_t	errc_;
-		static volatile uint32_t	ch_count_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept { asm("nop"); }
 
 
-		static INTERRUPT_FUNC void recv_task_()
+		static INTERRUPT_FUNC void rxi_task_()
 		{
 			bool err = false;
 			if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
@@ -173,17 +175,10 @@ namespace device {
 			if(err) {
 				++errc_;
 			} else {
-				if(flow_ctrl_ == FLOW_CTRL::SOFT || flow_ctrl_ == FLOW_CTRL::HARD || flow_ctrl_ == FLOW_CTRL::SOFT_HARD) {
+				if(FLCT == FLOW_CTRL::SOFT || FLCT == FLOW_CTRL::HARD || FLCT == FLOW_CTRL::SOFT_HARD) {
 					if(recv_.length() >= (recv_.size() - 6)) {
 						stop_ = true;
-						if(flow_ctrl_ == FLOW_CTRL::HARD || flow_ctrl_ == FLOW_CTRL::SOFT_HARD) {
-							RTS::P = 0;
-						}
-					}
-				} else if(flow_ctrl_ == FLOW_CTRL::RS485) {
-					if(ch_count_ > 0) {
-						ch_count_--;
-						if(send_.length() == 0 && ch_count_ == 0 && SCI::SCR.TIE() == 0) {
+						if(FLCT == FLOW_CTRL::HARD || FLCT == FLOW_CTRL::SOFT_HARD) {
 							RTS::P = 0;
 						}
 					}
@@ -192,35 +187,51 @@ namespace device {
 			}
 		}
 
-
-		static INTERRUPT_FUNC void send_task_()
+		static INTERRUPT_FUNC void txi_task_()
 		{
 			if(send_.length() > 0) {
-				++ch_count_;
 				SCI::TDR = send_.get();
 			} else {
 				SCI::SCR.TIE = 0;
+				if(FLCT == FLOW_CTRL::RS485) {
+					SCI::SCR.TEIE = 1;
+				}
 			}
 		}
 
-
-		static INTERRUPT_FUNC void send_fin_task_()
+		static inline void tei_task_()
 		{
-
+			if(send_.length() == 0) {
+				RTS::P = 0;
+			}
+			SCI::SCR.TEIE = 0;
 		}
 
+		static INTERRUPT_FUNC void tei_itask_()
+		{
+			tei_task_();
+		}
 
 		void set_intr_(uint8_t level) noexcept
 		{
 			if(level > 0) {
-				icu_mgr::set_task(SCI::RXI, recv_task_);
-				icu_mgr::set_task(SCI::TXI, send_task_);
+				icu_mgr::set_interrupt(SCI::RXI, rxi_task_, level);
+				icu_mgr::set_interrupt(SCI::TXI, txi_task_, level);
+				if(FLCT == FLOW_CTRL::RS485) {
+					auto gv = icu_mgr::get_group_vector(SCI::TEI);
+					if(gv == ICU::VECTOR::NONE) {
+						icu_mgr::set_interrupt(SCI::TEI, tei_itask_, level);
+					} else {
+						icu_mgr::set_interrupt(SCI::TEI, tei_task_, level);
+					}
+				}
 			} else {
-				icu_mgr::set_task(SCI::RXI, nullptr);
-				icu_mgr::set_task(SCI::TXI, nullptr);
+				icu_mgr::set_interrupt(SCI::RXI, nullptr, level);
+				icu_mgr::set_interrupt(SCI::TXI, nullptr, level);
+				if(FLCT == FLOW_CTRL::RS485) {
+					icu_mgr::set_interrupt(SCI::TEI, nullptr, level);
+				}
 			}
-			icu_mgr::set_level(SCI::RXI, level);
-			icu_mgr::set_level(SCI::TXI, level);
 		}
 
 	public:
@@ -237,7 +248,6 @@ namespace device {
 			port_map_(sci_port),
 			level_(0),
 			auto_crlf_(autocrlf), baud_(0) {
-			flow_ctrl_ = flow_ctrl;
 			stop_ = false;
 			errc_ = 0;
 		}
@@ -276,7 +286,7 @@ namespace device {
 #if defined(SIG_RX63T)
 			if(level == 0) return false;
 #endif
-			if(flow_ctrl_ == FLOW_CTRL::RS485 && level == 0) {
+			if(FLCT == FLOW_CTRL::RS485 && level == 0) {
 				// RS485 では、割り込みを使わない設定は NG
 				return false;
 			}
@@ -321,12 +331,12 @@ namespace device {
 				}
 			}
 
-			// RS-484 半二重制御ポート
-			if(flow_ctrl_ != FLOW_CTRL::NONE) {
-				if(flow_ctrl_ == FLOW_CTRL::RS485) {
+			// RS-485 半二重制御、ハードフロー制御ポート
+			if(FLCT != FLOW_CTRL::NONE) {
+				if(FLCT == FLOW_CTRL::RS485) {
 					RTS::DIR = 1;
 					RTS::P = 0;  // disable send driver
-				} else if(flow_ctrl_ == FLOW_CTRL::HARD || flow_ctrl_ != FLOW_CTRL::SOFT_HARD) {
+				} else if(FLCT == FLOW_CTRL::HARD || FLCT != FLOW_CTRL::SOFT_HARD) {
 					RTS::DIR = 1;
 					RTS::P = 1;
 				}
@@ -345,7 +355,7 @@ namespace device {
 			while(brr > limit) {
 				brr >>= 2;
 				++cks;
-				if(cks >= 4) {  // 範囲外の速度
+				if(cks >= 4) {  // 範囲外の速度（低速）
 					port_map::turn(SCI::PERIPHERAL, false, PSEL);
 					power_mgr::turn(SCI::PERIPHERAL, false);
 					return false;
@@ -541,18 +551,17 @@ namespace device {
 				if(b) {
 					SCI::SSR.ORER = 0;
 				}
-				if(flow_ctrl_ == FLOW_CTRL::NONE) {
+				if(FLCT == FLOW_CTRL::NONE) {
 					if(send_.length() >= (send_.size() * 7 / 8)) {
 						while(send_.length() != 0) sleep_();
 					}
 				}
 				send_.put(ch);
 				if(SCI::SCR.TIE() == 0) {
-					if(flow_ctrl_ == FLOW_CTRL::RS485) {
+					if(FLCT == FLOW_CTRL::RS485) {
 						RTS::P = 1;
 					}
 					SCI::SCR.TIE = 1;
-					++ch_count_;
 					SCI::TDR = send_.get();
 				}
 			} else {
@@ -607,7 +616,7 @@ namespace device {
 					sleep_();
 				}
 				auto ch = recv_.get();
-				if(flow_ctrl_ == FLOW_CTRL::HARD || flow_ctrl_ == FLOW_CTRL::SOFT_HARD) {
+				if(FLCT == FLOW_CTRL::HARD || FLCT == FLOW_CTRL::SOFT_HARD) {
 					if(recv_.length() == 0) {
 						RTS::P = 1;
 					}
@@ -637,16 +646,12 @@ namespace device {
 	};
 
 	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
-		RBF sci_io<SCI, RBF, SBF, PSEL, RTS>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
-		SBF sci_io<SCI, RBF, SBF, PSEL, RTS>::send_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
-		sci_io_base::FLOW_CTRL sci_io<SCI, RBF, SBF, PSEL, RTS>::flow_ctrl_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
-		volatile bool sci_io<SCI, RBF, SBF, PSEL, RTS>::stop_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
-		volatile uint16_t sci_io<SCI, RBF, SBF, PSEL, RTS>::errc_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, class RTS>
-		volatile uint32_t sci_io<SCI, RBF, SBF, PSEL, RTS>::ch_count_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, typename sci_io_base::FLOW_CTRL FLCT, class RTS>
+		RBF sci_io<SCI, RBF, SBF, PSEL, FLCT, RTS>::recv_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, typename sci_io_base::FLOW_CTRL FLCT, class RTS>
+		SBF sci_io<SCI, RBF, SBF, PSEL, FLCT, RTS>::send_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, typename sci_io_base::FLOW_CTRL FLCT, class RTS>
+		volatile bool sci_io<SCI, RBF, SBF, PSEL, FLCT, RTS>::stop_;
+	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, typename sci_io_base::FLOW_CTRL FLCT, class RTS>
+		volatile uint16_t sci_io<SCI, RBF, SBF, PSEL, FLCT, RTS>::errc_;
 }
