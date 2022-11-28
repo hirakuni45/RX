@@ -349,7 +349,7 @@ level = 0;
 				icu_mgr::set_interrupt(SCI::TXI, send_task_, level_);
 
 				// TEIx (STI interrupt)
-				auto grp = ICU::get_group_vector(SCI::TEI);
+				auto grp = icu_mgr::get_group_vector(SCI::TEI);
 				if(grp == ICU::VECTOR::NONE) {  // NONE が返ると通常割り込み
 					// 通常ベクターの場合、割り込み関数を登録、
 					// tev がグループベクターの場合にコンパイルエラーになるので回避
