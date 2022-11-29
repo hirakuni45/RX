@@ -273,7 +273,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_BE0 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBE0));
+			set_task(ICU::VECTOR::GROUPBE0, group_be0_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPBE0_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENBE0 |= 1 << i;
@@ -293,7 +293,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_BL0 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_bl0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBL0));
+			set_task(ICU::VECTOR::GROUPBL0, group_bl0_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPBL0_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENBL0 |= 1 << i;
@@ -313,7 +313,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_BL1 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_bl1_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBL1));
+			set_task(ICU::VECTOR::GROUPBL1, group_bl1_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPBL1_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENBL1 |= 1 << i;
@@ -333,7 +333,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_AL0 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_al0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPAL0));
+			set_task(ICU::VECTOR::GROUPAL0, group_al0_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPAL0_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENAL0 |= 1 << i;
@@ -353,7 +353,7 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR_AL1 idx, utils::TASK task) noexcept
 		{
 			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_al1_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPAL1));
+			set_task(ICU::VECTOR::GROUPAL1, group_al1_handler_);
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPAL1_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENAL1 |= 1 << i;
