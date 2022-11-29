@@ -19,7 +19,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
-	struct icu_t : public ICU_BASE {
+	struct icu_t : public ICU_BASE, ICU_IRQ8 {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -381,30 +381,137 @@ namespace device {
 		typedef ipr_t<0x0008'7300> IPR_;
 		static IPR_ IPR;
 
-
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
 		typedef dtcer_t<0x0008'7100, VECTOR> DTCER_;
 		static DTCER_ DTCER;
 
-
 		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
-		typedef rw8_t<0x0008'7400> DMRSR0_;
+		static DMRSR4N_ DMRSR;
 		static DMRSR0_ DMRSR0;
-		typedef rw8_t<0x0008'7404> DMRSR1_;
 		static DMRSR1_ DMRSR1;
-		typedef rw8_t<0x0008'7408> DMRSR2_;
 		static DMRSR2_ DMRSR2;
-		typedef rw8_t<0x0008'740C> DMRSR3_;
 		static DMRSR3_ DMRSR3;
-	};
-	typedef icu_t<void> ICU;
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ 0 割り込み要因レジスタ（GRP00）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct grp00_t : public ro32_t<base> {
+			typedef ro32_t<base> io_;
+			using io_::operator ();
+
+			bit_ro_t <io_, bitpos::B1>  IS1;
+		};
+		typedef grp00_t<0x0008'C300> GRP00_;
+		static GRP00_ GRP00;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ 12 割り込み要因レジスタ（GRP12）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct grp12_t : public ro32_t<base> {
+			typedef ro32_t<base> io_;
+			using io_::operator ();
+
+			bit_ro_t <io_, bitpos::B0>  IS0;
+			bit_ro_t <io_, bitpos::B1>  IS1;
+			bit_ro_t <io_, bitpos::B2>  IS2;
+			bit_ro_t <io_, bitpos::B3>  IS3;
+			bit_ro_t <io_, bitpos::B4>  IS4;
+			bit_ro_t <io_, bitpos::B5>  IS5;
+			bit_ro_t <io_, bitpos::B6>  IS6;
+		};
+		typedef grp12_t<0x0008'C330> GRP12_;
+		static GRP12_ GRP12;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ 0 割り込み許可レジスタ（GEN00）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct gen00_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_ro_t <io_, bitpos::B1>  EN1;
+		};
+		typedef gen00_t<0x0008'C340> GEN00_;
+		static GEN00_ GEN00;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ 12 割り込み許可レジスタ（GEN12）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct gen12_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  EN0;
+			bit_rw_t<io_, bitpos::B1>  EN1;
+			bit_rw_t<io_, bitpos::B2>  EN2;
+			bit_rw_t<io_, bitpos::B3>  EN3;
+			bit_rw_t<io_, bitpos::B4>  EN4;
+			bit_rw_t<io_, bitpos::B5>  EN5;
+			bit_rw_t<io_, bitpos::B6>  EN6;
+		};
+		typedef gen12_t<0x0008'C370> GEN12_;
+		static GEN12_ GEN12;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ 0 割り込みクリアレジスタ（GCR00）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct gcr00_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_ro_t <io_, bitpos::B1>  CLR1;
+		};
+		typedef gcr00_t<0x0008'C380> GCR00_;
+		static GCR00_ GCR00;
+	};
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
 	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
 	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
 	template<class _> typename icu_t<_>::DTCER_ icu_t<_>::DTCER;
+	template<class _> typename icu_t<_>::DMRSR4N_ icu_t<_>::DMRSR;
 	template<class _> typename icu_t<_>::DMRSR0_ icu_t<_>::DMRSR0;
 	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
 	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
 	template<class _> typename icu_t<_>::DMRSR3_ icu_t<_>::DMRSR3;
+	template<class _> typename icu_t<_>::GRP00_ icu_t<_>::GRP00;
+	template<class _> typename icu_t<_>::GRP12_ icu_t<_>::GRP12;
+	template<class _> typename icu_t<_>::GEN00_ icu_t<_>::GEN00;
+	template<class _> typename icu_t<_>::GEN12_ icu_t<_>::GEN12;
+	template<class _> typename icu_t<_>::GCR00_ icu_t<_>::GCR00;
+
+	typedef icu_t<void> ICU;
 }

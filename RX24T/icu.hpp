@@ -19,7 +19,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
-	struct icu_t : public ICU_BASE {
+	struct icu_t : public ICU_BASE, ICU_IRQ8 {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -251,7 +251,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x00087000> IR_;
+		typedef ir_t<0x0008'7000> IR_;
 		static IR_ IR;
 
 
@@ -298,7 +298,7 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		typedef ier_t<0x00087200> IER_;
+		typedef ier_t<0x0008'7200> IER_;
 		static IER_ IER;
 
 
@@ -480,12 +480,12 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		typedef ipr_t<0x00087300> IPR_;
+		typedef ipr_t<0x0008'7300> IPR_;
 		static IPR_ IPR;
 
 
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
-		typedef dtcer_t<0x00087100, VECTOR> DTCER_;
+		typedef dtcer_t<0x0008'7100, VECTOR> DTCER_;
 		static DTCER_ DTCER;
 	};
 	typedef icu_t<void> ICU;
