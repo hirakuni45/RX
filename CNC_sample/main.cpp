@@ -102,21 +102,26 @@ int main(int argc, char** argv)
 	}
 
 	auto clk = device::clock_profile::ICLK / 1'000'000;
-	utils::format("Start CNC sample for '%s' %d[MHz]\n") % system_str_ % clk;
+	utils::format("Start CNC sample for '%s' %d [MHz]\n") % system_str_ % clk;
 
 	LED::DIR = 1;
 
 	{
-		utils::format("SCI PCLK: %u\n") % SCI_CH::PCLK;
-		utils::format("SCI Baud rate (set):  %u\n") % sci_.get_baud_rate();
+		utils::format("SCI PCLK: %u [Hz]\n") % SCI_CH::PCLK;
+
+		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
 		rate *= 100.0f;
+		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(SCI_CH::SEMR_BRME);
+		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(SCI_CH::SEMR_BGDM);
 		utils::format("SCI Baud rate (real): %u (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
 
-		utils::format("RS-485 Baud rate (set):  %u\n") % rs485_.get_baud_rate();
+		utils::format("RS-485 Baud rate (set): %u [BPS]\n") % rs485_.get_baud_rate();
 		rate = 1.0f - static_cast<float>(rs485_.get_baud_rate()) / rs485_.get_baud_rate(true);
 		rate *= 100.0f;
 		utils::format("RS-485 Baud rate (real): %u (%3.2f [%%])\n") % rs485_.get_baud_rate(true) % rate;
+		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(RS485_CH::SEMR_BRME);
+		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(RS485_CH::SEMR_BGDM);
 
 		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
 		rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
