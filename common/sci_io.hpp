@@ -431,9 +431,9 @@ namespace device {
 			if(SCI::SEMR_BRME) {  // 微調整機能が使える場合
 				uint32_t rate = SCI::PCLK / mtx / brr / (1 << (cks * 2));
 				uint32_t mddr = (baud_ << 9) / rate;
+				++mddr;
+				mddr >>= 1;
 				if(mddr >= 128 && mddr < 256) {  // 微調整を行う場合
-					++mddr;
-					mddr >>= 1;
 					SCI::MDDR = mddr;
 					brme = true;
 				}

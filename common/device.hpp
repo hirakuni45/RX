@@ -1,7 +1,18 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX マイコン、デバイス固有ヘッダー
+	@brief	RX マイコン、デバイス固有ヘッダー @n
+			RX220 @n
+			RX63T @n
+			RX621/RX62N @n
+			RX24T @n
+			RX64M @n
+			RX71M @n
+			RX72M @n
+			RX72N @n
+			RX651/RX65N @n
+			RX66T @n
+			RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -10,7 +21,12 @@
 //=====================================================================//
 #include "common/io_utils.hpp"
 
-#if defined(SIG_RX63T)
+#if defined(SIG_RX220)
+
+#include "RX220/icu.hpp"
+#include "RX220/icu_mgr.hpp"
+
+#elif defined(SIG_RX63T)
 #include "RX63T/clock_profile.hpp"
 #include "RX63T/peripheral.hpp"
 #include "RX63T/system.hpp"

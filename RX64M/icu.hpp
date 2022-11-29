@@ -2,8 +2,8 @@
 //=============================================================================//
 /*!	@file
 	@brief	RX64M/RX71M グループ・ICUA 定義 @n
-			・RIIC の割り込み名は、SCI の割り込み名と区別出来ない為、変更している。@n
-			・Ex: RIIC0 (RXI0  --->  RIIC_RXI0) 
+			・RIIC の割り込み名は、SCI の割り込み名と重複する為、変更している。 @n
+			・Ex: RIIC0 (RXI0  --->  ICRXI0) 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -21,7 +21,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class _>
-	struct icu_t : public ICU_BASE {
+	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -570,7 +570,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x00087000> IR_;
+		typedef ir_t<0x0008'7000> IR_;
 		static IR_ IR;
 
 
@@ -617,7 +617,7 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		typedef ier_t<0x00087200> IER_;
+		typedef ier_t<0x0008'7200> IER_;
 		static IER_ IER;
 
 
@@ -656,224 +656,69 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		typedef ipr_t<0x00087300> IPR_;
+		typedef ipr_t<0x0008'7300> IPR_;
 		static IPR_ IPR;
 
-
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
-		typedef dtcer_t<0x00087100, VECTOR> DTCER_;
+		typedef dtcer_t<0x0008'7100, VECTOR> DTCER_;
 		static DTCER_ DTCER;
 
-
 		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
-		typedef rw8_t<0x00087400> DMRSR0_;
+		static DMRSR8N_ DMRSR;
 		static DMRSR0_ DMRSR0;
-		typedef rw8_t<0x00087404> DMRSR1_;
 		static DMRSR1_ DMRSR1;
-		typedef rw8_t<0x00087408> DMRSR2_;
 		static DMRSR2_ DMRSR2;
-		typedef rw8_t<0x0008740C> DMRSR3_;
 		static DMRSR3_ DMRSR3;
-		typedef rw8_t<0x00087410> DMRSR4_;
 		static DMRSR4_ DMRSR4;
-		typedef rw8_t<0x00087414> DMRSR5_;
 		static DMRSR5_ DMRSR5;
-		typedef rw8_t<0x00087418> DMRSR6_;
 		static DMRSR6_ DMRSR6;
-		typedef rw8_t<0x0008741C> DMRSR7_;
 		static DMRSR7_ DMRSR7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込み要求レジスタ
-			@param[in]	base	ベースアドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct grp_t : public ro32_t<base> {
-			typedef ro32_t<base> io_;
-			using io_::operator ();
-
-			bit_ro_t <io_, bitpos::B0>  IS0;
-			bit_ro_t <io_, bitpos::B1>  IS1;
-			bit_ro_t <io_, bitpos::B2>  IS2;
-			bit_ro_t <io_, bitpos::B3>  IS3;
-			bit_ro_t <io_, bitpos::B4>  IS4;
-			bit_ro_t <io_, bitpos::B5>  IS5;
-			bit_ro_t <io_, bitpos::B6>  IS6;
-			bit_ro_t <io_, bitpos::B7>  IS7;
-
-			bit_ro_t <io_, bitpos::B8>  IS8;
-			bit_ro_t <io_, bitpos::B9>  IS9;
-			bit_ro_t <io_, bitpos::B10> IS10;
-			bit_ro_t <io_, bitpos::B11> IS11;
-			bit_ro_t <io_, bitpos::B12> IS12;
-			bit_ro_t <io_, bitpos::B13> IS13;
-			bit_ro_t <io_, bitpos::B14> IS14;
-			bit_ro_t <io_, bitpos::B15> IS15;
-
-			bit_ro_t <io_, bitpos::B16> IS16;
-			bit_ro_t <io_, bitpos::B17> IS17;
-			bit_ro_t <io_, bitpos::B18> IS18;
-			bit_ro_t <io_, bitpos::B19> IS19;
-			bit_ro_t <io_, bitpos::B20> IS20;
-			bit_ro_t <io_, bitpos::B21> IS21;
-			bit_ro_t <io_, bitpos::B22> IS22;
-			bit_ro_t <io_, bitpos::B23> IS23;
-
-			bit_ro_t <io_, bitpos::B24> IS24;
-			bit_ro_t <io_, bitpos::B25> IS25;
-			bit_ro_t <io_, bitpos::B26> IS26;
-			bit_ro_t <io_, bitpos::B27> IS27;
-			bit_ro_t <io_, bitpos::B28> IS28;
-			bit_ro_t <io_, bitpos::B29> IS29;
-			bit_ro_t <io_, bitpos::B30> IS30;
-			bit_ro_t <io_, bitpos::B31> IS31;
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  グループ BE0 割り込み要求レジスタ（GRPBE0）@n
-					グループ BL0/1 割り込み要求レジスタ（GRPBL0/GRPBL1）@n
+			@brief  グループ BE0 割り込み要求レジスタ（GRPBE0） @n
+					グループ BL0/1 割り込み要求レジスタ（GRPBL0/GRPBL1） @n
 					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef grp_t<0x00087600> GRPBE0_;
+		typedef grp_t<0x0008'7600, VECTOR_BE0> GRPBE0_;
+		typedef grp_t<0x0008'7630, VECTOR_BL0> GRPBL0_;
+		typedef grp_t<0x0008'7634, VECTOR_BL1> GRPBL1_;
+		typedef grp_t<0x0008'7830, VECTOR_AL0> GRPAL0_;
+		typedef grp_t<0x0008'7834, VECTOR_AL1> GRPAL1_;
 		static GRPBE0_ GRPBE0;
-		typedef grp_t<0x00087630> GRPBL0_;
 		static GRPBL0_ GRPBL0;
-		typedef grp_t<0x00087634> GRPBL1_;
 		static GRPBL1_ GRPBL1;
-		typedef grp_t<0x00087830> GRPAL0_;
 		static GRPAL0_ GRPAL0;
-		typedef grp_t<0x00087834> GRPAL1_;
 		static GRPAL1_ GRPAL1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込み要求許可レジスタ
-			@param[in]	base	ベースアドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct gen_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  EN0;
-			bit_rw_t<io_, bitpos::B1>  EN1;
-			bit_rw_t<io_, bitpos::B2>  EN2;
-			bit_rw_t<io_, bitpos::B3>  EN3;
-			bit_rw_t<io_, bitpos::B4>  EN4;
-			bit_rw_t<io_, bitpos::B5>  EN5;
-			bit_rw_t<io_, bitpos::B6>  EN6;
-			bit_rw_t<io_, bitpos::B7>  EN7;
-
-			bit_rw_t<io_, bitpos::B8>  EN8;
-			bit_rw_t<io_, bitpos::B9>  EN9;
-			bit_rw_t<io_, bitpos::B10> EN10;
-			bit_rw_t<io_, bitpos::B11> EN11;
-			bit_rw_t<io_, bitpos::B12> EN12;
-			bit_rw_t<io_, bitpos::B13> EN13;
-			bit_rw_t<io_, bitpos::B14> EN14;
-			bit_rw_t<io_, bitpos::B15> EN15;
-
-			bit_rw_t<io_, bitpos::B16> EN16;
-			bit_rw_t<io_, bitpos::B17> EN17;
-			bit_rw_t<io_, bitpos::B18> EN18;
-			bit_rw_t<io_, bitpos::B19> EN19;
-			bit_rw_t<io_, bitpos::B20> EN20;
-			bit_rw_t<io_, bitpos::B21> EN21;
-			bit_rw_t<io_, bitpos::B22> EN22;
-			bit_rw_t<io_, bitpos::B23> EN23;
-
-			bit_rw_t<io_, bitpos::B24> EN24;
-			bit_rw_t<io_, bitpos::B25> EN25;
-			bit_rw_t<io_, bitpos::B26> EN26;
-			bit_rw_t<io_, bitpos::B27> EN27;
-			bit_rw_t<io_, bitpos::B28> EN28;
-			bit_rw_t<io_, bitpos::B29> EN29;
-			bit_rw_t<io_, bitpos::B30> EN30;
-			bit_rw_t<io_, bitpos::B31> EN31;
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  グループ BE0 割り込み要求許可レジスタ（GENBE0）@n
-					グループ BL0/1 割り込み要求許可レジスタ（GENBL0/GENBL1/GENBL2）@n
+			@brief  グループ BE0 割り込み要求許可レジスタ（GENBE0） @n
+					グループ BL0/1 割り込み要求許可レジスタ（GENBL0/GENBL1/GENBL2） @n
 					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gen_t<0x00087640> GENBE0_;
+		typedef gen_t<0x0008'7640, VECTOR_BE0> GENBE0_;
+		typedef gen_t<0x0008'7670, VECTOR_BL0> GENBL0_;
+		typedef gen_t<0x0008'7674, VECTOR_BL1> GENBL1_;
+		typedef gen_t<0x0008'7870, VECTOR_AL0> GENAL0_;
+		typedef gen_t<0x0008'7874, VECTOR_AL1> GENAL1_;
 		static GENBE0_ GENBE0;
-		typedef gen_t<0x00087670> GENBL0_;
 		static GENBL0_ GENBL0;
-		typedef gen_t<0x00087674> GENBL1_;
 		static GENBL1_ GENBL1;
-		typedef gen_t<0x00087870> GENAL0_;
 		static GENAL0_ GENAL0;
-		typedef gen_t<0x00087874> GENAL1_;
 		static GENAL1_ GENAL1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
-			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct gcrbe0_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>  CLR0;
-			bit_rw_t <io_, bitpos::B1>  CLR1;
-			bit_rw_t <io_, bitpos::B2>  CLR2;
-			bit_rw_t <io_, bitpos::B3>  CLR3;
-			bit_rw_t <io_, bitpos::B4>  CLR4;
-			bit_rw_t <io_, bitpos::B5>  CLR5;
-			bit_rw_t <io_, bitpos::B6>  CLR6;
-			bit_rw_t <io_, bitpos::B7>  CLR7;
-
-			bit_rw_t <io_, bitpos::B8>  CLR8;
-			bit_rw_t <io_, bitpos::B9>  CLR9;
-			bit_rw_t <io_, bitpos::B10> CLR10;
-			bit_rw_t <io_, bitpos::B11> CLR11;
-			bit_rw_t <io_, bitpos::B12> CLR12;
-			bit_rw_t <io_, bitpos::B13> CLR13;
-			bit_rw_t <io_, bitpos::B14> CLR14;
-			bit_rw_t <io_, bitpos::B15> CLR15;
-
-			bit_rw_t <io_, bitpos::B16> CLR16;
-			bit_rw_t <io_, bitpos::B17> CLR17;
-			bit_rw_t <io_, bitpos::B18> CLR18;
-			bit_rw_t <io_, bitpos::B19> CLR19;
-			bit_rw_t <io_, bitpos::B20> CLR20;
-			bit_rw_t <io_, bitpos::B21> CLR21;
-			bit_rw_t <io_, bitpos::B22> CLR22;
-			bit_rw_t <io_, bitpos::B23> CLR23;
-
-			bit_rw_t <io_, bitpos::B24> CLR24;
-			bit_rw_t <io_, bitpos::B25> CLR25;
-			bit_rw_t <io_, bitpos::B26> CLR26;
-			bit_rw_t <io_, bitpos::B27> CLR27;
-			bit_rw_t <io_, bitpos::B28> CLR28;
-			bit_rw_t <io_, bitpos::B29> CLR29;
-			bit_rw_t <io_, bitpos::B30> CLR30;
-			bit_rw_t <io_, bitpos::B31> CLR31;
-		};
-		typedef gcrbe0_t<0x00087680> GCRBE0_;
+		typedef gcrbe0_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
 		static GCRBE0_ GCRBE0;
 
 
@@ -907,17 +752,17 @@ namespace device {
 			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Ah）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087700> PIBR0;
-		static pixr_t<0x00087701> PIBR1;
-		static pixr_t<0x00087702> PIBR2;
-		static pixr_t<0x00087703> PIBR3;
-		static pixr_t<0x00087704> PIBR4;
-		static pixr_t<0x00087705> PIBR5;
-		static pixr_t<0x00087706> PIBR6;
-		static pixr_t<0x00087707> PIBR7;
-		static pixr_t<0x00087708> PIBR8;
-		static pixr_t<0x00087709> PIBR9;
-		static pixr_t<0x0008770A> PIBRA;
+		static pixr_t<0x0008'7700> PIBR0;
+		static pixr_t<0x0008'7701> PIBR1;
+		static pixr_t<0x0008'7702> PIBR2;
+		static pixr_t<0x0008'7703> PIBR3;
+		static pixr_t<0x0008'7704> PIBR4;
+		static pixr_t<0x0008'7705> PIBR5;
+		static pixr_t<0x0008'7706> PIBR6;
+		static pixr_t<0x0008'7707> PIBR7;
+		static pixr_t<0x0008'7708> PIBR8;
+		static pixr_t<0x0008'7709> PIBR9;
+		static pixr_t<0x0008'770A> PIBRA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -925,18 +770,18 @@ namespace device {
 			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087900> PIAR0;
-		static pixr_t<0x00087901> PIAR1;
-		static pixr_t<0x00087902> PIAR2;
-		static pixr_t<0x00087903> PIAR3;
-		static pixr_t<0x00087904> PIAR4;
-		static pixr_t<0x00087905> PIAR5;
-		static pixr_t<0x00087906> PIAR6;
-		static pixr_t<0x00087907> PIAR7;
-		static pixr_t<0x00087908> PIAR8;
-		static pixr_t<0x00087909> PIAR9;
-		static pixr_t<0x0008790A> PIARA;
-		static pixr_t<0x0008790B> PIARB;
+		static pixr_t<0x0008'7900> PIAR0;
+		static pixr_t<0x0008'7901> PIAR1;
+		static pixr_t<0x0008'7902> PIAR2;
+		static pixr_t<0x0008'7903> PIAR3;
+		static pixr_t<0x0008'7904> PIAR4;
+		static pixr_t<0x0008'7905> PIAR5;
+		static pixr_t<0x0008'7906> PIAR6;
+		static pixr_t<0x0008'7907> PIAR7;
+		static pixr_t<0x0008'7908> PIAR8;
+		static pixr_t<0x0008'7909> PIAR9;
+		static pixr_t<0x0008'790A> PIARA;
+		static pixr_t<0x0008'790B> PIARB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -944,7 +789,7 @@ namespace device {
 			@brief  選択型割り込み B 要因選択レジスタ Xn（SLIBXRn）（n = 128 ～ 143）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x00087700, VECTOR, VECTOR_SELB> SLIBR_;
+		typedef icu_utils::slixr_t<0x0008'7700, VECTOR, VECTOR_SELB> SLIBR_;
 		static SLIBR_ SLIBR;
 
 
@@ -953,17 +798,14 @@ namespace device {
 			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x00087900, VECTOR, VECTOR_SELA> SLIAR_;
+		typedef icu_utils::slixr_t<0x0008'7900, VECTOR, VECTOR_SELA> SLIAR_;
 		static SLIAR_ SLIAR;
 	};
-	typedef icu_t<void> ICU;
-
-	// テンプレート内、スタティック定義、実態：
 	template<class _> typename icu_t<_>::IR_  icu_t<_>::IR;
 	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
 	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
-
 	template<class _> typename icu_t<_>::DTCER_ icu_t<_>::DTCER;
+	template<class _> typename icu_t<_>::DMRSR8N_ icu_t<_>::DMRSR;
 	template<class _> typename icu_t<_>::DMRSR0_ icu_t<_>::DMRSR0;
 	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
 	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
@@ -972,21 +814,19 @@ namespace device {
 	template<class _> typename icu_t<_>::DMRSR5_ icu_t<_>::DMRSR5;
 	template<class _> typename icu_t<_>::DMRSR6_ icu_t<_>::DMRSR6;
 	template<class _> typename icu_t<_>::DMRSR7_ icu_t<_>::DMRSR7;
-
 	template<class _> typename icu_t<_>::GRPBE0_ icu_t<_>::GRPBE0;
 	template<class _> typename icu_t<_>::GRPBL0_ icu_t<_>::GRPBL0;
 	template<class _> typename icu_t<_>::GRPBL1_ icu_t<_>::GRPBL1;
 	template<class _> typename icu_t<_>::GRPAL0_ icu_t<_>::GRPAL0;
 	template<class _> typename icu_t<_>::GRPAL1_ icu_t<_>::GRPAL1;
-
 	template<class _> typename icu_t<_>::GENBE0_ icu_t<_>::GENBE0;
 	template<class _> typename icu_t<_>::GENBL0_ icu_t<_>::GENBL0;
 	template<class _> typename icu_t<_>::GENBL1_ icu_t<_>::GENBL1;
 	template<class _> typename icu_t<_>::GENAL0_ icu_t<_>::GENAL0;
 	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
-
 	template<class _> typename icu_t<_>::GCRBE0_ icu_t<_>::GCRBE0;
-
 	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
 	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
+
+	typedef icu_t<void> ICU;
 }

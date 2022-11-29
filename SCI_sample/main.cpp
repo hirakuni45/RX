@@ -156,8 +156,8 @@ int main(int argc, char** argv)
 	LED::P = 0;
 
 	{  // SCI/CMT の設定レポート表示
-		utils::format("SCI PCLK: %u\n") % SCI_CH::PCLK;
-		utils::format("SCI Baud rate (set):  %u\n") % sci_.get_baud_rate();
+		utils::format("SCI PCLK: %u [Hz]\n") % SCI_CH::PCLK;
+		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
 		rate *= 100.0f;
 		utils::format("  Baud rate (real): %u (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
