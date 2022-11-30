@@ -602,7 +602,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX グループ割り込みコントローラ、グループ割り込みクラス
+		@brief  グループ型割り込みクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
@@ -729,13 +729,13 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
+			@brief  グループ割り込みクリアレジスタ
 			@param[in]	base	ベースアドレス
 			@param[in]	GVEC	グループベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base, typename GVEC>
-		struct gcrbe0_t : public rw32_t<base> {
+		struct gcr_t : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -794,4 +794,190 @@ namespace device {
 	};
 
 	typedef icu_group_t<void> ICU_GROUP;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  選択型割り込みクラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class _>
+	struct icu_select_t {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み [AB] 要求レジスタ k (PI[AB]Rk) (k = 0h ～ Bh)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pixr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  PIR0;
+			bit_rw_t <io_, bitpos::B1>  PIR1;
+			bit_rw_t <io_, bitpos::B2>  PIR2;
+			bit_rw_t <io_, bitpos::B3>  PIR3;
+			bit_rw_t <io_, bitpos::B4>  PIR4;
+			bit_rw_t <io_, bitpos::B5>  PIR5;
+			bit_rw_t <io_, bitpos::B6>  PIR6;
+			bit_rw_t <io_, bitpos::B7>  PIR7;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Bh）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef pixr_t<0x0008'7700> PIBR0_;
+		typedef pixr_t<0x0008'7701> PIBR1_;
+		typedef pixr_t<0x0008'7702> PIBR2_;
+		typedef pixr_t<0x0008'7703> PIBR3_;
+		typedef pixr_t<0x0008'7704> PIBR4_;
+		typedef pixr_t<0x0008'7705> PIBR5_;
+		typedef pixr_t<0x0008'7706> PIBR6_;
+		typedef pixr_t<0x0008'7707> PIBR7_;
+		typedef pixr_t<0x0008'7708> PIBR8_;
+		typedef pixr_t<0x0008'7709> PIBR9_;
+		typedef pixr_t<0x0008'770A> PIBRA_;
+		typedef pixr_t<0x0008'770B> PIBRB_;
+		static PIBR0_ PIBR0;
+		static PIBR1_ PIBR1;
+		static PIBR2_ PIBR2;
+		static PIBR3_ PIBR3;
+		static PIBR4_ PIBR4;
+		static PIBR5_ PIBR5;
+		static PIBR6_ PIBR6;
+		static PIBR7_ PIBR7;
+		static PIBR8_ PIBR8;
+		static PIBR9_ PIBR9;
+		static PIBRA_ PIBRA;
+		static PIBRB_ PIBRB;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ 12h）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef pixr_t<0x0008'7900> PIAR0_;
+		typedef pixr_t<0x0008'7901> PIAR1_;
+		typedef pixr_t<0x0008'7902> PIAR2_;
+		typedef pixr_t<0x0008'7903> PIAR3_;
+		typedef pixr_t<0x0008'7904> PIAR4_;
+		typedef pixr_t<0x0008'7905> PIAR5_;
+		typedef pixr_t<0x0008'7906> PIAR6_;
+		typedef pixr_t<0x0008'7907> PIAR7_;
+		typedef pixr_t<0x0008'7908> PIAR8_;
+		typedef pixr_t<0x0008'7909> PIAR9_;
+		typedef pixr_t<0x0008'790A> PIARA_;
+		typedef pixr_t<0x0008'790B> PIARB_;
+		typedef pixr_t<0x0008'790C> PIARC_;
+		typedef pixr_t<0x0008'790D> PIARD_;
+		typedef pixr_t<0x0008'790E> PIARE_;
+		typedef pixr_t<0x0008'790F> PIARF_;
+		typedef pixr_t<0x0008'7910> PIAR10_;
+		typedef pixr_t<0x0008'7911> PIAR11_;
+		typedef pixr_t<0x0008'7912> PIAR12_;
+		static PIAR0_ PIAR0;
+		static PIAR1_ PIAR1;
+		static PIAR2_ PIAR2;
+		static PIAR3_ PIAR3;
+		static PIAR4_ PIAR4;
+		static PIAR5_ PIAR5;
+		static PIAR6_ PIAR6;
+		static PIAR7_ PIAR7;
+		static PIAR8_ PIAR8;
+		static PIAR9_ PIAR9;
+		static PIARA_ PIARA;
+		static PIARB_ PIARB;
+		static PIARC_ PIARC;
+		static PIARD_ PIARD;
+		static PIARE_ PIARE;
+		static PIARF_ PIARF;
+		static PIAR10_ PIAR10;
+		static PIAR11_ PIAR11;
+		static PIAR12_ PIAR12;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  EXDMAC 起動割り込み選択レジスタ (SELEXDR)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct selexdr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  SELEXD0;
+			bit_rw_t <io_, bitpos::B1>  SELEXD1;
+		};
+		typedef selexdr_t<0x0008'7A01> SELEXDR_;
+		static SELEXDR_ SELEXDR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み要因選択レジスタ書き込み保護レジスタ (SLIPRCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct sliprcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  WPRC;
+		};
+		typedef sliprcr_t<0x0008'7A00> SLIPRCR_;
+		static SLIPRCR_ SLIPRCR;
+	};
+	template<class _> typename icu_select_t<_>::PIBR0_ icu_select_t<_>::PIBR0;
+	template<class _> typename icu_select_t<_>::PIBR1_ icu_select_t<_>::PIBR1;
+	template<class _> typename icu_select_t<_>::PIBR2_ icu_select_t<_>::PIBR2;
+	template<class _> typename icu_select_t<_>::PIBR3_ icu_select_t<_>::PIBR3;
+	template<class _> typename icu_select_t<_>::PIBR4_ icu_select_t<_>::PIBR4;
+	template<class _> typename icu_select_t<_>::PIBR5_ icu_select_t<_>::PIBR5;
+	template<class _> typename icu_select_t<_>::PIBR6_ icu_select_t<_>::PIBR6;
+	template<class _> typename icu_select_t<_>::PIBR7_ icu_select_t<_>::PIBR7;
+	template<class _> typename icu_select_t<_>::PIBR8_ icu_select_t<_>::PIBR8;
+	template<class _> typename icu_select_t<_>::PIBR9_ icu_select_t<_>::PIBR9;
+	template<class _> typename icu_select_t<_>::PIBRA_ icu_select_t<_>::PIBRA;
+	template<class _> typename icu_select_t<_>::PIBRB_ icu_select_t<_>::PIBRB;
+	template<class _> typename icu_select_t<_>::PIAR0_ icu_select_t<_>::PIAR0;
+	template<class _> typename icu_select_t<_>::PIAR1_ icu_select_t<_>::PIAR1;
+	template<class _> typename icu_select_t<_>::PIAR2_ icu_select_t<_>::PIAR2;
+	template<class _> typename icu_select_t<_>::PIAR3_ icu_select_t<_>::PIAR3;
+	template<class _> typename icu_select_t<_>::PIAR4_ icu_select_t<_>::PIAR4;
+	template<class _> typename icu_select_t<_>::PIAR5_ icu_select_t<_>::PIAR5;
+	template<class _> typename icu_select_t<_>::PIAR6_ icu_select_t<_>::PIAR6;
+	template<class _> typename icu_select_t<_>::PIAR7_ icu_select_t<_>::PIAR7;
+	template<class _> typename icu_select_t<_>::PIAR8_ icu_select_t<_>::PIAR8;
+	template<class _> typename icu_select_t<_>::PIAR9_ icu_select_t<_>::PIAR9;
+	template<class _> typename icu_select_t<_>::PIARA_ icu_select_t<_>::PIARA;
+	template<class _> typename icu_select_t<_>::PIARB_ icu_select_t<_>::PIARB;
+	template<class _> typename icu_select_t<_>::PIARC_ icu_select_t<_>::PIARC;
+	template<class _> typename icu_select_t<_>::PIARD_ icu_select_t<_>::PIARD;
+	template<class _> typename icu_select_t<_>::PIARE_ icu_select_t<_>::PIARE;
+	template<class _> typename icu_select_t<_>::PIARF_ icu_select_t<_>::PIARF;
+	template<class _> typename icu_select_t<_>::PIAR10_ icu_select_t<_>::PIAR10;
+	template<class _> typename icu_select_t<_>::PIAR11_ icu_select_t<_>::PIAR11;
+	template<class _> typename icu_select_t<_>::PIAR12_ icu_select_t<_>::PIAR12;
+	template<class _> typename icu_select_t<_>::SELEXDR_ icu_select_t<_>::SELEXDR;
+	template<class _> typename icu_select_t<_>::SLIPRCR_ icu_select_t<_>::SLIPRCR;
+
+	typedef icu_select_t<void> ICU_SELECT;
 }

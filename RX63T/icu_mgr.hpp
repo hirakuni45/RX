@@ -10,7 +10,6 @@
 //=====================================================================//
 #include "common/device.hpp"
 #include "common/vect.h"
-#include "common/dispatch.hpp"
 #include "RX600/icu_utils.hpp"
 
 namespace device {
@@ -23,8 +22,8 @@ namespace device {
 	template <class _>
 	class icu_mgr_ {
 
-		typedef utils::dispatch<ICU::VECTOR::GROUP0, 2>  GROUP0_dispatch_t;
-		typedef utils::dispatch<ICU::VECTOR::GROUP12, 8> GROUP12_dispatch_t;
+		typedef icu_utils::dispatch<ICU::VECTOR_GROUP0> GROUP0_dispatch_t;
+		typedef icu_utils::dispatch<ICU::VECTOR_GROUP12> GROUP12_dispatch_t;
 
 		static GROUP0_dispatch_t GROUP0_dispatch_;
 		static GROUP12_dispatch_t GROUP12_dispatch_;
@@ -37,7 +36,7 @@ namespace device {
 			@param[in]	task	割り込みタスク
 		*/
 		//-----------------------------------------------------------------//
-		static void set_task(ICU::VECTOR vec, utils::TASK task) noexcept
+		static void set_task(ICU::VECTOR vec, icu_utils::ITASK task) noexcept
 		{
 			set_interrupt_task(task, static_cast<uint32_t>(vec));
 		}
@@ -81,7 +80,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, utils::TASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, icu_utils::ITASK task, uint8_t lvl) noexcept
 		{
 			set_task(vec, task);
 			set_level(vec, lvl);
@@ -122,84 +121,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込み・ハンドラ GROUP0
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group0_handler_() noexcept
-		{
-			uint32_t bits = ICU::GRP00() & GROUP0_dispatch_.get_mask();
-			uint32_t sign = 1;
-			for(uint32_t idx = 0; idx < GROUP0_dispatch_.size(); ++idx) {
-				if(bits & sign) {
-					GROUP0_dispatch_.run_task(idx);
-					ICU::GCR00 = sign;
-				}
-				sign <<= 1;
-			}
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  グループ割り込み・ハンドラ GROUP12（レベル割り込み）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group12_handler_() noexcept
-		{
-			uint32_t bits = ICU::GRP12() & GROUP12_dispatch_.get_mask();
-			uint32_t sign = 1;
-			for(uint32_t idx = 0; idx < GROUP12_dispatch_.size(); ++idx) {
-				if(bits & sign) {
-					GROUP12_dispatch_.run_task(idx);
-				}
-				sign <<= 1;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GROUP0 割り込みタスクを登録する @n
-					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	idx		グループ内インデックス
-			@param[in]	task	割り込みタスク（※nullptr なら無効）
-			@return グループ割り込み以外なら「false」
-		*/
-		//-----------------------------------------------------------------//
-		static bool install_group_task(ICU::VECTOR_GROUP0 idx, utils::TASK task) noexcept
-		{
-			bool ena = task != nullptr ? true : false;
-			set_task(ICU::VECTOR::GROUP0, group0_handler_);
-			auto i = static_cast<uint32_t>(idx);
-			bool ret = GROUP0_dispatch_.set_task(i, task);
-			if(ret && ena) ICU::GEN00 |= 1 << i;
-			return ret;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GROUPBL0 割り込みタスクを登録する @n
-					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	idx		グループ内インデックス
-			@param[in]	task	割り込みタスク（※nullptr なら無効）
-			@return グループ割り込み以外なら「false」
-		*/
-		//-----------------------------------------------------------------//
-		static bool install_group_task(ICU::VECTOR_GROUP12 idx, utils::TASK task) noexcept
-		{
-			bool ena = task != nullptr ? true : false;
-			set_task(ICU::VECTOR::GROUP12, group12_handler_);
-			auto i = static_cast<uint32_t>(idx);
-			bool ret = GROUP12_dispatch_.set_task(i, task);
-			if(ret && ena) ICU::GEN12 |= 1 << i;
-			return ret;
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  グループ割り込みに対するベクタを返すダミー
+			@brief  通常割り込みに対するグループベクタを返す
 			@return グループベクターでは無いので「NONE]を返す。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -211,44 +133,102 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得 @n
-			@param[in]	VEC		グループベクター型
+			@brief  GROUP0 ベクターの取得
+			@param[in]	gvec	グループベクター型
 			@return グループベクター
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR_GROUP0 ivec) noexcept {
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_GROUP0 gvec) noexcept
+		{
 			return ICU::VECTOR::GROUP0;
 		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクターの取得 @n
-			@param[in]	VEC		グループベクター型
+			@brief  GROUP12 ベクターの取得
+			@param[in]	gvec	グループベクター型
 			@return グループベクター
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR_GROUP12 ivec) noexcept {
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_GROUP12 gvec) noexcept
+		{
 			return ICU::VECTOR::GROUP12;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み・ハンドラ GROUP0（エッジ割り込み）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void group0_handler_() noexcept
+		{
+			GROUP12_dispatch_.run<ICU::GCR00_>(ICU::GCR00, ICU::GRP00());
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み・ハンドラ GROUP12（レベル割り込み）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void group12_handler_() noexcept
+		{
+			GROUP12_dispatch_.run(ICU::GRP12());
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  グループ割り込み設定のダミー
-			@param[in]	idx		インデックス
-			@param[in]	task	割り込みタスク（※nullptr なら無効）
+			@param[in]	vec		割り込みベクター型
+			@param[in]	task	割り込みタスク
 			@return グループ割り込み以外なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool install_group_task(ICU::VECTOR idx, utils::TASK task) noexcept
+		static bool install_group_task(ICU::VECTOR vec, icu_utils::GTASK task) noexcept
 		{
 			return false;
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GROUP0 割り込みタスクを登録する @n
+					※ここで登録するタスクは「割り込みアトリビュート」無しの通常関数を登録する事
+			@param[in]	grpv	グループベクター型
+			@param[in]	task	割り込みタスク
+		*/
+		//-----------------------------------------------------------------//
+		static void install_group_task(ICU::VECTOR_GROUP0 grpv, icu_utils::GTASK task) noexcept
+		{
+			ICU::GEN00.set(grpv, false);
+			set_task(get_group_vector(grpv), group0_handler_);
+			GROUP0_dispatch_.set_task(grpv, task);
+			if(task != nullptr) {
+				ICU::GEN00.set(grpv);
+			}
+		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GROUPBL0 割り込みタスクを登録する @n
+					※ここで登録するタスクは「割り込みアトリビュート」無しの通常関数を登録する事
+			@param[in]	grpv	グループベクター型
+			@param[in]	task	割り込みタスク
+		*/
+		//-----------------------------------------------------------------//
+		static void install_group_task(ICU::VECTOR_GROUP12 grpv, icu_utils::GTASK task) noexcept
+		{
+			ICU::GEN12.set(grpv, false);
+			set_task(get_group_vector(grpv), group12_handler_);
+			GROUP12_dispatch_.set_task(grpv, task);
+			if(task != nullptr) {
+				ICU::GEN12.set(grpv);
+			}
+		}
 	};
 	template <class _> typename icu_mgr_<_>::GROUP0_dispatch_t icu_mgr_<_>::GROUP0_dispatch_;
 	template <class _> typename icu_mgr_<_>::GROUP12_dispatch_t icu_mgr_<_>::GROUP12_dispatch_;

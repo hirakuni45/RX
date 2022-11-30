@@ -19,7 +19,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
-	struct icu_t : public ICU_BASE, ICU_IRQ8 {
+	struct icu_t : public ICU_BASE, ICU_IRQ8, ICU_GROUP {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -251,8 +251,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_GROUP0 : uint8_t {
-			NONE,
-			ERS1,	///< CAN1
+			ERS1 = 1,	///< CAN1
+			NUM_
 		};
 
 
@@ -262,14 +262,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_GROUP12 : uint8_t {
-			NONE,
-			ERI0,	///< SCI0
-			ERI1,	///< SCI1
-			ERI2,	///< SCI2
-			ERI3,	///< SCI3
-			ERI12,	///< SCI12
-			SPEI0,	///< RSPI0
-			SPEI1,	///< RSPI1
+			ERI0 = 0,	///< SCI0
+			ERI1,		///< SCI1
+			ERI2,		///< SCI2
+			ERI3,		///< SCI3
+			ERI12,		///< SCI12
+			SPEI0,		///< RSPI0
+			SPEI1,		///< RSPI1
+			NUM_
 		};
 
 
@@ -399,14 +399,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct grp00_t : public ro32_t<base> {
-			typedef ro32_t<base> io_;
-			using io_::operator ();
-
-			bit_ro_t <io_, bitpos::B1>  IS1;
-		};
-		typedef grp00_t<0x0008'C300> GRP00_;
+		typedef grp_t<0x0008'C300, VECTOR_GROUP0> GRP00_;
 		static GRP00_ GRP00;
 
 
@@ -416,20 +409,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct grp12_t : public ro32_t<base> {
-			typedef ro32_t<base> io_;
-			using io_::operator ();
-
-			bit_ro_t <io_, bitpos::B0>  IS0;
-			bit_ro_t <io_, bitpos::B1>  IS1;
-			bit_ro_t <io_, bitpos::B2>  IS2;
-			bit_ro_t <io_, bitpos::B3>  IS3;
-			bit_ro_t <io_, bitpos::B4>  IS4;
-			bit_ro_t <io_, bitpos::B5>  IS5;
-			bit_ro_t <io_, bitpos::B6>  IS6;
-		};
-		typedef grp12_t<0x0008'C330> GRP12_;
+		typedef grp_t<0x0008'C330, VECTOR_GROUP12> GRP12_;
 		static GRP12_ GRP12;
 
 
@@ -439,17 +419,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct gen00_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_ro_t <io_, bitpos::B1>  EN1;
-		};
-		typedef gen00_t<0x0008'C340> GEN00_;
+		typedef gen_t<0x0008'C340, VECTOR_GROUP0> GEN00_;
 		static GEN00_ GEN00;
 
 
@@ -459,23 +429,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct gen12_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  EN0;
-			bit_rw_t<io_, bitpos::B1>  EN1;
-			bit_rw_t<io_, bitpos::B2>  EN2;
-			bit_rw_t<io_, bitpos::B3>  EN3;
-			bit_rw_t<io_, bitpos::B4>  EN4;
-			bit_rw_t<io_, bitpos::B5>  EN5;
-			bit_rw_t<io_, bitpos::B6>  EN6;
-		};
-		typedef gen12_t<0x0008'C370> GEN12_;
+		typedef gen_t<0x0008'C370, VECTOR_GROUP12> GEN12_;
 		static GEN12_ GEN12;
 
 
@@ -485,17 +439,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct gcr00_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_ro_t <io_, bitpos::B1>  CLR1;
-		};
-		typedef gcr00_t<0x0008'C380> GCR00_;
+		typedef gcr_t<0x0008'C380, VECTOR_GROUP0> GCR00_;
 		static GCR00_ GCR00;
 	};
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;

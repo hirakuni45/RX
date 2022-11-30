@@ -428,9 +428,10 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 : uint8_t {
-			ERS0,			///< CAN0 / ERS0
+			ERS0 = 0,		///< CAN0 / ERS0
 			ERS1,			///< CAN1 / ERS1
-			ERS2			///< CAN2 / ERS2
+			ERS2,			///< CAN2 / ERS2
+			NUM_
 		};
 
 
@@ -440,7 +441,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL0 : uint8_t {
-			TEI0,			///< SCI0 / TEI0（送信完了）
+			TEI0 = 0,		///< SCI0 / TEI0（送信完了）
 			ERI0,			///< SCI0 / ERI0（受信エラー）
 			TEI1,			///< SCI1 / TEI1（送信完了）
 			ERI1,			///< SCI1 / ERI1（受信エラー）
@@ -470,7 +471,8 @@ namespace device {
 			OVFI,			///< CAC / OVFI
 			DOPCI,			///< DOC / DOPCI
 			PCFEI,			///< PDC / PCFEI
-			PCERI			///< PDC / PCERI
+			PCERI,			///< PDC / PCERI
+			NUM_
 		};
 
 
@@ -502,6 +504,7 @@ namespace device {
 
 			S12CMPAI = 20,	///< S12AD / S12CMPAI
 			S12CMPAI1 = 22,	///< S12AD1 / S12CMPAI1
+			NUM_
 		};
 
 
@@ -531,8 +534,11 @@ namespace device {
 
 			SPII0 = 16,		///< RSPI0 / SPII0
 			SPEI0,			///< RSPI0 / SPEI0
+#if defined(SIG_RX71M)
 			SPII1,			///< RSPI1 / SPII1
 			SPEI1,			///< RSPI1 / SPEI1
+#endif
+			NUM_
 		};
 
 
@@ -547,6 +553,7 @@ namespace device {
 
 			EINT0 = 4,		///< EDMAC0/EINT0
 			EINT1 = 5,		///< EDMAC1/EINT1
+			NUM_
 		};
 
 
@@ -718,70 +725,8 @@ namespace device {
 			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gcrbe0_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
+		typedef gcr_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
 		static GCRBE0_ GCRBE0;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み要求レジスタ
-			@param[in]	base	ベースアドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct pixr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>  PIR0;
-			bit_rw_t <io_, bitpos::B1>  PIR1;
-			bit_rw_t <io_, bitpos::B2>  PIR2;
-			bit_rw_t <io_, bitpos::B3>  PIR3;
-			bit_rw_t <io_, bitpos::B4>  PIR4;
-			bit_rw_t <io_, bitpos::B5>  PIR5;
-			bit_rw_t <io_, bitpos::B6>  PIR6;
-			bit_rw_t <io_, bitpos::B7>  PIR7;
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Ah）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x0008'7700> PIBR0;
-		static pixr_t<0x0008'7701> PIBR1;
-		static pixr_t<0x0008'7702> PIBR2;
-		static pixr_t<0x0008'7703> PIBR3;
-		static pixr_t<0x0008'7704> PIBR4;
-		static pixr_t<0x0008'7705> PIBR5;
-		static pixr_t<0x0008'7706> PIBR6;
-		static pixr_t<0x0008'7707> PIBR7;
-		static pixr_t<0x0008'7708> PIBR8;
-		static pixr_t<0x0008'7709> PIBR9;
-		static pixr_t<0x0008'770A> PIBRA;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x0008'7900> PIAR0;
-		static pixr_t<0x0008'7901> PIAR1;
-		static pixr_t<0x0008'7902> PIAR2;
-		static pixr_t<0x0008'7903> PIAR3;
-		static pixr_t<0x0008'7904> PIAR4;
-		static pixr_t<0x0008'7905> PIAR5;
-		static pixr_t<0x0008'7906> PIAR6;
-		static pixr_t<0x0008'7907> PIAR7;
-		static pixr_t<0x0008'7908> PIAR8;
-		static pixr_t<0x0008'7909> PIAR9;
-		static pixr_t<0x0008'790A> PIARA;
-		static pixr_t<0x0008'790B> PIARB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

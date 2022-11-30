@@ -228,6 +228,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 : uint8_t {
 			ERS0,			///< CAN0 / ERS0
+			NUM_
 		};
 
 
@@ -256,6 +257,7 @@ namespace device {
 			MENDI,			///< CAC / MENDI
 			OVFI,			///< CAC / OVFI
 			DOPCI,			///< DOC / DOPCI
+			NUM_
 		};
 
 
@@ -288,6 +290,7 @@ namespace device {
 			ERI8,			///< SCI8 / ERI8
 			TEI9,			///< SCI9 / TEI9
 			ERI9,			///< SCI9 / ERI9
+			NUM_
 		};
 
 
@@ -302,6 +305,7 @@ namespace device {
 
 			SPII0 = 16,		///< RSPI0 / SPII0
 			SPEI0,			///< RSPI0 / SPEI0
+			NUM_
 		};
 
 
@@ -692,78 +696,8 @@ namespace device {
 			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gcrbe0_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
+		typedef gcr_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
 		static GCRBE0_ GCRBE0;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み要求レジスタ
-			@param[in]	base	ベースアドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct pixr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>  PIR0;
-			bit_rw_t <io_, bitpos::B1>  PIR1;
-			bit_rw_t <io_, bitpos::B2>  PIR2;
-			bit_rw_t <io_, bitpos::B3>  PIR3;
-			bit_rw_t <io_, bitpos::B4>  PIR4;
-			bit_rw_t <io_, bitpos::B5>  PIR5;
-			bit_rw_t <io_, bitpos::B6>  PIR6;
-			bit_rw_t <io_, bitpos::B7>  PIR7;
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pixr_t<0x00087900> PIAR0_;
-		static PIAR0_ PIAR0;
-		typedef pixr_t<0x00087901> PIAR1_;
-		static PIAR1_ PIAR1;
-		typedef pixr_t<0x00087902> PIAR2_;
-		static PIAR2_ PIAR2;
-		typedef pixr_t<0x00087903> PIAR3_;
-		static PIAR3_ PIAR3;
-		typedef pixr_t<0x00087904> PIAR4_;
-		static PIAR4_ PIAR4;
-		typedef pixr_t<0x00087905> PIAR5_;
-		static PIAR5_ PIAR5;
-		typedef pixr_t<0x00087906> PIAR6_;
-		static PIAR6_ PIAR6;
-		typedef pixr_t<0x00087907> PIAR7_;
-		static PIAR7_ PIAR7;
-		typedef pixr_t<0x00087908> PIAR8_;
-		static PIAR8_ PIAR8;
-		typedef pixr_t<0x00087909> PIAR9_;
-		static PIAR9_ PIAR9;
-		typedef pixr_t<0x0008790A> PIARA_;
-		static PIARA_ PIARA;
-		typedef pixr_t<0x0008790B> PIARB_;
-		static PIARB_ PIARB;
-		typedef pixr_t<0x0008790C> PIARC_;
-		static PIARC_ PIARC;
-		typedef pixr_t<0x0008790D> PIARD_;
-		static PIARD_ PIARD;
-		typedef pixr_t<0x0008790E> PIARE_;
-		static PIARE_ PIARE;
-		typedef pixr_t<0x0008790F> PIARF_;
-		static PIARF_ PIARF;
-		typedef pixr_t<0x00087910> PIAR10_;
-		static PIAR10_ PIAR10;
-		typedef pixr_t<0x00087911> PIAR11_;
-		static PIAR11_ PIAR11;
-		typedef pixr_t<0x00087912> PIAR12_;
-		static PIAR12_ PIAR12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -797,25 +731,6 @@ namespace device {
 	template<class _> typename icuc_t<_>::GENBL1_ icuc_t<_>::GENBL1;
 	template<class _> typename icuc_t<_>::GENAL0_ icuc_t<_>::GENAL0;
 	template<class _> typename icuc_t<_>::GCRBE0_ icuc_t<_>::GCRBE0;
-	template<class _> typename icuc_t<_>::PIAR0_ icuc_t<_>::PIAR0;
-	template<class _> typename icuc_t<_>::PIAR1_ icuc_t<_>::PIAR1;
-	template<class _> typename icuc_t<_>::PIAR2_ icuc_t<_>::PIAR2;
-	template<class _> typename icuc_t<_>::PIAR3_ icuc_t<_>::PIAR3;
-	template<class _> typename icuc_t<_>::PIAR4_ icuc_t<_>::PIAR4;
-	template<class _> typename icuc_t<_>::PIAR5_ icuc_t<_>::PIAR5;
-	template<class _> typename icuc_t<_>::PIAR6_ icuc_t<_>::PIAR6;
-	template<class _> typename icuc_t<_>::PIAR7_ icuc_t<_>::PIAR7;
-	template<class _> typename icuc_t<_>::PIAR8_ icuc_t<_>::PIAR8;
-	template<class _> typename icuc_t<_>::PIAR9_ icuc_t<_>::PIAR9;
-	template<class _> typename icuc_t<_>::PIARA_ icuc_t<_>::PIARA;
-	template<class _> typename icuc_t<_>::PIARB_ icuc_t<_>::PIARB;
-	template<class _> typename icuc_t<_>::PIARC_ icuc_t<_>::PIARC;
-	template<class _> typename icuc_t<_>::PIARD_ icuc_t<_>::PIARD;
-	template<class _> typename icuc_t<_>::PIARE_ icuc_t<_>::PIARE;
-	template<class _> typename icuc_t<_>::PIARF_ icuc_t<_>::PIARF;
-	template<class _> typename icuc_t<_>::PIAR10_ icuc_t<_>::PIAR10;
-	template<class _> typename icuc_t<_>::PIAR11_ icuc_t<_>::PIAR11;
-	template<class _> typename icuc_t<_>::PIAR12_ icuc_t<_>::PIAR12;
 	template<class _> typename icuc_t<_>::SLIAR_ icuc_t<_>::SLIAR;
 
 	typedef icuc_t<void> ICU;

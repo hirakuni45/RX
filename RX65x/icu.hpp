@@ -439,6 +439,7 @@ namespace device {
 		enum class VECTOR_BE0 : uint8_t {
 			ERS0,	///< CAN0 / ERS0
 			ERS1,	///< CAN1 / ERS1
+			NUM_
 		};
 
 
@@ -478,7 +479,8 @@ namespace device {
 			OVFI,			///< CAC / OVFI
 			DOPCI,			///< DOC / DOPCI
 			PCFEI,			///< PDC / PCFEI
-			PCERI			///< PDC / PCERI
+			PCERI,			///< PDC / PCERI
+			NUM_
 		};
 
 
@@ -513,6 +515,7 @@ namespace device {
 			ERI9,			///< SCI9 / ERI9
 			TEI1,			///< RIIC1 / TEI1
 			EEI1,			///< RIIC1 / EEI1
+			NUM_
 		};
 
 
@@ -523,6 +526,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL2 : uint8_t {
 			SDIOI,			///< SDSI / SDIOI
+			NUM_
 		};
 
 
@@ -542,6 +546,7 @@ namespace device {
 			SPEI0,			///< RSPI0 / SPEI0
 			SPII2,			///< RSPI2 / SPII2
 			SPEI2,			///< RSPI2 / SPEI2
+			NUM_
 		};
 
 
@@ -556,7 +561,8 @@ namespace device {
 			VPOS  = 8,		///< GLCDC/VPOS
 			GR1UF,			///< GLCDC/GR1UF
 			GR2UF,			///< GLCDC/GR2UF
-			DRW_IRQ			///< DRW2D/DRW_IRQ
+			DRW_IRQ,		///< DRW2D/DRW_IRQ
+			NUM_
 		};
 
 
@@ -735,7 +741,7 @@ namespace device {
 			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gcrbe0_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
+		typedef gcr_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
 		static GCRBE0_ GCRBE0;
 
 
@@ -762,43 +768,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>  PIR6;
 			bit_rw_t <io_, bitpos::B7>  PIR7;
 		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Ah）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087700> PIBR0;
-		static pixr_t<0x00087701> PIBR1;
-		static pixr_t<0x00087702> PIBR2;
-		static pixr_t<0x00087703> PIBR3;
-		static pixr_t<0x00087704> PIBR4;
-		static pixr_t<0x00087705> PIBR5;
-		static pixr_t<0x00087706> PIBR6;
-		static pixr_t<0x00087707> PIBR7;
-		static pixr_t<0x00087708> PIBR8;
-		static pixr_t<0x00087709> PIBR9;
-		static pixr_t<0x0008770A> PIBRA;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087900> PIAR0;
-		static pixr_t<0x00087901> PIAR1;
-		static pixr_t<0x00087902> PIAR2;
-		static pixr_t<0x00087903> PIAR3;
-		static pixr_t<0x00087904> PIAR4;
-		static pixr_t<0x00087905> PIAR5;
-		static pixr_t<0x00087906> PIAR6;
-		static pixr_t<0x00087907> PIAR7;
-		static pixr_t<0x00087908> PIAR8;
-		static pixr_t<0x00087909> PIAR9;
-		static pixr_t<0x0008790A> PIARA;
-		static pixr_t<0x0008790B> PIARB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
