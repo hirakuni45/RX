@@ -252,7 +252,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_GROUP0 : uint8_t {
 			ERS1 = 1,	///< CAN1
-			NUM_
+			NUM_ = 1
 		};
 
 

@@ -19,7 +19,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
-	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP {
+	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -276,8 +276,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_IE0 : uint8_t {
-			DPFPUEX,	///< 倍精度浮動少数点例外
-			NUM_
+			DPFPUEX = 0,	///< 倍精度浮動少数点例外
+			NUM_ = 1
 		};
 
 
@@ -287,10 +287,10 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 : uint8_t {
-			ERS0,	///< CAN0 / ERS0
-			ERS1,	///< CAN1 / ERS1
-			ERS2,	///< CAN2 / ERS2
-			NUM_
+			ERS0 = 0,	///< CAN0 / ERS0
+			ERS1,		///< CAN1 / ERS1
+			ERS2,		///< CAN2 / ERS2
+			NUM_ = 3
 		};
 
 
@@ -300,7 +300,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL0 : uint8_t {
-			TEI0,			///< SCI0 / TEI0（送信完了）
+			TEI0 = 0,		///< SCI0 / TEI0（送信完了）
 			ERI0,			///< SCI0 / ERI0（受信エラー）
 			TEI1,			///< SCI1 / TEI1（送信完了）
 			ERI1,			///< SCI1 / ERI1（受信エラー）
@@ -330,7 +330,7 @@ namespace device {
 			DOPCI,			///< DOC / DOPCI
 			PCFEI,			///< PDC / PCFEI
 			PCERI,			///< PDC / PCERI
-			NUM_
+			NUM_ = 27
 		};
 
 
@@ -364,7 +364,7 @@ namespace device {
 
 			TEI1      = 28,	///< RIIC1 / TEI1
 			EEI1,			///< RIIC1 / EEI1
-			NUM_
+			NUM_ = 22
 		};
 
 
@@ -378,7 +378,7 @@ namespace device {
 			POEGGBI,		///< POEG グループＢ
 			POEGGCI,		///< POEG グループＣ
 			POEGGDI,		///< POEG グループＤ
-			NUM_
+			NUM_ = 4
 		};
 
 
@@ -408,7 +408,7 @@ namespace device {
 			SPEI2,			///< RSPI2 / SPEI1
 			TEI7,			///< SCI7  / TEI11
 			ERI7,			///< SCI7  / ERI11
-			NUM_
+			NUM_ = 16
 		};
 
 
@@ -428,7 +428,7 @@ namespace device {
 			GR1UF,			///< GLCDC    / GR1UF
 			GR2UF,			///< GLCDC    / GR2UF
 			DRW_IRQ,		///< DRW2D    / DRW_IRQ
-			NUM_
+			NUM_ = 8
 		};
 
 
