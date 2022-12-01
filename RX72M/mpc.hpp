@@ -709,6 +709,7 @@ namespace device {
 			using io::operator &=;
 
 			bit_rw_t<io, bitpos::B0>      CS0S;
+
 			bits_rw_t<io, bitpos::B2, 2>  CS1S;
 			bits_rw_t<io, bitpos::B4, 2>  CS2S;
 			bits_rw_t<io, bitpos::B6, 2>  CS3S;
@@ -1082,8 +1083,6 @@ namespace device {
 	template<class _> typename mpc_t<_>::PQ5PFS_ mpc_t<_>::PQ5PFS;
 	template<class _> typename mpc_t<_>::PQ6PFS_ mpc_t<_>::PQ6PFS;
 	template<class _> typename mpc_t<_>::PQ7PFS_ mpc_t<_>::PQ7PFS;
-
-
 	template<class _> typename mpc_t<_>::PFCSE_  mpc_t<_>::PFCSE;
 	template<class _> typename mpc_t<_>::PFCSS0_ mpc_t<_>::PFCSS0;
 	template<class _> typename mpc_t<_>::PFCSS1_ mpc_t<_>::PFCSS1;
