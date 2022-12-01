@@ -17,16 +17,26 @@ namespace device {
 		@brief  SCIF 定義基底クラス (SCIF)
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	txv		送信ベクター
-		@param[in]	rxv		受信ベクター
+		@param[in]	txi		送信割り込み
+		@param[in]	rxi		受信割り込み
+		@param[in]	tei		送信終了割り込み
+		@param[in]	eri		エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv>
+	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
 	struct scif_t {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto TXI		 = txi;		///< 受信割り込みベクター
+		static constexpr auto RXI		 = rxi;		///< 送信割り込みベクター
+		static constexpr auto TEI		 = tei;		///< 送信終了割り込みベクター
+		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
+		static constexpr auto PCLK		 = clock_profile::PCLKA;	///< PCLK 周波数
+
+		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
+		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
+		static constexpr bool SEMR_NFEN = true;	///< NFEN（ノイズフィルタ）
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -257,34 +267,53 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>  ABCS0;
+
 			bit_rw_t <io_, bitpos::B2>  NFEN;
 			bit_rw_t <io_, bitpos::B3>  DIR;
 			bit_rw_t <io_, bitpos::B4>  MDDRS;
 			bit_rw_t <io_, bitpos::B5>  BRME;
+
 			bit_rw_t <io_, bitpos::B7>  BGDM;
 		};
 		typedef semr_t SEMR_;
 		static  SEMR_ SEMR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FRDR_ scif_t<base, per, txv, rxv>::FRDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FTDR_ scif_t<base, per, txv, rxv>::FTDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::SMR_ scif_t<base, per, txv, rxv>::SMR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::SCR_ scif_t<base, per, txv, rxv>::SCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FSR_ scif_t<base, per, txv, rxv>::FSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::BRR_ scif_t<base, per, txv, rxv>::BRR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::MDDR_ scif_t<base, per, txv, rxv>::MDDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FCR_ scif_t<base, per, txv, rxv>::FCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FDR_ scif_t<base, per, txv, rxv>::FDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::SPTR_ scif_t<base, per, txv, rxv>::SPTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::LSR_ scif_t<base, per, txv, rxv>::LSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FTCR_ scif_t<base, per, txv, rxv>::FTCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::SEMR_ scif_t<base, per, txv, rxv>::SEMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txi, rxi, tei, eri>::FRDR_ scif_t<base, per, txi, rxi, tei, eri>::FRDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::FTDR_ scif_t<base, per, txv, rxv, tei, eri>::FTDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::SMR_ scif_t<base, per, txv, rxv, tei, eri>::SMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::SCR_ scif_t<base, per, txv, rxv, tei, eri>::SCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::FSR_ scif_t<base, per, txv, rxv, tei, eri>::FSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::BRR_ scif_t<base, per, txv, rxv, tei, eri>::BRR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::MDDR_ scif_t<base, per, txv, rxv, tei, eri>::MDDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::FCR_ scif_t<base, per, txv, rxv, tei, eri>::FCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::FDR_ scif_t<base, per, txv, rxv, tei, eri>::FDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::SPTR_ scif_t<base, per, txv, rxv, tei, eri>::SPTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::LSR_ scif_t<base, per, txv, rxv, tei, eri>::LSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::FTCR_ scif_t<base, per, txv, rxv, tei, eri>::FTCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tei, ICU::VECTOR_AL0 eri>
+		typename scif_t<base, per, txv, rxv, tei, eri>::SEMR_ scif_t<base, per, txv, rxv, tei, eri>::SEMR;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef scif_t<0x000D0000, peripheral::SCIF8,  ICU::VECTOR::TXIF8,  ICU::VECTOR::RXIF8>  SCIF8;
-	typedef scif_t<0x000D0020, peripheral::SCIF9,  ICU::VECTOR::TXIF9,  ICU::VECTOR::RXIF9>  SCIF9;
-	typedef scif_t<0x000D0040, peripheral::SCIF10, ICU::VECTOR::TXIF10, ICU::VECTOR::RXIF10> SCIF10;
-	typedef scif_t<0x000D0060, peripheral::SCIF11, ICU::VECTOR::TXIF11, ICU::VECTOR::RXIF11> SCIF11;
+	typedef scif_t<0x000D'0000, peripheral::SCIF8,  ICU::VECTOR::TXIF8, ICU::VECTOR::RXIF8,
+		ICU::VECTOR_AL0::TEIF8, ICU::VECTOR_AL0::ERIF8>  SCIF8;
+	typedef scif_t<0x000D'0020, peripheral::SCIF9,  ICU::VECTOR::TXIF9, ICU::VECTOR::RXIF9,
+		ICU::VECTOR_AL0::TEIF9, ICU::VECTOR_AL0::ERIF9>  SCIF9;
+	typedef scif_t<0x000D'0040, peripheral::SCIF10, ICU::VECTOR::TXIF10, ICU::VECTOR::RXIF10,
+		ICU::VECTOR_AL0::TEIF10, ICU::VECTOR_AL0::ERIF10>  SCIF10;
+	typedef scif_t<0x000D'0060, peripheral::SCIF11, ICU::VECTOR::TXIF11, ICU::VECTOR::RXIF11,
+		ICU::VECTOR_AL0::TEIF11, ICU::VECTOR_AL0::ERIF11>  SCIF11;
 #endif
 }

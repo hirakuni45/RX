@@ -205,9 +205,9 @@ namespace device {
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef ssi_t<0x0008A500, peripheral::SSI0,
+	typedef ssi_t<0x0008'A500, peripheral::SSI0,
 		ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR_BL1::SSIF0> SSI0;
-	typedef ssi_t<0x0008A540, peripheral::SSI1,
+	typedef ssi_t<0x0008'A540, peripheral::SSI1,
 		ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1, ICU::VECTOR_BL1::SSIF0> SSI1;
 #endif
 }

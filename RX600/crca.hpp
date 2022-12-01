@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -72,21 +72,13 @@ namespace device {
 		typedef rw8_t<base + 0x08> CRCDOR8_;
 		static CRCDOR8_ CRCDOR8;
 	};
-	template <uint32_t base, peripheral per>
-		typename crca_t<base, per>::CRCCR_    crca_t<base, per>::CRCCR;
-	template <uint32_t base, peripheral per>
-		typename crca_t<base, per>::CRCDIR32_ crca_t<base, per>::CRCDIR32;
-	template <uint32_t base, peripheral per>
-		typename crca_t<base, per>::CRCDIR16_ crca_t<base, per>::CRCDIR16;
-	template <uint32_t base, peripheral per>
-		typename crca_t<base, per>::CRCDIR8_  crca_t<base, per>::CRCDIR8;
-	template <uint32_t base, peripheral per>
-		typename crca_t<base, per>::CRCDOR32_ crca_t<base, per>::CRCDOR32;
-	template <uint32_t base, peripheral per>
-		typename crca_t<base, per>::CRCDOR16_ crca_t<base, per>::CRCDOR16;
-	template <uint32_t base, peripheral per>
-		typename crca_t<base, per>::CRCDOR8_  crca_t<base, per>::CRCDOR8;
-
+	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCCR_    crca_t<base, per>::CRCCR;
+	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDIR32_ crca_t<base, per>::CRCDIR32;
+	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDIR16_ crca_t<base, per>::CRCDIR16;
+	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDIR8_  crca_t<base, per>::CRCDIR8;
+	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDOR32_ crca_t<base, per>::CRCDOR32;
+	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDOR16_ crca_t<base, per>::CRCDOR16;
+	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDOR8_  crca_t<base, per>::CRCDOR8;
 
 	typedef crca_t<0x0008'8280, peripheral::CRC> CRCA;
 }

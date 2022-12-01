@@ -1336,13 +1336,13 @@ namespace device {
 
 
 #if defined(SIG_RX63T)
-	typedef usb_a_t<0x000A0000, peripheral::USB0, ICU::VECTOR,
+	typedef usb_a_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef usb_b_t<0x000A0000, peripheral::USB0, ICU::VECTOR,
+	typedef usb_b_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #else
-	typedef usb_b_t<0x000A0000, peripheral::USB0, ICU::VECTOR_SELB,
+	typedef usb_b_t<0x000A'0000, peripheral::USB0, ICU::VECTOR_SELB,
 		ICU::VECTOR_SELB::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #endif
 }

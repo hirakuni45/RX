@@ -271,5 +271,5 @@ namespace device {
 
 	};
 
-	typedef sdsi_t<0x00095000, peripheral::SDSI, ICU::VECTOR_BL2::SDIOI> SDSI;
+	typedef sdsi_t<0x0009'5000, peripheral::SDSI, ICU::VECTOR_BL2::SDIOI> SDSI;
 }

@@ -1283,6 +1283,6 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::DPUSR1R_ usba_t<base, per, rvec, d0vec, d1vec>::DPUSR1R;
 
 
-	typedef usba_t<0x000D0400, peripheral::USBA, ICU::VECTOR::USBAR,
+	typedef usba_t<0x000D'0400, peripheral::USBA, ICU::VECTOR::USBAR,
 		ICU::VECTOR::D0FIFO2, ICU::VECTOR::D1FIFO2> USBA;
 }

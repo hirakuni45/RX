@@ -467,27 +467,27 @@ namespace device {
 		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
 
 
-	typedef tpu_x_t<0x00088110, peripheral::TPU0,
+	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
 		ICU::VECTOR_SELB::TGI0A, ICU::VECTOR_SELB::TGI0B,
 		ICU::VECTOR_SELB::TGI0C, ICU::VECTOR_SELB::TGI0D,
 		ICU::VECTOR_SELB::TGI0V, ICU::VECTOR_SELB::NONE>  TPU0;
-	typedef tpu_y_t<0x00088120, peripheral::TPU1,
+	typedef tpu_y_t<0x0008'8120, peripheral::TPU1,
 		ICU::VECTOR_SELB::TGI1A, ICU::VECTOR_SELB::TGI1B,
 		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
 		ICU::VECTOR_SELB::TGI1V, ICU::VECTOR_SELB::TGI1U> TPU1;
-	typedef tpu_y_t<0x00088130, peripheral::TPU2,
+	typedef tpu_y_t<0x0008'8130, peripheral::TPU2,
 		ICU::VECTOR_SELB::TGI2A, ICU::VECTOR_SELB::TGI2B,
 		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
 		ICU::VECTOR_SELB::TGI2V, ICU::VECTOR_SELB::TGI2U> TPU2;
-	typedef tpu_x_t<0x00088140, peripheral::TPU3,
+	typedef tpu_x_t<0x0008'8140, peripheral::TPU3,
 		ICU::VECTOR_SELB::TGI3A, ICU::VECTOR_SELB::TGI3B,
 		ICU::VECTOR_SELB::TGI3C, ICU::VECTOR_SELB::TGI3D,
 		ICU::VECTOR_SELB::TGI3V, ICU::VECTOR_SELB::NONE>  TPU3;
-	typedef tpu_y_t<0x00088150, peripheral::TPU4,
+	typedef tpu_y_t<0x0008'8150, peripheral::TPU4,
 		ICU::VECTOR_SELB::TGI4A, ICU::VECTOR_SELB::TGI4B,
 		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
 		ICU::VECTOR_SELB::TGI4V, ICU::VECTOR_SELB::TGI4U> TPU4;
-	typedef tpu_y_t<0x00088160, peripheral::TPU5,
+	typedef tpu_y_t<0x0008'8160, peripheral::TPU5,
 		ICU::VECTOR_SELB::TGI5A, ICU::VECTOR_SELB::TGI5B,
 		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
 		ICU::VECTOR_SELB::TGI5V, ICU::VECTOR_SELB::TGI5U> TPU5;

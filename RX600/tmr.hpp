@@ -228,39 +228,39 @@ namespace device {
 		typename tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR_ tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR;
 
 #if defined(SIG_RX621) || defined(SIG_RX62N)
-	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR,
+	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
 		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLK> TMR0;
-	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR,
+	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,
 		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1, clock_profile::PCLK> TMR1;
-	typedef tmr0246_t<0x00088210, peripheral::TMR2, ICU::VECTOR,
+	typedef tmr0246_t<0x0008'8210, peripheral::TMR2, ICU::VECTOR,
 		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLK> TMR2;
-	typedef tmr1357_t<0x00088211, peripheral::TMR3, ICU::VECTOR,
+	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::VECTOR,
 		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLK> TMR3;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR_SELB,
+	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR_SELB,
 		ICU::VECTOR_SELB::CMIA0, ICU::VECTOR_SELB::CMIB0, ICU::VECTOR_SELB::OVI0, clock_profile::PCLKB> TMR0;
-	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR_SELB,
+	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR_SELB,
 		ICU::VECTOR_SELB::CMIA1, ICU::VECTOR_SELB::CMIB1, ICU::VECTOR_SELB::OVI1, clock_profile::PCLKB> TMR1;
-	typedef tmr0246_t<0x00088210, peripheral::TMR2, ICU::VECTOR_SELB,
+	typedef tmr0246_t<0x0008'8210, peripheral::TMR2, ICU::VECTOR_SELB,
 		ICU::VECTOR_SELB::CMIA2, ICU::VECTOR_SELB::CMIB2, ICU::VECTOR_SELB::OVI2, clock_profile::PCLKB> TMR2;
-	typedef tmr1357_t<0x00088211, peripheral::TMR3, ICU::VECTOR_SELB,
+	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::VECTOR_SELB,
 		ICU::VECTOR_SELB::CMIA3, ICU::VECTOR_SELB::CMIB3, ICU::VECTOR_SELB::OVI3, clock_profile::PCLKB> TMR3;
 #elif defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef tmr0246_t<0x00088200, peripheral::TMR0, ICU::VECTOR,
+	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
 		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
-	typedef tmr1357_t<0x00088201, peripheral::TMR1, ICU::VECTOR,
+	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,
 		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1, clock_profile::PCLKB> TMR1;
-	typedef tmr0246_t<0x00088210, peripheral::TMR2, ICU::VECTOR,
+	typedef tmr0246_t<0x0008'8210, peripheral::TMR2, ICU::VECTOR,
 		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLKB> TMR2;
-	typedef tmr1357_t<0x00088211, peripheral::TMR3, ICU::VECTOR,
+	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::VECTOR,
 		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLKB> TMR3;
-	typedef tmr0246_t<0x00088220, peripheral::TMR4, ICU::VECTOR,
+	typedef tmr0246_t<0x0008'8220, peripheral::TMR4, ICU::VECTOR,
 		ICU::VECTOR::CMIA4, ICU::VECTOR::CMIB4, ICU::VECTOR::OVI4, clock_profile::PCLKB> TMR4;
-	typedef tmr1357_t<0x00088221, peripheral::TMR5, ICU::VECTOR,
+	typedef tmr1357_t<0x0008'8221, peripheral::TMR5, ICU::VECTOR,
 		ICU::VECTOR::CMIA5, ICU::VECTOR::CMIB5, ICU::VECTOR::OVI5, clock_profile::PCLKB> TMR5;
-	typedef tmr0246_t<0x00088230, peripheral::TMR6, ICU::VECTOR,
+	typedef tmr0246_t<0x0008'8230, peripheral::TMR6, ICU::VECTOR,
 		ICU::VECTOR::CMIA6, ICU::VECTOR::CMIB6, ICU::VECTOR::OVI6, clock_profile::PCLKB> TMR6;
-	typedef tmr1357_t<0x00088231, peripheral::TMR7, ICU::VECTOR,
+	typedef tmr1357_t<0x0008'8231, peripheral::TMR7, ICU::VECTOR,
 		ICU::VECTOR::CMIA7, ICU::VECTOR::CMIB7, ICU::VECTOR::OVI7, clock_profile::PCLKB> TMR7;
 #endif
 }
