@@ -143,6 +143,8 @@ namespace device {
 		GLCDC,		///< グラフィックスＬＣＤコントローラ
 		DRW2D,		///< ２Ｄ描画エンジン
 
+		TSIP,		///< Trusted Secure IP
+
 		DSMIF0,		///< ΔΣモジュレータインターフェース 0
 		DSMIF1,		///< ΔΣモジュレータインターフェース 1
 
