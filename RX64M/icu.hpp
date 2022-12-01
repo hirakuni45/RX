@@ -21,7 +21,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class _>
-	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP {
+	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -431,7 +431,7 @@ namespace device {
 			ERS0 = 0,		///< CAN0 / ERS0
 			ERS1,			///< CAN1 / ERS1
 			ERS2,			///< CAN2 / ERS2
-			NUM_
+			NUM_ = 3
 		};
 
 
@@ -472,7 +472,7 @@ namespace device {
 			DOPCI,			///< DOC / DOPCI
 			PCFEI,			///< PDC / PCFEI
 			PCERI,			///< PDC / PCERI
-			NUM_
+			NUM_ = 29
 		};
 
 
@@ -504,7 +504,7 @@ namespace device {
 
 			S12CMPAI = 20,	///< S12AD / S12CMPAI
 			S12CMPAI1 = 22,	///< S12AD1 / S12CMPAI1
-			NUM_
+			NUM_ = 22
 		};
 
 
@@ -537,8 +537,10 @@ namespace device {
 #if defined(SIG_RX71M)
 			SPII1,			///< RSPI1 / SPII1
 			SPEI1,			///< RSPI1 / SPEI1
+			NUM_ = 20
+#else
+			NUM_ = 18
 #endif
-			NUM_
 		};
 
 
@@ -553,7 +555,7 @@ namespace device {
 
 			EINT0 = 4,		///< EDMAC0/EINT0
 			EINT1 = 5,		///< EDMAC1/EINT1
-			NUM_
+			NUM_ = 4
 		};
 
 

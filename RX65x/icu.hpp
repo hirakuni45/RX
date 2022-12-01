@@ -19,7 +19,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class _>
-	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP {
+	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -437,9 +437,9 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 : uint8_t {
-			ERS0,	///< CAN0 / ERS0
-			ERS1,	///< CAN1 / ERS1
-			NUM_
+			ERS0 = 0,	///< CAN0 / ERS0
+			ERS1,		///< CAN1 / ERS1
+			NUM_ = 2
 		};
 
 
@@ -449,7 +449,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL0 : uint8_t {
-			TEI0,	///< SCI0 / TEI0（送信完了）
+			TEI0 = 0,	///< SCI0 / TEI0（送信完了）
 			ERI0,	///< SCI0 / ERI0（受信エラー）
 			TEI1,	///< SCI1 / TEI1（送信完了）
 			ERI1,	///< SCI1 / ERI1（受信エラー）
@@ -480,7 +480,7 @@ namespace device {
 			DOPCI,			///< DOC / DOPCI
 			PCFEI,			///< PDC / PCFEI
 			PCERI,			///< PDC / PCERI
-			NUM_
+			NUM_ = 29
 		};
 
 
@@ -515,7 +515,7 @@ namespace device {
 			ERI9,			///< SCI9 / ERI9
 			TEI1,			///< RIIC1 / TEI1
 			EEI1,			///< RIIC1 / EEI1
-			NUM_
+			NUM_ = 24
 		};
 
 
@@ -525,8 +525,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL2 : uint8_t {
-			SDIOI,			///< SDSI / SDIOI
-			NUM_
+			SDIOI = 0,	///< SDSI / SDIOI
+			NUM_ = 1
 		};
 
 
@@ -546,7 +546,7 @@ namespace device {
 			SPEI0,			///< RSPI0 / SPEI0
 			SPII2,			///< RSPI2 / SPII2
 			SPEI2,			///< RSPI2 / SPEI2
-			NUM_
+			NUM_ = 8
 		};
 
 
@@ -562,7 +562,7 @@ namespace device {
 			GR1UF,			///< GLCDC/GR1UF
 			GR2UF,			///< GLCDC/GR2UF
 			DRW_IRQ,		///< DRW2D/DRW_IRQ
-			NUM_
+			NUM_ = 6
 		};
 
 

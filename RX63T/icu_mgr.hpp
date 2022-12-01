@@ -197,7 +197,7 @@ namespace device {
 		/*!
 			@brief  GROUP0 割り込みタスクを登録する @n
 					※ここで登録するタスクは「割り込みアトリビュート」無しの通常関数を登録する事
-			@param[in]	grpv	グループベクター型
+			@param[in]	grpv	グループ割り込み要因
 			@param[in]	task	割り込みタスク
 		*/
 		//-----------------------------------------------------------------//
@@ -216,7 +216,7 @@ namespace device {
 		/*!
 			@brief  GROUPBL0 割り込みタスクを登録する @n
 					※ここで登録するタスクは「割り込みアトリビュート」無しの通常関数を登録する事
-			@param[in]	grpv	グループベクター型
+			@param[in]	grpv	グループ割り込み要因
 			@param[in]	task	割り込みタスク
 		*/
 		//-----------------------------------------------------------------//
@@ -229,6 +229,49 @@ namespace device {
 				ICU::GEN12.set(grpv);
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（グループ GROUP0）
+			@param[in]	grpv	グループ割り込み要因
+			@param[in]	task	割り込みタスク @n
+								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
+			@param[in]	lvl		割り込みレベル @n
+								※グループ割り込みレベルが、設定レベルより高い場合に設定される。
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_GROUP0 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
+		{
+			install_group_task(grpv, task);
+			if(get_level(ICU::VECTOR::GROUP0) < lvl) {
+				set_level(ICU::VECTOR::GROUP0, lvl);
+			}
+			return ICU::VECTOR::GROUP0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（グループ GROUP12）
+			@param[in]	grpv	グループ割り込み要因
+			@param[in]	task	割り込みタスク @n
+								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
+			@param[in]	lvl		割り込みレベル @n
+								※グループ割り込みレベルが、設定レベルより高い場合に設定される。
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_GROUP12 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
+		{
+			install_group_task(grpv, task);
+			if(get_level(ICU::VECTOR::GROUP12) < lvl) {
+				set_level(ICU::VECTOR::GROUP12, lvl);
+			}
+			return ICU::VECTOR::GROUP12;
+		}
+
 	};
 	template <class _> typename icu_mgr_<_>::GROUP0_dispatch_t icu_mgr_<_>::GROUP0_dispatch_;
 	template <class _> typename icu_mgr_<_>::GROUP12_dispatch_t icu_mgr_<_>::GROUP12_dispatch_;

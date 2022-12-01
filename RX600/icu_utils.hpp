@@ -27,14 +27,16 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  dispatch class
+			@brief  グループ割り込み dispatch クラス
 			@param[in]	GRPV	グループ・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<typename GRPV>
 		class dispatch {
 
-			GTASK	task_[static_cast<uint32_t>(GRPV::NUM_)];
+			static constexpr auto NUM = static_cast<uint32_t>(GRPV::NUM_);
+			uint32_t	bits_[NUM];
+			GTASK		task_[NUM];
 
 		public:
 			//-----------------------------------------------------------------//
@@ -42,32 +44,35 @@ namespace device {
 				@brief	コンストラクター
 			*/
 			//-----------------------------------------------------------------//
-			dispatch() noexcept : task_{ nullptr } { }
+			constexpr dispatch() noexcept :
+				bits_{ 0 }, task_{ nullptr }
+			{ }
 
 
 			//-----------------------------------------------------------------//
 			/*!
-				@brief	分岐タスクを登録
+				@brief	タスクを登録
 				@param[in]	grpv	グループベクター型
 				@param[in]	task	タスク
 			*/
 			//-----------------------------------------------------------------//
 			void set_task(GRPV grpv, GTASK task) noexcept
 			{
-				task_[static_cast<uint32_t>(grpv)] = task;
-			}
-
-
-			//-----------------------------------------------------------------//
-			/*!
-				@brief	分岐タスクを取得
-				@param[in]	grpv	グループベクター型
-				@return 分岐タスク
-			*/
-			//-----------------------------------------------------------------//
-			auto get_task(GRPV grpv) const noexcept
-			{
-				return task_[static_cast<uint32_t>(grpv)];
+				uint32_t bits = 1 << static_cast<uint32_t>(grpv);
+				for(uint32_t i = 0; i < NUM; ++i) {
+					if(bits_[i] == bits) {
+						bits_[i] = 0;
+						task_[i] = nullptr;
+						break;
+					}
+				}
+				for(uint32_t i = 0; i < NUM; ++i) {
+					if(bits_[i] == 0) {
+						bits_[i] = bits;
+						task_[i] = task;
+						break;
+					}
+				}
 			}
 
 
@@ -81,13 +86,12 @@ namespace device {
 			template<class CLR>
 			void run(CLR& clr, uint32_t togo) const noexcept
 			{
-				for(uint32_t i = 0; i < static_cast<uint32_t>(GRPV::NUM_); ++i) {
-					if((togo & (1 << i)) != 0 && task_[i] != nullptr) {
+				for(uint32_t i = 0; i < NUM; ++i) {
+					if(bits_[i] == 0) break;
+					if((bits_[i] & togo) != 0 && task_[i] != nullptr) {
 						(*task_[i])();
 						clr.set(static_cast<GRPV>(i), false);
 					}
-					togo &= ~(1 << i);
-					if(togo == 0) break;
 				}
 			}
 
@@ -100,12 +104,11 @@ namespace device {
 			//-----------------------------------------------------------------//
 			void run(uint32_t togo) const noexcept
 			{
-				for(uint32_t i = 0; i < static_cast<uint32_t>(GRPV::NUM_); ++i) {
-					if((togo & (1 << i)) != 0 && task_[i] != nullptr) {
+				for(uint32_t i = 0; i < NUM; ++i) {
+					if(bits_[i] == 0) break;
+					if((bits_[i] & togo) != 0 && task_[i] != nullptr) {
 						(*task_[i])();
 					}
-					togo &= ~(1 << i);
-					if(togo == 0) break;
 				}
 			}
 		};

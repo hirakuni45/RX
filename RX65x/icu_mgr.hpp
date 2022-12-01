@@ -317,7 +317,7 @@ namespace device {
 		/*!
 			@brief  GROUPBE0 割り込みタスクを登録する @n
 					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	grpv	グループ内インデックス
+			@param[in]	grpv	BE0 グループ割り込み要因
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
@@ -336,7 +336,7 @@ namespace device {
 		/*!
 			@brief  GROUPBL0 割り込みタスクを登録する @n
 					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	grpv	グループ内インデックス
+			@param[in]	grpv	BL0 グループ割り込み要因
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
@@ -355,7 +355,7 @@ namespace device {
 		/*!
 			@brief  GROUPBL1 割り込みタスクを登録する @n
 					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	grpv	グループ内インデックス
+			@param[in]	grpv	BL1 グループ割り込み要因
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
@@ -374,7 +374,7 @@ namespace device {
 		/*!
 			@brief  GROUPBL2 割り込みタスクを登録する @n
 					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	grpv	グループ内インデックス
+			@param[in]	grpv	BL2 グループ割り込み要因
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
@@ -393,7 +393,7 @@ namespace device {
 		/*!
 			@brief  GROUPAL0 割り込みタスクを登録する @n
 					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	grpv	グループ内インデックス
+			@param[in]	grpv	AL0 グループ割り込み要因
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
@@ -412,7 +412,7 @@ namespace device {
 		/*!
 			@brief  GROUPAL1 割り込みタスクを登録する @n
 					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	grpv	グループ内インデックス
+			@param[in]	grpv	AL1 グループ割り込み要因
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
@@ -430,7 +430,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（グループ BE0）
-			@param[in]	sel		割り込み要因
+			@param[in]	grpv	BE0 グループ割り込み要因
 			@param[in]	task	割り込みタスク @n
 								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	lvl		割り込みレベル @n
@@ -438,9 +438,9 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_BE0 sel, icu_utils::GTASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_BE0 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
 		{
-			install_group_task(sel, task);
+			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPBE0) < lvl) {
 				set_level(ICU::VECTOR::GROUPBE0, lvl);
 			}
@@ -451,7 +451,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（グループ BL0）
-			@param[in]	sel		割り込み要因
+			@param[in]	grpv	BL0 グループ割り込み要因
 			@param[in]	task	割り込みタスク @n
 								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	lvl		割り込みレベル @n
@@ -459,9 +459,9 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL0 sel, icu_utils::GTASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL0 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
 		{
-			install_group_task(sel, task);
+			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPBL0) < lvl) {
 				set_level(ICU::VECTOR::GROUPBL0, lvl);
 			}
@@ -472,7 +472,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（グループ BL1）
-			@param[in]	sel		割り込み要因
+			@param[in]	grpv	BL1 グループ割り込み要因
 			@param[in]	task	割り込みタスク @n
 								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	lvl		割り込みレベル @n
@@ -480,9 +480,9 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL1 sel, icu_utils::GTASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL1 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
 		{
-			install_group_task(sel, task);
+			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPBL1) < lvl) {
 				set_level(ICU::VECTOR::GROUPBL1, lvl);
 			}
@@ -493,7 +493,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（グループ BL2）
-			@param[in]	sel		割り込み要因
+			@param[in]	grpv	BL2 グループ割り込み要因
 			@param[in]	task	割り込みタスク @n
 								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	lvl		割り込みレベル @n
@@ -501,9 +501,9 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL2 sel, icu_utils::GTASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL2 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
 		{
-			install_group_task(sel, task);
+			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPBL2) < lvl) {
 				set_level(ICU::VECTOR::GROUPBL2, lvl);
 			}
@@ -514,7 +514,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（グループ AL0）
-			@param[in]	sel		割り込み要因
+			@param[in]	grpv	AL0 グループ割り込み要因
 			@param[in]	task	割り込みタスク @n
 								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	lvl		割り込みレベル @n
@@ -522,9 +522,9 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_AL0 sel, icu_utils::GTASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_AL0 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
 		{
-			install_group_task(sel, task);
+			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPAL0) < lvl) {
 				set_level(ICU::VECTOR::GROUPAL0, lvl);
 			}
@@ -535,7 +535,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（グループ AL1）
-			@param[in]	sel		割り込み要因
+			@param[in]	grpv	AL1 グループ割り込み要因
 			@param[in]	task	割り込みタスク @n
 								※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	lvl		割り込みレベル @n
@@ -543,9 +543,9 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_AL1 sel, icu_utils::GTASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_AL1 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
 		{
-			install_group_task(sel, task);
+			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPAL1) < lvl) {
 				set_level(ICU::VECTOR::GROUPAL1, lvl);
 			}

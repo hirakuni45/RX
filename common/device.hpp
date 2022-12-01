@@ -98,6 +98,7 @@
 #include "RX72M/icu_mgr.hpp"
 #include "RX72M/port_map.hpp"
 #include "RX72M/port_map_mtu.hpp"
+#include "RX72M/port_map_gptw.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72N)
