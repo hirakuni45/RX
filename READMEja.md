@@ -91,7 +91,8 @@ int main(int argc, char** argv)
 |[/ff14](./ff14)|ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
 |[/common](./common)|共有クラス、ヘッダーなど|
 |[/chip](./chip)|I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
-|[/graphics](./graphics/)|グラフィックス描画関係クラス、GUI Widget|
+|[/graphics](./graphics/)|グラフィックス描画関係クラス|
+|[/gui](./gui/)|GUI Widget|
 |[/sound](./sound)|サウンド、オーディオ関係クラス|
 |[/usb](./usb)|USB 関係クラス|
 |[/tinyusb](./tinyusb)|TinyUSB ソースコード|
