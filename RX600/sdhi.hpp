@@ -517,7 +517,7 @@ namespace device {
 		typedef sdswap_t SDSWAP_;
 		static SDSWAP_ SDSWAP;
 	};
-	typedef sdhi_t<0x0008AC00, peripheral::SDHI,
+	typedef sdhi_t<0x0008'AC00, peripheral::SDHI,
 		ICU::VECTOR_BL1::CDETI, ICU::VECTOR_BL1::CACI, ICU::VECTOR_BL1::SDACI,
 		ICU::VECTOR::SBFAI> SDHI;
 

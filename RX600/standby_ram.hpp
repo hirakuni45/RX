@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ Standby RAM 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,8 +22,8 @@ namespace device {
 	class standby_ram {
 	public:
 
-		static constexpr uint32_t TOP  = 0x000A4000;  ///< RAM 開始アドレス
-		static constexpr uint32_t SIZE = 8192;  	  ///< RAM サイズ
+		static constexpr uint32_t TOP  = 0x000A'4000;  ///< RAM 開始アドレス
+		static constexpr uint32_t SIZE = 8192;  	   ///< RAM サイズ
 
 		//-----------------------------------------------------------------//
 		/*!

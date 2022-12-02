@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T グループ・システム定義
+	@brief	RX220 グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -38,7 +38,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8,  4> PCKB;
 
-			bits_rw_t<io_, bitpos::B12, 4> PCKA;
+			bits_rw_t<io_, bitpos::B16, 4> BCK;
 
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 			bits_rw_t<io_, bitpos::B28, 4> FCK;
@@ -65,48 +65,6 @@ namespace device {
 		};
 		typedef sckcr3_t<0x0008'0026> SCKCR3_;
 		static SCKCR3_ SCKCR3;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  PLL コントロールレジスタ（PLLCR）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct pllcr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 2> PLIDIV;
-			bit_rw_t <io_, bitpos::B2>    PLLSRCSEL;
-			bits_rw_t<io_, bitpos::B8, 6> STC;
-		};
-		typedef pllcr_t<0x0008'0028> PLLCR_;
-		static PLLCR_ PLLCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  PLL コントロールレジスタ 2（PLLCR2）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct pllcr2_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> PLLEN;
-		};
-		typedef pllcr2_t<0x0008'002A> PLLCR2_;
-		static PLLCR2_ PLLCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -211,47 +169,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  高速オンチップオシレータウェイトコントロールレジスタ (HOCOWTCR)
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct hocowtcr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 3> HSTS;
-		};
-		typedef hocowtcr_t<0x0008'00A5> HOCOWTCR_;
-		static HOCOWTCR_ HOCOWTCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  発振安定フラグレジスタ（OSCOVFSR）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct oscovfsr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_ro_t<ro8_t<base>, bitpos::B0> MOOVF;
-			bit_ro_t<ro8_t<base>, bitpos::B2> PLOVF;
-		};
-		typedef oscovfsr_t<0x0008'003C> OSCOVFSR_;
-		static OSCOVFSR_ OSCOVFSR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  発振停止検出コントロールレジスタ（OSTDCR）
 			@param[in]	base	ベースアドレス
 		*/
@@ -265,6 +182,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> OSTDIE;
+
 			bit_rw_t<io_, bitpos::B7> OSTDE;
 		};
 		typedef ostdcr_t<0x0008'0040> OSTDCR_;
@@ -293,26 +211,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メインクロック発振器ウェイトコントロールレジスタ（MOSCWTCR）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct moscwtcr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 5> MSTS;
-		};
-		typedef moscwtcr_t<0x0008'00A2> MOSCWTCR_;
-		static MOSCWTCR_ MOSCWTCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	メインクロック発振器強制発振コントロールレジスタ（MOFCR）
 			@param[in]	base	ベースアドレス
 		*/
@@ -325,8 +223,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B5> MODRV21;
-			bit_rw_t<io_, bitpos::B6> MOSEL;
+			bits_rw_t<io_, bitpos::B1, 3> MODRV;
+			bits_rw_t<io_, bitpos::B4, 2> MODRV2;
+			bit_rw_t <io_, bitpos::B6>    MOSEL;
 		};
 		typedef mofcr_t<0x0008'C293> MOFCR_;
 		static MOFCR_ MOFCR;
@@ -334,11 +233,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
+			@brief	高速オンチップオシレータ電源コントロールレジスタ（HOCOPCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'0031> MEMWAIT_;
-		static MEMWAIT_ MEMWAIT;
+		template <uint32_t base>
+		struct hocopcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  HOCOPCNT;
+		};
+		typedef hocopcr_t<0x0008'C294> HOCOPCR_;
+		static HOCOPCR_ HOCOPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -348,8 +258,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct sbycr_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
+		struct sbycr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -375,28 +285,26 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B2>  MSTPA2;
-			bit_rw_t<io_, bitpos::B3>  MSTPA3;
 			bit_rw_t<io_, bitpos::B4>  MSTPA4;
 			bit_rw_t<io_, bitpos::B5>  MSTPA5;
-
-			bit_rw_t<io_, bitpos::B7>  MSTPA7;
 
 			bit_rw_t<io_, bitpos::B9>  MSTPA9;
 
 			bit_rw_t<io_, bitpos::B14> MSTPA14;
 			bit_rw_t<io_, bitpos::B15> MSTPA15;
-			bit_rw_t<io_, bitpos::B16> MSTPA16;
+
 			bit_rw_t<io_, bitpos::B17> MSTPA17;
 
-			bit_rw_t<io_, bitpos::B19> MSTPA19;
+			bit_rw_t<io_, bitpos::B24> MSTPA24;
 
-			bit_rw_t<io_, bitpos::B23> MSTPA23;
-
+			bit_rw_t<io_, bitpos::B27> MSTPA27;
 			bit_rw_t<io_, bitpos::B28> MSTPA28;
+			bit_rw_t<io_, bitpos::B29> MSTPA29;
+
+			bit_rw_t<io_, bitpos::B31> ACSE;
 		};
 		typedef mstpcra_t<0x0008'0010> MSTPCRA_;
-		static MSTPCRA_ MSTPCRA;
+		static MSTPCRA_t MSTPCRA;
 
 
 		//-----------------------------------------------------------------//
@@ -413,11 +321,11 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  MSTPB0;
+			bit_rw_t<io_, bitpos::B4>  MSTPB4;
 
 			bit_rw_t<io_, bitpos::B6>  MSTPB6;
 
-			bit_rw_t<io_, bitpos::B10> MSTPB10;
+			bit_rw_t<io_, bitpos::B9>  MSTPB9;
 
 			bit_rw_t<io_, bitpos::B17> MSTPB17;
 
@@ -451,8 +359,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  MSTPC0;
 
 			bit_rw_t<io_, bitpos::B19> MSTPC19;
+			bit_rw_t<io_, bitpos::B20> MSTPC20;
 
-			bit_rw_t<io_, bitpos::B31> DSLPE;
+			bit_rw_t<io_, bitpos::B26> MSTPC26;
 		};
 		typedef mstpcrc_t<0x0008'0018> MSTPCRC_;
 		static MSTPCRC_ MSTPCRC;
@@ -482,6 +391,108 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  スリープモード復帰クロックソース切り替えレジスタ（RSTCKCR）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rstckcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 3> RSTCKSEL;
+
+			bit_rw_t <io_, bitpos::B4>    RSTCKEN;
+		};
+		typedef rstckcr_t<0x0008'00A1> RSTCKCR_;
+		static RSTCKCR_ RSTCKCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  メインクロック発振器ウェイトコントロールレジスタ（MOSCWTCR）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct moscwtcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5> MSTS;
+		};
+		typedef moscwtcr_t<0x0008'00A2> MOSCWTCR_;
+		static MOSCWTCR_ MOSCWTCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct soscwtcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5> SSTS;
+		};
+		typedef soscwtcr_t<0x0008'00A3> SOSCWTCR_;
+		static SOSCWTCR_ SOSCWTCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  HOCO ウェイトコントロールレジスタ 2（HOCOWTCR2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct hocowtcr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5> HSTS2;
+		};
+		typedef hocowtcr2_t<0x0008'00A9> HOCOWTCR2_;
+		static HOCOWTCR2_ HOCOWTCR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フラッシュ HOCO ソフトウェアスタンバイコントロールレジスタ（FHSSBYCR）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct fhssbycr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 3> SOFTCUT;
+		};
+		typedef fhssbycr_t<0x0008'C28F> FHSSBYCR_;
+		static FHSSBYCR_ FHSSBYCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  プロテクトレジスタ（PRCR）
 			@param[in]	base	ベースアドレス
 		*/
@@ -496,6 +507,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>    PRC0;
 			bit_rw_t <io_, bitpos::B1>    PRC1;
+
 			bit_rw_t <io_, bitpos::B3>    PRC3;
 			bits_rw_t<io_, bitpos::B8, 8> PRKEY;
 		};
@@ -504,25 +516,25 @@ namespace device {
 	};
 	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
 	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
-	template<class _> typename system_t<_>::PLLCR_ system_t<_>::PLLCR;
-	template<class _> typename system_t<_>::PLLCR2_ system_t<_>::PLLCR2;
 	template<class _> typename system_t<_>::MOSCCR_ system_t<_>::MOSCCR;
 	template<class _> typename system_t<_>::LOCOCR_ system_t<_>::LOCOCR;
 	template<class _> typename system_t<_>::ILOCOCR_ system_t<_>::ILOCOCR;
 	template<class _> typename system_t<_>::HOCOCR_ system_t<_>::HOCOCR;
 	template<class _> typename system_t<_>::HOCOCR2_ system_t<_>::HOCOCR2;
-	template<class _> typename system_t<_>::HOCOWTCR_ system_t<_>::HOCOWTCR;
-	template<class _> typename system_t<_>::OSCOVFSR_ system_t<_>::OSCOVFSR;
 	template<class _> typename system_t<_>::OSTDCR_ system_t<_>::OSTDCR;
 	template<class _> typename system_t<_>::OSTDSR_ system_t<_>::OSTDSR;
-	template<class _> typename system_t<_>::MOSCWTCR_ system_t<_>::MOSCWTCR;
 	template<class _> typename system_t<_>::MOFCR_ system_t<_>::MOFCR;
-	template<class _> typename system_t<_>::MEMWAIT_ system_t<_>::MEMWAIT;
+	template<class _> typename system_t<_>::HOCOPCR_ system_t<_>::HOCOPCR;
 	template<class _> typename system_t<_>::SBYCR_ system_t<_>::SBYCR;
 	template<class _> typename system_t<_>::MSTPCRA_ system_t<_>::MSTPCRA;
 	template<class _> typename system_t<_>::MSTPCRB_ system_t<_>::MSTPCRB;
 	template<class _> typename system_t<_>::MSTPCRC_ system_t<_>::MSTPCRC;
 	template<class _> typename system_t<_>::OPCCR_ system_t<_>::OPCCR;
+	template<class _> typename system_t<_>::RSTCKCR_ system_t<_>::RSTCKCR;
+	template<class _> typename system_t<_>::MOSCWTCR_ system_t<_>::MOSCWTCR;
+	template<class _> typename system_t<_>::SOSCWTCR_ system_t<_>::SOSCWTCR;
+	template<class _> typename system_t<_>::HOCOWTCR2_ system_t<_>::HOCOWTCR2;
+	template<class _> typename system_t<_>::FHSSBYCR_ system_t<_>::FHSSBYCR;
 	template<class _> typename system_t<_>::PRCR_ system_t<_>::PRCR;
 
 	typedef system_t<void> SYSTEM;

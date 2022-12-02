@@ -470,32 +470,32 @@ namespace device {
 	};
 
 #if defined(SIG_RX63T)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+	typedef riic_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
-	typedef riic_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
+	typedef riic_t<0x0008'8320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
 		ICU::VECTOR::ICEEI1, ICU::VECTOR::ICTEI1, clock_profile::PCLKB> RIIC1;
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+	typedef riic_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLK> RIIC0;
-	typedef riic_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
+	typedef riic_t<0x0008'8320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
 		ICU::VECTOR::ICEEI1, ICU::VECTOR::ICTEI1, clock_profile::PCLK> RIIC1;
 #elif defined(SIG_RX24T)
-	typedef riica_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef riica_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0, clock_profile::PCLKB> RIIC0;
-	typedef riica_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
+	typedef riica_t<0x0008'8340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2, clock_profile::PCLKB> RIIC2;
 #elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
-	typedef riica_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0, clock_profile::PCLKB> RIIC0;
-	typedef riica_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
+	typedef riica_t<0x0008'8320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI1, ICU::VECTOR_BL1::TEI1, clock_profile::PCLKB> RIIC1;
-	typedef riica_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
+	typedef riica_t<0x0008'8340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2, clock_profile::PCLKB> RIIC2;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef riica_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0, clock_profile::PCLKB> RIIC0;
 #endif
 }

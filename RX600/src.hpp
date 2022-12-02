@@ -29,7 +29,7 @@ namespace device {
 			@brief  入力データレジスタ（ SRCID ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0009DFF0> SRCID_;
+		typedef rw32_t<0x0009'DFF0> SRCID_;
 		static  SRCID_ SRCID;
 
 
@@ -38,7 +38,7 @@ namespace device {
 			@brief  出力データレジスタ（ SRCOD ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0009DFF4> SRCOD_;
+		typedef rw32_t<0x0009'DFF4> SRCOD_;
 		static  SRCOD_ SRCOD;
 
 
@@ -60,7 +60,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B8>     IEN;
 			bit_rw_t< io_, bitpos::B9>     IED;
 		};
-		typedef srcidctrl_t<0x0009DFF8> SRCIDCTRL_;
+		typedef srcidctrl_t<0x0009'DFF8> SRCIDCTRL_;
 		static  SRCIDCTRL_ SRCIDCTRL;
 
 
@@ -83,7 +83,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B9>     OED;
 			bit_rw_t< io_, bitpos::B10>    OCH;
 		};
-		typedef srcodctrl_t<0x0009DFFA> SRCODCTRL_;
+		typedef srcodctrl_t<0x0009'DFFA> SRCODCTRL_;
 		static  SRCODCTRL_ SRCODCTRL;
 
 
@@ -112,7 +112,7 @@ namespace device {
 
 			bit_rw_t< io_, bitpos::B15>    FICRAE;
 		};
-		typedef srcctrl_t<0x0009DFFC> SRCCTRL_;
+		typedef srcctrl_t<0x0009'DFFC> SRCCTRL_;
 		static  SRCCTRL_ SRCCTRL;
 
 
@@ -142,7 +142,7 @@ namespace device {
 			bits_rw_t<ro_, bitpos::B11, 5> OFDN;
 
 		};
-		typedef srcstat_t<0x0009DFFE> SRCSTAT_;
+		typedef srcstat_t<0x0009'DFFE> SRCSTAT_;
 		static  SRCSTAT_ SRCSTAT;
 
 

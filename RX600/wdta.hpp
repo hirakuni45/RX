@@ -113,5 +113,5 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
 		typename wdta_t<base, per, ivec, pclk>::WDTRCR_ wdta_t<base, per, ivec, pclk>::WDTRCR;
 
-	typedef wdta_t<0x00088020, peripheral::WDTA, ICU::VECTOR::WUNI, clock_profile::PCLKB> WDT;
+	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::WUNI, clock_profile::PCLKB> WDT;
 }

@@ -18,10 +18,6 @@
 #include "RX600/system.hpp"
 #include "RX600/flash.hpp"
 
-#if defined(SIG_RX24T)
-  #error "system_io.hpp: Not available on RX24T"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

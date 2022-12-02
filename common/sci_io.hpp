@@ -127,7 +127,8 @@ namespace device {
 		@param[in]	RTS		制御ポート（RTS/RS-485_DE）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST, typename sci_io_base::FLOW_CTRL FLCT = sci_io_base::FLOW_CTRL::NONE, class RTS = NULL_PORT>
+	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST,
+		typename sci_io_base::FLOW_CTRL FLCT = sci_io_base::FLOW_CTRL::NONE, class RTS = NULL_PORT>
 	class sci_io : public sci_io_base {
 	public:
 		typedef SCI sci_type;
@@ -154,7 +155,10 @@ namespace device {
 		static volatile uint16_t	errc_;
 
 		// ※マルチタスクの場合適切な実装をする
-		void sleep_() noexcept { asm("nop"); }
+		void sleep_() noexcept
+		{
+			asm("nop");
+		}
 
 
 		static INTERRUPT_FUNC void rxi_task_()
@@ -239,11 +243,10 @@ namespace device {
 		/*!
 			@brief  コンストラクター
 			@param[in]	autocrlf	LF 時、自動で CR の送出をしない場合「false」
-			@param[in]	flow_ctrl	フロー制御型
 			@param[in]	sci_port	ポート設定を詳細に行う場合
 		*/
 		//-----------------------------------------------------------------//
-		sci_io(bool autocrlf = true, FLOW_CTRL flow_ctrl = FLOW_CTRL::NONE,
+		sci_io(bool autocrlf = true,
 			const port_map_order::sci_port_t& sci_port = port_map_order::sci_port_t()) noexcept :
 			port_map_(sci_port),
 			level_(0),

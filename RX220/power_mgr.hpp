@@ -1,15 +1,15 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX621/RX62N グループ・電力制御クラス
+	@brief	RX220 グループ・電力制御クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX62x/system.hpp"
-#include "RX62x/peripheral.hpp"
+#include "RX220/system.hpp"
+#include "RX220/peripheral.hpp"
 
 namespace device {
 
@@ -25,7 +25,6 @@ namespace device {
 
 			uint8_t		tmr_;
 			uint8_t		mtu0_;
-			uint8_t		mtu1_;
 
 			uint8_t		cmt_;
 
@@ -34,12 +33,11 @@ namespace device {
 
 			pad_t() :
 				tmr_(0),
-				mtu0_(0), mtu1_(0),
+				mtu0_(0),
 
 				cmt_(0),
 
-				dmac_(0),
-				exdmac_(0)
+				dmac_(0)
 			{ }
 		};
 		static pad_t	pad_;
@@ -96,22 +94,6 @@ namespace device {
 				sr_(ena, pad_.mtu0_, peripheral::MTU0, per);
 				SYSTEM::MSTPCRA.MSTPA9 = (pad_.mtu0_ == 0);
 				break;
-			case peripheral::MTU6:
-			case peripheral::MTU7:
-			case peripheral::MTU8:
-			case peripheral::MTU9:
-			case peripheral::MTU10:
-			case peripheral::MTU11:
-				sr_(ena, pad_.mtu1_, peripheral::MTU6, per);
-				SYSTEM::MSTPCRA.MSTPA8 = (pad_.mtu1_ == 0);
-				break;
-
-			case peripheral::PPG1:
-				SYSTEM::MSTPCRA.MSTPA10 = f;
-				break;
-			case peripheral::PPG0:
-				SYSTEM::MSTPCRA.MSTPA11 = f;
-				break;
 
 			case peripheral::CMT2:
 			case peripheral::CMT3:
@@ -130,56 +112,31 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA17 = f;
 				break;
 
-			case peripheral::DA:
-				SYSTEM::MSTPCRA.MSTPA19 = f;
-				break;
-
-			case peripheral::AD1:
-				SYSTEM::MSTPCRA.MSTPA22 = f;
-				break;
-			case peripheral::AD0:
-				SYSTEM::MSTPCRA.MSTPA23 = f;
-				break;
-
-			case peripheral::DTC:
 			case peripheral::DMAC0:
 			case peripheral::DMAC1:
 			case peripheral::DMAC2:
 			case peripheral::DMAC3:
-				sr_(ena, pad_.dmac_, peripheral::DTC, per);
+			case peripheral::DTC:
+				sr_(ena, pad_.dmac_, peripheral::DMAC0, per);
 				SYSTEM::MSTPCRA.MSTPA28 = (pad_.dmac_ == 0);
 				break;
-			case peripheral::EXDMAC0:
-			case peripheral::EXDMAC1:
-				sr_(ena, pad_.exdmac_, peripheral::EXDMAC0, per);
-				SYSTEM::MSTPCRA.MSTPA29 = (pad_.exdmac_ == 0);
+
+			case peripheral::SCI12:
+				SYSTEM::MSTPCRB.MSTPB4 = f;
 				break;
 
-			case peripheral::CAN:
-				SYSTEM::MSTPCRB.MSTPB0 = f;
+			case peripheral::DOC:
+				SYSTEM::MSTPCRB.MSTPB6 = f;
 				break;
 
-			case peripheral::EDMAC:
-				SYSTEM::MSTPCRB.MSTPB15 = f;
+			case peripheral::ELC:
+				SYSTEM::MSTPCRB.MSTPB9 = f;
 				break;
 
-			case peripheral::RSPI1:
-				SYSTEM::MSTPCRB.MSTPB16 = f;
-				break;
 			case peripheral::RSPI0:
 				SYSTEM::MSTPCRB.MSTPB17 = f;
 				break;
 
-			case peripheral::USB1:
-				SYSTEM::MSTPCRB.MSTPB18 = f;
-				break;
-			case peripheral::USB0:
-				SYSTEM::MSTPCRB.MSTPB19 = f;
-				break;
-
-			case peripheral::RIIC1:
-				SYSTEM::MSTPCRB.MSTPB20 = f;
-				break;
 			case peripheral::RIIC0:
 				SYSTEM::MSTPCRB.MSTPB21 = f;
 				break;
@@ -189,28 +146,26 @@ namespace device {
 				break;
 
 			case peripheral::SCI6:
-			case peripheral::SCI6C:
 				SYSTEM::MSTPCRB.MSTPB25 = f;
 				break;
 			case peripheral::SCI5:
-			case peripheral::SCI5C:
 				SYSTEM::MSTPCRB.MSTPB26 = f;
 				break;
-			case peripheral::SCI3:
-			case peripheral::SCI3C:
-				SYSTEM::MSTPCRB.MSTPB28 = f;
-				break;
-			case peripheral::SCI2:
-			case peripheral::SCI2C:
-				SYSTEM::MSTPCRB.MSTPB29 = f;
-				break;
+
 			case peripheral::SCI1:
-			case peripheral::SCI1C:
 				SYSTEM::MSTPCRB.MSTPB30 = f;
 				break;
-			case peripheral::SCI0:
-			case peripheral::SCI0C:
-				SYSTEM::MSTPCRB.MSTPB31 = f;
+
+			case peripheral::CAC:
+				SYSTEM::MSTPCRC.MSTPC19 = f;
+				break;
+
+			case peripheral::IRDA:
+				SYSTEM::MSTPCRC.MSTPC20 = f;
+				break;
+
+			case peripheral::SCI9:
+				SYSTEM::MSTPCRC.MSTPC26 = f;
 				break;
 
 			default:

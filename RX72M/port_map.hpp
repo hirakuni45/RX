@@ -4,7 +4,7 @@
 	@brief	RX72M グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化して設定 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,29 +23,6 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
 	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  MTUx（マルチ・ファンクション・タイマ） チャネル型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
-			A,		///< MTUx A (MTIOCxA)
-			B,		///< MTUx B (MTIOCxB)
-			C,		///< MTUx C (MTIOCxC)
-			D,		///< MTUx D (MTIOCxD)
-
-			U,		///< MTU5 U (MTIC5U) P24
-			V,		///< MTU5 V (MTIC5V) P23
-			W,		///< MTU5 W (MTIC5W) P22
-			U2,		///< MTU5 U (MTIC5U) P82
-			V2,		///< MTU5 V (MTIC5V) P81
-			W2,		///< MTU5 W (MTIC5W) P80
-
-			CLK_AB,	///< MTCLKA, MTCLKB 1ST: P33/P32, 2ND: P21/P20 
-			CLK_CD,	///< MTCLKC, MTCLKD 1ST: P31/P30, 2ND: P11/P10, 3RD: PE4/PE3
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

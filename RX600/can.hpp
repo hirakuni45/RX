@@ -934,7 +934,7 @@ namespace device {
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
 		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
 
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	CAN モジュール（CAN 選択割り込み型 + グループ割り込み BE0）
@@ -962,12 +962,12 @@ namespace device {
 	typedef can_seli_t<0x0009'0200, peripheral::CAN0,
 		ICU::VECTOR_SELB::RXF0, ICU::VECTOR_SELB::TXF0,
 		ICU::VECTOR_SELB::RXM0, ICU::VECTOR_SELB::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef can_seli_t<0x0009'1200, peripheral::CAN1,
 		ICU::VECTOR_SELB::RXF1, ICU::VECTOR_SELB::TXF1,
 		ICU::VECTOR_SELB::RXM1, ICU::VECTOR_SELB::TXM1, ICU::VECTOR_BE0::ERS1> CAN1;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef can_seli_t<0x0009'2200, peripheral::CAN2,
 		ICU::VECTOR_SELB::RXF2, ICU::VECTOR_SELB::TXF2,
 		ICU::VECTOR_SELB::RXM2, ICU::VECTOR_SELB::TXM2, ICU::VECTOR_BE0::ERS2> CAN2;
