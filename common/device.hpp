@@ -22,9 +22,14 @@
 #include "common/io_utils.hpp"
 
 #if defined(SIG_RX220)
-
+#include "RX220/clock_profile.hpp"
+#include "RX220/peripheral.hpp"
+#include "RX220/system.hpp"
+#include "RX220/power_mgr.hpp"
 #include "RX220/icu.hpp"
 #include "RX220/icu_mgr.hpp"
+
+#include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX63T)
 #include "RX63T/clock_profile.hpp"
