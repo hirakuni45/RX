@@ -286,7 +286,7 @@ namespace device {
 	};
 	static dmist_t<0x0008'2204> DMIST;
 
-#if defined(SIG_RX63T) || defined(SIG_RX621) || defined(SIG_RX62N)
+#if defined(SIG_RX220) || defined(SIG_RX63T) || defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef dmac_t<0x0008'2000, peripheral::DMAC0, ICU::VECTOR::DMACI0>   DMAC0;
 	typedef dmac_t<0x0008'2040, peripheral::DMAC1, ICU::VECTOR::DMACI1>   DMAC1;
 	typedef dmac_t<0x0008'2080, peripheral::DMAC2, ICU::VECTOR::DMACI2>   DMAC2;

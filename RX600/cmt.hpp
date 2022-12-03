@@ -158,7 +158,7 @@ namespace device {
 	typedef cmt_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLK> CMT1;
 	typedef cmt_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2, clock_profile::PCLK> CMT2;
 	typedef cmt_t<0x0008'8018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3, clock_profile::PCLK> CMT3;
-#elif defined(SIG_RX63T) || defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX220) || defined(SIG_RX63T) || defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef cmt_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
 	typedef cmt_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
 	typedef cmt_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2, clock_profile::PCLKB> CMT2;
