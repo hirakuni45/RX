@@ -23,7 +23,6 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  DTC コントロールレジスタ（DTCCR）
