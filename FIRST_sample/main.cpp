@@ -18,7 +18,11 @@ namespace {
 // Memo:
 //    ポート出力は、電流を引いた（吸い込み）場合と、電流を掃き出した（吐き出し）場合で、能力が異なります。
 //    一般的に、「吸い込み」の方が電流を多く流せる場合が多く、その慣例に従って、「吸い込み」で接続する場合が通例です。
-#if defined(SIG_RX63T)
+#if defined(SIG_RX220)
+	// 秋月 RX220 ボード
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+#elif defined(SIG_RX63T)
 	// DIY RX63T board
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
