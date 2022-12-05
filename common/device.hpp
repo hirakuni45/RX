@@ -78,6 +78,7 @@
 #include "RX64M/port_map_mtu.hpp"
 #include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
+#include "RX64M/port_map_qspi.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX71M)
@@ -92,6 +93,7 @@
 #include "RX64M/port_map_mtu.hpp"
 #include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
+#include "RX64M/port_map_qspi.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72M)
