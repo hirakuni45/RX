@@ -304,7 +304,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B31> ACSE;
 		};
 		typedef mstpcra_t<0x0008'0010> MSTPCRA_;
-		static MSTPCRA_t MSTPCRA;
+		static MSTPCRA_ MSTPCRA;
 
 
 		//-----------------------------------------------------------------//

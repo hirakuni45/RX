@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include "common/device.hpp"
-#include "common/vect.h"
+#include "RX600/icu_utils.hpp"
 
 namespace device {
 
@@ -27,7 +27,7 @@ namespace device {
 			@param[in]	task	割り込みタスク
 		*/
 		//-----------------------------------------------------------------//
-		static void set_task(ICU::VECTOR vec, utils::TASK task) noexcept {
+		static void set_task(ICU::VECTOR vec, icu_utils::ITASK task) noexcept {
 			set_interrupt_task(task, static_cast<uint32_t>(vec));
 		}
 
@@ -67,7 +67,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, utils::TASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, icu_utils::ITASK task, uint8_t lvl) noexcept
 		{
 			set_task(vec, task);
 			set_level(vec, lvl);
@@ -126,7 +126,7 @@ namespace device {
 			@return グループ割り込み以外なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool install_group_task(ICU::VECTOR idx, utils::TASK task) noexcept
+		static bool install_group_task(ICU::VECTOR idx, icu_utils::ITASK task) noexcept
 		{
 			return false;
 		}

@@ -227,7 +227,16 @@ namespace device {
 	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
 		typename tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR_ tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR;
 
-#if defined(SIG_RX621) || defined(SIG_RX62N)
+#if defined(SIG_RX220) 
+	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
+		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
+	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,
+		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1, clock_profile::PCLKB> TMR1;
+	typedef tmr0246_t<0x0008'8210, peripheral::TMR2, ICU::VECTOR,
+		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLKB> TMR2;
+	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::VECTOR,
+		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLKB> TMR3;
+#elif defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
 		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLK> TMR0;
 	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,

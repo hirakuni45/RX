@@ -76,5 +76,5 @@ namespace device {
 
 
 
-	typedef rscan_t<0x000A8300, peripheral::RSCAN>  RSCAN;
+	typedef rscan_t<0x000A'8300, peripheral::RSCAN>  RSCAN;
 }

@@ -13,7 +13,7 @@
 */
 //=========================================================================//
 #include "RX72N/peripheral.hpp"
-#include "RX600/port.hpp"
+#include "RX72N/port.hpp"
 #include "RX72N/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 

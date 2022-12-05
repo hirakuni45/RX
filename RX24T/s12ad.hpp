@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "common/io_utils.hpp"
 #include "RX24T/peripheral.hpp"
-#include "RX600/port.hpp"
+#include "RX24T/port.hpp"
 #include "RX24T/mpc.hpp"
 #include "RX24T/icu.hpp"
 

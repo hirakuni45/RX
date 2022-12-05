@@ -13,7 +13,15 @@
 #include "common/delay.hpp"
 #include "common/device.hpp"
 
-#if defined(SIG_RX63T)
+#if defined(SIG_RX220)
+
+#include "RX600/dmac.hpp"
+#include "RX220/port.hpp"
+#include "RX600/tmr.hpp"
+
+#include "RX220/system_io.hpp"
+
+#elif defined(SIG_RX63T)
 #include "RX63T/lvda.hpp"
 #include "RX63T/bus.hpp"
 #include "RX600/dmac.hpp"
@@ -64,7 +72,7 @@
 #include "RX24T/lvda.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/cac.hpp"
-#include "RX600/port.hpp"
+#include "RX24T/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX24T/poe3.hpp"
 #include "RX600/tmr.hpp"
@@ -85,7 +93,7 @@
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/cac.hpp"
-#include "RX600/port.hpp"
+#include "RX64M/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX64M/poe3.hpp"
 #include "RX600/tmr.hpp"
@@ -98,7 +106,7 @@
 #include "RX600/cmtw.hpp"
 #include "RX600/can.hpp"
 #include "RX600/qspi.hpp"
-#include "RX600/s12adc.hpp"
+#include "RX64M/s12adc.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/sdram.hpp"
 #include "RX600/etherc.hpp"
@@ -133,7 +141,7 @@
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/cac.hpp"
-#include "RX600/port.hpp"
+#include "RX64M/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX65x/poe3.hpp"
 #include "RX600/tmr.hpp"
@@ -179,7 +187,7 @@
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/cac.hpp"
-#include "RX600/port.hpp"
+#include "RX72N/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX72N/poe3.hpp"
 #include "RX600/tmr.hpp"
@@ -234,7 +242,7 @@
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/cac.hpp"
-#include "RX600/port.hpp"
+#include "RX66T/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX66T/poe3.hpp"
 #include "RX600/tmr.hpp"

@@ -14,9 +14,9 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/port.hpp"
-#include "RX66T/mpc.hpp"
 #include "RX72T/peripheral.hpp"
+#include "RX66T/port.hpp"
+#include "RX66T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

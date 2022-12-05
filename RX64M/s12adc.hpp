@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include "common/device.hpp"
-#include "RX600/port.hpp"
+#include "RX64M/port.hpp"
 
 namespace device {
 

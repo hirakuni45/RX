@@ -68,10 +68,10 @@ namespace device {
 		//-------------------------------------------------------------//
 		static bool boost_master_clock()
 		{
-			device::SYSTEM::PRCR = 0xA500 | 0b0111;	// クロック、低消費電力、関係書き込み許可
-
 			// ベースクロック周波数の検査
 			static_assert(check_base_clock_(), "BASE out of range.");
+
+			device::SYSTEM::PRCR = 0xA500 | 0b0111;	// クロック、低消費電力、関係書き込み許可
 
 			while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
 			device::SYSTEM::OPCCR = 0;  // 高速モード選択
