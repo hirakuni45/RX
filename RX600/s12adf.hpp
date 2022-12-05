@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX65x/RX72x グループ・S12ADFa 定義
+	@brief	RX65x グループ・S12ADFa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -2104,8 +2104,8 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPBNSR_ s12adf1_t<base, per, avec, bvec>::ADCMPBNSR;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPBSR_ s12adf1_t<base, per, avec, bvec>::ADCMPBSR;
 
-	typedef s12adf0_t<0x00089000, peripheral::S12AD,
+	typedef s12adf0_t<0x0008'9000, peripheral::S12AD,
 		ICU::VECTOR_BL1::S12CMPAI,  ICU::VECTOR_BL1::S12CMPBI>   S12AD;
-	typedef s12adf1_t<0x00089100, peripheral::S12AD1,
+	typedef s12adf1_t<0x0008'9100, peripheral::S12AD1,
 		ICU::VECTOR_BL1::S12CMPAI1, ICU::VECTOR_BL1::S12CMPBI1>  S12AD1;
 }
