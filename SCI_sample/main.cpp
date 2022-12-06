@@ -136,12 +136,11 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（100Hz）
-		uint8_t intr = 4;
-		cmt_.start(100, intr);
+		cmt_.start(100, device::ICU::LEVEL::_4);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル（０を指定すると、ポーリング動作になる）
+		auto intr = device::ICU::LEVEL::_2;		// 割り込みレベル（０を指定すると、ポーリング動作になる）
 		uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 // 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。

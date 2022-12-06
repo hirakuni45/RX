@@ -381,11 +381,11 @@ extern "C" {
 
 	void vApplicationSetupTimerInterrupt(void)
 	{
-		uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
+		auto intr = static_cast<device::ICU::LEVEL>(configKERNEL_INTERRUPT_PRIORITY);
 		cmt_.start(configTICK_RATE_HZ, intr, vTickISR);
 
 		device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
-		device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
+		device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, intr);
 	}
 }
 
@@ -398,7 +398,7 @@ int main(int argc, char** argv)
 	LED::DIR = 1;
 
 	{  // タイマー設定 (100Hz) 10ms
-		uint8_t int_level = 4;
+		auto int_level = device::ICU::LEVEL::_4;
 		cmt_.start(100, int_level);
 	}
 
@@ -407,7 +407,7 @@ int main(int argc, char** argv)
 	}
 
 	{  // SCI 設定
-		uint8_t intr_level = 2;
+		auto intr_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, intr_level);
 	}
 

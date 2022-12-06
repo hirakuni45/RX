@@ -356,12 +356,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // 計測タイマー設定 (1000Hz)
-		uint8_t cmt_irq_level = 4;
+		auto cmt_irq_level = device::ICU::LEVEL::_4;
 		cmt_.start(CMT_FREQ, cmt_irq_level);
 	}
 
 	{  // SCI 設定
-		static const uint8_t sci_level = 2;
+		auto sci_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, sci_level);
 	}
 
@@ -384,7 +384,7 @@ int main(int argc, char** argv)
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
 		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_mgr_.start()) {
+		if(glcdc_mgr_.start(device::ICU::LEVEL::_2)) {
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
@@ -398,6 +398,7 @@ int main(int argc, char** argv)
 
 	{  // DRW2D 初期化
 //		render_.list_info();
+//		if(render_.start(device::ICU::LEVEL::_2)) {
 		if(render_.start()) {
 			utils:: format("Start DRW2D\n");
 		} else {
@@ -407,7 +408,7 @@ int main(int argc, char** argv)
 
 	{  // FT5206 touch screen controller
 		FT5206::reset<FT5206_RESET>();
-		uint8_t intr_lvl = 1;
+		auto intr_lvl = device::ICU::LEVEL::_1;
 		if(!ft5206_i2c_.start(FT5206_I2C::MODE::MASTER, FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		}

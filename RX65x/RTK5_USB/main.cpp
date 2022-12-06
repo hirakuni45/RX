@@ -346,12 +346,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(CMT_FREQ, intr);
 	}
 
 	{  // SCI 設定
-		uint8_t sci_level = 2;
+		auto sci_level = device::ICU::LEVEL::_2;
 		sci_io_.start(115200, sci_level);
 		vt100_.start();
 	}
@@ -367,7 +367,7 @@ int main(int argc, char** argv)
 	utils::format("RTK5_USB sample start\n");
 
 	{  // USB ホスト開始
-		uint8_t lvl = USB_CFG_INTERRUPT_PRIORITY;
+		auto lvl = static_cast<device::ICU::LEVEL>(USB_CFG_INTERRUPT_PRIORITY);
 		if(!usb_io_.start(lvl)) {
 			utils::format("USB Host not start...\n");
 		} else {
