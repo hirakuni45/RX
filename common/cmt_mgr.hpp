@@ -49,7 +49,7 @@ namespace device {
 		};
 
 	private:
-		uint8_t		level_;
+		ICU::LEVEL	level_;
 		uint32_t	rate_;
 
 		void sleep_() const { asm("nop"); }
@@ -70,7 +70,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmt_mgr() noexcept : level_(0), rate_(0) { }
+		cmt_mgr() noexcept : level_(ICU::LEVEL::NONE), rate_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -84,7 +84,7 @@ namespace device {
 			@return タイマー周波数が範囲を超えた場合「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(DIRECT direct, DIVIDE cks, uint8_t level = 0, void (*task)() = nullptr) noexcept
+		bool start(DIRECT direct, DIVIDE cks, ICU::LEVEL level = ICU::LEVEL::NONE, void (*task)() = nullptr) noexcept
 		{
 			rate_ = 0;
 			level_ = level;
@@ -100,7 +100,7 @@ namespace device {
 
 			counter_ = 0;
 
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				if(task != nullptr) {
 					icu_mgr::set_interrupt(CMT::IVEC, task, level_);
 				} else {
@@ -108,7 +108,7 @@ namespace device {
 				}
 			    CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks)) | CMT::CMCR.CMIE.b();
 			} else {
-				icu_mgr::set_interrupt(CMT::IVEC, nullptr, 0);
+				icu_mgr::set_interrupt(CMT::IVEC, nullptr, ICU::LEVEL::NONE);
 			    CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks));
 			}
 			CMT::enable();
@@ -127,7 +127,7 @@ namespace device {
 			@return タイマー周波数が範囲を超えた場合「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level = 0, void (*task)() = nullptr) noexcept
+		bool start(uint32_t freq, ICU::LEVEL level = ICU::LEVEL::NONE, void (*task)() = nullptr) noexcept
 		{
 			if(freq == 0) return false;
 
@@ -173,7 +173,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync() const noexcept
 		{
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				volatile uint32_t cnt = counter_;
 				while(cnt == counter_) sleep_();
 			} else {

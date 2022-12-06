@@ -63,7 +63,7 @@ namespace device {
 
 		uint32_t	freq_;
 
-		uint8_t		intr_lvl_;
+		ICU::LEVEL	intr_lvl_;
 		ICU::VECTOR	intr_vec_;
 
 		static INTERRUPT_FUNC void pr_task_()
@@ -79,7 +79,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		gpt_io() noexcept :
 			freq_(0),
-			intr_lvl_(0), intr_vec_(ICU::VECTOR::NONE)
+			intr_lvl_(ICU::LEVEL::NONE), intr_vec_(ICU::VECTOR::NONE)
 		{ }
 
 
@@ -108,7 +108,7 @@ namespace device {
 			@return エラーが無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(TYPE type, uint32_t freq, OUTPUT outa, OUTPUT outb, uint8_t intr = 0) noexcept
+		bool start(TYPE type, uint32_t freq, OUTPUT outa, OUTPUT outb, ICU::LEVEL intr = ICU::LEVEL::NONE) noexcept
 		{
 			uint32_t pr = GPT::PCLK / freq;
 			uint8_t shift = 0;
@@ -148,7 +148,7 @@ namespace device {
 			GPT::GTIOR.GTIOB = static_cast<uint8_t>(outb);
 			GPT::GTONCR = GPT::GTONCR.OBE.b(enb) | GPT::GTONCR.OAE.b(ena);
 
-			if(intr > 0) {
+			if(intr != ICU::LEVEL::NONE) {
 				intr_lvl_ = intr;
 				intr_vec_ = icu_mgr::set_interrupt(GPT::GTCIV, pr_task_, intr_lvl_);
 				if(intr_vec_ != ICU::VECTOR::NONE) {
@@ -332,8 +332,8 @@ namespace device {
 			port_map_gpt::turn(GPT::PERIPHERAL, port_map_gpt::CHANNEL::B, false, BSEL);
 			power_mgr::turn(GPT::PERIPHERAL, false);
 			freq_ = 0;
-			intr_lvl_ = 0;
-			intr_vec_ = ICU::VECTOR::NONE;
+			intr_lvl_ = ICU::VECTOR::NONE;
+			intr_vec_ = 0;
 		}
 	};
 }

@@ -139,7 +139,7 @@ namespace device {
 
 		ICU::VECTOR		intr_vec_;
 
-		uint8_t			intr_level_;
+		ICU::LEVEL		intr_level_;
 
 
 		static INTERRUPT_FUNC void cap_task_()
@@ -352,7 +352,7 @@ namespace device {
 		}
 
 
-		bool start_(CHANNEL ch, uint32_t freq, OUTPUT out, uint8_t lvl, MODE md) noexcept
+		bool start_(CHANNEL ch, uint32_t freq, OUTPUT out, ICU::LEVEL lvl, MODE md) noexcept
 		{
 			if(!power_mgr::turn(MTUX::PERIPHERAL)) {
 				return false;
@@ -391,7 +391,7 @@ namespace device {
 			// これを回避する為、MTU2 系では、TMDR と同一の機能を TMDR1 にも与えている。
 			MTUX::TMDR1 = static_cast<uint8_t>(md);
 
-			if(intr_level_ > 0) {
+			if(intr_level_ != ICU::LEVEL::NONE) {
 				set_interruptABCD_(ch);
 			}
 
@@ -410,7 +410,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		mtu_io() noexcept : clk_base_(MTUX::PCLK), channel_(CHANNEL::A),
-			intr_vec_(ICU::VECTOR::NONE), intr_level_(0)
+			intr_vec_(ICU::VECTOR::NONE), intr_level_(ICU::LEVEL::NONE)
 		{ }
 
 
@@ -424,7 +424,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_normal(CHANNEL ch, uint32_t freq, OUTPUT out, uint8_t lvl = 0) noexcept
+		bool start_normal(CHANNEL ch, uint32_t freq, OUTPUT out, ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			static_assert(MTUX::PERIPHERAL != peripheral::MTU5, "Normal mode cannot select MTU5");
 
@@ -444,7 +444,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t lvl = 0) noexcept
+		bool start(uint32_t freq, ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			return start_normal(CHANNEL::A, freq, OUTPUT::NONE, lvl);
 		}
@@ -493,7 +493,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t& po, uint8_t lvl = 0) noexcept
+		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t& po, ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);
 			if(ret) {
@@ -520,7 +520,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t& po1, const pwm_port_t& po2, uint8_t lvl = 0) noexcept
+		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t& po1, const pwm_port_t& po2, ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);  // PWM2 mode
 			if(ret) {
@@ -552,7 +552,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t po[3], uint8_t lvl = 0) noexcept
+		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t po[3], ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);
 			if(ret) {
@@ -626,9 +626,9 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_capture(CHANNEL ch, CAPTURE cap, uint8_t lvl) noexcept
+		bool start_capture(CHANNEL ch, CAPTURE cap, ICU::LEVEL lvl) noexcept
 		{
-			if(lvl == 0) return false;
+			if(lvl == ICU::LEVEL::NONE) return false;
 
 			// MTU5 はインプットキャプチャとして利用不可
 			if(MTUX::PERIPHERAL == peripheral::MTU5) {
@@ -660,7 +660,7 @@ namespace device {
 			set_TCR_(ch);
 			MTUX::TMDR1 = 0x00;  // 通常動作
 
-			if(lvl > 0) {
+			if(lvl != ICU::LEVEL::NONE) {
 				icu_mgr::set_interrupt(MTUX::TCIV, ovf_task_, lvl);
 				auto cvec = MTUX::get_vector(ch);
 				icu_mgr::set_interrupt(cvec, cap_task_, lvl);
@@ -688,7 +688,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_count_phase(typename MTUX::CHANNEL ch, uint8_t level = 0) noexcept
+		bool start_count_phase(typename MTUX::CHANNEL ch, ICU::LEVEL level = 0) noexcept
 		{
 			// 工事中
 			if(peripheral::MTU1 == MTUX::PERIPHERAL || peripheral::MTU2 == MTUX::PERIPHERAL) {
@@ -727,7 +727,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync() noexcept
 		{
-			if(intr_level_ > 0) {
+			if(intr_level_ != ICU::LEVEL::NONE) {
 				auto tmp = tt_.main_tick_;
 				while(tmp == tt_.main_tick_) { }
 			} else {  // インターバルの周期が CPU ループに対して、短い場合は、正確に機能しないので注意！

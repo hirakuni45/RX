@@ -222,7 +222,7 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル
+		auto intr = device::ICU::LEVEL::_2;        // 割り込みレベル
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
 
@@ -239,7 +239,7 @@ int main(int argc, char** argv)
 
 #ifdef TEST_CMT
 	{  // タイマー設定
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		if(!cmt_.start(1, intr)) {
 			utils::format("Can't start CMT\n");
 		} else {
@@ -259,7 +259,7 @@ int main(int argc, char** argv)
 	{
 		// RX72N Envision Kit Pmod2.8(PD1)
 		// MTIOC4B(TPU4,B)
-		uint8_t intr = 0;
+		auto intr = device::ICU::LEVEL::NONE;
 //		uint32_t freq = 10'000 * 2;  // トグル出力なので２倍
 		uint32_t freq = 100;  // トグル出力なので２倍
 		if(!tpu_.start(TPU::TYPE::MATCH_B, freq, intr, TPU::OUTPUT::IH_MT)) {
@@ -288,7 +288,7 @@ int main(int argc, char** argv)
 #ifdef SCI_I2C
 	{  // FT5206 touch screen controller
 		TOUCH::reset<FT5206_RESET>();
-		uint8_t intr_lvl = 1;
+		auto intr_lvl = device::ICU::LEVEL::_1;
 		if(!ft5206_i2c_.start(FT5206_I2C::MODE::MASTER, FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		}
@@ -311,7 +311,7 @@ int main(int argc, char** argv)
 #ifdef TEST_MTU
 	{
 		uint32_t freq = 300;
-		uint8_t intr = 3;
+		auto intr = device::ICU::LEVEL::_3;
 		if(mtu_io_.start(freq, intr)) {
 			utils::format("Start MTU interval timer\n");
 		} else {
@@ -323,7 +323,7 @@ int main(int argc, char** argv)
 #ifdef TEST_TMR
 	{
 		uint32_t freq = 100;
-		uint8_t intr = 2;
+		auto intr = device::ICU::LEVEL::_2;
 		if(tmr_mgr_.start(freq, intr)) {
 			utils::format("Start TMU interval timer\n");
 			utils::format("TMR interrupt: %u\n") % static_cast<uint16_t>(tmr_mgr_.get_intr_vec());
@@ -339,7 +339,7 @@ int main(int argc, char** argv)
 
 #ifdef TINY_USB
 	{  // タイマー設定
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(1000, intr);
 		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
 		float rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
@@ -347,7 +347,7 @@ int main(int argc, char** argv)
 		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 	{
-		uint8_t intr = 5;
+		auto intr = device::ICU::LEVEL::_5;
 		if(tinyusb_.start(intr)) {
 			utils::format("Start USB: OK!\n");
 		} else {

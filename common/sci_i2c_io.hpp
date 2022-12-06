@@ -68,7 +68,7 @@ namespace device {
 		static RBF	recv_;
 		static SBF	send_;
 
-		uint8_t		level_;
+		ICU::LEVEL	level_;
 		ERROR		error_;
 		uint16_t	i2c_loop_;
 
@@ -273,7 +273,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		sci_i2c_io() noexcept : i2c_base(), level_(0), i2c_loop_(0) { }
+		sci_i2c_io() noexcept : i2c_base(), level_(ICU::LEVEL::NONE), i2c_loop_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -294,7 +294,7 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(MODE mode, SPEED spd, uint8_t level = 0) noexcept
+		bool start(MODE mode, SPEED spd, ICU::LEVEL level = ICU::LEVEL::NONE) noexcept
 		{
 			// I2C オプションが無い場合エラー
 			if(PSEL == port_map::ORDER::FIRST_I2C || PSEL == port_map::ORDER::SECOND_I2C || PSEL == port_map::ORDER::THIRD_I2C) {
@@ -302,7 +302,7 @@ namespace device {
 				return false;
 			}
 // 割り込み動作に不具合があるので、強制的にポーリングとする。
-level = 0;
+level = ICU::LEVEL::NONE;
 			uint32_t clk = static_cast<uint32_t>(spd);
 			uint32_t brr = SCI::PCLK * 8 / clk;
 			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
@@ -341,7 +341,7 @@ level = 0;
 			SCI::SIMR2 = SCI::SIMR2.IICACKT.b() | SCI::SIMR2.IICCSC.b() | SCI::SIMR2.IICINTM.b();
 			SCI::SPMR = 0x00;
 
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				task_ = sci_i2c_t::TASK::IDLE;
 
 				// RXI, TXI の設定
@@ -378,7 +378,7 @@ level = 0;
 		//-----------------------------------------------------------------//
 		void sync() noexcept
 		{
-			if(level_ == 0) return;
+			if(level_ == ICU::LEVEL::NONE) return;
 
 			utils::format("SCI-I2C Start sync...\n");
 			auto task = task_;
@@ -413,7 +413,7 @@ level = 0;
 		{
 			if(src == nullptr || len == 0) return false;
 
-			if(level_ == 0) {  // ポーリング動作時
+			if(level_ == ICU::LEVEL::NONE) {  // ポーリング動作時
 				if(!i2c_start_()) {
 					error_ = ERROR::START;
 					i2c_stop_();
@@ -531,7 +531,7 @@ level = 0;
 		{
 			if(dst == nullptr || len == 0) return false;
 
-			if(level_ == 0) {  // ポーリング動作
+			if(level_ == ICU::LEVEL::NONE) {  // ポーリング動作
 				if(!i2c_start_()) {
 					error_ = ERROR::START;
 					i2c_stop_();

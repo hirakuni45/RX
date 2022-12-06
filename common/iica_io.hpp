@@ -74,7 +74,7 @@ namespace device {
 		static constexpr uint32_t BUS_BUSY_MS  = 500;  // バス占有状態待機ループ
 		static constexpr uint32_t WAIT_LOOP_MS = 500;  // 500uS
 
-		uint8_t		level_;
+		ICU::LEVEL	level_;
 		uint8_t		sadr_;
 		uint8_t		speed_;
 
@@ -228,7 +228,7 @@ namespace device {
 			@param[in]	sadr	スレーブ・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		iica_io(uint8_t sadr = 0x00) noexcept : i2c_base(), level_(0), sadr_(sadr), speed_(0) { }
+		iica_io(uint8_t sadr = 0x00) noexcept : i2c_base(), level_(ICU::LEVEL::NONE), sadr_(sadr), speed_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -241,7 +241,7 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(MODE mode, SPEED spd, uint8_t level = 0, NF nf = NF::PH1) noexcept
+		bool start(MODE mode, SPEED spd, ICU::LEVEL level = ICU::LEVEL::NONE, NF nf = NF::PH1) noexcept
 		{
 			level_ = level;
 
@@ -303,7 +303,7 @@ namespace device {
 
 ///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				icu_mgr::set_interrupt(IICA::RX_VEC, recv_itask_, level_);
 				icu_mgr::set_interrupt(IICA::TX_VEC, send_itask_, level_);
 
@@ -377,7 +377,7 @@ namespace device {
 			const uint8_t* ptr = static_cast<const uint8_t*>(src);
 
 			bool ret = true;
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				intr_.send_id_back_ = intr_.send_id_;
 				intr_.firstb_ = adr << 1;
 				intr_.src_ = ptr;
@@ -527,7 +527,7 @@ namespace device {
 			uint8_t* ptr = static_cast<uint8_t*>(dst);
 
 			bool ret = true;
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				intr_.recv_id_back_ = intr_.recv_id_;
 				intr_.firstb_ = (adr << 1) | 0x01;
 				intr_.src_ = nullptr;

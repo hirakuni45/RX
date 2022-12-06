@@ -80,7 +80,7 @@ namespace sound {
 
 		uint32_t	sample_rate_;
 
-		uint8_t		itv_intl_;
+		device::ICU::LEVEL	itv_intl_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -91,7 +91,7 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		dac_stream(SOUND_OUT& sound_out) noexcept :
 			sound_out_(sound_out), itv_t_(sound_out), itv_io_(),
-			dac_out_(), dmac_mgr_(), sample_rate_(48'000), itv_intl_(0)
+			dac_out_(), dmac_mgr_(), sample_rate_(48'000), itv_intl_(device::ICU::LEVEL::NONE)
 		{
 			itv_t_ptr_ = &itv_t_;
 		}
@@ -107,7 +107,7 @@ namespace sound {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t sample_rate, uint8_t dmac_intl, uint8_t itv_intl, bool amp_ena = true) noexcept
+		bool start(uint32_t sample_rate, device::ICU::LEVEL dmac_intl, device::ICU::LEVEL itv_intl, bool amp_ena = true) noexcept
 		{
 			{  // 内臓１２ビット D/A の設定
 				bool amp_ena = true;

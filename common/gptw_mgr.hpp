@@ -86,7 +86,7 @@ namespace device {
 	private:
 		uint32_t	freq_;
 		uint32_t	base_;
-		uint8_t		ilvl_;
+		ICU::LEVEL	ilvl_;
 		port_map_gptw::ORDER	ord_a_;
 		port_map_gptw::ORDER	ord_b_;
 		bool		buffer_;
@@ -113,7 +113,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		gptw_mgr() noexcept : freq_(0), base_(0), ilvl_(0),
+		gptw_mgr() noexcept : freq_(0), base_(0), ilvl_(ICU::LEVEL::NONE),
 			ord_a_(port_map_gptw::ORDER::BYPASS), ord_b_(port_map_gptw::ORDER::BYPASS),
 			buffer_(false), used_(false),
 			cm_vec_(ICU::VECTOR::NONE)
@@ -135,7 +135,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		bool start(MODE mode, OUTPUT out, uint32_t freq, typename port_map_gptw::ORDER ord_a, typename port_map_gptw::ORDER ord_b,
-			uint8_t ilvl = 0, uint8_t idiv = 0, bool buffer = true) noexcept
+			ICU::LEVEL ilvl = 0, uint8_t idiv = 0, bool buffer = true) noexcept
 		{
 			if(freq == 0) {
 				return false;
@@ -268,7 +268,7 @@ namespace device {
 				| GPTWn::GTIOR.GTIOA.b(sign_a) | GPTWn::GTIOR.GTIOB.b(sign_b);
 
 			ilvl_ = ilvl;
-			if(ilvl > 0) {  // GTPR のオーバーフローによる割り込み (V)
+			if(ilvl != ICU::LEVEL::NONE) {  // GTPR のオーバーフローによる割り込み (V)
 				if(idiv != 0) {  // 割り込み間引きカウント（１～７）
 					GPTWn::GTITC = GPTWn::GTITC.IVTC.b(0b01) | GPTWn::GTITC.IVTT.b(idiv);
 				}
@@ -294,7 +294,7 @@ namespace device {
 			@return 設定が適正なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(typename port_map_gptw::ORDER ord, uint8_t ilvl = 0) noexcept
+		bool start(typename port_map_gptw::ORDER ord, ICU::LEVEL ilvl = ICU::LEVEL::NONE) noexcept
 		{
 
 
@@ -394,9 +394,9 @@ namespace device {
 
 			GPTWn::GTCR.CST = 0;
 
-			if(ilvl_ > 0) {
+			if(ilvl_ != ICU::LEVEL::NONE) {
 				GPTWn::GTINTAD.GTINTPR = 0;
-				ilvl_ = 0;
+				ilvl_ = ICU::LEVEL::NONE;
 				icu_mgr::set_interrupt(GPTWn::GTCIV, nullptr, ilvl_);
 			}
 
@@ -423,7 +423,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync() noexcept
 		{
-			if(ilvl_ > 0) {
+			if(ilvl_ != ICU::LEVEL::NONE) {
 
 			} else {
 
