@@ -104,19 +104,19 @@ int main(int argc, char** argv)
 
 	// タイマー設定（１００Ｈｚ）
 	{
-		uint8_t intr = 1;
+		auto intr = device::ICU::LEVEL::_1;
 		cmt_.start(100, intr);
 	}
 
 	// SCI 設定
 	{
-		static uint8_t intr = 2;
+		auto intr = device::ICU::LEVEL::_3;
 		sci_.start(115200, intr);
 	}
 
 	// A/D 変換設定
 	{
-		uint8_t intr_level = 3;
+		auto intr_level = device::ICU::LEVEL::_3;
 		if(!adc_in_.start(ADC::ANALOG::AIN000, intr_level)) {
 			utils::format("A/D start fail AIN000\n");
 		}

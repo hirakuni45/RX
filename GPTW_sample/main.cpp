@@ -153,12 +153,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（100Hz）
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(100, intr);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル（０を指定すると、ポーリング動作になる）
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115'200;  // ボーレート（任意の整数値を指定可能）
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 	}

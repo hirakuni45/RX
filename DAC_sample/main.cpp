@@ -183,12 +183,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（200Hz）
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(200, intr);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
 	}
@@ -203,7 +203,7 @@ int main(int argc, char** argv)
 
 
 	{  // MTU0 の初期化
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		auto ret = mtu_io_.start(sample_, intr);
 		if(!ret) {
 			utils::format("MTU0 Not start...\n");
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
 	}
 
 	{  // DMAC マネージャー開始
-		uint8_t intr_level = 4;
+		auto intr_level = device::ICU::LEVEL::_4;
 		bool cpu_intr = false;
 		auto ret = dmac_mgr_.start(mtu_io_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
 			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address,
