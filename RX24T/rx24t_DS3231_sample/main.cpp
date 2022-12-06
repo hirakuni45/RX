@@ -183,12 +183,12 @@ int main(int argc, char** argv)
 	LED::P = 0;
 
 	{  // タイマー設定（100Hz）
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(100, intr);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
 	}
@@ -197,7 +197,7 @@ int main(int argc, char** argv)
 	utils::format("Start DS3231 (I2C) sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	{  // IICA(I2C) の開始
-		uint8_t intr_level = 0;
+		auto intr_level = device::ICU::LEVEL::NONE;
 		if(!i2c_.start(I2C::MODE::MASTER, I2C::SPEED::FAST, intr_level)) {
 			utils::format("IICA start error (%d)\n") % static_cast<int>(i2c_.get_last_error());
 		}

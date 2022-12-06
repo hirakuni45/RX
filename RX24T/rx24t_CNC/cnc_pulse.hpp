@@ -466,7 +466,7 @@ namespace cnc {
 			limit_neg_ = 0;
 
 			// MTU3 をノーマルモードで起動、初期 100Hz
-			uint8_t intr = 4;
+			auto intr = device::ICU::LEVEL::_4;
 			auto ch = device::MTU0::CHANNEL::A;
 			auto ot = MTU::OUTPUT::NONE;
 			auto f = mtu_.start_normal(ch, 100, ot, intr);

@@ -151,13 +151,13 @@ int main(int argc, char** argv)
 
 	// タイマー設定（100Hz）
 	{
-		uint8_t cmt_irq_level = 4;
+		auto cmt_irq_level = device::ICU::LEVEL::_4;
 		cmt_.start(100, cmt_irq_level);
 	}
 
 	// SCI 設定
 	{
-		uint8_t sci_level = 2;
+		auto sci_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, sci_level);
 	}
 

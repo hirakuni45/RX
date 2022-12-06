@@ -77,11 +77,11 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
+	auto cmt_irq_level = device::ICU::LEVEL::_4;
 	cmt_.start(60, cmt_irq_level);
 
 	// SCI 設定
-	static const uint8_t sci_level = 2;
+	auto sci_level = device::ICU::LEVEL::_2;
 	sci_.start(115200, sci_level);
 
 	utils::format("RX24T start\n");
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
 	// A/D 設定
 	{
-		uint8_t intr_level = 1;
+		auto intr_level = device::ICU::LEVEL::_1;
 		if(!adc_in_.start(ADC::ANALOG::AIN000, intr_level)) {
 			utils::format("A/D start fail AIN000\n");
 		}
