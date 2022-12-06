@@ -96,18 +96,6 @@
 #include "RX64M/port_map_qspi.hpp"
 #include "RX600/rx_dsp_inst.h"
 
-#elif defined(SIG_RX72M)
-#include "RX72M/clock_profile.hpp"
-#include "RX72M/peripheral.hpp"
-#include "RX600/system.hpp"
-#include "RX72M/power_mgr.hpp"
-#include "RX72M/icu.hpp"
-#include "RX72M/icu_mgr.hpp"
-#include "RX72M/port_map.hpp"
-#include "RX72M/port_map_mtu.hpp"
-#include "RX72M/port_map_gptw.hpp"
-#include "RX600/rx_dsp_inst.h"
-
 #elif defined(SIG_RX72N)
 #include "RX72N/clock_profile.hpp"
 #include "RX72N/peripheral.hpp"
@@ -122,6 +110,21 @@
 #include "RX72N/port_map_tpu.hpp"
 #include "RX72N/port_map_qspi.hpp"
 #include "RX72N/port_map_ether.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX72M)
+#include "RX72M/clock_profile.hpp"
+#include "RX72M/peripheral.hpp"
+#include "RX600/system.hpp"
+#include "RX72M/power_mgr.hpp"
+#include "RX72M/icu.hpp"
+#include "RX72M/icu_mgr.hpp"
+#include "RX72M/port_map.hpp"
+#include "RX72N/port_map_sci.hpp"
+#include "RX72M/port_map_mtu.hpp"
+#include "RX72M/port_map_gptw.hpp"
+#include "RX72N/port_map_tpu.hpp"
+#include "RX72N/port_map_qspi.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX651) || defined(SIG_RX65N)
