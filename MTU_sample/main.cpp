@@ -216,12 +216,12 @@ int main(int argc, char** argv)
 	LED::P = 0;
 
 	{  // タイマー設定（100Hz）
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(100, intr);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 	}

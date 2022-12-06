@@ -459,12 +459,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（100Hz）
-		uint8_t intr = 1;
+		auto intr = device::ICU::LEVEL::_1;
 		cmt_.start(100, intr);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;  // ボーレート
 		sci_io_.start(baud, intr);
 	}
@@ -484,7 +484,7 @@ int main(int argc, char** argv)
 	}
 
 	{  // I2C の開始
-		uint8_t intr_lvl = 4;  // 0 ならポーリング
+		auto intr_lvl = device::ICU::LEVEL::_4;
 		if(!i2c_io_.start(I2C_IO::MODE::MASTER, I2C_IO::SPEED::STANDARD, intr_lvl)) {
 			utils::format("I2C Start fail...\n");
 		} else {
@@ -495,7 +495,7 @@ int main(int argc, char** argv)
 #ifdef TOUCH_I2C
 	{  // FT5206 touch screen controller
 		TOUCH::reset<FT5206_RESET>();
-		uint8_t intr_lvl = 0;
+		auto intr_lvl = device::ICU::LEVEL::_2;
 		if(!ft5206_i2c_.start(FT5206_I2C::MODE::MASTER, FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		} else {
