@@ -151,8 +151,8 @@ namespace {
 
 	void start_audio_()
 	{
-		uint8_t dmac_intl = 4;
-		uint8_t mtu_intl  = 5;
+		auto dmac_intl = device::ICU::LEVEL::_4;
+		auto mtu_intl  = device::ICU::LEVEL::_5;
 		if(dac_stream_.start(48'000, dmac_intl, mtu_intl)) {
 			utils::format("Start D/A Stream\n");
 		} else {
@@ -171,7 +171,7 @@ namespace {
 	void start_audio_()
 	{
 		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/24 ビットフォーマット固定
-			uint8_t intr = 5;
+			auto intr = device::ICU::LEVEL::_5;
 			uint32_t aclk = 24'576'000;
 			uint32_t lrclk = 48'000;
 			auto ret = ssie_io_.start(aclk, lrclk, SSIE_IO::BFORM::I2S_32, intr);
@@ -288,7 +288,7 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
-		static const uint8_t sci_level = 2;
+		auto sci_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, sci_level);
 	}
 
@@ -314,7 +314,7 @@ int main(int argc, char** argv)
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
 		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_mgr_.start()) {
+		if(glcdc_mgr_.start(device::ICU::LEVEL::_2)) {
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)

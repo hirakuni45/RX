@@ -60,11 +60,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct interrupt_t {
-			uint8_t		error_level;	///< エラー割り込みレベル
-			uint8_t		rxm_level;		///< RXM 割り込みレベル
-			uint8_t		txm_level;		///< TXM 割り込みレベル
+			ICU::LEVEL	error_level;	///< エラー割り込みレベル
+			ICU::LEVEL	rxm_level;		///< RXM 割り込みレベル
+			ICU::LEVEL	txm_level;		///< TXM 割り込みレベル
 			interrupt_t() :
-				error_level(0), rxm_level(1), txm_level(1)
+				error_level(ICU::LEVEL::NONE), rxm_level(ICU::LEVEL::_1), txm_level(ICU::LEVEL::_1)
 			{ }
 		};
 
@@ -196,7 +196,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(SPEED speed, const interrupt_t& intr = interrupt_t()) noexcept
 		{
-			if(intr.rxm_level == 0 || intr.txm_level == 0) {
+			if(intr.rxm_level == ICU::LEVEL::NONE || intr.txm_level == ICU::LEVEL::NONE) {
 				// 割り込み未使用では、常に失敗する。
 				format("(0)RX/TX interrup level...\n");
 				return false;
@@ -295,7 +295,7 @@ namespace device {
 
 			intr_ = intr;
 			CAN::MIER = 0;
-			if(intr.error_level > 0) {
+			if(intr.error_level != ICU::LEVEL::NONE) {
 				auto gvec = icu_mgr::get_group_vector(CAN::ERS_VEC);
 				if(icu_mgr::get_level(gvec) < intr.error_level) {
 					// グループベクタの割り込みレベルがより高い場合は設定する。
@@ -304,13 +304,13 @@ namespace device {
 				icu_mgr::install_group_task(CAN::ERS_VEC, ers_task_);
 			    CAN::EIER = CAN::EIER.ORIE.b(1);
 			}
-			if(intr.rxm_level > 0) {  // 受信割り込み設定
+			if(intr.rxm_level != ICU::LEVEL::NONE) {  // 受信割り込み設定
 				icu_mgr::set_interrupt(CAN::RXM_VEC, rxm_task_, intr.rxm_level);
 				for(uint32_t i = RX_MB_TOP; i < (RX_MB_TOP + RX_MB_NUM); ++i) {
 					CAN::MIER.set(i);
 				}
 			}
-			if(intr.txm_level > 0) {  // 送信割り込み設定
+			if(intr.txm_level != ICU::LEVEL::NONE) {  // 送信割り込み設定
 				icu_mgr::set_interrupt(CAN::TXM_VEC, txm_task_, intr.txm_level);
 				for(uint32_t i = TX_MB_TOP; i < (TX_MB_TOP + TX_MB_NUM); ++i) {
 					CAN::MIER.set(i);

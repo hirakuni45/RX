@@ -1,14 +1,16 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72N/RX72M グループ・ポート・マッピング (QSPI)
+	@brief	RX64M/RX71M グループ・ポート・マッピング (QSPI)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/device.hpp"
+#include "RX64M/peripheral.hpp"
+#include "RX64M/port.hpp"
+#include "RX64M/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -86,8 +88,6 @@ namespace device {
 			switch(odr) {
 			/// P77
 			/// PD5
-			/// PM0
-			/// PN4
 			case ORDER::FIRST:
 				PORT7::PMR.B7 = 0;
 				MPC::P77PFS.PSEL = sel;
@@ -97,16 +97,6 @@ namespace device {
 				PORTD::PMR.B5 = 0;
 				MPC::PD5PFS.PSEL = sel;
 				PORTD::PMR.B5 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTM::PMR.B0 = 0;
-				MPC::PM0PFS.PSEL = sel;
-				PORTM::PMR.B0 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTN::PMR.B4 = 0;
-				MPC::PN4PFS.PSEL = sel;
-				PORTN::PMR.B4 = ena;
 				break;
 			default:
 				ret = false;
@@ -123,8 +113,6 @@ namespace device {
 			switch(odr) {
 			/// P76
 			/// PD4
-			/// PM1
-			/// PN5
 			case ORDER::FIRST:
 				PORT7::PMR.B6 = 0;
 				MPC::P76PFS.PSEL = sel;
@@ -134,16 +122,6 @@ namespace device {
 				PORTD::PMR.B4 = 0;
 				MPC::PD4PFS.PSEL = sel;
 				PORTD::PMR.B4 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTM::PMR.B1 = 0;
-				MPC::PM1PFS.PSEL = sel;
-				PORTM::PMR.B1 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTN::PMR.B5 = 0;
-				MPC::PN5PFS.PSEL = sel;
-				PORTN::PMR.B5 = ena;
 				break;
 			default:
 				ret = false;
@@ -160,8 +138,6 @@ namespace device {
 			switch(odr) {
 			/// PC3
 			/// PD6
-			/// PJ3
-			/// PM2
 			case ORDER::FIRST:
 				PORTC::PMR.B3 = 0;
 				MPC::PC3PFS.PSEL = sel;
@@ -171,16 +147,6 @@ namespace device {
 				PORTD::PMR.B6 = 0;
 				MPC::PD6PFS.PSEL = sel;
 				PORTD::PMR.B6 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTJ::PMR.B3 = 0;
-				MPC::PJ3PFS.PSEL = sel;
-				PORTJ::PMR.B3 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTM::PMR.B2 = 0;
-				MPC::PM2PFS.PSEL = sel;
-				PORTM::PMR.B2 = ena;
 				break;
 			default:
 				ret = false;
@@ -197,8 +163,6 @@ namespace device {
 			switch(odr) {
 			/// PC4
 			/// PD7
-			/// PJ5
-			/// PM3
 			case ORDER::FIRST:
 				PORTC::PMR.B4 = 0;
 				MPC::PC4PFS.PSEL = sel;
@@ -208,16 +172,6 @@ namespace device {
 				PORTD::PMR.B7 = 0;
 				MPC::PD7PFS.PSEL = sel;
 				PORTD::PMR.B7 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTJ::PMR.B5 = 0;
-				MPC::PJ5PFS.PSEL = sel;
-				PORTJ::PMR.B5 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTM::PMR.B3 = 0;
-				MPC::PM3PFS.PSEL = sel;
-				PORTM::PMR.B3 = ena;
 				break;
 			default:
 				ret = false;
@@ -232,29 +186,18 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b011011 : 0;
 			switch(odr) {
-			/// P00
 			/// P80
 			/// PD2
 			/// PM4
 			case ORDER::FIRST:
-				PORT0::PMR.B0 = 0;
-				MPC::P00PFS.PSEL = sel;
-				PORT0::PMR.B0 = ena;
-				break;
-			case ORDER::SECOND:
 				PORT8::PMR.B0 = 0;
 				MPC::P80PFS.PSEL = sel;
 				PORT8::PMR.B0 = ena;
 				break;
-			case ORDER::THIRD:
+			case ORDER::SECOND:
 				PORTD::PMR.B2 = 0;
 				MPC::PD2PFS.PSEL = sel;
 				PORTD::PMR.B2 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTM::PMR.B4 = 0;
-				MPC::PM4PFS.PSEL = sel;
-				PORTM::PMR.B4 = ena;
 				break;
 			default:
 				ret = false;
@@ -269,29 +212,17 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b011011 : 0;
 			switch(odr) {
-			/// P01
 			/// P81
 			/// PD3
-			/// PM5
 			case ORDER::FIRST:
-				PORT0::PMR.B1 = 0;
-				MPC::P01PFS.PSEL = sel;
-				PORT0::PMR.B1 = ena;
-				break;
-			case ORDER::SECOND:
 				PORT8::PMR.B1 = 0;
 				MPC::P81PFS.PSEL = sel;
 				PORT8::PMR.B1 = ena;
 				break;
-			case ORDER::THIRD:
+			case ORDER::SECOND:
 				PORTD::PMR.B3 = 0;
 				MPC::PD3PFS.PSEL = sel;
 				PORTD::PMR.B3 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTM::PMR.B5 = 0;
-				MPC::PM5PFS.PSEL = sel;
-				PORTM::PMR.B5 = ena;
 				break;
 			default:
 				ret = false;

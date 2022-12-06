@@ -286,7 +286,7 @@ namespace app {
 			}
 
 			{
-				uint8_t intr = 1;
+				auto intr = device::ICU::LEVEL::_1;
 				nmea_.start(intr);
 			}
 
@@ -295,7 +295,7 @@ namespace app {
 				LCD_LIGHT::DIR = 1;
 				LCD_DISP::P  = 0;  // DISP Disable
 				LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-				if(glcdc_mgr_.start()) {
+				if(glcdc_mgr_.start(device::ICU::LEVEL::_2)) {
 					utils::format("Start GLCDC\n");
 					LCD_DISP::P  = 1;  // DISP Enable
 					LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
@@ -309,7 +309,7 @@ namespace app {
 
 			{  // FT5206 touch screen controller
 				TOUCH::reset<FT5206_RESET>();
-				uint8_t intr_lvl = 1;
+				auto intr_lvl = device::ICU::LEVEL::_1;
 				if(!ft5206_i2c_.start(FT5206_I2C::MODE::MASTER, FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 					utils::format("FT5206 I2C Start Fail...\n");
 				}
@@ -319,7 +319,7 @@ namespace app {
 			}
 
 			{  // CMT 100Hz タイマー
-				uint8_t intr_level = 5;
+				auto intr_level = device::ICU::LEVEL::_5;
 				cmt_.start(100, intr_level);
 			}
 

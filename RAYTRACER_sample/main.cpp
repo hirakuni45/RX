@@ -348,12 +348,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
-		uint8_t intr_lvl = 2;
+		auto intr_lvl = device::ICU::LEVEL::_2;
 		sci_.start(115200, intr_lvl);
 	}
 
 	{  // 時間計測タイマー（1000Hz）
-		uint8_t intr_lvl = 4;
+		auto intr_lvl = device::ICU::LEVEL::_4;
 		cmt_.start(1000, intr_lvl);
 	}
 
@@ -367,7 +367,7 @@ int main(int argc, char** argv)
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
 		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_mgr_.start()) {
+		if(glcdc_mgr_.start(device::ICU::LEVEL::_2)) {
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)

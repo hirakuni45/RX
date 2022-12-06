@@ -372,7 +372,7 @@ namespace dsos {
 		void set_samplerate(uint32_t freq) noexcept
 		{
 #ifndef GLFW_SIM
-			uint8_t intr_level = 5;
+			auto intr_level = device::ICU::LEVEL::_5;
 			if(!tpu0_.start(freq, intr_level)) {
 				utils::format("TPU0 start error...\n");
 			} else {

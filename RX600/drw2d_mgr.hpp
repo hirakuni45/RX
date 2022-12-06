@@ -235,10 +235,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
+			@param[in]	ilvl	割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start() noexcept
+		bool start(ICU::LEVEL ilvl) noexcept
 		{
 			// DRW2D power management
 			power_mgr::turn(DRW::PERIPHERAL);
@@ -249,7 +250,7 @@ namespace device {
 			d2_inithw(d2_, init_flag);
 
 			icu_mgr::install_group_task(DRW::IVEC, drw_int_isr);
-			icu_mgr::set_level(ICU::VECTOR::GROUPAL1, 2);
+			icu_mgr::set_level(ICU::VECTOR::GROUPAL1, ilvl);
 
 			clut_[0] = 0xff000000;
 			clut_[1] = 0xffffffff;
@@ -270,9 +271,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync_frame(bool vsync = true) noexcept
 		{
-			if(d2_ == nullptr) {
-				start();
-			}
+//			if(d2_ == nullptr) {
+//				start(ICU::LEVEL::_2);
+//			}
 			end_frame_();
 			if(vsync) glc_.sync_vpos();
 			start_frame_();

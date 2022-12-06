@@ -49,11 +49,11 @@ namespace device {
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 		*/
 		//-----------------------------------------------------------------//
-		static void set_level(ICU::VECTOR vec, uint8_t lvl) noexcept
+		static void set_level(ICU::VECTOR vec, ICU::LEVEL lvl) noexcept
 		{
-			bool ena = lvl != 0 ? true : false;
+			bool ena = lvl != ICU::LEVEL::NONE ? true : false;
 			ICU::IER.enable(vec, 0);
-			ICU::IPR[vec] = lvl;
+			ICU::IPR[vec] = static_cast<uint8_t>(lvl);
 			ICU::IER.enable(vec, ena);
 		}
 
@@ -65,9 +65,9 @@ namespace device {
 			@return 割り込みレベル
 		*/
 		//-----------------------------------------------------------------//
-		static uint8_t get_level(ICU::VECTOR vec) noexcept
+		static auto get_level(ICU::VECTOR vec) noexcept
 		{
-			return ICU::IPR[vec];
+			return static_cast<ICU::LEVEL>(ICU::IPR[vec]);
 		}
 
 
@@ -80,7 +80,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, icu_utils::ITASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, icu_utils::ITASK task, ICU::LEVEL lvl) noexcept
 		{
 			set_task(vec, task);
 			set_level(vec, lvl);
@@ -242,7 +242,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_GROUP0 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_GROUP0 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
 		{
 			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUP0) < lvl) {
@@ -263,7 +263,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_GROUP12 grpv, icu_utils::GTASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_GROUP12 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
 		{
 			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUP12) < lvl) {

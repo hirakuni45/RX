@@ -44,7 +44,7 @@ namespace device {
 
 	private:
 		static TASK	task_;
-		uint8_t		level_;
+		ICU::LEVEL	level_;
 
 		static INTERRUPT_FUNC void dmac_task_() noexcept
 		{
@@ -54,7 +54,7 @@ namespace device {
 
 		void set_vector_(ICU::VECTOR vec) const noexcept
 		{
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				icu_mgr::set_task(vec, dmac_task_);
 			} else {
 				icu_mgr::set_task(vec, nullptr);
@@ -123,7 +123,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		dmac_mgr() noexcept : level_(0) { }
+		dmac_mgr() noexcept : level_(ICU::LEVEL::NONE) { }
 
 
 		//-----------------------------------------------------------------//
@@ -133,7 +133,7 @@ namespace device {
 								※無指定（０）なら割り込みを起動しない。
 		 */
 		//-----------------------------------------------------------------//
-		void start(uint32_t lvl = 0) noexcept
+		void start(ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			power_mgr::turn(DMAC::PERIPHERAL);
 
@@ -159,7 +159,7 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		bool start(ICU::VECTOR trg, trans_type tft, uint32_t src, uint32_t dst, uint32_t lim,
-			uint32_t ilvl, bool isel) noexcept
+			ICU::LEVEL ilvl, bool isel) noexcept
 		{
 			if(lim > 1024) return false;
 
@@ -217,7 +217,7 @@ namespace device {
 
 			level_ = ilvl;
 			set_vector_(DMAC::IVEC);
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				icu_mgr::set_dmac(DMAC::PERIPHERAL, trg);
 				DMAC::DMINT = DMAC::DMINT.DTIE.b();
 				DMAC::DMCSL.DISEL = isel;
@@ -309,7 +309,7 @@ namespace device {
 				return false;
 			}
 
-			if(tae && level_ > 0) {
+			if(tae && level_ != ICU::LEVEL::NONE) {
 				DMAC::DMINT.DTIE = 1;
 			} else {
 				DMAC::DMINT = 0x00;
@@ -442,7 +442,7 @@ namespace device {
 				return false;
 			}
 
-			if(tae && level_ > 0) {
+			if(tae && level_ != ICU::LEVEL::NONE) {
 				DMAC::DMINT.DTIE = 1;
 			} else {
 				DMAC::DMINT = 0x00;

@@ -211,11 +211,11 @@ extern "C" {
 
     void vApplicationSetupTimerInterrupt(void)
     {
-        uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
+        auto intr = static_cast<device::ICU::LEVEL>(configKERNEL_INTERRUPT_PRIORITY);
         cmt_.start(configTICK_RATE_HZ, intr, vTickISR);
 
         device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
-        device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
+        device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, intr);
     }
 }
 
@@ -226,7 +226,7 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
-		uint8_t intr = 2;
+		auto intr = device::ICU::LEVEL::_2;
 		sci_.start(115200, intr);
 	}
 

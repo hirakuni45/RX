@@ -148,7 +148,7 @@ namespace device {
 		static_assert(recv_.size() >= 8, "RECV Buffer too small.");
 		static_assert(send_.size() >= 8, "SEND Buffer too small.");
 
-		uint8_t		level_;
+		ICU::LEVEL	level_;
 		bool		auto_crlf_;
 		uint32_t	baud_;
 		static volatile bool		stop_;
@@ -216,9 +216,9 @@ namespace device {
 			tei_task_();
 		}
 
-		void set_intr_(uint8_t level) noexcept
+		void set_intr_(ICU::LEVEL level) noexcept
 		{
-			if(level > 0) {
+			if(level != ICU::LEVEL::NONE) {
 				icu_mgr::set_interrupt(SCI::RXI, rxi_task_, level);
 				icu_mgr::set_interrupt(SCI::TXI, txi_task_, level);
 				if(FLCT == FLOW_CTRL::RS485) {
@@ -249,7 +249,7 @@ namespace device {
 		sci_io(bool autocrlf = true,
 			const port_map_order::sci_port_t& sci_port = port_map_order::sci_port_t()) noexcept :
 			port_map_(sci_port),
-			level_(0),
+			level_(ICU::LEVEL::NONE),
 			auto_crlf_(autocrlf), baud_(0) {
 			stop_ = false;
 			errc_ = 0;
@@ -284,12 +284,12 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t baud, uint8_t level = 0, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
+		bool start(uint32_t baud, ICU::LEVEL level = 0, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
 		{
 #if defined(SIG_RX63T)
-			if(level == 0) return false;
+			if(level == ICU::LEVEL::NONE) return false;
 #endif
-			if(FLCT == FLOW_CTRL::RS485 && level == 0) {
+			if(FLCT == FLOW_CTRL::RS485 && level == ICU::LEVEL::NONE) {
 				// RS485 では、割り込みを使わない設定は NG
 				return false;
 			}
@@ -324,7 +324,7 @@ namespace device {
 				}
 			}
 
-			set_intr_(0);
+			set_intr_(ICU::LEVEL::NONE);
 
 			SCI::SCR = 0x00;			// TE, RE disable.
 			{
@@ -447,7 +447,7 @@ namespace device {
 			if(brr > 0) --brr;
 			SCI::BRR = brr;
 
-			if(level > 0) {
+			if(level != ICU::LEVEL::NONE) {
 				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b();
 			} else {
 				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
@@ -466,7 +466,7 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(BAUDRATE baud, uint8_t level = 0, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
+		bool start(BAUDRATE baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
 		{
 			return start(static_cast<uint32_t>(baud), level, prot);
 		}
@@ -529,7 +529,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint32_t send_length() const noexcept
 		{
-			if(level_) {
+			if(level_ != ICU::LEVEL::NONE) {
 				return send_.length();
 			} else {
 				return 0;
@@ -549,7 +549,7 @@ namespace device {
 			if(auto_crlf_ && ch == '\n') {
 				putch('\r');
 			}
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				volatile bool b = SCI::SSR.ORER();
 				if(b) {
 					SCI::SSR.ORER = 0;
@@ -582,7 +582,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint32_t recv_length() noexcept
 		{
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				return recv_.length();
 			} else {
 				if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
@@ -614,7 +614,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		char getch() noexcept
 		{
-			if(level_ > 0) {  // 割り込み受信
+			if(level_ != ICU::LEVEL::NONE) {  // 割り込み受信
 				while(recv_.length() == 0) {
 					sleep_();
 				}

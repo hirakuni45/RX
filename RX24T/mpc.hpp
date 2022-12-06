@@ -9,6 +9,8 @@
 */
 //=========================================================================//
 #include "common/io_utils.hpp"
+#include "RX24T/peripheral.hpp"
+#include "RX600/port_map_order.hpp"
 
 namespace device {
 
@@ -42,7 +44,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス X
+			@brief  端子機能制御規定クラス IP
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -60,7 +62,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス Y
+			@brief  端子機能制御規定クラス AIP
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -79,7 +81,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス Z
+			@brief  端子機能制御規定クラス A
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -96,7 +98,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス W
+			@brief  端子機能制御規定クラス AI
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -114,7 +116,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス M
+			@brief  端子機能制御規定クラス P
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -383,6 +385,69 @@ namespace device {
 		static PE3PFS_ PE3PFS;
 		static PE4PFS_ PE4PFS;
 		static PE5PFS_ PE5PFS;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  PSEL の値を取得
+			@param[in]	per		ペリフェラル型
+			@param[in]	ch		チャネル型
+			@param[in]	neg		負論理の場合「true」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static uint8_t get_PSEL(peripheral per, port_map_order::CHANNEL ch, bool neg = true) noexcept
+		{
+			uint8_t val = 0;
+			switch(per) {
+			case peripheral::MTU0:
+			case peripheral::MTU1:
+			case peripheral::MTU2:
+			case peripheral::MTU3:
+			case peripheral::MTU4:
+			case peripheral::MTU5:
+			case peripheral::MTU6:
+			case peripheral::MTU7:
+			case peripheral::MTU9:
+				switch(ch) {
+				case port_map_order::CHANNEL::A:
+				case port_map_order::CHANNEL::B:
+				case port_map_order::CHANNEL::C:
+				case port_map_order::CHANNEL::D:
+					if(neg) val = 0b00011;
+					else val = 0b00001;
+					break;
+				case port_map_order::CHANNEL::CLK_A:
+				case port_map_order::CHANNEL::CLK_B:
+				case port_map_order::CHANNEL::CLK_C:
+				case port_map_order::CHANNEL::CLK_D:
+					if(neg) val = 0b00100;
+					else val = 0b00010;
+					break;				
+				default:
+					break;
+				}
+				break;
+			case peripheral::TMR0:
+			case peripheral::TMR1:
+			case peripheral::TMR2:
+			case peripheral::TMR3:
+			case peripheral::TMR4:
+			case peripheral::TMR5:
+			case peripheral::TMR6:
+			case peripheral::TMR7:
+				val = 0b00101;
+				break;
+			case peripheral::GPT0:
+			case peripheral::GPT1:
+			case peripheral::GPT2:
+			case peripheral::GPT3:
+				
+				break;
+			default:
+				break;
+			}
+			return val;
+		}
 	};
 	template<class _> typename mpc_t<_>::PWPR_ mpc_t<_>::PWPR;
 	template<class _> typename mpc_t<_>::P00PFS_ mpc_t<_>::P00PFS;

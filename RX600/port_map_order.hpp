@@ -79,21 +79,21 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  タイマー・チャネル型
+			@brief  タイマー・チャネル型（MTUx, TPUx, GPTx, GPTWx）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CHANNEL : uint8_t {
-			A,		///< MTUx A (MTIOCxA), GPTWx A (GTIOCxA)
-			B,		///< MTUx B (MTIOCxB), GPTWx B (GTIOCxB)
-			C,		///< MTUx C (MTIOCxC)
-			D,		///< MTUx D (MTIOCxD)
-			U,		///< MTUy U (MTICyU)
-			V,		///< MTUy V (MTICyV)
-			W,		///< MTUy W (MTICyW)
-			CLK_A,	///< MTCLKA
-			CLK_B,	///< MTCLKB
-			CLK_C,	///< MTCLKC
-			CLK_D,	///< MTCLKD
+			A,		///< MTIOCxA(MTUx), TIOCAx(TPUx), GPTWx A (GTIOCxA)
+			B,		///< MTIOCxB(MTUx), TIOCBx(TPUx), GPTWx B (GTIOCxB)
+			C,		///< MTIOCxC(MTUx), TIOCCx(TPUx)
+			D,		///< MTIOCxD(MTUx), TIOCDx(TPUx)
+			U,		///< MTICyU(MTUx)
+			V,		///< MTICyV(MTUx)
+			W,		///< MTICyW(MTUx)
+			CLK_A,	///< MTCLKA(MTUx), TCLKA(TPUx)
+			CLK_B,	///< MTCLKB(MTUx), TCLKB(TPUx)
+			CLK_C,	///< MTCLKC(MTUx), TCLKC(TPUx)
+			CLK_D,	///< MTCLKD(MTUx), TCLKD(TPUx)
 			CLK_E,	///< MTCLKE (MTU2 系)
 			CLK_F,	///< MTCLKF (MTU2 系)
 			CLK_G,	///< MTCLKG (MTU2 系)

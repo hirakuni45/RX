@@ -76,7 +76,7 @@ namespace device {
 	class tpu_io : public tpu_io_base {
 
 		TYPE		type_;
-		uint8_t		level_;
+		ICU::LEVEL	level_;
 		uint8_t		shift_;
 		uint32_t	rate_;
 
@@ -100,7 +100,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		tpu_io() noexcept : type_(TYPE::NONE), level_(0), shift_(0), rate_(0),
+		tpu_io() noexcept : type_(TYPE::NONE), level_(ICU::LEVEL::NONE), shift_(0), rate_(0),
 			intr_vec_(ICU::VECTOR::NONE)
 		{ }
 
@@ -115,7 +115,7 @@ namespace device {
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(TYPE type, uint32_t freq, uint8_t level, OUTPUT out = OUTPUT::NONE) noexcept
+		bool start(TYPE type, uint32_t freq, ICU::LEVEL level, OUTPUT out = OUTPUT::NONE) noexcept
 		{
 			if(freq == 0) return false;
 
@@ -222,7 +222,7 @@ namespace device {
 			}
 			TPU::TCNT = 0x0000;
 
-			if(level_ > 0) {  // 割り込み設定
+			if(level_ != ICU::LEVEL::NONE) {  // 割り込み設定
 				intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
 				switch(type) {
 				case TYPE::MATCH_A:
@@ -250,16 +250,16 @@ namespace device {
 			case TYPE::NONE:  // 出力無し
 				break;
 			case TYPE::MATCH_A:
-				ret = port_map_tpu::turn(per, port_map_tpu::channel::A, true, ORDER);
+				ret = port_map_tpu::turn(per, port_map_tpu::CHANNEL::A, true, ORDER);
 				break;
 			case TYPE::MATCH_B:
-				ret = port_map_tpu::turn(per, port_map_tpu::channel::B, true, ORDER);
+				ret = port_map_tpu::turn(per, port_map_tpu::CHANNEL::B, true, ORDER);
 				break;
 			case TYPE::MATCH_C:
-				ret = port_map_tpu::turn(per, port_map_tpu::channel::C, true, ORDER);
+				ret = port_map_tpu::turn(per, port_map_tpu::CHANNEL::C, true, ORDER);
 				break;
 			case TYPE::MATCH_D:
-				ret = port_map_tpu::turn(per, port_map_tpu::channel::D, true, ORDER);
+				ret = port_map_tpu::turn(per, port_map_tpu::CHANNEL::D, true, ORDER);
 				break;
 			default:
 				ret = false;
@@ -280,7 +280,7 @@ namespace device {
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level) noexcept
+		bool start(uint32_t freq, ICU::LEVEL level) noexcept
 		{
 			return start(TYPE::MATCH_A, freq, level);
 		}
@@ -295,7 +295,7 @@ namespace device {
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(TYPE type, uint8_t level, INPUT inp) noexcept
+		bool start(TYPE type, ICU::LEVEL level, INPUT inp) noexcept
 		{
 
 			return false;

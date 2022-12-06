@@ -1,16 +1,14 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72N グループ・ポート・マッピング (SCIx) 
+	@brief	RX72N/RX72M グループ・ポート・マッピング (SCIx) 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX72N/peripheral.hpp"
-#include "RX72N/port.hpp"
-#include "RX72N/mpc.hpp"
+#include "common/device.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

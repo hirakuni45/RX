@@ -128,7 +128,7 @@ namespace device {
 			@return 初期化出来ない場合「false」（パラメータの異常など）
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t aclk, uint32_t lrclk, BFORM bform, uint8_t intl) noexcept
+		bool start(uint32_t aclk, uint32_t lrclk, BFORM bform, ICU::LEVEL intl) noexcept
 		{
 			power_mgr::turn(SSIE::PERIPHERAL);
 
@@ -277,7 +277,7 @@ namespace device {
 			}
 
 			// 割り込み設定
-			if(intl > 0) {
+			if(intl != ICU::LEVEL::NONE) {
 				icu_mgr::set_level(SSIE::TX_VEC, intl);
 				icu_mgr::set_task(SSIE::TX_VEC, send_task_);
 				SSIE::SSIFCR.TIE = 1;

@@ -260,8 +260,8 @@ namespace {
 
 	void start_audio_()
 	{
-		uint8_t dmac_intl = 4;
-		uint8_t mtu_intl  = 5;
+		auto dmac_intl = device::ICU::LEVEL::_4;
+		auto mtu_intl  = device::ICU::LEVEL::_5;
 		if(dac_stream_.start(48'000, dmac_intl, mtu_intl)) {
 			utils::format("Start D/A Stream\n");
 		} else {
@@ -277,7 +277,7 @@ namespace {
 	void start_audio_()
 	{
 		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/16 ビットフォーマット固定
-			uint8_t intr = 5;
+			auto intr = device::ICU::LEVEL::_5;
 			uint32_t aclk = 24'576'000;
 			uint32_t lrclk = 48'000;
 			auto ret = ssie_io_.start(aclk, lrclk, SSIE_IO::BFORM::I2S_32, intr);
@@ -457,11 +457,11 @@ extern "C" {
 
     void vApplicationSetupTimerInterrupt(void)
     {
-        uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
+        auto intr = static_cast<device::ICU::LEVEL>(configKERNEL_INTERRUPT_PRIORITY);
         cmt_.start(configTICK_RATE_HZ, intr, vTickISR);
 
         device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
-        device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
+        device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, intr);
     }
 
 
@@ -538,7 +538,7 @@ int main(int argc, char** argv)
 		putch_sync_ = xSemaphoreCreateBinary();
 		puts_sync_  = xSemaphoreCreateBinary();
 		getch_sync_ = xSemaphoreCreateBinary();
-		uint8_t sci_level = 2;
+		auto sci_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, sci_level);
 	}
 

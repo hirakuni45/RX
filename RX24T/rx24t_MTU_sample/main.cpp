@@ -55,19 +55,19 @@ int main(int argc, char** argv)
 
 	// タイマー設定（６０Ｈｚ）
 	{
-		uint8_t intr_level = 4;
+		auto intr_level = device::ICU::LEVEL::_4;
 		cmt_.start(60, intr_level);
 	}
 
 	// SCI 設定
 	{
-		uint8_t intr_level = 2;
+		auto intr_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, intr_level);
 	}
 
 	// MTU0 設定
 	{
-		uint8_t intr = 3;		
+		auto intr = device::ICU::LEVEL::_3;		
 		if(!mtu0_io_.start_capture(MTU0::CHANNEL::A, MTU0_IO::CAPTURE::POSITIVE, intr)) {
 			utils::format("MTU0 input capture start fail...\n");
 		}

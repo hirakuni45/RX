@@ -202,11 +202,11 @@ extern "C" {
 
 	void vApplicationSetupTimerInterrupt(void)
 	{
-		uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
+		auto intr = static_cast<device::ICU::LEVEL>(configKERNEL_INTERRUPT_PRIORITY);
 		cmt_.start(configTICK_RATE_HZ, intr, vTickISR);
 
 		device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
-		device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
+		device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, intr);
 	}
 
 
@@ -218,7 +218,7 @@ extern "C" {
 	/// Ethernet の開始
 	int InitializeEth(void)
     {
-		uint8_t intr_level = 4;
+		auto intr_level = device::ICU::LEVEL::_4;
 		if(!ethd_.start(intr_level)) {
 			utils::format("Ethernet start fail...\n");
 			return 0;
@@ -355,7 +355,7 @@ int main(int argc, char** argv)
 #endif
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
 	}

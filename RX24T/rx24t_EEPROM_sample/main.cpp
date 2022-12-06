@@ -62,11 +62,11 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
+	auto cmt_irq_level = device::ICU::LEVEL::_4;
 	cmt_.start(60, cmt_irq_level);
 
 	// SCI 設定
-	static const uint8_t sci_level = 2;
+	auto sci_level = device::ICU::LEVEL::_2;
 	sci_.start(115200, sci_level);
 
 	utils::format("RX24T EEPROM sample\n");

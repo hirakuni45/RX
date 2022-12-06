@@ -79,7 +79,7 @@ namespace utils {
 		uint32_t	id_;
 		uint32_t	iid_;
 
-		uint16_t	intr_;
+		device::ICU::LEVEL	intr_;
 		uint16_t	update_real_rate_;
 		uint16_t	update_fast_rate_;
 		uint16_t	no_recv_cnt_;
@@ -227,7 +227,7 @@ namespace utils {
 			time_{ 0 }, lat_{ 0 }, ns_{ 0 }, lon_{ 0 },
 			ew_{ 0 }, q_{ 0 }, satellite_{ 0 }, hq_{ 0 },
 			alt_{ 0 }, alt_unit_{ 0 }, date_{ 0 },
-			sidx_(0), id_(0), iid_(0), intr_(0),
+			sidx_(0), id_(0), iid_(0), intr_(device::ICU::LEVEL::NONE),
 			update_real_rate_(0), update_fast_rate_(0),
 			no_recv_cnt_(0),
 			baud_real_rate_(0), baud_fast_rate_(0)
@@ -469,7 +469,7 @@ namespace utils {
 			@param[in]	rate	更新レート（最大１０Ｈｚ）
         */
         //-----------------------------------------------------------------//
-		void start(uint16_t intr = 1, uint32_t fast = FAST_BAUDRATE, uint16_t rate = 10) noexcept
+		void start(device::ICU::LEVEL intr = device::ICU::LEVEL::_1, uint32_t fast = FAST_BAUDRATE, uint16_t rate = 10) noexcept
 		{
 			intr_ = intr;
 			baud_real_rate_ = 9600;

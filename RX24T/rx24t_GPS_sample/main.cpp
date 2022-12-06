@@ -67,19 +67,19 @@ int main(int argc, char** argv)
 
 	{
 		// タイマー設定（６０Ｈｚ）
-		uint8_t cmt_level = 4;
+		auto cmt_level = device::ICU::LEVEL::_4;
 		cmt_.start(60, cmt_level);
 	}
 
 	{
 		// SCI1 設定
-		uint8_t sci_level = 2;
+		auto sci_level = device::ICU::LEVEL::_2;
 		sci1_.start(115200, sci_level);
 	}
 
 	{
 		// SCI5 設定 (GPS)
-		uint8_t sci_level = 2;
+		auto sci_level = device::ICU::LEVEL::_2;
 		sci5_.start(9600, sci_level);
 	}
 

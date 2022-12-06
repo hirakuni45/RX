@@ -44,7 +44,7 @@ namespace device {
 			task_();
 		}
 
-		uint8_t	level_;
+		ICU::LEVEL	level_;
 
 		static inline void sleep_() { asm("nop"); }
 
@@ -54,7 +54,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		adc_in() : level_(0) { }
+		adc_in() : level_(ICU::LEVEL::NONE) { }
 
 
 		//-----------------------------------------------------------------//
@@ -65,7 +65,7 @@ namespace device {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(typename ADCU::ANALOG ana, uint8_t level = 0)
+		bool start(typename ADCU::ANALOG ana, ICU::LEVEL level = ICU::LEVEL::NONE)
 		{
 			level_ = level;
 
@@ -88,7 +88,7 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		void scan() {
-			if(level_ > 0) {
+			if(level_ != device::ICU::LEVEL::NONE) {
 				icu_mgr::set_task(ADCU::S12ADI, adi_task_);
 				icu_mgr::set_level(ADCU::S12ADI, level_);
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b() | ADCU::ADCSR.ADIE.b();

@@ -104,12 +104,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // TinyUSB/Host のタスクを動かす Tick を 1000Hz とする。
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(1000, intr);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル（０を指定すると、ポーリング動作になる）
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 	}
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 	}
 
 	{  // TinyUSB マネージャーの開始
-		uint8_t intr = 5;
+		auto intr = device::ICU::LEVEL::_5;
 		if(tinyusb_.start(intr)) {
 			utils::format("Start TinyUSB: OK!\n");
 		} else {

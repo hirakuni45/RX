@@ -144,15 +144,16 @@ namespace device {
 			@brief  選択型割り込みＡ設定テンプレート
 			@param[in]	ICU			ICU クラス
 			@param[in]	VEC_TYPE	割り込み要因型
-			@param[in]	TASK_TYPE	タスクタイプ
+			@param[in]	org			開始ベクタ
+			@param[in]	end			終了ベクタ
 			@param[in]	sel			割り込み要因
 			@param[in]	task		割り込みタスク
 			@param[in]	lvl			割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		template <class ICU, typename VEC_TYPE, typename TASK_TYPE, uint16_t org, uint16_t end>
-		static typename ICU::VECTOR set_interruptSELA(VEC_TYPE sel, TASK_TYPE task, uint8_t lvl) noexcept
+		template <class ICU, typename VEC_TYPE, uint16_t org, uint16_t end>
+		static typename ICU::VECTOR set_interruptSELA(VEC_TYPE sel, ITASK task, typename ICU::LEVEL lvl) noexcept
 		{
 			// sel 要因があれば消す。
 			for(uint16_t i = org; i < (end + 1); ++i) {
@@ -165,14 +166,14 @@ namespace device {
 					ICU::IR[idx] = 0;
 				}
 			}
-			if(lvl == 0 || task == nullptr) return ICU::VECTOR::NONE;
+			if(lvl == ICU::LEVEL::NONE || task == nullptr) return ICU::VECTOR::NONE;
 
 			for(uint16_t i = org; i < (end + 1); ++i) {
 				auto idx = static_cast<typename ICU::VECTOR>(i);
 				if(ICU::SLIAR[idx] == VEC_TYPE::NONE) {
 					ICU::IER.enable(idx, 0);
 					set_interrupt_task(task, i);
-					ICU::IPR[idx] = lvl;
+					ICU::IPR[idx] = static_cast<uint8_t>(lvl);
 					ICU::SLIAR[idx] = sel;
 					ICU::IR[idx] = 0;
 					ICU::IER.enable(idx, 1);
@@ -189,15 +190,16 @@ namespace device {
 			@brief  選択型割り込みＢ設定テンプレート
 			@param[in]	ICU			ICU クラス
 			@param[in]	VEC_TYPE	割り込み要因型
-			@param[in]	TASK_TYPE	タスクタイプ
+			@param[in]	org			開始ベクタ
+			@param[in]	end			終了ベクタ
 			@param[in]	sel			割り込み要因
 			@param[in]	task		割り込みタスク
 			@param[in]	lvl			割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		template <class ICU, typename VEC_TYPE, typename TASK_TYPE, uint16_t org, uint16_t end>
-		static typename ICU::VECTOR set_interruptSELB(VEC_TYPE sel, TASK_TYPE task, uint8_t lvl) noexcept
+		template <class ICU, typename VEC_TYPE, uint16_t org, uint16_t end>
+		static typename ICU::VECTOR set_interruptSELB(VEC_TYPE sel, ITASK task, typename ICU::LEVEL lvl) noexcept
 		{
 			// sel 要因があれば消す。
 			for(uint16_t i = org; i < (end + 1); ++i) {
@@ -210,14 +212,14 @@ namespace device {
 					ICU::IR[idx] = 0;
 				}
 			}
-			if(lvl == 0 || task == nullptr) return ICU::VECTOR::NONE;
+			if(lvl == ICU::LEVEL::NONE || task == nullptr) return ICU::VECTOR::NONE;
 
 			for(uint16_t i = org; i < (end + 1); ++i) {
 				auto idx = static_cast<typename ICU::VECTOR>(i);
 				if(ICU::SLIBR[idx] == VEC_TYPE::NONE) {
 					ICU::IER.enable(idx, 0);
 					set_interrupt_task(task, i);
-					ICU::IPR[idx] = lvl;
+					ICU::IPR[idx] = static_cast<uint8_t>(lvl);
 					ICU::SLIBR[idx] = sel;
 					ICU::IR[idx] = 0;
 					ICU::IER.enable(idx, 1);

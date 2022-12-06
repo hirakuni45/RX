@@ -534,11 +534,11 @@ extern "C" {
 
 	void vApplicationSetupTimerInterrupt(void)
 	{
-		uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
+		auto intr = static_cast<device::ICU::LEVEL>(configKERNEL_INTERRUPT_PRIORITY);
 		cmt_.start(configTICK_RATE_HZ, intr, vTickISR);
 
 		device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
-		device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
+		device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, intr);
 	}
 };
 
@@ -694,7 +694,7 @@ int main(int argc, char** argv)
 		putch_sync_ = xSemaphoreCreateBinary();	// putch 排他制御のリソースを作成
 		puts_sync_  = xSemaphoreCreateBinary();	// puts  排他制御のリソースを作成
 		getch_sync_ = xSemaphoreCreateBinary();	// getch 排他制御のリソースを作成
-		uint8_t intr = 2;        // 割り込みレベル
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
 	}

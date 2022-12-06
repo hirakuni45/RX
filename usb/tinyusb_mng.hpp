@@ -368,9 +368,9 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t ilvl) noexcept
+		bool start(ICU::LEVEL ilvl) noexcept
 		{
-			if(ilvl == 0) {  // 割り込み無しはエラー
+			if(ilvl == ICU::LEVEL::NONE) {  // 割り込み無しはエラー
 				return false;
 			}
 

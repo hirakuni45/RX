@@ -30,7 +30,7 @@ namespace device {
 
 		typedef utils::format format;
 
-		uint8_t			ilvl_;
+		ICU::LEVEL		ilvl_;
 
 		ICU::VECTOR		ivec_;
 
@@ -57,7 +57,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		usb_io() : ilvl_(0), ivec_(ICU::VECTOR::NONE),
+		usb_io() : ilvl_(ICU::LEVEL::NONE), ivec_(ICU::VECTOR::NONE),
 			event_(-1)
 		{ }
 
@@ -69,7 +69,7 @@ namespace device {
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t ilvl) noexcept
+		bool start(ICU::LEVEL ilvl) noexcept
 		{
 			ilvl_ = ilvl;
 

@@ -159,8 +159,8 @@ namespace {
 
 	void start_audio_()
 	{
-		uint8_t dmac_intl = 4;
-		uint8_t timer_intl  = 5;
+		auto dmac_intl = device::ICU::LEVEL::_4;
+		auto timer_intl  = device::ICU::LEVEL::_5;
 		if(dac_stream_.start(48'000, dmac_intl, timer_intl)) {
 			utils::format("Start D/A Stream\n");
 		} else {
@@ -176,7 +176,7 @@ namespace {
 	void start_audio_()
 	{
 		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/16 ビットフォーマット固定
-			uint8_t intr = 5;
+			auto intr = device::ICU::LEVEL::_5;
 			uint32_t aclk = 24'576'000;
 			uint32_t lrclk = 48'000;
 			auto ret = ssie_io_.start(aclk, lrclk, SSIE_IO::BFORM::I2S_32, intr);
@@ -1189,12 +1189,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(TICK, intr);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル（０を指定すると、ポーリング動作になる）
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 	}

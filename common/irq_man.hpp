@@ -36,7 +36,7 @@ namespace device {
 
 	private:
 		static TASK	task_;
-		static uint8_t level_;
+		static ICU::LEVEL level_;
 
 		static INTERRUPT_FUNC void irq_task_()
 		{
@@ -95,12 +95,12 @@ namespace device {
 			@param[in]	opt		ポート選択権
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t lvl, edge egt, port_map::ORDER opt)
+		bool start(ICU::LEVEL lvl, edge egt, port_map::ORDER opt)
 		{
 			auto vd = static_cast<uint32_t>(PER) - static_cast<uint32_t>(peripheral::IRQ0);
 			auto vec = static_cast<ICU::VECTOR>(static_cast<uint32_t>(ICU::VECTOR::IRQ0) + vd);
 
-			icu_mgr::set_level(vec, 0);
+			icu_mgr::set_level(vec, ICU::LEVEL::NONE);
 
 			if(!port_map::turn(PER, true, opt)) {
 				return false;
@@ -195,5 +195,5 @@ namespace device {
 	};
 
 	template <peripheral PER, class TASK> TASK irq_man<PER, TASK>::task_;
-	template <peripheral PER, class TASK> uint8_t irq_man<PER, TASK>::level_ = 0;
+	template <peripheral PER, class TASK> ICU::LEVEL irq_man<PER, TASK>::level_ = ICU::LEVEL::NONE;
 }

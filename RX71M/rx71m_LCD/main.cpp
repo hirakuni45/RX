@@ -145,12 +145,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（100Hz）
-		uint8_t intr = 4;
+		auto intr = device::ICU::LEVEL::_4;
 		cmt_.start(100, intr);
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル
+		auto intr = device::ICU::LEVEL::_2;
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
 	}

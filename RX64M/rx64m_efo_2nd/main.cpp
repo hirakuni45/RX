@@ -464,24 +464,24 @@ int main(int argc, char** argv)
 
 	{
 		// タイマー設定（100Hz）
-		uint8_t cmt_irq_level = 3;
+		auto cmt_irq_level = device::ICU::LEVEL::_3;
 		cmt_.start(100, cmt_irq_level);
 	}
 
 	{  // TPU0 設定
-		uint8_t int_level = 4;
+		auto int_level = device::ICU::LEVEL::_4;
 		if(!tpu0_.start(375000, int_level)) {
 			utils::format("TPU0 not start ...\n");
 		}
 	}
 
 	{  // DEBUG SCI 設定
-		uint8_t int_level = 1;
+		auto int_level = device::ICU::LEVEL::_1;
 		d_sci_.start(115200, int_level);
 	}
 
 	{  // MAIN SCI 設定
-		uint8_t int_level = 1;
+		auto int_level = device::ICU::LEVEL::_1;
 		m_sci_.start(115200, int_level);
 		m_sci_.auto_crlf(false);
 	}
