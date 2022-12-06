@@ -264,7 +264,7 @@ namespace device {
 
 		PHY				phy_;
 
-		uint8_t			intr_level_;
+		ICU::LEVEL		intr_level_;
 
 		uint8_t			mac_addr_[6];
 
@@ -629,7 +629,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		ether_io() :
 			app_rx_desc_(nullptr), app_tx_desc_(nullptr),
-			intr_level_(0), mac_addr_{ 0 },
+			intr_level_(ICU::LEVEL::NONE), mac_addr_{ 0 },
 			pause_frame_enable_(false), magic_packet_detect_(magic_packet_mode::no_use),
 			lchng_flag_(FLAG_OFF), transfer_enable_(false),
 			link_stat_(false), stat_(), recv_ptr_(nullptr), recv_mod_(0), err_data_(nullptr)
@@ -703,7 +703,7 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t level)
+		bool start(ICU::LEVEL level)
 		{
 			power_mgr::turn(ETHRC::PERIPHERAL);
 			port_map::turn(ETHRC::PERIPHERAL, true, PSEL);
@@ -774,9 +774,9 @@ namespace device {
 				EDMAC::EESIPR.ECIIP  = 1;
 
 				// Set EDMAC interrupt level and enable
-				if(intr_level_ > 0) {
+				if(intr_level_ != ICU::LEVEL::NONE) {
 					auto gvec = icu_mgr::get_group_vector(EDMAC::EINT);
-					if(icu_mgr::get_level(gvec) == 0) {
+					if(icu_mgr::get_level(gvec) < intr_level_) {
 						icu_mgr::set_level(gvec, intr_level_);
 					}
 					icu_mgr::install_group_task(EDMAC::EINT, ether_task_);

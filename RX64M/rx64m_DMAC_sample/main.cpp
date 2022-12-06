@@ -80,12 +80,12 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（６０Ｈｚ）
-		uint8_t int_level = 4;
+		auto int_level = device::ICU::LEVEL::_4;
 		cmt_.start(60, int_level);
 	}
 
 	{  // SCI 設定
-		uint8_t int_level = 2;
+		auto int_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, int_level);
 	}
 
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 	LED::DIR = 1;
 
 	{
-		uint8_t intr_level = 4;
+		auto intr_level = device::ICU::LEVEL::_4;
 		dmac_mgr_.start(intr_level);
 	}
 

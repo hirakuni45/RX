@@ -59,14 +59,14 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // SCI 設定
-		uint8_t int_level = 2;
+		auto int_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, int_level);
 	}
 
 	utils::format("RX64M TPU sample start\n");
 
 	{  // TPU タイマー設定（６０Ｈｚ）
-		uint8_t int_level = 4;
+		auto int_level = device::ICU::LEVEL::_4;
 		if(!tpu_.start(60, int_level)) {
 			utils::format("TPU not start...\n");
 		}

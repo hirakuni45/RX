@@ -430,7 +430,7 @@ namespace device {
 		uint32_t			flip_count_;
 		bool				enable_double_;
 
-		uint8_t				intr_lvl_;
+		ICU::LEVEL			intr_lvl_;
 		ERROR				last_error_;
 
 
@@ -1605,7 +1605,7 @@ namespace device {
 			// Enable the GLCD detections and interrupts
 			if(!ctrl_blk_.is_entry) {
 				icu_mgr::set_level(ICU::VECTOR::GROUPAL1, intr_lvl_);
-				if(intr_lvl_ > 0) {
+				if(intr_lvl_ != ICU::LEVEL::NONE) {
 					icu_mgr::install_group_task(ICU::VECTOR_AL1::VPOS,  line_detect_isr_);
 					icu_mgr::install_group_task(ICU::VECTOR_AL1::GR1UF, underflow_1_isr_);
 					icu_mgr::install_group_task(ICU::VECTOR_AL1::GR2UF, underflow_2_isr_);
@@ -1644,7 +1644,7 @@ namespace device {
 		glcdc_mgr(void* ly1, void* ly2) noexcept :
 			layer1_org_(ly1), layer2_org_(ly2),
 			flip_count_(0), enable_double_(false),
-			intr_lvl_(0), last_error_(ERROR::SUCCESS)
+			intr_lvl_(ICU::LEVEL::NONE), last_error_(ERROR::SUCCESS)
 		{ }
 
 
@@ -1741,7 +1741,7 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t ilvl = 2) noexcept
+		bool start(ICU::LEVEL ilvl = 2) noexcept
 		{
 			intr_lvl_ = ilvl;
 

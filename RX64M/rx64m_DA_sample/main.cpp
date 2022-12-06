@@ -166,17 +166,17 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（１００Ｈｚ）
-		uint8_t intr_level = 4;
+		auto intr_level = device::ICU::LEVEL::_4;
 		cmt_.start(100, intr_level);
 	}
 
 	{  // SCI 設定
-		uint8_t intr_level = 2;
+		auto intr_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, intr_level);
 	}
 
 	{  // インターバル・タイマー設定
-		uint8_t intr_level = 5;
+		auto intr_level = device::ICU::LEVEL::_5;
 		if(!itvt_.start(48'000, intr_level)) {
 			utils::format("TPU0 start error...\n");
 		}
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 
 #ifndef SOFT_TRANS
 	{  // DMAC マネージャー開始
-		uint8_t intr_level = 4;
+		auto intr_level = device::ICU::LEVEL::_4;
 		bool cpu_intr = true;
 		auto ret = dmac_mgr_.start(itvt_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
 			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address, WAVE_NUM, intr_level, cpu_intr);

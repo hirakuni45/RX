@@ -80,7 +80,7 @@ namespace fatfs {
 		uint8_t		card_type_;
 
 		uint8_t		mount_delay_;
-		uint8_t		intr_lvl_;
+		device::ICU::LEVEL	intr_lvl_;
 		bool		cd_;
 		bool		mount_;
 		bool		start_;
@@ -321,7 +321,7 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		sdhi_io(bool onew = false) noexcept :
 			stat_(STA_NOINIT), card_type_(0),
-			mount_delay_(0), intr_lvl_(0),
+			mount_delay_(0), intr_lvl_(device::ICU::LEVEL::NONE),
 			cd_(false), mount_(false), start_(false),
 			onew_(onew), rca_id_(0)
 		{ }
@@ -333,7 +333,7 @@ namespace fatfs {
 			@param[in]	lvl		割り込みレベル（０の場合、ポーリング）
 		 */
 		//-----------------------------------------------------------------//
-		void start(uint8_t lvl = 0)
+		void start(device::ICU::LEVEL lvl = device::ICU::LEVEL::NONE)
 		{
 			if(start_) {
 				return;
@@ -350,7 +350,7 @@ namespace fatfs {
 			port_map::turn_sdhi(port_map::sdhi_situation::START, PSEL);
 
 			intr_lvl_ = lvl;
-			if(intr_lvl_) {
+			if(intr_lvl_ != device::ICU::LEVEL::NONE) {
 //				cdeti_task_
 //				caci_task_
 //				sdaci_task_
