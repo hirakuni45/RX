@@ -17,6 +17,13 @@ html/
 *.db
 tmp/
 rxlib/src/
+tinyusb/.readthedocs.yaml
+tinyusb/CODE_OF_CONDUCT.rst
+tinyusb/CONTRIBUTORS.rst
+tinyusb/README.rst
+tinyusb/pkg.yml
+tinyusb/repository.yml
+tinyusb/version.yml
 tinyusb/docs/
 tinyusb/examples/
 tinyusb/hw/
