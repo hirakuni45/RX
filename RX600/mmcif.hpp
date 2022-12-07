@@ -23,9 +23,9 @@ namespace device {
 	struct mmcif_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto ACC_VEC  = ICU::VECTOR_BL1::ACCIO;
-		static constexpr auto ERR_VEC  = ICU::VECTOR_BL1::ERRIO;
-		static constexpr auto CDET_VEC = ICU::VECTOR_BL1::CDETIO;
+		static constexpr auto ACC_VEC  = ICU::GROUPBL1::ACCIO;
+		static constexpr auto ERR_VEC  = ICU::GROUPBL1::ERRIO;
+		static constexpr auto CDET_VEC = ICU::GROUPBL1::CDETIO;
 		static constexpr auto MBFA_VEC = ICU::VECTOR::MBFAI;
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

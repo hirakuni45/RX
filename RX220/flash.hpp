@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX621/RX62N グループ・フラッシュ 定義
+	@brief	RX220 グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -21,11 +21,31 @@ namespace device {
 	struct flash_t {
 
 		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
-		static constexpr uint32_t DATA_FLASH_SIZE = 32768;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_FLASH_BLOCK = 2048;		///< データ・フラッシュ、ブロックサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 8;			///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t DATA_FLASH_SIZE = 8192;		///< データ・フラッシュ、サイズ
+		static constexpr uint32_t DATA_FLASH_BLOCK = 64;		///< データ・フラッシュ、ブロックサイズ(128)
+		static constexpr uint32_t DATA_WORD_SIZE = 2;			///< データ・フラッシュ最小書き込みサイズ
 
 		static constexpr auto ID_NUM = 0;						///< 個別識別子数
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フラッシュライトイレーズプロテクトレジスタ（FWEPROR）
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct fwepror_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> FLWE;
+		};
+		typedef fwepror_t<0x0008'C296> FWEPROR_;
+		static FWEPROR_ FWEPROR;
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -101,28 +121,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  FCU RAM イネーブルレジスタ（FCURAME）
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct fcurame_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>    FCRME;
-
-			bits_rw_t<io_, bitpos::B8, 8> KEY;
-		};
-		typedef fcurame_t<0x007F'C454> FCURAME_;
-		static FCURAME_ FCURAME;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  フラッシュステータスレジスタ 0（FSTATR0）
 			@param[in]	base	ベース
 		*/
@@ -182,6 +180,29 @@ namespace device {
 		};
 		typedef frdyie_t<0x007F'C412> FRDYIE_;
 		static FRDYIE_ FRDYIE;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フラッシュ P/E モードエントリレジスタ（FENTRYR）
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct fentryr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>    FENTRY0;
+
+			bit_rw_t <io_, bitpos::B7>    FENTRYD;
+			bits_rw_t<io_, bitpos::B8, 8> FEKEY;
+		};
+		typedef fentryr_t<0x007F'C4B2> FENTRYR_;
+		static FENTRYR_ FENTRYR;
 
 
 		//-----------------------------------------------------------------//
@@ -306,26 +327,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  フラッシュライトイレースプロテクトレジスタ（FWEPROR）
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct fweprcr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 8> FLWE;
-		};
-		typedef fweprcr_t<0x0008'C289> FWEPROR_;
-		static FWEPROR_ FWEPROR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  データフラッシュ読み出し許可レジスタ 0（DFLRE0）
 			@param[in]	base	ベース
 		*/
@@ -342,42 +343,11 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>    DBRE01;
 			bit_rw_t <io_, bitpos::B2>    DBRE02;
 			bit_rw_t <io_, bitpos::B3>    DBRE03;
-			bit_rw_t <io_, bitpos::B4>    DBRE04;
-			bit_rw_t <io_, bitpos::B5>    DBRE05;
-			bit_rw_t <io_, bitpos::B6>    DBRE06;
-			bit_rw_t <io_, bitpos::B7>    DBRE07;
+
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
 		typedef dflre0_t<0x007F'C440> DFLRE0_;
 		static DFLRE0_ DFLRE0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  データフラッシュ読み出し許可レジスタ 1（DFLRE1）
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct dflre1_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>    DBRE08;
-			bit_rw_t <io_, bitpos::B1>    DBRE09;
-			bit_rw_t <io_, bitpos::B2>    DBRE10;
-			bit_rw_t <io_, bitpos::B3>    DBRE11;
-			bit_rw_t <io_, bitpos::B4>    DBRE12;
-			bit_rw_t <io_, bitpos::B5>    DBRE13;
-			bit_rw_t <io_, bitpos::B6>    DBRE14;
-			bit_rw_t <io_, bitpos::B7>    DBRE15;
-			bits_rw_t<io_, bitpos::B8, 8> KEY;
-		};
-		typedef dflre1_t<0x007F'C442> DFLRE1_;
-		static DFLRE1_ DFLRE1;
 
 
 		//-----------------------------------------------------------------//
@@ -398,65 +368,11 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>    DBWE01;
 			bit_rw_t <io_, bitpos::B2>    DBWE02;
 			bit_rw_t <io_, bitpos::B3>    DBWE03;
-			bit_rw_t <io_, bitpos::B4>    DBWE04;
-			bit_rw_t <io_, bitpos::B5>    DBWE05;
-			bit_rw_t <io_, bitpos::B6>    DBWE06;
-			bit_rw_t <io_, bitpos::B7>    DBWE07;
+
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
 		typedef dflwe0_t<0x007F'C450> DFLWE0_;
 		static DFLWE0_ DFLWE0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  データフラッシュ書き込み／消去許可レジスタ 1（DFLWE1）
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct dflwe1_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>    DBWE08;
-			bit_rw_t <io_, bitpos::B1>    DBWE09;
-			bit_rw_t <io_, bitpos::B2>    DBWE10;
-			bit_rw_t <io_, bitpos::B3>    DBWE11;
-			bit_rw_t <io_, bitpos::B4>    DBWE12;
-			bit_rw_t <io_, bitpos::B5>    DBWE13;
-			bit_rw_t <io_, bitpos::B6>    DBWE14;
-			bit_rw_t <io_, bitpos::B7>    DBWE15;
-			bits_rw_t<io_, bitpos::B8, 8> KEY;
-		};
-		typedef dflwe1_t<0x007F'C452> DFLWE1_;
-		static DFLWE1_ DFLWE1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  フラッシュ P/E モードエントリレジスタ（FENTRYR）
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct fentryr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>    FENTRY0;
-
-			bit_rw_t <io_, bitpos::B7>    FENTRYD;
-			bits_rw_t<io_, bitpos::B8, 8> KEY;
-		};
-		typedef fentryr_t<0x007F'FFB2> FENTRYR_;
-		static FENTRYR_ FENTRYR;
 
 
 		//-----------------------------------------------------------------//
@@ -473,9 +389,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>    BCSIZE;
+			bits_rw_t<io_, bitpos::B0, 11> BCADR;
 
-			bits_rw_t<io_, bitpos::B3, 8> BCADR;
+			bit_rw_t <io_, bitpos::B15>    BCSIZE;
 		};
 		typedef dflbccnt_t<0x007F'FFCA> DFLBCCNT_;
 		static DFLBCCNT_ DFLBCCNT;
@@ -513,12 +429,10 @@ namespace device {
 		static UIDR2_ UIDR2;
 		static UIDR3_ UIDR3;
 	};
-	typedef flash_t<void> FLASH;
-
+	template<class _> typename flash_t<_>::FWEPROR_ flash_t<_>::FWEPROR;
 	template<class _> typename flash_t<_>::FMODR_ flash_t<_>::FMODR;
 	template<class _> typename flash_t<_>::FASTAT_ flash_t<_>::FASTAT;
 	template<class _> typename flash_t<_>::FAEINT_ flash_t<_>::FAEINT;
-	template<class _> typename flash_t<_>::FCURAME_ flash_t<_>::FCURAME;
 	template<class _> typename flash_t<_>::FSTATR0_ flash_t<_>::FSTATR0;
 	template<class _> typename flash_t<_>::FSTATR1_ flash_t<_>::FSTATR1;
 	template<class _> typename flash_t<_>::FRDYIE_ flash_t<_>::FRDYIE;
@@ -528,11 +442,8 @@ namespace device {
 	template<class _> typename flash_t<_>::FCPSR_ flash_t<_>::FCPSR;
 	template<class _> typename flash_t<_>::FPESTAT_ flash_t<_>::FPESTAT;
 	template<class _> typename flash_t<_>::PCKAR_ flash_t<_>::PCKAR;
-	template<class _> typename flash_t<_>::FWEPROR_ flash_t<_>::FWEPROR;
 	template<class _> typename flash_t<_>::DFLRE0_ flash_t<_>::DFLRE0;
-	template<class _> typename flash_t<_>::DFLRE1_ flash_t<_>::DFLRE1;
 	template<class _> typename flash_t<_>::DFLWE0_ flash_t<_>::DFLWE0;
-	template<class _> typename flash_t<_>::DFLWE1_ flash_t<_>::DFLWE1;
 	template<class _> typename flash_t<_>::FENTRYR_ flash_t<_>::FENTRYR;
 	template<class _> typename flash_t<_>::DFLBCCNT_ flash_t<_>::DFLBCCNT;
 	template<class _> typename flash_t<_>::DFLBCSTAT_ flash_t<_>::DFLBCSTAT;
@@ -540,4 +451,6 @@ namespace device {
 	template<class _> typename flash_t<_>::UIDR1_ flash_t<_>::UIDR1;
 	template<class _> typename flash_t<_>::UIDR2_ flash_t<_>::UIDR2;
 	template<class _> typename flash_t<_>::UIDR3_ flash_t<_>::UIDR3;
+
+	typedef flash_t<void> FLASH;
 }

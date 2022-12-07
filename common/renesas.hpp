@@ -19,6 +19,8 @@
 #include "RX220/port.hpp"
 #include "RX600/tmr.hpp"
 
+#include "RX220/flash.hpp"
+
 #include "RX220/system_io.hpp"
 
 #elif defined(SIG_RX63T)

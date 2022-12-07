@@ -102,13 +102,13 @@ namespace device {
 
 			if(level_ != ICU::LEVEL::NONE) {
 				if(task != nullptr) {
-					icu_mgr::set_interrupt(CMT::IVEC, task, level_);
+					icu_mgr::set_interrupt(CMT::CMI, task, level_);
 				} else {
-					icu_mgr::set_interrupt(CMT::IVEC, i_task_, level_);
+					icu_mgr::set_interrupt(CMT::CMI, i_task_, level_);
 				}
 			    CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks)) | CMT::CMCR.CMIE.b();
 			} else {
-				icu_mgr::set_interrupt(CMT::IVEC, nullptr, ICU::LEVEL::NONE);
+				icu_mgr::set_interrupt(CMT::CMI, nullptr, ICU::LEVEL::NONE);
 			    CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks));
 			}
 			CMT::enable();

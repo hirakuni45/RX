@@ -23,8 +23,8 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 		static constexpr auto VEC_DFI = ICU::VECTOR::PCDFI;		///< 受信データレディ割り込み
-		static constexpr auto VEC_FEI = ICU::VECTOR_BL0::PCFEI;	///< フレームエンド割り込み
-		static constexpr auto VEC_ERI = ICU::VECTOR_BL0::PCERI;	///< エラー割り込み
+		static constexpr auto VEC_FEI = ICU::GROUPBL0::PCFEI;	///< フレームエンド割り込み
+		static constexpr auto VEC_ERI = ICU::GROUPBL0::PCERI;	///< エラー割り込み
 
 		//-----------------------------------------------------------------//
 		/*!

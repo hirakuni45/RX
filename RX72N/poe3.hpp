@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72N ポートアウトプットイネーブル 3（POE3a）定義
+	@brief	RX72M/RX72N ポートアウトプットイネーブル 3（POE3a）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -22,10 +22,10 @@ namespace device {
 	struct poe3_t {
 
 		static constexpr auto PERIPHERAL = peripheral::POE3;	///< ペリフェラル型
-		static constexpr auto OEI1 = ICU::VECTOR_BL1::OEI1;		///< アウトプットイネーブル割り込み1
-		static constexpr auto OEI2 = ICU::VECTOR_BL1::OEI2;		///< アウトプットイネーブル割り込み2
-		static constexpr auto OEI3 = ICU::VECTOR_BL1::OEI3;		///< アウトプットイネーブル割り込み3
-		static constexpr auto OEI4 = ICU::VECTOR_BL1::OEI4;		///< アウトプットイネーブル割り込み4
+		static constexpr auto OEI1 = ICU::GROUPBL1::OEI1;		///< アウトプットイネーブル割り込み1
+		static constexpr auto OEI2 = ICU::GROUPBL1::OEI2;		///< アウトプットイネーブル割り込み2
+		static constexpr auto OEI3 = ICU::GROUPBL1::OEI3;		///< アウトプットイネーブル割り込み3
+		static constexpr auto OEI4 = ICU::GROUPBL1::OEI4;		///< アウトプットイネーブル割り込み4
 		static constexpr auto OEI5 = ICU::VECTOR::NONE;			///< アウトプットイネーブル割り込み5
 
 

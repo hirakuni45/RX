@@ -182,7 +182,6 @@ namespace device {
 		ICU::VECTOR, ICU::VECTOR::FERRF, ICU::VECTOR::MENDF, ICU::VECTOR::OVFF> CAC;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef cac_t<peripheral::CAC,
-		ICU::VECTOR_BL0,
-		ICU::VECTOR_BL0::FERRI, ICU::VECTOR_BL0::MENDI, ICU::VECTOR_BL0::OVFI> CAC;
+		ICU::GROUPBL0, ICU::GROUPBL0::FERRI, ICU::GROUPBL0::MENDI, ICU::GROUPBL0::OVFI> CAC;
 #endif
 }

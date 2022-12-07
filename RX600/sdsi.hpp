@@ -23,7 +23,7 @@ namespace device {
 		@param[in]	sbfai	バッファアクセス割り込み・ベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi>
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 sdioi>
 	struct sdsi_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
@@ -271,5 +271,5 @@ namespace device {
 
 	};
 
-	typedef sdsi_t<0x0009'5000, peripheral::SDSI, ICU::VECTOR_BL2::SDIOI> SDSI;
+	typedef sdsi_t<0x0009'5000, peripheral::SDSI, ICU::GROUPBL2::SDIOI> SDSI;
 }

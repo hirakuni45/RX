@@ -21,7 +21,7 @@ namespace device {
 		@param[in]	cmpi	CMP 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi>
 	struct s12adc_t {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
@@ -412,35 +412,35 @@ namespace device {
 		typedef rw16_t<base + 0x9E> ADCMPDR1_;
 		static  ADCMPDR1_ ADCMPDR1;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR0_ s12adc_t<base, per, cmpi>::ADDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR1_ s12adc_t<base, per, cmpi>::ADDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR2_ s12adc_t<base, per, cmpi>::ADDR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR3_ s12adc_t<base, per, cmpi>::ADDR3;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR4_ s12adc_t<base, per, cmpi>::ADDR4;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR5_ s12adc_t<base, per, cmpi>::ADDR5;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR6_ s12adc_t<base, per, cmpi>::ADDR6;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR7_ s12adc_t<base, per, cmpi>::ADDR7;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDBLDR_ s12adc_t<base, per, cmpi>::ADDBLDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDBLDRA_ s12adc_t<base, per, cmpi>::ADDBLDRA;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDBLDRB_ s12adc_t<base, per, cmpi>::ADDBLDRB;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADRD_ s12adc_t<base, per, cmpi>::ADRD;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCSR_ s12adc_t<base, per, cmpi>::ADCSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADADC_ s12adc_t<base, per, cmpi>::ADADC;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCER_ s12adc_t<base, per, cmpi>::ADCER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSTRGR_ s12adc_t<base, per, cmpi>::ADSTRGR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR0_ s12adc_t<base, per, cmpi>::ADSSTR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR1_ s12adc_t<base, per, cmpi>::ADSSTR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR2_ s12adc_t<base, per, cmpi>::ADSSTR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR3_ s12adc_t<base, per, cmpi>::ADSSTR3;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR4_ s12adc_t<base, per, cmpi>::ADSSTR4;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR5_ s12adc_t<base, per, cmpi>::ADSSTR5;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR6_ s12adc_t<base, per, cmpi>::ADSSTR6;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR7_ s12adc_t<base, per, cmpi>::ADSSTR7;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDISCR_ s12adc_t<base, per, cmpi>::ADDISCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADGSPCR_ s12adc_t<base, per, cmpi>::ADGSPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCMPCR_ s12adc_t<base, per, cmpi>::ADCMPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCMPDR0_ s12adc_t<base, per, cmpi>::ADCMPDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCMPDR1_ s12adc_t<base, per, cmpi>::ADCMPDR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR0_ s12adc_t<base, per, cmpi>::ADDR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR1_ s12adc_t<base, per, cmpi>::ADDR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR2_ s12adc_t<base, per, cmpi>::ADDR2;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR3_ s12adc_t<base, per, cmpi>::ADDR3;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR4_ s12adc_t<base, per, cmpi>::ADDR4;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR5_ s12adc_t<base, per, cmpi>::ADDR5;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR6_ s12adc_t<base, per, cmpi>::ADDR6;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDR7_ s12adc_t<base, per, cmpi>::ADDR7;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDBLDR_ s12adc_t<base, per, cmpi>::ADDBLDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDBLDRA_ s12adc_t<base, per, cmpi>::ADDBLDRA;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDBLDRB_ s12adc_t<base, per, cmpi>::ADDBLDRB;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADRD_ s12adc_t<base, per, cmpi>::ADRD;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCSR_ s12adc_t<base, per, cmpi>::ADCSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADADC_ s12adc_t<base, per, cmpi>::ADADC;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCER_ s12adc_t<base, per, cmpi>::ADCER;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSTRGR_ s12adc_t<base, per, cmpi>::ADSTRGR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR0_ s12adc_t<base, per, cmpi>::ADSSTR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR1_ s12adc_t<base, per, cmpi>::ADSSTR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR2_ s12adc_t<base, per, cmpi>::ADSSTR2;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR3_ s12adc_t<base, per, cmpi>::ADSSTR3;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR4_ s12adc_t<base, per, cmpi>::ADSSTR4;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR5_ s12adc_t<base, per, cmpi>::ADSSTR5;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR6_ s12adc_t<base, per, cmpi>::ADSSTR6;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADSSTR7_ s12adc_t<base, per, cmpi>::ADSSTR7;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADDISCR_ s12adc_t<base, per, cmpi>::ADDISCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADGSPCR_ s12adc_t<base, per, cmpi>::ADGSPCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCMPCR_ s12adc_t<base, per, cmpi>::ADCMPCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCMPDR0_ s12adc_t<base, per, cmpi>::ADCMPDR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12adc_t<base, per, cmpi>::ADCMPDR1_ s12adc_t<base, per, cmpi>::ADCMPDR1;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -451,7 +451,7 @@ namespace device {
 		@param[in]	cmpi	CMP 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi>
 	struct s12ad0_t : public s12adc_t<base, per, cmpi> {
 
 		typedef s12adc_t<base, per, cmpi> base_class;
@@ -785,18 +785,18 @@ namespace device {
 		typedef adcmpsr0_t<base + 0xA0>  ADCMPSR0_;
 		static  ADCMPSR0_ ADCMPSR0;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADDR_ s12ad0_t<base, per, cmpi>::ADDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADANSA0_ s12ad0_t<base, per, cmpi>::ADANSA0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADANSA_ s12ad0_t<base, per, cmpi>::ADANSA;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADANSB_ s12ad0_t<base, per, cmpi>::ADANSB;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADANSB0_ s12ad0_t<base, per, cmpi>::ADANSB0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADADS0_ s12ad0_t<base, per, cmpi>::ADADS0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADSSTR_ s12ad0_t<base, per, cmpi>::ADSSTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADSHCR_ s12ad0_t<base, per, cmpi>::ADSHCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADSHMSR_ s12ad0_t<base, per, cmpi>::ADSHMSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADCMPANSR0_ s12ad0_t<base, per, cmpi>::ADCMPANSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADCMPLR0_ s12ad0_t<base, per, cmpi>::ADCMPLR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADCMPSR0_ s12ad0_t<base, per, cmpi>::ADCMPSR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADDR_ s12ad0_t<base, per, cmpi>::ADDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADANSA0_ s12ad0_t<base, per, cmpi>::ADANSA0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADANSA_ s12ad0_t<base, per, cmpi>::ADANSA;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADANSB_ s12ad0_t<base, per, cmpi>::ADANSB;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADANSB0_ s12ad0_t<base, per, cmpi>::ADANSB0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADADS0_ s12ad0_t<base, per, cmpi>::ADADS0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADSSTR_ s12ad0_t<base, per, cmpi>::ADSSTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADSHCR_ s12ad0_t<base, per, cmpi>::ADSHCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADSHMSR_ s12ad0_t<base, per, cmpi>::ADSHMSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADCMPANSR0_ s12ad0_t<base, per, cmpi>::ADCMPANSR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADCMPLR0_ s12ad0_t<base, per, cmpi>::ADCMPLR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad0_t<base, per, cmpi>::ADCMPSR0_ s12ad0_t<base, per, cmpi>::ADCMPSR0;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -807,7 +807,7 @@ namespace device {
 		@param[in]	cmpi	CMP 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi>
 	struct s12ad1_t : public s12adc_t<base, per, cmpi> {
 
 		typedef s12adc_t<base,per, cmpi> base_class;
@@ -1598,46 +1598,46 @@ namespace device {
 		typedef adcmpser_t<base + 0xA4>  ADCMPSER_;
 		static  ADCMPSER_ ADCMPSER;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR8_ s12ad1_t<base, per, cmpi>::ADDR8;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR9_ s12ad1_t<base, per, cmpi>::ADDR9;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR10_ s12ad1_t<base, per, cmpi>::ADDR10;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR11_ s12ad1_t<base, per, cmpi>::ADDR11;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR12_ s12ad1_t<base, per, cmpi>::ADDR12;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR13_ s12ad1_t<base, per, cmpi>::ADDR13;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR14_ s12ad1_t<base, per, cmpi>::ADDR14;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR15_ s12ad1_t<base, per, cmpi>::ADDR15;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR16_ s12ad1_t<base, per, cmpi>::ADDR16;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR17_ s12ad1_t<base, per, cmpi>::ADDR17;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR18_ s12ad1_t<base, per, cmpi>::ADDR18;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR19_ s12ad1_t<base, per, cmpi>::ADDR19;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR20_ s12ad1_t<base, per, cmpi>::ADDR20;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADTSDR_ s12ad1_t<base, per, cmpi>::ADTSDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADOCDR_ s12ad1_t<base, per, cmpi>::ADOCDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR_ s12ad1_t<base, per, cmpi>::ADDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSA0_ s12ad1_t<base, per, cmpi>::ADANSA0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSA1_ s12ad1_t<base, per, cmpi>::ADANSA1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSA_ s12ad1_t<base, per, cmpi>::ADANSA;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSB0_ s12ad1_t<base, per, cmpi>::ADANSB0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSB_ s12ad1_t<base, per, cmpi>::ADANSB;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSB1_ s12ad1_t<base, per, cmpi>::ADANSB1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADADS0_ s12ad1_t<base, per, cmpi>::ADADS0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADADS1_ s12ad1_t<base, per, cmpi>::ADADS1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADEXICR_ s12ad1_t<base, per, cmpi>::ADEXICR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADSSTRL_ s12ad1_t<base, per, cmpi>::ADSSTRL;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADSSTRT_ s12ad1_t<base, per, cmpi>::ADSSTRT;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADSSTRO_ s12ad1_t<base, per, cmpi>::ADSSTRO;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADSSTR_ s12ad1_t<base, per, cmpi>::ADSSTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPANSR0_ s12ad1_t<base, per, cmpi>::ADCMPANSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPANSR1_ s12ad1_t<base, per, cmpi>::ADCMPANSR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPANSER_ s12ad1_t<base, per, cmpi>::ADCMPANSER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPLR0_ s12ad1_t<base, per, cmpi>::ADCMPLR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPLR1_ s12ad1_t<base, per, cmpi>::ADCMPLR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPLER_ s12ad1_t<base, per, cmpi>::ADCMPLER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPSR0_ s12ad1_t<base, per, cmpi>::ADCMPSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPSR1_ s12ad1_t<base, per, cmpi>::ADCMPSR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPSER_ s12ad1_t<base, per, cmpi>::ADCMPSER;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR8_ s12ad1_t<base, per, cmpi>::ADDR8;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR9_ s12ad1_t<base, per, cmpi>::ADDR9;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR10_ s12ad1_t<base, per, cmpi>::ADDR10;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR11_ s12ad1_t<base, per, cmpi>::ADDR11;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR12_ s12ad1_t<base, per, cmpi>::ADDR12;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR13_ s12ad1_t<base, per, cmpi>::ADDR13;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR14_ s12ad1_t<base, per, cmpi>::ADDR14;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR15_ s12ad1_t<base, per, cmpi>::ADDR15;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR16_ s12ad1_t<base, per, cmpi>::ADDR16;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR17_ s12ad1_t<base, per, cmpi>::ADDR17;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR18_ s12ad1_t<base, per, cmpi>::ADDR18;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR19_ s12ad1_t<base, per, cmpi>::ADDR19;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR20_ s12ad1_t<base, per, cmpi>::ADDR20;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADTSDR_ s12ad1_t<base, per, cmpi>::ADTSDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADOCDR_ s12ad1_t<base, per, cmpi>::ADOCDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADDR_ s12ad1_t<base, per, cmpi>::ADDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSA0_ s12ad1_t<base, per, cmpi>::ADANSA0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSA1_ s12ad1_t<base, per, cmpi>::ADANSA1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSA_ s12ad1_t<base, per, cmpi>::ADANSA;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSB0_ s12ad1_t<base, per, cmpi>::ADANSB0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSB_ s12ad1_t<base, per, cmpi>::ADANSB;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADANSB1_ s12ad1_t<base, per, cmpi>::ADANSB1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADADS0_ s12ad1_t<base, per, cmpi>::ADADS0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADADS1_ s12ad1_t<base, per, cmpi>::ADADS1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADEXICR_ s12ad1_t<base, per, cmpi>::ADEXICR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADSSTRL_ s12ad1_t<base, per, cmpi>::ADSSTRL;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADSSTRT_ s12ad1_t<base, per, cmpi>::ADSSTRT;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADSSTRO_ s12ad1_t<base, per, cmpi>::ADSSTRO;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADSSTR_ s12ad1_t<base, per, cmpi>::ADSSTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPANSR0_ s12ad1_t<base, per, cmpi>::ADCMPANSR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPANSR1_ s12ad1_t<base, per, cmpi>::ADCMPANSR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPANSER_ s12ad1_t<base, per, cmpi>::ADCMPANSER;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPLR0_ s12ad1_t<base, per, cmpi>::ADCMPLR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPLR1_ s12ad1_t<base, per, cmpi>::ADCMPLR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPLER_ s12ad1_t<base, per, cmpi>::ADCMPLER;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPSR0_ s12ad1_t<base, per, cmpi>::ADCMPSR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPSR1_ s12ad1_t<base, per, cmpi>::ADCMPSR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cmpi> typename s12ad1_t<base, per, cmpi>::ADCMPSER_ s12ad1_t<base, per, cmpi>::ADCMPSER;
 
 
-	typedef s12ad0_t<0x00089000, peripheral::S12AD,  ICU::VECTOR_BL1::S12CMPAI>   S12AD;
-	typedef s12ad1_t<0x00089100, peripheral::S12AD1, ICU::VECTOR_BL1::S12CMPAI1>  S12AD1;
+	typedef s12ad0_t<0x00089000, peripheral::S12AD,  ICU::GROUPBL1::S12CMPAI>   S12AD;
+	typedef s12ad1_t<0x00089100, peripheral::S12AD1, ICU::GROUPBL1::S12CMPAI1>  S12AD1;
 }

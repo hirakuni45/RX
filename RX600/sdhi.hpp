@@ -23,7 +23,7 @@ namespace device {
 		@param[in]	sbfai	バッファアクセス割り込み・ベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	struct sdhi_t {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
@@ -518,82 +518,82 @@ namespace device {
 		static SDSWAP_ SDSWAP;
 	};
 	typedef sdhi_t<0x0008'AC00, peripheral::SDHI,
-		ICU::VECTOR_BL1::CDETI, ICU::VECTOR_BL1::CACI, ICU::VECTOR_BL1::SDACI,
+		ICU::GROUPBL1::CDETI, ICU::GROUPBL1::CACI, ICU::GROUPBL1::SDACI,
 		ICU::VECTOR::SBFAI> SDHI;
 
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDCMD_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDCMD;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDARG_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDARG;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTOP_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTOP;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDBLKCNT_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDBLKCNT;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP10_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP10;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP32_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP32;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP54_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP54;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP76_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP76;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTS1_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTS1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTS2_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTS2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIMSK1_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIMSK1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIMSK2_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIMSK2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDCLKCR_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDCLKCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSIZE_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSIZE;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDOPT_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDOPT;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDERSTS1_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDERSTS1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDERSTS2_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDERSTS2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDBUFR_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDBUFR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOMD_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOMD;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOSTS_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOSTS;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOIMSK_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOIMSK;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDDMAEN_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDDMAEN;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRST_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRST;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDVER_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDVER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 cdeti, ICU::GROUPBL1 caci, ICU::GROUPBL1 sdaci, ICU::VECTOR sbfai>
 	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSWAP_
 	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSWAP;
 }

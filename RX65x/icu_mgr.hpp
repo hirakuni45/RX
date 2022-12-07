@@ -21,12 +21,12 @@ namespace device {
 	template <class _>
 	class icu_mgr_ {
 
-		typedef icu_utils::dispatch<ICU::VECTOR_BE0> GROUPBE0_dispatch_t;
-		typedef icu_utils::dispatch<ICU::VECTOR_BL0> GROUPBL0_dispatch_t;
-		typedef icu_utils::dispatch<ICU::VECTOR_BL1> GROUPBL1_dispatch_t;
-		typedef icu_utils::dispatch<ICU::VECTOR_BL2> GROUPBL2_dispatch_t;
-		typedef icu_utils::dispatch<ICU::VECTOR_AL0> GROUPAL0_dispatch_t;
-		typedef icu_utils::dispatch<ICU::VECTOR_AL1> GROUPAL1_dispatch_t;
+		typedef icu_utils::dispatch<ICU::GROUPBE0> GROUPBE0_dispatch_t;
+		typedef icu_utils::dispatch<ICU::GROUPBL0> GROUPBL0_dispatch_t;
+		typedef icu_utils::dispatch<ICU::GROUPBL1> GROUPBL1_dispatch_t;
+		typedef icu_utils::dispatch<ICU::GROUPBL2> GROUPBL2_dispatch_t;
+		typedef icu_utils::dispatch<ICU::GROUPAL0> GROUPAL0_dispatch_t;
+		typedef icu_utils::dispatch<ICU::GROUPAL1> GROUPAL1_dispatch_t;
 
 		static GROUPBE0_dispatch_t GROUPBE0_dispatch_;
 		static GROUPBL0_dispatch_t GROUPBL0_dispatch_;
@@ -101,9 +101,9 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA sel, icu_utils::ITASK task, ICU::LEVEL lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::SELECTA sel, icu_utils::ITASK task, ICU::LEVEL lvl) noexcept
 		{
-			return icu_utils::set_interruptSELA<ICU, ICU::VECTOR_SELA, 208, 255>(sel, task, lvl);
+			return icu_utils::set_interruptSELA<ICU, ICU::SELECTA, 208, 255>(sel, task, lvl);
 		}
 
 
@@ -116,9 +116,9 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELB sel, icu_utils::ITASK task, ICU::LEVEL lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::SELECTB sel, icu_utils::ITASK task, ICU::LEVEL lvl) noexcept
 		{
-			return icu_utils::set_interruptSELB<ICU, ICU::VECTOR_SELB, 128, 207>(sel, task, lvl);
+			return icu_utils::set_interruptSELB<ICU, ICU::SELECTB, 128, 207>(sel, task, lvl);
 		}
 
 
@@ -180,7 +180,7 @@ namespace device {
 			@brief  グループ割り込み BE0 に対するベクタを返す
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR_BE0 vec) noexcept {
+		static ICU::VECTOR get_group_vector(ICU::GROUPBE0 vec) noexcept {
 			return ICU::VECTOR::GROUPBE0;
 		}
 
@@ -190,7 +190,7 @@ namespace device {
 			@brief  グループ割り込み BL2 に対するベクタを返す
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR_BL2 vec) noexcept {
+		static ICU::VECTOR get_group_vector(ICU::GROUPBL2 vec) noexcept {
 			return ICU::VECTOR::GROUPBL2;
 		}
 
@@ -200,7 +200,7 @@ namespace device {
 			@brief  グループ割り込み BL0 に対するベクタを返す
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR_BL0 vec) noexcept {
+		static ICU::VECTOR get_group_vector(ICU::GROUPBL0 vec) noexcept {
 			return ICU::VECTOR::GROUPBL0;
 		}
 
@@ -210,7 +210,7 @@ namespace device {
 			@brief  グループ割り込み BL1 に対するベクタを返す
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR_BL1 vec) noexcept {
+		static ICU::VECTOR get_group_vector(ICU::GROUPBL1 vec) noexcept {
 			return ICU::VECTOR::GROUPBL1;
 		}
 
@@ -220,7 +220,7 @@ namespace device {
 			@brief  グループ割り込み AL0 に対するベクタを返す
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR_AL0 vec) noexcept {
+		static ICU::VECTOR get_group_vector(ICU::GROUPAL0 vec) noexcept {
 			return ICU::VECTOR::GROUPAL0;
 		}
 
@@ -230,7 +230,7 @@ namespace device {
 			@brief  グループ割り込み AL1 に対するベクタを返す
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static ICU::VECTOR get_group_vector(ICU::VECTOR_AL1 vec) noexcept {
+		static ICU::VECTOR get_group_vector(ICU::GROUPAL1 vec) noexcept {
 			return ICU::VECTOR::GROUPAL1;
 		}
 
@@ -323,7 +323,7 @@ namespace device {
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
-		static void install_group_task(ICU::VECTOR_BE0 grpv, icu_utils::GTASK task) noexcept
+		static void install_group_task(ICU::GROUPBE0 grpv, icu_utils::GTASK task) noexcept
 		{
 			ICU::GENBE0.set(grpv, false);
 			set_task(get_group_vector(grpv), group_be0_handler_);
@@ -342,7 +342,7 @@ namespace device {
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
-		static void install_group_task(ICU::VECTOR_BL0 grpv, icu_utils::GTASK task) noexcept
+		static void install_group_task(ICU::GROUPBL0 grpv, icu_utils::GTASK task) noexcept
 		{
 			ICU::GENBL0.set(grpv, false);
 			set_task(get_group_vector(grpv), group_bl0_handler_);
@@ -361,7 +361,7 @@ namespace device {
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
-		static void install_group_task(ICU::VECTOR_BL1 grpv, icu_utils::GTASK task) noexcept
+		static void install_group_task(ICU::GROUPBL1 grpv, icu_utils::GTASK task) noexcept
 		{
 			ICU::GENBL1.set(grpv, false);
 			set_task(get_group_vector(grpv), group_bl1_handler_);
@@ -380,7 +380,7 @@ namespace device {
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
-		static void install_group_task(ICU::VECTOR_BL2 grpv, icu_utils::GTASK task) noexcept
+		static void install_group_task(ICU::GROUPBL2 grpv, icu_utils::GTASK task) noexcept
 		{
 			ICU::GENBL2.set(grpv, false);
 			set_task(get_group_vector(grpv), group_bl2_handler_);
@@ -399,7 +399,7 @@ namespace device {
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
-		static void install_group_task(ICU::VECTOR_AL0 grpv, icu_utils::GTASK task) noexcept
+		static void install_group_task(ICU::GROUPAL0 grpv, icu_utils::GTASK task) noexcept
 		{
 			ICU::GENAL0.set(grpv, false);
 			set_task(get_group_vector(grpv), group_al0_handler_);
@@ -418,7 +418,7 @@ namespace device {
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 		*/
 		//-----------------------------------------------------------------//
-		static void install_group_task(ICU::VECTOR_AL1 grpv, icu_utils::GTASK task) noexcept
+		static void install_group_task(ICU::GROUPAL1 grpv, icu_utils::GTASK task) noexcept
 		{
 			ICU::GENAL1.set(grpv, false);
 			set_task(get_group_vector(grpv), group_al1_handler_);
@@ -440,7 +440,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_BE0 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::GROUPBE0 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
 		{
 			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPBE0) < lvl) {
@@ -461,7 +461,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL0 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::GROUPBL0 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
 		{
 			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPBL0) < lvl) {
@@ -482,7 +482,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL1 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::GROUPBL1 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
 		{
 			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPBL1) < lvl) {
@@ -503,7 +503,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_BL2 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::GROUPBL2 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
 		{
 			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPBL2) < lvl) {
@@ -524,7 +524,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_AL0 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::GROUPAL0 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
 		{
 			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPAL0) < lvl) {
@@ -545,7 +545,7 @@ namespace device {
 			@return ベクター番号
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_AL1 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::GROUPAL1 grpv, icu_utils::GTASK task, ICU::LEVEL lvl) noexcept
 		{
 			install_group_task(grpv, task);
 			if(get_level(ICU::VECTOR::GROUPAL1) < lvl) {

@@ -21,7 +21,7 @@ namespace device {
 		@param[in]	bvec	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec>
 	struct s12adf_t {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
@@ -508,41 +508,41 @@ namespace device {
 		typedef adsampr_t<base + 0x63>  ADSAMPR_;
 		static  ADSAMPR_ ADSAMPR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR0_ s12adf_t<base, per, avec, bvec>::ADDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR1_ s12adf_t<base, per, avec, bvec>::ADDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR2_ s12adf_t<base, per, avec, bvec>::ADDR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR3_ s12adf_t<base, per, avec, bvec>::ADDR3;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR4_ s12adf_t<base, per, avec, bvec>::ADDR4;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR5_ s12adf_t<base, per, avec, bvec>::ADDR5;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR6_ s12adf_t<base, per, avec, bvec>::ADDR6;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR7_ s12adf_t<base, per, avec, bvec>::ADDR7;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDBLDR_ s12adf_t<base, per, avec, bvec>::ADDBLDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDBLDRA_ s12adf_t<base, per, avec, bvec>::ADDBLDRA;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDBLDRB_ s12adf_t<base, per, avec, bvec>::ADDBLDRB;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADRD_ s12adf_t<base, per, avec, bvec>::ADRD;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCSR_ s12adf_t<base, per, avec, bvec>::ADCSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADADC_ s12adf_t<base, per, avec, bvec>::ADADC;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCER_ s12adf_t<base, per, avec, bvec>::ADCER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSTRGR_ s12adf_t<base, per, avec, bvec>::ADSTRGR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADGCTRGR_ s12adf_t<base, per, avec, bvec>::ADGCTRGR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR0_ s12adf_t<base, per, avec, bvec>::ADSSTR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR1_ s12adf_t<base, per, avec, bvec>::ADSSTR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR2_ s12adf_t<base, per, avec, bvec>::ADSSTR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR3_ s12adf_t<base, per, avec, bvec>::ADSSTR3;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR4_ s12adf_t<base, per, avec, bvec>::ADSSTR4;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR5_ s12adf_t<base, per, avec, bvec>::ADSSTR5;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR6_ s12adf_t<base, per, avec, bvec>::ADSSTR6;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR7_ s12adf_t<base, per, avec, bvec>::ADSSTR7;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDISCR_ s12adf_t<base, per, avec, bvec>::ADDISCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADGSPCR_ s12adf_t<base, per, avec, bvec>::ADGSPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCMPCR_ s12adf_t<base, per, avec, bvec>::ADCMPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCMPDR0_ s12adf_t<base, per, avec, bvec>::ADCMPDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCMPDR1_ s12adf_t<base, per, avec, bvec>::ADCMPDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADWINMON_ s12adf_t<base, per, avec, bvec>::ADWINMON;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADWINLLB_ s12adf_t<base, per, avec, bvec>::ADWINLLB;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADWINULB_ s12adf_t<base, per, avec, bvec>::ADWINULB;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSAM_ s12adf_t<base, per, avec, bvec>::ADSAM;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSAMPR_ s12adf_t<base, per, avec, bvec>::ADSAMPR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR0_ s12adf_t<base, per, avec, bvec>::ADDR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR1_ s12adf_t<base, per, avec, bvec>::ADDR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR2_ s12adf_t<base, per, avec, bvec>::ADDR2;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR3_ s12adf_t<base, per, avec, bvec>::ADDR3;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR4_ s12adf_t<base, per, avec, bvec>::ADDR4;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR5_ s12adf_t<base, per, avec, bvec>::ADDR5;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR6_ s12adf_t<base, per, avec, bvec>::ADDR6;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR7_ s12adf_t<base, per, avec, bvec>::ADDR7;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDBLDR_ s12adf_t<base, per, avec, bvec>::ADDBLDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDBLDRA_ s12adf_t<base, per, avec, bvec>::ADDBLDRA;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDBLDRB_ s12adf_t<base, per, avec, bvec>::ADDBLDRB;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADRD_ s12adf_t<base, per, avec, bvec>::ADRD;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCSR_ s12adf_t<base, per, avec, bvec>::ADCSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADADC_ s12adf_t<base, per, avec, bvec>::ADADC;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCER_ s12adf_t<base, per, avec, bvec>::ADCER;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSTRGR_ s12adf_t<base, per, avec, bvec>::ADSTRGR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADGCTRGR_ s12adf_t<base, per, avec, bvec>::ADGCTRGR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR0_ s12adf_t<base, per, avec, bvec>::ADSSTR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR1_ s12adf_t<base, per, avec, bvec>::ADSSTR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR2_ s12adf_t<base, per, avec, bvec>::ADSSTR2;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR3_ s12adf_t<base, per, avec, bvec>::ADSSTR3;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR4_ s12adf_t<base, per, avec, bvec>::ADSSTR4;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR5_ s12adf_t<base, per, avec, bvec>::ADSSTR5;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR6_ s12adf_t<base, per, avec, bvec>::ADSSTR6;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSSTR7_ s12adf_t<base, per, avec, bvec>::ADSSTR7;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDISCR_ s12adf_t<base, per, avec, bvec>::ADDISCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADGSPCR_ s12adf_t<base, per, avec, bvec>::ADGSPCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCMPCR_ s12adf_t<base, per, avec, bvec>::ADCMPCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCMPDR0_ s12adf_t<base, per, avec, bvec>::ADCMPDR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADCMPDR1_ s12adf_t<base, per, avec, bvec>::ADCMPDR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADWINMON_ s12adf_t<base, per, avec, bvec>::ADWINMON;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADWINLLB_ s12adf_t<base, per, avec, bvec>::ADWINLLB;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADWINULB_ s12adf_t<base, per, avec, bvec>::ADWINULB;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSAM_ s12adf_t<base, per, avec, bvec>::ADSAM;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSAMPR_ s12adf_t<base, per, avec, bvec>::ADSAMPR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -554,7 +554,7 @@ namespace device {
 		@param[in]	bvec	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec>
 	struct s12adf0_t : public s12adf_t<base, per, avec, bvec> {
 
 		typedef s12adf_t<base, per, avec, bvec> base_class;
@@ -987,22 +987,22 @@ namespace device {
 		typedef adcmpbsr_t<base + 0xAC>  ADCMPBSR_;
 		static  ADCMPBSR_ ADCMPBSR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADDR_ s12adf0_t<base, per, avec, bvec>::ADDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSA0_ s12adf0_t<base, per, avec, bvec>::ADANSA0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSB0_ s12adf0_t<base, per, avec, bvec>::ADANSB0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSC0_ s12adf0_t<base, per, avec, bvec>::ADANSC0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSA_ s12adf0_t<base, per, avec, bvec>::ADANSA;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSB_ s12adf0_t<base, per, avec, bvec>::ADANSB;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSC_ s12adf0_t<base, per, avec, bvec>::ADANSC;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADADS0_ s12adf0_t<base, per, avec, bvec>::ADADS0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADSSTR_ s12adf0_t<base, per, avec, bvec>::ADSSTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADSHCR_ s12adf0_t<base, per, avec, bvec>::ADSHCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADSHMSR_ s12adf0_t<base, per, avec, bvec>::ADSHMSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPANSR0_ s12adf0_t<base, per, avec, bvec>::ADCMPANSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPLR0_ s12adf0_t<base, per, avec, bvec>::ADCMPLR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPSR0_ s12adf0_t<base, per, avec, bvec>::ADCMPSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPBNSR_ s12adf0_t<base, per, avec, bvec>::ADCMPBNSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPBSR_ s12adf0_t<base, per, avec, bvec>::ADCMPBSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADDR_ s12adf0_t<base, per, avec, bvec>::ADDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSA0_ s12adf0_t<base, per, avec, bvec>::ADANSA0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSB0_ s12adf0_t<base, per, avec, bvec>::ADANSB0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSC0_ s12adf0_t<base, per, avec, bvec>::ADANSC0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSA_ s12adf0_t<base, per, avec, bvec>::ADANSA;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSB_ s12adf0_t<base, per, avec, bvec>::ADANSB;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSC_ s12adf0_t<base, per, avec, bvec>::ADANSC;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADADS0_ s12adf0_t<base, per, avec, bvec>::ADADS0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADSSTR_ s12adf0_t<base, per, avec, bvec>::ADSSTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADSHCR_ s12adf0_t<base, per, avec, bvec>::ADSHCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADSHMSR_ s12adf0_t<base, per, avec, bvec>::ADSHMSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPANSR0_ s12adf0_t<base, per, avec, bvec>::ADCMPANSR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPLR0_ s12adf0_t<base, per, avec, bvec>::ADCMPLR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPSR0_ s12adf0_t<base, per, avec, bvec>::ADCMPSR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPBNSR_ s12adf0_t<base, per, avec, bvec>::ADCMPBNSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPBSR_ s12adf0_t<base, per, avec, bvec>::ADCMPBSR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1014,7 +1014,7 @@ namespace device {
 		@param[in]	bvec	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec>
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec>
 	struct s12adf1_t : public s12adf_t<base, per, avec, bvec> {
 
 		typedef s12adf_t<base, per, avec, bvec> base_class;
@@ -2051,61 +2051,61 @@ namespace device {
 		typedef adcmpbsr_t<base + 0xAC>  ADCMPBSR_;
 		static  ADCMPBSR_ ADCMPBSR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR8_  s12adf1_t<base, per, avec, bvec>::ADDR8;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR9_  s12adf1_t<base, per, avec, bvec>::ADDR9;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR10_ s12adf1_t<base, per, avec, bvec>::ADDR10;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR11_ s12adf1_t<base, per, avec, bvec>::ADDR11;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR12_ s12adf1_t<base, per, avec, bvec>::ADDR12;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR13_ s12adf1_t<base, per, avec, bvec>::ADDR13;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR14_ s12adf1_t<base, per, avec, bvec>::ADDR14;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR15_ s12adf1_t<base, per, avec, bvec>::ADDR15;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR16_ s12adf1_t<base, per, avec, bvec>::ADDR16;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR17_ s12adf1_t<base, per, avec, bvec>::ADDR17;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR18_ s12adf1_t<base, per, avec, bvec>::ADDR18;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR19_ s12adf1_t<base, per, avec, bvec>::ADDR19;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR20_ s12adf1_t<base, per, avec, bvec>::ADDR20;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADTSDR_ s12adf1_t<base, per, avec, bvec>::ADTSDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADOCDR_ s12adf1_t<base, per, avec, bvec>::ADOCDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR_   s12adf1_t<base, per, avec, bvec>::ADDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSA0_ s12adf1_t<base, per, avec, bvec>::ADANSA0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSA1_ s12adf1_t<base, per, avec, bvec>::ADANSA1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSB0_ s12adf1_t<base, per, avec, bvec>::ADANSB0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSB1_ s12adf1_t<base, per, avec, bvec>::ADANSB1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSC0_ s12adf1_t<base, per, avec, bvec>::ADANSC0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSC1_ s12adf1_t<base, per, avec, bvec>::ADANSC1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSA_  s12adf1_t<base, per, avec, bvec>::ADANSA;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSB_  s12adf1_t<base, per, avec, bvec>::ADANSB;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSC_  s12adf1_t<base, per, avec, bvec>::ADANSC;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADADS0_  s12adf1_t<base, per, avec, bvec>::ADADS0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADADS1_  s12adf1_t<base, per, avec, bvec>::ADADS1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADEXICR_ s12adf1_t<base, per, avec, bvec>::ADEXICR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADGCEXCR_ s12adf1_t<base, per, avec, bvec>::ADGCEXCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTRL_  s12adf1_t<base, per, avec, bvec>::ADSSTRL;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTRT_  s12adf1_t<base, per, avec, bvec>::ADSSTRT;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTRO_  s12adf1_t<base, per, avec, bvec>::ADSSTRO;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR8_  s12adf1_t<base, per, avec, bvec>::ADSSTR8;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR9_  s12adf1_t<base, per, avec, bvec>::ADSSTR9;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR10_ s12adf1_t<base, per, avec, bvec>::ADSSTR10;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR11_ s12adf1_t<base, per, avec, bvec>::ADSSTR11;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR12_ s12adf1_t<base, per, avec, bvec>::ADSSTR12;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR13_ s12adf1_t<base, per, avec, bvec>::ADSSTR13;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR14_ s12adf1_t<base, per, avec, bvec>::ADSSTR14;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR15_ s12adf1_t<base, per, avec, bvec>::ADSSTR15;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR_   s12adf1_t<base, per, avec, bvec>::ADSSTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPANSR0_ s12adf1_t<base, per, avec, bvec>::ADCMPANSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPANSR1_ s12adf1_t<base, per, avec, bvec>::ADCMPANSR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPANSER_ s12adf1_t<base, per, avec, bvec>::ADCMPANSER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPLR0_ s12adf1_t<base, per, avec, bvec>::ADCMPLR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPLR1_ s12adf1_t<base, per, avec, bvec>::ADCMPLR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPLER_ s12adf1_t<base, per, avec, bvec>::ADCMPLER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPSR0_ s12adf1_t<base, per, avec, bvec>::ADCMPSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPSR1_ s12adf1_t<base, per, avec, bvec>::ADCMPSR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPSER_ s12adf1_t<base, per, avec, bvec>::ADCMPSER;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPBNSR_ s12adf1_t<base, per, avec, bvec>::ADCMPBNSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPBSR_ s12adf1_t<base, per, avec, bvec>::ADCMPBSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR8_  s12adf1_t<base, per, avec, bvec>::ADDR8;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR9_  s12adf1_t<base, per, avec, bvec>::ADDR9;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR10_ s12adf1_t<base, per, avec, bvec>::ADDR10;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR11_ s12adf1_t<base, per, avec, bvec>::ADDR11;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR12_ s12adf1_t<base, per, avec, bvec>::ADDR12;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR13_ s12adf1_t<base, per, avec, bvec>::ADDR13;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR14_ s12adf1_t<base, per, avec, bvec>::ADDR14;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR15_ s12adf1_t<base, per, avec, bvec>::ADDR15;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR16_ s12adf1_t<base, per, avec, bvec>::ADDR16;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR17_ s12adf1_t<base, per, avec, bvec>::ADDR17;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR18_ s12adf1_t<base, per, avec, bvec>::ADDR18;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR19_ s12adf1_t<base, per, avec, bvec>::ADDR19;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR20_ s12adf1_t<base, per, avec, bvec>::ADDR20;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADTSDR_ s12adf1_t<base, per, avec, bvec>::ADTSDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADOCDR_ s12adf1_t<base, per, avec, bvec>::ADOCDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR_   s12adf1_t<base, per, avec, bvec>::ADDR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSA0_ s12adf1_t<base, per, avec, bvec>::ADANSA0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSA1_ s12adf1_t<base, per, avec, bvec>::ADANSA1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSB0_ s12adf1_t<base, per, avec, bvec>::ADANSB0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSB1_ s12adf1_t<base, per, avec, bvec>::ADANSB1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSC0_ s12adf1_t<base, per, avec, bvec>::ADANSC0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSC1_ s12adf1_t<base, per, avec, bvec>::ADANSC1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSA_  s12adf1_t<base, per, avec, bvec>::ADANSA;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSB_  s12adf1_t<base, per, avec, bvec>::ADANSB;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADANSC_  s12adf1_t<base, per, avec, bvec>::ADANSC;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADADS0_  s12adf1_t<base, per, avec, bvec>::ADADS0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADADS1_  s12adf1_t<base, per, avec, bvec>::ADADS1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADEXICR_ s12adf1_t<base, per, avec, bvec>::ADEXICR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADGCEXCR_ s12adf1_t<base, per, avec, bvec>::ADGCEXCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTRL_  s12adf1_t<base, per, avec, bvec>::ADSSTRL;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTRT_  s12adf1_t<base, per, avec, bvec>::ADSSTRT;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTRO_  s12adf1_t<base, per, avec, bvec>::ADSSTRO;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR8_  s12adf1_t<base, per, avec, bvec>::ADSSTR8;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR9_  s12adf1_t<base, per, avec, bvec>::ADSSTR9;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR10_ s12adf1_t<base, per, avec, bvec>::ADSSTR10;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR11_ s12adf1_t<base, per, avec, bvec>::ADSSTR11;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR12_ s12adf1_t<base, per, avec, bvec>::ADSSTR12;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR13_ s12adf1_t<base, per, avec, bvec>::ADSSTR13;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR14_ s12adf1_t<base, per, avec, bvec>::ADSSTR14;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR15_ s12adf1_t<base, per, avec, bvec>::ADSSTR15;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADSSTR_   s12adf1_t<base, per, avec, bvec>::ADSSTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPANSR0_ s12adf1_t<base, per, avec, bvec>::ADCMPANSR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPANSR1_ s12adf1_t<base, per, avec, bvec>::ADCMPANSR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPANSER_ s12adf1_t<base, per, avec, bvec>::ADCMPANSER;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPLR0_ s12adf1_t<base, per, avec, bvec>::ADCMPLR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPLR1_ s12adf1_t<base, per, avec, bvec>::ADCMPLR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPLER_ s12adf1_t<base, per, avec, bvec>::ADCMPLER;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPSR0_ s12adf1_t<base, per, avec, bvec>::ADCMPSR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPSR1_ s12adf1_t<base, per, avec, bvec>::ADCMPSR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPSER_ s12adf1_t<base, per, avec, bvec>::ADCMPSER;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPBNSR_ s12adf1_t<base, per, avec, bvec>::ADCMPBNSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL1 avec, ICU::GROUPBL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPBSR_ s12adf1_t<base, per, avec, bvec>::ADCMPBSR;
 
 	typedef s12adf0_t<0x0008'9000, peripheral::S12AD,
-		ICU::VECTOR_BL1::S12CMPAI,  ICU::VECTOR_BL1::S12CMPBI>   S12AD;
+		ICU::GROUPBL1::S12CMPAI,  ICU::GROUPBL1::S12CMPBI>   S12AD;
 	typedef s12adf1_t<0x0008'9100, peripheral::S12AD1,
-		ICU::VECTOR_BL1::S12CMPAI1, ICU::VECTOR_BL1::S12CMPBI1>  S12AD1;
+		ICU::GROUPBL1::S12CMPAI1, ICU::GROUPBL1::S12CMPBI1>  S12AD1;
 }

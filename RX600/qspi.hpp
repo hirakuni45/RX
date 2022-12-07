@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -22,7 +22,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		ICU::VECTOR_BL0 sslv>
+		ICU::GROUPBL0 sslv>
 	struct qspi_t {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
@@ -390,29 +390,29 @@ namespace device {
 		typedef spbmul_t<0x1C> SPBMUL_;
 		static SPBMUL_ SPBMUL;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCR_ qspi_t<base, per, txv, rxv, sslv>::SPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SSLP_ qspi_t<base, per, txv, rxv, sslv>::SSLP;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPPCR_ qspi_t<base, per, txv, rxv, sslv>::SPPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSR_ qspi_t<base, per, txv, rxv, sslv>::SPSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR32_ qspi_t<base, per, txv, rxv, sslv>::SPDR32;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR16_ qspi_t<base, per, txv, rxv, sslv>::SPDR16;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR8_ qspi_t<base, per, txv, rxv, sslv>::SPDR8;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSCR_ qspi_t<base, per, txv, rxv, sslv>::SPSCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSSR_ qspi_t<base, per, txv, rxv, sslv>::SPSSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBR_ qspi_t<base, per, txv, rxv, sslv>::SPBR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDCR_ qspi_t<base, per, txv, rxv, sslv>::SPDCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCKD_ qspi_t<base, per, txv, rxv, sslv>::SPCKD;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SSLND_ qspi_t<base, per, txv, rxv, sslv>::SSLND;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPND_ qspi_t<base, per, txv, rxv, sslv>::SPND;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD_ qspi_t<base, per, txv, rxv, sslv>::SPCMD;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBFCR_ qspi_t<base, per, txv, rxv, sslv>::SPBFCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBDCR_ qspi_t<base, per, txv, rxv, sslv>::SPBDCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL0_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL0;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL1_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL2_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL3_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL3;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCR_ qspi_t<base, per, txv, rxv, sslv>::SPCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SSLP_ qspi_t<base, per, txv, rxv, sslv>::SSLP;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPPCR_ qspi_t<base, per, txv, rxv, sslv>::SPPCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSR_ qspi_t<base, per, txv, rxv, sslv>::SPSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR32_ qspi_t<base, per, txv, rxv, sslv>::SPDR32;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR16_ qspi_t<base, per, txv, rxv, sslv>::SPDR16;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR8_ qspi_t<base, per, txv, rxv, sslv>::SPDR8;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSCR_ qspi_t<base, per, txv, rxv, sslv>::SPSCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSSR_ qspi_t<base, per, txv, rxv, sslv>::SPSSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBR_ qspi_t<base, per, txv, rxv, sslv>::SPBR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDCR_ qspi_t<base, per, txv, rxv, sslv>::SPDCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCKD_ qspi_t<base, per, txv, rxv, sslv>::SPCKD;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SSLND_ qspi_t<base, per, txv, rxv, sslv>::SSLND;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPND_ qspi_t<base, per, txv, rxv, sslv>::SPND;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD_ qspi_t<base, per, txv, rxv, sslv>::SPCMD;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBFCR_ qspi_t<base, per, txv, rxv, sslv>::SPBFCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBDCR_ qspi_t<base, per, txv, rxv, sslv>::SPBDCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL0_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL0;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL1_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL1;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL2_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL2;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL3_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL3;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPBL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL;
 
 	typedef qspi_t<0x00089E00, peripheral::QSPI, ICU::VECTOR::SPTI, ICU::VECTOR::SPRI,
-		ICU::VECTOR_BL0::QSPSSLI>  QSPI;
+		ICU::GROUPBL0::QSPSSLI>  QSPI;
 }

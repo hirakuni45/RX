@@ -250,7 +250,7 @@ namespace device {
 			@brief  GROUP0 ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_GROUP0 : uint8_t {
+		enum class GROUP0 : uint8_t {
 			ERS1 = 1,	///< CAN1
 			NUM_ = 1
 		};
@@ -261,7 +261,7 @@ namespace device {
 			@brief  GROUP12 ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_GROUP12 : uint8_t {
+		enum class GROUP12 : uint8_t {
 			ERI0 = 0,	///< SCI0
 			ERI1,		///< SCI1
 			ERI2,		///< SCI2
@@ -399,7 +399,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef grp_t<0x0008'C300, VECTOR_GROUP0> GRP00_;
+		typedef grp_t<0x0008'C300, GROUP0> GRP00_;
 		static GRP00_ GRP00;
 
 
@@ -409,7 +409,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef grp_t<0x0008'C330, VECTOR_GROUP12> GRP12_;
+		typedef grp_t<0x0008'C330, GROUP12> GRP12_;
 		static GRP12_ GRP12;
 
 
@@ -419,7 +419,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gen_t<0x0008'C340, VECTOR_GROUP0> GEN00_;
+		typedef gen_t<0x0008'C340, GROUP0> GEN00_;
 		static GEN00_ GEN00;
 
 
@@ -429,7 +429,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gen_t<0x0008'C370, VECTOR_GROUP12> GEN12_;
+		typedef gen_t<0x0008'C370, GROUP12> GEN12_;
 		static GEN12_ GEN12;
 
 
@@ -439,7 +439,7 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gcr_t<0x0008'C380, VECTOR_GROUP0> GCR00_;
+		typedef gcr_t<0x0008'C380, GROUP0> GCR00_;
 		static GCR00_ GCR00;
 	};
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;

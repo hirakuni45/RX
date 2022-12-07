@@ -254,9 +254,9 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb,
-		ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd,
-		ICU::VECTOR_SELB intrv, ICU::VECTOR_SELB intru>
+		ICU::SELECTB intra, ICU::SELECTB intrb,
+		ICU::SELECTB intrc, ICU::SELECTB intrd,
+		ICU::SELECTB intrv, ICU::SELECTB intru>
 	struct tpu_x_t : public tpu_base_t<base> {
 
 		typedef tpu_base_t<base> BASE;
@@ -339,15 +339,15 @@ namespace device {
 		}
 	};
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
 		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL_
 		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
 		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC_
 		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
 		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD_
 		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
 
@@ -366,9 +366,9 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb,
-		ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd,
-		ICU::VECTOR_SELB intrv, ICU::VECTOR_SELB intru>
+		ICU::SELECTB intra, ICU::SELECTB intrb,
+		ICU::SELECTB intrc, ICU::SELECTB intrd,
+		ICU::SELECTB intrv, ICU::SELECTB intru>
 	struct tpu_y_t : public tpu_base_t<base> {
 
 		typedef tpu_base_t<base> BASE;
@@ -454,41 +454,41 @@ namespace device {
 		}
 	};
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
 		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL_
 		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
 		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC_
 		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB intra, ICU::VECTOR_SELB intrb, ICU::VECTOR_SELB intrc, ICU::VECTOR_SELB intrd, ICU::VECTOR_SELB intru, ICU::VECTOR_SELB intrv>
+		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
 		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD_
 		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
 
 
 	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
-		ICU::VECTOR_SELB::TGI0A, ICU::VECTOR_SELB::TGI0B,
-		ICU::VECTOR_SELB::TGI0C, ICU::VECTOR_SELB::TGI0D,
-		ICU::VECTOR_SELB::TGI0V, ICU::VECTOR_SELB::NONE>  TPU0;
+		ICU::SELECTB::TGI0A, ICU::SELECTB::TGI0B,
+		ICU::SELECTB::TGI0C, ICU::SELECTB::TGI0D,
+		ICU::SELECTB::TGI0V, ICU::SELECTB::NONE>  TPU0;
 	typedef tpu_y_t<0x0008'8120, peripheral::TPU1,
-		ICU::VECTOR_SELB::TGI1A, ICU::VECTOR_SELB::TGI1B,
-		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
-		ICU::VECTOR_SELB::TGI1V, ICU::VECTOR_SELB::TGI1U> TPU1;
+		ICU::SELECTB::TGI1A, ICU::SELECTB::TGI1B,
+		ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB::TGI1V, ICU::SELECTB::TGI1U> TPU1;
 	typedef tpu_y_t<0x0008'8130, peripheral::TPU2,
-		ICU::VECTOR_SELB::TGI2A, ICU::VECTOR_SELB::TGI2B,
-		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
-		ICU::VECTOR_SELB::TGI2V, ICU::VECTOR_SELB::TGI2U> TPU2;
+		ICU::SELECTB::TGI2A, ICU::SELECTB::TGI2B,
+		ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB::TGI2V, ICU::SELECTB::TGI2U> TPU2;
 	typedef tpu_x_t<0x0008'8140, peripheral::TPU3,
-		ICU::VECTOR_SELB::TGI3A, ICU::VECTOR_SELB::TGI3B,
-		ICU::VECTOR_SELB::TGI3C, ICU::VECTOR_SELB::TGI3D,
-		ICU::VECTOR_SELB::TGI3V, ICU::VECTOR_SELB::NONE>  TPU3;
+		ICU::SELECTB::TGI3A, ICU::SELECTB::TGI3B,
+		ICU::SELECTB::TGI3C, ICU::SELECTB::TGI3D,
+		ICU::SELECTB::TGI3V, ICU::SELECTB::NONE>  TPU3;
 	typedef tpu_y_t<0x0008'8150, peripheral::TPU4,
-		ICU::VECTOR_SELB::TGI4A, ICU::VECTOR_SELB::TGI4B,
-		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
-		ICU::VECTOR_SELB::TGI4V, ICU::VECTOR_SELB::TGI4U> TPU4;
+		ICU::SELECTB::TGI4A, ICU::SELECTB::TGI4B,
+		ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB::TGI4V, ICU::SELECTB::TGI4U> TPU4;
 	typedef tpu_y_t<0x0008'8160, peripheral::TPU5,
-		ICU::VECTOR_SELB::TGI5A, ICU::VECTOR_SELB::TGI5B,
-		ICU::VECTOR_SELB::NONE,  ICU::VECTOR_SELB::NONE,
-		ICU::VECTOR_SELB::TGI5V, ICU::VECTOR_SELB::TGI5U> TPU5;
+		ICU::SELECTB::TGI5A, ICU::SELECTB::TGI5B,
+		ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB::TGI5V, ICU::SELECTB::TGI5U> TPU5;
 }
