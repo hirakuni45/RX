@@ -24,7 +24,7 @@ namespace device {
 		@param[in]	cmpbi	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 	struct s12adh_t {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
@@ -816,107 +816,107 @@ namespace device {
 		typedef rw16_t<base + 0xAA> ADWINULB_;
 		static  ADWINULB_ ADWINULB;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR1_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR2_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR3_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR3;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR4_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR4;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR5_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR5;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR6_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR6;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR7_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR7;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDBLDR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDBLDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDBLDRA_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDBLDRA;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDBLDRB_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDBLDRB;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADRD_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADRD;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCSR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADANSA0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSA0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADANSB0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSB0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADANSC0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSC0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS1_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS2_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS2;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS3_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS3;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS4_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS4;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS5_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS5;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS6_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS6;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS7_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS7;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADADS0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADADS0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADADC_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADADC;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCER_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCER;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSTRGR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSTRGR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADGCTRGR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADGCTRGR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR1_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR2_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR3_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR3;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR4_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR4;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR5_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR5;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR6_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR6;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR7_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR7;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDISCR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDISCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADELCCR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADELCCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADGSPCR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADGSPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPCR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPDR0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPDR1_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPANSR0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPANSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPLR0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPLR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPSR0_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPSR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADWINMON_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADWINMON;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPBNSR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPBNSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPBSR_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPBSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADWINLLB_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADWINLLB;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12adh_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADWINULB_ s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADWINULB;
 
 
@@ -932,7 +932,7 @@ namespace device {
 		@param[in]	cmpbi	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 	struct s12ad_t : public s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> {
 
 		static constexpr uint32_t UNIT_NO = 0;		///< 変換ユニット番号
@@ -1222,25 +1222,25 @@ namespace device {
 		typedef adpgadcr0_t<base + 0x1B0>  ADPGADCR0_;
 		static  ADPGADCR0_ ADPGADCR0;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSA_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSA;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSB_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSB;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSC_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSC;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSHCR_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSHCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSHMSR_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSHMSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGACR_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGACR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGAGS0_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGAGS0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGADCR0_ s12ad_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGADCR0;
 
 
@@ -1256,7 +1256,7 @@ namespace device {
 		@param[in]	cmpbi	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 	struct s12ad1_t : public s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> {
 
 		static constexpr uint32_t UNIT_NO = 1;		///< 変換ユニット番号
@@ -1553,25 +1553,25 @@ namespace device {
 		typedef adpgadcr0_t<base + 0x1B0>  ADPGADCR0_;
 		static  ADPGADCR0_ ADPGADCR0;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSA_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSA;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSB_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSB;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSC_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSC;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSHCR_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSHCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSHMSR_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSHMSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGACR_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGACR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGAGS0_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGAGS0;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGADCR0_ s12ad1_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADPGADCR0;
 
 
@@ -1587,7 +1587,7 @@ namespace device {
 		@param[in]	cmpbi	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 	struct s12ad2_t : public s12adh_t<base, per, vec, gbi, gci, cmpai, cmpbi> {
 
 		static constexpr uint32_t UNIT_NO = 2;		///< 変換ユニット番号
@@ -2319,92 +2319,92 @@ namespace device {
 		typedef advmono_t<base + 0x1E4>  ADVMONO_;
 		static  ADVMONO_ ADVMONO;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR8_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR8;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR9_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR9;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR10_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR10;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR11_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR11;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR16_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR16;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR17_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR17;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADTSDR_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADTSDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADOCDR_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADOCDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADDR_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADANSA1_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSA1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADANSB1_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSB1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADANSC1_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSC1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSA_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSA;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSB_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSB;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSC_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADANSC;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS8_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS8;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS9_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS9;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS10_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS10;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS11_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS11;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS12_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS12;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSCS13_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSCS13;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADADS1_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADADS1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADEXICR_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADEXICR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADGCEXCR_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADGCEXCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR8_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR8;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR9_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR9;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR10_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR10;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR11_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR11;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTRL_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTRL;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTRT_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTRT;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTRO_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTRO;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADSSTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPANSR1_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPANSR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPANSER_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPANSER;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPLR1_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPLR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPLER_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPLER;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPSR1_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPSR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADCMPSER_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADCMPSER;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADVMONCR_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADVMONCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::VECTOR_BL1 cmpai, ICU::VECTOR_BL1 cmpbi>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec, ICU::VECTOR gbi, ICU::VECTOR gci, ICU::GROUPBL1 cmpai, ICU::GROUPBL1 cmpbi>
 		typename s12ad2_t<base,per, vec, gbi, gci, cmpai, cmpbi>::ADVMONO_ s12ad2_t<base, per, vec, gbi, gci, cmpai, cmpbi>::ADVMONO;
 
 
 	typedef s12ad_t<0x00089000, peripheral::S12AD,
-		ICU::VECTOR::S12ADI,  ICU::VECTOR::S12GBADI,  ICU::VECTOR::S12GCADI,  ICU::VECTOR_BL1::S12CMPAI,  ICU::VECTOR_BL1::S12CMPBI>  S12AD;
+		ICU::VECTOR::S12ADI,  ICU::VECTOR::S12GBADI,  ICU::VECTOR::S12GCADI,  ICU::GROUPBL1::S12CMPAI,  ICU::GROUPBL1::S12CMPBI>  S12AD;
 	typedef s12ad1_t<0x00089200, peripheral::S12AD1,
-		ICU::VECTOR::S12ADI1, ICU::VECTOR::S12GBADI1, ICU::VECTOR::S12GCADI1, ICU::VECTOR_BL1::S12CMPAI1, ICU::VECTOR_BL1::S12CMPBI1> S12AD1;
+		ICU::VECTOR::S12ADI1, ICU::VECTOR::S12GBADI1, ICU::VECTOR::S12GCADI1, ICU::GROUPBL1::S12CMPAI1, ICU::GROUPBL1::S12CMPBI1> S12AD1;
 	typedef s12ad2_t<0x00089400, peripheral::S12AD2,
-		ICU::VECTOR::S12ADI2, ICU::VECTOR::S12GBADI2, ICU::VECTOR::S12GCADI2, ICU::VECTOR_BL1::S12CMPAI2, ICU::VECTOR_BL1::S12CMPBI2> S12AD2;
+		ICU::VECTOR::S12ADI2, ICU::VECTOR::S12GBADI2, ICU::VECTOR::S12GCADI2, ICU::GROUPBL1::S12CMPAI2, ICU::GROUPBL1::S12CMPBI2> S12AD2;
 }
