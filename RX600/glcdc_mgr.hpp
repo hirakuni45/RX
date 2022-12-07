@@ -1606,9 +1606,9 @@ namespace device {
 			if(!ctrl_blk_.is_entry) {
 				icu_mgr::set_level(ICU::VECTOR::GROUPAL1, intr_lvl_);
 				if(intr_lvl_ != ICU::LEVEL::NONE) {
-					icu_mgr::install_group_task(ICU::VECTOR_AL1::VPOS,  line_detect_isr_);
-					icu_mgr::install_group_task(ICU::VECTOR_AL1::GR1UF, underflow_1_isr_);
-					icu_mgr::install_group_task(ICU::VECTOR_AL1::GR2UF, underflow_2_isr_);
+					icu_mgr::install_group_task(ICU::GROUPAL1::VPOS,  line_detect_isr_);
+					icu_mgr::install_group_task(ICU::GROUPAL1::GR1UF, underflow_1_isr_);
+					icu_mgr::install_group_task(ICU::GROUPAL1::GR2UF, underflow_2_isr_);
 				}
 				ctrl_blk_.is_entry = true;
 			}

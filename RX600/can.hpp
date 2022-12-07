@@ -864,7 +864,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::VECTOR_GROUP0 ers>
+		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::GROUP0 ers>
 	struct can_norm_t : can_t<base, per> {
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
@@ -876,7 +876,7 @@ namespace device {
 	};
 	typedef can_norm_t<0x0009'1200, peripheral::CAN1,
 		ICU::VECTOR::RXF1, ICU::VECTOR::TXF1,
-		ICU::VECTOR::RXM1, ICU::VECTOR::TXM1, ICU::VECTOR_GROUP0::ERS1> CAN1;
+		ICU::VECTOR::RXM1, ICU::VECTOR::TXM1, ICU::GROUP0::ERS1> CAN1;
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -920,7 +920,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::VECTOR_BE0 ers>
+		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::GROUPBE0 ers>
 	struct can_norm_t : can_t<base, per> {
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
@@ -932,7 +932,7 @@ namespace device {
 	};
 	typedef can_norm_t<0x0009'0200, peripheral::CAN0,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
-		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
+		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::GROUPBE0::ERS0> CAN0;
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -948,7 +948,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB rxf, ICU::VECTOR_SELB txf, ICU::VECTOR_SELB rxm, ICU::VECTOR_SELB txm, ICU::VECTOR_BE0 ers>
+		ICU::SELECTB rxf, ICU::SELECTB txf, ICU::SELECTB rxm, ICU::SELECTB txm, ICU::GROUPBE0 ers>
 	struct can_seli_t : can_t<base, per> {
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
@@ -960,17 +960,17 @@ namespace device {
 	};
 
 	typedef can_seli_t<0x0009'0200, peripheral::CAN0,
-		ICU::VECTOR_SELB::RXF0, ICU::VECTOR_SELB::TXF0,
-		ICU::VECTOR_SELB::RXM0, ICU::VECTOR_SELB::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
+		ICU::SELECTB::RXF0, ICU::SELECTB::TXF0,
+		ICU::SELECTB::RXM0, ICU::SELECTB::TXM0, ICU::GROUPBE0::ERS0> CAN0;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef can_seli_t<0x0009'1200, peripheral::CAN1,
-		ICU::VECTOR_SELB::RXF1, ICU::VECTOR_SELB::TXF1,
-		ICU::VECTOR_SELB::RXM1, ICU::VECTOR_SELB::TXM1, ICU::VECTOR_BE0::ERS1> CAN1;
+		ICU::SELECTB::RXF1, ICU::SELECTB::TXF1,
+		ICU::SELECTB::RXM1, ICU::SELECTB::TXM1, ICU::GROUPBE0::ERS1> CAN1;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef can_seli_t<0x0009'2200, peripheral::CAN2,
-		ICU::VECTOR_SELB::RXF2, ICU::VECTOR_SELB::TXF2,
-		ICU::VECTOR_SELB::RXM2, ICU::VECTOR_SELB::TXM2, ICU::VECTOR_BE0::ERS2> CAN2;
+		ICU::SELECTB::RXF2, ICU::SELECTB::TXF2,
+		ICU::SELECTB::RXM2, ICU::SELECTB::TXM2, ICU::GROUPBE0::ERS2> CAN2;
 #endif
 #endif
 // note: RX65x/RX72x CAN0, CAN1

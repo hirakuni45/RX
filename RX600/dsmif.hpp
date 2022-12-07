@@ -23,7 +23,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi>
+		ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi>
 	struct dsmif_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
@@ -197,32 +197,32 @@ namespace device {
 		typedef rw32_t<base + 0x4C> OCDR2_;
 		static  OCDR2_ OCDR2;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::DSCR_ dsmif_t<base, per, ocdi, sumei, scdi>::DSCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::DSSR_ dsmif_t<base, per, ocdi, sumei, scdi>::DSSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::OCLTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::OCHTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SCLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SCLTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SCHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SCHTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SUMLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SUMLTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SUMHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SUMHTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR0;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR1;
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR2;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::DSCR_ dsmif_t<base, per, ocdi, sumei, scdi>::DSCR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::DSSR_ dsmif_t<base, per, ocdi, sumei, scdi>::DSSR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::OCLTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::OCHTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SCLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SCLTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SCHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SCHTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SUMLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SUMLTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SUMHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SUMHTR;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR2;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR2;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR2;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR0;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR1;
+	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR2;
 
 
 	typedef dsmif_t<0x000A'0700, peripheral::DSMIF0,
-		ICU::VECTOR_BL2::OCDI0, ICU::VECTOR_BL2::SUMEI0, ICU::VECTOR_BL2::SCDI0> DSMIF0;
+		ICU::GROUPBL2::OCDI0, ICU::GROUPBL2::SUMEI0, ICU::GROUPBL2::SCDI0> DSMIF0;
 	typedef dsmif_t<0x000A'0780, peripheral::DSMIF1,
-		ICU::VECTOR_BL2::OCDI1, ICU::VECTOR_BL2::SUMEI1, ICU::VECTOR_BL2::SCDI1> DSMIF1;
+		ICU::GROUPBL2::OCDI1, ICU::GROUPBL2::SUMEI1, ICU::GROUPBL2::SCDI1> DSMIF1;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

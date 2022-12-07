@@ -100,12 +100,12 @@ namespace device {
 		@param[in]	vec		割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL0 vec>
+	template <uint32_t base, peripheral per, ICU::GROUPBL0 vec>
 	struct doc_gbl0_t : public doc_t<base, per> {
 
 		static constexpr auto I_VEC = vec;	///< 割り込みベクター
 
 	};
-	typedef doc_gbl0_t<0x0008'B080, peripheral::DOC, ICU::VECTOR_BL0::DOPCI> DOC;
+	typedef doc_gbl0_t<0x0008'B080, peripheral::DOC, ICU::GROUPBL0::DOPCI> DOC;
 #endif
 }

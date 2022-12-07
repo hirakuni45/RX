@@ -23,7 +23,7 @@ namespace device {
 	struct drw2d_t {
 
 		static constexpr auto PERIPHERAL = per;					///< ペリフェラル型
-		static constexpr auto IVEC = ICU::VECTOR_AL1::DRW_IRQ;	///< 割り込みベクター
+		static constexpr auto IVEC = ICU::GROUPAL1::DRW_IRQ;	///< 割り込みベクター
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -682,7 +682,6 @@ namespace device {
 	template <uint32_t base, peripheral per> typename drw2d_t<base, per>::PERFTRG_ drw2d_t<base, per>::PERFTRG;
 	template <uint32_t base, peripheral per> typename drw2d_t<base, per>::PERFCNT1_ drw2d_t<base, per>::PERFCNT1;
 	template <uint32_t base, peripheral per> typename drw2d_t<base, per>::PERFCNT2_ drw2d_t<base, per>::PERFCNT2;
-
 
 	typedef drw2d_t<0x000E'3000, peripheral::DRW2D> DRW2D;
 }

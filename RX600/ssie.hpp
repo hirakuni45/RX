@@ -24,7 +24,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 	struct ssie_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
@@ -223,49 +223,48 @@ namespace device {
 		typedef ssiscr_t<base + 0x24> SSISCR_;
 		static SSISCR_ SSISCR;
 	};
-
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSICR_ ssie_t<base, per, txi, rxi, ssie>::SSICR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSISR_ ssie_t<base, per, txi, rxi, ssie>::SSISR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIFCR_ ssie_t<base, per, txi, rxi, ssie>::SSIFCR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIFSR_ ssie_t<base, per, txi, rxi, ssie>::SSIFSR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIFTDR32_ ssie_t<base, per, txi, rxi, ssie>::SSIFTDR32;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIFTDR16_ ssie_t<base, per, txi, rxi, ssie>::SSIFTDR16;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIFTDR8_ ssie_t<base, per, txi, rxi, ssie>::SSIFTDR8;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIFRDR32_ ssie_t<base, per, txi, rxi, ssie>::SSIFRDR32;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIFRDR16_ ssie_t<base, per, txi, rxi, ssie>::SSIFRDR16;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIFRDR8_ ssie_t<base, per, txi, rxi, ssie>::SSIFRDR8;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSIOFR_ ssie_t<base, per, txi, rxi, ssie>::SSIOFR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
 		typename ssie_t<base, per, txi, rxi, ssie>::SSISCR_ ssie_t<base, per, txi, rxi, ssie>::SSISCR;
 
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef ssie_t<0x0008'A500, peripheral::SSIE0,
-		ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR_BL1::SSIF0> SSIE0;
+		ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::GROUPBL1::SSIF0> SSIE0;
 	typedef ssie_t<0x0008'A540, peripheral::SSIE1,
-		ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1, ICU::VECTOR_BL1::SSIF1> SSIE1;
+		ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1, ICU::GROUPBL1::SSIF1> SSIE1;
 #endif
 }

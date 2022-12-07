@@ -31,9 +31,9 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	struct gptw_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
@@ -1079,337 +1079,337 @@ namespace device {
 		static GTSECR_ GTSECR;
 	};
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTWP_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTWP; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSTR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSTR; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSTP_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSTP; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCLR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCLR; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSSR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSSR; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPSR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPSR; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCSR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCSR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTUPSR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTUPSR; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDNSR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDNSR; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTICASR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTICASR; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTICBSR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTICBSR; 
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTUDDTYC_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTUDDTYC;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTIOR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTIOR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTINTAD_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTINTAD;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTST_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTST;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTBER_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTBER;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTITC_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTITC;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCNT_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCNT;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRA_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRA;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRB_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRB;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRC_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRC;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRD_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRD;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRE_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRE;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRF_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRF;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPBR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPBR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPDBR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPDBR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTRA_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTRA;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTRB_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTRB;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTBRA_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTBRA;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTBRB_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTBRB;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTDBRA_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTDBRA;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTDBRB_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTDBRB;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDTCR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDTCR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDVU_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDVU;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDVD_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDVD;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDBU_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDBU;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDBD_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDBD;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSOS_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSOS;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSOTR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSOTR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADSMR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADSMR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITC_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITC;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLI1_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLI1;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLI2_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLI2;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLB_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLB;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECSR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECSR;
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
-		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
-		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
+		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
+		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
+		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR;
 
 #if defined(SIG_RX72N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) 
 	typedef gptw_t<0x000C'2000, peripheral::GPTW0,
-		ICU::VECTOR_SELA::GTCIA0, ICU::VECTOR_SELA::GTCIB0, ICU::VECTOR_SELA::GTCIC0,
-		ICU::VECTOR_SELA::GTCID0, ICU::VECTOR_SELA::GDTE0,  ICU::VECTOR_SELA::GTCIE0,
-		ICU::VECTOR_SELA::GTCIF0, ICU::VECTOR_SELA::GTCIV0, ICU::VECTOR_SELA::GTCIU0> GPTW0;
+		ICU::SELECTA::GTCIA0, ICU::SELECTA::GTCIB0, ICU::SELECTA::GTCIC0,
+		ICU::SELECTA::GTCID0, ICU::SELECTA::GDTE0,  ICU::SELECTA::GTCIE0,
+		ICU::SELECTA::GTCIF0, ICU::SELECTA::GTCIV0, ICU::SELECTA::GTCIU0> GPTW0;
 	typedef gptw_t<0x000C'2100, peripheral::GPTW1,
-		ICU::VECTOR_SELA::GTCIA1, ICU::VECTOR_SELA::GTCIB1, ICU::VECTOR_SELA::GTCIC1,
-		ICU::VECTOR_SELA::GTCID1, ICU::VECTOR_SELA::GDTE1,  ICU::VECTOR_SELA::GTCIE1,
-		ICU::VECTOR_SELA::GTCIF1, ICU::VECTOR_SELA::GTCIV1, ICU::VECTOR_SELA::GTCIU1> GPTW1;
+		ICU::SELECTA::GTCIA1, ICU::SELECTA::GTCIB1, ICU::SELECTA::GTCIC1,
+		ICU::SELECTA::GTCID1, ICU::SELECTA::GDTE1,  ICU::SELECTA::GTCIE1,
+		ICU::SELECTA::GTCIF1, ICU::SELECTA::GTCIV1, ICU::SELECTA::GTCIU1> GPTW1;
 	typedef gptw_t<0x000C'2200, peripheral::GPTW2,
-		ICU::VECTOR_SELA::GTCIA2, ICU::VECTOR_SELA::GTCIB2, ICU::VECTOR_SELA::GTCIC2,
-		ICU::VECTOR_SELA::GTCID2, ICU::VECTOR_SELA::GDTE2,  ICU::VECTOR_SELA::GTCIE2,
-		ICU::VECTOR_SELA::GTCIF2, ICU::VECTOR_SELA::GTCIV2, ICU::VECTOR_SELA::GTCIU2> GPTW2;
+		ICU::SELECTA::GTCIA2, ICU::SELECTA::GTCIB2, ICU::SELECTA::GTCIC2,
+		ICU::SELECTA::GTCID2, ICU::SELECTA::GDTE2,  ICU::SELECTA::GTCIE2,
+		ICU::SELECTA::GTCIF2, ICU::SELECTA::GTCIV2, ICU::SELECTA::GTCIU2> GPTW2;
 	typedef gptw_t<0x000C'2300, peripheral::GPTW3,
-		ICU::VECTOR_SELA::GTCIA3, ICU::VECTOR_SELA::GTCIB3, ICU::VECTOR_SELA::GTCIC3,
-		ICU::VECTOR_SELA::GTCID3, ICU::VECTOR_SELA::GDTE3,  ICU::VECTOR_SELA::GTCIE3,
-		ICU::VECTOR_SELA::GTCIF3, ICU::VECTOR_SELA::GTCIV3, ICU::VECTOR_SELA::GTCIU3> GPTW3;
+		ICU::SELECTA::GTCIA3, ICU::SELECTA::GTCIB3, ICU::SELECTA::GTCIC3,
+		ICU::SELECTA::GTCID3, ICU::SELECTA::GDTE3,  ICU::SELECTA::GTCIE3,
+		ICU::SELECTA::GTCIF3, ICU::SELECTA::GTCIV3, ICU::SELECTA::GTCIU3> GPTW3;
 #endif
 
 #if defined(SIG_RX66T) || defined(SIG_RX72T) 
 	typedef gptw_t<0x000C'2400, peripheral::GPTW4,
-		ICU::VECTOR_SELA::GTCIA4, ICU::VECTOR_SELA::GTCIB4, ICU::VECTOR_SELA::GTCIC4,
-		ICU::VECTOR_SELA::GTCID4, ICU::VECTOR_SELA::GDTE4,  ICU::VECTOR_SELA::GTCIE4,
-		ICU::VECTOR_SELA::GTCIF4, ICU::VECTOR_SELA::GTCIV4, ICU::VECTOR_SELA::GTCIU4> GPTW4;
+		ICU::SELECTA::GTCIA4, ICU::SELECTA::GTCIB4, ICU::SELECTA::GTCIC4,
+		ICU::SELECTA::GTCID4, ICU::SELECTA::GDTE4,  ICU::SELECTA::GTCIE4,
+		ICU::SELECTA::GTCIF4, ICU::SELECTA::GTCIV4, ICU::SELECTA::GTCIU4> GPTW4;
 	typedef gptw_t<0x000C'2500, peripheral::GPTW5,
-		ICU::VECTOR_SELA::GTCIA5, ICU::VECTOR_SELA::GTCIB5, ICU::VECTOR_SELA::GTCIC5,
-		ICU::VECTOR_SELA::GTCID5, ICU::VECTOR_SELA::GDTE5,  ICU::VECTOR_SELA::GTCIE5,
-		ICU::VECTOR_SELA::GTCIF5, ICU::VECTOR_SELA::GTCIV5, ICU::VECTOR_SELA::GTCIU5> GPTW5;
+		ICU::SELECTA::GTCIA5, ICU::SELECTA::GTCIB5, ICU::SELECTA::GTCIC5,
+		ICU::SELECTA::GTCID5, ICU::SELECTA::GDTE5,  ICU::SELECTA::GTCIE5,
+		ICU::SELECTA::GTCIF5, ICU::SELECTA::GTCIV5, ICU::SELECTA::GTCIU5> GPTW5;
 	typedef gptw_t<0x000C'2600, peripheral::GPTW6,
-		ICU::VECTOR_SELA::GTCIA6, ICU::VECTOR_SELA::GTCIB6, ICU::VECTOR_SELA::GTCIC6,
-		ICU::VECTOR_SELA::GTCID6, ICU::VECTOR_SELA::GDTE6,  ICU::VECTOR_SELA::GTCIE6,
-		ICU::VECTOR_SELA::GTCIF6, ICU::VECTOR_SELA::GTCIV6, ICU::VECTOR_SELA::GTCIU6> GPTW6;
+		ICU::SELECTA::GTCIA6, ICU::SELECTA::GTCIB6, ICU::SELECTA::GTCIC6,
+		ICU::SELECTA::GTCID6, ICU::SELECTA::GDTE6,  ICU::SELECTA::GTCIE6,
+		ICU::SELECTA::GTCIF6, ICU::SELECTA::GTCIV6, ICU::SELECTA::GTCIU6> GPTW6;
 	typedef gptw_t<0x000C'2700, peripheral::GPTW7,
-		ICU::VECTOR_SELA::GTCIA7, ICU::VECTOR_SELA::GTCIB7, ICU::VECTOR_SELA::GTCIC7,
-		ICU::VECTOR_SELA::GTCID7, ICU::VECTOR_SELA::GDTE7,  ICU::VECTOR_SELA::GTCIE7,
-		ICU::VECTOR_SELA::GTCIF7, ICU::VECTOR_SELA::GTCIV7, ICU::VECTOR_SELA::GTCIU7> GPTW7;
+		ICU::SELECTA::GTCIA7, ICU::SELECTA::GTCIB7, ICU::SELECTA::GTCIC7,
+		ICU::SELECTA::GTCID7, ICU::SELECTA::GDTE7,  ICU::SELECTA::GTCIE7,
+		ICU::SELECTA::GTCIF7, ICU::SELECTA::GTCIV7, ICU::SELECTA::GTCIU7> GPTW7;
 	typedef gptw_t<0x000C'2800, peripheral::GPTW8,
-		ICU::VECTOR_SELA::GTCIA8, ICU::VECTOR_SELA::GTCIB8, ICU::VECTOR_SELA::GTCIC8,
-		ICU::VECTOR_SELA::GTCID8, ICU::VECTOR_SELA::GDTE8,  ICU::VECTOR_SELA::GTCIE8,
-		ICU::VECTOR_SELA::GTCIF8, ICU::VECTOR_SELA::GTCIV8, ICU::VECTOR_SELA::GTCIU8> GPTW8;
+		ICU::SELECTA::GTCIA8, ICU::SELECTA::GTCIB8, ICU::SELECTA::GTCIC8,
+		ICU::SELECTA::GTCID8, ICU::SELECTA::GDTE8,  ICU::SELECTA::GTCIE8,
+		ICU::SELECTA::GTCIF8, ICU::SELECTA::GTCIV8, ICU::SELECTA::GTCIU8> GPTW8;
 	typedef gptw_t<0x000C'2900, peripheral::GPTW9,
-		ICU::VECTOR_SELA::GTCIA9, ICU::VECTOR_SELA::GTCIB9, ICU::VECTOR_SELA::GTCIC9,
-		ICU::VECTOR_SELA::GTCID9, ICU::VECTOR_SELA::GDTE9,  ICU::VECTOR_SELA::GTCIE9,
-		ICU::VECTOR_SELA::GTCIF9, ICU::VECTOR_SELA::GTCIV9, ICU::VECTOR_SELA::GTCIU9> GPTW9;
+		ICU::SELECTA::GTCIA9, ICU::SELECTA::GTCIB9, ICU::SELECTA::GTCIC9,
+		ICU::SELECTA::GTCID9, ICU::SELECTA::GDTE9,  ICU::SELECTA::GTCIE9,
+		ICU::SELECTA::GTCIF9, ICU::SELECTA::GTCIV9, ICU::SELECTA::GTCIU9> GPTW9;
 #endif
 }
