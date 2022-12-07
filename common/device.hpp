@@ -3,8 +3,9 @@
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー @n
 			RX220 @n
-			RX63T @n
 			RX621/RX62N @n
+			RX631/RX63N @n
+			RX63T @n
 			RX24T @n
 			RX64M @n
 			RX71M @n
@@ -31,6 +32,25 @@
 
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX621) || defined(SIG_RX62N)
+#include "RX62x/clock_profile.hpp"
+#include "RX62x/peripheral.hpp"
+#include "RX62x/system.hpp"
+#include "RX62x/power_mgr.hpp"
+#include "RX62x/icu.hpp"
+#include "RX62x/icu_mgr.hpp"
+#include "RX62x/port_map.hpp"
+#include "RX62x/port_map_mtu.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX631) || defined(SIG_RX63N)
+#include "RX63x/clock_profile.hpp"
+#include "RX63x/peripheral.hpp"
+
+#include "RX63x/power_mgr.hpp"
+
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX63T)
 #include "RX63T/clock_profile.hpp"
 #include "RX63T/peripheral.hpp"
@@ -41,17 +61,6 @@
 #include "RX63T/port_map.hpp"
 #include "RX63T/port_map_mtu.hpp"
 #include "RX63T/port_map_gpt.hpp"
-#include "RX600/rx_dsp_inst.h"
-
-#elif defined(SIG_RX621) || defined(SIG_RX62N)
-#include "RX62x/clock_profile.hpp"
-#include "RX62x/peripheral.hpp"
-#include "RX62x/system.hpp"
-#include "RX62x/power_mgr.hpp"
-#include "RX62x/icu.hpp"
-#include "RX62x/icu_mgr.hpp"
-#include "RX62x/port_map.hpp"
-#include "RX62x/port_map_mtu.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX24T)
