@@ -290,7 +290,7 @@ namespace device {
 			@brief  選択型割り込みＢ要因・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_SELB : uint8_t {
+		enum class SELECTB : uint8_t {
 			NONE = 0,	///< 要因無し
 
 			CMI2 = 1,	///< CMT2
@@ -374,7 +374,7 @@ namespace device {
 			@brief  選択型割り込みＡ要因・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_SELA : uint8_t {
+		enum class SELECTA : uint8_t {
 			NONE = 0,	///< 要因無し
 
 			TGIA0 = 1,	///< MTU0（TGRAのインプットキャプチャ /コンペアマッチ）
@@ -436,7 +436,7 @@ namespace device {
 			@brief  GROUPBE0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BE0 : uint8_t {
+		enum class GROUPBE0 : uint8_t {
 			ERS0 = 0,	///< CAN0 / ERS0
 			ERS1,		///< CAN1 / ERS1
 			NUM_ = 2
@@ -448,7 +448,7 @@ namespace device {
 			@brief  GROUPBL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL0 : uint8_t {
+		enum class GROUPBL0 : uint8_t {
 			TEI0 = 0,	///< SCI0 / TEI0（送信完了）
 			ERI0,	///< SCI0 / ERI0（受信エラー）
 			TEI1,	///< SCI1 / TEI1（送信完了）
@@ -489,7 +489,7 @@ namespace device {
 			@brief  GROUPBL1・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL1 : uint8_t {
+		enum class GROUPBL1 : uint8_t {
 			CDETI = 3,		///< SDHI / CDETI
 			CACI,			///< SDHI / CACI
 			SDACI,			///< SDHI / SDACI
@@ -524,7 +524,7 @@ namespace device {
 			@brief  GROUPBL2・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL2 : uint8_t {
+		enum class GROUPBL2 : uint8_t {
 			SDIOI = 0,	///< SDSI / SDIOI
 			NUM_ = 1
 		};
@@ -535,7 +535,7 @@ namespace device {
 			@brief  GROUPAL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_AL0 : uint8_t {
+		enum class GROUPAL0 : uint8_t {
 			TEI10 = 8,		///< SCI10 / TEI10
 			ERI10,			///< SCI10 / ERI10
 
@@ -555,7 +555,7 @@ namespace device {
 			@brief  GROUPAL1・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_AL1 : uint8_t {
+		enum class GROUPAL1 : uint8_t {
 			EINT0 = 4,		///< EDMAC0/EINT0
 			EINT1 = 5,		///< EDMAC1/EINT1
 			VPOS  = 8,		///< GLCDC/VPOS
@@ -701,12 +701,12 @@ namespace device {
 					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef grp_t<0x0008'7600, VECTOR_BE0> GRPBE0_;
-		typedef grp_t<0x0008'7630, VECTOR_BL0> GRPBL0_;
-		typedef grp_t<0x0008'7634, VECTOR_BL1> GRPBL1_;
-		typedef grp_t<0x0008'7638, VECTOR_BL2> GRPBL2_;
-		typedef grp_t<0x0008'7830, VECTOR_AL0> GRPAL0_;
-		typedef grp_t<0x0008'7834, VECTOR_AL1> GRPAL1_;
+		typedef grp_t<0x0008'7600, GROUPBE0> GRPBE0_;
+		typedef grp_t<0x0008'7630, GROUPBL0> GRPBL0_;
+		typedef grp_t<0x0008'7634, GROUPBL1> GRPBL1_;
+		typedef grp_t<0x0008'7638, GROUPBL2> GRPBL2_;
+		typedef grp_t<0x0008'7830, GROUPAL0> GRPAL0_;
+		typedef grp_t<0x0008'7834, GROUPAL1> GRPAL1_;
 		static GRPBE0_ GRPBE0;
 		static GRPBL0_ GRPBL0;
 		static GRPBL1_ GRPBL1;
@@ -722,12 +722,12 @@ namespace device {
 					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gen_t<0x0008'7640, VECTOR_BE0> GENBE0_;
-		typedef gen_t<0x0008'7670, VECTOR_BL0> GENBL0_;
-		typedef gen_t<0x0008'7674, VECTOR_BL1> GENBL1_;
-		typedef gen_t<0x0008'7678, VECTOR_BL2> GENBL2_;
-		typedef gen_t<0x0008'7870, VECTOR_AL0> GENAL0_;
-		typedef gen_t<0x0008'7874, VECTOR_AL1> GENAL1_;
+		typedef gen_t<0x0008'7640, GROUPBE0> GENBE0_;
+		typedef gen_t<0x0008'7670, GROUPBL0> GENBL0_;
+		typedef gen_t<0x0008'7674, GROUPBL1> GENBL1_;
+		typedef gen_t<0x0008'7678, GROUPBL2> GENBL2_;
+		typedef gen_t<0x0008'7870, GROUPAL0> GENAL0_;
+		typedef gen_t<0x0008'7874, GROUPAL1> GENAL1_;
 		static GENBE0_ GENBE0;
 		static GENBL0_ GENBL0;
 		static GENBL1_ GENBL1;
@@ -741,7 +741,7 @@ namespace device {
 			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gcr_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
+		typedef gcr_t<0x0008'7680, GROUPBE0> GCRBE0_;
 		static GCRBE0_ GCRBE0;
 
 
@@ -775,7 +775,7 @@ namespace device {
 			@brief	選択型割り込み B 要因選択レジスタ（SLIBXR）（n = 128 ～ 143）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x00087700, VECTOR, VECTOR_SELB> SLIBR_;
+		typedef icu_utils::slixr_t<0x00087700, VECTOR, SELECTB> SLIBR_;
 		static SLIBR_ SLIBR;
 
 
@@ -784,7 +784,7 @@ namespace device {
 			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x00087900, VECTOR, VECTOR_SELA> SLIAR_;
+		typedef icu_utils::slixr_t<0x00087900, VECTOR, SELECTA> SLIAR_;
 		static SLIAR_ SLIAR;
 	};
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;

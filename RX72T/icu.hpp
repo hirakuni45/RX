@@ -226,7 +226,7 @@ namespace device {
 			@brief  GROUPBE0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BE0 : uint8_t {
+		enum class GROUPBE0 : uint8_t {
 			ERS0 = 0,		///< CAN0 / ERS0
 			NUM_ = 1
 		};
@@ -237,7 +237,7 @@ namespace device {
 			@brief  GROUPBL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL0 : uint8_t {
+		enum class GROUPBL0 : uint8_t {
 			TEI1 = 2,		///< SCI1 / TEI1（送信完了）
 			ERI1,			///< SCI1 / ERI1（受信エラー）
 
@@ -266,7 +266,7 @@ namespace device {
 			@brief  GROUPBL1・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL1 : uint8_t {
+		enum class GROUPBL1 : uint8_t {
 			POEGGAI = 0,	///< POEG (group A)
 			POEGGBI,		///< POEG (group B)
 			POEGGCI,		///< POEG (group C)
@@ -299,7 +299,7 @@ namespace device {
 			@brief  GROUPAL0・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_AL0 : uint8_t {
+		enum class GROUPAL0 : uint8_t {
 			TEI11 = 12,		///< SCI11 / TEI11
 			ERI11,			///< SCI11 / ERI11
 
@@ -314,7 +314,7 @@ namespace device {
 			@brief  選択型割り込みＡ要因・ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_SELA : uint8_t {
+		enum class SELECTA : uint8_t {
 			NONE = 0,	///< なし
 
 			TGIA0 = 1,	///< MTU0（TGRAのインプットキャプチャ /コンペアマッチ）
@@ -664,10 +664,10 @@ namespace device {
 					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef grp_t<0x0008'7600, VECTOR_BE0> GRPBE0_;
-		typedef grp_t<0x0008'7630, VECTOR_BL0> GRPBL0_;
-		typedef grp_t<0x0008'7634, VECTOR_BL1> GRPBL1_;
-		typedef grp_t<0x0008'7830, VECTOR_AL0> GRPAL0_;
+		typedef grp_t<0x0008'7600, GROUPBE0> GRPBE0_;
+		typedef grp_t<0x0008'7630, GROUPBL0> GRPBL0_;
+		typedef grp_t<0x0008'7634, GROUPBL1> GRPBL1_;
+		typedef grp_t<0x0008'7830, GROUPAL0> GRPAL0_;
 		static GRPBE0_ GRPBE0;
 		static GRPBL0_ GRPBL0;
 		static GRPBL1_ GRPBL1;
@@ -681,10 +681,10 @@ namespace device {
 					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gen_t<0x0008'7640, VECTOR_BE0> GENBE0_;
-		typedef gen_t<0x0008'7670, VECTOR_BL0> GENBL0_;
-		typedef gen_t<0x0008'7674, VECTOR_BL1> GENBL1_;
-		typedef gen_t<0x0008'7870, VECTOR_AL0> GENAL0_;
+		typedef gen_t<0x0008'7640, GROUPBE0> GENBE0_;
+		typedef gen_t<0x0008'7670, GROUPBL0> GENBL0_;
+		typedef gen_t<0x0008'7674, GROUPBL1> GENBL1_;
+		typedef gen_t<0x0008'7870, GROUPAL0> GENAL0_;
 		static GENBE0_ GENBE0;
 		static GENBL0_ GENBL0;
 		static GENBL1_ GENBL1;
@@ -696,7 +696,7 @@ namespace device {
 			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gcr_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
+		typedef gcr_t<0x0008'7680, GROUPBE0> GCRBE0_;
 		static GCRBE0_ GCRBE0;
 
 
@@ -705,7 +705,7 @@ namespace device {
 			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x00087900, VECTOR, VECTOR_SELA> SLIAR_;
+		typedef icu_utils::slixr_t<0x00087900, VECTOR, SELECTA> SLIAR_;
 		static SLIAR_ SLIAR;
 	};
 	template<class _> typename icuc_t<_>::IR_ icuc_t<_>::IR;

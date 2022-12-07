@@ -501,13 +501,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
-					ROM 0xFFFF'FFC0 to 0xFFFF'FFCF
+					ROM 0xFFFF'FFE8 to 0xFFFF'FFF7 互換性ダミー
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<0xFFFF'FFC0> UIDR0_;
-		typedef ro32_t<0xFFFF'FFC4> UIDR1_;
-		typedef ro32_t<0xFFFF'FFC8> UIDR2_;
-		typedef ro32_t<0xFFFF'FFCC> UIDR3_;
+		typedef ro32_t<0xFFFF'FFE8> UIDR0_;
+		typedef ro32_t<0xFFFF'FFEC> UIDR1_;
+		typedef ro32_t<0xFFFF'FFF0> UIDR2_;
+		typedef ro32_t<0xFFFF'FFF4> UIDR3_;
 		static UIDR0_ UIDR0;
 		static UIDR1_ UIDR1;
 		static UIDR2_ UIDR2;
