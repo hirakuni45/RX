@@ -91,6 +91,12 @@
 #include "RX24T/adc_in.hpp"
 #include "RX24T/dac_out.hpp"
 
+#elif defined(SIG_RX631) || defined(SIG_RX63N)
+
+#include "RX63x/port.hpp"
+
+#include "RX63x/system_io.hpp"
+
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"

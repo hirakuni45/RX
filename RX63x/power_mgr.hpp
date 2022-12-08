@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include "RX63x/peripheral.hpp"
-#include "RX600/system.hpp"
+#include "RX63x/system.hpp"
 #include "RX600/bus.hpp"
 
 namespace device {

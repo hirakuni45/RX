@@ -22,6 +22,10 @@ namespace {
 	// 秋月 RX220 ボード
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+#elif defined(SIG_RX631)
+	// DIY RX24T board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX63T)
 	// DIY RX63T board
 	static constexpr bool LED_ACTIVE = 0;
@@ -48,7 +52,7 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX72N)
-	// RX72N Envision Kit
+	// Renesas RX72N Envision Kit
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX64M)
@@ -56,7 +60,7 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX65N)
-	// RX65N Envision Kit
+	// Renesas RX65N Envision Kit
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX66T)

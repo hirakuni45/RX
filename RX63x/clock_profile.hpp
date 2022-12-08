@@ -16,7 +16,8 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  クロック・プロファイル・クラス @n
-				・PLL_BASE は、BASE の 0.5 倍単位 @n
+				・PLL_BASE は、BASE の 8, 10, 12, 16, 20, 24, 25, 50 倍 @n
+				・PLL_BASE は、104MHz ～ 200MHz の範囲 @n
 				・他は、PLL_BASE を基数とする整数除算値 @n
 				・選択出来ない値を指定すると、コンパイルエラーとなる @n
 				・詳細はハードウェアーマニュアル参照の事
@@ -34,7 +35,7 @@ namespace device {
 		enum class OSC_TYPE : uint8_t {
 			XTAL,		///< クリスタル接続（4MHz ～ 16MHz）
 			EXT,		///< 外部クロック入力（最大 20MHz）
-			HOCO,		///< 内蔵高速オンチップオシレーター
+			HOCO,		///< 内蔵高速オンチップオシレーター（50MHz）
 			LOCO,		///< 内蔵低速オンチップオシレーター (125KHz)
 		};
 
@@ -43,13 +44,11 @@ namespace device {
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
 		static constexpr uint32_t	BASE		=  12'000'000;		///< 外部接続クリスタル
-		static constexpr uint32_t	PLL_BASE	=  96'000'000;		///< PLL ベースクロック（最大100MHz）
+		static constexpr uint32_t	PLL_BASE	= 192'000'000;		///< PLL ベースクロック（104MHz ～ 200MHz）
 
 		static constexpr uint32_t	ICLK		=  96'000'000;		///< ICLK 周波数（最大100MHz）
 		static constexpr uint32_t	PCLKA		=  96'000'000;		///< PCLKA 周波数（最大100MHz）
 		static constexpr uint32_t	PCLKB		=  48'000'000;		///< PCLKB 周波数（最大50MHz）
-		static constexpr uint32_t	PCLKC		=   0'000'000;		///< PCLKC 周波数ダミー
-		static constexpr uint32_t	PCLKD		=   0'000'000;		///< PCLKD 周波数ダミー
 		static constexpr uint32_t	FCLK		=  48'000'000;		///< FCLK 周波数（最大50MHz）
 		static constexpr uint32_t	BCLK		=  48'000'000;		///< BCLK 周波数（最大100MHz）
 

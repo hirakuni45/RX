@@ -46,8 +46,10 @@
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
 #include "RX63x/clock_profile.hpp"
 #include "RX63x/peripheral.hpp"
-
+#include "RX63x/system.hpp"
 #include "RX63x/power_mgr.hpp"
+#include "RX63x/icu.hpp"
+#include "RX63x/icu_mgr.hpp"
 
 #include "RX600/rx_dsp_inst.h"
 

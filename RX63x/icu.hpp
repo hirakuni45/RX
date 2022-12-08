@@ -17,11 +17,11 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX64M/RX71M 割り込みコントローラ・テンプレート・クラス（ICUA）
+		@brief  RX631/RX63N 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class _>
-	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {
+	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -275,7 +275,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUP0 型
+			@brief  GROUP0 型（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class GROUP0 : uint8_t {
@@ -288,7 +288,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUP1 型
+			@brief  GROUP1 型（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class GROUP1 : uint8_t {
@@ -301,7 +301,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GROUP2 型
+			@brief  GROUP2 型（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class GROUP2 : uint8_t {
@@ -312,10 +312,90 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUP3 型（レベル割り込み）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GROUP3 : uint8_t {
+			TCI0V = 0,		///< TPU0
+			TCI1V = 1,		///< TPU1
+			TCI1U,
+			TCI5V = 3,		///< TPU5
+			TCI5U,
+			NUM_ = 5
+		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUP4 型（レベル割り込み）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GROUP4 : uint8_t {
+			TCI2V = 0,		///< TPU2
+			TCI2U,
+			TCI3V = 2,		///< TPU3
+			TCI4V = 3,		///< TPU4
+			TCI4U,
+			NUM_ = 5
+		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUP5 型（レベル割り込み）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GROUP5 : uint8_t {
+			TCI6V  = 0,		///< TPU6
+			TCI7V  = 1,		///< TPU7
+			TCI7U,
+			TCI11V = 3,		///< TPU11
+			TCI11U,
+			NUM_ = 5
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUP6 型（レベル割り込み）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GROUP6 : uint8_t {
+			TCI8V  = 0,		///< TPU8
+			TCI8U,
+			TCI9V  = 2,		///< TPU9
+			TCI10V = 3,		///< TPU10
+			TCI10U,
+			NUM_ = 5
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUP12 型（エッジ割り込み）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GROUP12 : uint8_t {
+			ERI0  = 0,	///< SCI0
+			ERI1  = 1,	///< SCI1
+			ERI2  = 2,	///< SCI2
+			ERI3  = 3,	///< SCI3
+			ERI4  = 4,	///< SCI4
+			ERI5  = 5,	///< SCI5
+			ERI6  = 6,	///< SCI6
+			ERI7  = 7,	///< SCI7
+			ERI8  = 8,	///< SCI8
+			ERI9  = 9,	///< SCI9
+			ERI10 = 10,	///< SCI10
+			ERI11 = 11,	///< SCI11
+			ERI12 = 12,	///< SCI12
+			SPEI0 = 13,	///< RSPI0
+			SPEI1 = 14,	///< RSPI1
+			SPEI2 = 15,	///< RSPI2
+			NUM_ = 16
+		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -410,15 +490,13 @@ namespace device {
 				uint32_t idx = 0;
 				switch(vec) {
 				case VECTOR::BUSERR: idx = 0; break;
-				case VECTOR::RAMERR: idx = 0; break;
 				case VECTOR::FIFERR: idx = 1; break;
 				case VECTOR::FRDYI:  idx = 2; break;
-				case VECTOR::SWINT2: idx = 3; break;
 				case VECTOR::SWINT:  idx = 3; break;
 				case VECTOR::CMI0:   idx = 4; break;
 				case VECTOR::CMI1:   idx = 5; break;
-				case VECTOR::CMWI0:  idx = 6; break;
-				case VECTOR::CMWI1:  idx = 7; break;
+				case VECTOR::CMI2:   idx = 6; break;
+				case VECTOR::CMI3:   idx = 7; break;
 				default: idx = static_cast<uint32_t>(vec); break;
 				}
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
@@ -437,75 +515,76 @@ namespace device {
 		static DMRSR1_ DMRSR1;
 		static DMRSR2_ DMRSR2;
 		static DMRSR3_ DMRSR3;
-		static DMRSR4_ DMRSR4;
-		static DMRSR5_ DMRSR5;
-		static DMRSR6_ DMRSR6;
-		static DMRSR7_ DMRSR7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ BE0 割り込み要求レジスタ（GRPBE0） @n
-					グループ BL0/1 割り込み要求レジスタ（GRPBL0/GRPBL1） @n
-					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
+			@brief  グループ m 割り込み要因レジスタ（GRPm）(m= グループ番号 ) @n
+					GROUP0 ～ GROUP6, GROUP12
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef grp_t<0x0008'7600, VECTOR_BE0> GRPBE0_;
-		typedef grp_t<0x0008'7630, VECTOR_BL0> GRPBL0_;
-		typedef grp_t<0x0008'7634, VECTOR_BL1> GRPBL1_;
-		typedef grp_t<0x0008'7830, VECTOR_AL0> GRPAL0_;
-		typedef grp_t<0x0008'7834, VECTOR_AL1> GRPAL1_;
-		static GRPBE0_ GRPBE0;
-		static GRPBL0_ GRPBL0;
-		static GRPBL1_ GRPBL1;
-		static GRPAL0_ GRPAL0;
-		static GRPAL1_ GRPAL1;
+		typedef grp_t<0x0008'C300, GROUP0> GRP00_;
+		typedef grp_t<0x0008'C304, GROUP1> GRP01_;
+		typedef grp_t<0x0008'C308, GROUP2> GRP02_;
+		typedef grp_t<0x0008'C30C, GROUP3> GRP03_;
+		typedef grp_t<0x0008'C310, GROUP4> GRP04_;
+		typedef grp_t<0x0008'C314, GROUP5> GRP05_;
+		typedef grp_t<0x0008'C318, GROUP6> GRP06_;
+		typedef grp_t<0x0008'C330, GROUP12> GRP12_;
+		static GRP00_ GRP00;
+		static GRP01_ GRP01;
+		static GRP02_ GRP02;
+		static GRP03_ GRP03;
+		static GRP04_ GRP04;
+		static GRP05_ GRP05;
+		static GRP06_ GRP06;
+		static GRP12_ GRP12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ BE0 割り込み要求許可レジスタ（GENBE0） @n
-					グループ BL0/1 割り込み要求許可レジスタ（GENBL0/GENBL1/GENBL2） @n
-					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
+			@brief  グループ m 割り込み許可レジスタ（GENm）(m= グループ番号 ) @n
+					GROUP0 ～ GROUP6, GROUP12
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gen_t<0x0008'7640, VECTOR_BE0> GENBE0_;
-		typedef gen_t<0x0008'7670, VECTOR_BL0> GENBL0_;
-		typedef gen_t<0x0008'7674, VECTOR_BL1> GENBL1_;
-		typedef gen_t<0x0008'7870, VECTOR_AL0> GENAL0_;
-		typedef gen_t<0x0008'7874, VECTOR_AL1> GENAL1_;
-		static GENBE0_ GENBE0;
-		static GENBL0_ GENBL0;
-		static GENBL1_ GENBL1;
-		static GENAL0_ GENAL0;
-		static GENAL1_ GENAL1;
+		typedef gen_t<0x0008'C340, GROUP0> GEN00_;
+		typedef gen_t<0x0008'C344, GROUP1> GEN01_;
+		typedef gen_t<0x0008'C348, GROUP2> GEN02_;
+		typedef gen_t<0x0008'C34C, GROUP3> GEN03_;
+		typedef gen_t<0x0008'C350, GROUP4> GEN04_;
+		typedef gen_t<0x0008'C354, GROUP5> GEN05_;
+		typedef gen_t<0x0008'C358, GROUP6> GEN06_;
+		typedef gen_t<0x0008'C370, GROUP12> GEN12_;
+		static GEN00_ GEN00;
+		static GEN01_ GEN01;
+		static GEN02_ GEN02;
+		static GEN03_ GEN03;
+		static GEN04_ GEN04;
+		static GEN05_ GEN05;
+		static GEN06_ GEN06;
+		static GEN12_ GEN12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
+			@brief  グループ m 割り込みクリアレジスタ（GCRm）(m= グループ番号 )
+					GROUP0 ～ GROUP6
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gcr_t<0x0008'7680, VECTOR_BE0> GCRBE0_;
-		static GCRBE0_ GCRBE0;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み B 要因選択レジスタ Xn（SLIBXRn）（n = 128 ～ 143）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x0008'7700, VECTOR, VECTOR_SELB> SLIBR_;
-		static SLIBR_ SLIBR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x0008'7900, VECTOR, VECTOR_SELA> SLIAR_;
-		static SLIAR_ SLIAR;
+		typedef gcr_t<0x0008'C380, GROUP0> GCR00_;
+		typedef gcr_t<0x0008'C384, GROUP1> GCR01_;
+		typedef gcr_t<0x0008'C388, GROUP2> GCR02_;
+		typedef gcr_t<0x0008'C38C, GROUP3> GCR03_;
+		typedef gcr_t<0x0008'C390, GROUP4> GCR04_;
+		typedef gcr_t<0x0008'C394, GROUP5> GCR05_;
+		typedef gcr_t<0x0008'C398, GROUP6> GCR06_;
+		static GCR00_ GCR00;
+		static GCR01_ GCR01;
+		static GCR02_ GCR02;
+		static GCR03_ GCR03;
+		static GCR04_ GCR04;
+		static GCR05_ GCR05;
+		static GCR06_ GCR06;
 	};
 	template<class _> typename icu_t<_>::IR_  icu_t<_>::IR;
 	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
@@ -516,23 +595,29 @@ namespace device {
 	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
 	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
 	template<class _> typename icu_t<_>::DMRSR3_ icu_t<_>::DMRSR3;
-	template<class _> typename icu_t<_>::DMRSR4_ icu_t<_>::DMRSR4;
-	template<class _> typename icu_t<_>::DMRSR5_ icu_t<_>::DMRSR5;
-	template<class _> typename icu_t<_>::DMRSR6_ icu_t<_>::DMRSR6;
-	template<class _> typename icu_t<_>::DMRSR7_ icu_t<_>::DMRSR7;
-	template<class _> typename icu_t<_>::GRPBE0_ icu_t<_>::GRPBE0;
-	template<class _> typename icu_t<_>::GRPBL0_ icu_t<_>::GRPBL0;
-	template<class _> typename icu_t<_>::GRPBL1_ icu_t<_>::GRPBL1;
-	template<class _> typename icu_t<_>::GRPAL0_ icu_t<_>::GRPAL0;
-	template<class _> typename icu_t<_>::GRPAL1_ icu_t<_>::GRPAL1;
-	template<class _> typename icu_t<_>::GENBE0_ icu_t<_>::GENBE0;
-	template<class _> typename icu_t<_>::GENBL0_ icu_t<_>::GENBL0;
-	template<class _> typename icu_t<_>::GENBL1_ icu_t<_>::GENBL1;
-	template<class _> typename icu_t<_>::GENAL0_ icu_t<_>::GENAL0;
-	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
-	template<class _> typename icu_t<_>::GCRBE0_ icu_t<_>::GCRBE0;
-	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
-	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
+	template<class _> typename icu_t<_>::GRP00_ icu_t<_>::GRP00;
+	template<class _> typename icu_t<_>::GRP01_ icu_t<_>::GRP01;
+	template<class _> typename icu_t<_>::GRP02_ icu_t<_>::GRP02;
+	template<class _> typename icu_t<_>::GRP03_ icu_t<_>::GRP03;
+	template<class _> typename icu_t<_>::GRP04_ icu_t<_>::GRP04;
+	template<class _> typename icu_t<_>::GRP05_ icu_t<_>::GRP05;
+	template<class _> typename icu_t<_>::GRP06_ icu_t<_>::GRP06;
+	template<class _> typename icu_t<_>::GRP12_ icu_t<_>::GRP12;
+	template<class _> typename icu_t<_>::GEN00_ icu_t<_>::GEN00;
+	template<class _> typename icu_t<_>::GEN01_ icu_t<_>::GEN01;
+	template<class _> typename icu_t<_>::GEN02_ icu_t<_>::GEN02;
+	template<class _> typename icu_t<_>::GEN03_ icu_t<_>::GEN03;
+	template<class _> typename icu_t<_>::GEN04_ icu_t<_>::GEN04;
+	template<class _> typename icu_t<_>::GEN05_ icu_t<_>::GEN05;
+	template<class _> typename icu_t<_>::GEN06_ icu_t<_>::GEN06;
+	template<class _> typename icu_t<_>::GEN12_ icu_t<_>::GEN12;
+	template<class _> typename icu_t<_>::GCR00_ icu_t<_>::GCR00;
+	template<class _> typename icu_t<_>::GCR01_ icu_t<_>::GCR01;
+	template<class _> typename icu_t<_>::GCR02_ icu_t<_>::GCR02;
+	template<class _> typename icu_t<_>::GCR03_ icu_t<_>::GCR03;
+	template<class _> typename icu_t<_>::GCR04_ icu_t<_>::GCR04;
+	template<class _> typename icu_t<_>::GCR05_ icu_t<_>::GCR05;
+	template<class _> typename icu_t<_>::GCR06_ icu_t<_>::GCR06;
 
 	typedef icu_t<void> ICU;
 }
