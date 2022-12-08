@@ -115,11 +115,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void boost_master_clock() noexcept
 		{
-			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC0.b();
-
-			// ベースクロック周波数の検査
 			static_assert(check_base_clock_(), "BASE out of range.");
+			static_assert(check_pll_base_(), "PLL_BASE out of range.");
 
+			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC0.b();
 			// メインクロック強制発振とドライブ能力設定
 			if(OSCT == clock_profile::OSC_TYPE::XTAL) {
 
@@ -139,7 +138,6 @@ namespace device {
 				return;
 			}
 
-			static_assert(check_pll_base_(), "PLL_BASE out of range.");
 			uint32_t n = clock_profile::PLL_BASE / clock_profile::BASE;
 			device::SYSTEM::PLLCR.STC = n - 1;
 			device::SYSTEM::PLLCR2.PLLEN = 0; // PLL 動作

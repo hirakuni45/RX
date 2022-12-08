@@ -278,14 +278,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct sbycr_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
+		struct sbycr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B14>	OPE;
+
 			bit_rw_t<io_, bitpos::B15>	SSBY;
 		};
 		typedef sbycr_t<0x0008'000C> SBYCR_;
@@ -383,7 +384,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B6>  MSTPC0;
+			bit_rw_t<io_, bitpos::B0>  MSTPC0;
 
 			bit_rw_t<io_, bitpos::B19> MSTPC19;
 
@@ -647,6 +648,8 @@ namespace device {
 		static PRCR_ PRCR;
 
 
+		//-------- リセット機能
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  リセットステータスレジスタ 0（RSTSR0）
@@ -723,8 +726,6 @@ namespace device {
 		typedef rw16_t<0x0008'00C2> SWRR_;
 		static SWRR_ SWRR;
 	};
-	typedef system_t<void> SYSTEM;
-
 	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
 	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
 	template<class _> typename system_t<_>::PLLCR_ system_t<_>::PLLCR;
@@ -749,4 +750,10 @@ namespace device {
 	template<class _> typename system_t<_>::DPSIEGR0_ system_t<_>::DPSIEGR0;
 	template<class _> typename system_t<_>::DPSBKR_ system_t<_>::DPSBKR;
 	template<class _> typename system_t<_>::PRCR_ system_t<_>::PRCR;
+	template<class _> typename system_t<_>::RSTSR0_ system_t<_>::RSTSR0;
+	template<class _> typename system_t<_>::RSTSR1_ system_t<_>::RSTSR1;
+	template<class _> typename system_t<_>::RSTSR2_ system_t<_>::RSTSR2;
+	template<class _> typename system_t<_>::SWRR_ system_t<_>::SWRR;
+
+	typedef system_t<void> SYSTEM;
 }
