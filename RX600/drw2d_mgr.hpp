@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX65N/RX651 DRW2D マネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -235,11 +235,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
-			@param[in]	ilvl	割り込みレベル
+			@param[in]	lvl		割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(ICU::LEVEL ilvl) noexcept
+		bool start(ICU::LEVEL lvl) noexcept
 		{
 			// DRW2D power management
 			power_mgr::turn(DRW::PERIPHERAL);
@@ -250,7 +250,7 @@ namespace device {
 			d2_inithw(d2_, init_flag);
 
 			icu_mgr::install_group_task(DRW::IVEC, drw_int_isr);
-			icu_mgr::set_level(ICU::VECTOR::GROUPAL1, ilvl);
+			icu_mgr::set_level(ICU::VECTOR::GROUPAL1, lvl);
 
 			clut_[0] = 0xff000000;
 			clut_[1] = 0xffffffff;
