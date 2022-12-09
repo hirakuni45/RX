@@ -651,8 +651,8 @@ int main(int argc, char** argv)
 				% can0_.get_bcr_brp() % can0_.get_bcr_tseg1() % can0_.get_bcr_tseg2()
 				% can0_.get_bcr_sjw();
 			utils::format("    RX Interrupt level: %u, TX Interrupt level: %u\n")
-				% static_cast<uint16_t>(can0_.get_interrupt().rxm_level)
-				% static_cast<uint16_t>(can0_.get_interrupt().txm_level);
+				% static_cast<uint16_t>(can0_.get_rxm_level())
+				% static_cast<uint16_t>(can0_.get_txm_level());
 		}
 #ifdef MULTI
 		if(!can1_.start(CAN::SPEED::_1M)) {
@@ -663,8 +663,8 @@ int main(int argc, char** argv)
 				% can1_.get_bcr_brp() % can1_.get_bcr_tseg1() % can1_.get_bcr_tseg2()
 				% can1_.get_bcr_sjw();
 			utils::format("    RX Interrupt level: %u, TX Interrupt level: %u\n")
-				% static_cast<uint16_t>(can1_.get_interrupt().rxm_level)
-				% static_cast<uint16_t>(can1_.get_interrupt().txm_level);
+				% static_cast<uint16_t>(can1_.get_rxm_level())
+				% static_cast<uint16_t>(can1_.get_txm_level());
 		}
 #endif
 	}
