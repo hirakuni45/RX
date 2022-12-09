@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "1.60";
+	const std::string version_ = "1.61";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -352,8 +352,8 @@ int main(int argc, char* argv[])
 		for(const auto& t : conf_in_.get_device_list()) {
 			std::string s;
 			s += (boost::format("%s (%s):") % t.name_ % t.group_).str();
-			s += (boost::format(" RAM: %5s") % t.ram_).str();
-			s += (boost::format(", Program-Flash: %5s") % t.rom_).str();
+			s += (boost::format(" Program-Flash: %5s") % t.rom_).str();
+			s += (boost::format(", RAM: %5s") % t.ram_).str();
 			if(!t.data_.empty()) {
 				s += (boost::format(", Data-Flash: %3s") % t.data_).str();
 			} else {
@@ -427,7 +427,8 @@ int main(int argc, char* argv[])
 	rx.cpu_type_ = opts.device;
 
 	// 接続されたクロック周波数が必要なグループ
-	if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N" || rx.cpu_type_ == "RX63T") {
+	if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N"
+		|| rx.cpu_type_ == "RX631" || rx.cpu_type_ == "RX63N" || rx.cpu_type_ == "RX63T") {
 		std::string name;
 		for(const auto& t : conf_in_.get_device_list()) {
 			if(t.group_ != rx.cpu_type_) continue;

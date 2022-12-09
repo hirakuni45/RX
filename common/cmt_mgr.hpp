@@ -49,7 +49,6 @@ namespace device {
 		};
 
 	private:
-		ICU::LEVEL	level_;
 		uint32_t	rate_;
 
 		void sleep_() const { asm("nop"); }
@@ -70,7 +69,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmt_mgr() noexcept : level_(ICU::LEVEL::NONE), rate_(0) { }
+		cmt_mgr() noexcept : rate_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -87,7 +86,6 @@ namespace device {
 		bool start(DIRECT direct, DIVIDE cks, ICU::LEVEL level = ICU::LEVEL::NONE, void (*task)() = nullptr) noexcept
 		{
 			rate_ = 0;
-			level_ = level;
 
 			power_mgr::turn(CMT::PERIPHERAL);
 
@@ -100,11 +98,11 @@ namespace device {
 
 			counter_ = 0;
 
-			if(level_ != ICU::LEVEL::NONE) {
+			if(level != ICU::LEVEL::NONE) {
 				if(task != nullptr) {
-					icu_mgr::set_interrupt(CMT::CMI, task, level_);
+					icu_mgr::set_interrupt(CMT::CMI, task, level);
 				} else {
-					icu_mgr::set_interrupt(CMT::CMI, i_task_, level_);
+					icu_mgr::set_interrupt(CMT::CMI, i_task_, level);
 				}
 			    CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks)) | CMT::CMCR.CMIE.b();
 			} else {
@@ -173,7 +171,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync() const noexcept
 		{
-			if(level_ != ICU::LEVEL::NONE) {
+			if(icu_mgr::get_level(CMT::CMI) != ICU::LEVEL::NONE) {
 				volatile uint32_t cnt = counter_;
 				while(cnt == counter_) sleep_();
 			} else {

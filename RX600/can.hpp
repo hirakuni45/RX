@@ -850,10 +850,10 @@ namespace device {
 	template <uint32_t base, peripheral per> typename can_t<base, per>::TCR_ can_t<base, per>::TCR;
 
 
-#if defined(SIG_RX63T)
+#if defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX63T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	CAN モジュール（CAN 通常割り込み型）
+		@brief	CAN モジュール（CAN 通常割り込み、GROUP0 型）
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	rxf		受信 FIFO 割り込み
@@ -868,15 +868,23 @@ namespace device {
 	struct can_norm_t : can_t<base, per> {
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
-		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
-		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
-		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
-		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
-		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
+		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター
+		static constexpr auto TXF = txf;	///< TXF 割り込みベクター
+		static constexpr auto RXM = rxm;	///< RXM 割り込みベクター
+		static constexpr auto TXM = txm;	///< TXM 割り込みベクター
+		static constexpr auto ERS = ers;	///< ERS 割り込みベクター
 	};
 	typedef can_norm_t<0x0009'1200, peripheral::CAN1,
 		ICU::VECTOR::RXF1, ICU::VECTOR::TXF1,
 		ICU::VECTOR::RXM1, ICU::VECTOR::TXM1, ICU::GROUP0::ERS1> CAN1;
+#if defined(SIG_RX631) || defined(SIG_RX63N)
+	typedef can_norm_t<0x0009'0200, peripheral::CAN0,
+		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
+		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::GROUP0::ERS0> CAN0;
+	typedef can_norm_t<0x0009'2200, peripheral::CAN2,
+		ICU::VECTOR::RXF2, ICU::VECTOR::TXF2,
+		ICU::VECTOR::RXM2, ICU::VECTOR::TXM2, ICU::GROUP0::ERS2> CAN2;
+#endif
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -896,11 +904,11 @@ namespace device {
 	struct can_norm_t : can_t<base, per> {
 
 		static constexpr auto PCLK = clock_profile::PCLK;	///< クロック周波数
-		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
-		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
-		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
-		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
-		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
+		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター
+		static constexpr auto TXF = txf;	///< TXF 割り込みベクター
+		static constexpr auto RXM = rxm;	///< RXM 割り込みベクター
+		static constexpr auto TXM = txm;	///< TXM 割り込みベクター
+		static constexpr auto ERS = ers;	///< ERS 割り込みベクター
 	};
 	typedef can_norm_t<0x0009'0200, peripheral::CAN,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
@@ -924,11 +932,11 @@ namespace device {
 	struct can_norm_t : can_t<base, per> {
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
-		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
-		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
-		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
-		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
-		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
+		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター
+		static constexpr auto TXF = txf;	///< TXF 割り込みベクター
+		static constexpr auto RXM = rxm;	///< RXM 割り込みベクター
+		static constexpr auto TXM = txm;	///< TXM 割り込みベクター
+		static constexpr auto ERS = ers;	///< ERS 割り込みベクター
 	};
 	typedef can_norm_t<0x0009'0200, peripheral::CAN0,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
@@ -952,11 +960,11 @@ namespace device {
 	struct can_seli_t : can_t<base, per> {
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
-		static constexpr auto RXF_VEC = rxf;	///< RXF 割り込みベクター
-		static constexpr auto TXF_VEC = txf;	///< TXF 割り込みベクター
-		static constexpr auto RXM_VEC = rxm;	///< RXM 割り込みベクター
-		static constexpr auto TXM_VEC = txm;	///< TXM 割り込みベクター
-		static constexpr auto ERS_VEC = ers;	///< ERS 割り込みベクター
+		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター
+		static constexpr auto TXF = txf;	///< TXF 割り込みベクター
+		static constexpr auto RXM = rxm;	///< RXM 割り込みベクター
+		static constexpr auto TXM = txm;	///< TXM 割り込みベクター
+		static constexpr auto ERS = ers;	///< ERS 割り込みベクター
 	};
 
 	typedef can_seli_t<0x0009'0200, peripheral::CAN0,

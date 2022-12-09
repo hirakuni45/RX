@@ -55,7 +55,9 @@ namespace device {
 			@return 割り込みレベル
 		*/
 		//-----------------------------------------------------------------//
-		static auto get_level(ICU::VECTOR vec) noexcept { return ICU::IPR[vec]; }
+		static auto get_level(ICU::VECTOR vec) noexcept {
+			return static_cast<ICU::LEVEL>(ICU::IPR[vec]);
+		}
 
 
 		//-----------------------------------------------------------------//

@@ -1,28 +1,28 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX63T プログラミング・プロトコル・クラス
+	@brief	RX63x プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
-#include "rs232c_io.hpp"
-#include "rx_protocol.hpp"
-#include <vector>
-#include <boost/format.hpp>
+//=========================================================================//
+#include "protocol_base.hpp"
 
-namespace rx63t {
+namespace rx63x {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	RX63T プログラミング・プロトコル・クラス
+		@brief	RX63x プログラミング・プロトコル・クラス @n
+				Support device: RX631/RX63N/RX63T @n
+				RX63x はクロック生成ハードウェアーの仕様により、高いボーレートで誤差が大きく、 @n
+				ボーレートは、115200 に制限される。
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class protocol {
+	class protocol : public rx::protocol_base {
 
-		utils::rs232c_io	rs232c_;
+		static constexpr uint32_t LIMIT_BAUDRATE = 115200;
 
 		bool				verbose_ = false;
 
@@ -47,78 +47,6 @@ namespace rx63t {
 		speed_t						baud_rate_ = B9600;
 
 		uint8_t						last_error_ = 0;
-
-		bool command_(uint8_t cmd) {
-			bool f = rs232c_.send(static_cast<char>(cmd));
-			rs232c_.sync_send();
-			return f;
-		}
-
-		bool read_(void* buff, uint32_t len, const timeval& tv) {
-			return rs232c_.recv(buff, len, tv) == len;
-		}
-
-		bool read_(void* buff, uint32_t len) {
-			timeval tv;
-			tv.tv_sec  = 5;
-			tv.tv_usec = 0;
-			return rs232c_.recv(buff, len, tv) == len;
-		}
-
-		bool write_(const void* buff, uint32_t len) {
-			uint32_t wr = rs232c_.send(buff, len);
-			rs232c_.sync_send();
-			return wr == len;
-		} 
-
-		uint32_t get32_(const uint8_t* p) {
-			uint32_t v;
-			v = p[0];
-			v |= p[1] << 8;
-			v |= p[2] << 16;
-			v |= p[3] << 24;
-			return v;
-		}
-
-		uint32_t get16_big_(const uint8_t* p) {
-			uint32_t v;
-			v = p[1];
-			v |= p[0] << 8;
-			return v;
-		}
-
-		uint32_t get32_big_(const uint8_t* p) {
-			uint32_t v;
-			v = p[3];
-			v |= p[2] << 8;
-			v |= p[1] << 16;
-			v |= p[0] << 24;
-			return v;
-		}
-
-		void put16_big_(uint8_t* p, uint32_t val) {
-			p[0] = (val >> 8) & 0xff;
-			p[1] = val & 0xff;
-		}
-
-		void put32_big_(uint8_t* p, uint32_t val) {
-			p[0] = (val >> 24) & 0xff;
-			p[1] = (val >> 16) & 0xff;
-			p[2] = (val >> 8) & 0xff;
-			p[3] =  val & 0xff;
-		}
-
-		uint8_t sum_(const uint8_t* buff, uint32_t len) {
-			uint16_t sum = 0;
-			for(uint32_t i = 0; i < len; ++i) {
-				sum += *buff++;
-			}
-			return 0x100 - sum;
-		}
-
-		std::string out_section_(uint32_t n, uint32_t num) const {
-			return (boost::format("#%02d/%02d: ") % n % num).str();
-		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -366,16 +294,7 @@ namespace rx63t {
 		//-----------------------------------------------------------------//
 		bool start(const std::string& path) noexcept
 		{
-			if(!rs232c_.open(path, B9600)) {
-				return false;
-			}
-			if(!rs232c_.enable_RTS(false)) {
-				return false;
-			}
-			if(!rs232c_.enable_DTR(false)) {
-				return false;
-			}
-			return true;
+			return rx::protocol_base::start(path);
 		}
 
 
@@ -480,7 +399,7 @@ namespace rx63t {
 			@return デバイス
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::devices& get_device() const { return devices_; }
+		const rx::protocol::devices& get_device() const noexcept { return devices_; }
 
 
 		//-----------------------------------------------------------------//
@@ -489,7 +408,8 @@ namespace rx63t {
 			@param[in]	code	デバイス・コード
 		*/
 		//-----------------------------------------------------------------//
-		bool select_device(uint32_t code) {
+		bool select_device(uint32_t code) noexcept
+		{
 			if(!connection_) return false;
 
 			uint8_t tmp[7];
@@ -523,7 +443,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_clock_mode() {
+		bool inquiry_clock_mode() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x21)) {
@@ -556,7 +477,7 @@ namespace rx63t {
 			@return デバイス
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::clock_modes& get_clock_mode() const { return clock_modes_; }
+		const rx::protocol::clock_modes& get_clock_mode() const noexcept { return clock_modes_; }
 
 
 		//-----------------------------------------------------------------//
@@ -565,7 +486,8 @@ namespace rx63t {
 			@param[in]	cm	クロック・モード
 		*/
 		//-----------------------------------------------------------------//
-		bool select_clock_mode(const rx::protocol::clock_mode& cm) {
+		bool select_clock_mode(const rx::protocol::clock_mode& cm) noexcept
+		{
 			if(!connection_) return false;
 
 			uint8_t tmp[4];
@@ -596,7 +518,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_multiplier() {
+		bool inquiry_multiplier() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x22)) {
@@ -637,7 +560,7 @@ namespace rx63t {
 			@return 逓倍比
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::multipliers& get_multiplier() const { return multipliers_; }
+		const rx::protocol::multipliers& get_multiplier() const noexcept { return multipliers_; }
 
 
 		//-----------------------------------------------------------------//
@@ -646,7 +569,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_frequency() {
+		bool inquiry_frequency() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x23)) {
@@ -688,7 +612,7 @@ namespace rx63t {
 			@return 動作周波数
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::frequencies& get_frequency() const { return frequencies_; }
+		const rx::protocol::frequencies& get_frequency() const noexcept { return frequencies_; }
 
 
 		//-----------------------------------------------------------------//
@@ -699,12 +623,12 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) {
+		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) noexcept
+		{
 			if(!connection_) return false;
 
-			// RX63T では、最大１１５２００ボーまでとする（誤差が大きい為）
-			if(speed > 115200) {
-				speed = 115200;
+			if(speed > LIMIT_BAUDRATE) {
+				speed = LIMIT_BAUDRATE;
 			}
 
 			uint32_t nbr;
@@ -783,7 +707,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_boot_area() {
+		bool inquiry_boot_area() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x24)) {
@@ -823,7 +748,7 @@ namespace rx63t {
 			@return ユーザー・ブート領域
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_boot_area() const { return boot_area_; }
+		const rx::protocol::areas& get_boot_area() const noexcept { return boot_area_; }
 
 
 		//-----------------------------------------------------------------//
@@ -832,7 +757,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_area() {
+		bool inquiry_area() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x25)) {
@@ -872,7 +798,7 @@ namespace rx63t {
 			@return ユーザー領域
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_area() const { return area_; }
+		const rx::protocol::areas& get_area() const noexcept { return area_; }
 
 
 		//-----------------------------------------------------------------//
@@ -881,7 +807,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_block() {
+		bool inquiry_block() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x26)) {
@@ -923,7 +850,7 @@ namespace rx63t {
 			@return ブロック情報
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_block() const { return blocks_; }
+		const rx::protocol::areas& get_block() const noexcept { return blocks_; }
 
 
 		//-----------------------------------------------------------------//
@@ -932,7 +859,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_prog_size() {
+		bool inquiry_prog_size() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x27)) {
@@ -959,7 +887,7 @@ namespace rx63t {
 			@return プログラム・サイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_prog_size() const { return prog_size_; }
+		uint32_t get_prog_size() const noexcept { return prog_size_; }
 
 
 		//-----------------------------------------------------------------//
@@ -968,7 +896,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_data() {
+		bool inquiry_data() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x2a)) {
@@ -995,7 +924,7 @@ namespace rx63t {
 			@return データ量域有無「true」ならデータ量域（有）
 		*/
 		//-----------------------------------------------------------------//
-		bool get_data() const { return data_; }
+		bool get_data() const noexcept { return data_; }
 
 
 		//-----------------------------------------------------------------//
@@ -1004,7 +933,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_data_area() {
+		bool inquiry_data_area() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x2b)) {
@@ -1046,7 +976,7 @@ namespace rx63t {
 			@return データ量域情報
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_data_area() const { return data_areas_; }
+		const rx::protocol::areas& get_data_area() const noexcept { return data_areas_; }
 
 
 		//-----------------------------------------------------------------//
@@ -1055,7 +985,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool turn_pe_status() {
+		bool turn_pe_status() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x40)) {
@@ -1095,7 +1026,7 @@ namespace rx63t {
 			@return プロテクト状態
 		*/
 		//-----------------------------------------------------------------//
-		bool get_protect() const { return id_protect_; }
+		bool get_protect() const noexcept { return id_protect_; }
 
 
 		//-----------------------------------------------------------------//
@@ -1105,7 +1036,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) {
+		bool erase_page(uint32_t address) noexcept
+		{
 #if 0
 			if(!connection_) return false;
 			if(!verification_) return false;
@@ -1142,7 +1074,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read_page(uint32_t adr, uint8_t* dst) {
+		bool read_page(uint32_t adr, uint8_t* dst) noexcept
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
@@ -1198,7 +1131,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool select_write_area(bool data) {
+		bool select_write_area(bool data) noexcept
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
@@ -1235,7 +1169,8 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool write_page(uint32_t address, const uint8_t* src) {
+		bool write_page(uint32_t address, const uint8_t* src) noexcept
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 			if(!select_write_area_) return false;
@@ -1281,7 +1216,7 @@ namespace rx63t {
 				return false;
 			}
 			if(head[0] != 0x06) {
-				std::cout << "Respons error" << std::endl;
+				std::cerr << "Respons error" << std::endl;
 				select_write_area_ = false;
 				if(head[0] != 0xd0) {
 					return false;
@@ -1304,13 +1239,12 @@ namespace rx63t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool end() {
+		bool end() noexcept
+		{
 			connection_ = false;
 			pe_turn_on_ = false;
 			select_write_area_ = false;
-			return rs232c_.close();
+			return rx::protocol_base::close();
 		}
-
 	};
-
 }

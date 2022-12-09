@@ -37,6 +37,11 @@ namespace device {
 		static GROUPAL0_dispatch_t GROUPAL0_dispatch_;
 		static GROUPAL1_dispatch_t GROUPAL1_dispatch_;
 
+		static constexpr uint8_t SELECTA_ORG = 208;
+		static constexpr uint8_t SELECTA_END = 255;
+		static constexpr uint8_t SELECTB_ORG = 128;
+		static constexpr uint8_t SELECTB_END = 207;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -80,6 +85,32 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  選択型割り込みレベルを取得する
+			@param[in]	vec	割り込み要因
+			@return 割り込みレベル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_level(ICU::SELECTA sel) noexcept {
+
+			return get_level(icu_utils::get_interruptSELA<ICU, ICU::SELECTA, SELECTA_ORG, SELECTA_END>(sel));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  選択型割り込みレベルを取得する
+			@param[in]	vec	割り込み要因
+			@return 割り込みレベル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_level(ICU::SELECTB sel) noexcept {
+
+			return get_level(icu_utils::get_interruptSELB<ICU, ICU::SELECTB, SELECTB_ORG, SELECTB_END>(sel));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  割り込み設定（通常ベクター）
 			@param[in]	vec		割り込み要因
 			@param[in]	task	割り込みタスク
@@ -105,7 +136,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR set_interrupt(ICU::SELECTA sel, icu_utils::ITASK task, ICU::LEVEL lvl) noexcept
 		{
-			return icu_utils::set_interruptSELA<ICU, ICU::SELECTA, 208, 255>(sel, task, lvl);
+			return icu_utils::set_interruptSELA<ICU, ICU::SELECTA, SELECTA_ORG, SELECTA_END>(sel, task, lvl);
 		}
 
 
@@ -120,7 +151,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR set_interrupt(ICU::SELECTB sel, icu_utils::ITASK task, ICU::LEVEL lvl) noexcept
 		{
-			return icu_utils::set_interruptSELB<ICU, ICU::SELECTB, 128, 207>(sel, task, lvl);
+			return icu_utils::set_interruptSELB<ICU, ICU::SELECTB, SELECTB_ORG, SELECTB_END>(sel, task, lvl);
 		}
 
 
