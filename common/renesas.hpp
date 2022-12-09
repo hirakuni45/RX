@@ -95,6 +95,8 @@
 
 #include "RX63x/port.hpp"
 
+#include "RX600/can.hpp"
+
 #include "RX63x/system_io.hpp"
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
