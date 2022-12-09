@@ -195,7 +195,7 @@ namespace app {
 			auto& tag = play_tag_;
 			render_.set_fore_color(graphics::def_color::Black);
 			render_.fill_box(vtx::srect(0, 0, LCD_X - LCD_Y, 20 * 6));
-//			render_.fill_box(vtx::srect(LCD_X - LCD_Y, 0, LCD_Y, LCD_Y));
+			render_.fill_box(vtx::srect(LCD_X - LCD_Y, 0, LCD_Y, LCD_Y));
 			render_.sync_frame();
 
 			auto org_pos = fin.tell();
