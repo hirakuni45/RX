@@ -60,11 +60,16 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct interrupt_t {
-			ICU::LEVEL	error_level;	///< エラー割り込みレベル
 			ICU::LEVEL	rxm_level;		///< RXM 割り込みレベル
 			ICU::LEVEL	txm_level;		///< TXM 割り込みレベル
-			interrupt_t() :
-				error_level(ICU::LEVEL::NONE), rxm_level(ICU::LEVEL::_1), txm_level(ICU::LEVEL::_1)
+			ICU::LEVEL	error_level;	///< エラー割り込みレベル
+			explicit interrupt_t(ICU::LEVEL lvl) noexcept :
+				rxm_level(lvl), txm_level(lvl),
+				error_level(ICU::LEVEL::NONE)
+			{ }
+			interrupt_t(ICU::LEVEL rx, ICU::LEVEL tx) noexcept :
+				rxm_level(rx), txm_level(tx),
+				error_level(ICU::LEVEL::NONE)
 			{ }
 		};
 
@@ -127,7 +132,6 @@ namespace device {
 		typedef utils::format		format;
 #endif
 
-		interrupt_t		intr_;
 		MODE			mode_;
 
 		static RBF		rbf_;
@@ -181,20 +185,21 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		can_io() noexcept : intr_(), mode_(MODE::RESET) { }
+		can_io() noexcept : mode_(MODE::RESET) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  通信速度を設定して、CAN デバイスを「OPERATION」モードにする @n
-					正確な通信速度を設定出来ない場合「false」を返して失敗する。@n
+					正確な通信速度を設定出来ない場合「false」を返して失敗する。 @n
 					「オペレーションモード」に移行
 			@param[in]	speed	通信速度
-			@param[in]	intr	割り込み設定
+			@param[in]	intr	割り込み設定 @n
+								割り込みレベルは何も設定しないと「1」となる。 
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(SPEED speed, const interrupt_t& intr = interrupt_t()) noexcept
+		bool start(SPEED speed, const interrupt_t& intr = interrupt_t(ICU::LEVEL::_1)) noexcept
 		{
 			if(intr.rxm_level == ICU::LEVEL::NONE || intr.txm_level == ICU::LEVEL::NONE) {
 				// 割り込み未使用では、常に失敗する。
@@ -293,25 +298,24 @@ namespace device {
 				}
 			}
 
-			intr_ = intr;
 			CAN::MIER = 0;
 			if(intr.error_level != ICU::LEVEL::NONE) {
-				auto gvec = icu_mgr::get_group_vector(CAN::ERS_VEC);
+				auto gvec = icu_mgr::get_group_vector(CAN::ERS);
 				if(icu_mgr::get_level(gvec) < intr.error_level) {
 					// グループベクタの割り込みレベルがより高い場合は設定する。
 					icu_mgr::set_level(gvec, intr.error_level);
 				}
-				icu_mgr::install_group_task(CAN::ERS_VEC, ers_task_);
+				icu_mgr::install_group_task(CAN::ERS, ers_task_);
 			    CAN::EIER = CAN::EIER.ORIE.b(1);
 			}
 			if(intr.rxm_level != ICU::LEVEL::NONE) {  // 受信割り込み設定
-				icu_mgr::set_interrupt(CAN::RXM_VEC, rxm_task_, intr.rxm_level);
+				icu_mgr::set_interrupt(CAN::RXM, rxm_task_, intr.rxm_level);
 				for(uint32_t i = RX_MB_TOP; i < (RX_MB_TOP + RX_MB_NUM); ++i) {
 					CAN::MIER.set(i);
 				}
 			}
 			if(intr.txm_level != ICU::LEVEL::NONE) {  // 送信割り込み設定
-				icu_mgr::set_interrupt(CAN::TXM_VEC, txm_task_, intr.txm_level);
+				icu_mgr::set_interrupt(CAN::TXM, txm_task_, intr.txm_level);
 				for(uint32_t i = TX_MB_TOP; i < (TX_MB_TOP + TX_MB_NUM); ++i) {
 					CAN::MIER.set(i);
 				}
@@ -418,11 +422,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込み設定を返す
-			@return 割り込み設定
+			@brief  受信割り込みレベルの取得
+			@return 受信割り込みレベル
 		*/
 		//-----------------------------------------------------------------//
-		const auto& get_interrupt() const noexcept { return intr_; }
+		static auto get_rxm_level() noexcept { return icu_mgr::get_level(CAN::RXM); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信割り込みレベルの取得
+			@return 送信割り込みレベル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_txm_level() noexcept { return icu_mgr::get_level(CAN::TXM); }
 
 
 		//-----------------------------------------------------------------//

@@ -144,7 +144,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CMT 定義クラス（ICU::VECTOR）
+		@brief  CMT 定義クラス（ICU::VECTOR 型）
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
 		@param[in]	cmi		割り込みベクター
@@ -163,7 +163,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CMT 定義クラス（ベクター型指定）
+		@brief  CMT 定義クラス（ベクター自由型）
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
 		@param[in]	IVEC	割り込みベクター型
