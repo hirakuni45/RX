@@ -75,7 +75,7 @@ LK	=	clang++
 RC	=
 endif
 
-POPT	=	-O2 -std=gnu++14
+POPT	=	-O2 -std=gnu++17
 COPT	=	-O2
 LOPT	=
 

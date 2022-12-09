@@ -11,21 +11,21 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "rs232c_io.hpp"
-#include "rx_protocol.hpp"
-#include <vector>
-#include <boost/format.hpp>
+#include "protocol_base.hpp"
 
 namespace rx62x {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	RX621/RX62N プログラミング・プロトコル・クラス
+				Support device: RX621/RX62N @n
+				RX62x はクロック生成ハードウェアーの仕様により、高いボーレートで誤差が大きく、 @n
+				ボーレートは、115200 に制限される。
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class protocol {
+	class protocol : public rx::protocol_base {
 
-		utils::rs232c_io	rs232c_;
+		static constexpr uint32_t LIMIT_BAUDRATE = 115200;
 
 		bool				verbose_ = false;
 
@@ -51,78 +51,6 @@ namespace rx62x {
 		speed_t						baud_rate_ = B9600;
 
 		uint8_t						last_error_ = 0;
-
-		bool command_(uint8_t cmd) noexcept {
-			bool f = rs232c_.send(static_cast<char>(cmd));
-			rs232c_.sync_send();
-			return f;
-		}
-
-		bool read_(void* buff, uint32_t len, const timeval& tv) noexcept {
-			return rs232c_.recv(buff, len, tv) == len;
-		}
-
-		bool read_(void* buff, uint32_t len) noexcept {
-			timeval tv;
-			tv.tv_sec  = 5;
-			tv.tv_usec = 0;
-			return rs232c_.recv(buff, len, tv) == len;
-		}
-
-		bool write_(const void* buff, uint32_t len) noexcept {
-			uint32_t wr = rs232c_.send(buff, len);
-			rs232c_.sync_send();
-			return wr == len;
-		} 
-
-		uint32_t get32_(const uint8_t* p) noexcept {
-			uint32_t v;
-			v = p[0];
-			v |= p[1] << 8;
-			v |= p[2] << 16;
-			v |= p[3] << 24;
-			return v;
-		}
-
-		uint32_t get16_big_(const uint8_t* p) noexcept {
-			uint32_t v;
-			v = p[1];
-			v |= p[0] << 8;
-			return v;
-		}
-
-		uint32_t get32_big_(const uint8_t* p) noexcept {
-			uint32_t v;
-			v = p[3];
-			v |= p[2] << 8;
-			v |= p[1] << 16;
-			v |= p[0] << 24;
-			return v;
-		}
-
-		void put16_big_(uint8_t* p, uint32_t val) noexcept {
-			p[0] = (val >> 8) & 0xff;
-			p[1] = val & 0xff;
-		}
-
-		void put32_big_(uint8_t* p, uint32_t val) noexcept {
-			p[0] = (val >> 24) & 0xff;
-			p[1] = (val >> 16) & 0xff;
-			p[2] = (val >> 8) & 0xff;
-			p[3] =  val & 0xff;
-		}
-
-		uint8_t sum_(const uint8_t* buff, uint32_t len) noexcept {
-			uint16_t sum = 0;
-			for(uint32_t i = 0; i < len; ++i) {
-				sum += *buff++;
-			}
-			return 0x100 - sum;
-		}
-
-		std::string out_section_(uint32_t n, uint32_t num) const noexcept {
-			return (boost::format("#%02d/%02d: ") % n % num).str();
-		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -373,16 +301,7 @@ namespace rx62x {
 		//-----------------------------------------------------------------//
 		bool start(const std::string& path) noexcept
 		{
-			if(!rs232c_.open(path, B9600)) {
-				return false;
-			}
-			if(!rs232c_.enable_RTS(false)) {
-				return false;
-			}
-			if(!rs232c_.enable_DTR(false)) {
-				return false;
-			}
-			return true;
+			return rx::protocol_base::start(path);
 		}
 
 
@@ -726,8 +645,8 @@ namespace rx62x {
 			if(!connection_) return false;
 
 			// RX62x では、最大１１５２００ボーまでとする（誤差が大きい為）
-			if(speed > 115200) {
-				speed = 115200;
+			if(speed > LIMIT_BAUDRATE) {
+				speed = LIMIT_BAUDRATE;
 			}
 
 			uint32_t nbr;
@@ -1382,7 +1301,7 @@ namespace rx62x {
 			connection_ = false;
 			pe_turn_on_ = false;
 			select_write_area_ = false;
-			return rs232c_.close();
+			return rx::protocol_base::close();
 		}
 	};
 }

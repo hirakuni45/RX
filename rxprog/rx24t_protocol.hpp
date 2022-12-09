@@ -3,15 +3,12 @@
 /*!	@file
 	@brief	RX24T プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "rs232c_io.hpp"
-#include "rx_protocol.hpp"
-#include <vector>
-#include <boost/format.hpp>
+#include "protocol_base.hpp"
 
 namespace rx24t {
 
@@ -20,9 +17,7 @@ namespace rx24t {
 		@brief	RX24T プログラミング・プロトコル・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class protocol {
-
-		utils::rs232c_io	rs232c_;
+	class protocol : public rx::protocol_base {
 
 		bool				verbose_ = false;
 
@@ -42,85 +37,13 @@ namespace rx24t {
 
 		uint8_t						last_error_ = 0;
 
-		bool command_(uint8_t cmd) {
-			bool f = rs232c_.send(static_cast<char>(cmd));
-			rs232c_.sync_send();
-			return f;
-		}
-
-		bool read_(void* buff, uint32_t len, const timeval& tv) {
-			return rs232c_.recv(buff, len, tv) == len;
-		}
-
-		bool read_(void* buff, uint32_t len) {
-			timeval tv;
-			tv.tv_sec  = 5;
-			tv.tv_usec = 0;
-			return rs232c_.recv(buff, len, tv) == len;
-		}
-
-		bool write_(const void* buff, uint32_t len) {
-			uint32_t wr = rs232c_.send(buff, len);
-			rs232c_.sync_send();
-			return wr == len;
-		} 
-
-		uint32_t get32_(const uint8_t* p) {
-			uint32_t v;
-			v = p[0];
-			v |= static_cast<uint32_t>(p[1]) << 8;
-			v |= static_cast<uint32_t>(p[2]) << 16;
-			v |= static_cast<uint32_t>(p[3]) << 24;
-			return v;
-		}
-
-		uint32_t get16_big_(const uint8_t* p) {
-			uint32_t v;
-			v = p[1];
-			v |= static_cast<uint32_t>(p[0]) << 8;
-			return v;
-		}
-
-		uint32_t get32_big_(const uint8_t* p) {
-			uint32_t v;
-			v = p[3];
-			v |= static_cast<uint32_t>(p[2]) << 8;
-			v |= static_cast<uint32_t>(p[1]) << 16;
-			v |= static_cast<uint32_t>(p[0]) << 24;
-			return v;
-		}
-
-		void put16_big_(uint8_t* p, uint32_t val) {
-			p[0] = (val >> 8) & 0xff;
-			p[1] = val & 0xff;
-		}
-
-		void put32_big_(uint8_t* p, uint32_t val) {
-			p[0] = (val >> 24) & 0xff;
-			p[1] = (val >> 16) & 0xff;
-			p[2] = (val >> 8) & 0xff;
-			p[3] =  val & 0xff;
-		}
-
-		uint8_t sum_(const uint8_t* buff, uint32_t len) {
-			uint16_t sum = 0;
-			for(uint32_t i = 0; i < len; ++i) {
-				sum += *buff++;
-			}
-			return (0 - sum) & 0xff;
-		}
-
-		std::string out_section_(uint32_t n, uint32_t num) const {
-			return (boost::format("#%02d/%02d: ") % n % num).str();
-		}
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		protocol() { }
+		protocol() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -132,7 +55,7 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool bind(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx)
+		bool bind(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) noexcept
 		{
 			verbose_ = rx.verbose_;
 
@@ -278,17 +201,9 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(const std::string& path) {
-			if(!rs232c_.open(path, B9600)) {
-				return false;
-			}
-			if(!rs232c_.enable_RTS(false)) {
-				return false;
-			}
-			if(!rs232c_.enable_DTR(false)) {
-				return false;
-			}
-			return true;
+		bool start(const std::string& path) noexcept
+		{
+			return rx::protocol_base::start(path);
 		}
 
 
@@ -298,7 +213,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool connection() {
+		bool connection() noexcept
+		{
 			bool ok = false;
 			for(int i = 0; i < 30; ++i) {
 				if(!command_(0x00)) {
@@ -339,7 +255,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_device() {
+		bool inquiry_device() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x20)) {
@@ -378,7 +295,7 @@ namespace rx24t {
 			@return デバイス
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::devices& get_device() const { return devices_; }
+		const rx::protocol::devices& get_device() const noexcept { return devices_; }
 
 
 		//-----------------------------------------------------------------//
@@ -387,7 +304,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_area() {
+		bool inquiry_area() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x25)) {
@@ -432,7 +350,7 @@ namespace rx24t {
 			@return ユーザー領域
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_area() const { return area_; }
+		const rx::protocol::areas& get_area() const noexcept { return area_; }
 
 
 		//-----------------------------------------------------------------//
@@ -441,7 +359,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_data() {
+		bool inquiry_data() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x2A)) {
@@ -472,7 +391,7 @@ namespace rx24t {
 			@return データ量域有無（通常、０ｘ１Ｄ）
 		*/
 		//-----------------------------------------------------------------//
-		uint8_t get_data() const { return data_; }
+		uint8_t get_data() const noexcept { return data_; }
 
 
 		//-----------------------------------------------------------------//
@@ -481,7 +400,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_data_area() {
+		bool inquiry_data_area() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x2B)) {
@@ -526,7 +446,7 @@ namespace rx24t {
 			@return データ量域情報
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_data_area() const { return data_areas_; }
+		const rx::protocol::areas& get_data_area() const noexcept { return data_areas_; }
 
 
 		//-----------------------------------------------------------------//
@@ -535,7 +455,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_block() {
+		bool inquiry_block() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x26)) {
@@ -581,7 +502,7 @@ namespace rx24t {
 			@return ブロック情報
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::blocks& get_block() const { return blocks_; }
+		const rx::protocol::blocks& get_block() const noexcept { return blocks_; }
 
 
 		//-----------------------------------------------------------------//
@@ -590,7 +511,8 @@ namespace rx24t {
 			@param[in]	code	デバイス・コード
 		*/
 		//-----------------------------------------------------------------//
-		bool select_device(uint32_t code) {
+		bool select_device(uint32_t code) noexcept
+		{
 			if(!connection_) return false;
 
 			uint8_t tmp[7];
@@ -626,7 +548,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) {
+		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) noexcept
+		{
 			if(!connection_) return false;
 
 			uint32_t nbr;
@@ -706,7 +629,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool turn_pe_status() {
+		bool turn_pe_status() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x40)) {
@@ -746,7 +670,7 @@ namespace rx24t {
 			@return プロテクト状態
 		*/
 		//-----------------------------------------------------------------//
-		bool get_protect() const { return id_protect_; }
+		bool get_protect() const noexcept { return id_protect_; }
 
 
 		//-----------------------------------------------------------------//
@@ -756,7 +680,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) {
+		bool erase_page(uint32_t address) noexcept
+		{
 			return true;
 		}
 
@@ -768,7 +693,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool select_write_area(bool data) {
+		bool select_write_area(bool data) noexcept
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
@@ -802,7 +728,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool write_page(uint32_t address, const uint8_t* src) {
+		bool write_page(uint32_t address, const uint8_t* src) noexcept
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 			if(!select_write_area_) return false;
@@ -873,7 +800,8 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read_page(uint32_t adr, uint8_t* dst) {
+		bool read_page(uint32_t adr, uint8_t* dst) noexcept
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
@@ -962,11 +890,12 @@ namespace rx24t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool end() {
+		bool end() noexcept
+		{
 			connection_ = false;
 			pe_turn_on_ = false;
 			select_write_area_ = false;
-			return rs232c_.close();
+			return  rx::protocol_base::close();
 		}
 
 	};
