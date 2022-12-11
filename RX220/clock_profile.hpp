@@ -39,18 +39,44 @@ namespace device {
 			HOCO,	///< 内蔵高速オンチップオシレーター（BASE: 32MHz, 36.864MHz, 40MHz, 50MHz）
 			LOCO,	///< 内蔵低速オンチップオシレーター (125KHz)
 		};
-
+#if 1
 		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 32'000'000;		///< ベースクロック
 
 		static constexpr uint32_t   ICLK		= 32'000'000;		///< ICLK 周波数（最大32MHz）
-		static constexpr uint32_t   PCLKA		= 0;				///< PCLKA（互換性の為定義）
 		static constexpr uint32_t   PCLKB		= 32'000'000;		///< PCLKB 周波数（最大32MHz）
-		static constexpr uint32_t	PCLKC		= 0;				///< PCLKC（互換性の為定義）
 		static constexpr uint32_t   PCLKD		= 32'000'000;		///< PCLKD 周波数（最大32MHz）
 		static constexpr uint32_t   FCLK		= 32'000'000;		///< FCLK 周波数（最大4 ～ 32MHz）
+#else
+		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
+		static constexpr uint32_t   BASE		= 20'000'000;		///< ベースクロック
 
-		static constexpr uint32_t	DELAY_MS	= ICLK / 4444444;	///< ソフトウェアー遅延における定数（1マイクロ秒）
-		static constexpr bool		DELAY_T1	= false;			///< 微調整として、「nop」を１つ追加
+		static constexpr uint32_t   ICLK		= 20'000'000;		///< ICLK 周波数（最大32MHz）
+		static constexpr uint32_t   PCLKB		= 20'000'000;		///< PCLKB 周波数（最大32MHz）
+		static constexpr uint32_t   PCLKD		= 20'000'000;		///< PCLKD 周波数（最大32MHz）
+		static constexpr uint32_t   FCLK		= 20'000'000;		///< FCLK 周波数（最大4 ～ 32MHz）
+#endif
+
+		/// ソフトウェアー遅延における定数（1マイクロ秒）
+		static void delay_us() noexcept
+		{
+			// 定数（DELAY_MS）で指定すると、ループ数が少なくインライン展開され、予想した時間にならない為、直で’NOP’数で調整する。
+			if(ICLK == 32'000'000) {  // 32MHz 用
+				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
+				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
+				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
+				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
+			} else if(ICLK == 20'000'000) { // 20MHz 用
+				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
+				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
+				asm("nop"); asm("nop"); asm("nop");
+			} else {
+				for(volatile uint8_t i = 0; i < (ICLK / 2'000'000) - 4; ++i) {
+					asm("nop");
+				}
+			}
+		}
+		static constexpr bool		DELAY_T1	= true;			///< 微調整として、「nop」を１つ追加
+		static constexpr bool		DELAY_T2	= true;			///< 微調整として、「nop」を１つ追加
 	};
 }

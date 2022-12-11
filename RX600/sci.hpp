@@ -1209,8 +1209,11 @@ namespace device {
 		static constexpr bool SEMR_NFEN = true;		///< NFEN（ノイズフィルタ）
 	};
 
+#if defined(SIG_RX220)
+	typedef scia_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+		ICU::VECTOR::TEI1, ICU::VECTOR::ERI1, clock_profile::PCLKB> SCI1;
 
-#if defined(SIG_RX621) || defined(SIG_RX62N)
+#elif defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef scia_t<0x0008'8240, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
 		ICU::VECTOR::TEI0, ICU::VECTOR::ERI0, clock_profile::PCLK> SCI0;
 	typedef scia_t<0x0008'8248, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
