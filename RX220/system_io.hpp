@@ -63,11 +63,11 @@ namespace device {
 		static constexpr uint8_t clock_div_(uint32_t clk) noexcept
 		{
 			uint8_t div = 0;
-			while(clk < (clock_profile::BASE * 8)) {
+			while(clk < clock_profile::BASE) {
 				++div;
 				clk <<= 1;
 			}
-			if(div > 0b0011) div = 0b111;
+			if(div > 0b0110) div = 0b111;
 			return div;
 		}
 
@@ -77,7 +77,7 @@ namespace device {
 			if(div > 0b0110) {
 				return false;  // overflow
 			}
-			if((clk << div) != ((clock_profile::BASE * 8) & (0xffffffff << div))) {
+			if((clk << div) != ((clock_profile::BASE) & (0xffffffff << div))) {
 				return false;  // 割り切れない周期
 			}
 			return true;
