@@ -479,7 +479,7 @@ namespace device {
 		ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLK> RIIC0;
 	typedef riic_t<0x0008'8320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
 		ICU::VECTOR::ICEEI1, ICU::VECTOR::ICTEI1, clock_profile::PCLK> RIIC1;
-#elif defined(SIG_RX24T)
+#elif defined(SIG_RX220) || defined(SIG_RX24T)
 	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
