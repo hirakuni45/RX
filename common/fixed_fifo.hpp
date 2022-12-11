@@ -42,7 +42,7 @@ namespace utils {
 			@return	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		constexpr uint32_t size() const noexcept { return SIZE; }
+		constexpr auto size() const noexcept { return SIZE; }
 
 
         //-----------------------------------------------------------------//
@@ -51,7 +51,7 @@ namespace utils {
 			@return	長さ
         */
         //-----------------------------------------------------------------//
-		uint32_t length() const noexcept {
+		auto length() const noexcept {
 			if(put_ >= get_) return (put_ - get_);
 			else return (SIZE + put_ - get_);
 		}
@@ -150,7 +150,7 @@ namespace utils {
 			@return	位置
         */
         //-----------------------------------------------------------------//
-		inline uint16_t pos_get() const noexcept { return get_; }
+		inline auto pos_get() const noexcept { return get_; }
 
 
         //-----------------------------------------------------------------//
@@ -159,6 +159,6 @@ namespace utils {
 			@return	位置
         */
         //-----------------------------------------------------------------//
-		inline uint16_t pos_put() const noexcept { return put_; }
+		inline auto pos_put() const noexcept { return put_; }
 	};
 }
