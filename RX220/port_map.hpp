@@ -25,34 +25,20 @@ namespace device {
 		static bool sub_1st_(peripheral per, bool enable) noexcept
 		{
 			switch(per) {
-#if 0
 			case peripheral::RIIC0:
-			// PB1/SCL0
-			// PB2/SDA0
+			// P16/SCL
+			// P17/SDA
 				{
 					uint8_t sel = enable ? 0b0'1111 : 0;
-					PORTB::PMR.B1 = 0;
-					PORTB::PMR.B2 = 0;
-					MPC::PB1PFS.PSEL = sel;
-					MPC::PB2PFS.PSEL = sel;
-					PORTB::PMR.B1 = enable;
-					PORTB::PMR.B2 = enable;
+					PORT1::PMR.B6 = 0;
+					PORT1::PMR.B7 = 0;
+					MPC::P16PFS.PSEL = sel;
+					MPC::P17PFS.PSEL = sel;
+					PORT1::PMR.B6 = enable;
+					PORT1::PMR.B7 = enable;
 				}
 				break;
-			case peripheral::RIIC1:
-			// P25/SCL1
-			// P26/SDA1
-				{
-					uint8_t sel = enable ? 0b0'1111 : 0;
-					PORT2::PMR.B5 = 0;
-					PORT2::PMR.B6 = 0;
-					MPC::P25PFS.PSEL = sel;
-					MPC::P26PFS.PSEL = sel;
-					PORT2::PMR.B5 = enable;
-					PORT2::PMR.B6 = enable;
-				}
-				break;
-
+#if 0
 			case peripheral::RSPI0:
 			// P24/RSPCKA
 			// P23/MOSIA
@@ -87,22 +73,98 @@ namespace device {
 					PORT2::PMR.B2 = enable;
 				}
 				break;
-
-			case peripheral::SCI0:
-			// P22/RXD0
-			// P23/TXD0
-				{
-					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORT2::PMR.B2 = 0;
-					PORT2::PMR.B3 = 0;
-					MPC::P22PFS.PSEL = sel;
-					MPC::P23PFS.PSEL = sel;
-					PORT2::PMR.B2 = enable;
-					PORT2::PMR.B3 = enable;
-				}
-				break;
 #endif
 
+			case peripheral::SCI1:  // for BOOT serial port
+			// P15/RXD1
+			// P16/TXD1
+				{
+					uint8_t sel = enable ? 0b0'1010 : 0;
+					PORT1::PMR.B5 = 0;
+					PORT1::PMR.B6 = 0;
+					MPC::P15PFS.PSEL = sel;
+					MPC::P16PFS.PSEL = sel;
+					PORT1::PMR.B5 = enable;
+					PORT1::PMR.B6 = enable;
+				}
+				break;
+			case peripheral::SCI5:
+			// PA2/RXD5
+			// PA4/TXD5
+				{
+					uint8_t sel = enable ? 0b0'1010 : 0;
+					PORTA::PMR.B2 = 0;
+					PORTA::PMR.B4 = 0;
+					MPC::PA2PFS.PSEL = sel;
+					MPC::PA4PFS.PSEL = sel;
+					PORTA::PMR.B2 = enable;
+					PORTA::PMR.B4 = enable;
+				}
+				break;
+			case peripheral::SCI6:
+			// P33/RXD6
+			// P32/TXD6
+				{
+					uint8_t sel = enable ? 0b0'1011 : 0;
+					PORT3::PMR.B3 = 0;
+					PORT3::PMR.B2 = 0;
+					MPC::P33PFS.PSEL = sel;
+					MPC::P32PFS.PSEL = sel;
+					PORT3::PMR.B3 = enable;
+					PORT3::PMR.B2 = enable;
+				}
+				break;
+			case peripheral::SCI9:
+			// PB6/RXD9
+			// PB7/TXD9
+				{
+					uint8_t sel = enable ? 0b0'1011 : 0;
+					PORTB::PMR.B6 = 0;
+					PORTB::PMR.B7 = 0;
+					MPC::PB6PFS.PSEL = sel;
+					MPC::PB7PFS.PSEL = sel;
+					PORTB::PMR.B6 = enable;
+					PORTB::PMR.B7 = enable;
+				}
+				break;
+			case peripheral::SCI12:
+			// PE2/RXD12
+			// PE1/TXD12
+				{
+					uint8_t sel = enable ? 0b0'1100 : 0;
+					PORTE::PMR.B2 = 0;
+					PORTE::PMR.B1 = 0;
+					MPC::PE2PFS.PSEL = sel;
+					MPC::PE1PFS.PSEL = sel;
+					PORTE::PMR.B2 = enable;
+					PORTE::PMR.B1 = enable;
+				}
+				break;
+
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
+
+		static bool sub_2nd_(peripheral per, bool enable) noexcept
+		{
+			switch(per) {
+			case peripheral::RIIC0:
+			// P12/SCL
+			// P13/SDA
+				{
+					uint8_t sel = enable ? 0b0'1111 : 0;
+					PORT1::PMR.B2 = 0;
+					PORT1::PMR.B3 = 0;
+					MPC::P12PFS.PSEL = sel;
+					MPC::P13PFS.PSEL = sel;
+					PORT1::PMR.B2 = enable;
+					PORT1::PMR.B3 = enable;
+				}
+				break;
 			case peripheral::SCI1:  // for BOOT serial port
 			// P30/RXD1
 			// P26/TXD1
@@ -116,60 +178,35 @@ namespace device {
 					PORT2::PMR.B6 = enable;
 				}
 				break;
-#if 0
-			case peripheral::SCI2:
-			// P03/RXD2
-			// P02/TXD2
+			case peripheral::SCI5:
+			// PC2/RXD5
+			// PC3/TXD5
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORT0::PMR.B3 = 0;
-					PORT0::PMR.B2 = 0;
-					MPC::P03PFS.PSEL = sel;
-					MPC::P02PFS.PSEL = sel;
-					PORT0::PMR.B3 = enable;
-					PORT0::PMR.B2 = enable;
+					PORTC::PMR.B2 = 0;
+					PORTC::PMR.B3 = 0;
+					MPC::PC2PFS.PSEL = sel;
+					MPC::PC3PFS.PSEL = sel;
+					PORTC::PMR.B2 = enable;
+					PORTC::PMR.B3 = enable;
 				}
 				break;
-			case peripheral::SCI3:
-			// P34/RXD3
-			// P35/TXD3
+			case peripheral::SCI6:
+			// PB0/RXD6
+			// PB1/TXD6
 				{
-					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORT3::PMR.B4 = 0;
-					PORT3::PMR.B5 = 0;
-					MPC::P34PFS.PSEL = sel;
-					MPC::P35PFS.PSEL = sel;
-					PORT3::PMR.B4 = enable;
-					PORT3::PMR.B5 = enable;
+					uint8_t sel = enable ? 0b0'1011 : 0;
+					PORTB::PMR.B0 = 0;
+					PORTB::PMR.B1 = 0;
+					MPC::PB0PFS.PSEL = sel;
+					MPC::PB1PFS.PSEL = sel;
+					PORTB::PMR.B0 = enable;
+					PORTB::PMR.B1 = enable;
 				}
 				break;
-#endif
-			default:
-				return false;
-				break;
-			}
-			return true;
-		}
 
 
-		static bool sub_2nd_(peripheral per, bool enable) noexcept
-		{
-			switch(per) {
 #if 0
-			case peripheral::CAN1:
-			// PB6/CRX1
-			// PB5/CTX1
-				{
-					uint8_t sel = enable ? 0b1'0000 : 0;
-					PORTB::PMR.B6 = 0;
-					PORTB::PMR.B5 = 0;
-					MPC::PB6PFS.PSEL = sel;
-					MPC::PB5PFS.PSEL = sel;
-					PORTB::PMR.B6 = enable;
-					PORTB::PMR.B5 = enable;
-				}
-				break;
-
 			case peripheral::RSPI0:
 			// P24/RSPCKA
 			// P23/MOSIA
@@ -216,21 +253,19 @@ namespace device {
 		static bool sub_3rd_(peripheral per, bool enable) noexcept
 		{
 			switch(per) {
-#if 0
-			case peripheral::SCI1:
-			// P93/RXD1
-			// P26/TXD1
+			case peripheral::SCI5:
+			// PA3/RXD5
+			// PA4/TXD5
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORT9::PMR.B3 = 0;
-					PORT2::PMR.B6 = 0;
-					MPC::P93PFS.PSEL = sel;
-					MPC::P26PFS.PSEL = sel;
-					PORT9::PMR.B3 = enable;
-					PORT2::PMR.B6 = enable;
+					PORTA::PMR.B3 = 0;
+					PORTA::PMR.B4 = 0;
+					MPC::PA3PFS.PSEL = sel;
+					MPC::PA4PFS.PSEL = sel;
+					PORTA::PMR.B3 = enable;
+					PORTA::PMR.B4 = enable;
 				}
 				break;
-#endif
 			default:
 				return false;
 				break;
