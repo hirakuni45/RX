@@ -231,13 +231,13 @@ $(BUILD)/%.o : %.cpp
 	mkdir -p $(dir $@); \
 	$(CP) -c $(POPT) $(PFLAGS) $(PINCS) $(CPWARN) -o $@ $<
 
-$(BUILD)/%.d: %.c Makefile
+$(BUILD)/%.d: %.c Makefile ../../common/makefile
 	mkdir -p $(dir $@); \
 	$(CC) -MM -DDEPEND_ESCAPE $(COPT) $(CFLAGS) $(APPINCS) $< \
 	| sed 's/$(notdir $*)\.o:/$(subst /,\/,$(patsubst %.d,%.o,$@) $@):/' > $@ ; \
 	[ -s $@ ] || rm -f $@
 
-$(BUILD)/%.d: %.cpp Makefile
+$(BUILD)/%.d: %.cpp Makefile ../../common/makefile
 	mkdir -p $(dir $@); \
 	$(CP) -MM -DDEPEND_ESCAPE $(POPT) $(PFLAGS) $(APPINCS) $< \
 	| sed 's/$(notdir $*)\.o:/$(subst /,\/,$(patsubst %.d,%.o,$@) $@):/' > $@ ; \
