@@ -8,6 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "rx220_protocol.hpp"
 #include "rx62x_protocol.hpp"
 #include "rx63x_protocol.hpp"
 #include "rx24t_protocol.hpp"
@@ -31,7 +32,7 @@ namespace rx {
 		typedef utils::rs232c_io RS232C;
 		RS232C		rs232c_;
 
-		using protocol_type = boost::variant<rx62x::protocol, rx63x::protocol, rx24t::protocol, rx64m::protocol, rx65x::protocol, rx66t::protocol, rx72t::protocol>;
+		using protocol_type = boost::variant<rx220::protocol, rx62x::protocol, rx63x::protocol, rx24t::protocol, rx64m::protocol, rx65x::protocol, rx66t::protocol, rx72t::protocol>;
 		protocol_type protocol_;
 
 		std::string out_section_(uint32_t n, uint32_t num) const {
@@ -138,7 +139,9 @@ namespace rx {
 		//-------------------------------------------------------------//
 		bool start(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx)
 		{
-			if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N") {
+			if(rx.cpu_type_ == "RX220") {
+				protocol_ = rx220::protocol();
+			} else if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N") {
 				protocol_ = rx62x::protocol();
 			} else if(rx.cpu_type_ == "RX631" || rx.cpu_type_ == "RX63N" || rx.cpu_type_ == "RX63T") {
 				protocol_ = rx63x::protocol();

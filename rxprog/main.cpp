@@ -427,7 +427,7 @@ int main(int argc, char* argv[])
 	rx.cpu_type_ = opts.device;
 
 	// 接続されたクロック周波数が必要なグループ
-	if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N"
+	if(rx.cpu_type_ == "RX220" || rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N"
 		|| rx.cpu_type_ == "RX631" || rx.cpu_type_ == "RX63N" || rx.cpu_type_ == "RX63T") {
 		std::string name;
 		for(const auto& t : conf_in_.get_device_list()) {
