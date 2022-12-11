@@ -441,7 +441,7 @@ namespace device {
 		clock_profile::PCLK>  RSPI0;
 	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
 		clock_profile::PCLK>  RSPI1;
-#elif defined(SIG_RX24T)
+#elif defined(SIG_RX220) || defined(SIG_RX24T)
 	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKB>  RSPI0;
 #elif defined(SIG_RX64M)

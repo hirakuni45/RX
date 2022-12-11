@@ -24,75 +24,72 @@
 
 namespace {
 
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
+
 #if defined(SIG_RX220)
 	// 秋月 RX220 ボード
 	static const char* system_str_ = { "AE-RX220" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX63T)
 	// DIY RX63T board
 	static const char* system_str_ = { "RX63T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX62N)
   #if defined(CQ_FRK)
     // FRK-RX62N(CQ 出版社)
 	static const char* system_str_ = { "RX62N FRK-RX62N" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
   #else
     // BlueBoard-RX62N_100pin
 	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
   #endif
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::SCI9 SCI_CH;
+	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::SCI2 SCI_CH;
+	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
 #endif
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
-
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 	SCI		sci_;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
@@ -157,13 +154,13 @@ int main(int argc, char** argv)
 	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("\nStart SCI (UART) sample for '%s' %d[MHz]\n") % system_str_ % clk;
 	{  // SCI/CMT の設定レポート表示
-		utils::format("SCI PCLK: %u [Hz]\n") % SCI_CH::PCLK;
+		utils::format("SCI PCLK: %u [Hz]\n") % SCI::sci_type::PCLK;
 		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
 		rate *= 100.0f;
 		utils::format("  Baud rate (real): %u (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
-		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(SCI_CH::SEMR_BRME);
-		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(SCI_CH::SEMR_BGDM);
+		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(SCI::sci_type::SEMR_BRME);
+		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(SCI::sci_type::SEMR_BGDM);
 		utils::format("CMT Timer (set):  %d [Hz]\n") % cmt_.get_rate();
 		rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
 		rate *= 100.0f;

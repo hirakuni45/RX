@@ -23,7 +23,7 @@ namespace device {
 	template <class CMT, class TASK = utils::null_task>
 	class cmt_mgr {
 	public:
-		typedef CMT value_type;		///< CMT チャネル・クラス型
+		typedef CMT cmt_type;	///< CMT チャネル・クラス型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
