@@ -49,10 +49,13 @@ namespace utils {
 		static void micro_second(uint32_t us)
 		{
 			while(us > 0) {
-				// RXv2 コア（最大 80MHz）
+#if defined (SIG_RX220)
+				device::clock_profile::delay_us();
+#else
 				for(uint32_t n = 0; n < device::clock_profile::DELAY_MS; ++n) {
 					asm("nop");
 				}
+#endif
 				--us;
 			}
 			if(device::clock_profile::DELAY_T1) { asm("nop"); }

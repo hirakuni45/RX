@@ -20,11 +20,17 @@
 #include "common/monitor.hpp"
 
 // debug monitor を有効にする場合
-#define MEMORY_MONITOR
+// #define MEMORY_MONITOR
 
 namespace {
 
-#if defined(SIG_RX63T)
+#if defined(SIG_RX220)
+	// 秋月 RX220 ボード
+	static const char* system_str_ = { "AE-RX220" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX63T)
 	// DIY RX63T board
 	static const char* system_str_ = { "RX63T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
@@ -150,10 +156,6 @@ int main(int argc, char** argv)
 
 	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("\nStart SCI (UART) sample for '%s' %d[MHz]\n") % system_str_ % clk;
-
-	LED::DIR = 1;
-	LED::P = 0;
-
 	{  // SCI/CMT の設定レポート表示
 		utils::format("SCI PCLK: %u [Hz]\n") % SCI_CH::PCLK;
 		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_.get_baud_rate();
@@ -171,6 +173,9 @@ int main(int argc, char** argv)
 #ifndef MEMORY_MONITOR
 	cmd_.set_prompt("# ");
 #endif
+
+	LED::DIR = 1;
+	LED::P = 0;
 
 	uint8_t cnt = 0;
 	while(1) {
