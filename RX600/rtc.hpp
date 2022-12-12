@@ -45,7 +45,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>	F2HZ;
 			bit_rw_t<io_, bitpos::B6>	F1HZ;
 		};
-		typedef r64cnt_t<0x0008C400> R64CNT_;
+		typedef r64cnt_t<0x0008'C400> R64CNT_;
 		static  R64CNT_ R64CNT;
 
 
@@ -66,7 +66,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>  SEC1;
 			bits_rw_t<io_, bitpos::B4, 3>  SEC10;
 		};
-		typedef rseccnt_t<0x0008C402> RSECCNT_;
+		typedef rseccnt_t<0x0008'C402> RSECCNT_;
 		static  RSECCNT_ RSECCNT;
 
 
@@ -87,7 +87,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>  MIN1;
 			bits_rw_t<io_, bitpos::B4, 3>  MIN10;
 		};
-		typedef rmincnt_t<0x0008C404> RMINCNT_;
+		typedef rmincnt_t<0x0008'C404> RMINCNT_;
 		static  RMINCNT_ RMINCNT;
 
 
@@ -109,7 +109,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  HR10;
 			bit_rw_t <io_, bitpos::B6>     PM;
 		};
-		typedef rhrcnt_t<0x0008C406> RHRCNT_;
+		typedef rhrcnt_t<0x0008'C406> RHRCNT_;
 		static  RHRCNT_ RHRCNT;
 
 
@@ -129,7 +129,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  DAYW;
 		};
-		typedef rwkcnt_t<0x0008C408> RWKCNT_;
+		typedef rwkcnt_t<0x0008'C408> RWKCNT_;
 		static  RWKCNT_ RWKCNT;
 
 
@@ -150,7 +150,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> DATE1;
 			bits_rw_t<io_, bitpos::B4, 2> DATE10;
 		};
-		typedef rdaycnt_t<0x0008C40A> RDAYCNT_;
+		typedef rdaycnt_t<0x0008'C40A> RDAYCNT_;
 		static  RDAYCNT_ RDAYCNT;
 
 
@@ -171,7 +171,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> MON1;
 			bit_rw_t <io_, bitpos::B4>    MON10;
 		};
-		typedef rmoncnt_t<0x0008C40C> RMONCNT_;
+		typedef rmoncnt_t<0x0008'C40C> RMONCNT_;
 		static  RMONCNT_ RMONCNT;
 
 
@@ -192,7 +192,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> YR1;
 			bits_rw_t<io_, bitpos::B4, 4> YR10;
 		};
-		typedef ryrcnt_t<0x0008C40E> RYRCNT_;
+		typedef ryrcnt_t<0x0008'C40E> RYRCNT_;
 		static  RYRCNT_ RYRCNT;
 
 
@@ -214,7 +214,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3> SEC10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rsecar_t<0x0008C410> RSECAR_;
+		typedef rsecar_t<0x0008'C410> RSECAR_;
 		static  RSECAR_ RSECAR;
 
 
@@ -236,7 +236,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3> MIN10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rminar_t<0x0008C412> RMINAR_;
+		typedef rminar_t<0x0008'C412> RMINAR_;
 		static  RMINAR_ RMINAR;
 
 
@@ -259,7 +259,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>    PM;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rhrar_t<0x0008C414> RHRAR_;
+		typedef rhrar_t<0x0008'C414> RHRAR_;
 		static  RHRAR_ RHRAR;
 
 
@@ -281,7 +281,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rwkar_t<0x0008C416> RWKAR_;
+		typedef rwkar_t<0x0008'C416> RWKAR_;
 		static  RWKAR_ RWKAR;
 
 
@@ -303,7 +303,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> DATE10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rdayar_t<0x0008C418> RDAYAR_;
+		typedef rdayar_t<0x0008'C418> RDAYAR_;
 		static  RDAYAR_ RDAYAR;
 
 
@@ -325,7 +325,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>    MON10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rmonar_t<0x0008C41A> RMONAR_;
+		typedef rmonar_t<0x0008'C41A> RMONAR_;
 		static  RMONAR_ RMONAR;
 
 
@@ -346,7 +346,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> YR1;
 			bits_rw_t<io_, bitpos::B4, 4> YR10;
 		};
-		typedef ryrar_t<0x0008C41C> RYRAR_;
+		typedef ryrar_t<0x0008'C41C> RYRAR_;
 		static  RYRAR_ RYRAR;
 
 
@@ -366,7 +366,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  ENB;
 		};
-		typedef ryraren_t<0x0008C41E> RYRAREN_;
+		typedef ryraren_t<0x0008'C41E> RYRAREN_;
 		static  RYRAREN_ RYRAREN;
 
 
@@ -390,7 +390,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B3>	  RTCOS;
 			bits_rw_t<io_, bitpos::B4, 4> PES;
 		};
-		typedef rcr1_t<0x0008C422> RCR1_;
+		typedef rcr1_t<0x0008'C422> RCR1_;
 		static  RCR1_ RCR1;
 
 
@@ -417,7 +417,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  HR24;
 			bit_rw_t<io_, bitpos::B7>  CNTMD;
 		};
-		typedef rcr2_t<0x0008C424> RCR2_;
+		typedef rcr2_t<0x0008'C424> RCR2_;
 		static  RCR2_ RCR2;
 
 
@@ -438,7 +438,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>	  RTCEN;
 			bits_rw_t<io_, bitpos::B1, 3> RTCDV;
 		};
-		typedef rcr3_t<0x0008C426> RCR3_;
+		typedef rcr3_t<0x0008'C426> RCR3_;
 		static  RCR3_ RCR3;
 
 
@@ -458,7 +458,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>	  RCKSEL;
 		};
-		typedef rcr4_t<0x0008C428> RCR4_;
+		typedef rcr4_t<0x0008'C428> RCR4_;
 		static  RCR4_ RCR4;
 
 
@@ -467,7 +467,7 @@ namespace device {
 			@brief  周波数レジスタ H（RFRH）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008C42A> RFRH_;
+		typedef rw16_t<0x0008'C42A> RFRH_;
 		static  RFRH_ RFRH;
 
 
@@ -476,7 +476,7 @@ namespace device {
 			@brief  周波数レジスタ L（RFRL）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008C42C> RFRL_;
+		typedef rw16_t<0x0008'C42C> RFRL_;
 		static  RFRL_ RFRL;
 
 
@@ -497,7 +497,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 5> ADJ;
 			bits_rw_t<io_, bitpos::B6, 2> PMADJ;
 		};
-		typedef radj_t<0x0008C42E> RADJ_;
+		typedef radj_t<0x0008'C42E> RADJ_;
 		static  RADJ_ RADJ;
 
 
@@ -520,11 +520,11 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> TCNF;
 			bit_rw_t <io_, bitpos::B7>    TCEN;
 		};
-		typedef rtccr_t<0x0008C440> RTCCR0_;
+		typedef rtccr_t<0x0008'C440> RTCCR0_;
 		static  RTCCR0_ RTCCR0;
-		typedef rtccr_t<0x0008C442> RTCCR1_;
+		typedef rtccr_t<0x0008'C442> RTCCR1_;
 		static  RTCCR1_ RTCCR1;
-		typedef rtccr_t<0x0008C444> RTCCR2_;
+		typedef rtccr_t<0x0008'C444> RTCCR2_;
 		static  RTCCR2_ RTCCR2;
 
 
@@ -545,11 +545,11 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> SEC1;
 			bits_rw_t<io_, bitpos::B4, 3> SEC10;
 		};
-		typedef rseccpy_t<0x0008C452> RSECCPY0_;
+		typedef rseccpy_t<0x0008'C452> RSECCPY0_;
 		static  RSECCPY0_ RSECCPY0;
-		typedef rseccpy_t<0x0008C462> RSECCPY1_;
+		typedef rseccpy_t<0x0008'C462> RSECCPY1_;
 		static  RSECCPY1_ RSECCPY1;
-		typedef rseccpy_t<0x0008C472> RSECCPY2_;
+		typedef rseccpy_t<0x0008'C472> RSECCPY2_;
 		static  RSECCPY2_ RSECCPY2;
 
 
@@ -570,11 +570,11 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> MIN1;
 			bits_rw_t<io_, bitpos::B4, 3> MIN10;
 		};
-		typedef rmincpy_t<0x0008C454> RMINCP0_;
+		typedef rmincpy_t<0x0008'C454> RMINCP0_;
 		static  RMINCP0_ RMINCP0;
-		typedef rmincpy_t<0x0008C464> RMINCP1_;
+		typedef rmincpy_t<0x0008'C464> RMINCP1_;
 		static  RMINCP1_ RMINCP1;
-		typedef rmincpy_t<0x0008C474> RMINCP2_;
+		typedef rmincpy_t<0x0008'C474> RMINCP2_;
 		static  RMINCP2_ RMINCP2;
 
 
@@ -596,11 +596,11 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> HR10;
 			bit_rw_t <io_, bitpos::B6>    PM;
 		};
-		typedef rhrcpy_t<0x0008C456> RHRCP0_;
+		typedef rhrcpy_t<0x0008'C456> RHRCP0_;
 		static  RHRCP0_ RHRCP0;
-		typedef rhrcpy_t<0x0008C466> RHRCP1_;
+		typedef rhrcpy_t<0x0008'C466> RHRCP1_;
 		static  RHRCP1_ RHRCP1;
-		typedef rhrcpy_t<0x0008C476> RHRCP2_;
+		typedef rhrcpy_t<0x0008'C476> RHRCP2_;
 		static  RHRCP2_ RHRCP2;
 
 
@@ -621,11 +621,11 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> DATE1;
 			bits_rw_t<io_, bitpos::B4, 2> DATE10;
 		};
-		typedef rdaycpy_t<0x0008C45A> RDAYCP0_;
+		typedef rdaycpy_t<0x0008'C45A> RDAYCP0_;
 		static  RDAYCP0_ RDAYCP0;
-		typedef rdaycpy_t<0x0008C46A> RDAYCP1_;
+		typedef rdaycpy_t<0x0008'C46A> RDAYCP1_;
 		static  RDAYCP1_ RDAYCP1;
-		typedef rdaycpy_t<0x0008C47A> RDAYCP2_;
+		typedef rdaycpy_t<0x0008'C47A> RDAYCP2_;
 		static  RDAYCP2_ RDAYCP2;
 
 
@@ -646,13 +646,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> MON1;
 			bit_rw_t <io_, bitpos::B4>    MON10;
 		};
-		typedef rmoncpy_t<0x0008C45C> RMONCP0_;
+		typedef rmoncpy_t<0x0008'C45C> RMONCP0_;
 		static  RMONCP0_ RMONCP0;
-		typedef rmoncpy_t<0x0008C46C> RMONCP1_;
+		typedef rmoncpy_t<0x0008'C46C> RMONCP1_;
 		static  RMONCP1_ RMONCP1;
-		typedef rmoncpy_t<0x0008C47C> RMONCP2_;
+		typedef rmoncpy_t<0x0008'C47C> RMONCP2_;
 		static  RMONCP2_ RMONCP2;
-
 
 
 		//-----------------------------------------------------------------//
@@ -660,63 +659,63 @@ namespace device {
 			@brief  バイナリカウンタ 0（BCNT0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C402> BCNT0_;
+		typedef rw8_t<0x0008'C402> BCNT0_;
 		static  BCNT0_ BCNT0;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 1（BCNT1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C404> BCNT1_;
+		typedef rw8_t<0x0008'C404> BCNT1_;
 		static  BCNT1_ BCNT1;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2（BCNT2）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C406> BCNT2_;
+		typedef rw8_t<0x0008'C406> BCNT2_;
 		static  BCNT2_ BCNT2;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3（BCNT3）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C408> BCNT3_;
+		typedef rw8_t<0x0008'C408> BCNT3_;
 		static  BCNT3_ BCNT3;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 0 アラームレジスタ（BCNT0AR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C410> BCNT0AR_;
+		typedef rw8_t<0x0008'C410> BCNT0AR_;
 		static  BCNT0AR_ BCNT0AR;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 1 アラームレジスタ（BCNT1AR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C412> BCNT1AR_;
+		typedef rw8_t<0x0008'C412> BCNT1AR_;
 		static  BCNT1AR_ BCNT1AR;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2 アラームレジスタ（BCNT2AR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C414> BCNT2AR_;
+		typedef rw8_t<0x0008'C414> BCNT2AR_;
 		static  BCNT2AR_ BCNT2AR;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3 アラームレジスタ（BCNT3AR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C416> BCNT3AR_;
+		typedef rw8_t<0x0008'C416> BCNT3AR_;
 		static  BCNT3AR_ BCNT3AR;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 0 アラーム許可レジスタ（BCNT0AER）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C418> BCNT0AER_;
+		typedef rw8_t<0x0008'C418> BCNT0AER_;
 		static  BCNT0AER_ BCNT0AER;
 
 		//-----------------------------------------------------------------//
@@ -724,24 +723,22 @@ namespace device {
 			@brief  バイナリカウンタ 1 アラーム許可レジスタ（BCNT1AER）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C41A> BCNT1AER_;
+		typedef rw8_t<0x0008'C41A> BCNT1AER_;
 		static  BCNT1AER_ BCNT1AER;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2 アラーム許可レジスタ（BCNT2AER）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C41C> BCNT2AER_;
+		typedef rw8_t<0x0008'C41C> BCNT2AER_;
 		static  BCNT2AER_ BCNT2AER;
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3 アラーム許可レジスタ（BCNT3AER）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C41E> BCNT3AER_;
+		typedef rw8_t<0x0008'C41E> BCNT3AER_;
 		static  BCNT3AER_ BCNT3AER;
-
-
 
 
 		//-----------------------------------------------------------------//
@@ -749,7 +746,7 @@ namespace device {
 			@brief  BCNT0 キャプチャレジスタ 0（BCNT0CP0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C452> BCNT0CP0_;
+		typedef rw8_t<0x0008'C452> BCNT0CP0_;
 		static  BCNT0CP0_ BCNT0CP0;
 
 
@@ -758,7 +755,7 @@ namespace device {
 			@brief  BCNT0 キャプチャレジスタ 1（BCNT0CP1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C462> BCNT0CP1_;
+		typedef rw8_t<0x0008'C462> BCNT0CP1_;
 		static  BCNT0CP1_ BCNT0CP1;
 
 
@@ -767,7 +764,7 @@ namespace device {
 			@brief  BCNT0 キャプチャレジスタ 2（BCNT0CP2）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C472> BCNT0CP2_;
+		typedef rw8_t<0x0008'C472> BCNT0CP2_;
 		static  BCNT0CP2_ BCNT0CP2;
 
 		//-----------------------------------------------------------------//
@@ -775,7 +772,7 @@ namespace device {
 			@brief  BCNT1 キャプチャレジスタ 0（BCNT1CP0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C454> BCNT1CP0_;
+		typedef rw8_t<0x0008'C454> BCNT1CP0_;
 		static  BCNT1CP0_ BCNT1CP0;
 
 
@@ -784,7 +781,7 @@ namespace device {
 			@brief  BCNT1 キャプチャレジスタ 1（BCNT1CP1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C464> BCNT1CP1_;
+		typedef rw8_t<0x0008'C464> BCNT1CP1_;
 		static  BCNT1CP1_ BCNT1CP1;
 
 
@@ -793,7 +790,7 @@ namespace device {
 			@brief  BCNT1 キャプチャレジスタ 2（BCNT1CP2）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C474> BCNT1CP2_;
+		typedef rw8_t<0x0008'C474> BCNT1CP2_;
 		static  BCNT1CP2_ BCNT1CP2;
 
 		//-----------------------------------------------------------------//
@@ -801,7 +798,7 @@ namespace device {
 			@brief  BCNT2 キャプチャレジスタ 0（BCNT2CP0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C456> BCNT2CP0_;
+		typedef rw8_t<0x0008'C456> BCNT2CP0_;
 		static  BCNT2CP0_ BCNT2CP0;
 
 
@@ -810,7 +807,7 @@ namespace device {
 			@brief  BCNT2 キャプチャレジスタ 1（BCNT2CP1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C466> BCNT2CP1_;
+		typedef rw8_t<0x0008'C466> BCNT2CP1_;
 		static  BCNT2CP1_ BCNT2CP1;
 
 
@@ -819,7 +816,7 @@ namespace device {
 			@brief  BCNT2 キャプチャレジスタ 2（BCNT2CP2）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C476> BCNT2CP2_;
+		typedef rw8_t<0x0008'C476> BCNT2CP2_;
 		static  BCNT2CP2_ BCNT2CP2;
 
 
@@ -828,7 +825,7 @@ namespace device {
 			@brief  BCNT3 キャプチャレジスタ 0（BCNT3CP0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C45A> BCNT3CP0_;
+		typedef rw8_t<0x0008'C45A> BCNT3CP0_;
 		static  BCNT3CP0_ BCNT3CP0;
 
 
@@ -837,7 +834,7 @@ namespace device {
 			@brief  BCNT3 キャプチャレジスタ 1（BCNT3CP1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C46A> BCNT3CP1_;
+		typedef rw8_t<0x0008'C46A> BCNT3CP1_;
 		static  BCNT3CP1_ BCNT3CP1;
 
 
@@ -846,7 +843,7 @@ namespace device {
 			@brief  BCNT3 キャプチャレジスタ 2（BCNT3CP2）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008C47A> BCNT3CP2_;
+		typedef rw8_t<0x0008'C47A> BCNT3CP2_;
 		static  BCNT3CP2_ BCNT3CP2;
 	};
 	template <peripheral per> typename rtc_t<per>::R64CNT_ rtc_t<per>::R64CNT;
