@@ -75,7 +75,7 @@ namespace device {
 		typename doc_t<base, per>::DODSR_ doc_t<base, per>::DODSR;
 
 
-#if defined(SIG_RX63T) || defined(SIG_RX24T)
+#if defined(SIG_RX220) || defined(SIG_RX63T) || defined(SIG_RX24T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データ演算回路（DOC）
@@ -86,7 +86,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR vec>
 	struct doc_norm_t : public doc_t<base, per> {
 
-		static constexpr auto I_VEC = vec;	///< 割り込みベクター
+		static constexpr auto INTRV = vec;	///< 割り込みベクター
 
 	};
 	typedef doc_norm_t<0x0008'B080, peripheral::DOC, ICU::VECTOR::DOPCF> DOC;
@@ -103,7 +103,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::GROUPBL0 vec>
 	struct doc_gbl0_t : public doc_t<base, per> {
 
-		static constexpr auto I_VEC = vec;	///< 割り込みベクター
+		static constexpr auto INTRV = vec;	///< 割り込みベクター
 
 	};
 	typedef doc_gbl0_t<0x0008'B080, peripheral::DOC, ICU::GROUPBL0::DOPCI> DOC;
