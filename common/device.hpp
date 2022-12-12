@@ -30,6 +30,7 @@
 #include "RX220/icu.hpp"
 #include "RX220/icu_mgr.hpp"
 #include "RX220/port_map.hpp"
+#include "RX220/port_map_mtu.hpp"
 
 #include "RX600/rx_dsp_inst.h"
 
