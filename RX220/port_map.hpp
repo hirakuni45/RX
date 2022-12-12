@@ -26,8 +26,8 @@ namespace device {
 		{
 			switch(per) {
 			case peripheral::RIIC0:
-			// P16/SCL
-			// P17/SDA
+			// P16/SCL (LQFP64:18)
+			// P17/SDA (LQFP64:17)
 				{
 					uint8_t sel = enable ? 0b0'1111 : 0;
 					PORT1::PMR.B6 = 0;
@@ -40,8 +40,8 @@ namespace device {
 				break;
 #if 0
 			case peripheral::RSPI0:
-			// P24/RSPCKA
-			// P23/MOSIA
+			// PA5/RSPCKA
+			// PA6/MOSIA
 			// P22/MISOA
 				{
 					uint8_t sel = enable ? 0b0'1101 : 0;
@@ -56,28 +56,11 @@ namespace device {
 					PORT2::PMR.B3 = enable;
 				}
 				break;
-			case peripheral::RSPI1:
-			// P24/RSPCKB
-			// P23/MOSIB
-			// P22/MISOB
-				{
-					uint8_t sel = enable ? 0b0'1110 : 0;
-					PORT2::PMR.B4 = 0;
-					PORT2::PMR.B3 = 0;
-					PORT2::PMR.B2 = 0;
-					MPC::P24PFS.PSEL = sel;
-					MPC::P23PFS.PSEL = sel;
-					MPC::P22PFS.PSEL = sel;
-					PORT2::PMR.B4 = enable;
-					PORT2::PMR.B3 = enable;
-					PORT2::PMR.B2 = enable;
-				}
-				break;
 #endif
 
 			case peripheral::SCI1:  // for BOOT serial port
-			// P15/RXD1
-			// P16/TXD1
+			// P15/RXD1 (LQFP64:19)
+			// P16/TXD1 (LQFP64:18)
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
 					PORT1::PMR.B5 = 0;
@@ -165,6 +148,25 @@ namespace device {
 					PORT1::PMR.B3 = enable;
 				}
 				break;
+#if 0
+			case peripheral::RSPI0:
+			// P24/RSPCKA
+			// P23/MOSIA
+			// P22/MISOA
+				{
+					uint8_t sel = enable ? 0b0'1101 : 0;
+					PORT2::PMR.B4 = 0;
+					PORT2::PMR.B3 = 0;
+					PORT2::PMR.B2 = 0;
+					MPC::P24PFS.PSEL = sel;
+					MPC::P22PFS.PSEL = sel;
+					MPC::P23PFS.PSEL = sel;
+					PORT2::PMR.B4 = enable;
+					PORT2::PMR.B2 = enable;
+					PORT2::PMR.B3 = enable;
+				}
+				break;
+#endif
 			case peripheral::SCI1:  // for BOOT serial port
 			// P30/RXD1
 			// P26/TXD1
@@ -204,8 +206,17 @@ namespace device {
 					PORTB::PMR.B1 = enable;
 				}
 				break;
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
 
 
+		static bool sub_3rd_(peripheral per, bool enable) noexcept
+		{
+			switch(per) {
 #if 0
 			case peripheral::RSPI0:
 			// P24/RSPCKA
@@ -224,35 +235,7 @@ namespace device {
 					PORT2::PMR.B3 = enable;
 				}
 				break;
-			case peripheral::RSPI1:
-			// P24/RSPCKB
-			// P23/MOSIB
-			// P22/MISOB
-				{
-					uint8_t sel = enable ? 0b0'1110 : 0;
-					PORT2::PMR.B4 = 0;
-					PORT2::PMR.B3 = 0;
-					PORT2::PMR.B2 = 0;
-					MPC::P24PFS.PSEL = sel;
-					MPC::P23PFS.PSEL = sel;
-					MPC::P22PFS.PSEL = sel;
-					PORT2::PMR.B4 = enable;
-					PORT2::PMR.B3 = enable;
-					PORT2::PMR.B2 = enable;
-				}
-				break;
 #endif
-			default:
-				return false;
-				break;
-			}
-			return true;
-		}
-
-
-		static bool sub_3rd_(peripheral per, bool enable) noexcept
-		{
-			switch(per) {
 			case peripheral::SCI5:
 			// PA3/RXD5
 			// PA4/TXD5

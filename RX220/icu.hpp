@@ -49,7 +49,7 @@ namespace device {
 			SPTI0   = 46,	///< RSPI0
 			SPII0   = 47,	///< RSPI0
 
-			DCPCF	= 57,	///< DOC
+			DOPCF	= 57,	///< DOC
 
 			CUP		= 63,	///< RTC
 			IRQ0    = 64,	///< ICU

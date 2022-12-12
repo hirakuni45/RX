@@ -161,7 +161,7 @@ namespace device {
 				SYSTEM::MSTPCRC.MSTPC19 = f;
 				break;
 
-			case peripheral::IRDA:
+			case peripheral::IrDA:
 				SYSTEM::MSTPCRC.MSTPC20 = f;
 				break;
 

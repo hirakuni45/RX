@@ -40,6 +40,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  GPS;
 			bit_rw_t <io_, bitpos::B2>     LMS;
+
 			bit_rw_t <io_, bitpos::B7>     DORCLR;
 		};
 		typedef crccr_t<base + 0x00> CRCCR_;

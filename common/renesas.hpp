@@ -14,14 +14,26 @@
 #include "common/device.hpp"
 
 #if defined(SIG_RX220)
-
+#include "RX220/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX220/bus.hpp"
 #include "RX600/dmac.hpp"
+#include "RX220/elc.hpp"
 #include "RX220/port.hpp"
+#include "RX220/mtu2.hpp"
+#include "RX220/poe2.hpp"
 #include "RX600/tmr.hpp"
-
+#include "RX220/rtc.hpp"
+#include "RX220/irda.hpp"
+#include "RX600/crc.hpp"
+#include "RX220/s12ad.hpp"
+#include "RX220/cmpa.hpp"
+#include "RX600/doc.hpp"
 #include "RX220/flash.hpp"
 
 #include "RX220/system_io.hpp"
+// #include "RX220/flash_io.hpp"
+#include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX63T)
 #include "RX63T/lvda.hpp"

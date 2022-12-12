@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・RTC 定義
+	@brief	RX220 グループ・RTCc 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RTC 定義基底クラス
+		@brief  RTCc 定義基底クラス
 		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -72,6 +72,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  バイナリカウンタ 0（BCNT0）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C402> BCNT0_;
+		static  BCNT0_ BCNT0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  分カウンタ（RMINCNT）
 			@param[in]	base	ベースアドレス
 		*/
@@ -89,6 +98,15 @@ namespace device {
 		};
 		typedef rmincnt_t<0x0008'C404> RMINCNT_;
 		static  RMINCNT_ RMINCNT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バイナリカウンタ 1（BCNT1）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C404> BCNT1_;
+		static  BCNT1_ BCNT1;
 
 
 		//-----------------------------------------------------------------//
@@ -115,6 +133,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  バイナリカウンタ 2（BCNT2）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C406> BCNT2_;
+		static  BCNT2_ BCNT2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  曜日カウンタ（RWKCNT）
 			@param[in]	base	ベースアドレス
 		*/
@@ -131,6 +158,15 @@ namespace device {
 		};
 		typedef rwkcnt_t<0x0008'C408> RWKCNT_;
 		static  RWKCNT_ RWKCNT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バイナリカウンタ 3（BCNT3）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C408> BCNT3_;
+		static  BCNT3_ BCNT3;
 
 
 		//-----------------------------------------------------------------//
@@ -220,6 +256,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  バイナリカウンタ 0 アラームレジスタ（BCNT0AR）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C410> BCNT0AR_;
+		static  BCNT0AR_ BCNT0AR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  分アラームレジスタ（RMINAR）
 			@param[in]	base	ベースアドレス
 		*/
@@ -238,6 +283,15 @@ namespace device {
 		};
 		typedef rminar_t<0x0008'C412> RMINAR_;
 		static  RMINAR_ RMINAR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バイナリカウンタ 1 アラームレジスタ（BCNT1AR）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C412> BCNT1AR_;
+		static  BCNT1AR_ BCNT1AR;
 
 
 		//-----------------------------------------------------------------//
@@ -265,6 +319,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  バイナリカウンタ 2 アラームレジスタ（BCNT2AR）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C414> BCNT2AR_;
+		static  BCNT2AR_ BCNT2AR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  曜日アラームレジスタ（RWKAR）
 			@param[in]	base	ベースアドレス
 		*/
@@ -287,6 +350,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  バイナリカウンタ 3 アラームレジスタ（BCNT3AR）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C416> BCNT3AR_;
+		static  BCNT3AR_ BCNT3AR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  日アラームレジスタ（RDAYAR）
 			@param[in]	base	ベースアドレス
 		*/
@@ -301,10 +373,20 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4> DATE1;
 			bits_rw_t<io_, bitpos::B4, 2> DATE10;
+
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
 		typedef rdayar_t<0x0008'C418> RDAYAR_;
 		static  RDAYAR_ RDAYAR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バイナリカウンタ 0 アラーム許可レジスタ（BCNT0AER）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C418> BCNT0AER_;
+		static  BCNT0AER_ BCNT0AER;
 
 
 		//-----------------------------------------------------------------//
@@ -323,10 +405,20 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4> MON1;
 			bit_rw_t <io_, bitpos::B4>    MON10;
+
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
 		typedef rmonar_t<0x0008'C41A> RMONAR_;
 		static  RMONAR_ RMONAR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バイナリカウンタ 1 アラーム許可レジスタ（BCNT1AER）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C41A> BCNT1AER_;
+		static  BCNT1AER_ BCNT1AER;
 
 
 		//-----------------------------------------------------------------//
@@ -352,13 +444,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  バイナリカウンタ 2 アラーム許可レジスタ（BCNT2AER）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw16_t<0x0008'C41C> BCNT2AER_;
+		static  BCNT2AER_ BCNT2AER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  年アラーム許可レジスタ（RYRAREN）
 			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct ryraren_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		struct ryraren_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -368,6 +469,15 @@ namespace device {
 		};
 		typedef ryraren_t<0x0008'C41E> RYRAREN_;
 		static  RYRAREN_ RYRAREN;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バイナリカウンタ 3 アラーム許可レジスタ（BCNT3AER）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C41E> BCNT3AER_;
+		static  BCNT3AER_ BCNT3AER;
 
 
 		//-----------------------------------------------------------------//
@@ -444,44 +554,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  RTC コントロールレジスタ 4（RCR4）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct rcr4_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>	  RCKSEL;
-		};
-		typedef rcr4_t<0x0008'C428> RCR4_;
-		static  RCR4_ RCR4;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  周波数レジスタ H（RFRH）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008'C42A> RFRH_;
-		static  RFRH_ RFRH;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  周波数レジスタ L（RFRL）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008'C42C> RFRL_;
-		static  RFRL_ RFRL;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  時間誤差補正レジスタ（RADJ）
 			@param[in]	base	ベースアドレス
 		*/
@@ -494,357 +566,11 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 5> ADJ;
+			bits_rw_t<io_, bitpos::B0, 6> ADJ;
 			bits_rw_t<io_, bitpos::B6, 2> PMADJ;
 		};
 		typedef radj_t<0x0008'C42E> RADJ_;
 		static  RADJ_ RADJ;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  時間キャプチャ制御レジスタ y（RTCCRy）（y=0 ～ 2）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct rtccr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 2> TCCT;
-			bit_rw_t <io_, bitpos::B2>    TCST;
-			bits_rw_t<io_, bitpos::B4, 2> TCNF;
-			bit_rw_t <io_, bitpos::B7>    TCEN;
-		};
-		typedef rtccr_t<0x0008'C440> RTCCR0_;
-		static  RTCCR0_ RTCCR0;
-		typedef rtccr_t<0x0008'C442> RTCCR1_;
-		static  RTCCR1_ RTCCR1;
-		typedef rtccr_t<0x0008'C444> RTCCR2_;
-		static  RTCCR2_ RTCCR2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  秒キャプチャレジスタ y（RSECCPy）（y=0 ～ 2）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct rseccpy_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 4> SEC1;
-			bits_rw_t<io_, bitpos::B4, 3> SEC10;
-		};
-		typedef rseccpy_t<0x0008'C452> RSECCPY0_;
-		static  RSECCPY0_ RSECCPY0;
-		typedef rseccpy_t<0x0008'C462> RSECCPY1_;
-		static  RSECCPY1_ RSECCPY1;
-		typedef rseccpy_t<0x0008'C472> RSECCPY2_;
-		static  RSECCPY2_ RSECCPY2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  分キャプチャレジスタ y（RMINCPy）（y=0 ～ 2）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct rmincpy_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 4> MIN1;
-			bits_rw_t<io_, bitpos::B4, 3> MIN10;
-		};
-		typedef rmincpy_t<0x0008'C454> RMINCP0_;
-		static  RMINCP0_ RMINCP0;
-		typedef rmincpy_t<0x0008'C464> RMINCP1_;
-		static  RMINCP1_ RMINCP1;
-		typedef rmincpy_t<0x0008'C474> RMINCP2_;
-		static  RMINCP2_ RMINCP2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  時キャプチャレジスタ y（RHRCPy）（y=0 ～ 2）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct rhrcpy_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 4> HR1;
-			bits_rw_t<io_, bitpos::B4, 2> HR10;
-			bit_rw_t <io_, bitpos::B6>    PM;
-		};
-		typedef rhrcpy_t<0x0008'C456> RHRCP0_;
-		static  RHRCP0_ RHRCP0;
-		typedef rhrcpy_t<0x0008'C466> RHRCP1_;
-		static  RHRCP1_ RHRCP1;
-		typedef rhrcpy_t<0x0008'C476> RHRCP2_;
-		static  RHRCP2_ RHRCP2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  日キャプチャレジスタ y（RDAYCPy）（y=0 ～ 2）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct rdaycpy_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 4> DATE1;
-			bits_rw_t<io_, bitpos::B4, 2> DATE10;
-		};
-		typedef rdaycpy_t<0x0008'C45A> RDAYCP0_;
-		static  RDAYCP0_ RDAYCP0;
-		typedef rdaycpy_t<0x0008'C46A> RDAYCP1_;
-		static  RDAYCP1_ RDAYCP1;
-		typedef rdaycpy_t<0x0008'C47A> RDAYCP2_;
-		static  RDAYCP2_ RDAYCP2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  月キャプチャレジスタ y（RMONCPy）（y=0 ～ 2）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct rmoncpy_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 4> MON1;
-			bit_rw_t <io_, bitpos::B4>    MON10;
-		};
-		typedef rmoncpy_t<0x0008'C45C> RMONCP0_;
-		static  RMONCP0_ RMONCP0;
-		typedef rmoncpy_t<0x0008'C46C> RMONCP1_;
-		static  RMONCP1_ RMONCP1;
-		typedef rmoncpy_t<0x0008'C47C> RMONCP2_;
-		static  RMONCP2_ RMONCP2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 0（BCNT0）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C402> BCNT0_;
-		static  BCNT0_ BCNT0;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 1（BCNT1）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C404> BCNT1_;
-		static  BCNT1_ BCNT1;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 2（BCNT2）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C406> BCNT2_;
-		static  BCNT2_ BCNT2;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 3（BCNT3）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C408> BCNT3_;
-		static  BCNT3_ BCNT3;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 0 アラームレジスタ（BCNT0AR）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C410> BCNT0AR_;
-		static  BCNT0AR_ BCNT0AR;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 1 アラームレジスタ（BCNT1AR）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C412> BCNT1AR_;
-		static  BCNT1AR_ BCNT1AR;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 2 アラームレジスタ（BCNT2AR）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C414> BCNT2AR_;
-		static  BCNT2AR_ BCNT2AR;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 3 アラームレジスタ（BCNT3AR）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C416> BCNT3AR_;
-		static  BCNT3AR_ BCNT3AR;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 0 アラーム許可レジスタ（BCNT0AER）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C418> BCNT0AER_;
-		static  BCNT0AER_ BCNT0AER;
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 1 アラーム許可レジスタ（BCNT1AER）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C41A> BCNT1AER_;
-		static  BCNT1AER_ BCNT1AER;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 2 アラーム許可レジスタ（BCNT2AER）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C41C> BCNT2AER_;
-		static  BCNT2AER_ BCNT2AER;
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バイナリカウンタ 3 アラーム許可レジスタ（BCNT3AER）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C41E> BCNT3AER_;
-		static  BCNT3AER_ BCNT3AER;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT0 キャプチャレジスタ 0（BCNT0CP0）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C452> BCNT0CP0_;
-		static  BCNT0CP0_ BCNT0CP0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT0 キャプチャレジスタ 1（BCNT0CP1）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C462> BCNT0CP1_;
-		static  BCNT0CP1_ BCNT0CP1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT0 キャプチャレジスタ 2（BCNT0CP2）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C472> BCNT0CP2_;
-		static  BCNT0CP2_ BCNT0CP2;
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT1 キャプチャレジスタ 0（BCNT1CP0）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C454> BCNT1CP0_;
-		static  BCNT1CP0_ BCNT1CP0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT1 キャプチャレジスタ 1（BCNT1CP1）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C464> BCNT1CP1_;
-		static  BCNT1CP1_ BCNT1CP1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT1 キャプチャレジスタ 2（BCNT1CP2）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C474> BCNT1CP2_;
-		static  BCNT1CP2_ BCNT1CP2;
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT2 キャプチャレジスタ 0（BCNT2CP0）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C456> BCNT2CP0_;
-		static  BCNT2CP0_ BCNT2CP0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT2 キャプチャレジスタ 1（BCNT2CP1）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C466> BCNT2CP1_;
-		static  BCNT2CP1_ BCNT2CP1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT2 キャプチャレジスタ 2（BCNT2CP2）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C476> BCNT2CP2_;
-		static  BCNT2CP2_ BCNT2CP2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT3 キャプチャレジスタ 0（BCNT3CP0）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C45A> BCNT3CP0_;
-		static  BCNT3CP0_ BCNT3CP0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT3 キャプチャレジスタ 1（BCNT3CP1）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C46A> BCNT3CP1_;
-		static  BCNT3CP1_ BCNT3CP1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  BCNT3 キャプチャレジスタ 2（BCNT3CP2）
-		*/
-		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C47A> BCNT3CP2_;
-		static  BCNT3CP2_ BCNT3CP2;
 	};
 	template <peripheral per> typename rtc_t<per>::R64CNT_ rtc_t<per>::R64CNT;
 	template <peripheral per> typename rtc_t<per>::RSECCNT_ rtc_t<per>::RSECCNT;
@@ -877,40 +603,7 @@ namespace device {
 	template <peripheral per> typename rtc_t<per>::RCR1_ rtc_t<per>::RCR1;
 	template <peripheral per> typename rtc_t<per>::RCR2_ rtc_t<per>::RCR2;
 	template <peripheral per> typename rtc_t<per>::RCR3_ rtc_t<per>::RCR3;
-	template <peripheral per> typename rtc_t<per>::RCR4_ rtc_t<per>::RCR4;
-	template <peripheral per> typename rtc_t<per>::RFRH_ rtc_t<per>::RFRH;
-	template <peripheral per> typename rtc_t<per>::RFRL_ rtc_t<per>::RFRL;
 	template <peripheral per> typename rtc_t<per>::RADJ_ rtc_t<per>::RADJ;
-	template <peripheral per> typename rtc_t<per>::RTCCR0_ rtc_t<per>::RTCCR0;
-	template <peripheral per> typename rtc_t<per>::RTCCR1_ rtc_t<per>::RTCCR1;
-	template <peripheral per> typename rtc_t<per>::RTCCR2_ rtc_t<per>::RTCCR2;
-	template <peripheral per> typename rtc_t<per>::RSECCPY0_ rtc_t<per>::RSECCPY0;
-	template <peripheral per> typename rtc_t<per>::RSECCPY1_ rtc_t<per>::RSECCPY1;
-	template <peripheral per> typename rtc_t<per>::RSECCPY2_ rtc_t<per>::RSECCPY2;
-	template <peripheral per> typename rtc_t<per>::BCNT0CP0_ rtc_t<per>::BCNT0CP0;
-	template <peripheral per> typename rtc_t<per>::BCNT0CP1_ rtc_t<per>::BCNT0CP1;
-	template <peripheral per> typename rtc_t<per>::BCNT0CP2_ rtc_t<per>::BCNT0CP2;
-	template <peripheral per> typename rtc_t<per>::RMINCP0_ rtc_t<per>::RMINCP0;
-	template <peripheral per> typename rtc_t<per>::RMINCP1_ rtc_t<per>::RMINCP1;
-	template <peripheral per> typename rtc_t<per>::RMINCP2_ rtc_t<per>::RMINCP2;
-	template <peripheral per> typename rtc_t<per>::BCNT1CP0_ rtc_t<per>::BCNT1CP0;
-	template <peripheral per> typename rtc_t<per>::BCNT1CP1_ rtc_t<per>::BCNT1CP1;
-	template <peripheral per> typename rtc_t<per>::BCNT1CP2_ rtc_t<per>::BCNT1CP2;
-	template <peripheral per> typename rtc_t<per>::RHRCP0_ rtc_t<per>::RHRCP0;
-	template <peripheral per> typename rtc_t<per>::RHRCP1_ rtc_t<per>::RHRCP1;
-	template <peripheral per> typename rtc_t<per>::RHRCP2_ rtc_t<per>::RHRCP2;
-	template <peripheral per> typename rtc_t<per>::BCNT2CP0_ rtc_t<per>::BCNT2CP0;
-	template <peripheral per> typename rtc_t<per>::BCNT2CP1_ rtc_t<per>::BCNT2CP1;
-	template <peripheral per> typename rtc_t<per>::BCNT2CP2_ rtc_t<per>::BCNT2CP2;
-	template <peripheral per> typename rtc_t<per>::RDAYCP0_ rtc_t<per>::RDAYCP0;
-	template <peripheral per> typename rtc_t<per>::RDAYCP1_ rtc_t<per>::RDAYCP1;
-	template <peripheral per> typename rtc_t<per>::RDAYCP2_ rtc_t<per>::RDAYCP2;
-	template <peripheral per> typename rtc_t<per>::BCNT3CP0_ rtc_t<per>::BCNT3CP0;
-	template <peripheral per> typename rtc_t<per>::BCNT3CP1_ rtc_t<per>::BCNT3CP1;
-	template <peripheral per> typename rtc_t<per>::BCNT3CP2_ rtc_t<per>::BCNT3CP2;
-	template <peripheral per> typename rtc_t<per>::RMONCP0_ rtc_t<per>::RMONCP0;
-	template <peripheral per> typename rtc_t<per>::RMONCP1_ rtc_t<per>::RMONCP1;
-	template <peripheral per> typename rtc_t<per>::RMONCP2_ rtc_t<per>::RMONCP2;
 
 	typedef rtc_t<peripheral::RTC> RTC;
 }
