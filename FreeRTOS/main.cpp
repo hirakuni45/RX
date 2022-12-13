@@ -27,68 +27,73 @@
 
 namespace {
 
-#if defined(SIG_RX62N)
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+
+#if defined(SIG_RX220)
+	// 秋月 RX220 ボード
+	static const char* system_str_ = { "AE-RX220" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX62N)
   #if defined(CQ_FRK)
     // FRK-RX62N(CQ 出版社)
 	static const char* system_str_ = { "RX62N FRK-RX62N" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
   #else
     // BlueBoard-RX62N_100pin
 	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
   #endif
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX64M)
 #ifdef GR_KAEDE
 	static const char* system_str_ = { "GR-KAEDE" };
 	typedef device::PORT<device::PORTC, device::bitpos::B1> LED;
 	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
-	typedef device::SCI7 SCI_CH;
+	typedef device::sci_io<device::SCI7, RXB, TXB> SCI;
 #else
 	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #endif
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
+	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
+	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #endif
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
-
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI			sci_;
 
 //  StaticSemaphore を使う場合、「configSUPPORT_STATIC_ALLOCATION」を「1」にする必要がある。
