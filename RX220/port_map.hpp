@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX63T グループ・ポート・マッピング
+	@brief	RX220 グループ・ポート・マッピング
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -72,6 +72,7 @@ namespace device {
 				}
 				break;
 			case peripheral::SCI5:
+			case peripheral::IrDA:
 			// PA2/RXD5
 			// PA4/TXD5
 				{
@@ -181,6 +182,7 @@ namespace device {
 				}
 				break;
 			case peripheral::SCI5:
+			case peripheral::IrDA:
 			// PC2/RXD5
 			// PC3/TXD5
 				{
@@ -237,6 +239,7 @@ namespace device {
 				break;
 #endif
 			case peripheral::SCI5:
+			case peripheral::IrDA:
 			// PA3/RXD5
 			// PA4/TXD5
 				{

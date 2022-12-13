@@ -31,7 +31,7 @@
 #include "RX220/icu_mgr.hpp"
 #include "RX220/port_map.hpp"
 #include "RX220/port_map_mtu.hpp"
-
+#include "RX220/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
@@ -43,6 +43,7 @@
 #include "RX62x/icu_mgr.hpp"
 #include "RX62x/port_map.hpp"
 #include "RX62x/port_map_mtu.hpp"
+#include "RX62x/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
@@ -53,6 +54,7 @@
 #include "RX63x/icu.hpp"
 #include "RX63x/icu_mgr.hpp"
 
+#include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX63T)
@@ -65,6 +67,7 @@
 #include "RX63T/port_map.hpp"
 #include "RX63T/port_map_mtu.hpp"
 #include "RX63T/port_map_gpt.hpp"
+#include "RX63T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX24T)
@@ -77,6 +80,7 @@
 #include "RX24T/port_map.hpp"
 #include "RX24T/port_map_mtu.hpp"
 #include "RX24T/port_map_gpt.hpp"
+#include "RX24T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX64M)
@@ -92,6 +96,7 @@
 #include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
 #include "RX64M/port_map_qspi.hpp"
+#include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX71M)
@@ -107,6 +112,7 @@
 #include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
 #include "RX64M/port_map_qspi.hpp"
+#include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72N)
@@ -123,6 +129,7 @@
 #include "RX72N/port_map_tpu.hpp"
 #include "RX72N/port_map_qspi.hpp"
 #include "RX72N/port_map_ether.hpp"
+#include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72M)
@@ -138,6 +145,7 @@
 #include "RX72M/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
 #include "RX72N/port_map_qspi.hpp"
+#include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX651) || defined(SIG_RX65N)
@@ -150,6 +158,7 @@
 #include "RX65x/port_map.hpp"
 #include "RX65x/port_map_mtu.hpp"
 #include "RX65x/port_map_tpu.hpp"
+#include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX66T)
@@ -162,6 +171,7 @@
 #include "RX66T/port_map.hpp"
 #include "RX66T/port_map_mtu.hpp"
 #include "RX66T/port_map_gptw.hpp"
+#include "RX66T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72T)
@@ -175,6 +185,7 @@
 #include "RX72T/port_map_sci.hpp"
 #include "RX72T/port_map_mtu.hpp"
 #include "RX72T/port_map_gptw.hpp"
+#include "RX66T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #else

@@ -355,7 +355,61 @@ namespace device {
 
 	template <class _>
 	struct mpc_t {
-	
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートファンクションレジスタ 8（PF8IRQ）
+			@param[in] base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pf8irq_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B0> ITS8;
+			bit_rw_t<io, bitpos::B1> ITS9;
+			bit_rw_t<io, bitpos::B2> ITS10;
+			bit_rw_t<io, bitpos::B3> ITS11;
+
+			bit_rw_t<io, bitpos::B5> ITS13;
+
+			bit_rw_t<io, bitpos::B7> ITS15;
+		};
+		typedef pf8irq_t<0x0008'C108> PF8IRQ_;
+		static PF8IRQ_ PF8IRQ;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートファンクションレジスタ 9（PF9IRQ）
+			@param[in] base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pf9irq_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B0> ITS0;
+			bit_rw_t<io, bitpos::B1> ITS1;
+			bit_rw_t<io, bitpos::B2> ITS2;
+			bit_rw_t<io, bitpos::B3> ITS3;
+			bit_rw_t<io, bitpos::B4> ITS4;
+			bit_rw_t<io, bitpos::B5> ITS5;
+			bit_rw_t<io, bitpos::B6> ITS6;
+			bit_rw_t<io, bitpos::B7> ITS7;
+		};
+		typedef pf9irq_t<0x0008'C109> PF9IRQ_;
+		static PF9IRQ_ PF9IRQ;
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートファンクションレジスタ C（PFCMTU）
@@ -474,6 +528,8 @@ namespace device {
 		typedef pfjcan_t<0x0008'C113> PFJCAN_;
 		static PFJCAN_ PFJCAN;
 	};
+	template <class _> typename mpc_t<_>::PF8IRQ_ mpc_t<_>::PF8IRQ;
+	template <class _> typename mpc_t<_>::PF9IRQ_ mpc_t<_>::PF9IRQ;
 	template <class _> typename mpc_t<_>::PFCMTU_ mpc_t<_>::PFCMTU;
 	template <class _> typename mpc_t<_>::PFDMTU_ mpc_t<_>::PFDMTU;
 	template <class _> typename mpc_t<_>::PFFSCI_ mpc_t<_>::PFFSCI;
