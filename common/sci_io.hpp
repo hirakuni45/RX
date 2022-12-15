@@ -2,20 +2,25 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX グループ・SCI I/O 制御 @n
-			・DMAC による転送をサポートしていませんが、必要性を感じていません。@n
-			・同期通信で、ブロック転送を行うような場合は、必要かもしれません。@n
+			・SCI のバリエーションは多義に渡っており、機能的に利用出来ない機能が数多くあります。 @n
+			  詳しくは、ハードウェアーマニュアルを参照して下さい。 @n
+			  通常の非同期通信では、ボーレートの設定範囲と精度が異なるだけです。 @n
+			・SCI の機能によって、ポーリングが出来ない場合があります。 @n
+			   SCIx::SSR_RDRF 定数が false の場合はポーリング不可です。 @n
+			・DMAC による転送をサポートしていませんが、必要性を感じていません。 @n
+			・同期通信で、ブロック転送を行うような場合は、必要かもしれません。 @n
 			Ex: 定義例 @n
-			・受信バッファ、送信バッファの大きさは、最低１６バイトは必要でしょう。@n
-			・ボーレート、サービスする内容に応じて適切に設定して下さい。@n
+			・受信バッファ、送信バッファの大きさは、最低１６バイトは必要です。 @n
+			・ボーレート、サービスする内容に応じて適切に設定して下さい。 @n
 			  typedef utils::fixed_fifo<char, 512>  RBF;  // 受信バッファ定義 @n
 			  typedef utils::fixed_fifo<char, 1024> SBF;  // 送信バッファ定義 @n
 			  typedef device::sci_io<device::SCI1, RBF, SBF> SCI;  // SCI1 の場合 @n
 			  SCI	sci_; // 実態の宣言 @n
 			Ex: 開始例 @n
 			  uint8_t intr_level = 2;    // 割り込みレベル(2) @n
-			  uint32_t baud = 115200;    // ボーレート設定(115200) @n
+			  uint32_t baud = 115200;    // ボーレート設定 (115200) @n
 			  sci_.start(baud, intr_level); @n  
-			Ex: POSIX 関数 (printf など) への通路設定 @n
+			Ex: POSIX 関数 (printf など) への経路設定 @n
               C の関数「sci_putch(), sci_getch()」を定義してリンク可能にする。 @n
 			  syscalls.c ソースをプロジェクトにリンクする。 @n
 			  POSIX read, write 関数が、stdout ディスクリプタに対してアクセスする。 @n
@@ -276,19 +281,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ボーレートを設定して、SCI を有効にする @n
-					※RX63T では、ポーリングはサポート外
+			@brief  ボーレートを設定して、SCI を有効にする
 			@param[in]	baud	ボーレート
-			@param[in]	level	割り込みレベル（０の場合ポーリング）
-			@param[in]	prot	通信プロトコル（標準は、８ビット、パリティ無し、１ストップ）
+			@param[in]	level	割り込みレベル（ICU::LEVEL::NONE の場合ポーリング）
+			@param[in]	prot	通信プロトコル（指定無しの場合、８ビット、パリティ無し、１ストップビット）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t baud, ICU::LEVEL level = 0, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
+		bool start(uint32_t baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
 		{
-#if defined(SIG_RX63T)
-			if(level == ICU::LEVEL::NONE) return false;
-#endif
+			if(level == ICU::LEVEL::NONE && !SCI::SSR_RDRF) {
+				// SSR.RDRF が利用出来ない場合、ポーリングは不可。
+				return false;
+			}
+
 			if(FLCT == FLOW_CTRL::RS485 && level == ICU::LEVEL::NONE) {
 				// RS485 では、割り込みを使わない設定は NG
 				return false;
