@@ -227,7 +227,7 @@ namespace device {
 	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
 		typename tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR_ tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR;
 
-#if defined(SIG_RX220) 
+#if defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
 		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
 	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,

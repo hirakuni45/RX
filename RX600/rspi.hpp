@@ -431,19 +431,26 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
 		typename rspi_c_t<base, per, txv, rxv, pclk>::SPDCR2_ rspi_c_t<base, per, txv, rxv, pclk>::SPDCR2;
 
-#if defined(SIG_RX63T)
+#if defined(SIG_RX220) || defined(SIG_RX24T)
 	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKB>  RSPI0;
-	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
-		clock_profile::PCLKB>  RSPI1;
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLK>  RSPI0;
 	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
 		clock_profile::PCLK>  RSPI1;
-#elif defined(SIG_RX220) || defined(SIG_RX24T)
+#elif defined(SIG_RX63T)
 	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKB>  RSPI0;
+	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
+		clock_profile::PCLKB>  RSPI1;
+#elif defined(SIG_RX631) || defined(SIG_RX63N)
+	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
+		clock_profile::PCLKB>  RSPI0;
+	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
+		clock_profile::PCLKB>  RSPI1;
+	typedef rspi_t<0x0008'83C0, peripheral::RSPI2, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
+		clock_profile::PCLKB>  RSPI2;
 #elif defined(SIG_RX64M)
 	typedef rspi_t<0x000D'0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI;
