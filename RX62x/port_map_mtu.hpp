@@ -10,6 +10,7 @@
 //=========================================================================//
 #include "RX62x/peripheral.hpp"
 #include "RX62x/port.hpp"
+#include "RX62x/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

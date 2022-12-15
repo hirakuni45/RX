@@ -19,6 +19,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX2206 chip.  */
 MEMORY {
+/*	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00003800 /* 16K - stack_size (0x800) */
+/*	USTACK (w) : ORIGIN = 0x00003E00, LENGTH = 4 /* ustack 1536 bytes */
+/*	ISTACK (w) : ORIGIN = 0x00004000, LENGTH = 4 /* istack 512 bytes  */
 	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00003C00 /* 16K - stack_size (0x400) */
 	USTACK (w) : ORIGIN = 0x00003F00, LENGTH = 4 /* ustack 768 bytes */
 	ISTACK (w) : ORIGIN = 0x00004000, LENGTH = 4 /* istack 256 bytes  */

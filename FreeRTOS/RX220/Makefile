@@ -1,17 +1,16 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
-#   @file
-#   @brief  RX24T Makefile
+#	RX220 Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
 TARGET		=	rtos_sample
 
-DEVICE		=	R5F524TA
+DEVICE		=	R5F52206
 
-RX_DEF		=	SIG_RX24T
+RX_DEF		=	SIG_RX220
 
 BUILD		=	release
 # BUILD		=	debug
@@ -23,7 +22,7 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
+				FreeRTOS/Source/portable/GCC/RX200/port.c \
 				FreeRTOS/Source/portable/MemMang/heap_1.c \
 				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
@@ -37,11 +36,11 @@ PSOURCES	=	FreeRTOS/main.cpp
 
 USER_LIBS	=
 
-USER_DEFS	+=	RTOS RTOS_HEAP_SIZE=10
+USER_DEFS   +=	RTOS RTOS_HEAP_SIZE=10
 
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
-				../../FreeRTOS/Source/portable/GCC/RX600v2
+				../../FreeRTOS/Source/portable/GCC/RX200
 
 AS_OPT		=	--defsym NOT_USER=1
 

@@ -14,6 +14,7 @@ Sample program of LED blinking using RX microcontroller
 
 ## Description
 - main.cpp
+- RX220/Makefile
 - RX63T/Makefile
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
 - RX24T/Makefile
@@ -39,7 +40,12 @@ Sample program of LED blinking using RX microcontroller
 /// Memo:
 // Port outputs have different capabilities when current is drawn (suction) and when current is swept (discharge).
 // In general, "sucking in" often allows more current to flow, and it is customary to follow that convention and connect with "sucking in".
-#if defined(SIG_RX63T)
+#if defined(SIG_RX220)
+	// Akizuki-Denshi（秋月電子通商）AE-RX220 ボード
+	// P03 に LED を吸い込みで接続する事を想定している。
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+#elif defined(SIG_RX63T)
 	// DIY RX63T board
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;

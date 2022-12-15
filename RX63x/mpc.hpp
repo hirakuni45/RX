@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ MPC 定義
+	@brief	RX631/RX63N グループ MPC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -17,13 +17,12 @@ namespace device {
 		@brief  マルチファンクションピンコントローラークラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
+	template <class _>
 	struct mpc_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  書き込みプロテクトレジスタ (PWPR)
-			@param[in]	base	アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -43,55 +42,17 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス PSEL
-			@param[in]	base	アドレス
+			@brief  端子機能制御規定クラス ASEL, ISEL
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct pfs_p_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 6>  PSEL;
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  端子機能制御規定クラス ASEL, PSEL 
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct pfs_pa_t : public rw8_t<base> {
+		struct pfs_ai_t : public rw8_t<base> {
 			typedef rw8_t<base> io;
 			using io::operator =;
 			using io::operator ();
 			using io::operator |=;
 			using io::operator &=;
 
-			bits_rw_t<io, bitpos::B0, 6>  PSEL;
-
-			bit_rw_t< io, bitpos::B7>     ASEL;
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  端子機能制御規定クラス PIA
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct pfs_pia_t : public rw8_t<base> {
-			typedef rw8_t<base> io;
-			using io::operator =;
-			using io::operator ();
-			using io::operator |=;
-			using io::operator &=;
-
-			bits_rw_t<io, bitpos::B0, 6>  PSEL;
 			bit_rw_t< io, bitpos::B6>     ISEL;
 			bit_rw_t< io, bitpos::B7>     ASEL;
 		};
@@ -99,43 +60,82 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス PI
+			@brief  端子機能制御規定クラス ASEL, PSEL
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct pfs_pi_t : public rw8_t<base> {
+		struct pfs_ap_t : public rw8_t<base> {
 			typedef rw8_t<base> io;
 			using io::operator =;
 			using io::operator ();
 			using io::operator |=;
 			using io::operator &=;
 
-			bits_rw_t<io, bitpos::B0, 6>  PSEL;
-			bit_rw_t <io, bitpos::B6>     ISEL;
+			bits_rw_t<io, bitpos::B0, 5>  PSEL;
+
+			bit_rw_t< io, bitpos::B7>     ASEL;
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス IA
+			@brief  端子機能制御規定クラス ASEL, ISEL, PSEL
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct pfs_ia_t : public rw8_t<base> {
+		struct pfs_aip_t : public rw8_t<base> {
 			typedef rw8_t<base> io;
 			using io::operator =;
 			using io::operator ();
 			using io::operator |=;
 			using io::operator &=;
 
-			bit_rw_t<io, bitpos::B6>      ISEL;
-			bit_rw_t<io, bitpos::B7>      ASEL;
+			bits_rw_t<io, bitpos::B0, 5>  PSEL;
+
+			bit_rw_t< io, bitpos::B6>     ISEL;
+			bit_rw_t< io, bitpos::B7>     ASEL;
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  端子機能制御規定クラス A
+			@brief  端子機能制御規定クラス ISEL, PSEL
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pfs_ip_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bits_rw_t<io, bitpos::B0, 5>  PSEL;
+
+			bit_rw_t< io, bitpos::B6>     ISEL;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  端子機能制御規定クラス PSEL
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pfs_p_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bits_rw_t<io, bitpos::B0, 5>  PSEL;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  端子機能制御規定クラス ASEL
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -155,12 +155,12 @@ namespace device {
 			@brief  P0n 端子機能制御レジスタ（P0nPFS）（n = 0 ～ 3, 5, 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pia_t<0x0008'C140> P00PFS_;
-		typedef pfs_pia_t<0x0008'C141> P01PFS_;
-		typedef pfs_pia_t<0x0008'C142> P02PFS_;
-		typedef pfs_pia_t<0x0008'C143> P03PFS_;
-		typedef pfs_pia_t<0x0008'C145> P05PFS_;
-		typedef pfs_pia_t<0x0008'C147> P07PFS_;
+		typedef pfs_aip_t<0x0008'C140> P00PFS_;
+		typedef pfs_aip_t<0x0008'C141> P01PFS_;
+		typedef pfs_aip_t<0x0008'C142> P02PFS_;
+		typedef pfs_aip_t<0x0008'C143> P03PFS_;
+		typedef pfs_aip_t<0x0008'C145> P05PFS_;
+		typedef pfs_aip_t<0x0008'C147> P07PFS_;
 		static P00PFS_ P00PFS;
 		static P01PFS_ P01PFS;
 		static P02PFS_ P02PFS;
@@ -174,14 +174,14 @@ namespace device {
 			@brief  P1n 端子機能制御レジスタ（P1nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C148> P10PFS_;
-		typedef pfs_pi_t<0x0008'C149> P11PFS_;
-		typedef pfs_pi_t<0x0008'C14A> P12PFS_;
-		typedef pfs_pi_t<0x0008'C14B> P13PFS_;
-		typedef pfs_pi_t<0x0008'C14C> P14PFS_;
-		typedef pfs_pi_t<0x0008'C14D> P15PFS_;
-		typedef pfs_pi_t<0x0008'C14E> P16PFS_;
-		typedef pfs_pi_t<0x0008'C14F> P17PFS_;
+		typedef pfs_ip_t<0x0008'C148> P10PFS_;
+		typedef pfs_ip_t<0x0008'C149> P11PFS_;
+		typedef pfs_ip_t<0x0008'C14A> P12PFS_;
+		typedef pfs_ip_t<0x0008'C14B> P13PFS_;
+		typedef pfs_ip_t<0x0008'C14C> P14PFS_;
+		typedef pfs_ip_t<0x0008'C14D> P15PFS_;
+		typedef pfs_ip_t<0x0008'C14E> P16PFS_;
+		typedef pfs_ip_t<0x0008'C14F> P17PFS_;
 		static P10PFS_ P10PFS;
 		static P11PFS_ P11PFS;
 		static P12PFS_ P12PFS;
@@ -197,14 +197,14 @@ namespace device {
 			@brief  P2n 端子機能制御レジスタ（P2nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C150> P20PFS_;
-		typedef pfs_pi_t<0x0008'C151> P21PFS_;
-		typedef pfs_pi_t<0x0008'C152> P22PFS_;
-		typedef pfs_pi_t<0x0008'C153> P23PFS_;
-		typedef pfs_pi_t<0x0008'C154> P24PFS_;
-		typedef pfs_pi_t<0x0008'C155> P25PFS_;
-		typedef pfs_pi_t<0x0008'C156> P26PFS_;
-		typedef pfs_pi_t<0x0008'C157> P27PFS_;
+		typedef pfs_ip_t<0x0008'C150> P20PFS_;
+		typedef pfs_ip_t<0x0008'C151> P21PFS_;
+		typedef pfs_ip_t<0x0008'C152> P22PFS_;
+		typedef pfs_ip_t<0x0008'C153> P23PFS_;
+		typedef pfs_ip_t<0x0008'C154> P24PFS_;
+		typedef pfs_ip_t<0x0008'C155> P25PFS_;
+		typedef pfs_ip_t<0x0008'C156> P26PFS_;
+		typedef pfs_ip_t<0x0008'C157> P27PFS_;
 		static P20PFS_ P20PFS;
 		static P21PFS_ P21PFS;
 		static P22PFS_ P22PFS;
@@ -220,11 +220,11 @@ namespace device {
 			@brief  P3n 端子機能制御レジスタ（P3nPFS）（n = 0 ～ 4）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C158> P30PFS_;
-		typedef pfs_pi_t<0x0008'C159> P31PFS_;
-		typedef pfs_pi_t<0x0008'C15A> P32PFS_;
-		typedef pfs_pi_t<0x0008'C15B> P33PFS_;
-		typedef pfs_pi_t<0x0008'C15C> P34PFS_;
+		typedef pfs_ip_t<0x0008'C158> P30PFS_;
+		typedef pfs_ip_t<0x0008'C159> P31PFS_;
+		typedef pfs_ip_t<0x0008'C15A> P32PFS_;
+		typedef pfs_ip_t<0x0008'C15B> P33PFS_;
+		typedef pfs_ip_t<0x0008'C15C> P34PFS_;
 		static P30PFS_ P30PFS;
 		static P31PFS_ P31PFS;
 		static P32PFS_ P32PFS;
@@ -237,14 +237,14 @@ namespace device {
 			@brief  P4n 端子機能制御レジスタ（P4nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_ia_t<0x0008'C160> P40PFS_;
-		typedef pfs_ia_t<0x0008'C161> P41PFS_;
-		typedef pfs_ia_t<0x0008'C162> P42PFS_;
-		typedef pfs_ia_t<0x0008'C163> P43PFS_;
-		typedef pfs_ia_t<0x0008'C164> P44PFS_;
-		typedef pfs_ia_t<0x0008'C165> P45PFS_;
-		typedef pfs_ia_t<0x0008'C166> P46PFS_;
-		typedef pfs_ia_t<0x0008'C167> P47PFS_;
+		typedef pfs_ai_t<0x0008'C160> P40PFS_;
+		typedef pfs_ai_t<0x0008'C161> P41PFS_;
+		typedef pfs_ai_t<0x0008'C162> P42PFS_;
+		typedef pfs_ai_t<0x0008'C163> P43PFS_;
+		typedef pfs_ai_t<0x0008'C164> P44PFS_;
+		typedef pfs_ai_t<0x0008'C165> P45PFS_;
+		typedef pfs_ai_t<0x0008'C166> P46PFS_;
+		typedef pfs_ai_t<0x0008'C167> P47PFS_;
 		static P40PFS_ P40PFS;
 		static P41PFS_ P41PFS;
 		static P42PFS_ P42PFS;
@@ -257,16 +257,16 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P5n 端子機能制御レジスタ（P5nPFS）（n = 0 ～ 2, 4 ～ 6）
+			@brief  P5n 端子機能制御レジスタ（P5nPFS）（n = 0 ～ 2, 4 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C168> P50PFS_;
-		typedef pfs_pi_t<0x0008'C169> P51PFS_;
-		typedef pfs_pi_t<0x0008'C16A> P52PFS_;
-		typedef pfs_pi_t<0x0008'C16C> P54PFS_;
-		typedef pfs_pi_t<0x0008'C16D> P55PFS_;
-		typedef pfs_pi_t<0x0008'C16E> P56PFS_;
-		typedef pfs_pi_t<0x0008'C16F> P57PFS_;
+		typedef pfs_ip_t<0x0008'C168> P50PFS_;
+		typedef pfs_ip_t<0x0008'C169> P51PFS_;
+		typedef pfs_ip_t<0x0008'C16A> P52PFS_;
+		typedef pfs_ip_t<0x0008'C16C> P54PFS_;
+		typedef pfs_ip_t<0x0008'C16D> P55PFS_;
+		typedef pfs_ip_t<0x0008'C16E> P56PFS_;
+		typedef pfs_ip_t<0x0008'C16F> P57PFS_;
 		static P50PFS_ P50PFS;
 		static P51PFS_ P51PFS;
 		static P52PFS_ P52PFS;
@@ -278,22 +278,25 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P6n 端子機能制御レジスタ（P6nPFS）（n = 0 ～ 7）
+			@brief  P6n 端子機能制御レジスタ（P6nPFS）（n = 0, 1, 6, 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C170> P60PFS_;
-		typedef pfs_pi_t<0x0008'C176> P66PFS_;
-		typedef pfs_pi_t<0x0008'C177> P67PFS_;
+		typedef pfs_ip_t<0x0008'C170> P60PFS_;
+		typedef pfs_ip_t<0x0008'C171> P61PFS_;
+		typedef pfs_ip_t<0x0008'C176> P66PFS_;
+		typedef pfs_ip_t<0x0008'C177> P67PFS_;
 		static P60PFS_ P60PFS;
+		static P61PFS_ P61PFS;
 		static P66PFS_ P66PFS;
 		static P67PFS_ P67PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P7n 端子機能制御レジスタ（P7nPFS）（n = 1 ～ 7）
+			@brief  P7n 端子機能制御レジスタ（P7nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef pfs_p_t<0x0008'C178> P70PFS_;
 		typedef pfs_p_t<0x0008'C179> P71PFS_;
 		typedef pfs_p_t<0x0008'C17A> P72PFS_;
 		typedef pfs_p_t<0x0008'C17B> P73PFS_;
@@ -301,6 +304,7 @@ namespace device {
 		typedef pfs_p_t<0x0008'C17D> P75PFS_;
 		typedef pfs_p_t<0x0008'C17E> P76PFS_;
 		typedef pfs_p_t<0x0008'C17F> P77PFS_;
+		static P70PFS_ P70PFS;
 		static P71PFS_ P71PFS;
 		static P72PFS_ P72PFS;
 		static P73PFS_ P73PFS;
@@ -331,25 +335,17 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P9n 端子機能制御レジスタ（P9nPFS）（n = 0 ～ 7）
+			@brief  P9n 端子機能制御レジスタ（P9nPFS）（n = 0 ～ 3）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pa_t<0x0008'C188> P90PFS_;
-		typedef pfs_pa_t<0x0008'C189> P91PFS_;
-		typedef pfs_pa_t<0x0008'C18A> P92PFS_;
-		typedef pfs_pa_t<0x0008'C18B> P93PFS_;
-		typedef pfs_pa_t<0x0008'C18C> P94PFS_;
-		typedef pfs_pa_t<0x0008'C18D> P95PFS_;
-		typedef pfs_pa_t<0x0008'C18E> P96PFS_;
-		typedef pfs_pa_t<0x0008'C18F> P97PFS_;
+		typedef pfs_ap_t<0x0008'C188> P90PFS_;
+		typedef pfs_ap_t<0x0008'C189> P91PFS_;
+		typedef pfs_ap_t<0x0008'C18A> P92PFS_;
+		typedef pfs_ap_t<0x0008'C18B> P93PFS_;
 		static P90PFS_ P90PFS;
 		static P91PFS_ P91PFS;
 		static P92PFS_ P92PFS;
 		static P93PFS_ P93PFS;
-		static P94PFS_ P94PFS;
-		static P95PFS_ P95PFS;
-		static P96PFS_ P96PFS;
-		static P97PFS_ P97PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -357,14 +353,14 @@ namespace device {
 			@brief  PAn 端子機能制御レジスタ（PAnPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C190> PA0PFS_;
-		typedef pfs_pi_t<0x0008'C191> PA1PFS_;
-		typedef pfs_pi_t<0x0008'C192> PA2PFS_;
-		typedef pfs_pi_t<0x0008'C193> PA3PFS_;
-		typedef pfs_pi_t<0x0008'C194> PA4PFS_;
-		typedef pfs_pi_t<0x0008'C195> PA5PFS_;
-		typedef pfs_pi_t<0x0008'C196> PA6PFS_;
-		typedef pfs_pi_t<0x0008'C197> PA7PFS_;
+		typedef pfs_ip_t<0x0008'C190> PA0PFS_;
+		typedef pfs_ip_t<0x0008'C191> PA1PFS_;
+		typedef pfs_ip_t<0x0008'C192> PA2PFS_;
+		typedef pfs_ip_t<0x0008'C193> PA3PFS_;
+		typedef pfs_ip_t<0x0008'C194> PA4PFS_;
+		typedef pfs_ip_t<0x0008'C195> PA5PFS_;
+		typedef pfs_ip_t<0x0008'C196> PA6PFS_;
+		typedef pfs_ip_t<0x0008'C197> PA7PFS_;
 		static PA0PFS_ PA0PFS;
 		static PA1PFS_ PA1PFS;
 		static PA2PFS_ PA2PFS;
@@ -380,14 +376,14 @@ namespace device {
 			@brief  PBn 端子機能制御レジスタ（PBnPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C198> PB0PFS_;
-		typedef pfs_pi_t<0x0008'C199> PB1PFS_;
-		typedef pfs_pi_t<0x0008'C19A> PB2PFS_;
-		typedef pfs_pi_t<0x0008'C19B> PB3PFS_;
-		typedef pfs_pi_t<0x0008'C19C> PB4PFS_;
-		typedef pfs_pi_t<0x0008'C19D> PB5PFS_;
-		typedef pfs_pi_t<0x0008'C19E> PB6PFS_;
-		typedef pfs_pi_t<0x0008'C19F> PB7PFS_;
+		typedef pfs_ip_t<0x0008'C198> PB0PFS_;
+		typedef pfs_ip_t<0x0008'C199> PB1PFS_;
+		typedef pfs_ip_t<0x0008'C19A> PB2PFS_;
+		typedef pfs_ip_t<0x0008'C19B> PB3PFS_;
+		typedef pfs_ip_t<0x0008'C19C> PB4PFS_;
+		typedef pfs_ip_t<0x0008'C19D> PB5PFS_;
+		typedef pfs_ip_t<0x0008'C19E> PB6PFS_;
+		typedef pfs_ip_t<0x0008'C19F> PB7PFS_;
 		static PB0PFS_ PB0PFS;
 		static PB1PFS_ PB1PFS;
 		static PB2PFS_ PB2PFS;
@@ -403,14 +399,14 @@ namespace device {
 			@brief  PCn 端子機能制御レジスタ（PCnPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C1A0> PC0PFS_;
-		typedef pfs_pi_t<0x0008'C1A1> PC1PFS_;
-		typedef pfs_pi_t<0x0008'C1A2> PC2PFS_;
-		typedef pfs_pi_t<0x0008'C1A3> PC3PFS_;
-		typedef pfs_pi_t<0x0008'C1A4> PC4PFS_;
-		typedef pfs_pi_t<0x0008'C1A5> PC5PFS_;
-		typedef pfs_pi_t<0x0008'C1A6> PC6PFS_;
-		typedef pfs_pi_t<0x0008'C1A7> PC7PFS_;
+		typedef pfs_ip_t<0x0008'C1A0> PC0PFS_;
+		typedef pfs_ip_t<0x0008'C1A1> PC1PFS_;
+		typedef pfs_ip_t<0x0008'C1A2> PC2PFS_;
+		typedef pfs_ip_t<0x0008'C1A3> PC3PFS_;
+		typedef pfs_ip_t<0x0008'C1A4> PC4PFS_;
+		typedef pfs_ip_t<0x0008'C1A5> PC5PFS_;
+		typedef pfs_ip_t<0x0008'C1A6> PC6PFS_;
+		typedef pfs_ip_t<0x0008'C1A7> PC7PFS_;
 		static PC0PFS_ PC0PFS;
 		static PC1PFS_ PC1PFS;
 		static PC2PFS_ PC2PFS;
@@ -426,14 +422,14 @@ namespace device {
 			@brief  PDn 端子機能制御レジスタ（PDnPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pia_t<0x0008'C1A8> PD0PFS_;
-		typedef pfs_pia_t<0x0008'C1A9> PD1PFS_;
-		typedef pfs_pia_t<0x0008'C1AA> PD2PFS_;
-		typedef pfs_pia_t<0x0008'C1AB> PD3PFS_;
-		typedef pfs_pia_t<0x0008'C1AC> PD4PFS_;
-		typedef pfs_pia_t<0x0008'C1AD> PD5PFS_;
-		typedef pfs_pia_t<0x0008'C1AE> PD6PFS_;
-		typedef pfs_pia_t<0x0008'C1AF> PD7PFS_;
+		typedef pfs_aip_t<0x0008'C1A8> PD0PFS_;
+		typedef pfs_aip_t<0x0008'C1A9> PD1PFS_;
+		typedef pfs_aip_t<0x0008'C1AA> PD2PFS_;
+		typedef pfs_aip_t<0x0008'C1AB> PD3PFS_;
+		typedef pfs_aip_t<0x0008'C1AC> PD4PFS_;
+		typedef pfs_aip_t<0x0008'C1AD> PD5PFS_;
+		typedef pfs_aip_t<0x0008'C1AE> PD6PFS_;
+		typedef pfs_aip_t<0x0008'C1AF> PD7PFS_;
 		static PD0PFS_ PD0PFS;
 		static PD1PFS_ PD1PFS;
 		static PD2PFS_ PD2PFS;
@@ -449,14 +445,14 @@ namespace device {
 			@brief  PEn 端子機能制御レジスタ（PEnPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pia_t<0x0008'C1B0> PE0PFS_;
-		typedef pfs_pia_t<0x0008'C1B1> PE1PFS_;
-		typedef pfs_pia_t<0x0008'C1B2> PE2PFS_;
-		typedef pfs_pia_t<0x0008'C1B3> PE3PFS_;
-		typedef pfs_pia_t<0x0008'C1B4> PE4PFS_;
-		typedef pfs_pia_t<0x0008'C1B5> PE5PFS_;
-		typedef pfs_pia_t<0x0008'C1B6> PE6PFS_;
-		typedef pfs_pia_t<0x0008'C1B7> PE7PFS_;
+		typedef pfs_aip_t<0x0008'C1B0> PE0PFS_;
+		typedef pfs_aip_t<0x0008'C1B1> PE1PFS_;
+		typedef pfs_aip_t<0x0008'C1B2> PE2PFS_;
+		typedef pfs_aip_t<0x0008'C1B3> PE3PFS_;
+		typedef pfs_aip_t<0x0008'C1B4> PE4PFS_;
+		typedef pfs_aip_t<0x0008'C1B5> PE5PFS_;
+		typedef pfs_aip_t<0x0008'C1B6> PE6PFS_;
+		typedef pfs_aip_t<0x0008'C1B7> PE7PFS_;
 		static PE0PFS_ PE0PFS;
 		static PE1PFS_ PE1PFS;
 		static PE2PFS_ PE2PFS;
@@ -472,10 +468,10 @@ namespace device {
 			@brief  PFn 端子機能制御レジスタ（PFnPFS）（n = 0 ～ 2, 5）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_pi_t<0x0008'C1B8> PF0PFS_;
-		typedef pfs_pi_t<0x0008'C1B9> PF1PFS_;
-		typedef pfs_pi_t<0x0008'C1BA> PF2PFS_;
-		typedef pfs_pi_t<0x0008'C1BD> PF5PFS_;
+		typedef pfs_ip_t<0x0008'C1B8> PF0PFS_;
+		typedef pfs_ip_t<0x0008'C1B9> PF1PFS_;
+		typedef pfs_ip_t<0x0008'C1BA> PF2PFS_;
+		typedef pfs_ip_t<0x0008'C1BD> PF5PFS_;
 		static PF0PFS_ PF0PFS;
 		static PF1PFS_ PF1PFS;
 		static PF2PFS_ PF2PFS;
@@ -484,36 +480,15 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  PGn 端子機能制御レジスタ（PGnPFS）（n = 0 ～ 7）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pfs_p_t<0x0008'C1C0> PG0PFS_;
-		typedef pfs_p_t<0x0008'C1C1> PG1PFS_;
-		typedef pfs_p_t<0x0008'C1C2> PG2PFS_;
-		typedef pfs_p_t<0x0008'C1C3> PG3PFS_;
-		typedef pfs_p_t<0x0008'C1C4> PG4PFS_;
-		typedef pfs_p_t<0x0008'C1C5> PG5PFS_;
-		typedef pfs_p_t<0x0008'C1C6> PG6PFS_;
-		typedef pfs_p_t<0x0008'C1C7> PG7PFS_;
-		static PG0PFS_ PG0PFS;
-		static PG1PFS_ PG1PFS;
-		static PG2PFS_ PG2PFS;
-		static PG3PFS_ PG3PFS;
-		static PG4PFS_ PG4PFS;
-		static PG5PFS_ PG5PFS;
-		static PG6PFS_ PG6PFS;
-		static PG7PFS_ PG7PFS;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  PJn 端子機能制御レジスタ（PJnPFS）（n = 3, 5）
+			@brief  PJ3 端子機能制御レジスタ（PJ3PFS）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef pfs_p_t<0x0008'C1D3> PJ3PFS_;
 		static PJ3PFS_ PJ3PFS;
-		typedef pfs_p_t<0x0008'C1D5> PJ5PFS_;
-		static PJ5PFS_ PJ5PFS;
+
+
+
+
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -529,14 +504,15 @@ namespace device {
 			using io::operator |=;
 			using io::operator &=;
 
-			bit_rw_t<io, bitpos::B0>  CS0E;
-			bit_rw_t<io, bitpos::B1>  CS1E;
-			bit_rw_t<io, bitpos::B2>  CS2E;
-			bit_rw_t<io, bitpos::B3>  CS3E;
-			bit_rw_t<io, bitpos::B4>  CS4E;
-			bit_rw_t<io, bitpos::B5>  CS5E;
-			bit_rw_t<io, bitpos::B6>  CS6E;
-			bit_rw_t<io, bitpos::B7>  CS7E;
+			bit_rw_t<io, bitpos::B0>   CS0E;
+			bit_rw_t<io, bitpos::B1>   CS1E;
+			bit_rw_t<io, bitpos::B2>   CS2E;
+			bit_rw_t<io, bitpos::B3>   CS3E;
+			bit_rw_t<io, bitpos::B4>   CS4E;
+			bit_rw_t<io, bitpos::B5>   CS5E;
+			bit_rw_t<io, bitpos::B6>   CS6E;
+			bit_rw_t<io, bitpos::B7>   CS7E;
+
 		};
 		typedef pfcse_t<0x0008'C100> PFCSE_;
 		static PFCSE_ PFCSE;
@@ -555,7 +531,8 @@ namespace device {
 			using io::operator |=;
 			using io::operator &=;
 
-			bit_rw_t<io, bitpos::B0>  CS0S;
+			bit_rw_t<io, bitpos::B0>      CS0S;
+
 			bits_rw_t<io, bitpos::B2, 2>  CS1S;
 			bits_rw_t<io, bitpos::B4, 2>  CS2S;
 			bits_rw_t<io, bitpos::B6, 2>  CS3S;
@@ -599,14 +576,14 @@ namespace device {
 			using io::operator |=;
 			using io::operator &=;
 
-			bit_rw_t<io, bitpos::B0>  A8E;
-			bit_rw_t<io, bitpos::B1>  A9E;
-			bit_rw_t<io, bitpos::B2>  A10E;
-			bit_rw_t<io, bitpos::B3>  A11E;
-			bit_rw_t<io, bitpos::B4>  A12E;
-			bit_rw_t<io, bitpos::B5>  A13E;
-			bit_rw_t<io, bitpos::B6>  A14E;
-			bit_rw_t<io, bitpos::B7>  A15E;
+			bit_rw_t<io, bitpos::B0>   A8E;
+			bit_rw_t<io, bitpos::B1>   A9E;
+			bit_rw_t<io, bitpos::B2>   A10E;
+			bit_rw_t<io, bitpos::B3>   A11E;
+			bit_rw_t<io, bitpos::B4>   A12E;
+			bit_rw_t<io, bitpos::B5>   A13E;
+			bit_rw_t<io, bitpos::B6>   A14E;
+			bit_rw_t<io, bitpos::B7>   A15E;
 		};
 		typedef pfaoe0_t<0x0008'C104> PFAOE0_;
 		static PFAOE0_ PFAOE0;
@@ -625,16 +602,16 @@ namespace device {
 			using io::operator |=;
 			using io::operator &=;
 
-			bit_rw_t<io, bitpos::B0>  A16E;
-			bit_rw_t<io, bitpos::B1>  A17E;
-			bit_rw_t<io, bitpos::B2>  A18E;
-			bit_rw_t<io, bitpos::B3>  A19E;
-			bit_rw_t<io, bitpos::B4>  A20E;
-			bit_rw_t<io, bitpos::B5>  A21E;
-			bit_rw_t<io, bitpos::B6>  A22E;
-			bit_rw_t<io, bitpos::B7>  A23E;
+			bit_rw_t<io, bitpos::B0>   A16E;
+			bit_rw_t<io, bitpos::B1>   A17E;
+			bit_rw_t<io, bitpos::B2>   A18E;
+			bit_rw_t<io, bitpos::B3>   A19E;
+			bit_rw_t<io, bitpos::B4>   A20E;
+			bit_rw_t<io, bitpos::B5>   A21E;
+			bit_rw_t<io, bitpos::B6>   A22E;
+			bit_rw_t<io, bitpos::B7>   A23E;
 		};
-		typedef pfaoe0_t<0x0008'C105> PFAOE1_;
+		typedef pfaoe1_t<0x0008'C105> PFAOE1_;
 		static PFAOE1_ PFAOE1;
 
 
@@ -651,14 +628,13 @@ namespace device {
 			using io::operator |=;
 			using io::operator &=;
 
-			bit_rw_t<io, bitpos::B0>  ADRLE;
-			bit_rw_t<io, bitpos::B1>  ADRHMS;
-			bit_rw_t<io, bitpos::B2>  ADRHMS2;
-			bit_rw_t<io, bitpos::B3>  BCLKO;
-			bit_rw_t<io, bitpos::B4>  DHE;
-			bit_rw_t<io, bitpos::B5>  DH32E;
-			bit_rw_t<io, bitpos::B6>  WR1BC1E;
-			bit_rw_t<io, bitpos::B7>  WR32BC32E;
+			bit_rw_t<io, bitpos::B0>   ADRLE;
+			bit_rw_t<io, bitpos::B1>   ADRHMS;
+
+			bit_rw_t<io, bitpos::B4>   DHE;
+			bit_rw_t<io, bitpos::B5>   DH32E;
+			bit_rw_t<io, bitpos::B6>   WR1BC1E;
+			bit_rw_t<io, bitpos::B7>   WR32BC32E;
 		};
 		typedef pfbcr0_t<0x0008'C106> PFBCR0_;
 		static PFBCR0_ PFBCR0;
@@ -679,7 +655,7 @@ namespace device {
 
 			bits_rw_t<io, bitpos::B0, 2>  WAITS;
 			bit_rw_t <io, bitpos::B2>     ALEOE;
-			bit_rw_t <io, bitpos::B3>     ALES;
+
 			bit_rw_t <io, bitpos::B4>     MDSDE;
 
 			bit_rw_t <io, bitpos::B6>     DQM1E;
@@ -702,13 +678,51 @@ namespace device {
 			using io::operator |=;
 			using io::operator &=;
 
-			bit_rw_t<io, bitpos::B4>  PHYMODE0;
-			bit_rw_t<io, bitpos::B5>  PHYMODE1;
+			bit_rw_t <io, bitpos::B4>     PHYMODE;
 		};
 		typedef pfenet_t<0x0008'C10E> PFENET_;
 		static PFENET_ PFENET;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  USB0 制御レジスタ（PFUSB0）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pfusb0_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B2>     PUPHZS;
+			bit_rw_t<io, bitpos::B3>     PDHZS;
+		};
+		typedef pfusb0_t<0x0008'C114> PFUSB0_;
+		static PFUSB0_ PFUSB0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  USB0 制御レジスタ（PFUSB1）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pfusb1_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B2>     PUPHZS;
+		};
+		typedef pfusb1_t<0x0008'C115> PFUSB1_;
+		static PFUSB1_ PFUSB1;
 	};
-	template<class _> typename mpc_t<_>::PWPR_   mpc_t<_>::PWPR;
+	template<class _> typename mpc_t<_>::PWPR_ mpc_t<_>::PWPR;
 	template<class _> typename mpc_t<_>::P00PFS_ mpc_t<_>::P00PFS;
 	template<class _> typename mpc_t<_>::P01PFS_ mpc_t<_>::P01PFS;
 	template<class _> typename mpc_t<_>::P02PFS_ mpc_t<_>::P02PFS;
@@ -752,8 +766,10 @@ namespace device {
 	template<class _> typename mpc_t<_>::P56PFS_ mpc_t<_>::P56PFS;
 	template<class _> typename mpc_t<_>::P57PFS_ mpc_t<_>::P57PFS;
 	template<class _> typename mpc_t<_>::P60PFS_ mpc_t<_>::P60PFS;
+	template<class _> typename mpc_t<_>::P61PFS_ mpc_t<_>::P61PFS;
 	template<class _> typename mpc_t<_>::P66PFS_ mpc_t<_>::P66PFS;
 	template<class _> typename mpc_t<_>::P67PFS_ mpc_t<_>::P67PFS;
+	template<class _> typename mpc_t<_>::P70PFS_ mpc_t<_>::P70PFS;
 	template<class _> typename mpc_t<_>::P71PFS_ mpc_t<_>::P71PFS;
 	template<class _> typename mpc_t<_>::P72PFS_ mpc_t<_>::P72PFS;
 	template<class _> typename mpc_t<_>::P73PFS_ mpc_t<_>::P73PFS;
@@ -771,10 +787,6 @@ namespace device {
 	template<class _> typename mpc_t<_>::P91PFS_ mpc_t<_>::P91PFS;
 	template<class _> typename mpc_t<_>::P92PFS_ mpc_t<_>::P92PFS;
 	template<class _> typename mpc_t<_>::P93PFS_ mpc_t<_>::P93PFS;
-	template<class _> typename mpc_t<_>::P94PFS_ mpc_t<_>::P94PFS;
-	template<class _> typename mpc_t<_>::P95PFS_ mpc_t<_>::P95PFS;
-	template<class _> typename mpc_t<_>::P96PFS_ mpc_t<_>::P96PFS;
-	template<class _> typename mpc_t<_>::P97PFS_ mpc_t<_>::P97PFS;
 	template<class _> typename mpc_t<_>::PA0PFS_ mpc_t<_>::PA0PFS;
 	template<class _> typename mpc_t<_>::PA1PFS_ mpc_t<_>::PA1PFS;
 	template<class _> typename mpc_t<_>::PA2PFS_ mpc_t<_>::PA2PFS;
@@ -819,17 +831,8 @@ namespace device {
 	template<class _> typename mpc_t<_>::PF1PFS_ mpc_t<_>::PF1PFS;
 	template<class _> typename mpc_t<_>::PF2PFS_ mpc_t<_>::PF2PFS;
 	template<class _> typename mpc_t<_>::PF5PFS_ mpc_t<_>::PF5PFS;
-	template<class _> typename mpc_t<_>::PG0PFS_ mpc_t<_>::PG0PFS;
-	template<class _> typename mpc_t<_>::PG1PFS_ mpc_t<_>::PG1PFS;
-	template<class _> typename mpc_t<_>::PG2PFS_ mpc_t<_>::PG2PFS;
-	template<class _> typename mpc_t<_>::PG3PFS_ mpc_t<_>::PG3PFS;
-	template<class _> typename mpc_t<_>::PG4PFS_ mpc_t<_>::PG4PFS;
-	template<class _> typename mpc_t<_>::PG5PFS_ mpc_t<_>::PG5PFS;
-	template<class _> typename mpc_t<_>::PG6PFS_ mpc_t<_>::PG6PFS;
-	template<class _> typename mpc_t<_>::PG7PFS_ mpc_t<_>::PG7PFS;
 	template<class _> typename mpc_t<_>::PJ3PFS_ mpc_t<_>::PJ3PFS;
-	template<class _> typename mpc_t<_>::PJ5PFS_ mpc_t<_>::PJ5PFS;
-	template<class _> typename mpc_t<_>::PFCSE_  mpc_t<_>::PFCSE;
+	template<class _> typename mpc_t<_>::PFCSE_ mpc_t<_>::PFCSE;
 	template<class _> typename mpc_t<_>::PFCSS0_ mpc_t<_>::PFCSS0;
 	template<class _> typename mpc_t<_>::PFCSS1_ mpc_t<_>::PFCSS1;
 	template<class _> typename mpc_t<_>::PFAOE0_ mpc_t<_>::PFAOE0;
@@ -837,6 +840,8 @@ namespace device {
 	template<class _> typename mpc_t<_>::PFBCR0_ mpc_t<_>::PFBCR0;
 	template<class _> typename mpc_t<_>::PFBCR1_ mpc_t<_>::PFBCR1;
 	template<class _> typename mpc_t<_>::PFENET_ mpc_t<_>::PFENET;
+	template<class _> typename mpc_t<_>::PFUSB0_ mpc_t<_>::PFUSB0;
+	template<class _> typename mpc_t<_>::PFUSB1_ mpc_t<_>::PFUSB1;
 
 	typedef mpc_t<void> MPC;
 }

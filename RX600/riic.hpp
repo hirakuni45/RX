@@ -2,6 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX621/RX62N RIIC 定義 @n
+			RX631/RX63N RIIC 定義 @n
 			RX24T/RX66T/RX64M/RX71M/RX65N RIICa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
@@ -469,7 +470,10 @@ namespace device {
 		static constexpr auto PCLK   = pclk;	///< クロック周波数
 	};
 
-#if defined(SIG_RX63T)
+#if defined(SIG_RX220) || defined(SIG_RX24T)
+	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
+#elif defined(SIG_RX63T)
 	typedef riic_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
 	typedef riic_t<0x0008'8320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
@@ -479,9 +483,15 @@ namespace device {
 		ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLK> RIIC0;
 	typedef riic_t<0x0008'8320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
 		ICU::VECTOR::ICEEI1, ICU::VECTOR::ICTEI1, clock_profile::PCLK> RIIC1;
-#elif defined(SIG_RX220) || defined(SIG_RX24T)
-	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
-		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
+#elif defined(SIG_RX631) || defined(SIG_RX63N)
+	typedef riic_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+		ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
+	typedef riic_t<0x0008'8320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
+		ICU::VECTOR::ICEEI1, ICU::VECTOR::ICTEI1, clock_profile::PCLKB> RIIC1;
+	typedef riic_t<0x0008'8340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
+		ICU::VECTOR::ICEEI2, ICU::VECTOR::ICTEI2, clock_profile::PCLKB> RIIC2;
+	typedef riic_t<0x0008'8360, peripheral::RIIC3, ICU::VECTOR::ICTXI3, ICU::VECTOR::ICRXI3,
+		ICU::VECTOR::ICEEI3, ICU::VECTOR::ICTEI3, clock_profile::PCLKB> RIIC3;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::GROUPBL1, ICU::GROUPBL1::EEI0, ICU::GROUPBL1::TEI0, clock_profile::PCLKB> RIIC0;

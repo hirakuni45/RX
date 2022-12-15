@@ -1,4 +1,4 @@
-Renesas RX63T, RX62N、RX24T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
+Renesas RX220, RX62N、RX63T, RX24T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
 =========
    
 [英語版](README.md)
@@ -14,8 +14,9 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 
 ## プロジェクト・リスト
 - main.cpp
-- RX63T/Makefile
+- RX220/Makefile (AE-RX220)
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
+- RX63T/Makefile
 - RX24T/Makefile
 - RX66T/Makefile
 - RX72T/Makefile
@@ -39,7 +40,12 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 // Memo:
 //    ポート出力は、電流を引いた（吸い込み）場合と、電流を掃き出した（吐き出し）場合で、能力が異なります。
 //    一般的に、「吸い込み」の方が電流を多く流せる場合が多く、その慣例に従って、「吸い込み」で接続する場合が通例です。
-#if defined(SIG_RX63T)
+#if defined(SIG_RX220)
+	// 秋月 AE-RX220 ボード
+	// P03 に LED を吸い込みで接続する事を想定している。
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+#elif defined(SIG_RX63T)
 	// DIY RX63T board
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
@@ -90,6 +96,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
  - FRK-RX62N の場合、ボード上の LED1 を利用する。（黄色） 
  - Envision kit RX65N の場合、インジケーター LED はボード上の青色 LED を利用する。
  - Envision kit RX72N の場合、インジケーター LED はボード上の青色 LED を利用する。
+ - 他ボードでは、'LED' の 'typedef' で示されたポートに LED を接続するか、LED が接続されたポートを 'typedef' する。
 
 ---
 

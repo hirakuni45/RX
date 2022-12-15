@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include "RX62x/port.hpp"
+#include "RX62x/mpc.hpp"
 #include "RX62x/icu.hpp"
 #include "RX600/port_map_order.hpp"
 

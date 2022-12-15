@@ -10,21 +10,39 @@ Renesas RX Microcontroller
  ※現在、Renesas GNU-RX gcc 8.3.0 をメインに使って開発しています。    
    
  現在は、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
- 複数の環境で、開発が出来るようになっています。   
- - 現在サポートされ、動作確認済みデバイスは RX63T、RX62[1N]、RX24T、RX66T, RX72T、RX64M、RX71M, RX65N, RX72N となっており、   
- デバイスクラスを日々拡張しています。
- - 今後のサポート予定として、RX72M があります。
+ 複数の環境で、開発が出来るようになっています。
+       
+ 現在サポートされ、動作確認済みデバイス：   
+ |シリーズ|コア|FPU|動作確認|ペリフェラルクラス|rx_prog サポート|リンカーファイル|
+ |---|:-:|:-:|:-:|:-:|:-:|---|
+ |RX220|RXv1|No|〇|〇|〇|R5F52206|
+ |RX631/RX63N|RXv1|Yes|－|△|－|R5F5631F|
+ |RX63T|RXv1|Yes|〇|〇|〇|R5F563T6|
+ |RX621/RX62N|RXv1|Yes|〇|〇|〇|R5F562N7/8|
+ |RX24T|RXv2|Yes|〇|〇|〇|R5F524T8/A|
+ |RX66T|RXv3|Yes|〇|〇|〇|R5F566TA/E/F/K|
+ |RX72T|RXv3|Yes|〇|〇|〇|R5F572TF/K|
+ |RX64M|RXv2|Yes|〇|〇|〇|R5F564MF/G/J/L|
+ |RX71M|RXv2|Yes|〇|〇|〇|R5F571MF/G/J/L|
+ |RX651/RX65N|RXv2|Yes|〇|〇|〇|R5F565NE|
+ |RX72N|RXv3|Yes|〇|〇|〇|R5F572ND/N|
+ |RX72M|RXv3|Yes|－|△|△|R5F572MD/N|
+    
  - ディレクトリー構成など日々アップデートしています。
- - RX63T は、現在はサポートしていません。(legacy フォルダーにあります。) 
+ - 部分的に作業中な機能があったりします、サンプルの動作実績で確認して下さい。
+
+ ---
    
  **他の RX デバイスをサポートして欲しい場合にはリクエストを下さい。（以下条件）**
- - GitHub のサポートメンバーである事。
+ - hirakuni45 GitHub のサポートメンバーである事。
  - サポート要求の RX マイコンが載っているボードを貸し出す事。
- - 新規に追加された RX マイコンの関連ファイルは MIT ライセンスで公開されます。
+ - 新規に追加された RX マイコン関連ファイルを MIT ライセンスで公開する事を承諾する事。
 
  プロジェクトは、Makefile、及び、関連ヘッダー、ソースコードからなり、専用のスタートアップ   
  ルーチンやリンカースクリプトで構成されています。
-   
+
+---
+
 <img src="docs/RTK5_side.jpg" width="40%"> <img src="docs/NES_001.jpg" width="40%">   
 Space Invaders Emulator, NES Emulator, for RX65N Envision kit   
 <img src="docs/AudioPlayer.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
@@ -64,6 +82,7 @@ int main(int argc, char** argv)
 必要としません。  
 その為、専用のブートプログラムやローダーは必要なく、作成したバイナリーをそのまま ROM へ   
 書いて実行できます。   
+別プログラムにより、機能依存のコードを生成する必要が全くありません。   
 開発にはマルチプラットホームでも使える、「Visual Studio Code」の利用を推奨します。 
    
 ---
@@ -78,6 +97,7 @@ int main(int argc, char** argv)
 |[all_project_build.sh](./all_project_build.sh)|全てのプロジェクトをビルド(シェル・スクリプト)|
 |[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr ライブラリ|
 |[/RX600](./RX600)|RX マイコン共通デバイス定義クラス|
+|[/RX220](./RX220)|RX220 専用デバイス定義クラス、リンカースクリプト|
 |[/RX24T](./RX24T)|RX24T 専用デバイス定義クラス、リンカースクリプト|
 |[/RX63T](./RX63T)|RX63T 専用デバイス定義クラス、リンカースクリプト|
 |[/RX62x](./RX62x)|RX621/RX62N 専用デバイス定義クラス、リンカースクリプト|
@@ -87,7 +107,6 @@ int main(int argc, char** argv)
 |[/RX66T](./RX66T)|RX66T 専用デバイス定義クラス、リンカースクリプト|
 |[/RX72T](./RX72T)|RX72T 専用デバイス定義クラス、リンカースクリプト|
 |[/RX72N](./RX72N)|RX72N 専用デバイス定義クラス、リンカースクリプト|
-|[/FreeRTOS](./FreeRTOS)|FreeRTOS の RX マイコン各種対応版と簡単なサンプル|
 |[/ff14](./ff14)|ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
 |[/common](./common)|共有クラス、ヘッダーなど|
 |[/chip](./chip)|I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
@@ -108,17 +127,17 @@ int main(int argc, char** argv)
 |[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
 |[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
 |[/MTU_sample](./MTU_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|MTU サンプルプログラム|
-|[/CAN_sample](./CAN_sample)|－|〇|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
+|[/CAN_sample](./CAN_sample)|－|△|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
 |[/FLASH_sample](./FLASH_sample)|－|－|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
 |[/FreeRTOS](./FreeRTOS)|－|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS 基本動作確認サンプル|
 |[/GPTW_sample](./GPTW_sample)|－|－|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
 |[/I2C_sample](./I2C_sample)|－|－|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
-|[/RAYTRACER_sample](./RAYTRACER_sample)|－|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
 |[/SDCARD_sample](./SDCARD_sample)|－|－|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
 |[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
 |[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
-|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (ソフトレンダリング、DRW2D エンジン利用)|
-|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|－|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
+|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (DRW2D エンジン利用)|
+|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|△|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
 |[/SYNTH_sample](./SYNTH_sample)|－|－|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
 |[/CALC_sample](./CALC_sample)|－|〇|－|〇|〇|〇|〇|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
 |[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
@@ -126,7 +145,7 @@ int main(int argc, char** argv)
 |[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
-※△：機能が不十分な場合など。
+※△：機能が不十分、未動作検証、など。
 
 ---
 

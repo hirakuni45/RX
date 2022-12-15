@@ -80,7 +80,7 @@ namespace rx220 {
 				return false;
 			}
 			if(verbose_) {
-				std::cout << "Connection OK. (RX62x)" << std::endl;
+				std::cout << "Connection OK. (RX220)" << std::endl;
 			}
 
 			// サポート・デバイス問い合わせ

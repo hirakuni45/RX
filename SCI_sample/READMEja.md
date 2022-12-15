@@ -1,4 +1,4 @@
-Renesas RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
+Renesas RX220, RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
 =========
 
 [英語版](README.md)
@@ -14,6 +14,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 ## プロジェクト・リスト
 
 - main.cpp
+- RX220/Makefile
 - RX62N/Makefile
 - RX24T/Makefile
 - RX64M/Makefile
@@ -30,6 +31,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - 各マイコンの、クリスタル周波数、各モジュールの周波数は、RXxxx/clock_profile.hpp を参照して下さい。
 - インジケーター LED を指定のポートに接続する。
 -  USB シリアルとSCI ポートを接続する。
+- RX220 の SCI 標準ポートは、「RX220/port_map.hpp」参照。
 - RX62N の SCI 標準ポートは、「RX62x/port_map.hpp」参照。
 - RX24T の SCI 標準ポートは、「RX24T/port_map.hpp」参照。
 - RX64M/RX71M の SCI 標準ポートは、「RX64M/port_map.hpp」参照。
