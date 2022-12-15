@@ -214,10 +214,10 @@ namespace device {
 			ICTXI3		= 196,
 			ICTEI3		= 197,
 
-			DMAC0I		= 198,	///< DMAC
-			DMAC1I		= 199,
-			DMAC2I		= 200,
-			DMAC3I		= 201,
+			DMACI0		= 198,	///< DMAC
+			DMACI1		= 199,
+			DMACI2		= 200,
+			DMACI3		= 201,
 
 			EXDMAC0I	= 202,	///< EXDMAC 0
 			EXDMAC1I	= 203,	///< EXDMAC 1

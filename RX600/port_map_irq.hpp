@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX651/RX65N/RX72N/RX72M ポート・マッピング (IRQ) @n
+	@brief	RX63[1N]/RX64M/RX71M/RX65[1N]/RX72N/RX72M ポート・マッピング (IRQ) @n
 			IRQx-DS 端子は、ディープスタンバイからの復帰が有効な端子 @n
 			  通常割り込み入力としても使え、通常「ORDER::FIRST」で選択する。 @n
 			  詳しくは、MPC の解説を参照する事。
@@ -11,7 +11,6 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "common/device.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

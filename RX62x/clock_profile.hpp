@@ -43,7 +43,7 @@ namespace device {
 
 		static constexpr uint32_t	FCLK        = PCLK;				///< FCLK 周波数（互換性の為設定）
 
-		// RXv2 コア（最大 100MHz）
+		// RXv1 コア（最大 100MHz）
 		// ※96MHz 動作、10uS で調整
 		static constexpr uint32_t	DELAY_MS	= ICLK / 5333333;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 		static constexpr bool		DELAY_T1	= true;				///< 微調整として、「nop」を１つ追加

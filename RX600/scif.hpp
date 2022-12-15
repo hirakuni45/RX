@@ -36,7 +36,8 @@ namespace device {
 		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
 		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
 		static constexpr bool SEMR_NFEN = true;	///< NFEN（ノイズフィルタ）
-
+		// 受信データフル
+		static constexpr bool SSR_RDRF  = false;	///< SSR.RDRF が利用可能な場合「true」
 
 		//-----------------------------------------------------------------//
 		/*!
