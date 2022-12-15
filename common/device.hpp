@@ -7,13 +7,11 @@
 			RX631/RX63N @n
 			RX63T @n
 			RX24T @n
-			RX64M @n
-			RX71M @n
-			RX72M @n
-			RX72N @n
+			RX64M/RX71M @n
 			RX651/RX65N @n
-			RX66T @n
-			RX72T
+			RX72N @n
+			RX72M @n
+			RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -53,6 +51,7 @@
 #include "RX63x/power_mgr.hpp"
 #include "RX63x/icu.hpp"
 #include "RX63x/icu_mgr.hpp"
+#include "RX63x/port_map.hpp"
 
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
@@ -115,6 +114,19 @@
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX651) || defined(SIG_RX65N)
+#include "RX65x/clock_profile.hpp"
+#include "RX65x/peripheral.hpp"
+#include "RX600/system.hpp"
+#include "RX65x/power_mgr.hpp"
+#include "RX65x/icu.hpp"
+#include "RX65x/icu_mgr.hpp"
+#include "RX65x/port_map.hpp"
+#include "RX65x/port_map_mtu.hpp"
+#include "RX65x/port_map_tpu.hpp"
+#include "RX600/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX72N)
 #include "RX72N/clock_profile.hpp"
 #include "RX72N/peripheral.hpp"
@@ -145,19 +157,6 @@
 #include "RX72M/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
 #include "RX72N/port_map_qspi.hpp"
-#include "RX600/port_map_irq.hpp"
-#include "RX600/rx_dsp_inst.h"
-
-#elif defined(SIG_RX651) || defined(SIG_RX65N)
-#include "RX65x/clock_profile.hpp"
-#include "RX65x/peripheral.hpp"
-#include "RX600/system.hpp"
-#include "RX65x/power_mgr.hpp"
-#include "RX65x/icu.hpp"
-#include "RX65x/icu_mgr.hpp"
-#include "RX65x/port_map.hpp"
-#include "RX65x/port_map_mtu.hpp"
-#include "RX65x/port_map_tpu.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
