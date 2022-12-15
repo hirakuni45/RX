@@ -37,7 +37,7 @@ PSOURCES	=	FreeRTOS/main.cpp
 
 USER_LIBS	=
 
-USER_DEFS	=	RTOS RTOS_HEAP_SIZE=10
+USER_DEFS	+=	RTOS RTOS_HEAP_SIZE=10
 
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
