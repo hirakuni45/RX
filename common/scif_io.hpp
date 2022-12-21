@@ -1,21 +1,18 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX グループ・SCIF I/O 制御（FIFO 内臓型）@n
-			※内臓のFIFOバッファを利用しない実装（扱いにくい）
+			※内臓のFIFOバッファを利用しない実装（扱いにくいので使わない） @n
+			SCIF は、RX64M/RX71M 専用となっている。 @n
+			SCIF8 ～ SCIF11
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
-
-/// F_PCLKA はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCLKA
-#  error "scif_io.hpp requires F_PCLKA to be defined"
-#endif
 
 namespace device {
 
@@ -73,7 +70,8 @@ namespace device {
 			SCIF::FSR.TDFE = 0;
 		}
 
-		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) {
+		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) noexcept
+		{
 			if(level_) {
 				icu_mgr::set_task(rx_vec, recv_task_);
 				icu_mgr::set_task(tx_vec, send_task_);
@@ -83,7 +81,8 @@ namespace device {
 			}
 		}
 
-		void set_intr_() {
+		void set_intr_() noexcept
+		{
 			set_vector_(SCIF::get_rx_vec(), SCIF::get_tx_vec());
 			icu_mgr::set_level(SCIF::PERIPHERAL, level_);
 		}
@@ -92,22 +91,21 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	crlf	LF 時、CR の送出をしないばあい「false」
+			@param[in]	crlf	LF 時、CR の送出をしない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		scif_io(bool crlf = true) : level_(0), crlf_(crlf) { }
+		scif_io(bool crlf = true) noexcept : level_(0), crlf_(crlf) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ボーレートを設定して、SCI を有効にする @n
-					※RX63T では、ポーリングはサポート外
+			@brief  ボーレートを設定して、SCI を有効にする
 			@param[in]	baud	ボーレート
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t baud, uint8_t level = 0)
+		bool start(uint32_t baud, ICU::LEVEL level = ICU::LEVEL::NONE) noexcept
 		{
 			send_stall_ = true;
 
@@ -151,74 +149,6 @@ namespace device {
 			return true;
 		}
 
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  通信速度を設定して、SPI を有効にする
-			@param[in]	master	マスターモードの場合「true」
-			@param[in]	bps	ビットレート
-			@param[in]	level	割り込みレベル（０の場合ポーリング）
-			@return エラーなら「false」
-		*/
-		//-----------------------------------------------------------------//
-		bool start_spi(bool master, uint32_t bps, uint8_t level = 0)
-		{
-			send_stall_ = true;
-			level_ = level;
-
-			SCI::SCR = 0x00;			// TE, RE disable.
-
-			uint32_t brr = F_PCLKB / bps / 2;
-			if(brr & 1) { brr >>= 1; ++brr; }
-			else { brr >>= 1; }
-			uint8_t cks = 0;
-			while(brr > 256) {
-				brr >>= 2;
-				++cks;
-			}
-			if(cks > 3 || brr > 256) return false;
-
-			power_cfg::turn(SCI::PERIPHERAL);
-
-			set_intr_();
-
-			// LSB(0), MSB(1) first
-			SCI::SCMR.SDIR = 1;
-
-			SCI::SIMR1.IICM = 0;
-			SCI::SMR = cks | SCI::SMR.CM.b();
-			SCI::SPMR.SSE = 0;		///< SS 端子制御しない「０」
-
-			if(master) {
-				SCI::SPMR.MSS = 0;
-			} else {
-				SCI::SPMR.MSS = 1;
-			}
-
-			// クロックタイミング種別選択
-			SCI::SPMR.CKPOL = 0;
-			SCI::SPMR.CKPH  = 0;
-
-			if(brr) --brr;
-brr = 1;
-			SCI::BRR = static_cast<uint8_t>(brr);
-
-			uint8_t scr = 0;
-			if(master) {
-				scr = SCI::SCR.CKE.b(0b01);
-			} else {
-				scr = SCI::SCR.CKE.b(0b10);
-			}
-
-			if(level_) {
-				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
-			} else {
-				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
-			}
-
-			return true;
-		}
-#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -226,7 +156,7 @@ brr = 1;
 			@param[in]	f	「false」なら無効
 		 */
 		//-----------------------------------------------------------------//
-		void auto_crlf(bool f = true) { crlf_ = f; }
+		void auto_crlf(bool f = true) noexcept { crlf_ = f; }
 
 
 		//-----------------------------------------------------------------//
@@ -235,8 +165,8 @@ brr = 1;
 			@return　バッファのサイズ
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t send_length() const {
-			if(level_) {
+		uint32_t send_length() const noexcept {
+			if(level_ != ICU::LEVEL::NONE) {
 				return send_.length();
 			} else {
 				return 0;
@@ -250,12 +180,12 @@ brr = 1;
 			@param[in]	ch	文字コード
 		 */
 		//-----------------------------------------------------------------//
-		void putch(char ch) {
+		void putch(char ch) noexcept {
 			if(crlf_ && ch == '\n') {
 				putch('\r');
 			}
 
-			if(level_) {
+			if(level_ != ICU::LEVEL::NONE) {
 //				volatile bool b = SCI::SSR.ORER();
 //				if(b) {
 //					SCI::SSR.ORER = 0;
@@ -290,8 +220,8 @@ brr = 1;
 			@return	入力文字数
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t recv_length() {
-			if(level_) {
+		uint32_t recv_length() noexcept {
+			if(level_ != ICU::LEVEL::NONE) {
 				return recv_.length();
 			} else {
 				if(SCIF::FSR.PER()) {	///< パリティ・エラー状態確認
@@ -311,8 +241,8 @@ brr = 1;
 			@return 文字コード
 		 */
 		//-----------------------------------------------------------------//
-		char getch() {
-			if(level_) {
+		char getch() noexcept {
+			if(level_ != ICU::LEVEL::NONE) {
 				while(recv_.length() == 0) sleep_();
 				return recv_.get();
 			} else {
@@ -330,65 +260,10 @@ brr = 1;
 			@param[in]	s	出力ストリング
 		 */
 		//-----------------------------------------------------------------//
-		void puts(const char* s) {
+		void puts(const char* s) noexcept {
 			char ch;
 			while((ch = *s++) != 0) {
 				putch(ch);
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  送受信
-			@param[in]	ch	送信データ
-			@return	受信データ
-		*/
-		//-----------------------------------------------------------------//
-		inline uint8_t xchg(uint8_t ch = 0xff)
-		{
-			if(level_) {
-				return 0;
-			} else {
-				SCIF::FTDR = ch;
-				while(recv_length() == 0) sleep_();
-				return SCIF::FRDR();
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  シリアル送信
-			@param[in]	src	送信ソース
-			@param[in]	cnt	送信サイズ
-		*/
-		//-----------------------------------------------------------------//
-		void send(const void* src, uint16_t size)
-		{
-			const uint8_t* p = static_cast<const uint8_t*>(src);
-			auto end = p + size;
-			while(p < end) {
-				xchg(*p);
-				++p;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  シリアル受信
-			@param[out]	dst	受信先
-			@param[in]	cnt	受信サイズ
-		*/
-		//-----------------------------------------------------------------//
-		void recv(void* dst, uint16_t size)
-		{
-			uint8_t* p = static_cast<uint8_t*>(dst);
-			auto end = p + size;
-			while(p < end) {
-				*p = xchg();
-				++p;
 			}
 		}
 	};

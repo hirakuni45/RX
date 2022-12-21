@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・RTC 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -36,7 +36,7 @@ namespace utils {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		rtc_io() { }
+		rtc_io() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -45,7 +45,8 @@ namespace utils {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start() {
+		bool start() noexcept
+		{
 			device::SYSTEM::SOSCCR.SOSTP = 0;
 
 			device::RTC::RCR3 = device::RTC::RCR3.RTCEN.b(1) | device::RTC::RCR3.RTCDV.b(0b110);
@@ -66,7 +67,8 @@ namespace utils {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool set_time(time_t t) const {
+		bool set_time(time_t t) const noexcept
+		{
 			device::RTC::RCR2.START = 0;
 			device::RTC::BCNT0 = t & 0xff;
 			device::RTC::BCNT1 = (t >> 8)  & 0xff;
@@ -84,7 +86,8 @@ namespace utils {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool get_time(time_t& tp) const {
+		bool get_time(time_t& tp) const noexcept
+		{
 			auto a = get_();
 			for(int i = 0; i < 5; ++i) {
 				auto b = get_();

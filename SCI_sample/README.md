@@ -1,4 +1,4 @@
-Renesas RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) sample
+Renesas RX220, RX62N, RX631, RX24T, RX66T, RX72T, RX64M, RX71M, RX65N, RX72N SCI (UART) sample
 =========
 
 [Japanese](READMEja.md)
@@ -13,7 +13,9 @@ SCI (UART) sample program using RX microcontroller
 
 ## Project list
  - main.cpp
+ - RX220/Makefile
  - RX62N/Makefile
+ - RX631/Makefile
  - RX24T/Makefile
  - RX64M/Makefile
  - RX71M/Makefile
@@ -25,73 +27,23 @@ SCI (UART) sample program using RX microcontroller
 ---
 
 ## Hardware preparation (general)
- - If the base crystal is different, change the typedef parameter.
- - Makefile declares the set frequency for each module.
- - RX24T:  80MHz (10MHz)
- - RX64M: 120MHz (12MHz)
- - RX71M: 240MHz (12MHz)
- - RX65N: 120MHz (12MHz)
- - RX66T: 160MHz (10MHz)
- - RX72T: 192MHz (16MHz)
- - RX72N: 240MHz (16MHz)
- - Connect the indicator LED to the specified port.
- - Connect the USB serial and SCI ports.
- - Refer to RX64M/port_map.hpp for the RX64M/RX71M SCI standard port.
- - Refer to RX24T/port_map.hpp for the RX24T SCI standard port.
- - Refer to RX65x/port_map.hpp for the RX65x SCI standard port.
- - Refer to RX72N/port_map.hpp for the RX72N SCI standard port.
- 
-```C++
-#if defined(SIG_RX62N)
-  #if defined(CQ_FRK)
-    // FRK-RX62N(CQ Publishing Co.,Ltd.)
-	static const char* system_str_ = { "RX62N FRK-RX62N" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
-  #else
-    // BlueBoard-RX62N_100pin
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
-  #endif
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
-	typedef device::SCI9 SCI_CH;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
-	typedef device::SCI2 SCI_CH;
-#elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
-	typedef device::SCI1 SCI_CH;
-#endif
-```
 
- - The standard crystal value is 10MHz for the RX24T and RX66T, and 12MHz for other CPUs.
- - RX72N Envision kit is a "16MHz" crystal
- - RX72T is a "16MHz" crystal
- - For the Envision kit RX65N, the indicator LED uses the blue color on the board.
- - For the Envision kit RX72N, the indicator LED uses the blue color on the board.
+- Refer to RXxxx/clock_profile.hpp for each microcontroller, crystal frequency, and frequency of each module.
+- Connect the indicator LEDs to the specified ports.
+- Connect USB serial and SCI ports.
+- Refer to "RX220/port_map.hpp" for the SCI standard port of RX220.
+- For the SCI standard port of RX62N, refer to "RX62x/port_map.hpp".
+- For the RX631's SCI standard port, refer to "RX63x/port_map.hpp".
+- For the RX24T SCI standard port, refer to "RX24T/port_map.hpp".
+- For the SCI standard port of RX66T, refer to "RX66T/port_map.hpp".
+- For the RX72T SCI standard port, refer to "RX72T/port_map.hpp".
+- For the RX64M/RX71M SCI standard ports, refer to "RX64M/port_map.hpp".
+- For the RX65x SCI standard ports, refer to "RX65x/port_map.hpp".
+- For the standard SCI port of RX72N, refer to "RX72N/port_map.hpp".
+- For BlueBoard-RX62N_100pin, use D2 LED on the board. (red) 
+- In case of FRK-RX62N, use LED1 on the board. (Yellow) 
+- In case of RX65N Envision kit, the indicator LED on the board is blue.
+- For RX72N Envision kit, the indicator LED is blue on the board.
 
 ---
 
@@ -100,12 +52,88 @@ SCI (UART) sample program using RX microcontroller
  - Connect the RXD terminal on the microcontroller side to the TXD of USB serial.
  - Connect the TXD terminal on the microcontroller side to the RXD of USB serial.
  - The RX72N Envision kit connects a PC to the CN8 micro USB on board.
-   
+
 ---
 
 ## Build method
  - Go to each platform directory and make it.
  - Write the sci_sample.mot file.
+
+```C++
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
+
+#if defined(SIG_RX220)
+	// 秋月 RX220 ボード
+	static const char* system_str_ = { "AE-RX220" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX62N)
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ 出版社)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+  #else
+    // BlueBoard-RX62N_100pin
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+  #endif
+#elif defined(SIG_RX631)
+	// DIY RX631 board
+	static const char* system_str_ = { "RX631 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
+#elif defined(SIG_RX63T)
+	// DIY RX63T board
+	static const char* system_str_ = { "RX63T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX64M)
+	static const char* system_str_ = { "RX64M DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX65N)
+	static const char* system_str_ = { "RX65N Envision Kit" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
+#elif defined(SIG_RX66T)
+	static const char* system_str_ = { "RX66T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX72N)
+	static const char* system_str_ = { "RX72N Envision Kit" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
+#endif
+
+	SCI		sci_;
+```
 
 ---
 

@@ -243,6 +243,58 @@ namespace device {
 			}
 		}
 
+
+		static constexpr bool calc_rate_(uint32_t baud,
+			uint8_t& brr_, uint8_t& cks_, uint8_t& mddr_, bool& abcs_, bool& bgdm_, bool& brme_) noexcept
+		{
+			// BGDM が使える場合、1/8 スタート
+			uint32_t mtx = 8;
+			uint32_t limit = 1024;
+			if(!SCI::SEMR_BGDM) {  // BGDM が使えない場合 1/16 スタート
+				mtx = 16;
+				limit = 512;
+			}
+			uint32_t brr = SCI::PCLK / mtx / baud;
+			uint8_t cks = 0;
+			while(brr > limit) {
+				brr >>= 2;
+				++cks;
+				if(cks >= 4) {  // 範囲外の速度（低速）
+					return false;
+				}
+			}
+
+			// BGDM フラグの設定
+			bool bgdm = true;
+			if(SCI::SEMR_BGDM) {
+				if(brr > 512) { brr >>= 1; bgdm = false; mtx <<= 1; }
+			} else {
+				bgdm = false;
+			}
+			bool abcs = true;
+			if(brr > 256) { brr >>= 1; abcs = false; mtx <<= 1; }
+
+			bool brme = false;
+			if(SCI::SEMR_BRME) {  // 微調整機能が使える場合
+				uint32_t rate = SCI::PCLK / mtx / brr / (1 << (cks * 2));
+				uint32_t mddr = (baud << 9) / rate;
+				++mddr;
+				mddr >>= 1;
+				if(mddr >= 128 && mddr < 256) {  // 微調整を行う場合
+					mddr_ = mddr;
+					brme = true;
+				}
+			}
+
+			brr_ = brr;
+			cks_ = cks;
+			abcs_ = abcs;
+			bgdm_ = bgdm;
+			brme_ = brme;
+			return true;
+		}
+
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -281,6 +333,49 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ボーレートの設定誤差を検証
+			@param[in]	baud	ボーレート
+			@param[in]	thper	許容誤差（通常４％）
+			@return 誤差範囲なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		static constexpr bool probe_baud(uint32_t baud, uint32_t thper = 4) noexcept
+		{
+			uint8_t brr = 0;
+			uint8_t cks = 0;
+			uint8_t mddr = 0;
+			bool abcs = false;
+			bool bgdm = false;
+			bool brme = false;
+			if(!calc_rate_(baud, brr, cks, mddr, abcs, bgdm, brme)) {
+				return false;
+			}
+
+			uint32_t mtx = 8;
+			if(SCI::SEMR_BGDM) {
+				if(!bgdm) mtx <<= 1;
+			} else {
+				mtx <<= 1;
+			}
+			if(!abcs) mtx <<= 1;
+			auto cbaud = SCI::PCLK / mtx / (1 << (static_cast<uint32_t>(cks) * 2)) / (static_cast<uint32_t>(brr) + 1);
+			if(brme) {
+				cbaud *= mddr;
+				cbaud /= 256;
+			}
+
+			auto d = baud * thper / 100;
+			if(cbaud < (baud - d) || (baud + d) < cbaud) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ボーレートを設定して、SCI を有効にする
 			@param[in]	baud	ボーレート
 			@param[in]	level	割り込みレベル（ICU::LEVEL::NONE の場合ポーリング）
@@ -290,6 +385,16 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
 		{
+			uint8_t brr;
+			uint8_t cks;
+			uint8_t mddr;
+			bool abcs;
+			bool bgdm;
+			bool brme;
+			if(!calc_rate_(baud, brr, cks, mddr, abcs, bgdm, brme)) {
+				return false;
+			}
+
 			if(level == ICU::LEVEL::NONE && !SCI::SSR_RDRF) {
 				// SSR.RDRF が利用出来ない場合、ポーリングは不可。
 				return false;
@@ -352,6 +457,7 @@ namespace device {
 			}
 
 			baud_ = baud;
+#if 0
 			// BGDM が使える場合、1/8 スタート
 			uint32_t mtx = 8;
 			uint32_t limit = 1024;
@@ -380,6 +486,7 @@ namespace device {
 			}
 			bool abcs = true;
 			if(brr > 256) { brr >>= 1; abcs = false; mtx <<= 1; }
+#endif
 
 			set_intr_(level_);
 
@@ -435,7 +542,7 @@ namespace device {
 			}
 			SCI::SMR = SCI::SMR.CKS.b(cks) | SCI::SMR.STOP.b(stop)
 					 | SCI::SMR.PM.b(pm) | SCI::SMR.PE.b(pe) | SCI::SMR.CHR.b(seven);
-
+#if 0
 			bool brme = false;
 			if(SCI::SEMR_BRME) {  // 微調整機能が使える場合
 				uint32_t rate = SCI::PCLK / mtx / brr / (1 << (cks * 2));
@@ -447,7 +554,10 @@ namespace device {
 					brme = true;
 				}
 			}
-
+#endif
+			if(brme) {
+				SCI::MDDR = mddr;
+			}
 			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b(brme) | SCI::SEMR.BGDM.b(bgdm);
 
 			if(brr > 0) --brr;

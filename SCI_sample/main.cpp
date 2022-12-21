@@ -33,12 +33,6 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX63T)
-	// DIY RX63T board
-	static const char* system_str_ = { "RX63T DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX62N)
   #if defined(CQ_FRK)
     // FRK-RX62N(CQ 出版社)
@@ -53,6 +47,18 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
   #endif
+#elif defined(SIG_RX631)
+	// DIY RX631 board
+	static const char* system_str_ = { "RX631 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
+#elif defined(SIG_RX63T)
+	// DIY RX63T board
+	static const char* system_str_ = { "RX63T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
@@ -143,8 +149,9 @@ int main(int argc, char** argv)
 	}
 
 	{  // SCI の開始
-		auto intr = device::ICU::LEVEL::_2;		// 割り込みレベル（０を指定すると、ポーリング動作になる）
-		uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
+		constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
+		static_assert(SCI::probe_baud(baud), "Can't set BAUDRATE");
+		auto intr = device::ICU::LEVEL::_2;		// 割り込みレベル（NONE を指定すると、ポーリング動作になる）
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 // 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
 // sci_io.hpp PROTOCOL enum class のタイプを参照

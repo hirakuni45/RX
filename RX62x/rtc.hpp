@@ -25,6 +25,7 @@ namespace device {
 		static constexpr auto ALM = ICU::VECTOR::ALM;	///< アラーム割り込みベクタ
 		static constexpr auto PRD = ICU::VECTOR::PRD;	///< 周期割り込みベクタ
 		static constexpr auto CUP = ICU::VECTOR::CUP;	///< 桁上げ割り込みベクタ
+		static constexpr bool BINARY = false;			///< バイナリーカウントモード
 
 
 		//-----------------------------------------------------------------//

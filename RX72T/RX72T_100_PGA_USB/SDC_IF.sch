@@ -364,7 +364,7 @@ U 1 1 61246A7D
 P 7450 1550
 F 0 "C?" H 7533 1603 60  0000 L CNN
 F 1 "0.1uF" H 7533 1497 60  0000 L CNN
-F 2 "" V 7450 1550 60  0001 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 7450 1550 60  0001 C CNN
 F 3 "" V 7450 1550 60  0001 C CNN
 	1    7450 1550
 	1    0    0    -1  
@@ -379,4 +379,25 @@ Wire Wire Line
 Wire Wire Line
 	7450 1850 7000 1850
 Connection ~ 7000 1850
+$Comp
+L akizuki:C-POL C?
+U 1 1 61C2BFAB
+P 7900 1550
+F 0 "C?" H 7983 1603 60  0000 L CNN
+F 1 "10uF" H 7983 1497 60  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 7900 1550 60  0001 C CNN
+F 3 "" V 7900 1550 60  0001 C CNN
+	1    7900 1550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7450 1050 7900 1050
+Wire Wire Line
+	7900 1050 7900 1400
+Connection ~ 7450 1050
+Wire Wire Line
+	7450 1850 7900 1850
+Wire Wire Line
+	7900 1850 7900 1700
+Connection ~ 7450 1850
 $EndSCHEMATC
