@@ -22,6 +22,7 @@ namespace device {
 	struct rtc_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr bool BINARY = true;	///< バイナリーカウントモード
 
 		//-----------------------------------------------------------------//
 		/*!

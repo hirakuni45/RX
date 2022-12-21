@@ -41,6 +41,7 @@ namespace device {
 		};
 #if 1
 		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
+
 #if 1
 		static constexpr uint32_t   BASE		= 32'000'000;		///< ベースクロック
 
@@ -57,6 +58,7 @@ namespace device {
 		static constexpr uint32_t   PCLKD		= 50'000'000;		///< PCLKD 周波数（最大32MHz）
 		static constexpr uint32_t   FCLK		= 25'000'000;		///< FCLK 周波数（最大4 ～ 32MHz）
 #endif
+
 #else
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 20'000'000;		///< ベースクロック

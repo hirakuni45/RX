@@ -408,40 +408,39 @@ namespace device {
 					PORTE::PMR.B1 = 0;
 					PORTE::PMR.B2 = 0;
 					PORTE::PMR.B3 = 0;
-					MPC::PE1PFS.PSEL = enable ? 0b0'1110 : 0;
-					MPC::PE2PFS.PSEL = enable ? 0b0'1110 : 0;
-					MPC::PE3PFS.PSEL = enable ? 0b0'1101 : 0;
+					MPC::PE1PFS.PSEL = enable ? 0b0'1110 : 0;  // ok
+					MPC::PE2PFS.PSEL = enable ? 0b0'1110 : 0;  // ok
+					MPC::PE3PFS.PSEL = enable ? 0b0'1101 : 0;  // ok
 					PORTE::PMR.B1 = enable;
 					PORTE::PMR.B2 = enable;
 					PORTE::PMR.B3 = enable;
 				}
 				break;
 
-#if 0
 			case peripheral::SCI0:
-			// P21/RXD0
-			// P20/TXD0
+			// P33/RXD0
+			// P32/TXD0
 				{
-					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORT2::PMR.B1 = 0;
-					PORT2::PMR.B0 = 0;
-					MPC::P21PFS.PSEL = sel;
-					MPC::P20PFS.PSEL = sel;
-					PORT2::PMR.B1 = enable;
-					PORT2::PMR.B0 = enable;
+					uint8_t sel = enable ? 0b0'1011 : 0;
+					PORT3::PMR.B3 = 0;
+					PORT3::PMR.B2 = 0;
+					MPC::P33PFS.PSEL = sel;  // ok
+					MPC::P32PFS.PSEL = sel;  // ok
+					PORT3::PMR.B3 = enable;
+					PORT3::PMR.B2 = enable;
 				}
 				break;
 			case peripheral::SCI1:
-			// P15/RXD1
-			// P16/TXD1
+			// P30/RXD1
+			// P26/TXD1
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORT1::PMR.B5 = 0;
-					PORT1::PMR.B6 = 0;
-					MPC::P15PFS.PSEL = sel;
-					MPC::P16PFS.PSEL = sel;
-					PORT1::PMR.B5 = enable;
-					PORT1::PMR.B6 = enable;
+					PORT3::PMR.B0 = 0;
+					PORT2::PMR.B6 = 0;
+					MPC::P30PFS.PSEL = sel;  // ok
+					MPC::P26PFS.PSEL = sel;  // ok
+					PORT3::PMR.B0 = enable;
+					PORT2::PMR.B6 = enable;
 				}
 				break;
 			case peripheral::SCI2:
@@ -451,14 +450,51 @@ namespace device {
 					uint8_t sel = enable ? 0b0'1010 : 0;
 					PORT1::PMR.B2 = 0;
 					PORT1::PMR.B3 = 0;
-					MPC::P12PFS.PSEL = sel;
-					MPC::P13PFS.PSEL = sel;
+					MPC::P12PFS.PSEL = sel;  // ok
+					MPC::P13PFS.PSEL = sel;  // ok
 					PORT1::PMR.B2 = enable;
 					PORT1::PMR.B3 = enable;
 				}
 				break;
-#endif
-
+			case peripheral::SCI3:
+			// P25/RXD2
+			// P23/TXD2
+				{
+					uint8_t sel = enable ? 0b0'1010 : 0;
+					PORT2::PMR.B5 = 0;
+					PORT2::PMR.B3 = 0;
+					MPC::P25PFS.PSEL = sel;  // ok
+					MPC::P23PFS.PSEL = sel;  // ok
+					PORT2::PMR.B5 = enable;
+					PORT2::PMR.B3 = enable;
+				}
+				break;
+			case peripheral::SCI5:
+			// PC2/RXD2
+			// PC3/TXD2
+				{
+					uint8_t sel = enable ? 0b0'1010 : 0;
+					PORT2::PMR.B5 = 0;
+					PORT2::PMR.B3 = 0;
+					MPC::P25PFS.PSEL = sel;  // ok
+					MPC::P23PFS.PSEL = sel;  // ok
+					PORT2::PMR.B5 = enable;
+					PORT2::PMR.B3 = enable;
+				}
+				break;
+			case peripheral::SCI6:
+			// P33/RXD2
+			// P32/TXD2
+				{
+					uint8_t sel = enable ? 0b0'1010 : 0;
+					PORT2::PMR.B5 = 0;
+					PORT2::PMR.B3 = 0;
+					MPC::P25PFS.PSEL = sel;  // ok
+					MPC::P23PFS.PSEL = sel;  // ok
+					PORT2::PMR.B5 = enable;
+					PORT2::PMR.B3 = enable;
+				}
+				break;
 
 			default:
 				return false;
@@ -506,21 +542,21 @@ namespace device {
 					PORTE::PMR.B7 = enable;
 				}
 				break;
-#if 0
-			case peripheral::SCI1:
-			// P93/RXD1
-			// P26/TXD1
+
+			case peripheral::SCI1:  // Serial Boot Mode
+			// PF2/RXD1
+			// PF0/TXD1
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORT9::PMR.B3 = 0;
-					PORT2::PMR.B6 = 0;
-					MPC::P93PFS.PSEL = sel;
-					MPC::P26PFS.PSEL = sel;
-					PORT9::PMR.B3 = enable;
-					PORT2::PMR.B6 = enable;
+					PORTF::PMR.B2 = 0;
+					PORTF::PMR.B0 = 0;
+					MPC::PF2PFS.PSEL = sel;  // ok
+					MPC::PF0PFS.PSEL = sel;  // ok
+					PORTF::PMR.B2 = enable;
+					PORTF::PMR.B0 = enable;
 				}
 				break;
-#endif
+
 			default:
 				return false;
 				break;

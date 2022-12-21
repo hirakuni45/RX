@@ -24,7 +24,7 @@ namespace device {
 		static constexpr auto DATA_FLASH_SIZE  = FLASH::DATA_FLASH_SIZE;
 		static constexpr auto DATA_FLASH_BLOCK = FLASH::DATA_FLASH_BLOCK;
 		static constexpr auto DATA_FLASH_BANK  = FLASH::DATA_FLASH_SIZE / FLASH::DATA_FLASH_BLOCK;
-		static constexpr auto DATA_WORD_SIZE = FLASH::DATA_WORD_SIZE;
+		static constexpr auto DATA_WORD_SIZE   = FLASH::DATA_WORD_SIZE;
 
 	private:
 		enum class MODE : uint8_t {
