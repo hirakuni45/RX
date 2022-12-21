@@ -1,4 +1,4 @@
-Renesas RX220, RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
+Renesas RX220, RX62N, RX631, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
 =========
 
 [英語版](README.md)
@@ -16,6 +16,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - main.cpp
 - RX220/Makefile
 - RX62N/Makefile
+- RX631/Makefile
 - RX24T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
@@ -33,59 +34,13 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 -  USB シリアルとSCI ポートを接続する。
 - RX220 の SCI 標準ポートは、「RX220/port_map.hpp」参照。
 - RX62N の SCI 標準ポートは、「RX62x/port_map.hpp」参照。
+- RX631 の SCI 標準ポートは、「RX63x/port_map.hpp」参照。
 - RX24T の SCI 標準ポートは、「RX24T/port_map.hpp」参照。
+- RX66T の SCI 標準ポートは、「RX66T/port_map.hpp」参照。
+- RX72T の SCI 標準ポートは、「RX72T/port_map.hpp」参照。
 - RX64M/RX71M の SCI 標準ポートは、「RX64M/port_map.hpp」参照。
 - RX65x の SCI 標準ポートは、「RX65x/port_map.hpp」参照。
 - RX72N の SCI 標準ポートは、「RX72N/port_map.hpp」参照。
-- RX66T の SCI 標準ポートは、「RX66T/port_map.hpp」参照。
-- RX72T の SCI 標準ポートは、「RX72T/port_map.hpp」参照。
-
-```C++
-#if defined(SIG_RX62N)
-  #if defined(CQ_FRK)
-    // FRK-RX62N(CQ 出版社)
-	static const char* system_str_ = { "RX62N FRK-RX62N" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
-  #else
-    // BlueBoard-RX62N_100pin
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
-  #endif
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
-	typedef device::SCI9 SCI_CH;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
-	typedef device::SCI2 SCI_CH;
-#elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
-	typedef device::SCI1 SCI_CH;
-#endif
-```
-
 - BlueBoard-RX62N_100pin の場合、ボード上の D2 LED を利用する。（赤色） 
 - FRK-RX62N の場合、ボード上の LED1 を利用する。（黄色） 
 - RX65N Envision kit の場合、インジケーター LED はボード上の青色を利用する。
@@ -109,12 +64,80 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - FRK-RX62N は、R5F562N7(FlashRom: 374KB) の為、Makefile のデバイスを変更する。
 - CQ_FRK 変数（コンパイル時定数）を有効にする事で、基板依存の切り替えを行う。
 
-```
-# BlueBoard-RX62N_100pin
-#DEVICE		=	R5F562N8
-# FRK-RX62N (CQ出版)
-DEVICE		=	R5F562N7
-USER_DEFS	=	CQ_FRK
+```C++
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
+
+#if defined(SIG_RX220)
+	// 秋月 RX220 ボード
+	static const char* system_str_ = { "AE-RX220" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX62N)
+  #if defined(CQ_FRK)
+    // FRK-RX62N(CQ 出版社)
+	static const char* system_str_ = { "RX62N FRK-RX62N" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+  #else
+    // BlueBoard-RX62N_100pin
+	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+  #endif
+#elif defined(SIG_RX631)
+	// DIY RX631 board
+	static const char* system_str_ = { "RX631 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
+#elif defined(SIG_RX63T)
+	// DIY RX63T board
+	static const char* system_str_ = { "RX63T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX64M)
+	static const char* system_str_ = { "RX64M DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX65N)
+	static const char* system_str_ = { "RX65N Envision Kit" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
+#elif defined(SIG_RX66T)
+	static const char* system_str_ = { "RX66T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX72N)
+	static const char* system_str_ = { "RX72N Envision Kit" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
+#endif
+
+	SCI		sci_;
 ```
 
 ---
@@ -130,6 +153,64 @@ USER_DEFS	=	CQ_FRK
 - utils::command クラスにより、１行入力機能をサービス。
 - 受け取った文字をパースしてワード表示。
     
+---
+
+## ボーレートの誤差、コンパイル時アサート
+
+- RX マイコンの SCI は、各マイコンで、様々な仕様があり、機能が微妙に異なっています。
+- sci_io クラスでは、それらの機能を参照して、なるべく正確なボーレートになるように調整します。
+- 設定は、整数で設定する事が出来るので、基本的にどのような設定も可能です。
+- SCI の機能を超えた設定を行うと、「start」関数は「false」を返して失敗します。
+- 非同期通信では、１つのパケットが比較的短いので、ある程度の誤差を許容する事が出来ます。
+- ロジックレベルのサンプリングは、ボーレート周期の中心で行われる為、誤差の許容範囲は、大体４％程度です。
+- 設定したボーレートと、実際に設定されたボーレートの誤差は、以下のように得る事が出来ます。
+
+```C++
+	{
+		utils::format("SCI PCLK: %u [Hz]\n") % SCI::sci_type::PCLK;
+		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_.get_baud_rate();
+		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
+		rate *= 100.0f;
+		utils::format("  Baud rate (real): %u (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
+		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(SCI::sci_type::SEMR_BRME);
+		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(SCI::sci_type::SEMR_BGDM);
+	}
+```
+
+```
+Start SCI (UART) sample for 'RX72T DIY' 200[MHz]
+SCI PCLK: 50000000 [Hz]
+SCI Baud rate (set): 115200 [BPS]
+  Baud rate (real): 115287 (0.08 [%])
+  SEMR_BRME: true
+  SEMR_BGDM: true
+```
+
+- コンパイル時アサート、constexpr を利用すると、コンパイル時に、ボーレートが設定出来るか検査出来ます。
+- これは、実機での実行時間に影響を与えませんし、余分なコードも含まれません。
+- 設定不可能なボーレートの場合、コンパイルエラーが発生するので、事前に止める事が出来ます。
+- 検査するボーレートは、定数である必要があります。
+- DIP スイッチなどの状態を読み込んで、ボーレートを設定するような場合は、全ての組み合わせを検査する事も出来ます。
+
+```C++
+	constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
+	static_assert(SCI::probe_baud(baud), "Can't set BAUDRATE");
+```
+
+エラー発生の場合：
+```C++
+	constexpr uint32_t baud = 500000;  // ボーレート（任意の整数値を指定可能）
+	static_assert(SCI::probe_baud(baud), "Can't set BAUDRATE");
+```
+
+```
+../../SCI_sample/main.cpp: In function 'int main(int, char**)':
+../../SCI_sample/main.cpp:148:32: error: static assertion failed: Can't set BAUDRATE
+   static_assert(SCI::probe_baud(baud), "Can't set BAUDRATE");
+                 ~~~~~~~~~~~~~~~^~~~~~
+make: *** [../../common/makefile:231: release/SCI_sample/main.o] Error 1
+```
+
 ---
 
 ## 備考
@@ -154,11 +235,11 @@ USER_DEFS	=	CQ_FRK
 - main.cpp には、標準出力（printf）に対応する事が出来る「枝」を出してあります。
 - 「sci_putch」などですが、これらの関数は、POSIX 関数、write などから、特定のディスクリプタ（stdout）で呼ばれるような仕組みが実装されています。 [common/syscalls.c](../common/syscalls.c)
 - なので、printf 関数は普通に使えるのですが、C++ では推奨しません。（使う理由がありません）
-- printf は、引数が可変引数になっていて、スタック経由なので、format 文と引数に反故がある場合、クラッシュする事もあります、コンパイラのチェックでは完全に「反故」を見つける事は困難です、従って、どんなに便利でも使ってはいけません。
+- printf は、引数が可変引数になっていて、スタック経由なので、format 文と引数に反故がある場合、クラッシュする事もあります、コンパイラのチェックでは完全に「反故」を見つける事は困難です、従って、どんなに便利でも C++ では使わないのがセオリーです。
 - 代わりに、utils::format クラスを利用して下さい、printf とほぼ同じように使えて、間違った引数でもクラッシュする事はありません。
-- C++ の標準出力機能「std::cout」は、メモリを大量に消費し、実質的に利用出来ない為非推奨としています。
+- C++ の標準ライブラリを使った出力操作「std::cout」は、メモリを大量に消費し、実質的に利用出来ない為非推奨としています。
 - std::string などの STL を使いたい場合、Makefile の USER_LIBS に、stdc++ などの STL ライブラリを追加します。
-- STL を使う場合、記憶割り当てを多用するので、十分な RAM が必要です。
+- STL を使う場合、記憶割り当てを使用するので、十分な RAM が必要です。
 
  ---
 
@@ -179,7 +260,7 @@ USER_DEFS	=	CQ_FRK
 
 syscalls.c 内、write 関数の sci_putch 呼び出し：   
 
-```
+```C
 _READ_WRITE_RETURN_TYPE write(int file, const void *ptr, size_t len)
 {
 	if(ptr == NULL) return 0;
@@ -200,7 +281,7 @@ _READ_WRITE_RETURN_TYPE write(int file, const void *ptr, size_t len)
    
 syscalls.c 内、read 関数の sci_getch 呼び出し：   
 
-```
+```C
 _READ_WRITE_RETURN_TYPE read(int file, void *ptr, size_t len)
 {
 	if(ptr == NULL) return 0;
@@ -225,7 +306,7 @@ _READ_WRITE_RETURN_TYPE read(int file, void *ptr, size_t len)
 
 main.cpp sci_putch、sci_getch の定義：   
 
-```
+```C
 extern "C" {
 
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
@@ -267,7 +348,7 @@ extern "C" {
 
 ## サポートされている通信プロトコル
 
-```
+```C++
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	SCI 通信プロトコル型
@@ -293,9 +374,9 @@ extern "C" {
    
 他の指定をする場合：
 
-```
-	uint8_t intr = 2;        // 割り込みレベル（０を指定すると、ポーリング動作になる）
-	uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
+```C++
+	constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
+	auto intr = device::ICU::LEVEL::_2;      // 割り込みレベル（NONE を指定すると、ポーリング動作になる）
 	auto protocol = SCI::PROTOCOL::B8_E_2S;  // 8 ビット、Even(偶数)、2 Stop Bits
 	sci_.start(baud, intr, protocol);
 ```
@@ -306,7 +387,7 @@ extern "C" {
 
 - ボーレートは、整数で指定しますが、良く使われるボーレートは設定がありますのでそれを利用する事も出来ます。
 
-```
+```C++
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	SCI ボーレート型（シリアル通信で標準的に指定する定型値）
@@ -330,8 +411,8 @@ extern "C" {
 	};
 ```
    
-```
-	uint8_t intr = 2;        				 // 割り込みレベル（０を指定すると、ポーリング動作になる）
+```C++
+	auto intr = device::ICU:LEVEL::_2;       // 割り込みレベル（NONE を指定すると、ポーリング動作になる）
 	auto protocol = SCI::PROTOCOL::B8_E_2S;  // 8 ビット、Even(偶数)、2 Stop Bits
 	sci_.start(SCI::BAUDRATE::B115200, intr, protocol);  // 115200 B.P.S.
 ```
