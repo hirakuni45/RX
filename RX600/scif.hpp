@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・SCIF(SCIFA) 定義
+	@brief	RX600 グループ・SCIF 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -11,6 +11,8 @@
 #include "common/device.hpp"
 
 namespace device {
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -23,21 +25,8 @@ namespace device {
 		@param[in]	eri		エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-	struct scif_t {
-
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto TXI		 = txi;		///< 受信割り込みベクター
-		static constexpr auto RXI		 = rxi;		///< 送信割り込みベクター
-		static constexpr auto TEI		 = tei;		///< 送信終了割り込みベクター
-		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
-		static constexpr auto PCLK		 = clock_profile::PCLKA;	///< PCLK 周波数
-
-		static constexpr bool SEMR_BRME = true;	///< BRME（ボーレート微調整）
-		static constexpr bool SEMR_BGDM = true;	///< BGDM（ボーレート倍速）
-		static constexpr bool SEMR_NFEN = true;	///< NFEN（ノイズフィルタ）
-		// 受信データフル
-		static constexpr bool SSR_RDRF  = false;	///< SSR.RDRF が利用可能な場合「true」
+	template <uint32_t base>
+	struct scif_base_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -279,35 +268,52 @@ namespace device {
 		typedef semr_t SEMR_;
 		static  SEMR_ SEMR;
 	};
+	template <uint32_t base> typename scif_base_t<base>::FRDR_ scif_base_t<base>::FRDR;
+	template <uint32_t base> typename scif_base_t<base>::FTDR_ scif_base_t<base>::FTDR;
+	template <uint32_t base> typename scif_base_t<base>::SMR_ scif_base_t<base>::SMR;
+	template <uint32_t base> typename scif_base_t<base>::SCR_ scif_base_t<base>::SCR;
+	template <uint32_t base> typename scif_base_t<base>::FSR_ scif_base_t<base>::FSR;
+	template <uint32_t base> typename scif_base_t<base>::BRR_ scif_base_t<base>::BRR;
+	template <uint32_t base> typename scif_base_t<base>::MDDR_ scif_base_t<base>::MDDR;
+	template <uint32_t base> typename scif_base_t<base>::FCR_ scif_base_t<base>::FCR;
+	template <uint32_t base> typename scif_base_t<base>::FDR_ scif_base_t<base>::FDR;
+	template <uint32_t base> typename scif_base_t<base>::SPTR_ scif_base_t<base>::SPTR;
+	template <uint32_t base> typename scif_base_t<base>::LSR_ scif_base_t<base>::LSR;
+	template <uint32_t base> typename scif_base_t<base>::FTCR_ scif_base_t<base>::FTCR;
+	template <uint32_t base> typename scif_base_t<base>::SEMR_ scif_base_t<base>::SEMR;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCIF 定義基底クラス (SCIF)
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	txi		送信割り込み
+		@param[in]	rxi		受信割り込み
+		@param[in]	tei		送信終了割り込み
+		@param[in]	eri		エラー割り込み
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txi, rxi, tei, eri>::FRDR_ scif_t<base, per, txi, rxi, tei, eri>::FRDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::FTDR_ scif_t<base, per, txv, rxv, tei, eri>::FTDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::SMR_ scif_t<base, per, txv, rxv, tei, eri>::SMR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::SCR_ scif_t<base, per, txv, rxv, tei, eri>::SCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::FSR_ scif_t<base, per, txv, rxv, tei, eri>::FSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::BRR_ scif_t<base, per, txv, rxv, tei, eri>::BRR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::MDDR_ scif_t<base, per, txv, rxv, tei, eri>::MDDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::FCR_ scif_t<base, per, txv, rxv, tei, eri>::FCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::FDR_ scif_t<base, per, txv, rxv, tei, eri>::FDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::SPTR_ scif_t<base, per, txv, rxv, tei, eri>::SPTR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::LSR_ scif_t<base, per, txv, rxv, tei, eri>::LSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::FTCR_ scif_t<base, per, txv, rxv, tei, eri>::FTCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
-		typename scif_t<base, per, txv, rxv, tei, eri>::SEMR_ scif_t<base, per, txv, rxv, tei, eri>::SEMR;
+	struct scif_t : public scif_base_t<base> {
 
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto TXI		 = txi;		///< 受信割り込みベクター
+		static constexpr auto RXI		 = rxi;		///< 送信割り込みベクター
+		static constexpr auto TEI		 = tei;		///< 送信終了割り込みベクター
+		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
+		static constexpr auto PCLK		 = clock_profile::PCLKA;	///< PCLK 周波数
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+		//ボーレート微調整
+		static constexpr bool SEMR_BRME  = true;	///< SEMR.BRME が利用可能な場合「true」
+		// ボーレート倍速
+		static constexpr bool SEMR_BGDM  = true;	///< SEMR.BGDM が利用可能な場合「true」
+		// ノイズフィルタ
+		static constexpr bool SEMR_NFEN  = true;	///< SEMR.NFEN が利用可能な場合「true」
+		// 調歩同期基本クロックセレクト拡張
+		static constexpr bool SEMR_ABCSE = true;	///< SEMR.ABCSE が利用可能な場合「true」
+	};
+
 	typedef scif_t<0x000D'0000, peripheral::SCIF8,  ICU::VECTOR::TXIF8, ICU::VECTOR::RXIF8,
 		ICU::GROUPAL0::TEIF8, ICU::GROUPAL0::ERIF8>  SCIF8;
 	typedef scif_t<0x000D'0020, peripheral::SCIF9,  ICU::VECTOR::TXIF9, ICU::VECTOR::RXIF9,

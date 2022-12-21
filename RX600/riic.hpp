@@ -1,9 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX621/RX62N RIIC 定義 @n
+	@brief	RX220 RIIC @n
+			RX621/RX62N RIIC 定義 @n
 			RX631/RX63N RIIC 定義 @n
-			RX24T/RX66T/RX64M/RX71M/RX65N RIICa 定義
+			RX24T/RX66T/RX72T/RX64M/RX71M/RX65N RIICa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -401,25 +402,25 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  I 2 C バスインタフェース 定義（IICAa 型）
+		@brief  I 2 C バスインタフェース 定義（RIIC 型）
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	eev		「通信エラー、通信イベント」ベクター
-		@param[in]	rxv		「受信データフル」ベクター
-		@param[in]	txv		「送信データエンプティ」ベクター
-		@param[in]	tev		「送信終了」ベクター
+		@param[in]	txi		「送信データエンプティ」ベクター
+		@param[in]	rxi		「受信データフル」ベクター
+		@param[in]	eei		「通信エラー、通信イベント」ベクター
+		@param[in]	tei		「送信終了」ベクター
 		@param[in]	pclk	クロック元
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR eev, ICU::VECTOR tev, uint32_t pclk>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR eei, ICU::VECTOR tei, uint32_t pclk>
 	struct riic_t : riic_core_t<base> {
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto EE_VEC = eev;		///< 通信エラー、イベント割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static constexpr auto PCLK   = pclk;	///< クロック周波数
+		static constexpr auto TXI  = txi;		///< 受信割り込みベクター
+		static constexpr auto RXI  = rxi;		///< 送信割り込みベクター
+		static constexpr auto EEI  = eei;		///< 通信エラー、イベント割り込みベクター
+		static constexpr auto TEI  = tei;		///< 送信終了割り込みベクター
+		static constexpr auto PCLK = pclk;		///< クロック周波数
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -439,35 +440,35 @@ namespace device {
 		typedef rw8_t<base + 0x0B> TMOCNTU_;
 		static TMOCNTU_ TMOCNTU;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR eev, ICU::VECTOR tev, uint32_t pclk>
-		typename riic_t<base, per, txv, rxv, eev, tev, pclk>::TMOCNTL_ riic_t<base, per, txv, rxv, eev, tev, pclk>::TMOCNTL;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR eev, ICU::VECTOR tev, uint32_t pclk>
-		typename riic_t<base, per, txv, rxv, eev, tev, pclk>::TMOCNTU_ riic_t<base, per, txv, rxv, eev, tev, pclk>::TMOCNTU;
+	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR eei, ICU::VECTOR tei, uint32_t pclk>
+		typename riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTL_ riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTL;
+	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR eei, ICU::VECTOR tei, uint32_t pclk>
+		typename riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTU_ riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTU;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  I 2 C バスインタフェース 定義（IICAa 型）
+		@brief  I 2 C バスインタフェース 定義（RIICa 型）
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	txi		「送信データエンプティ」ベクター
+		@param[in]	rxi		「受信データフル」ベクター
 		@param[in]	INT		割り込みベクター型
-		@param[in]	eev		「通信エラー、通信イベント」ベクター
-		@param[in]	rxv		「受信データフル」ベクター
-		@param[in]	txv		「送信データエンプティ」ベクター
-		@param[in]	tev		「送信終了」ベクター
+		@param[in]	eei		「通信エラー、通信イベント」ベクター
+		@param[in]	tei		「送信終了」ベクター
 		@param[in]	pclk	クロック元
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT eev, INT tev, uint32_t pclk>
+		ICU::VECTOR txi, ICU::VECTOR rxi, typename INT, INT eei, INT tei, uint32_t pclk>
 	struct riica_t : riic_core_t<base> {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr auto EE_VEC = eev;		///< 通信エラー、イベント割り込みベクター
-		static constexpr auto TE_VEC = tev;		///< 送信終了割り込みベクター
-		static constexpr auto PCLK   = pclk;	///< クロック周波数
+		static constexpr auto TXI  = txi;		///< 受信割り込みベクター
+		static constexpr auto RXI  = rxi;		///< 送信割り込みベクター
+		static constexpr auto EEI  = eei;		///< 通信エラー、イベント割り込みベクター
+		static constexpr auto TEI  = tei;		///< 送信終了割り込みベクター
+		static constexpr auto PCLK = pclk;		///< クロック周波数
 	};
 
 #if defined(SIG_RX220) || defined(SIG_RX24T)

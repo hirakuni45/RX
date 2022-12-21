@@ -10,6 +10,7 @@
 //=========================================================================//
 #include "common/renesas.hpp"
 #include "common/intr_utils.hpp"
+#include "common/time_base.hpp"
 
 namespace device {
 

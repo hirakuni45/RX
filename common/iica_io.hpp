@@ -20,7 +20,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  IICA 制御クラス（I2C) @n
-				※ポートは候補が１つしか無い為、候補指定がありません。
+				※ポートは候補が通常１つしか無い為、指定がありません。
 		@param[in]	IICA	IICA 定義基底クラス
 		@param[in]	TPSZ	テンポラリーバッファサイズ（I2C 通信で行う最大サイズを指定）
 	*/
@@ -37,6 +37,12 @@ namespace device {
 		};
 
 		static constexpr clock_t clock_tables_[] = {
+			{ 0b100, 15, 18 },  //   50Kbps, PCLK:30MHz
+			{ 0b010,  2,  3 },  //  100Kbps, PCLK:30MHz
+			{ 0b010,  4,  6 },  //  200Kbps, PCLK:30MHz
+			{ 0b001,  8, 19 },  //  400Kbps, PCLK:30MHz
+			{ 0b000,  7, 15 },  // 1000Kbps, PCLK:30MHz
+
 			{ 0b100, 17, 20 },  //   50Kbps, PCLK:33MHz
 			{ 0b011, 16, 19 },  //  100Kbps, PCLK:33MHz
 			{ 0b010, 15, 18 },  //  200Kbps, PCLK:33MHz
@@ -61,10 +67,11 @@ namespace device {
 			{ 0b010,  8, 19 },  //  400Kbps, PCLK:60MHz
 			{ 0b000, 15, 29 },  // 1000Kbps, PCLK:60MHz
 		};
-		static constexpr uint32_t PCLK_33 = 5 * 0;
-		static constexpr uint32_t PCLK_40 = 5 * 1;
-		static constexpr uint32_t PCLK_50 = 5 * 2;
-		static constexpr uint32_t PCLK_60 = 5 * 3;
+		static constexpr uint32_t PCLK_30 = 5 * 0;
+		static constexpr uint32_t PCLK_33 = 5 * 1;
+		static constexpr uint32_t PCLK_40 = 5 * 2;
+		static constexpr uint32_t PCLK_50 = 5 * 3;
+		static constexpr uint32_t PCLK_60 = 5 * 4;
 		static constexpr uint32_t CLOCK_OFS_50K   = 0;
 		static constexpr uint32_t CLOCK_OFS_100K  = 1;
 		static constexpr uint32_t CLOCK_OFS_200K  = 2;
@@ -260,7 +267,8 @@ namespace device {
 			IICA::SARU2 = 0x00;
 
 			uint32_t idx_base = 0;
-			if(IICA::PCLK <= 33'000'000) idx_base = PCLK_33;
+			if(IICA::PCLK <= 30'000'000) idx_base = PCLK_30;
+			else if(IICA::PCLK <= 33'000'000) idx_base = PCLK_33;
 			else if(IICA::PCLK <= 40'000'000) idx_base = PCLK_40;
 			else if(IICA::PCLK <= 50'000'000) idx_base = PCLK_50;
 			else idx_base = PCLK_60;
@@ -304,24 +312,24 @@ namespace device {
 ///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
 			if(level_ != ICU::LEVEL::NONE) {
-				icu_mgr::set_interrupt(IICA::RX_VEC, recv_itask_, level_);
-				icu_mgr::set_interrupt(IICA::TX_VEC, send_itask_, level_);
+				icu_mgr::set_interrupt(IICA::RXI, recv_itask_, level_);
+				icu_mgr::set_interrupt(IICA::TXI, send_itask_, level_);
 
-				if(icu_mgr::get_group_vector(IICA::EE_VEC) == ICU::VECTOR::NONE) {  // 通常割り込みの場合
-					icu_mgr::set_interrupt(IICA::EE_VEC, event_itask_, level_);
+				if(icu_mgr::get_group_vector(IICA::EEI) == ICU::VECTOR::NONE) {  // 通常割り込みの場合
+					icu_mgr::set_interrupt(IICA::EEI, event_itask_, level_);
 				} else {
-					icu_mgr::set_interrupt(IICA::EE_VEC, event_ntask_, level_);	// グループ割り込みの場合、通常の関数を登録
+					icu_mgr::set_interrupt(IICA::EEI, event_ntask_, level_);	// グループ割り込みの場合、通常の関数を登録
 				}
-				if(icu_mgr::get_group_vector(IICA::TE_VEC) == ICU::VECTOR::NONE) {  // 通常割り込みの場合
-					icu_mgr::set_interrupt(IICA::TE_VEC, tend_itask_, level_);
+				if(icu_mgr::get_group_vector(IICA::TEI) == ICU::VECTOR::NONE) {  // 通常割り込みの場合
+					icu_mgr::set_interrupt(IICA::TEI, tend_itask_, level_);
 				} else {
-					icu_mgr::set_interrupt(IICA::TE_VEC, tend_ntask_, level_);  // グループ割り込みの場合、通常の関数を登録
+					icu_mgr::set_interrupt(IICA::TEI, tend_ntask_, level_);  // グループ割り込みの場合、通常の関数を登録
 				}
 			} else {
-				icu_mgr::set_interrupt(IICA::RX_VEC, nullptr, level_);
-				icu_mgr::set_interrupt(IICA::TX_VEC, nullptr, level_);
-				icu_mgr::set_interrupt(IICA::EE_VEC, nullptr, level_);
-				icu_mgr::set_interrupt(IICA::TE_VEC, nullptr, level_);
+				icu_mgr::set_interrupt(IICA::RXI, nullptr, level_);
+				icu_mgr::set_interrupt(IICA::TXI, nullptr, level_);
+				icu_mgr::set_interrupt(IICA::EEI, nullptr, level_);
+				icu_mgr::set_interrupt(IICA::TEI, nullptr, level_);
 			}
 			IICA::ICIER = 0x00;
 
