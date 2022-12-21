@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "1.61";
+	const std::string version_ = "1.65";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
