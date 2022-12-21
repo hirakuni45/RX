@@ -2,20 +2,18 @@
 //=====================================================================//
 /*!	@file
 	@brief	CPU 内蔵 D/A ストリームクラス @n
-			内蔵 D/A に、連続した値を流す。@n
-			MTU を基準タイマーとして利用する。@n
-			DMAC を使って、D/A に値を書き込む。@n
+			内蔵 D/A に、連続した値を流す。 @n
+			MTU を基準タイマーとして利用する。 @n
+			DMAC を使って、D/A に値を書き込む。 @n
 			出力の GND レベルは中心電圧とする。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "sound/sound_out.hpp"
-// #include "common/tpu_io.hpp"
 #include "common/mtu_io.hpp"
-// #include "common/cmt_mgr.hpp"
 
 namespace sound {
 
@@ -31,6 +29,8 @@ namespace sound {
 	template<class DAC, class ITV, class DMAC, class SOUND_OUT>
 	class dac_stream {
 
+		static constexpr uint32_t SAMPLE_DIV = 32;	///< 波形の転送分周比
+
 		SOUND_OUT&	sound_out_;
 
 		struct itv_t {
@@ -43,23 +43,21 @@ namespace sound {
 
 		static void* itv_t_ptr_;
 
-		// ITM 割り込み、32 フレーム毎に、ソースバッファから波形メモリに転送
+		// ITM 割り込み、SAMPLE_DIV 毎に、ソースバッファから波形メモリに転送
 		class itv_task {
 		public:
 			void operator() () {
 				auto p = static_cast<itv_t*>(itv_t_ptr_);
 				uint32_t tmp = p->wpos_;
 				++p->wpos_;
-				if((tmp ^ p->wpos_) & 32) {
-					p->sound_out_.service(32);
+				if((tmp ^ p->wpos_) & SAMPLE_DIV) {
+					p->sound_out_.service(SAMPLE_DIV);
 				}
 			}
 		};
 
-//		typedef device::tpu_io<ITV, itv_task> ITV_IO;
-		typedef device::mtu_io<ITV, itv_task> ITV_IO;
-//		typedef device::cmt_mgr<ITV, itv_task> ITV_IO;
-		ITV_IO		itv_io_;
+		typedef device::mtu_io<ITV, itv_task> ITV_MGR;
+		ITV_MGR		itv_mgr_;
 
 		// Internal D/A
 		typedef device::dac_out<DAC> DAC_OUT;
@@ -90,7 +88,7 @@ namespace sound {
 		*/
 		//-----------------------------------------------------------------//
 		dac_stream(SOUND_OUT& sound_out) noexcept :
-			sound_out_(sound_out), itv_t_(sound_out), itv_io_(),
+			sound_out_(sound_out), itv_t_(sound_out), itv_mgr_(),
 			dac_out_(), dmac_mgr_(), sample_rate_(48'000), itv_intl_(device::ICU::LEVEL::NONE)
 		{
 			itv_t_ptr_ = &itv_t_;
@@ -124,7 +122,7 @@ namespace sound {
 
 			{  // DMAC マネージャー開始
 				bool cpu_intr = true;
-				auto ret = dmac_mgr_.start(itv_io_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
+				auto ret = dmac_mgr_.start(itv_mgr_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
 					reinterpret_cast<uint32_t>(sound_out_.get_sample()), DAC::DADR0.address,
 					sound_out_.get_sample_size(), dmac_intl, cpu_intr);
 				if(!ret) {
@@ -145,8 +143,8 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		void set_sample_rate(uint32_t freq) noexcept
 		{
-    	    if(!itv_io_.start(freq, itv_intl_)) {
-        	    utils::format("ITM start error...\n");
+    	    if(!itv_mgr_.start(freq, itv_intl_)) {
+ //       	    utils::format("ITM start error...\n");
         	} else {
 #if 0
 				utils::format("ITV intr level: %d\n") % static_cast<int>(itv_io_.get_intr_vec());
@@ -187,7 +185,6 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		uint32_t get_sample_size() const noexcept { return sound_out_.get_sample_size(); }
 	};
-
 	template<class DAC, class MTU, class DMAC, class SOUND_OUT>
 		void* dac_stream<DAC, MTU, DMAC, SOUND_OUT>::itv_t_ptr_;
 }
