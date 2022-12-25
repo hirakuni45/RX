@@ -94,10 +94,10 @@ namespace device {
 			CLK_B,	///< MTCLKB(MTUx), TCLKB(TPUx)
 			CLK_C,	///< MTCLKC(MTUx), TCLKC(TPUx)
 			CLK_D,	///< MTCLKD(MTUx), TCLKD(TPUx)
-			CLK_E,	///< MTCLKE (MTU2 系)
-			CLK_F,	///< MTCLKF (MTU2 系)
-			CLK_G,	///< MTCLKG (MTU2 系)
-			CLK_H,	///< MTCLKH (MTU2 系)
+			CLK_E,	///< MTCLKE (MTU2, TPU 系)
+			CLK_F,	///< MTCLKF (MTU2, TPU 系)
+			CLK_G,	///< MTCLKG (MTU2, TPU 系)
+			CLK_H,	///< MTCLKH (MTU2, TPU 系)
 			NONE,	///< 無効なチャネル
 		};
 
