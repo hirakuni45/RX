@@ -12,7 +12,7 @@
 
 namespace device {
 
-#if defined(SIG_RX63T)
+#if defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX63T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCId クラス
@@ -24,8 +24,7 @@ namespace device {
 		@param[in]	eri		受信エラー割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi,
-		ICU::VECTOR tei, ICU::GROUP12 eri>
+	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR tei, ICU::GROUP12 eri>
 	struct scid_t : public sci_ce_t<base>, sci_ext_t<base> {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
@@ -51,8 +50,7 @@ namespace device {
 		static constexpr bool SPI_SUB    = true;	///< 簡易 SPI が利用可能な場合「true」
 	};
 
-
-	typedef scid_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
-		ICU::VECTOR::TEI12, ICU::GROUP12::ERI12> SCI12;
+	typedef scid_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12, ICU::VECTOR::TEI12,
+		ICU::GROUP12::ERI12> SCI12;
 #endif
 }

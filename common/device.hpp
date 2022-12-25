@@ -52,6 +52,8 @@
 #include "RX63x/icu.hpp"
 #include "RX63x/icu_mgr.hpp"
 #include "RX63x/port_map.hpp"
+#include "RX63x/port_map_mtu.hpp"
+#include "RX63x/port_map_tpu.hpp"
 
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"

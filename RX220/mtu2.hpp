@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX220 グループ・MTU2a 定義
+	@brief	RX220/RX631/RX63N グループ・MTU2a 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n

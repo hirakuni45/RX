@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX651/RX65N/RX72N/RX72M 16 ビットタイマパルスユニット定義
+	@brief	16 ビットタイマパルスユニット定義 @n
+			RX631/RX63N @n
+			RX64M/RX71M/RX651/RX65N/RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -245,29 +247,29 @@ namespace device {
 		@brief  16 ビットタイマパルスユニット・ベース（TPUa）TPU0, TPU3
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	intra	割り込み要因Ａ
-		@param[in]	intrb	割り込み要因Ｂ
-		@param[in]	intrc	割り込み要因Ｃ
-		@param[in]	intrd	割り込み要因Ｄ
-		@param[in]	intrv	割り込み要因Ｖ
-		@param[in]	intru	割り込み要因Ｕ
+		@param[in]	TGI		TGI[ABCD] 割り込み型
+		@param[in]	tgia	割り込み要因Ａ
+		@param[in]	tgib	割り込み要因Ｂ
+		@param[in]	tgic	割り込み要因Ｃ
+		@param[in]	tgid	割り込み要因Ｄ
+		@param[in]	TCI		TCI[VU] 割り込み型
+		@param[in]	tciv	割り込み要因Ｖ
+		@param[in]	tciu	割り込み要因Ｕ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::SELECTB intra, ICU::SELECTB intrb,
-		ICU::SELECTB intrc, ICU::SELECTB intrd,
-		ICU::SELECTB intrv, ICU::SELECTB intru>
+		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
 	struct tpu_x_t : public tpu_base_t<base> {
 
 		typedef tpu_base_t<base> BASE;
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto RA_INN = intra;	///< 割り込み要因Ａ
-		static constexpr auto RB_INN = intrb;	///< 割り込み要因Ｂ
-		static constexpr auto RC_INN = intrc;	///< 割り込み要因Ｃ
-		static constexpr auto RD_INN = intrd;	///< 割り込み要因Ｄ
-		static constexpr auto RV_INN = intrv;	///< 割り込み要因Ｖ
-		static constexpr auto RU_INN = intru;	///< 割り込み要因Ｕ
+		static constexpr auto TGIA = tgia;	///< 割り込み要因Ａ
+		static constexpr auto TGIB = tgib;	///< 割り込み要因Ｂ
+		static constexpr auto TGIC = tgic;	///< 割り込み要因Ｃ
+		static constexpr auto TGID = tgid;	///< 割り込み要因Ｄ
+		static constexpr auto TCIV = tciv;	///< 割り込み要因Ｖ
+		static constexpr auto TCIU = tciu;	///< 割り込み要因Ｕ
 
 
 		//-----------------------------------------------------------------//
@@ -339,17 +341,17 @@ namespace device {
 		}
 	};
 	template <uint32_t base, peripheral per,
-		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
-		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL_
-		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
+		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
+		typename tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TIORL_
+		tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TIORL;
 	template <uint32_t base, peripheral per,
-		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
-		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC_
-		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
+		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
+		typename tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRC_
+		tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRC;
 	template <uint32_t base, peripheral per,
-		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
-		typename tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD_
-		tpu_x_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
+		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
+		typename tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD_
+		tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -357,29 +359,29 @@ namespace device {
 		@brief  16 ビットタイマパルスユニット・ベース（TPUa）TPU1, TPU2, TPU4, TPU5
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	intra	割り込み要因Ａ
-		@param[in]	intrb	割り込み要因Ｂ
-		@param[in]	intrc	割り込み要因Ｃ
-		@param[in]	intrd	割り込み要因Ｄ
-		@param[in]	intrv	割り込み要因Ｖ
-		@param[in]	intru	割り込み要因Ｕ
+		@param[in]	TGI		TGI[ABCD] 割り込み型
+		@param[in]	tgia	割り込み要因Ａ
+		@param[in]	tgib	割り込み要因Ｂ
+		@param[in]	tgic	割り込み要因Ｃ
+		@param[in]	tgid	割り込み要因Ｄ
+		@param[in]	TGI		TCI[VU] 割り込み型
+		@param[in]	tciv	割り込み要因Ｖ
+		@param[in]	tciu	割り込み要因Ｕ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::SELECTB intra, ICU::SELECTB intrb,
-		ICU::SELECTB intrc, ICU::SELECTB intrd,
-		ICU::SELECTB intrv, ICU::SELECTB intru>
+		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
 	struct tpu_y_t : public tpu_base_t<base> {
 
 		typedef tpu_base_t<base> BASE;
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto RA_INN = intra;	///< 割り込み要因Ａ
-		static constexpr auto RB_INN = intrb;	///< 割り込み要因Ｂ
-		static constexpr auto RC_INN = intrc;	///< 割り込み要因Ｃ
-		static constexpr auto RD_INN = intrd;	///< 割り込み要因Ｄ
-		static constexpr auto RV_INN = intrv;	///< 割り込み要因Ｖ
-		static constexpr auto RU_INN = intru;	///< 割り込み要因Ｕ
+		static constexpr auto TGIA = tgia;	///< 割り込み要因Ａ
+		static constexpr auto TGIB = tgib;	///< 割り込み要因Ｂ
+		static constexpr auto TGIC = tgic;	///< 割り込み要因Ｃ
+		static constexpr auto TGID = tgid;	///< 割り込み要因Ｄ
+		static constexpr auto TCIV = tciv;	///< 割り込み要因Ｖ
+		static constexpr auto TCIU = tciu;	///< 割り込み要因Ｕ
 
 
 		//-----------------------------------------------------------------//
@@ -454,41 +456,75 @@ namespace device {
 		}
 	};
 	template <uint32_t base, peripheral per,
-		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
-		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL_
-		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
+		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
+		typename tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TIORL_
+		tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TIORL;
 	template <uint32_t base, peripheral per,
-		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
-		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC_
-		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
+		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
+		typename tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRC_
+		tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRC;
 	template <uint32_t base, peripheral per,
-		ICU::SELECTB intra, ICU::SELECTB intrb, ICU::SELECTB intrc, ICU::SELECTB intrd, ICU::SELECTB intru, ICU::SELECTB intrv>
-		typename tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD_
-		tpu_y_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
+		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
+		typename tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD_
+		tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD;
 
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX651) || defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
-		ICU::SELECTB::TGI0A, ICU::SELECTB::TGI0B,
-		ICU::SELECTB::TGI0C, ICU::SELECTB::TGI0D,
-		ICU::SELECTB::TGI0V, ICU::SELECTB::NONE>  TPU0;
+		ICU::SELECTB, ICU::SELECTB::TGI0A, ICU::SELECTB::TGI0B, ICU::SELECTB::TGI0C, ICU::SELECTB::TGI0D,
+		ICU::SELECTB, ICU::SELECTB::TGI0V, ICU::SELECTB::NONE>  TPU0;
 	typedef tpu_y_t<0x0008'8120, peripheral::TPU1,
-		ICU::SELECTB::TGI1A, ICU::SELECTB::TGI1B,
-		ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
-		ICU::SELECTB::TGI1V, ICU::SELECTB::TGI1U> TPU1;
+		ICU::SELECTB, ICU::SELECTB::TGI1A, ICU::SELECTB::TGI1B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB, ICU::SELECTB::TGI1V, ICU::SELECTB::TGI1U> TPU1;
 	typedef tpu_y_t<0x0008'8130, peripheral::TPU2,
-		ICU::SELECTB::TGI2A, ICU::SELECTB::TGI2B,
-		ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
-		ICU::SELECTB::TGI2V, ICU::SELECTB::TGI2U> TPU2;
+		ICU::SELECTB, ICU::SELECTB::TGI2A, ICU::SELECTB::TGI2B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB, ICU::SELECTB::TGI2V, ICU::SELECTB::TGI2U> TPU2;
 	typedef tpu_x_t<0x0008'8140, peripheral::TPU3,
-		ICU::SELECTB::TGI3A, ICU::SELECTB::TGI3B,
-		ICU::SELECTB::TGI3C, ICU::SELECTB::TGI3D,
-		ICU::SELECTB::TGI3V, ICU::SELECTB::NONE>  TPU3;
+		ICU::SELECTB, ICU::SELECTB::TGI3A, ICU::SELECTB::TGI3B, ICU::SELECTB::TGI3C, ICU::SELECTB::TGI3D,
+		ICU::SELECTB, ICU::SELECTB::TGI3V, ICU::SELECTB::NONE>  TPU3;
 	typedef tpu_y_t<0x0008'8150, peripheral::TPU4,
-		ICU::SELECTB::TGI4A, ICU::SELECTB::TGI4B,
-		ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
-		ICU::SELECTB::TGI4V, ICU::SELECTB::TGI4U> TPU4;
+		ICU::SELECTB, ICU::SELECTB::TGI4A, ICU::SELECTB::TGI4B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB, ICU::SELECTB::TGI4V, ICU::SELECTB::TGI4U> TPU4;
 	typedef tpu_y_t<0x0008'8160, peripheral::TPU5,
-		ICU::SELECTB::TGI5A, ICU::SELECTB::TGI5B,
-		ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
-		ICU::SELECTB::TGI5V, ICU::SELECTB::TGI5U> TPU5;
+		ICU::SELECTB, ICU::SELECTB::TGI5A, ICU::SELECTB::TGI5B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB, ICU::SELECTB::TGI5V, ICU::SELECTB::TGI5U> TPU5;
+#elif defined(SIG_RX631) || defined(SIG_RX63N)
+	// グループベクターには無効表現が無い為、割り込みが無い場合「NUM_」としている。（I/O ドライバーのケアが必要）
+	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
+		ICU::VECTOR, ICU::VECTOR::TGI0A, ICU::VECTOR::TGI0B, ICU::VECTOR::TGI0C, ICU::VECTOR::TGI0D,
+		ICU::GROUP3, ICU::GROUP3::TCI0V, ICU::GROUP3::NUM_>  TPU0;
+	typedef tpu_y_t<0x0008'8120, peripheral::TPU1,
+		ICU::VECTOR, ICU::VECTOR::TGI1A, ICU::VECTOR::TGI1B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::GROUP3, ICU::GROUP3::TCI1V, ICU::GROUP3::TCI1U> TPU1;
+	typedef tpu_y_t<0x0008'8130, peripheral::TPU2,
+		ICU::VECTOR, ICU::VECTOR::TGI2A, ICU::VECTOR::TGI2B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::GROUP4, ICU::GROUP4::TCI2V, ICU::GROUP4::TCI2U> TPU2;
+	typedef tpu_x_t<0x0008'8140, peripheral::TPU3,
+		ICU::VECTOR, ICU::VECTOR::TGI3A, ICU::VECTOR::TGI3B, ICU::VECTOR::TGI3C, ICU::VECTOR::TGI3D,
+		ICU::GROUP4, ICU::GROUP4::TCI3V, ICU::GROUP4::NUM_>  TPU3;
+	typedef tpu_y_t<0x0008'8150, peripheral::TPU4,
+		ICU::VECTOR, ICU::VECTOR::TGI4A, ICU::VECTOR::TGI4B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::GROUP4, ICU::GROUP4::TCI4V, ICU::GROUP4::TCI4U> TPU4;
+	typedef tpu_y_t<0x0008'8160, peripheral::TPU5,
+		ICU::VECTOR, ICU::VECTOR::TGI5A, ICU::VECTOR::TGI5B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::GROUP3, ICU::GROUP3::TCI5V, ICU::GROUP3::TCI5U> TPU5;
+	typedef tpu_x_t<0x0008'8180, peripheral::TPU6,
+		ICU::VECTOR, ICU::VECTOR::TGI6A, ICU::VECTOR::TGI6B, ICU::VECTOR::TGI6C, ICU::VECTOR::TGI6D,
+		ICU::GROUP5, ICU::GROUP5::TCI6V, ICU::GROUP5::NUM_>  TPU6;
+	typedef tpu_y_t<0x0008'8190, peripheral::TPU7,
+		ICU::VECTOR, ICU::VECTOR::TGI7A, ICU::VECTOR::TGI7B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::GROUP5, ICU::GROUP5::TCI7V, ICU::GROUP5::TCI7U> TPU7;
+	typedef tpu_y_t<0x0008'81A0, peripheral::TPU8,
+		ICU::VECTOR, ICU::VECTOR::TGI8A, ICU::VECTOR::TGI8B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::GROUP6, ICU::GROUP6::TCI8V, ICU::GROUP6::TCI8U> TPU8;
+	typedef tpu_x_t<0x0008'81B0, peripheral::TPU9,
+		ICU::VECTOR, ICU::VECTOR::TGI9A, ICU::VECTOR::TGI9B, ICU::VECTOR::TGI9C, ICU::VECTOR::TGI9D,
+		ICU::GROUP6, ICU::GROUP6::TCI9V, ICU::GROUP6::NUM_>  TPU9;
+	typedef tpu_y_t<0x0008'81C0, peripheral::TPU10,
+		ICU::VECTOR, ICU::VECTOR::TGI10A, ICU::VECTOR::TGI10B, ICU::VECTOR::NONE, ICU::VECTOR::NONE,
+		ICU::GROUP6, ICU::GROUP6::TCI10V, ICU::GROUP6::TCI10U> TPU10;
+	typedef tpu_y_t<0x0008'81D0, peripheral::TPU11,
+		ICU::VECTOR, ICU::VECTOR::TGI11A, ICU::VECTOR::TGI11B, ICU::VECTOR::NONE, ICU::VECTOR::NONE,
+		ICU::GROUP5, ICU::GROUP5::TCI11V, ICU::GROUP5::TCI11U> TPU11;
+#endif
 }

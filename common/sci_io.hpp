@@ -142,8 +142,8 @@ namespace device {
 
 	private:
 
-		static constexpr char XON  = 0x11;
-		static constexpr char XOFF = 0x13;
+		static constexpr char XON  = 0x11;  ///< 送信再開 CTRL-Q
+		static constexpr char XOFF = 0x13;  ///< 送信中断 CTRL-S
 
 		const port_map_order::sci_port_t&	port_map_;
 
@@ -192,6 +192,15 @@ namespace device {
 						}
 					}
 				}
+#if 0
+			if(FLCT == FLOW_CTRL::SOFT || FLCT == FLOW_CTRL::SOFT_HARD) {
+				if(ch == XON) {
+					send_stop_ = false;
+				} else if(ch == XOFF) {
+					send_stop_ = true;
+				}
+			}
+#endif	
 				recv_.put(rd);
 			}
 		}
@@ -294,7 +303,6 @@ namespace device {
 			return true;
 		}
 
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -358,20 +366,19 @@ namespace device {
 				mtx <<= 1;
 			}
 			if(!abcs) mtx <<= 1;
-			auto cbaud = SCI::PCLK / mtx / (1 << (static_cast<uint32_t>(cks) * 2)) / (static_cast<uint32_t>(brr) + 1);
+			auto cbaud = SCI::PCLK / mtx / (1 << (static_cast<uint32_t>(cks) * 2)) / static_cast<uint32_t>(brr);
 			if(brme) {
 				cbaud *= mddr;
 				cbaud /= 256;
 			}
 
-			auto d = baud * thper / 100;
-			if(cbaud < (baud - d) || (baud + d) < cbaud) {
+			auto d = baud * thper;
+			if((cbaud * 100) < (baud * 100 - d) || (baud * 100 + d) < (cbaud * 100)) {
 				return false;
 			}
 
 			return true;
 		}
-
 
 
 		//-----------------------------------------------------------------//
@@ -457,36 +464,6 @@ namespace device {
 			}
 
 			baud_ = baud;
-#if 0
-			// BGDM が使える場合、1/8 スタート
-			uint32_t mtx = 8;
-			uint32_t limit = 1024;
-			if(!SCI::SEMR_BGDM) {  // BGDM が使えない場合 1/16 スタート
-				mtx = 16;
-				limit = 512;
-			}
-			uint32_t brr = SCI::PCLK / mtx / baud;
-			uint8_t cks = 0;
-			while(brr > limit) {
-				brr >>= 2;
-				++cks;
-				if(cks >= 4) {  // 範囲外の速度（低速）
-					port_map::turn(SCI::PERIPHERAL, false, PSEL);
-					power_mgr::turn(SCI::PERIPHERAL, false);
-					return false;
-				}
-			}
-
-			// BGDM フラグの設定
-			bool bgdm = true;
-			if(SCI::SEMR_BGDM) {
-				if(brr > 512) { brr >>= 1; bgdm = false; mtx <<= 1; }
-			} else {
-				bgdm = false;
-			}
-			bool abcs = true;
-			if(brr > 256) { brr >>= 1; abcs = false; mtx <<= 1; }
-#endif
 
 			set_intr_(level_);
 
@@ -542,19 +519,6 @@ namespace device {
 			}
 			SCI::SMR = SCI::SMR.CKS.b(cks) | SCI::SMR.STOP.b(stop)
 					 | SCI::SMR.PM.b(pm) | SCI::SMR.PE.b(pe) | SCI::SMR.CHR.b(seven);
-#if 0
-			bool brme = false;
-			if(SCI::SEMR_BRME) {  // 微調整機能が使える場合
-				uint32_t rate = SCI::PCLK / mtx / brr / (1 << (cks * 2));
-				uint32_t mddr = (baud_ << 9) / rate;
-				++mddr;
-				mddr >>= 1;
-				if(mddr >= 128 && mddr < 256) {  // 微調整を行う場合
-					SCI::MDDR = mddr;
-					brme = true;
-				}
-			}
-#endif
 			if(brme) {
 				SCI::MDDR = mddr;
 			}
@@ -743,7 +707,8 @@ namespace device {
 				return ch;
 			} else {
 				while(recv_length() == 0) sleep_();
-				return SCI::RDR();	///< 受信データ読み出し
+				auto ch = SCI::RDR();
+				return ch;
 			}
 		}
 
