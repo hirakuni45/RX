@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 
 	{  // SCI の開始
 		constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
-		static_assert(SCI::probe_baud(baud), "Can't set BAUDRATE");
+		static_assert(SCI::probe_baud(baud), "Failed baud rate accuracy test");
 		auto intr = device::ICU::LEVEL::_2;		// 割り込みレベル（NONE を指定すると、ポーリング動作になる）
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 // 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
