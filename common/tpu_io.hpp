@@ -223,18 +223,21 @@ namespace device {
 			TPU::TCNT = 0x0000;
 
 			if(level_ != ICU::LEVEL::NONE) {  // 割り込み設定
-				intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
 				switch(type) {
 				case TYPE::MATCH_A:
+					intr_vec_ = icu_mgr::set_interrupt(TPU::TGIA, tpu_task_, level_);
 					TPU::TIER.TGIEA = 1;
 					break;
 				case TYPE::MATCH_B:
+					intr_vec_ = icu_mgr::set_interrupt(TPU::TGIB, tpu_task_, level_);
 					TPU::TIER.TGIEB = 1;
 					break;
 				case TYPE::MATCH_C:
+					intr_vec_ = icu_mgr::set_interrupt(TPU::TGIC, tpu_task_, level_);
 					TPU::TIER.TGIEC = 1;
 					break;
 				case TYPE::MATCH_D:
+					intr_vec_ = icu_mgr::set_interrupt(TPU::TGID, tpu_task_, level_);
 					TPU::TIER.TGIED = 1;
 					break;
 				default:
@@ -309,7 +312,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void destroy() noexcept
 		{
-			icu_mgr::set_interrupt(TPU::RA_INN, nullptr, 0);
+			icu_mgr::set_interrupt(TPU::TGIA, nullptr, 0);
+			icu_mgr::set_interrupt(TPU::TGIB, nullptr, 0);
+			icu_mgr::set_interrupt(TPU::TGIC, nullptr, 0);
+			icu_mgr::set_interrupt(TPU::TGID, nullptr, 0);
 			intr_vec_ = 0;
 			TPU::TIER = 0;
 			TPU::enable(false);
