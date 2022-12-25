@@ -88,21 +88,23 @@
 #include "RX24T/dac_out.hpp"
 
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
-
+#include "RX63T/lvda.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/exdmac.hpp"
-
 #include "RX63x/port.hpp"
+#include "RX220/mtu2.hpp"
+
+#include "RX600/tpu.hpp"
 
 #include "RX600/tmr.hpp"
-
 #include "RX600/sci_c.hpp"
+#include "RX600/sci_d.hpp"
 
 #include "RX600/can.hpp"
 #include "RX600/crc.hpp"
 
 #include "RX63x/system_io.hpp"
-
+// #include "RX63x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX63T)
