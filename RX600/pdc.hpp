@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ・PDC 定義
+	@brief	RX631/RX63N/RX64M/RX71M グループ・PDC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,16 +15,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	パラレルデータキャプチャユニット（PDC）
-		@param[in]	per	ペリフェラル
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per>
+	template <class _>
 	struct pdc_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto VEC_DFI = ICU::VECTOR::PCDFI;		///< 受信データレディ割り込み
-		static constexpr auto VEC_FEI = ICU::GROUPBL0::PCFEI;	///< フレームエンド割り込み
-		static constexpr auto VEC_ERI = ICU::GROUPBL0::PCERI;	///< エラー割り込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -172,13 +166,35 @@ namespace device {
 		typedef hcr_t<0x000A'0518>  HCR_;
 		static  HCR_ HCR;
 	};
-	template <peripheral per> typename pdc_t<per>::PCCR0_  pdc_t<per>::PCCR0;
-	template <peripheral per> typename pdc_t<per>::PCCR1_  pdc_t<per>::PCCR1;
-	template <peripheral per> typename pdc_t<per>::PCSR_   pdc_t<per>::PCSR;
-	template <peripheral per> typename pdc_t<per>::PCMONR_ pdc_t<per>::PCMONR;
-	template <peripheral per> typename pdc_t<per>::PCDR_   pdc_t<per>::PCDR;
-	template <peripheral per> typename pdc_t<per>::VCR_    pdc_t<per>::VCR;
-	template <peripheral per> typename pdc_t<per>::HCR_    pdc_t<per>::HCR;
+	template <class _> typename pdc_t<_>::PCCR0_  pdc_t<_>::PCCR0;
+	template <class _> typename pdc_t<_>::PCCR1_  pdc_t<_>::PCCR1;
+	template <class _> typename pdc_t<_>::PCSR_   pdc_t<_>::PCSR;
+	template <class _> typename pdc_t<_>::PCMONR_ pdc_t<_>::PCMONR;
+	template <class _> typename pdc_t<_>::PCDR_   pdc_t<_>::PCDR;
+	template <class _> typename pdc_t<_>::VCR_    pdc_t<_>::VCR;
+	template <class _> typename pdc_t<_>::HCR_    pdc_t<_>::HCR;
 
-	typedef pdc_t<peripheral::PDC> PDC;
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	パラレルデータキャプチャユニット（PDC）
+		@param[in]	per	ペリフェラル
+		@param[in]	GTI	グループ割り込み型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <peripheral per, typename GPT>
+	struct pdc_x_t : public pdc_t<void> {
+
+		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
+		static constexpr auto PCDFI = ICU::VECTOR::PCDFI;	///< 受信データレディ割り込み
+		static constexpr auto PCFEI = GPT::PCFEI;			///< フレームエンド割り込み
+		static constexpr auto PCERI = GPT::PCERI;			///< エラー割り込み
+
+	};
+
+#if defined(SIG_RX631) || defined(SIG_RX63N)
+	typedef pdc_x_t<peripheral::PDC, ICU::VECTOR> PDC;
+#else
+	typedef pdc_x_t<peripheral::PDC, ICU::GROUPBL0> PDC;
+#endif
 }
