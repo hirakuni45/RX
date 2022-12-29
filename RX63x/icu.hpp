@@ -104,6 +104,8 @@ namespace device {
 
 			ADI0		= 98,	///< AD
 
+			S12ADI0		= 102,	///< S12AD
+
 			GROUP0		= 106,  ///< ICU
 			GROUP1		= 107,
 			GROUP2		= 108,
