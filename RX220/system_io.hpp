@@ -156,6 +156,9 @@ namespace device {
 						  | SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD))
 						  | SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK));
 
+			device::SYSTEM::SOSCWTCR = 0b01011;
+			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
+
 			SYSTEM::PRCR = SYSTEM::PRCR.PRKEY.b(0xA5);
 
 			return true;
