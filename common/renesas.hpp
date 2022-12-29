@@ -83,29 +83,40 @@
 #include "RX62x/flash.hpp"
 
 #include "RX62x/system_io.hpp"
-// #include "RX62x/flash_io.hpp"
+#include "RX62x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX24T/dac_out.hpp"
 
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
 #include "RX63T/lvda.hpp"
+#include "RX63x/mck.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/exdmac.hpp"
 #include "RX63x/port.hpp"
 #include "RX220/mtu2.hpp"
-
+#include "RX63x/poe2.hpp"
 #include "RX600/tpu.hpp"
-
+#include "RX600/ppg.hpp"
 #include "RX600/tmr.hpp"
+#include "RX63x/rtc.hpp"
+#include "RX600/wdta.hpp"
+#include "RX600/etherc.hpp"
+#include "RX600/edmac.hpp"
+#include "RX62x/usb.hpp"
 #include "RX600/sci_c.hpp"
 #include "RX600/sci_d.hpp"
-
 #include "RX600/can.hpp"
+#include "RX63x/ieb.hpp"
 #include "RX600/crc.hpp"
+#include "RX600/pdc.hpp"
+#include "RX63x/s12ad.hpp"
+#include "RX63x/ad.hpp"
+#include "RX63x/da.hpp"
 
 #include "RX63x/system_io.hpp"
 // #include "RX63x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+// #include "RX63x/dac_out.hpp"
 
 #elif defined(SIG_RX63T)
 #include "RX63T/lvda.hpp"
@@ -128,8 +139,9 @@
 #include "RX63T/flash.hpp"
 
 #include "RX63T/system_io.hpp"
-
+// #include "RX63T/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+// #include "RX63T/dac_out.hpp"
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/lvda.hpp"
