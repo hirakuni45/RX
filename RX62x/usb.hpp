@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX62X グループ・USB 定義 @n
+	@brief	RX621/RX62N/RX631/RX63N グループ USB 定義 @n
 			※この USB ペリフェラルは、LowSpeed(1.5Mbps）に対応していない。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
