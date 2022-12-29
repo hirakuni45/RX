@@ -24,7 +24,7 @@ namespace device {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  発信器タイプ @n
+			@brief  発信器型 @n
 					XTAL: @n
 						144/120/112/100 pin: 8 ~ 12.5MHz @n
 						64/48 pin: 4 ~ 16MHz @n
@@ -33,17 +33,23 @@ namespace device {
 						64/48 pin: 20MHz (max) @n
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class OSC_TYPE : uint8_t {
+			XTAL,		///< クリスタル接続
+			EXT,		///< 外部クロック入力
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  パッケージ型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PACKAGE : uint8_t {
 			MINI,	///< 48/64 pin package
 			LARGE,	///< 100/112/129/144 pin package
 		};
 
 		static constexpr auto		PACK        = PACKAGE::MINI;	///< パッケージの設定 
-
-		enum class OSC_TYPE : uint8_t {
-			XTAL,		///< クリスタル接続
-			EXT,		///< 外部クロック入力
-		};
 
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
