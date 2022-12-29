@@ -77,7 +77,7 @@ RX/README.md、RX/READMEja.md の開発環境準備を参照
 
 |モード|B/UB|
 |---|:---:|
-|Boot Mode|0|
+|シリアルブート|0|
 |User Boot Mode|1|
 
 ---
@@ -99,14 +99,18 @@ RX/README.md、RX/READMEja.md の開発環境準備を参照
 ---
 
 |端子|RX63T (64)|RX24T (100)|RX66T (100)|RX72T (144)|
-|---|---|---|---|------|
+|---|---|---|---|---|
 |UB|P00(2)|X|UB/P00(4)|UB/P00(9)|
 |MD|MD(5)|MD(6)|MD/FINED(6)|MD/FINED(11)|
 |EMLE|EMLE(1)|X|EMLE(2)|EMLE(7)|
 |RXD|PD5/RXD1(14)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(25)|
 |TXD|PD3/TXD1(16)|PD3/TXD1(22)|PD3/TXD1(22)|PD3/TXD1(27)|
 
-Serial Boot: MD = 0, UB = 0
+|モード|UB|MD|
+|---|:---:|:---:|
+|シリアルブート|0|0|
+|USB ブート|1|0|
+|シングルチップ|-|1|
 
 ---
 
@@ -118,7 +122,11 @@ Serial Boot: MD = 0, UB = 0
 |RXD|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|
 |TXD|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|
 
-Serial Boot: MD = 0, UB = 0
+|モード|UB|MD|
+|---|:---:|:---:|
+|シリアルブート|0|0|
+|USB ブート|1|0|
+|シングルチップ|-|1|
 
 ---
 

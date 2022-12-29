@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -113,5 +113,10 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
 		typename wdta_t<base, per, ivec, pclk>::WDTRCR_ wdta_t<base, per, ivec, pclk>::WDTRCR;
 
+#if defined(SIG_RX631) || defined(SIG_RX63N)
+	// RX631/RX63N では割り込みは、NMI を利用する。
+	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::NONE, clock_profile::PCLKB> WDT;
+#else
 	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::WUNI, clock_profile::PCLKB> WDT;
+#endif
 }

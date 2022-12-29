@@ -42,6 +42,8 @@ namespace device {
 #if 1
 		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
 
+		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
+
 #if 1
 		static constexpr uint32_t   BASE		= 32'000'000;		///< ベースクロック
 

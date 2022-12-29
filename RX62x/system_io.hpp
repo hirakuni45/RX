@@ -74,6 +74,9 @@ namespace device {
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
 								  | device::SYSTEM::SCKCR.BCK.b(clock_div_(clock_profile::BCLK))
 								  | device::SYSTEM::SCKCR.PCK.b(clock_div_(clock_profile::PCLK));
+
+			device::SYSTEM::SUBOSCCR = device::SYSTEM::SUBOSCCR.SUBSTOP.b(!clock_profile::TURN_SBC);
+
 			return true;
 		}
 	};

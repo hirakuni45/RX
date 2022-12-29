@@ -39,8 +39,23 @@ namespace device {
 			LOCO,		///< 内蔵低速オンチップオシレーター (125KHz)
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  パッケージ型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class PACKAGE : uint8_t {
+			MINI,	///< 64 pin package
+			LARGE,	///< 100/112/129/144/167 pin package
+		};
+
+
+		static constexpr PACKAGE	PACK		= PACKAGE::LARGE;	///< パッケージの種別
+
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
 
+		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
 		static constexpr uint32_t	BASE		=  12'000'000;		///< 外部接続クリスタル

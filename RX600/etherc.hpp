@@ -469,8 +469,9 @@ namespace device {
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
 	};
-#if defined(SIG_RX621) || defined(SIG_RX62N)
+#if defined(SIG_RX62N) || defined(SIG_RX63N)
 	typedef etherc_t<0x000C'0100, peripheral::ETHERC> ETHERC;
+#elif defined(SIG_RX621) || defined(SIG_RX631)
 #else
 	typedef etherc_t<0x000C'0100, peripheral::ETHERC0> ETHERC0;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)

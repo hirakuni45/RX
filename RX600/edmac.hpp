@@ -592,8 +592,9 @@ namespace device {
 	template <uint32_t base, peripheral per>
 		typename ptpedmac_t<base, per>::EESIPR_ ptpedmac_t<base, per>::EESIPR;
 
-#if defined(SIG_RX621) || defined(SIG_RX62N)
+#if defined(SIG_RX62N) || defined(SIG_RX63N)
 	typedef edmac_t<0x000C'0000, peripheral::EDMAC, ICU::VECTOR, ICU::VECTOR::EINT> EDMAC;
+#elif defined(SIG_RX621) || defined(SIG_RX631)
 #else
 	typedef edmac_t<0x000C'0000, peripheral::EDMAC0, ICU::GROUPAL1, ICU::GROUPAL1::EINT0> EDMAC0;
 #endif

@@ -177,6 +177,13 @@ namespace device {
 				device::SYSTEM::HOCOPCR.HOCOPCNT = 1;	// HOCO 電源 OFF
 			}
 
+			if(clock_profile::PACK == clock_profile::PACKAGE::MINI) {
+				device::SYSTEM::SOSCWTCR = 0b01100;
+			} else {
+				device::SYSTEM::SOSCWTCR = 0b01010;
+			}
+			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
+
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 		}
 	};

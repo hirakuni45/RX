@@ -89,6 +89,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct sosccr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> SOSTP;
+		};
+		typedef sosccr_t<0x0008'0033> SOSCCR_;
+		static SOSCCR_ SOSCCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  低速オンチップオシレータコントロールレジスタ（LOCOCR）
 			@param[in]	base	ベースアドレス
 		*/
@@ -517,6 +537,7 @@ namespace device {
 	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
 	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
 	template<class _> typename system_t<_>::MOSCCR_ system_t<_>::MOSCCR;
+	template<class _> typename system_t<_>::SOSCCR_ system_t<_>::SOSCCR;
 	template<class _> typename system_t<_>::LOCOCR_ system_t<_>::LOCOCR;
 	template<class _> typename system_t<_>::ILOCOCR_ system_t<_>::ILOCOCR;
 	template<class _> typename system_t<_>::HOCOCR_ system_t<_>::HOCOCR;

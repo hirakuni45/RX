@@ -35,6 +35,7 @@ namespace device {
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 12'000'000;		///< 外部接続クリスタル
 
+		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
 		static constexpr uint32_t   ICLK		= 96'000'000;		///< ICLK 周波数（最大 8~100MHz）

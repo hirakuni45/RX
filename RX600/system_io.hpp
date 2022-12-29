@@ -163,7 +163,7 @@ namespace device {
 #endif
 			// RX71M はスーパーバイザモードでの変更が必要なので、「start.s」内で行う。
 			// RX71M の場合、アセンブラにオプション「--defsym MEMWAIT=1」を渡す。
-#if defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+#if defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 			if(clock_profile::ICLK > 120'000'000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::MEMWAIT = 1;
 				volatile auto tmp = device::SYSTEM::MEMWAIT();  // 読み出しを行う
@@ -215,6 +215,11 @@ namespace device {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 			}
 
+#if defined(SIG_RX66T) || defined(SIG_RX72T)
+#else
+			device::SYSTEM::SOSCWTCR = 0b01010;
+			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
+#endif
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 
 #if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)

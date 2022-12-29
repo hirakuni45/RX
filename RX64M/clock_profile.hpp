@@ -41,7 +41,8 @@ namespace device {
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
 
 #ifdef EFO_CLOCK_DEF
-		static constexpr bool       TURN_USB    = false;				///< USB を使う場合「true」
+		static constexpr bool		TURN_SBC	= true;				///< サブクロックを利用する場合「true」
+		static constexpr bool       TURN_USB    = false;			///< USB を使う場合「true」
 
 		static constexpr uint32_t	BASE		=  12'500'000;		///< 外部接続クリスタル
 		static constexpr uint32_t	PLL_BASE	= 237'500'000;		///< PLL ベースクロック（最大240MHz）
@@ -54,6 +55,7 @@ namespace device {
 		static constexpr uint32_t	FCLK		=  59'375'000;		///< FCLK 周波数（最大60MHz）
 		static constexpr uint32_t	BCLK		= 118'750'000;		///< BCLK 周波数（最大120MHz）
 #else
+		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
 		static constexpr uint32_t	BASE		=  12'000'000;		///< 外部接続クリスタル
