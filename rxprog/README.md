@@ -70,6 +70,20 @@ See development environment preparation of 'RX/README.md'
 
 ## Connection terminal list
 
+|Terminal|RX220 (64)|
+|---|---|
+|MD|MD(3)|
+|B/UB|PC7(27)|
+|RXD|P30/RXD1(14)|
+|TXD|P26/TXD1(16)|
+
+|Mode|B/UB|
+|---|:---:|
+|Boot Mode|0|
+|User Boot Mode|1|
+
+---
+
 |Terminal|RX62N (144)|
 |---|---|
 |MD0|MD0(16)|
@@ -86,20 +100,6 @@ See development environment preparation of 'RX/README.md'
 
 ---
 
-|Terminal|RX220 (64)|
-|---|---|
-|MD|MD(3)|
-|B/UB|PC7(27)|
-|RXD|P30/RXD1(14)|
-|TXD|P26/TXD1(16)|
-
-|Mode|B/UB|
-|---|:---:|
-|Boot Mode|0|
-|User Boot Mode|1|
-
----
-
 |Terminal|RX63T (64)|RX24T (100)|RX66T (100)|RX72T (144)|
 |---|---|---|---|------|
 |UB|P00(2)|X|UB/P00(4)|UB/P00(9)|
@@ -107,6 +107,12 @@ See development environment preparation of 'RX/README.md'
 |EMLE|EMLE(1)|X|EMLE(2)|EMLE(7)|
 |RXD|PD5/RXD1(14)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(25)|
 |TXD|PD3/TXD1(16)|PD3/TXD1(22)|PD3/TXD1(22)|PD3/TXD1(27)|
+
+|Mode|UB|MD|
+|---|:---:|:---:|
+|Serial Boot|0|0|
+|USB Boot|1|0|
+|Single Chip|-|1|
 
 ---
 
@@ -118,8 +124,15 @@ See development environment preparation of 'RX/README.md'
 |RXD|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|
 |TXD|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|
    
-- MD0, MD1, UB, MD, and EMLE terminals are pulled up or down with a resistor (approximately 4.7K).
+|Mode|UB|MD|
+|---|:---:|:---:|
+|Serial Boot|0|0|
+|USB Boot|1|0|
+|Single Chip|-|1|
+
+- MD0、MD1、UB、MD、B/UB, and EMLE terminals are pulled up or down with a resistor (approximately 4.7K).
 - Connect appropriate crystals to XTAL and EXTAL.
+- Connect the specified capacitor to VCL.
 - Connect all the power supplies such as VSS, VCC, AVSS, AVCC etc.
 - Connect USB power sources such as USB_VSS and USB_VCC properly.
    
