@@ -181,6 +181,13 @@ int main(int argc, char** argv)
 	LED::DIR = 1;
 	LED::P = 0;
 
+#if 0
+	sci_ = 'A';
+	sci_ = "ABC\n";
+	auto ch = sci_();
+	sci_ = ch;
+#endif
+
 	uint8_t cnt = 0;
 	while(1) {
 
