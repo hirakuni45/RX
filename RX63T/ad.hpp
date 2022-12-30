@@ -404,7 +404,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D データレジスタ n（ADDR）
+			@brief  A/D データレジスタ（ADDR）
 		*/
 		//-----------------------------------------------------------------//
 		struct addr_t {
@@ -415,10 +415,50 @@ namespace device {
 		};
 		typedef addr_t ADDR_;
 		static ADDR_ ADDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ（ADSSTR）
+		*/
+		//-----------------------------------------------------------------//
+		struct adsstr_t {
+
+			bool set(ANALOG an, uint8_t val) noexcept
+			{
+				if(an >= ANALOG::AN0 && an <= ANALOG::AN7) {
+					wr16_(BASE::ADSSTR0::addresss + (static_cast<uint32_t>(an) * 2), val);
+				} else if(an >= ANALOG::AN8 && an <= ANALOG::AN19) {
+					wr16_(BASE::ADSSTRL::addresss, val);
+				} else {
+					return false;
+				}
+				return true;
+			}
+
+			uint16_t get(ANALOG an) noexcept
+			{
+				if(an >= ANALOG::AN0 && an <= ANALOG::AN7) {
+					return rd16_(BASE::ADSSTR0::addresss + (static_cast<uint32_t>(an) * 2));
+				} else if(an >= ANALOG::AN8 && an <= ANALOG::AN19) {
+					return BASE::ADSSTRL();
+				} else {
+					return 0;
+				}
+			}
+
+			uint16_t operator () (ANALOG an) noexcept
+			{
+				return get(an);
+			}
+		};
+		typedef adsstr_t ADSSTR_;
+		static ADSSTR_ ADSSTR;
 	};
 	template <uint32_t base, peripheral per, ICU::VECTOR adi>
 		typename ada_t<base, per, adi>::ADDR_ ada_t<base, per, adi>::ADDR;
-
+	template <uint32_t base, peripheral per, ICU::VECTOR adi>
+		typename ada_t<base, per, adi>::ADSSTR_ ada_t<base, per, adi>::ADSSTR;
 
 	typedef ada_t<0x0008'9800, peripheral::AD, ICU::VECTOR::ADI0> AD;
 }

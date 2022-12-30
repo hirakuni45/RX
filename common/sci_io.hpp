@@ -343,11 +343,11 @@ namespace device {
 		/*!
 			@brief	ボーレートの設定誤差を検証
 			@param[in]	baud	ボーレート
-			@param[in]	thper	許容誤差（通常４％）
+			@param[in]	thper	許容誤差（通常３％）
 			@return 誤差範囲なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		static constexpr bool probe_baud(uint32_t baud, uint32_t thper = 4) noexcept
+		static constexpr bool probe_baud(uint32_t baud, uint32_t thper = 3) noexcept
 		{
 			uint8_t brr = 0;
 			uint8_t cks = 0;
@@ -727,6 +727,11 @@ namespace device {
 				putch(ch);
 			}
 		}
+	
+
+		char operator () () noexcept { return getch(); }
+		void operator = (char ch) noexcept { putch(ch); }
+		void operator = (const char* str) noexcept { puts(str); }
 	};
 
 	// テンプレート関数、実態の定義
