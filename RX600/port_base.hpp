@@ -258,6 +258,8 @@ namespace device {
 	template <class PORTX, bitpos BPOS, bool ASSERT_ = true>
 	struct PORT : public PORT_BASE {
 
+		typedef PORTX value_type;
+
 		static constexpr auto PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);	///< ポート番号（０～３１）
 		static constexpr auto BIT_POS = BPOS;		///< ポート、ビット位置
 		static constexpr auto ASSERT  = ASSERT_;	///< アサート論理
@@ -278,7 +280,7 @@ namespace device {
 			@brief  ポートを出力にする
 		*/
 		//-----------------------------------------------------------------//
-		static void OUTPUT() { DIR = 1; }
+		static void OUTPUT() noexcept { DIR = 1; }
 
 
 		//-----------------------------------------------------------------//
@@ -286,7 +288,7 @@ namespace device {
 			@brief  ポートを入力にする
 		*/
 		//-----------------------------------------------------------------//
-		static void INPUT() { DIR = 0; }
+		static void INPUT() noexcept { DIR = 0; }
 
 
 		//-----------------------------------------------------------------//
@@ -309,7 +311,7 @@ namespace device {
 			typedef rw8_t<PORTX::base_address_ + 0x81> ODR1_;
 			static ODR1_ ODR1;
 
-			void operator = (OD_TYPE val) {
+			void operator = (OD_TYPE val) noexcept {
 				uint8_t pos = static_cast<uint8_t>(BPOS);
 				if(pos < 4) {
 					ODR0 = (ODR0() & ~(3 << (pos * 2))) | (static_cast<uint8_t>(val) << (pos * 2));
@@ -319,7 +321,7 @@ namespace device {
 				}
 			}
 
-			OD_TYPE operator () () {
+			OD_TYPE operator () () noexcept {
 				uint8_t pos = static_cast<uint8_t>(BPOS);
 				switch(BPOS) {
 				case bitpos::B0:
@@ -359,10 +361,10 @@ namespace device {
 			typedef bit_ro_t<ro8_t<PORTX::base_address_ + 0x40>, BPOS> PI_;
 			static PI_ PI;  // ポート入力用
 
-			void operator = (bool val) {
+			void operator = (bool val) noexcept {
 				if(ASSERT_) { PO = val; } else { PO = !val; }
 			}
-			bool operator () () {
+			bool operator () () noexcept {
 				if(ASSERT_) { return PI(); } 
 				else { return !PI(); }
 			}
@@ -376,7 +378,7 @@ namespace device {
 			@brief  反転
 		*/
 		//-----------------------------------------------------------------//
-		static void FLIP() { P = !P(); }
+		static void FLIP() noexcept { P = !P(); }
 	};
 	template <class PORTX, bitpos BPOS, bool ASSERT>
 		typename PORT<PORTX, BPOS, ASSERT>::DIR_ PORT<PORTX, BPOS, ASSERT>::DIR;

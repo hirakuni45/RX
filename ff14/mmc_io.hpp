@@ -97,7 +97,7 @@ namespace fatfs {
 		};
 
 		/* 1:OK, 0:Timeout */
-		int wait_ready_() {
+		int wait_ready_() noexcept {
 			UINT tmr;
 			for (tmr = 5000; tmr; tmr--) {	/* Wait for ready in timeout of 500ms */
 				BYTE d = spi_.xchg();
@@ -108,7 +108,7 @@ namespace fatfs {
 		}
 
 
-		void deselect_() {
+		void deselect_() noexcept {
 			lock_();
 			SEL::P = 1;
 			unlock_();
@@ -118,7 +118,7 @@ namespace fatfs {
 
 
 		/* 1:OK, 0:Timeout */
-		int select_() {
+		int select_() noexcept {
 			lock_();
 			SEL::P = 0;
 			unlock_();
@@ -135,7 +135,7 @@ namespace fatfs {
 		/* 1:OK, 0:Failed */
 		/* Data buffer to store received data */
 		/* Byte count */
-		int rcvr_datablock_ (BYTE *buff, UINT btr)
+		int rcvr_datablock_ (BYTE *buff, UINT btr) noexcept
 		{
 			BYTE d[2];
 			UINT tmr;
@@ -158,7 +158,7 @@ namespace fatfs {
 		/* 1:OK, 0:Failed */
 		/* 512 byte data block to be transmitted */
 		/* Data/Stop token */
-		int xmit_datablock_(const BYTE *buff, BYTE token) {
+		int xmit_datablock_(const BYTE *buff, BYTE token) noexcept {
 			BYTE d[2];
 
 			if (!wait_ready_()) return 0;
@@ -177,7 +177,7 @@ namespace fatfs {
 		}
 
 
-		BYTE send_cmd_(command cmd, DWORD arg) {
+		BYTE send_cmd_(command cmd, DWORD arg) noexcept {
 
 			debug_format("send_cmd_: 0x%02X, 0x%08X\n") % static_cast<uint32_t>(cmd) % static_cast<uint32_t>(arg);
 			uint8_t c = static_cast<uint8_t>(cmd);
@@ -224,7 +224,7 @@ namespace fatfs {
 			return d;			/* Return with the response value */
 		}
 
-		void start_spi_(bool fast)
+		void start_spi_(bool fast) noexcept
 		{
 			uint32_t speed;
 			if(fast) {  // 最大速度制限
@@ -259,7 +259,7 @@ namespace fatfs {
 			@brief	開始（初期化）
 		 */
 		//-----------------------------------------------------------------//
-		void start()
+		void start() noexcept
 		{
 			if(init_port_) return;
 
