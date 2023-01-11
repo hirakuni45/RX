@@ -1,15 +1,16 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX220 S12ADb 定義 @n
 			  16 channel A/D input 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
+#include "RX600/ad_utils.hpp"
 
 namespace device {
 
@@ -21,6 +22,150 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base>
 	struct s12ad_base_t {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 0（ADDR0）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x20> ADDR0_;
+		static  ADDR0_ ADDR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 1（ADDR1）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x22> ADDR1_;
+		static  ADDR1_ ADDR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 2（ADDR2）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x24> ADDR2_;
+		static  ADDR2_ ADDR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 3（ADDR3）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x26> ADDR3_;
+		static  ADDR3_ ADDR3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 4（ADDR4）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x28> ADDR4_;
+		static  ADDR4_ ADDR4;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 5（ADDR5）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x2A> ADDR5_;
+		static  ADDR5_ ADDR5;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 6（ADDR6）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x2C> ADDR6_;
+		static  ADDR6_ ADDR6;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 7（ADDR7）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x2E> ADDR7_;
+		static  ADDR7_ ADDR7;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 8（ADDR8）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x30> ADDR8_;
+		static  ADDR8_ ADDR8;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 9（ADDR9）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x32> ADDR9_;
+		static  ADDR9_ ADDR9;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 10（ADDR10）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x34> ADDR10_;
+		static  ADDR10_ ADDR10;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 11（ADDR11）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x36> ADDR11_;
+		static  ADDR11_ ADDR11;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 12（ADDR12）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x38> ADDR12_;
+		static  ADDR12_ ADDR12;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 13（ADDR13）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x3A> ADDR13_;
+		static  ADDR13_ ADDR13;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 14（ADDR14）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x3C> ADDR14_;
+		static  ADDR14_ ADDR14;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 15（ADDR15）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x3E> ADDR15_;
+		static  ADDR15_ ADDR15;
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -160,6 +305,22 @@ namespace device {
 		typedef addiscr_t<base + 0x7A>  ADDISCR_;
 		static  ADDISCR_ ADDISCR;
 	};
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR0_ s12ad_base_t<base>::ADDR0;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR1_ s12ad_base_t<base>::ADDR1;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR2_ s12ad_base_t<base>::ADDR2;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR3_ s12ad_base_t<base>::ADDR3;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR4_ s12ad_base_t<base>::ADDR4;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR5_ s12ad_base_t<base>::ADDR5;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR6_ s12ad_base_t<base>::ADDR6;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR7_ s12ad_base_t<base>::ADDR7;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR8_ s12ad_base_t<base>::ADDR8;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR9_ s12ad_base_t<base>::ADDR9;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR10_ s12ad_base_t<base>::ADDR10;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR11_ s12ad_base_t<base>::ADDR11;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR12_ s12ad_base_t<base>::ADDR12;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR13_ s12ad_base_t<base>::ADDR13;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR14_ s12ad_base_t<base>::ADDR14;
+	template <uint32_t base> typename s12ad_base_t<base>::ADDR15_ s12ad_base_t<base>::ADDR15;
 	template <uint32_t base> typename s12ad_base_t<base>::ADCSR_ s12ad_base_t<base>::ADCSR;
 	template <uint32_t base> typename s12ad_base_t<base>::ADADC_ s12ad_base_t<base>::ADADC;
 	template <uint32_t base> typename s12ad_base_t<base>::ADCER_ s12ad_base_t<base>::ADCER;
@@ -172,15 +333,22 @@ namespace device {
 	/*!
 		@brief  S12ADb 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base>
 	struct s12ad_t : public s12ad_base_t<base> {
 
-		static constexpr auto PERIPHERAL = per;  				///< ペリフェラル型
-		static constexpr auto S12ADI = ICU::VECTOR::S12ADI0;	///< スキャン終了割り込みベクター
-		static constexpr auto GBADI  = ICU::VECTOR::GBADI;		///< 割り込みベクター
+		typedef s12ad_base_t<base> BASE;
+
+		static constexpr auto PERIPHERAL = peripheral::S12AD;		///< ペリフェラル型
+		static constexpr auto ADI		 = ICU::VECTOR::S12ADI0;	///< 変換終了割り込みベクター
+		static constexpr auto GBADI		 = ICU::VECTOR::GBADI;		///< グループＢ変換終了割り込みベクター
+		static constexpr auto GCADI		 = ICU::VECTOR::NONE;		///< グループＣ変換終了割り込みベクター
+		static constexpr auto CMPAI		 = ICU::VECTOR::NONE;		///< コンペアＡ割り込みベクター
+		static constexpr auto CMPBI		 = ICU::VECTOR::NONE;		///< コンペアＢ割り込みベクター
+
+		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
+
 		static constexpr uint32_t ANALOG_NUM = 16;	///< アナログ入力数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -213,79 +381,132 @@ namespace device {
 		/*!
 			@brief	ポート設定と解除
 			@param[in]	an	アナログ入力型
-			@param[in]	f	ポート無効の場合「false」
+			@param[in]	ena	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static void enable(ANALOG an, bool f = true)
+		static void enable(ANALOG an, bool ena = true)
 		{
+			MPC::PWPR.B0WI  = 0;
+			MPC::PWPR.PFSWE = 1;
+
 			switch(an) {
 			case ANALOG::AN000:
-				PORT4::PDR.B0 = 0;
-				MPC::P40PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B0 = 0;
+					PORT4::PMR.B0 = 0;
+				}
+				MPC::P40PFS.ASEL = ena;
 				break;
 			case ANALOG::AN001:
-				PORT4::PDR.B1 = 0;
-				MPC::P41PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B1 = 0;
+					PORT4::PMR.B1 = 0;
+				}
+				MPC::P41PFS.ASEL = ena;
 				break;
 			case ANALOG::AN002:
-				PORT4::PDR.B2 = 0;
-				MPC::P42PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B2 = 0;
+					PORT4::PMR.B2 = 0;
+				}
+				MPC::P42PFS.ASEL = ena;
 				break;
 			case ANALOG::AN003:
-				PORT4::PDR.B3 = 0;
-				MPC::P43PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B3 = 0;
+					PORT4::PMR.B3 = 0;
+				}
+				MPC::P43PFS.ASEL = ena;
 				break;
 			case ANALOG::AN004:
-				PORT4::PDR.B4 = 0;
-				MPC::P44PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B4 = 0;
+					PORT4::PMR.B4 = 0;
+				}
+				MPC::P44PFS.ASEL = ena;
 				break;
 			case ANALOG::AN005:
-				PORT4::PDR.B5 = 0;
-				MPC::P45PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B5 = 0;
+					PORT4::PMR.B5 = 0;
+				}
+				MPC::P45PFS.ASEL = ena;
 				break;
 			case ANALOG::AN006:
-				PORT4::PDR.B6 = 0;
-				MPC::P46PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B6 = 0;
+					PORT4::PMR.B6 = 0;
+				}
+				MPC::P46PFS.ASEL = ena;
 				break;
 			case ANALOG::AN007:
-				PORT4::PDR.B7 = 0;
-				MPC::P47PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B7 = 0;
+					PORT4::PMR.B7 = 0;
+				}
+				MPC::P47PFS.ASEL = ena;
 				break;
 			case ANALOG::AN008:
-				PORTE::PDR.B0 = 0;
-				MPC::PE0PFS.ASEL = f;
+				if(ena) {
+					PORTE::PDR.B0 = 0;
+					PORTE::PMR.B0 = 0;
+				}
+				MPC::PE0PFS.ASEL = ena;
 				break;
 			case ANALOG::AN009:
-				PORTE::PDR.B1 = 0;
-				MPC::PE1PFS.ASEL = f;
+				if(ena) {
+					PORTE::PDR.B1 = 0;
+					PORTE::PMR.B1 = 0;
+				}
+				MPC::PE1PFS.ASEL = ena;
 				break;
 			case ANALOG::AN010:
-				PORTE::PDR.B2 = 0;
-				MPC::PE2PFS.ASEL = f;
+				if(ena) {
+					PORTE::PDR.B2 = 0;
+					PORTE::PMR.B2 = 0;
+				}
+				MPC::PE2PFS.ASEL = ena;
 				break;
 			case ANALOG::AN011:
-				PORTE::PDR.B3 = 0;
-				MPC::PE3PFS.ASEL = f;
+				if(ena) {
+					PORTE::PDR.B3 = 0;
+					PORTE::PMR.B3 = 0;
+				}
+				MPC::PE3PFS.ASEL = ena;
 				break;
 			case ANALOG::AN012:
-				PORTE::PDR.B4 = 0;
-				MPC::PE4PFS.ASEL = f;
+				if(ena) {
+					PORTE::PDR.B4 = 0;
+					PORTE::PMR.B4 = 0;
+				}
+				MPC::PE4PFS.ASEL = ena;
 				break;
 			case ANALOG::AN013:
-				PORTE::PDR.B5 = 0;
-				MPC::PE5PFS.ASEL = f;
+				if(ena) {
+					PORTE::PDR.B5 = 0;
+					PORTE::PMR.B5 = 0;
+				}
+				MPC::PE5PFS.ASEL = ena;
 				break;
 			case ANALOG::AN014:
-				PORTE::PDR.B6 = 0;
-				MPC::PE6PFS.ASEL = f;
+				if(ena) {
+					PORTE::PDR.B6 = 0;
+					PORTE::PMR.B6 = 0;
+				}
+				MPC::PE6PFS.ASEL = ena;
 				break;
 			case ANALOG::AN015:
-				PORTE::PDR.B7 = 0;
-				MPC::PE7PFS.ASEL = f;
+				if(ena) {
+					PORTE::PDR.B7 = 0;
+					PORTE::PMR.B7 = 0;
+				}
+				MPC::PE7PFS.ASEL = ena;
 				break;
 			default:
 				break;
 			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 
 
@@ -311,6 +532,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D データレジスタ（ADDR）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ad_utils::addr_r_t<ANALOG, BASE::ADDR0_::address, ANALOG::REF, ADOCDR_::address> ADDR_;
+		static  ADDR_ ADDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D 自己診断データレジスタ（ADRD） @n
 					右詰め、左詰めで有効ビット位置が異なる。
 		*/
@@ -321,115 +551,189 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D データレジスタ（ADDR）（AIN000 ～ AIN015）
+			@brief  A/D チャネル選択レジスタ A（ADANSA）
+			@param[in] regadr	レジスタアドレス
 		*/
 		//-----------------------------------------------------------------//
-		struct addr_t {
+		template <uint32_t regadr>
+		struct adansa_t : public ad_utils::adans1_t<ANALOG, regadr> {
+			typedef ad_utils::adans1_t<ANALOG, regadr> adans1_;
+			using adans1_::operator ();
 
-			//-------------------------------------------------------------//
-			/*!
-				@brief  データレジスタアクセスオペレーター
-				@param[in]	an	アナログ入力型
-				@return A/D データレジスタ値
-			*/
-			//-------------------------------------------------------------//
-			uint16_t operator() (ANALOG an) noexcept {
-				return rd16_(base + 0x20 + static_cast<uint32_t>(an) * 2);
-			}
+			typedef rw16_t<regadr> io_;
+			bits_rw_t<io_, bitpos::B0, 16> ANSA;
 		};
-		typedef addr_t ADDR_;
-		static  ADDR_ ADDR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  A/D チャネル選択レジスタ (ADANS)
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t ofs>
-		struct adans_t {
-			void set(ANALOG an, bool f = true) noexcept {
-				auto n = static_cast<uint32_t>(an);
-				if(f) {
-					wr16_(ofs, rd16_(ofs) |  (static_cast<uint16_t>(1) << n));
-				} else {
-					wr16_(ofs, rd16_(ofs) & ~(static_cast<uint16_t>(1) << n));
-				}
-			}
-
-			// チャネルビット取得
-			bool operator() (ANALOG an) const noexcept {
-				auto n = static_cast<uint32_t>(an);
-				return (rd16_(ofs) >> n) & 1;
-			}
-		};
-		typedef adans_t<base + 0x04> ADANSA_;
+		typedef adansa_t<base + 0x04> ADANSA_;
 		static  ADANSA_ ADANSA;
-		typedef adans_t<base + 0x14> ADANSB_;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ B (ADANSB)
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t regadr>
+		struct adansb_t : public ad_utils::adans1_t<ANALOG, regadr> {
+			typedef ad_utils::adans1_t<ANALOG, regadr> adans1_;
+			using adans1_::operator ();
+
+			typedef rw16_t<regadr> io_;
+			bits_rw_t<io_, bitpos::B0, 16> ANSB;
+		};
+		typedef adansb_t<base + 0x14> ADANSB_;
 		static  ADANSB_ ADANSB;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief  A/D 変換値加算モード選択レジスタ（ADADS）
+			@param[in] regadr	レジスタアドレス
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef adans_t<base + 0x08> ADADS_;
+		//-----------------------------------------------------------------//
+		template <uint32_t regadr>
+		struct adads_t : public ad_utils::adans1_t<ANALOG, regadr> {
+			typedef ad_utils::adans1_t<ANALOG, regadr> adans1_;
+			using adans1_::operator ();
+
+			typedef rw16_t<regadr> io_;
+			bits_rw_t<io_, bitpos::B0, 16> ADS;
+		};
+		typedef adads_t<base + 0x08> ADADS_;
 		static  ADADS_ ADADS;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	A/D サンプリングステートレジスタ n（ADSSTRn）（n=0 ～ 7、L、O）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct adsstrn_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  SST;
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D サンプリングステートレジスタ n（ADSSTRn）（n=0 ～ 7、L、O）
+			@brief  A/D サンプリングステートレジスタ 0（ADSSTR0）
 		*/
 		//-----------------------------------------------------------------//
-		struct adsstr_t {
-
-			uint32_t get_adr_offset(ANALOG an) const noexcept
-			{
-				uint32_t ofs;
-				switch(an) {
-				case ANALOG::AN000: ofs = 0x00; break;
-				case ANALOG::AN001: ofs = 0x13; break;
-				case ANALOG::AN002: ofs = 0x14; break;
-				case ANALOG::AN003: ofs = 0x15; break;
-				case ANALOG::AN004: ofs = 0x16; break;
-				case ANALOG::AN005: ofs = 0x17; break;
-				case ANALOG::AN006: ofs = 0x18; break;
-				case ANALOG::AN007: ofs = 0x19; break;
-				case ANALOG::REF:   ofs = 0x11; break;
-				default:
-					ofs = 0x01;
-				}
-				return ofs;
-			}
-
-			void set(ANALOG an, uint8_t val) noexcept
-			{
-				wr8_(base + 0x60 + get_adr_offset(an), val);
-			}
+		typedef adsstrn_t<base + 0x60>  ADSSTR0_;
+		static  ADSSTR0_ ADSSTR0;
 
 
-			//-------------------------------------------------------------//
-			/*!
-				@brief  データレジスタアクセスオペレーター
-				@param[in]	an	アナログ入力型
-				@return A/D データレジスタ値
-			*/
-			//-------------------------------------------------------------//
-			uint16_t operator() (ANALOG an) const noexcept {
-				return rd8_(base + 0x60 + get_adr_offset(an));
-			}
-		};
-		typedef adsstr_t ADSSTR_;
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 1（ADSSTR1）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x73>  ADSSTR1_;
+		static  ADSSTR1_ ADSSTR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 2（ADSSTR2）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x74>  ADSSTR2_;
+		static  ADSSTR2_ ADSSTR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 3（ADSSTR3）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x75>  ADSSTR3_;
+		static  ADSSTR3_ ADSSTR3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 4（ADSSTR4）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x76>  ADSSTR4_;
+		static  ADSSTR4_ ADSSTR4;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 5（ADSSTR5）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x77>  ADSSTR5_;
+		static  ADSSTR5_ ADSSTR5;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 6（ADSSTR6）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x78>  ADSSTR6_;
+		static  ADSSTR6_ ADSSTR6;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 7（ADSSTR7）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x79>  ADSSTR7_;
+		static  ADSSTR7_ ADSSTR7;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ L（ADSSTRL）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x61>  ADSSTRL_;
+		static  ADSSTRL_ ADSSTRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ O（ADSSTRO）
+		*/
+		//-----------------------------------------------------------------//
+		typedef adsstrn_t<base + 0x71>  ADSSTRO_;
+		static  ADSSTRO_ ADSSTRO;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ（ADSSTR）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ad_utils::adsstr1il_r_t<ANALOG, ADSSTR0_::address, ADSSTR1_::address, ADSSTRL_::address,
+			ANALOG::REF, ADSSTRO_::address> ADSSTR_;
 		static  ADSSTR_ ADSSTR;
 	};
-	template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADDR_  s12ad_t<base, per>::ADDR;
-	template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADANSA_ s12ad_t<base, per>::ADANSA;
-	template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADANSB_ s12ad_t<base, per>::ADANSB;
-	template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADADS_ s12ad_t<base, per>::ADADS;
-	template <uint32_t base, peripheral per> typename s12ad_t<base, per>::ADSSTR_ s12ad_t<base, per>::ADSSTR;
+	template <uint32_t base> typename s12ad_t<base>::ADDR_  s12ad_t<base>::ADDR;
+	template <uint32_t base> typename s12ad_t<base>::ADANSA_ s12ad_t<base>::ADANSA;
+	template <uint32_t base> typename s12ad_t<base>::ADANSB_ s12ad_t<base>::ADANSB;
+	template <uint32_t base> typename s12ad_t<base>::ADADS_ s12ad_t<base>::ADADS;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR0_ s12ad_t<base>::ADSSTR0;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR1_ s12ad_t<base>::ADSSTR1;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR2_ s12ad_t<base>::ADSSTR2;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR3_ s12ad_t<base>::ADSSTR3;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR4_ s12ad_t<base>::ADSSTR4;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR5_ s12ad_t<base>::ADSSTR5;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR6_ s12ad_t<base>::ADSSTR6;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR7_ s12ad_t<base>::ADSSTR7;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTRL_ s12ad_t<base>::ADSSTRL;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTRO_ s12ad_t<base>::ADSSTRO;
+	template <uint32_t base> typename s12ad_t<base>::ADSSTR_ s12ad_t<base>::ADSSTR;
 
-
-	typedef s12ad_t<0x0008'9000, peripheral::S12AD>  S12AD;
+	typedef s12ad_t<0x0008'9000>  S12AD;
 }

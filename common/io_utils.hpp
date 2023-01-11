@@ -778,7 +778,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  TempRead/Write 32 bits アクセス・テンプレート
+		@brief  Temp Read/Write 32 bits アクセス・テンプレート
 		@param[in]	adr	アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -962,9 +962,15 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos>
 	struct bit_rw_t {
+
+		typedef T value_type;
+
+		static constexpr auto POS = pos;
+
 		static bool get() noexcept {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & 1;
 		}
+
 		static void set(bool v) noexcept {
 			if(v) {
 				T::write(T::read() | (1 << static_cast<typename T::value_type>(pos)));
@@ -977,8 +983,9 @@ namespace device {
 			return static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos);
 		}
 
-		void operator = (bool v) { set(v); }
-		bool operator () () { return get(); }
+		void operator = (bool v) noexcept { set(v); }
+
+		bool operator () () noexcept { return get(); }
 	};
 
 
@@ -992,9 +999,16 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos, uint8_t len>
 	struct bits_rw_t {
+
+		typedef T value_type;
+
+		static constexpr auto POS = pos;
+		static constexpr auto LEN = len;
+
 		static typename T::value_type get() noexcept {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
 		}
+
 		static void set(typename T::value_type v) noexcept {
 			auto m = static_cast<typename T::value_type>(((1 << len) - 1) << static_cast<typename T::value_type>(pos));
 			T::write((T::read() & ~m) | (static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos)));
@@ -1004,8 +1018,9 @@ namespace device {
 			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
 		}
 
-		void operator = (typename T::value_type v) { set(v); }
-		typename T::value_type operator () () { return get(); }
+		void operator = (typename T::value_type v) noexcept { set(v); }
+
+		auto operator () () noexcept { return get(); }
 	};
 
 
@@ -1019,6 +1034,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos>
 	struct bit_ro_t {
+
+		typedef T value_type;
+
+		static constexpr auto POS = pos;
+
 		static bool get() noexcept {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & 1;
 		}
@@ -1027,7 +1047,7 @@ namespace device {
 			return 1 << static_cast<typename T::value_type>(pos);
 		}
 
-		bool operator () () { return get(); }
+		bool operator () () noexcept { return get(); }
 	};
 
 
@@ -1041,6 +1061,12 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos, uint8_t len>
 	struct bits_ro_t {
+
+		typedef T value_type;
+
+		static constexpr auto POS = pos;
+		static constexpr auto LEN = len;
+
 		static typename T::value_type get() noexcept {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
 		}
@@ -1049,18 +1075,21 @@ namespace device {
 			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
 		}
 
-		typename T::value_type operator () () { return get(); }
+		auto operator () () noexcept { return get(); }
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  標準バイト Read/Write アクセス・テンプレート
+		@brief  標準バイト Read/Write アクセス・テンプレート @n
+				ポートアクセス用
 		@param[in]	T	アクセステンプレート
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T>
 	struct basic_rw_t : public T {
+
+		typedef T value_type;
 
 		using T::operator =;
 		using T::operator ();
@@ -1096,12 +1125,15 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  標準バイト Read アクセス・テンプレート
+		@brief  標準バイト Read アクセス・テンプレート @n
+				ポートアクセス用
 		@param[in]	T	アクセステンプレート
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T>
 	struct basic_ro_t : public T {
+
+		typedef T value_type;
 
 		using T::operator ();
 

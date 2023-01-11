@@ -89,8 +89,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void scan() {
 			if(level_ != device::ICU::LEVEL::NONE) {
-				icu_mgr::set_task(ADCU::S12ADI, adi_task_);
-				icu_mgr::set_level(ADCU::S12ADI, level_);
+				icu_mgr::set_task(ADCU::ADI, adi_task_);
+				icu_mgr::set_level(ADCU::ADI, level_);
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b() | ADCU::ADCSR.ADIE.b();
 			} else {
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b();

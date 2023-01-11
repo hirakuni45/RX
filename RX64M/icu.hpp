@@ -5,7 +5,7 @@
 			・RIIC の割り込み名は、SCI の割り込み名と重複する為、変更している。 @n
 			・Ex: RIIC0 (RXI0  --->  ICRXI0) 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -355,8 +355,21 @@ namespace device {
 			TXF2 = 59,		///< CAN2（送信 FIFO 割り込み）
 			RXM2 = 60,		///< CAN2（メールボックス０～３１メッセージ受信完了）
 			TXM2 = 61,		///< CAN2（メールボックス０～３１メッセージ送信完了）
-
 			USBI0 = 62,		///< USB0（１５要因のステータス割り込み） 
+
+			S12ADI    = 64,	///< S12AD (A/D変換終了)
+			S12GBADI  = 65,	///< S12AD (グループ B A/D変換終了割り込み)
+			S12ADI1   = 68,	///< S12AD1 (A/D変換終了)
+			S12GBADI1 = 69,	///< S12AD1 (グループ B A/D変換終了割り込み)
+
+			SHARDY = 72,	///< SHA (暗号/復号準備完了)
+			DESEND,			///< DES (暗号/復号処理完了)
+			SHADEND,		///< SHA (ダイレクト暗号/復号処理完了)
+			SHAEND,			///< SHA (暗号/復号処理完了)
+			RNGEND,			///< RNG (完了割り込み)
+
+			ELSR18I = 79,	///< ELC (ELC割り込み)
+			ELSR19I,		///< ELC (ELC割り込み)
 		};
 
 
@@ -419,6 +432,54 @@ namespace device {
 			TGIC8,			///< MTU8（TGRCのインプットキャプチャ /コンペアマッチ）
 			TGID8,			///< MTU8（TGRDのインプットキャプチャ /コンペアマッチ）
 			TCIV8,			///< MTU8（TCNTのオーバフロー）
+
+			GTCIA0 = 47,	///< GPT0 (GTCCRAレジスタのインプットキャプチャ /コンペアマッチ)
+			GTCIB0,			///< GPT0 (GTCCRBレジスタのインプットキャプチャ /コンペアマッチ)
+			GTCIC0,			///< GPT0 (GTCCRCレジスタのコンペアマッチ)
+			GTCID0,			///< GPT0 (GTCCRDレジスタのコンペアマッチ)
+			GDTE0,			///< GPT0 (デッドタイムエラー )
+			GTCIE0,			///< GPT0 (GTCCREレジスタのコンペアマッチ)
+			GTCIF0,			///< GPT0 (GTCCRFレジスタのコンペアマッチ)
+			GTCIV0,			///< GPT0 (GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
+			GTCIU0,			///< GPT0 (GTCNTカウンタのアンダフロー )
+
+			ETGIN = 56,		///< GPT共通 (外部トリガ立ち下がり入力)
+			ETGIP,			///< GPT共通 (外部トリガ立ち上がり入力)
+
+			GTCIA1 = 58,	///< GPT1 (GTCCRAレジスタのインプットキャプチャ /コンペアマッチ)
+			GTCIB1,			///< GPT1 (GTCCRBレジスタのインプットキャプチャ /コンペアマッチ)
+			GTCIC1,			///< GPT1 (GTCCRCレジスタのコンペアマッチ)
+			GTCID1,			///< GPT1 (GTCCRDレジスタのコンペアマッチ)
+			GDTE1,			///< GPT1 (デッドタイムエラー )
+			GTCIE1,			///< GPT1 (GTCCREレジスタのコンペアマッチ)
+			GTCIF1,			///< GPT1 (GTCCRFレジスタのコンペアマッチ)
+			GTCIV1,			///< GPT1 (GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
+			GTCIU1,			///< GPT1 (GTCNTカウンタのアンダフロー )
+
+			GTCIA2 = 67,	///< GPT2 (GTCCRAレジスタのインプットキャプチャ /コンペアマッチ)
+			GTCIB2,			///< GPT2 (GTCCRBレジスタのインプットキャプチャ /コンペアマッチ)
+			GTCIC2,			///< GPT2 (GTCCRCレジスタのコンペアマッチ)
+			GTCID2,			///< GPT2 (GTCCRDレジスタのコンペアマッチ)
+			GDTE2,			///< GPT2 (デッドタイムエラー )
+			GTCIE2,			///< GPT2 (GTCCREレジスタのコンペアマッチ)
+			GTCIF2,			///< GPT2 (GTCCRFレジスタのコンペアマッチ)
+			GTCIV2,			///< GPT2 (GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
+			GTCIU2,			///< GPT2 (GTCNTカウンタのアンダフロー )
+
+			GTCIA3 = 76,	///< GPT3 (GTCCRAレジスタのインプットキャプチャ /コンペアマッチ)
+			GTCIB3,			///< GPT3 (GTCCRBレジスタのインプットキャプチャ /コンペアマッチ)
+			GTCIC3,			///< GPT3 (GTCCRCレジスタのコンペアマッチ)
+			GTCID3,			///< GPT3 (GTCCRDレジスタのコンペアマッチ)
+			GDTE3,			///< GPT3 (デッドタイムエラー )
+			GTCIE3,			///< GPT3 (GTCCREレジスタのコンペアマッチ)
+			GTCIF3,			///< GPT3 (GTCCRFレジスタのコンペアマッチ)
+			GTCIV3,			///< GPT3 (GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
+			GTCIU3,			///< GPT3 (GTCNTカウンタのアンダフロー )
+
+			EPTPC = 86,		///< IPLS (タイマ割り込み)
+
+			AESRDY = 88,	///< AES (暗号/復号準備完了)
+			AESEND,			///< AES (暗号/復号準備完了)
 		};
 
 

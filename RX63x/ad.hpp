@@ -3,12 +3,13 @@
 /*!	@file
 	@brief	RX631/RX63N 10 ビット A/D コンバータ（ADb）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=============================================================================//
 #include "common/device.hpp"
+#include "RX600/ad_utils.hpp"
 
 namespace device {
 
@@ -151,27 +152,30 @@ namespace device {
 	template <uint32_t base> typename ad_base_t<base>::ADCSR_  ad_base_t<base>::ADCSR;
 	template <uint32_t base> typename ad_base_t<base>::ADCR_  ad_base_t<base>::ADCR;
 	template <uint32_t base> typename ad_base_t<base>::ADCR2_  ad_base_t<base>::ADCR2;
-	template <uint32_t base> typename ad_base_t<base>::ADSSTR_  ad_base_t<base>::ADSSTR;
 	template <uint32_t base> typename ad_base_t<base>::ADDIAGR_  ad_base_t<base>::ADDIAGR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  A/D コンバータ・ベース・クラス
+		@brief  A/D コンバータ・ベース・クラス (ADb)
 		@param[in]	base	ベースアドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	adi		割り込み番号
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR adi>
-	struct ada_t : public ad_base_t<base> {
+	template <uint32_t base>
+	struct ad_t : public ad_base_t<base> {
 
 		typedef ad_base_t<base> BASE;
 
-		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
-		static constexpr auto ADI = adi;					///< A/D 変換終了割り込み
-		static constexpr uint32_t ANALOG_NUM = 8;			///< アナログ入力数
+		static constexpr auto PERIPHERAL = peripheral::AD;		///< ペリフェラル型
+		static constexpr auto ADI		 = ICU::VECTOR::ADI0;	///< スキャン終了割り込みベクター
+		static constexpr auto GBADI		 = ICU::VECTOR::NONE;	///< グループＢスキャン終了割り込みベクター
+		static constexpr auto GCADI		 = ICU::VECTOR::NONE;	///< グループＣスキャン終了割り込みベクター
+		static constexpr auto CMPAI		 = ICU::VECTOR::NONE;	///< コンペアＡ割り込みベクター
+		static constexpr auto CMPBI		 = ICU::VECTOR::NONE;	///< コンペアＢ割り込みベクター
+
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< A/D 変換クロック元
+
+		static constexpr uint32_t ANALOG_NUM = 8;			///< アナログ入力数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -194,11 +198,11 @@ namespace device {
 		/*!
 			@brief	ポート設定と解除
 			@param[in]	an	アナログ入力型
-			@param[in]	f	ポート無効の場合「false」
+			@param[in]	ena	ポート無効の場合「false」
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//		
-		static bool enable(ANALOG an, bool f = true)
+		static bool enable(ANALOG an, bool ena = true)
 		{
 			bool ret = true;
 
@@ -207,74 +211,74 @@ namespace device {
 
 			switch(an) {
 			case ANALOG::AN0:
-				if(f) {
+				if(ena) {
 					PORTE::PDR.B2 = 0;
 					PORTE::PMR.B2 = 0;
 				}
-				MPC::PE2PFS.ASEL = f;
+				MPC::PE2PFS.ASEL = ena;
 				break;
 			case ANALOG::AN1:
-				if(f) {
+				if(ena) {
 					PORTE::PDR.B3 = 0;
 					PORTE::PMR.B3 = 0;
 				}
-				MPC::PE3PFS.ASEL = f;
+				MPC::PE3PFS.ASEL = ena;
 				break;
 			case ANALOG::AN2:
-				if(f) {
+				if(ena) {
 					PORTE::PDR.B4 = 0;
 					PORTE::PMR.B4 = 0;
 				}
-				MPC::PE4PFS.ASEL = f;
+				MPC::PE4PFS.ASEL = ena;
 				break;
 			case ANALOG::AN3:
-				if(f) {
+				if(ena) {
 					PORTE::PDR.B5 = 0;
 					PORTE::PMR.B5 = 0;
 				}
-				MPC::PE5PFS.ASEL = f;
+				MPC::PE5PFS.ASEL = ena;
 				break;
 			case ANALOG::AN4:
-				if(f) {
+				if(ena) {
 					PORTE::PDR.B6 = 0;
 					PORTE::PMR.B6 = 0;
 				}
-				MPC::PE6PFS.ASEL = f;
+				MPC::PE6PFS.ASEL = ena;
 				break;
 			case ANALOG::AN5:
-				if(f) {
+				if(ena) {
 					PORTE::PDR.B7 = 0;
 					PORTE::PMR.B7 = 0;
 				}
-				MPC::PE7PFS.ASEL = f;
+				MPC::PE7PFS.ASEL = ena;
 				break;
 			case ANALOG::AN6:
-				if(f) {
+				if(ena) {
 					PORTD::PDR.B6 = 0;
 					PORTD::PMR.B6 = 0;
 				}
-				MPC::PD6PFS.ASEL = f;
+				MPC::PD6PFS.ASEL = ena;
 				break;
 			case ANALOG::AN7:
-				if(f) {
+				if(ena) {
 					PORTD::PDR.B7 = 0;
 					PORTD::PMR.B7 = 0;
 				}
-				MPC::PD7PFS.ASEL = f;
+				MPC::PD7PFS.ASEL = ena;
 				break;
 			case ANALOG::ANEX0:
-				if(f) {
+				if(ena) {
 					PORTE::PDR.B0 = 0;
 					PORTE::PMR.B0 = 0;
 				}
-				MPC::PE0PFS.ASEL = f;
+				MPC::PE0PFS.ASEL = ena;
 				break;
 			case ANALOG::ANEX1:
-				if(f) {
+				if(ena) {
 					PORTE::PDR.B1 = 0;
 					PORTE::PMR.B1 = 0;
 				}
-				MPC::PE1PFS.ASEL = f;
+				MPC::PE1PFS.ASEL = ena;
 				break;
 			default:
 				ret = false;
@@ -292,17 +296,10 @@ namespace device {
 			@brief  A/D データレジスタ（ADDR）
 		*/
 		//-----------------------------------------------------------------//
-		struct addr_t {
-			uint16_t operator () (ANALOG an) noexcept
-			{
-				return rd16_(BASE::ADDR0::addresss + (static_cast<uint32_t>(an) * 2));
-			}
-		};
-		typedef addr_t ADDR_;
+		typedef ad_utils::addr_t<ANALOG, BASE::ADDRA_::address> ADDR_;
 		static ADDR_ ADDR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR adi>
-		typename ada_t<base, per, adi>::ADDR_ ada_t<base, per, adi>::ADDR;
+	template <uint32_t base> typename ad_t<base>::ADDR_ ad_t<base>::ADDR;
 
-	typedef ada_t<0x0008'9800, peripheral::AD, ICU::VECTOR::ADI0> AD;
+	typedef ad_t<0x0008'9800> AD;
 }

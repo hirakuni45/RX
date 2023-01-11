@@ -11,14 +11,28 @@ I am currently using Renesas GNU-RX gcc 8.3.0 as my main development tool.
 
 Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
 Development is now possible in multiple environments.   
-   
-- Currently supported and tested devices are RX62[1N], RX63T, RX24T, RX66T, RX72T, RX64M, RX65N, RX71M, RX72N.   
-I extend the device class daily.
-- The RX72M are scheduled to be supported in the future.
-- I update it daily including directory configuration.   
-- The RX62N(RX621) and RX63T are not currently supported. (It's in the LEGACY folder.)
-   
-Project consists of Makefile, related header, source code, dedicated startup It consists of routines and linker scripts.   
+
+Currently supported and tested devices:   
+|Series|Core|FPU|DFPU|Operation check|rx_prog supports|Linker file|
+|---|:-:|:-:|:-:|:-:|:-:|---|
+|RX220|RXv1|No|-|〇|〇|R5F52206|
+|RX631|RXv1|Yes|-|－|〇|R5F5631F|
+|RX63N|RXv1|Yes|-|－|〇|R5F563NE|
+|RX63T|RXv1|Yes|-|〇|〇|R5F563T6|
+|RX621|RXv1|Yes|-|〇|〇|R5F56218|
+|RX62N|RXv1|Yes|-|〇|〇|R5F562N7|
+|RX62N|RXv1|Yes|-|〇|〇|R5F562N8|
+|RX24T|RXv2|Yes|-|〇|〇|R5F524T8/A|
+|RX64M|RXv2|Yes|-|〇|〇|R5F564MF/G/J/L|
+|RX71M|RXv2|Yes|-|〇|〇|R5F571MF/G/J/L|
+|RX651/RX65N|RXv2|Yes|-|〇|〇|R5F565NE|
+|RX66T|RXv3|Yes|-|〇|〇|R5F566TA/E/F/K|
+|RX72T|RXv3|Yes|-|〇|〇|R5F572TF/K|
+|RX72N|RXv3|Yes|Yes|〇|〇|R5F572ND/N|
+|RX72M|RXv3|Yes|Yes|－|△|R5F572MD/N|
+    
+- The directory structure is updated daily.
+- Some features are still under construction.
    
 <img src="docs/RTK5_side.jpg" width="40%"> <img src="docs/NES_001.jpg" width="40%">   
 Space Invaders Emulator, NES Emulator, for RX65N/RX72N Envision kit   
@@ -74,9 +88,11 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |[all_project_build.sh](./all_project_build.sh)|build all projects (shell script) |
 |[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr libraries|
 |[/rx600](./RX600)|RX microcontroller common device definition class|
-|[/RX24T](./RX24T)|RX24T specific device definition class, linker script|
-|[/RX63T](./RX63T)|RX63T specific device definition class, linker script|
+|[/RX220](./RX220)|RX220 specific device definition class, linker script|
 |[/RX62x](./RX62x)|RX621/RX62N dedicated device definition class, linker script|
+|[/RX24T](./RX24T)|RX24T specific device definition class, linker script|
+|[/RX63x](./RX63x)|RX631/RX63N specific device definition class, linker script|
+|[/RX63T](./RX63T)|RX63T specific device definition class, linker script|
 |[/RX64M](./RX64M)|RX64M dedicated device definition class, linker script|
 |[/RX71M](./RX71M)|RX71M dedicated device definition class, linker script|
 |[/RX65x](./RX65x)|Device definition class for RX651 and RX65N, linker script|
