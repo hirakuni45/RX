@@ -34,8 +34,8 @@ namespace dsos {
 		typedef device::S12AD  ADC0;
 		typedef device::S12AD1 ADC1;
 #if defined(SIG_RX65N)
-		static constexpr auto ADC_CH0 = ADC0::ANALOG::AIN000;  ///< P40 CN10(1)
-		static constexpr auto ADC_CH1 = ADC1::ANALOG::AIN114;  ///< P90 CN10(5)
+		static constexpr auto ADC_CH0 = ADC0::ANALOG::AN000;  ///< P40 CN10(1)
+		static constexpr auto ADC_CH1 = ADC1::ANALOG::AN114;  ///< P90 CN10(5)
 		typedef device::PORT<device::PORT6, device::bitpos::B0> CH0_SA;
 		typedef device::PORT<device::PORT6, device::bitpos::B1> CH0_SB;
 		typedef device::PORT<device::PORT6, device::bitpos::B2> CH0_DC;
@@ -43,8 +43,8 @@ namespace dsos {
 		typedef device::PORT<device::PORT3, device::bitpos::B7> CH1_SB;
 		typedef device::PORT<device::PORT5, device::bitpos::B3> CH1_DC;
 #elif defined(SIG_RX72N)
-		static constexpr auto ADC_CH0 = ADC0::ANALOG::AIN007;  ///< P47 Pmod2(10) CN6
-		static constexpr auto ADC_CH1 = ADC1::ANALOG::AIN108;  ///< PD0 Pmod2( 7) CN6
+		static constexpr auto ADC_CH0 = ADC0::ANALOG::AN007;  ///< P47 Pmod2(10) CN6
+		static constexpr auto ADC_CH1 = ADC1::ANALOG::AN108;  ///< PD0 Pmod2( 7) CN6
 		typedef device::PORT<device::PORT9, device::bitpos::B0> CH0_SA;		///< P90 Pmod2( 2) CN6
 		typedef device::PORT<device::PORT9, device::bitpos::B1> CH0_SB;		///< P91 Pmod2( 4) CN6
 		typedef device::PORT<device::PORT9, device::bitpos::B2> CH0_DC;		///< P92 Pmod2( 3) CN6

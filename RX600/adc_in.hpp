@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ A/D 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -62,14 +62,17 @@ namespace device {
 			level_ = level;
 
 			// 基本変換時間クロック
-			uint32_t n = ADCU::BASE_CLOCK / ADCU::IN_CONV_TIME_NS / 100;
+//			uint32_t n = ADCU::PCLK / ADCU::IN_CONV_TIME_NS / 100;
+			uint32_t n = 100;
 			n += 5;
 			n /= 10;
 			// チャネル構成により割り切れるように調整
+#if 0
 			{
 				auto m = n % ADCU::UNIT_NUM;
 				if(m > 0) n += ADCU::UNIT_NUM - m;
 			}
+#endif
 			if(n < 12 || n > 255) return false;
 
 			power_mgr::turn(ADCU::PERIPHERAL);
@@ -90,7 +93,7 @@ namespace device {
 		void scan() noexcept
 		{
 			if(level_ != ICU::LEVEL::NONE) {
-				icu_mgr::set_interrupt(ADCU::VEC, adi_task_, level_);
+				icu_mgr::set_interrupt(ADCU::ADI, adi_task_, level_);
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b() | ADCU::ADCSR.ADIE.b();
 			} else {
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b();

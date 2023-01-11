@@ -117,8 +117,8 @@ int main(int argc, char** argv)
 	// A/D 変換設定
 	{
 		auto intr_level = device::ICU::LEVEL::_3;
-		if(!adc_in_.start(ADC::ANALOG::AIN000, intr_level)) {
-			utils::format("A/D start fail AIN000\n");
+		if(!adc_in_.start(ADC::ANALOG::AN000, intr_level)) {
+			utils::format("A/D start fail AN000\n");
 		}
 	}
 
@@ -135,8 +135,8 @@ int main(int argc, char** argv)
 		++msg;
 		if(msg >= 100) {
 			msg = 0;
-			auto v = adc_in_.get(ADC::ANALOG::AIN000);
-			utils::format("AIN000: %d (%d)\n") % v % ad_count_;
+			auto v = adc_in_.get(ADC::ANALOG::AN000);
+			utils::format("AN000: %d (%d)\n") % v % ad_count_;
 		}
 
 		++cnt;
