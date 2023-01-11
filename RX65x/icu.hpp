@@ -350,7 +350,7 @@ namespace device {
 			OC0I1,		///< CMTW1 (CMWOCR0 レジスタのアウトプットコンペア出力)
 			OC1I1,		///< CMTW1 (CMWOCR1 レジスタのアウトプットコンペア出力)
 
-			CUP,		///< RTC (桁上げ割り込み)
+			CUP = 49,	///< RTC (桁上げ割り込み)
 
 			RXF0 = 50,	///< CAN0（受信 FIFO 割り込み）
 			TXF0 = 51,	///< CAN0（送信 FIFO 割り込み）
@@ -365,7 +365,31 @@ namespace device {
 			RXM2 = 60,	///< CAN2（メールボックス０～３１メッセージ受信完了）
 			TXM2 = 61,	///< CAN2（メールボックス０～３１メッセージ送信完了）
 
-			USBI0 = 62,	///< USB0（１５要因のステータス割り込み）
+			USBI0 = 62,		///< USB0（１５要因のステータス割り込み）
+
+			S12ADI    = 64,	///< S12AD (A/D変換終了)
+			S12GBADI  = 65,	///< S12AD (グループ B A/D変換終了割り込み)
+			S12GCADI  = 66,	///< S12AD (グループ C A/D変換終了割り込み)
+			S12ADI1   = 68,	///< S12AD1 (A/D変換終了)
+			S12GBADI1 = 69,	///< S12AD1 (グループ B A/D変換終了割り込み)
+			S12GCADI1 = 70,	///< S12AD1 (グループ C A/D変換終了割り込み)
+
+			RNGEND = 76,	///< RNG (完了割り込み)
+
+			ELSR18I = 79,	///< ELC (ELC割り込み)
+			ELSR19I,		///< ELC (ELC割り込み)
+
+			PROC_BUSY = 85,	///< TSIP (手順完了割り込み)
+			ROMOK,			///< TSIP (改ざん検出割り込み)
+			LONG_PLG,		///< TSIP (演算完了割り込み)
+			TEST_BUSY,		///< TSIP (テストビジー )
+			WRRDY0,			///< TSIP (ライトレディ 0)
+			WRRDY1,			///< TSIP (ライトレディ 1)
+			WRRDY4,			///< TSIP (ライトレディ 4)
+			RDRDY0,			///< TSIP (リードレディ 0)
+			RDRDY1,			///< TSIP (リードレディ 1)
+			INTEGRATE_WRRDY,	///< TSIP (インテグレートライトレディ )
+			INTEGRATE_RDRDY,	///< TSIP (インテグレートリードレディ )
 		};
 
 
@@ -428,6 +452,9 @@ namespace device {
 			TGIC8,		///< MTU8（TGRCのインプットキャプチャ /コンペアマッチ）
 			TGID8,		///< MTU8（TGRDのインプットキャプチャ /コンペアマッチ）
 			TCIV8,		///< MTU8（TCNTのオーバフロー）
+
+			AESRDY = 88,	///< AES (暗号/復号準備完了)
+			AESEND,			///< AES (暗号/復号準備完了)
 		};
 
 
