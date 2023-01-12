@@ -652,11 +652,9 @@ namespace device {
 		static constexpr auto CMPBI		 = ICU::GROUPBL1::S12CMPBI;	///< コンペアＢ割り込みベクター
 
 		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
+		static constexpr uint32_t CONV_TIME_NS = 900;				///< A/D 入力 0.9uS、単位「ns」
 
 		static constexpr uint32_t ANALOG_NUM = 8;					///< アナログ入力数
-
-		static constexpr uint32_t IN_CONV_TIME_NS = 900;	///< A/D 入力 0.9uS、単位「ns」
-		static constexpr uint32_t TO_CONV_TIME_NS = 4000;	///< 温度、基準電圧 4uS、単位「ns」
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1161,6 +1159,7 @@ namespace device {
 		static constexpr auto CMPBI		 = ICU::GROUPBL1::S12CMPBI1;	///< コンペアＢ割り込みベクター
 
 		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
+		static constexpr uint32_t CONV_TIME_NS = 900;				///< A/D 入力 0.9uS、単位「ns」
 
 		static constexpr uint32_t ANALOG_NUM = 8;					///< アナログ入力数
 
@@ -1693,6 +1692,8 @@ namespace device {
 		static constexpr auto CMPBI		 = ICU::GROUPBL1::S12CMPBI2;	///< コンペアＢ割り込みベクター
 
 		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
+		static constexpr uint32_t CONV_TIME_NS = 900;				///< A/D 入力 0.9uS、単位「ns」
+		static constexpr uint32_t TO_CONV_TIME_NS = 4000;			///< 温度、基準電圧 4uS、単位「ns」
 
 		static constexpr uint32_t ANALOG_NUM = 14;					///< アナログ入力数
 

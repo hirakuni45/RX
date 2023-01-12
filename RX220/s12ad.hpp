@@ -348,6 +348,7 @@ namespace device {
 		static constexpr auto CMPBI		 = ICU::VECTOR::NONE;		///< コンペアＢ割り込みベクター
 
 		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
+		static constexpr uint32_t CONV_TIME_NS = 1560;				///< A/D 入力 1.56uS、単位「ns」
 
 		static constexpr uint32_t ANALOG_NUM = 16;	///< アナログ入力数
 
