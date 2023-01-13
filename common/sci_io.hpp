@@ -17,9 +17,9 @@
 			  typedef device::sci_io<device::SCI1, RBF, SBF> SCI;  // SCI1 の場合 @n
 			  SCI	sci_; // 実態の宣言 @n
 			Ex: 開始例 @n
-			  uint8_t intr_level = 2;    // 割り込みレベル(2) @n
+			  auto intr = device::ICU::LEVEL::_2;  // 割り込みレベル(2) @n
 			  uint32_t baud = 115200;    // ボーレート設定 (115200) @n
-			  sci_.start(baud, intr_level); @n  
+			  sci_.start(baud, intr); @n  
 			Ex: POSIX 関数 (printf など) への経路設定 @n
               C の関数「sci_putch(), sci_getch()」を定義してリンク可能にする。 @n
 			  syscalls.c ソースをプロジェクトにリンクする。 @n
@@ -42,9 +42,14 @@
 			・レシーバーの送信ゲート制御のみ、ドライバーが行う。 @n
 			Ex: RS-485 を利用する場合の定義例 @n
 			  	typedef device::PORT<device::PORT3, device::bitpos::B3> RS485_DE;   // for MAX3485 DE @n
-				typedef device::sci_io<RS485_CH, RS485_RXB, RS485_TXB, device::port_map::ORDER::SECOND, device::sci_io_base::FLOW_CTRL::RS485, RS485_DE> RS485;
+				typedef device::sci_io<RS485_CH, RS485_RXB, RS485_TXB, device::port_map::ORDER::SECOND, device::sci_io_base::FLOW_CTRL::RS485, RS485_DE> RS485; @n
+			コンパイル時アサート： @n
+			・コンパイル時に、ボーレートの設定誤差を計算して、止める事が出来ます。(通常 3.2%) @n
+			Ex: static_assert(SCI::probe_baud(baud), "Failed baud rate accuracy test"); @n
+			Ex: 許容誤差を 2% にする場合。(百分率を 10 倍にした整数を設定) @n
+			    static_assert(SCI::probe_baud(baud, 20), "Failed baud rate accuracy test");
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -341,13 +346,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ボーレートの設定誤差を検証
+			@brief	ボーレートの設定誤差を検証 @n
+					8 ビット 1 ストップビット、パリティ無しの場合、限界は 3.9% 程度
 			@param[in]	baud	ボーレート
-			@param[in]	thper	許容誤差（通常３％）
+			@param[in]	thper	許容誤差（標準値は 3.2%） @n
+						100 分率を 10 倍した値を設定
 			@return 誤差範囲なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		static constexpr bool probe_baud(uint32_t baud, uint32_t thper = 3) noexcept
+		static constexpr bool probe_baud(uint32_t baud, uint32_t thper = 32) noexcept
 		{
 			uint8_t brr = 0;
 			uint8_t cks = 0;
@@ -373,7 +380,7 @@ namespace device {
 			}
 
 			auto d = baud * thper;
-			if((cbaud * 100) < (baud * 100 - d) || (baud * 100 + d) < (cbaud * 100)) {
+			if((cbaud * 1000) < (baud * 1000 - d) || (baud * 1000 + d) < (cbaud * 1000)) {
 				return false;
 			}
 
