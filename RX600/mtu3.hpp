@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・MTU3x 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -4638,7 +4638,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGR_ mtu9_t<per, INT>::TGR;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::NFCR_ mtu9_t<per, INT>::NFCR;
 
-#if defined(SIG_RX63T)  // MTU3
+#if defined(SIG_RX63T) || defined(SIG_RX63T_S)  // MTU3
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR> MTU2;

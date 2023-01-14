@@ -1041,7 +1041,11 @@ namespace device {
 	template <uint32_t base> typename s12ad1_t<base>::ADSSTR_ s12ad1_t<base>::ADSSTR;
 	template <uint32_t base> typename s12ad1_t<base>::ADPG_ s12ad1_t<base>::ADPG;
 
+// 64/48 ピン版
+#if defined(SIG_RX63T_S)
 	typedef s12ad_t<0x0008'9000> S12AD;
+#else
 	typedef s12ad0_t<0x0008'9000> S12AD0;
 	typedef s12ad1_t<0x0008'9100> S12AD1;
+#endif
 }
