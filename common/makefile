@@ -65,6 +65,14 @@ ifeq ($(RX_DEF),SIG_RX63T)
   PROG_ERASE =
 endif
 
+ifeq ($(RX_DEF),SIG_RX63T_S)
+# 64/48 pin package
+  RX_CPU = RX63T
+  RX_CHOOSE = -misa=v1
+  LDSCRIPT	=	../../RX63T/$(DEVICE).ld
+  PROG_ERASE =
+endif
+
 ifeq ($(RX_DEF),SIG_RX631)
   RX_CPU = RX631
   RX_CHOOSE = -misa=v1

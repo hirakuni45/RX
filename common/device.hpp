@@ -58,7 +58,7 @@
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
-#elif defined(SIG_RX63T)
+#elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
 #include "RX63T/clock_profile.hpp"
 #include "RX63T/peripheral.hpp"
 #include "RX63T/system.hpp"

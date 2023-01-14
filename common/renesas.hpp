@@ -118,7 +118,7 @@
 #include "RX600/dmac_mgr.hpp"
 // #include "RX63x/dac_out.hpp"
 
-#elif defined(SIG_RX63T)
+#elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
 #include "RX63T/lvda.hpp"
 #include "RX63T/bus.hpp"
 #include "RX600/dmac.hpp"

@@ -4,7 +4,7 @@
 	@brief	RX600 グループ・USB[ab] 定義 @n
 			RX64M/RX71M/RX651/RX65N/RX72M/RX72N/RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -1335,7 +1335,7 @@ namespace device {
 		usb_b_t<base, per, IVT, ivec, rvec, d0vec, d1vec>::DPUSR1R;
 
 
-#if defined(SIG_RX63T)
+#if defined(SIG_RX63T) || defined(SIG_RX63T_S)
 	typedef usb_a_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)

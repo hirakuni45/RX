@@ -1,9 +1,15 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600, RX200 グループ・CMT I/O 制御
+	@brief	RX マイコン・CMT I/O 制御 @n
+			コンパイル時、設定周波数を検査して、範囲を超えたらコンパイルを止める事が出来ます。 @n
+			Ex: 標準では、1% @n 
+			  constexpr uint32_t freq = 1000; @n
+			  static_assert(CMT_MGR::probe_freq(freq), "Failed rate accuracy test"); @n
+			  ・0.5% にする場合 @n
+			  static_assert(CMT_MGR::probe_freq(freq, 5), "Failed rate accuracy test");
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -64,6 +70,34 @@ namespace device {
 			task_();
 		}
 
+		static constexpr bool calc_freq_(uint32_t freq, uint8_t& cks, uint32_t& cmcor)
+		{
+			if(freq == 0) return false;
+
+			cmcor = CMT::PCLK / freq / 4;
+			cmcor++;
+			cmcor >>= 1;
+
+			cks = 0;
+			while(cmcor > 65536) {
+				cmcor >>= 2;
+				++cks;
+			}
+
+			if(cks > 3 || cmcor == 0) {
+				return false;
+			}
+
+			return true;
+		}
+
+		static constexpr uint32_t get_real_freq_(uint8_t cks, uint32_t cmcor)
+		{
+			uint32_t rate = CMT::PCLK / cmcor;
+			rate /= 8 << (cks * 2);
+			return rate;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -71,6 +105,33 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		cmt_mgr() noexcept : rate_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	設定周波数の誤差を検証
+			@param[in]	freq	周波数
+			@param[in]	thper	許容誤差（通常 1.0%） @n
+								百分率を 10 倍した値を設定
+			@return 誤差範囲なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		static constexpr bool probe_freq(uint32_t freq, uint32_t thper = 10) noexcept
+		{
+			uint8_t cks = 0;
+			uint32_t cmcor = 0;
+			if(!calc_freq_(freq, cks, cmcor)) {
+				return false;
+			}
+
+			auto rate = get_real_freq_(cks, cmcor);
+			auto d = freq * thper;
+			if((rate * 1000) < (freq * 1000 - d) || (freq * 1000 + d) < (rate * 1000)) {
+				return false;
+			}
+
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -90,8 +151,6 @@ namespace device {
 
 			power_mgr::turn(CMT::PERIPHERAL);
 
-//			CMT::CMCR.CMIE = 0;
-//			icu_mgr::set_interrupt(CMT::IVEC, nullptr, 0);
 			CMT::enable(false);
 
 			CMT::CMCNT = 0;
@@ -128,19 +187,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t freq, ICU::LEVEL level = ICU::LEVEL::NONE, void (*task)() = nullptr) noexcept
 		{
-			if(freq == 0) return false;
-
-			uint32_t cmcor = CMT::PCLK / freq / 4;
-			cmcor++;
-			cmcor >>= 1;
-
-			uint8_t cks = 0;
-			while(cmcor > 65536) {
-				cmcor >>= 2;
-				++cks;
-			}
-
-			if(cks > 3 || cmcor == 0) {
+			uint8_t cks;
+			uint32_t cmcor;
+			if(!calc_freq_(freq, cks, cmcor)) {
 				return false;
 			}
 
@@ -223,16 +272,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	周期を取得
-			@param[in]	real	「true」にした場合、内部で計算されたリアルな値
+			@param[in]	real	「true」にした場合、設定されている実際の値
 			@return 周期
 		 */
 		//-----------------------------------------------------------------//
 		uint32_t get_rate(bool real = false) const noexcept
 		{
 			if(real) {
-				uint32_t rate = CMT::PCLK / (static_cast<uint32_t>(CMT::CMCOR()) + 1);
-				rate /= 8 << (CMT::CMCR.CKS() * 2);
-				return rate;
+				return get_real_freq_(CMT::CMCR.CKS(), static_cast<uint32_t>(CMT::CMCOR()) + 1);
 			} else {
 				return rate_;
 			}

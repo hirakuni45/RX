@@ -145,12 +145,14 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	{  // タイマー設定（100Hz）
-		cmt_.start(100, device::ICU::LEVEL::_4);
+		constexpr uint32_t freq = 100;
+		static_assert(CMT::probe_freq(freq), "Failed CMT rate accuracy test");
+		cmt_.start(freq, device::ICU::LEVEL::_4);
 	}
 
 	{  // SCI の開始
 		constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
-		static_assert(SCI::probe_baud(baud), "Failed baud rate accuracy test");
+		static_assert(SCI::probe_baud(baud), "Failed baud rate accuracy test");  // 許容誤差（3%）を超える場合、コンパイルエラー
 		auto intr = device::ICU::LEVEL::_2;		// 割り込みレベル（NONE を指定すると、ポーリング動作になる）
 		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 // 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。

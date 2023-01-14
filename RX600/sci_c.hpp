@@ -75,7 +75,7 @@ namespace device {
 		ICU::GROUP12, ICU::GROUP12::ERI10> SCI10;
 	typedef scic_t<0x0008'A160, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11, ICU::VECTOR::TEI11,
 		ICU::GROUP12, ICU::GROUP12::ERI11> SCI11;
-#elif defined(SIG_RX63T)
+#elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
 	typedef scic_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0, ICU::VECTOR::TEI0,
 		ICU::GROUP12, ICU::GROUP12::ERI0> SCI0;
 	typedef scic_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1, 
