@@ -4,22 +4,22 @@ namespace resource {
 
 	struct bitmap {
 
-		static const uint8_t* x_2_;
-		static const uint8_t* x_y_;
-		static const uint8_t* x_m1_;
+		#include "resource/x_2.h"
+		#include "resource/x_y.h"
+		#include "resource/x_m1.h"
 
-		static const uint8_t* s_0_;
-		static const uint8_t* s_1_;
-		static const uint8_t* s_2_;
-		static const uint8_t* s_3_;
-		static const uint8_t* s_4_;
-		static const uint8_t* s_5_;
-		static const uint8_t* s_6_;
-		static const uint8_t* s_7_;
-		static const uint8_t* s_8_;
-		static const uint8_t* s_9_;
-		static const uint8_t* s_p_;
-		static const uint8_t* s_m_;
+		#include "resource/s_0.h"
+		#include "resource/s_1.h"
+		#include "resource/s_2.h"
+		#include "resource/s_3.h"
+		#include "resource/s_4.h"
+		#include "resource/s_5.h"
+		#include "resource/s_6.h"
+		#include "resource/s_7.h"
+		#include "resource/s_8.h"
+		#include "resource/s_9.h"
+		#include "resource/s_p.h"
+		#include "resource/s_m.h"
 
 	};
 }

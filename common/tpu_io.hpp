@@ -85,11 +85,7 @@ namespace device {
 		static TASK	task_;
 
 		static INTERRUPT_FUNC void tpu_task_() noexcept {
-//		static void tpu_task_() noexcept {
-//			asm("save #0");
 			task_();
-//			asm("rstr #0");
-//			asm("rte");
 		}
 
 		void sleep_() const noexcept { asm("nop"); }
@@ -141,8 +137,6 @@ namespace device {
 			}
 			if(cmt == 0) return false;
 
-			auto per = TPU::PERIPHERAL;
-
 			// プリスケーラーの算出と指定 (shift)
 			// 1: 1/2, 2: 1/4, 3: 1/8, ...
 			// TPU0: 1/1(0), 1/4(1), 1/16(2), 1/64(3) 
@@ -151,6 +145,7 @@ namespace device {
  			// TPU3: 1/1(0), 1/4(1), 1/16(2), 1/64(3), 1/256(4), 1/1024(5), 1/4096(6)
 			// TPU4: 1/1(0), 1/4(1), 1/16(2), 1/64(3), 1/1024(5)
 			// TPU5: 1/1(0), 1/4(1), 1/16(2), 1/64(3), 1/256(4)
+			auto per = TPU::PERIPHERAL;
 			uint8_t tpsc = 0;
 			if(shift == 0) {
 			} else if(shift == 1) {

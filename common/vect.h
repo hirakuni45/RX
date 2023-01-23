@@ -10,7 +10,11 @@
 //=====================================================================//
 #include <stdint.h>
 
+#ifdef TEST_MODE
+#define INTERRUPT_FUNC
+#else
 #define INTERRUPT_FUNC __attribute__ ((interrupt))
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +37,7 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	void set_interrupt_task(void (*task)(void), uint32_t idx);
 
-
+#ifndef TEST_MODE
 	//-----------------------------------------------------------------//
 	/*!
 		@brief	ユーザーモードに移行する
@@ -55,6 +59,7 @@ extern "C" {
 		asm("nop");
 		asm("nop");
 	}
+#endif
 
 #ifdef __cplusplus
 };

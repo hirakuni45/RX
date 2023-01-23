@@ -833,7 +833,7 @@ namespace app {
 			};
 
 			sqr_.set_layer(WIDGET::LAYER::_0);
-			sqr_.set_mobj(resource::bitmap::x_2_);
+			sqr_.set_mobj(resource::bitmap::x_2);
 			sqr_.at_select_func() = [=](uint32_t id) {
 				cbuff_ += '^';
 				cbuff_ += '2';
@@ -844,7 +844,7 @@ namespace app {
 				cbuff_ += '('; nest_++;
 			};
 			pow_.set_layer(WIDGET::LAYER::_0);
-			pow_.set_mobj(resource::bitmap::x_y_);
+			pow_.set_mobj(resource::bitmap::x_y);
 			pow_.at_select_func() = [=](uint32_t id) {
 				cbuff_ += '^';
 			};
@@ -860,7 +860,7 @@ namespace app {
 				cbuff_ += '('; nest_++;
 			};
 			inv_.set_layer(WIDGET::LAYER::_0);
-			inv_.set_mobj(resource::bitmap::x_m1_);
+			inv_.set_mobj(resource::bitmap::x_m1);
 			inv_.at_select_func() = [=](uint32_t id) {
 				cbuff_ += '^';
 				cbuff_ += '-';
