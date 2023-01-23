@@ -61,7 +61,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 
 - 各プラットホームディレクトリーに移動、make する。
 - sci_sample.mot ファイルを書き込む。
-- FRK-RX62N は、R5F562N7(FlashRom: 374KB) の為、Makefile のデバイスを変更する。
+- FRK-RX62N は、R5F562N7(FlashRom: 384KB) の為、Makefile のデバイスを変更する。
 - CQ_FRK 変数（コンパイル時定数）を有効にする事で、基板依存の切り替えを行う。
 
 ```C++
