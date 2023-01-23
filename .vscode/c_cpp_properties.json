@@ -11,7 +11,7 @@
                 "C:/msys64/usr/local/rx-elf/rx-elf/include/c++/8.3.0.202004-GNURX/backward",
                 "C:/msys64/usr/local/rx-elf/rx-elf/include/c++/8.3.0.202004-GNURX/rx-elf",
                 "C:/msys64/usr/local/rx-elf/rx-elf/include/c++/8.3.0.202004-GNURX",
-                "C:/msys64/mingw64/include",
+                "C:/boost_1_74_0",
                 "D:/Git/RX",
                 "D:/Git/RX/RX600/drw2d/inc/tes",
 				"D:/Git/RX/FreeRTOS/Source/include",
