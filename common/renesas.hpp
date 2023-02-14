@@ -46,6 +46,7 @@
 #include "RX24T/poe3.hpp"
 #include "RX600/tmr.hpp"
 #include "RX600/gpt.hpp"
+#include "RX600/rscan.hpp"
 #include "RX600/sci_g.hpp"
 #include "RX24T/s12ad.hpp"
 #include "RX24T/da.hpp"
