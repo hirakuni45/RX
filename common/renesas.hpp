@@ -191,7 +191,7 @@
 #include "RX600/adc_in.hpp"
 #include "RX600/dac_out.hpp"
 #include "RX600/flash_io.hpp"
-#include "RX600/sdhi_io.hpp"
+#include "ff14/sdhi_io.hpp"
 #include "RX600/ssi_io.hpp"
 
 #elif defined(SIG_RX65N)
@@ -236,7 +236,7 @@
 #include "RX600/rtc_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/ether_io.hpp"
-#include "RX600/sdhi_io.hpp"
+#include "ff14/sdhi_io.hpp"
 #include "RX600/glcdc_mgr.hpp"
 #include "RX600/drw2d_mgr.hpp"
 #include "RX600/adc_in.hpp"
@@ -291,7 +291,7 @@
 #include "RX600/system_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/rtc_io.hpp"
-#include "RX600/sdhi_io.hpp"
+#include "ff14/sdhi_io.hpp"
 #include "RX600/ssie_io.hpp"
 #include "RX600/glcdc_mgr.hpp"
 #include "RX600/drw2d_mgr.hpp"
