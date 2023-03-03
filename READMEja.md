@@ -7,7 +7,8 @@ Renesas RX Microcontroller
 ## 概要
 
 これはルネサス RX マイコンと、そのコンパイラである rx-elf-gcc,g++ によるプログラムです。  
-※現在、Renesas GNU-RX gcc 8.3.0 をメインに使って開発しています。    
+※現在、Renesas GNU-RX gcc 8.3.0 をメインに使って開発しています。  
+※GNU-RX は、RXv3、DFPU に対応しており、最適化も優れています。   
    
 現在は、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
 複数の環境で、開発が出来るようになっています。
@@ -15,21 +16,22 @@ Renesas RX Microcontroller
 現在サポートされ、動作確認済みデバイス：   
 |シリーズ|コア|FPU|DFPU|動作確認|ペリフェラルクラス|rx_prog サポート|リンカーファイル|
 |---|:-:|:-:|:-:|:-:|:-:|:-:|---|
-|RX220|RXv1|No|-|〇|〇|〇|R5F52206|
-|RX631/RX63N|RXv1|Yes|-|－|〇|〇|R5F5631F/NE|
-|RX63T|RXv1|Yes|-|〇|〇|〇|R5F563T6|
-|RX621/RX62N|RXv1|Yes|-|〇|〇|〇|R5F562N7/8|
-|RX24T|RXv2|Yes|-|〇|〇|〇|R5F524T8/A|
-|RX64M|RXv2|Yes|-|〇|〇|〇|R5F564MF/G/J/L|
-|RX71M|RXv2|Yes|-|〇|〇|〇|R5F571MF/G/J/L|
-|RX651/RX65N|RXv2|Yes|-|〇|〇|〇|R5F565NE|
-|RX66T|RXv3|Yes|-|〇|〇|〇|R5F566TA/E/F/K|
-|RX72T|RXv3|Yes|-|〇|〇|〇|R5F572TF/K|
+|RX220|RXv1|No|－|〇|〇|〇|R5F52206|
+|RX631/RX63N|RXv1|Yes|－|－|〇|〇|R5F5631F/NE|
+|RX63T|RXv1|Yes|－|〇|〇|〇|R5F563T6|
+|RX621/RX62N|RXv1|Yes|－|〇|〇|〇|R5F562N7/8|
+|RX24T|RXv2|Yes|－|〇|〇|〇|R5F524T8/A|
+|RX64M|RXv2|Yes|－|〇|〇|〇|R5F564MF/G/J/L|
+|RX71M|RXv2|Yes|－|〇|〇|〇|R5F571MF/G/J/L|
+|RX651/RX65N|RXv2|Yes|－|〇|〇|〇|R5F565NE|
+|RX66T|RXv3|Yes|－|〇|〇|〇|R5F566TA/E/F/K|
+|RX72T|RXv3|Yes|－|〇|〇|〇|R5F572TF/K|
 |RX72N|RXv3|Yes|Yes|〇|〇|〇|R5F572ND/N|
 |RX72M|RXv3|Yes|Yes|－|△|△|R5F572MD/N|
     
 - ディレクトリー構成など日々アップデートしています。
 - 部分的に作業中な機能があったりします、サンプルの動作実績で確認して下さい。
+- プロジェクトは、Makefile、及び、関連ヘッダー、ソースコードからなり、専用のスタートアップルーチンやリンカースクリプトで構成されています。
 
 ---
    
@@ -37,9 +39,6 @@ Renesas RX Microcontroller
 - hirakuni45 GitHub のサポートメンバーになる事。
 - サポート要求の RX マイコンが載っているボードを貸し出す事。
 - 新規に追加された RX マイコン関連ファイルを MIT ライセンスで公開する事を承諾する事。
-
-プロジェクトは、Makefile、及び、関連ヘッダー、ソースコードからなり、専用のスタートアップ   
-ルーチンやリンカースクリプトで構成されています。
 
 **フレームワークの使い方が判らない場合**
 - GitHub のアカウントを作成し、Discussions に書き込んで下さい。
@@ -130,7 +129,7 @@ int main(int argc, char** argv)
 
 ---
 
-### サンプル・プロジェクト（アプリケーション）
+## サンプル・プロジェクト（アプリケーション）
 
 |ディレクトリ|RX63T|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
@@ -197,6 +196,14 @@ int main(int argc, char** argv)
 
 ---
 
+### gui ディレクトリー
+
+- GUI Widget クラス
+
+[gui](./gui) 参照
+
+---
+
 ### sound ディレクトリー
 
  - サウンドに関係するクラス
@@ -252,9 +259,11 @@ RX マイコン用 最新（2020/07 現在）GNU ツールチェインとして�
 
 サポートも行っているようです。（CyberTHOR Studios Limited）   
 
-MSYS2 からこのツールを利用するには、ツールチェインをインストール後、「.bash_profile」に、コマンドパスを設定して下さい。
+MSYS2 からこのツールを利用するには、ツールチェインをインストール後、「.bash_profile」に、コマンドパスを設定して下さい。   
+オープンソースのライブラリなどをコンパイルする場合、パス文字列に「空白」や２バイトコードが含まれている問題があります。   
+この問題を回避するには、ディレクトリを「/usr/local」にコピーして、そのパスを利用する方法が推奨されます。   
 
-```
+```bash
 # rx-elf path
 # PATH=$PATH:/usr/local/rx-elf/bin
 PATH=$PATH:/C/'Program Files (x86)'/'GCC for Renesas RX 8.3.0.202002-GNURX-ELF'/rx-elf/rx-elf/bin
@@ -275,11 +284,11 @@ CC-RX との違い：
 - 良く調べていませんが、CC-RX では、整数を使った行列計算における積和演算を DSP 命令に置き換える事が出来るのかもしれません。   
    
 |コンパイラ|RXコア|CoreMark (MHz)|比率|
-|---------|------|--------------|---|
-|CC-RX (V3.02)|RX72N|5.21|1|
+|---|:-:|:-:|:-:|
+|CC-RX (V3.02)|RX72N|5.21|1.00|
 |GNU-RX (8.3.x)|RX72N|3.59|0.69|
 |||||
-|CC-RX (V3.02)|RX65N|4.37|1|
+|CC-RX (V3.02)|RX65N|4.37|1.00|
 |GNU-RX (8.3.x)|RX65N|3.22|0.74|
    
 上記の数値は、かなり刺激的な値ですが、実際のアプリを動かした場合、感覚的にこのような大きな差は感じません。  
@@ -310,14 +319,14 @@ CC-RX との違い：
    
  - msys2 のアップグレード
 
-```
+```bash
 pacman -Sy pacman
 pacman -Syu
 ```
 
  - コンソールを開きなおす。（コンソールを開きなおすように、メッセージが表示されるはずです）
 
-```
+```bash
 pacman -Su
 ```
  - アップデートは、複数回行われ、その際、コンソールの指示に従う事。
@@ -325,7 +334,8 @@ pacman -Su
 
  - gcc、texinfo、gmp、mpfr、mpc、diffutils、automake、zlib、tar、make、unzip、git コマンドなどをインストール
  - 必ず、一つづつ進めて下さい
-```
+
+```bash
 pacman -S gcc
 pacman -S texinfo
 pacman -S mpc-devel
@@ -339,70 +349,6 @@ pacman -S zlib-devel
 pacman -S git
 ```
    
-### VSCode のインストールをお勧め
-
-- テキストエディターは、好みの問題があり、未だに古い手慣れた物を使っている人がいます
-- それが悪いとは言いませんが「最高」だとは言えないと思います
-- 新しい最新の環境は優れているものです
-- vi、emacs 派などは非常に嗜好が強いアプリケーションですが、拡張機能を導入する事で、ほぼ同じキーバインドに出来ます
-- C# や、Windows アプリのプログラミングで Visual Studio を好む人もいます
-- Unity の editor が最高だと言う人もいます
-- どれも、フリーで利用出来るアプリです
-- 自分は、vscode が色々な意味で優れていると感じますので、お勧めします
-- R8C/RL78/RX マイコンのフレームワークを使った開発では、ある程度インテリセンスが利き、便利です
-- github のアーカイブには、vscode の環境ファイルも含まれています
-- マークダウンをプレビューしたり、色々な拡張機能が豊富で、インストールも簡単です
-- MSYS2 のコンソールを直接ドッキングして操作する事が出来ます（make を直接実行できます）
-
-### git 関係コマンドは何を使うべきか？
-
-- windows に MSYS2 環境をインストールした場合、MSYS2 に git も入れると思います
-- ですが、それとは別に、「Git For Windows」もあります
-- MSYS2 の git と併用が可能です
-- MSYS2 に敢えて git を入れずに、Git For Windows をメインに使う事も考えられます
-- どの選択が正しいか、現在、まだ判断が出来ません、自分は併用しています
-- 併用した場合の注意として、クローンしたり新規に作成したリポジトリの操作は、統一する必要があります
-- クローンを MSYS2 で行い、コミットを Git For Windows で行うなどは決してやっては駄目です
-- Git For Windows をインストールすると、MSYS2 とは異なるコンソールも増えて多少複雑になります
-- vscode は git の存在が標準なので、vscode を使う場合、標準で、Git For Windows をインストールする必要もあります
-
-### MSYS2 環境の修正
-
-- 素の MSYS2 環境は、何かと使いづらい事もあるので、以下の修正を行うとより良く使えると思います
-- 環境ファイルは、/c/msys64/home/ユーザー名 にあります。
-
-```
-Uranus-W10.~ % ls -a
-./  ../  .bash_history  .bash_logout  .bash_profile  .bashrc  .inputrc  .lesshst  .profile
-```
-
-- テキストファイルの修正は、最近では VSCode で行っています
-
-
-- .bashrc の修正
-- コメントの '#' を外して有効にします
-   
-- ls コマンドの出力をカラー化する
-- 好みの環境を選択して下さい
-
-```
-# Some shortcuts for different directory listings
-alias ls='ls -hF --color=tty'                 # classify files in colour
-# alias dir='ls --color=auto --format=vertical'
-# alias vdir='ls --color=auto --format=long'
-# alias ll='ls -l'                              # long list
-# alias la='ls -A'                              # all but . and ..
-# alias l='ls -CF' 
-```
-
-- .bash_profile の末尾に追加する
-- カレントディレクトリが表示される
-
-```
-# prompt
-PS1='\h.\w % '
-```
-
 ---
 ## RX 開発環境準備（OS-X）
 
@@ -412,26 +358,29 @@ PS1='\h.\w % '
 
  - macports のアップグレード
 
-```
+```bash
    sudo port -d self update
 ```
 
  - ご存知とは思いますが、OS−X では初期段階では、gcc の呼び出しで llvm が起動するようになっています。
  - しかしながら、現状では llvm では、gcc のクロスコンパイラをビルドする事は出来ません。
  - そこで、macports で gcc をインストールします、バージョンは５系を使う事とします。
-```
+
+```bash
 sudo port install gcc5
 sudo ln -sf /opt/local/bin/gcc-mp-5  /usr/local/bin/gcc
 sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/g++
 sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/c++
 ```
+
  - 再起動が必要かもしれません。
  - 一応、確認してみて下さい。
-```
+
+```bash
    gcc --version
 ```
    
-```
+```bash
 gcc (MacPorts gcc5 5.4.0_0) 5.4.0
 Copyright (C) 2015 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
@@ -454,7 +403,8 @@ sudo port install automake
 Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境の場合を書いておきます。
 
  - texinfo、gmp、mpfr、mpc、diffutils、automake コマンドなどをインストール
-```
+
+```bash
 sudo apt-get install texinfo
 sudo apt-get install libgmp-dev
 sudo apt-get install libmpfr-dev
@@ -489,14 +439,13 @@ sudo apt-get install zlib1g-dev
 |binutils-2.30|gcc-6.4.0|newlib-3.0.0|NG|
 |binutils-2.34|gcc-7.5.0|newlib-2.4.0|OK (new current)|
 
-```
  - 最新の gcc を使った方がより高速なコードになるようで、C++ の場合に特に効果が大きいです。
    
 ---
    
 #### binutils-2.34 をビルド
 
-```
+```bash
 cd
 tar xfvz binutils-2.34.tar.gz
 cd binutils-2.34
@@ -509,17 +458,17 @@ make install     OS-X,Linux: (sudo make install)
 
  -  /usr/local/rx-elf/bin へパスを通す（.bash_profile を編集して、パスを追加）
 
-```
+```bash
 PATH=$PATH:/usr/local/rx-elf/bin
 ```
 
  -  コンソールを開きなおす。
 
-```
+```bash
 rx-elf-as --version
 ```
    
-```
+```bash
 GNU assembler (GNU Binutils) 2.34
 Copyright (C) 2020 Free Software Foundation, Inc.
 This program is free software; you may redistribute it under the terms of
@@ -532,7 +481,7 @@ This assembler was configured for a target of `rx-elf'.
   
 #### C コンパイラをビルド
 
-```
+```bash
 cd
 tar xfvz gcc-7.5.0.tar.gz
 cd gcc-7.5.0
@@ -545,7 +494,7 @@ make install     OS-X,Linux: (sudo make install)
   
 #### newlib をビルド
 
-```
+```bash
 cd
 tar xfvz newlib-2.4.0.tar.gz
 cd newlib-2.4.0
@@ -557,7 +506,8 @@ make install     OS-X: (sudo make install)
 ```
  - Linux 環境では、sudo コマンドで、ローカルで設定した binutils のパスを認識しないので、
 「make install」が失敗します、その為、以下のようなスクリプトを書いて実行します。
-```
+
+```bash
 #!/bin/sh
 # file: rx_install.sh
 
@@ -565,14 +515,15 @@ PATH=${PATH}:/usr/local/rx-elf/bin
 make install
 ```
    
-```
+```bash
 sudo rx_install.sh
 ```
    
 ---
      
 #### C++ コンパイラをビルド
-```
+
+```bash
 cd
 cd gcc-7.5.0
 cd rx_build
@@ -587,10 +538,73 @@ make install     OS-X,Linux: (sudo make install)
 http://www.rvf-rc45.net/Renesas_GNU_Tools/ 
 
 ---
+
+### VSCode のインストールをお勧め
+
+- テキストエディターは、好みの問題があり、未だに古い手慣れた物を使っている人がいます
+- それが悪いとは言いませんが「最高」だとは言えないと思います
+- 新しい最新の環境は優れているものです（それを感じないのは、慣れの問題だと思います）
+- vi、emacs 派などは非常に嗜好が強いアプリケーションですが、拡張機能を導入する事で、ほぼ同じキーバインドに出来ます
+- C# や、Windows アプリのプログラミングで Visual Studio を好む人もいます
+- Unity の editor が最高だと言う人もいます
+- どれも、フリーで利用出来るアプリです
+- 自分は、vscode が色々な意味で優れていると感じますので、お勧めします
+- R8C/RL78/RX マイコンのフレームワークを使った開発では、ある程度インテリセンスが利き、便利です
+- github のアーカイブには、vscode の環境ファイルも含まれています
+- マークダウンをプレビューしたり、色々な拡張機能が豊富で、インストールも簡単です
+- MSYS2 のコンソールを直接ドッキングして操作する事が出来ます（make を直接実行できます）
+
+### git 関係コマンドは何を使うべきか？
+
+- windows に MSYS2 環境をインストールした場合、MSYS2 に git も入れると思います
+- ですが、それとは別に、「Git For Windows」もあります
+- MSYS2 の git と併用が可能です
+- MSYS2 に敢えて git を入れずに、Git For Windows をメインに使う事も考えられます
+- どの選択が正しいか、現在、まだ判断が出来ません、自分は併用しています
+- 併用した場合の注意として、クローンしたり新規に作成したリポジトリの操作は、統一する必要があります
+- クローンを MSYS2 で行い、コミットを Git For Windows で行うなどは決してやっては駄目です
+- Git For Windows をインストールすると、MSYS2 とは異なるコンソールも増えて多少複雑になります
+- vscode は git の存在が標準なので、vscode を使う場合、標準で、Git For Windows をインストールする必要もあります
+
+### MSYS2 環境の修正
+
+- 素の MSYS2 環境は、何かと使いづらい事もあるので、以下の修正を行うとより良く使えると思います。
+- 環境ファイルは、/c/msys64/home/ユーザー名 にあります。
+
+```
+Uranus-W10.~ % ls -a
+./  ../  .bash_history  .bash_logout  .bash_profile  .bashrc  .inputrc  .lesshst  .profile
+```
+
+- テキストファイルの修正は、最近では VSCode で行っています
+
+- .bashrc の修正
+- コメントの '#' を外して有効にします
    
+- ls コマンドの出力をカラー化する
+- 好みの環境を選択して下さい
+
+```bash
+# Some shortcuts for different directory listings
+alias ls='ls -hF --color=tty'                 # classify files in colour
+# alias dir='ls --color=auto --format=vertical'
+# alias vdir='ls --color=auto --format=long'
+# alias ll='ls -l'                              # long list
+# alias la='ls -A'                              # all but . and ..
+# alias l='ls -CF' 
+```
+
+- .bash_profile の末尾に追加する
+- カレントディレクトリが表示される
+
+```bash
+# prompt
+PS1='\h.\w % '
+```
+
 ## RX フレームワークのソースコードを取得
    
-```
+```bash
 git clone https://github.com/hirakuni45/RX.git
 ```
    
@@ -602,17 +616,23 @@ git clone https://github.com/hirakuni45/RX.git
 - この方法は MSYS2 環境の場合に発生します。
 - boost は、1.74.0 を使いますので、事前にダウンロード（D:￥Download へ配置）して下さい。（boost_1_74_0.tar.gz）
 
-```
+```bash
 cd /c/
 tar xfvz /d/Download/boost_1_74_0.tar.gz
 ```
    
 ## RX 全プロジェクトのビルド
    
+```bash
+sh all_project_build.sh
 ```
-sh all_project_build.sh [clean]
+
+クリーンしてビルド：
+```bash
+sh all_project_build.sh clean
+sh all_project_build.sh
 ```
-   
+
 --- 
    
 ## RX デバイスへのプログラム書き込み方法
@@ -655,7 +675,7 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
  - rxprog のビルド（MSYS2）
  - ビルドした実行ファイルは、/usr/local/bin に配置します。
 
-```
+```bash
 cd rxprog
 make
 make install

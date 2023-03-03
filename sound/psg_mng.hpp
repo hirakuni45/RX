@@ -179,7 +179,9 @@ namespace utils {
 			B_7,		///< B  シ
 			C_8,		///< C  ド
 
-			Q,		///< 休符
+			Q,			///< 休符
+
+			term		///< 終端
 		};
 
 
@@ -189,7 +191,7 @@ namespace utils {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CTRL : uint8_t {
-			TR = 89,	///< (2) トランスポーズ, num(-88 ~ 0 ~ 88)
+			TR = static_cast<uint8_t>(KEY::term),	///< (2) トランスポーズ, num(-88 ~ 0 ~ 88)
 			SQ25,		///< (1) 波形 SQ25
 			SQ50,		///< (1) 波形 SQ50
 			SQ75,		///< (1) 波形 SQ75
@@ -199,8 +201,19 @@ namespace utils {
 			FADE_SPEED,	///< (2) フェード速度, num(0 ~ 255)
 			TEMPO,		///< (2) テンポ, num(1 ~ 255)
 			FOR,		///< (2) ループ開始, num(1 ~ 255)
+			ATTACK,		///< (2) 音のアタック, gain(0 ~ 255)
+			CHOUT,		///< (2) 文字出力, char（楽譜のデバッグ用に文字を出力）
+			RELEASE,	///< (3) 音のリリース, release_frame(n), gain(0 ~ 255)
 			BEFORE,		///< (1) ループ終了
 			END,		///< (1) 終了
+			SBRM0,		///< (1) サブルーチン０マーカー
+			SBRM1,		///< (1) サブルーチン１マーカー
+			SBRM2,		///< (1) サブルーチン２マーカー
+			SBRM3,		///< (1) サブルーチン３マーカー
+			SBRM4,		///< (1) サブルーチン４マーカー
+			SBRM5,		///< (1) サブルーチン５マーカー
+			SBRM6,		///< (1) サブルーチン６マーカー
+			SBRM7,		///< (1) サブルーチン７マーカー
 			CALL0,		///< (1) サブルーチンコール０
 			CALL1,		///< (1) サブルーチンコール１
 			CALL2,		///< (1) サブルーチンコール２
@@ -211,11 +224,17 @@ namespace utils {
 			CALL7,		///< (1) サブルーチンコール７
 			RET,		///< (1) サブルーチンコールから復帰
 			REPEAT,		///< (1) リピート
-			ATTACK,		///< (2) 音のアタック, gain(0 ~ 255)
-			RELEASE,	///< (3) 音のリリース, release_frame(n), gain(0 ~ 255)
-			CHOUT,		///< (2) 文字出力, char（楽譜のデバッグ用に文字を出力）
 		};
 
+		static constexpr const uint8_t CTRL_BYTE[] = {
+			1, 1, 1, 1,
+			2, 2, 2, 2, 2, 2, 2,
+			3,
+			1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1
+		};
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -251,7 +270,7 @@ namespace utils {
 	class psg_mng : public psg_base {
 
 		// 12 平均音階率の計算： 6 オクターブ（3520Hz）を基底にする。
-		// 2^(1/12) の定数、１２乗すると２倍（１オクターブ上がる）となる。
+		// 2^(1/12) の定数、１２乗すると２（１オクターブ上がる）となる。
 		static constexpr uint16_t key_tbl_[12] = {
 			static_cast<uint16_t>((3520 * 65536.0 * 1.000000000) / SAMPLE),  ///< A  ラ
 			static_cast<uint16_t>((3520 * 65536.0 * 1.059463094) / SAMPLE),  ///< A#
@@ -280,6 +299,45 @@ namespace utils {
 		};
 		share_t		share_;
 
+	public:
+		static constexpr uint16_t count_sub_score(const SCORE* top, uint32_t len)
+		{
+			if(top == nullptr || len == 0) {
+				return 0;
+			}
+			uint16_t n = 0;
+			uint32_t pos = 0;
+			while(pos < len) {
+				auto k = top[pos].key;
+				if(k < KEY::term) {
+					pos += 2;
+				} else {
+					auto ctrl = top[pos].len - static_cast<uint8_t>(KEY::term);
+					if(ctrl < sizeof(CTRL_BYTE)) {
+						switch(top[pos].ctrl) {
+						case CTRL::SBRM0:
+						case CTRL::SBRM1:
+						case CTRL::SBRM2:
+						case CTRL::SBRM3:
+						case CTRL::SBRM4:
+						case CTRL::SBRM5:
+						case CTRL::SBRM6:
+						case CTRL::SBRM7:
+							++n;
+							break;
+						default:
+							break;
+						}
+						pos += CTRL_BYTE[ctrl];
+					} else {
+						++pos;
+					}
+				}
+			}
+			return n;
+		}
+
+	private:
 		struct stack_t {
 			const SCORE*	org_;
 			uint16_t		pos_;
@@ -424,7 +482,7 @@ namespace utils {
 
 				auto v = score_org_[score_pos_];
 				++score_pos_;
-				if(v.len < 88) {
+				if(v.key < KEY::Q) {
 					v.len += tr_;
 					if(v.len >= 0x80) v.len = 0;
 					else if(v.len >= 88) v.len = 87;
@@ -440,7 +498,7 @@ namespace utils {
 					rel_count_ = (count_ / tempo_) - rel_frame_;
 					env_cycle_ = 0;
 					return true;
-				} else if(v.len == 88) {  // 休符
+				} else if(v.key == KEY::Q) {  // 休符
 					spd_ = 0;
 					acc_ = 0;
 					env_ = 0;

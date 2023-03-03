@@ -8,6 +8,7 @@ Renesas RX Microcontroller
    
 This is a program by Renesas RX microcontroller and its compiler rx-elf-gcc, g++.   
 I am currently using Renesas GNU-RX gcc 8.3.0 as my main development tool.   
+GNU-RX supports RXv3 and DFPU, and has excellent optimization.   
 
 Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
 Development is now possible in multiple environments.   
@@ -15,25 +16,43 @@ Development is now possible in multiple environments.
 Currently supported and tested devices:   
 |Series|Core|FPU|DFPU|Operation check|rx_prog supports|Linker file|
 |---|:-:|:-:|:-:|:-:|:-:|---|
-|RX220|RXv1|No|-|〇|〇|R5F52206|
-|RX631|RXv1|Yes|-|－|〇|R5F5631F|
-|RX63N|RXv1|Yes|-|－|〇|R5F563NE|
-|RX63T|RXv1|Yes|-|〇|〇|R5F563T6|
-|RX621|RXv1|Yes|-|〇|〇|R5F56218|
-|RX62N|RXv1|Yes|-|〇|〇|R5F562N7|
-|RX62N|RXv1|Yes|-|〇|〇|R5F562N8|
-|RX24T|RXv2|Yes|-|〇|〇|R5F524T8/A|
-|RX64M|RXv2|Yes|-|〇|〇|R5F564MF/G/J/L|
-|RX71M|RXv2|Yes|-|〇|〇|R5F571MF/G/J/L|
-|RX651/RX65N|RXv2|Yes|-|〇|〇|R5F565NE|
-|RX66T|RXv3|Yes|-|〇|〇|R5F566TA/E/F/K|
-|RX72T|RXv3|Yes|-|〇|〇|R5F572TF/K|
+|RX220|RXv1|No|－|〇|〇|R5F52206|
+|RX631|RXv1|Yes|－|－|〇|R5F5631F|
+|RX63N|RXv1|Yes|－|－|〇|R5F563NE|
+|RX63T|RXv1|Yes|－|〇|〇|R5F563T6|
+|RX621|RXv1|Yes|－|〇|〇|R5F56218|
+|RX62N|RXv1|Yes|－|〇|〇|R5F562N7|
+|RX62N|RXv1|Yes|－|〇|〇|R5F562N8|
+|RX24T|RXv2|Yes|－|〇|〇|R5F524T8/A|
+|RX64M|RXv2|Yes|－|〇|〇|R5F564MF/G/J/L|
+|RX71M|RXv2|Yes|－|〇|〇|R5F571MF/G/J/L|
+|RX651/RX65N|RXv2|Yes|－|〇|〇|R5F565NE|
+|RX66T|RXv3|Yes|－|〇|〇|R5F566TA/E/F/K|
+|RX72T|RXv3|Yes|－|〇|〇|R5F572TF/K|
 |RX72N|RXv3|Yes|Yes|〇|〇|R5F572ND/N|
 |RX72M|RXv3|Yes|Yes|－|△|R5F572MD/N|
     
 - The directory structure is updated daily.
 - Some features are still under construction.
-   
+- The project consists of a Makefile and related headers and source code, and includes dedicated startup routines and linker scripts.
+
+---
+**Please make a request if you want us to support other RX devices. (Conditions below)**
+- Become a support member of hirakuni45 GitHub.
+- Lend us a board with the RX microcontroller you are requesting support for.
+- You agree to release newly added files related to the RX microcontroller under the MIT license.
+
+**If you do not know how to use the framework
+- Create a GitHub account and post in Discussions.
+- You can also become a support member to get extensive support.
+
+**If you have a problem with the framework or need a fix**, please create a Github account and post a note in Discussions.
+- Create a Github account and post in Issues.
+- If you have a modification request, post it in Discussions.
+- If you have a pull request, please write the contents in Issues and Discussions in advance.
+
+---
+
 <img src="docs/RTK5_side.jpg" width="40%"> <img src="docs/NES_001.jpg" width="40%">   
 Space Invaders Emulator, NES Emulator, for RX65N/RX72N Envision kit   
 <img src="docs/AudioPlayer.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
@@ -112,7 +131,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 ---
 
-### Sample Projects (Applications)
+## Sample Projects (Applications)
 
 |Directory|RX63T|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|Contents|
 |---------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
@@ -178,6 +197,14 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 ---
 
+### gui directory
+
+- GUI Widget Classes
+
+[gui](./gui) See also
+
+---
+
 ### sound directory
 
  - Classes related to sound
@@ -232,9 +259,11 @@ All projects using the C++ framework published here are compileable.
 
 They are also providing support.（CyberTHOR Studios Limited）   
 
-To use this tool, install the toolchain and add ".bash_profile Set the command path to   
+To use this tool from MSYS2, set the command path to ".bash_profile" after installing the toolchain.   
+When compiling open source libraries, etc., there is a problem with path strings containing "spaces" or 2-byte codes.   
+To avoid this problem, it is recommended to copy the directory to "/usr/local" and use that path.   
 
-```
+```bash
 # rx-elf path
 # PATH=$PATH:/usr/local/rx-elf/bin
 PATH=$PATH:/C/'Program Files (x86)'/'GCC for Renesas RX 8.3.0.202002-GNURX-ELF'/rx-elf/rx-elf/bin
@@ -253,11 +282,11 @@ In terms of compiler optimization, CC-RX seems to be superior to GNU-RX in the C
 It's hard to imagine why such a big difference would occur, but if you know the internal structure of the CPU, you might be able to achieve it...   
    
 |Compiler|RX core|CoreMark (MHz)|Rate|
-|---------|------|--------------|---|
-|CC-RX (V3.02)|RX72N|5.21|1|
+|---|:-:|:-:|:-:|
+|CC-RX (V3.02)|RX72N|5.21|1.00|
 |GNU-RX (8.3.x)|RX72N|3.59|0.69|
 |||||
-|CC-RX (V3.02)|RX65N|4.37|1|
+|CC-RX (V3.02)|RX65N|4.37|1.00|
 |GNU-RX (8.3.x)|RX65N|3.22|0.74|
    
 The above values are quite exciting, but when running actual applications, we do not feel such a big difference in sensory perception.   
@@ -280,21 +309,22 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
 1. The GCC build may take an unusually long time or may fail to build.   
 
  - MSYS2 upgrade
-```
+
+```bash
    pacman -Sy pacman
    pacman -Syu
 ```
    
 - Open the console again. (You should see a message as you reopen the console)   
    
-```
+```bash
    pacman -Su
 ```
 - The update is done multiple times, then follow the instructions on the console.
 - You need to reopen the console several times.
 
 - Install gcc, texinfo, gmp, mpfr, mpc, diffutils, automake, zlib, tar, make, unzip, git commands etc
-```
+```bash
    pacman -S gcc
    pacman -S texinfo
    pacman -S mpc-devel
@@ -315,13 +345,13 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
   brew is not recommended because it has less flexibility   
 - Depending on the version of OS-X, you may need to install X-Code, Command Line Tools, etc. in advance   
  - macports upgrade   
-```
+```bash
    sudo port -d self update
 ```
 - As you probably know, in the early stage of OS-X, llvm starts by calling gcc.
 - However, llvm can not currently build gcc cross compilers.
 - So, I will install gcc on macports, I will use the 5 series version.
-```
+```bash
    sudo port install gcc5
    sudo ln -sf /opt/local/bin/gcc-mp-5  /usr/local/bin/gcc
    sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/g++
@@ -329,11 +359,11 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
 ```
 - You may need to reboot.
 - For now, please check.
-```
+```bash
    gcc --version
 ```
    
-```
+```bash
    gcc (MacPorts gcc5 5.4.0_0) 5.4.0
    Copyright (C) 2015 Free Software Foundation, Inc.
    This is free software; see the source for copying conditions.  There is NO
@@ -341,7 +371,7 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
 ```
    
  - Install texinfo, gmp, mpfr, mpc, diffutils, automake command etc
-```
+```bash
    sudo port install texinfo
    sudo port install gmp
    sudo port install mpfr
@@ -356,7 +386,7 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
 - There are multiple Linux environments, so here we will write the case for the "Ubuntu 16.04 LTS" environment.
    
 - Install texinfo, gmp, mpfr, mpc, diffutils, automake command etc
-```
+```bash
    sudo apt-get install texinfo
    sudo apt-get install libgmp-dev
    sudo apt-get install libmpfr-dev
@@ -392,7 +422,7 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
    
 ---
 #### build binutils-2.34
-```
+```bash
    cd
    tar xfvz binutils-2.34.tar.gz
    cd binutils-2.34
@@ -405,20 +435,20 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
 
 -  Pass PATH to /usr/local/rx-elf/bin (edit .bash_profile and add path)
 
-```
+```bash
    PATH=$PATH:/usr/local/rx-elf/bin
 ```
 
 - Open the console again.
 
-```
+```bash
    rx-elf-as --version
 ```
 
 - Execute the assembler command and check if the path is valid.
   
 #### Build C compiler
-```
+```bash
     cd
     tar xfvz gcc-7.5.0.tar.gz
     cd gcc-7.5.0
@@ -430,7 +460,7 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
 ```
   
 #### Build newlib
-```
+```bash
     cd
     tar xfvz newlib-2.4.0.tar.gz
 	cd newlib-2.4.0
@@ -442,7 +472,7 @@ In addition, the above benchmarks are based on CoreMark, so you need to evaluate
 ```
 - In Linux environment, sudo command does not recognize the path of binutils set up locally.
 "Make install" will fail, so write the following script and execute it.
-```
+```bash
 #!/bin/sh
 # file: rx_install.sh
 
@@ -450,12 +480,12 @@ PATH=${PATH}:/usr/local/rx-elf/bin
 make install
 ```
    
-```
+```bash
     sudo rx_install.sh
 ```
    
 #### Build C++ compiler
-```
+```bash
     cd
     cd gcc-7.5.0
     cd rx_build
@@ -470,21 +500,27 @@ http://www.rvf-rc45.net/Renesas_GNU_Tools/
 
 ---
 ## Get RX Framework Source Code
-```
+```bash
     git clone https://github.com/hirakuni45/RX.git
 ```
    
 ---
 ### Boost installation used by RX framework
+
+- In the past, boost was installed for mingw64 using pacman in the MSYS2 environment.
+- However, as the version of boost advanced, we found that this boost caused problems.
+- Therefore, we put the boost archive in the proper location and handle it.
+- This method is used in the MSYS2 environment.
+- Since boost uses 1.74.0, please download it in advance (place it in D:³ Download). (boost_1_74_0.tar.gz)
+
+```bash
+cd /c/
+tar xfvz /d/Download/boost_1_74_0.tar.gz
 ```
-    pacman -S mingw-w64-x86_64-boost   (for MSYS2)
-    sudo port install boost   (for OS-X)
-    sudo apt-get install boost    (for Linux)
-```
-   
+
 ---
 ## RX Build all projects
-```
+```bash
     sh all_project_build.sh [clean]
 ```
 --- 
@@ -524,7 +560,7 @@ The most common, because not all RX microcontrollers have built-in USB interface
 - Build rxprog in MSYS2 environment.
 - Copy the built executable file to "/usr/local/bin".
 - Pass the PATH to /usr/local/bin.
-```
+```bash
     cd rxprog
     make
     make install
@@ -565,8 +601,6 @@ speed_linux = 230400
 ## Development using Renesus RX72N Envision Kit
 <img src="docs/rx72n-envision-kit.jpg" width="50%">
 <img src="docs/rx72n-envision-kit-board.jpg" width="80%">
-   
-
    
 ---
 ## Programming environment using C++ framework
