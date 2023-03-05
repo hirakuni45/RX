@@ -349,7 +349,6 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B14>	OPE;
-
 			bit_rw_t<io_, bitpos::B15>	SSBY;
 		};
 		typedef sbycr_t<0x0008'000C> SBYCR_;
