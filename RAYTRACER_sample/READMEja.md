@@ -1,4 +1,4 @@
-Renesas RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N レイトレーサーサンプル
+Renesas RX62N, RX631, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N レイトレーサーサンプル
 =========
    
 [Japanese](READMEja.md)
@@ -17,6 +17,7 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - main.cpp
 - raytracer.hpp
 - RX62N/Makefile
+- RX631/Makefile
 - RX24T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
@@ -28,7 +29,9 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 ## ハードウェアーの準備（全般）
 - ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
 - Makefile で、各モジュール別の設定周波数を宣言している。
+- RX62N:  96MHz (12MHz)
 - RX24T:  80MHz (10MHz)
+- RX631:  96MHz (12MHz)
 - RX64M: 120MHz (12MHz)
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
@@ -71,6 +74,7 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 |マイコン|core|FPU|fsqrt 命令|周波数 [MHz]|描画方式|時間 [ms]|
 |-------|:---:|:---:|:---:|:---:|-----|:---:|
 |RX62N  |RXv1|O|X|96  |8 bits, port-bus |1860 |
+|RX631  |RXv1|O|X|96  |8 bits, port-bus |1868 |
 |RX24T  |RXv2|O|O|80  |8 bits, port-bus |1224 |
 |RX65N  |RXv2|O|O|120 |Frame Memory     |784  |
 |RX64M  |RXv2|O|O|120 |16 bits, port-bus|751  |

@@ -16,6 +16,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - main.cpp
 - RX220/Makefile (AE-RX220)
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
+- RX631/Makefile (GR-CITRUS)
 - RX63T/Makefile
 - RX24T/Makefile
 - RX66T/Makefile
@@ -45,10 +46,6 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 	// P03 に LED を吸い込みで接続する事を想定している。
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-#elif defined(SIG_RX63T)
-	// DIY RX63T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX62N)
 	// BlueBoard-RX62N_100pin
 	static constexpr bool LED_ACTIVE = 0;
@@ -57,6 +54,14 @@ RX マイコンを使った LED 点滅のサンプルプログラム
   #else
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
   #endif
+#elif defined(SIG_RX631)
+	// RX631 GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+#elif defined(SIG_RX63T)
+	// DIY RX63T board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX24T)
 	// DIY RX24T board
 	static constexpr bool LED_ACTIVE = 0;
@@ -94,6 +99,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 
  - BlueBoard-RX62N_100pin の場合、ボード上の D2 LED を利用する。（赤色） 
  - FRK-RX62N の場合、ボード上の LED1 を利用する。（黄色） 
+ - GR-CITRUS の場合、ボード上 LED1 を利用する。（赤色）
  - Envision kit RX65N の場合、インジケーター LED はボード上の青色 LED を利用する。
  - Envision kit RX72N の場合、インジケーター LED はボード上の青色 LED を利用する。
  - 他ボードでは、'LED' の 'typedef' で示されたポートに LED を接続するか、LED が接続されたポートを 'typedef' する。
