@@ -17,10 +17,11 @@ The code is basically for gcc.
 
 ---
 
-## About the RX24T heap size
+## About the RX24T, RX220 heap size
 
-There is a project for the RX24T, but be aware that the RX24T's internal memory is small, so be careful when using it in practice.   
-The size can be changed in the RX24T/Makefile's environment variable settings.   
+- There is a project for the RX24T, but be aware that the RX24T,RX220's internal memory is small, so be careful when using it in practice.   
+- The size can be changed in the RX220/Makefile's environment variable settings.   
+- The size can be changed in the RX24T/Makefile's environment variable settings.   
 　　　
 ```
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( RTOS_HEAP_SIZE * 1024 ) )
@@ -39,7 +40,9 @@ Other microcontrollers use malloc/free memory allocation, so memory is allocated
 - READMEja.md
 - README.md
 - Source (FreeRTOS Kernel sources)
+- [RX220/Makefile](RX220/Makefile)
 - [RX62N/Makefile](RX62N/Makefile)
+- [RX631/Makefile](RX631/Makefile)
 - [RX24T/Makefile](RX24T/Makefile)
 - [RX64M/Makefile](RX64M/Makefile)
 - [RX71M/Makefile](RX71M/Makefile)
@@ -144,19 +147,6 @@ I think this 32-bit transfer is a bad idea because it violates the precautions i
 It may be a structural problem with the RX microcomputer, so it may make sense to do so.   
 I've asked this question before, but I haven't gotten a clear answer as to why it's happening.   
    
----
-   
-## CPU Clock Settings
-
-In FreeRTOSConfig.h, there is a CPU clock setting, There are changes, as follows   
-It depends on the clock frequency set by Makefile.   
-By this modification, even different CPUs can share the source code by giving the compile time constant.    
-   
-```
-#define configCPU_CLOCK_HZ             ( F_ICLK )
-#define configPERIPHERAL_CLOCK_HZ      ( F_PCLKB )
-```
-
 ---
 
 ## Sample Programs
