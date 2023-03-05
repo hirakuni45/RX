@@ -5,7 +5,7 @@
 			ROM 領域、100MHz、ノーウェイトアクセス @n
 			RAM 領域、100MHz、ノーウェイトアクセス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -55,6 +55,8 @@ namespace device {
 
 		static constexpr bool check_pll_base_() noexcept
 		{
+			if(OSCT == clock_profile::OSC_TYPE::HOCO) return true;
+
 			if(clock_profile::PLL_BASE <= 104'000'000) return false;
 			if(clock_profile::PLL_BASE >= 200'000'000) return false;
 			bool ok = false;
@@ -121,14 +123,17 @@ namespace device {
 				return;
 			}
 
-			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC0.b();
+			device::SYSTEM::PRCR = device::SYSTEM::PRCR.PRKEY.b(0xA5) | device::SYSTEM::PRCR.PRC0.b(1) | device::SYSTEM::PRCR.PRC1.b(1);
 
 			// メインクロック強制発振とドライブ能力設定
 			switch(OSCT) {
 			case clock_profile::OSC_TYPE::XTAL:
 				device::SYSTEM::MOSCWTCR = 13;  // for 12MHz OSC
 				device::SYSTEM::PLLWTCR = 9;  // for 12MHz OSC
-
+				device::SYSTEM::MOFCR.MOFXIN = 1;
+				while(device::SYSTEM::MOFCR.MOFXIN() == 0) {  // 「1」に書き換えた事を確認
+					asm("nop");
+				}
 				device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
 				while(device::SYSTEM::MOSCCR.MOSTP() != 0) {  // 「0」に書き換えた事を確認
 					asm("nop");
@@ -148,10 +153,12 @@ namespace device {
 				break;
 			}
 
-			uint32_t n = clock_profile::PLL_BASE / clock_profile::BASE;
-			device::SYSTEM::PLLCR.STC = n - 1;
-			device::SYSTEM::PLLCR2.PLLEN = 0; // PLL 動作
-			utils::delay::loop(1500);  // PLL 起動待ち(CPU speed: LOCO: 125KHz)
+			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
+				uint32_t n = clock_profile::PLL_BASE / clock_profile::BASE;
+				device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.STC.b(n - 1) | device::SYSTEM::PLLCR.PLIDIV.b(0b00);
+				device::SYSTEM::PLLCR2 = device::SYSTEM::PLLCR2.PLLEN.b(0);
+				utils::delay::loop(1500);
+			}
 
 			// 1/64 以上、分周出来ない設定は不可
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
@@ -164,18 +171,13 @@ namespace device {
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
 								  | device::SYSTEM::SCKCR.BCK.b(clock_div_(clock_profile::BCLK))
 								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
-								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB));
+								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
+								  | 0b0001'0001;
 
 			static_assert(usb_div_() >= 2 && usb_div_() <= 5, "USB Clock can't divided.");
 			// 1/2:0b0001, 1/3:0b0010, 1/4:0b0011, 1/5:0b0100
-			device::SYSTEM::SCKCR2.UCK = usb_div_() - 1;
-
-			device::SYSTEM::SCKCR3.CKSEL = 0b100;   // PLL 選択
-
-			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
-				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
-				device::SYSTEM::HOCOPCR.HOCOPCNT = 1;	// HOCO 電源 OFF
-			}
+			device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(usb_div_() - 1)
+								   | device::SYSTEM::SCKCR2.IEBCK.b(clock_div_(clock_profile::IECLK));
 
 			if(clock_profile::PACK == clock_profile::PACKAGE::MINI) {
 				device::SYSTEM::SOSCWTCR = 0b01100;
@@ -184,7 +186,21 @@ namespace device {
 			}
 			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
 
-			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
+			switch(OSCT) {
+			case clock_profile::OSC_TYPE::XTAL:
+				device::SYSTEM::SCKCR3 = device::SYSTEM::SCKCR3.CKSEL.b(0b100);
+			case clock_profile::OSC_TYPE::EXT:
+				device::SYSTEM::LOCOCR.LCSTP = 1;  		// 低速オンチップオシレータ停止
+				device::SYSTEM::HOCOPCR.HOCOPCNT = 1;	// HOCO 電源 OFF
+				break;
+			case clock_profile::OSC_TYPE::HOCO:
+				device::SYSTEM::SCKCR3 = device::SYSTEM::SCKCR3.CKSEL.b(0b001);
+				break;
+			default:
+				break;
+			}
+
+			device::SYSTEM::PRCR = device::SYSTEM::PRCR.PRKEY.b(0xA5);	// クロック関係書き込み不許可
 		}
 	};
 

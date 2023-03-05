@@ -17,7 +17,7 @@ Currently supported and tested devices:
 |Series|Core|FPU|DFPU|Operation check|rx_prog supports|Linker file|
 |---|:-:|:-:|:-:|:-:|:-:|---|
 |RX220|RXv1|No|－|〇|〇|R5F52206|
-|RX631|RXv1|Yes|－|－|〇|R5F5631F|
+|RX631|RXv1|Yes|－|〇|〇|R5F5631F|
 |RX63N|RXv1|Yes|－|－|〇|R5F563NE|
 |RX63T|RXv1|Yes|－|〇|〇|R5F563T6|
 |RX621|RXv1|Yes|－|〇|〇|R5F56218|

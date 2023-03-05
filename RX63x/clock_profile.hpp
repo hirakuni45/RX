@@ -52,10 +52,10 @@ namespace device {
 
 
 		static constexpr PACKAGE	PACK		= PACKAGE::LARGE;	///< パッケージの種別
-
+#if 1
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
 
-		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
+		static constexpr bool		TURN_SBC	= true;				///< サブクロックを利用する場合「true」
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
 		static constexpr uint32_t	BASE		=  12'000'000;		///< 外部接続クリスタル
@@ -66,8 +66,24 @@ namespace device {
 		static constexpr uint32_t	PCLKB		=  48'000'000;		///< PCLKB 周波数（最大50MHz）
 		static constexpr uint32_t	FCLK		=  48'000'000;		///< FCLK 周波数（最大50MHz）
 		static constexpr uint32_t	BCLK		=  48'000'000;		///< BCLK 周波数（最大100MHz）
+#else
+		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::HOCO;	///< 発信器種別型
 
-		static constexpr uint32_t	DELAY_MS	= ICLK / 4285714;	///< ソフトウェアー遅延における定数（1マイクロ秒）
-		static constexpr bool		DELAY_T1	= false;			///< 微調整として、「nop」を１つ追加
+		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
+		static constexpr bool       TURN_USB    = false;			///< USB を使う場合「true」
+
+		static constexpr uint32_t	BASE		=  50'000'000;		///< 外部接続クリスタル
+		static constexpr uint32_t	PLL_BASE	=  50'000'000;		///< PLL ベースクロック（104MHz ～ 200MHz）
+
+		static constexpr uint32_t	ICLK		=  50'000'000;		///< ICLK 周波数（最大100MHz）
+		static constexpr uint32_t	PCLKA		=  50'000'000;		///< PCLKA 周波数（最大100MHz）
+		static constexpr uint32_t	PCLKB		=  50'000'000;		///< PCLKB 周波数（最大50MHz）
+		static constexpr uint32_t	FCLK		=  50'000'000;		///< FCLK 周波数（最大50MHz）
+		static constexpr uint32_t	BCLK		=  50'000'000;		///< BCLK 周波数（最大100MHz）
+#endif
+		static constexpr uint32_t	IECLK		=  50'000'000;		///< IECLK 周波数（最大50MHz）
+
+		static constexpr uint32_t	DELAY_MS	= ICLK / 5333333;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr bool		DELAY_T1	= true;				///< 微調整として、「nop」を１つ追加
     };
 }

@@ -30,6 +30,7 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
  - string_utils.hpp
  - Makefile
  - rx_prog.conf
+ - USB_CP2102N ---> KiCAD CP2102N USB シリアルボードプロジェクト（回路図、PCB トラック、ガーバー）
    
 ---
 ## ビルド（コンパイル）環境の準備（Windows）
@@ -37,18 +38,19 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
  - gcc 関係のインストール
  - boost は、1.74.0 を使いますので、事前にダウンロード（D:￥Download へ配置）して下さい。（boost_1_74_0.tar.gz）
  - C ドライブのルートに展開します
+ - 以前は、MSYS2 pacman で mingw64 環境用をインストールしていましたが、最新バージョンで問題が発生する為
 
 ```
 cd /c/
 tar xfvz /d/Download/boost_1_74_0.tar.gz
 ```
    
-RX/README.md、RX/READMEja.md の開発環境準備を参照
+- RX/READMEja.md の開発環境準備を参照
    
 ---
 ## ビルド方法、環境設定
  - make する
- - make install により、設定ファイルと実行ファイルをコピー
+ - make install により、設定ファイルと実行ファイルをコピー (/usr/local/bin)
  - /usr/local/bin にパスを通す
    
 ---
@@ -145,7 +147,7 @@ RX/README.md、RX/READMEja.md の開発環境準備を参照
 ### rx_prog の起動確認
  - rx_prog を実行して、動作する事を確認（help がリストされる）
 ```
-rx_prog
+% rx_prog
 Renesas RX Series Programmer Version 1.50
 Copyright (C) 2016, 2022 Hiramatsu Kunihito (hira@rvf-rc45.net)
 usage:
@@ -165,6 +167,76 @@ Options :
     --verbose                  Verbose output
     -h, --help                 Display this
 ```
+
+### -P PORT (--port=PORT)
+
+- 通信ポートを指定する場合
+- rx_prog.conf ファイルでも指定可能
+- rx_prog.conf では、異なった環境で共有出来るようにする為、Windows、OS-X、Linux で異なるポートを指定可能
+
+conf ファイルで指定する場合：
+```
+#port = /dev/ttyS10
+#port = COM12
+```
+
+環境毎の異なった設定：
+```
+port_win   = COM7
+port_osx   = /dev/tty.usbserial-DA00X2QP
+port_linux = /dev/ttyUSB0
+```
+
+### -s SPEED (--speed=SPEED)
+
+- シリアル通信の最大速度を指定
+- RX デバイスにより、最大速度が制限される場合がある
+- 環境によって、設定可能な最大速度が異なる
+- rx_prog.conf ファイルでも指定可能
+- rx_prog.conf では、異なった環境で共有出来るようにする為、Windows、OS-X、Linux で異なるポートを指定可能
+
+設定可能な通信速度：
+- 19200
+- 38400
+- 57600
+- 115200
+- 230400 (RX220, RX621, RX62N では設定しても、115200 に制限される)
+
+### -d DEVICE (--device==DEVICE)
+
+- RX マイコン名の設定（RX24T, RX621, RX62N, RX631, RX63N, RX63T, RX64M, RX71M, RX651, RX65N, RX66T, RX72T, RX220）
+- RX621, RX62N, RX220 RX631, RX63N, RX63T では、conf ファイル中で、分周器定数を指定する必要がある
+
+RX621 の場合（divide_sys, divide_ext）：
+```
+R5F56217 {
+	group = "RX621"
+	clock = 1200
+	divide_sys = 8
+	divide_ext = 4
+	rom = 384K
+	ram = 64K
+	data = 32K
+	comment = "; RX621 Flash:384K DataFlash:32K RAM:64K"
+	rom-area  = FFFA0000,FFFFFFFF
+	data-area = 00100000,00107FFF
+	ram-area  = 00000000,0000FFFF
+}
+```
+
+### --progress
+
+- プログレス表示（キャラクターによる進捗状況表示）を行う
+
+### --erase-page-wait
+
+- イレース・ページ発行後の遅延時間（マイクロ秒）
+- 標準では、２ミリ秒（２０００マイクロ秒）が設定
+
+### --write-page-wait
+
+- ライト・ページ発行語の遅延時間（マイクロ秒）
+- 標準では、５ミリ秒（５０００マイクロ秒）が設定
 
 ### --erase コマンドの有無
 
@@ -261,6 +333,16 @@ R5F572TK (RX72T): Program-Flash: 1024K, RAM:  128K, Data-Flash: 32K
 R5F572ND (RX72N): Program-Flash: 2048K, RAM: 1024K, Data-Flash: 32K
 R5F572NN (RX72N): Program-Flash: 4096K, RAM: 1024K, Data-Flash: 32K
 ```
+
+---
+
+### 現在の実装依存
+
+- 現在の実装では、rx_prog.conf に定義された、デバイス情報プロファイルは、フラッシュプログラム時に参照されたり、評価される仕組みを実装していません。
+- 将来の拡張用です。
+- 「clock、divide_sys、divide_ext」など、接続に必要な情報は、最初にマッチしたグループデバイスのプロファイルが利用されます。
+- 本来、接続時に取得した、デバイス TYP に沿ったデバイスプロファイルを利用すべきですが、その実装がされていません。
+- 同じグループで、ハードウェアー仕様が異なるデバイスがあり、rx_prog.conf に異なる定義を行っても、反映されませんので注意が必要です。
 
 ---
 

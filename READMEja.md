@@ -16,18 +16,22 @@ Renesas RX Microcontroller
 現在サポートされ、動作確認済みデバイス：   
 |シリーズ|コア|FPU|DFPU|動作確認|ペリフェラルクラス|rx_prog サポート|リンカーファイル|
 |---|:-:|:-:|:-:|:-:|:-:|:-:|---|
-|RX220|RXv1|No|－|〇|〇|〇|R5F52206|
-|RX631/RX63N|RXv1|Yes|－|－|〇|〇|R5F5631F/NE|
-|RX63T|RXv1|Yes|－|〇|〇|〇|R5F563T6|
-|RX621/RX62N|RXv1|Yes|－|〇|〇|〇|R5F562N7/8|
-|RX24T|RXv2|Yes|－|〇|〇|〇|R5F524T8/A|
-|RX64M|RXv2|Yes|－|〇|〇|〇|R5F564MF/G/J/L|
-|RX71M|RXv2|Yes|－|〇|〇|〇|R5F571MF/G/J/L|
-|RX651/RX65N|RXv2|Yes|－|〇|〇|〇|R5F565NE|
-|RX66T|RXv3|Yes|－|〇|〇|〇|R5F566TA/E/F/K|
-|RX72T|RXv3|Yes|－|〇|〇|〇|R5F572TF/K|
-|RX72N|RXv3|Yes|Yes|〇|〇|〇|R5F572ND/N|
-|RX72M|RXv3|Yes|Yes|－|△|△|R5F572MD/N|
+|---|:-:|:-:|:-:|:-:|:-:|---|
+|RX220|RXv1|No|－|〇|〇|R5F52206|
+|RX631|RXv1|Yes|－|〇|〇|R5F5631F|
+|RX63N|RXv1|Yes|－|－|〇|R5F563NE|
+|RX63T|RXv1|Yes|－|〇|〇|R5F563T6|
+|RX621|RXv1|Yes|－|〇|〇|R5F56218|
+|RX62N|RXv1|Yes|－|〇|〇|R5F562N7|
+|RX62N|RXv1|Yes|－|〇|〇|R5F562N8|
+|RX24T|RXv2|Yes|－|〇|〇|R5F524T8/A|
+|RX64M|RXv2|Yes|－|〇|〇|R5F564MF/G/J/L|
+|RX71M|RXv2|Yes|－|〇|〇|R5F571MF/G/J/L|
+|RX651/RX65N|RXv2|Yes|－|〇|〇|R5F565NE|
+|RX66T|RXv3|Yes|－|〇|〇|R5F566TA/E/F/K|
+|RX72T|RXv3|Yes|－|〇|〇|R5F572TF/K|
+|RX72N|RXv3|Yes|Yes|〇|〇|R5F572ND/N|
+|RX72M|RXv3|Yes|Yes|－|△|R5F572MD/N|
     
 - ディレクトリー構成など日々アップデートしています。
 - 部分的に作業中な機能があったりします、サンプルの動作実績で確認して下さい。

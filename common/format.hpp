@@ -40,9 +40,10 @@
 			! 2022/07/13 14:45- %Ng の自動（Ｎの有効桁がある場合）フォーマットの対応。(V98) @n
 			! 2022/07/14 13:31- 内部処理で、’if’ 文 から 'switch' へ変更（速度改善？、見やすさに貢献）(V99) @n
 			! 2022/07/24 17:48- V99 で変更した処理の不具合、'%%' の処理 (V100) @n
-			! 2022/08/05 06:51- 出力ファンクタに対するフラッシュ要求 API (V101)
+			! 2022/08/05 06:51- 出力ファンクタに対するフラッシュ要求 API (V101) @n
+			! 2023/03/03 22:44- ポインター値の１６進表示を大文字にする。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -1008,17 +1009,21 @@ namespace utils {
 		}
 
 
+		// ポインター値の１６進表示（最近の実装では、大文字で表示）
 		void pointer_(const void* val) noexcept
 		{
-			auto v = reinterpret_cast<uint64_t>(val);
-			if(sizeof(val) > 4) {
-				zerosupp_ = true;
-				num_ = 8;
-				out_hex_(v >> 32, 'a');
-			}
 			zerosupp_ = true;
 			num_ = 8;
-			out_hex_(v, 'a');
+			if(sizeof(void*) > 4) {
+				auto v = reinterpret_cast<size_t>(val);
+				out_hex_(v >> (sizeof(size_t) << 2), 'A');
+				out_hex_(v, 'A');
+			} else {
+				if(sizeof(void*) < 4) {  // 8/16 ビットマイコンの場合
+					num_ = 4;
+				}
+				out_hex_(reinterpret_cast<size_t>(val), 'A');
+			}
 		}
 
 	public:
@@ -1266,7 +1271,7 @@ namespace utils {
 						error_ = error::over;
 					}
 				} else {
-					decimal_(static_cast<int32_t>(val), std::is_signed<T>::value);
+					decimal_(val, std::is_signed<T>::value);
 				}
 #ifndef NO_FLOAT_FORM
 			} else if(std::is_floating_point<T>::value) {
