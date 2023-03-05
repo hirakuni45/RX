@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX programmer クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -35,7 +35,7 @@ namespace rx {
 		using protocol_type = boost::variant<rx220::protocol, rx62x::protocol, rx63x::protocol, rx24t::protocol, rx64m::protocol, rx65x::protocol, rx66t::protocol, rx72t::protocol>;
 		protocol_type protocol_;
 
-		std::string out_section_(uint32_t n, uint32_t num) const {
+		std::string out_section_(uint32_t n, uint32_t num) const noexcept {
 			return (boost::format("#%02d/%02d: ") % n % num).str();
 		}
 
@@ -110,6 +110,17 @@ namespace rx {
 		};
 
 
+		struct get_area_visitor {
+			using result_type = void;
+			protocol::areas areas_;
+
+    		template <class T>
+    		void operator()(T& x) {
+				areas_ = x.get_area();
+			}
+		};
+
+
 		struct end_visitor {
 			using result_type = void;
 
@@ -125,7 +136,7 @@ namespace rx {
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		prog(bool verbose = false) : verbose_(verbose) { }
+		prog(bool verbose = false) noexcept : verbose_(verbose) { }
 
 
 		//-------------------------------------------------------------//
@@ -137,7 +148,7 @@ namespace rx {
 			@return エラー無ければ「true」
 		*/
 		//-------------------------------------------------------------//
-		bool start(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx)
+		bool start(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) noexcept
 		{
 			if(rx.cpu_type_ == "RX220") {
 				protocol_ = rx220::protocol();
@@ -179,7 +190,8 @@ namespace rx {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool erase_page(uint32_t adr) {
+		bool erase_page(uint32_t adr) noexcept
+		{
 			erase_page_visitor vis(adr);
            	if(!boost::apply_visitor(vis, protocol_)) {
 				end();
@@ -198,11 +210,12 @@ namespace rx {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool read_page(uint32_t adr, uint8_t* dst) {
+		bool read_page(uint32_t adr, uint8_t* dst) noexcept
+		{
 			read_page_visitor vis(adr, dst);
            	if(!boost::apply_visitor(vis, protocol_)) {
 				end();
-				std::cerr << "Read page error." << std::endl;
+				std::cerr << boost::format("Read page error: %08X") % adr << std::endl;
 				return false;
 			}
 			return true;
@@ -217,7 +230,8 @@ namespace rx {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool verify_page(uint32_t adr, const uint8_t* src) {
+		bool verify_page(uint32_t adr, const uint8_t* src) noexcept
+		{
 			uint8_t dev[256];
 			if(!read_page(adr, &dev[0])) {
 				return false;
@@ -249,7 +263,8 @@ namespace rx {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool start_write(bool data) {
+		bool start_write(bool data) noexcept
+		{
 			select_write_visitor vis(data);
            	if(!boost::apply_visitor(vis, protocol_)) {
 				end();
@@ -268,11 +283,12 @@ namespace rx {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool write(uint32_t adr, const uint8_t* src) {
+		bool write(uint32_t adr, const uint8_t* src) noexcept
+		{
 			write_visitor vis(adr, src);
            	if(!boost::apply_visitor(vis, protocol_)) {
 				end();
-				std::cerr << "Write body error." << std::endl;
+				std::cerr << boost::format("Write body error: %08X") % adr << std::endl;
 				return false;
 			}
 			return true;
@@ -285,8 +301,9 @@ namespace rx {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool final_write() {
-			write_visitor vis(0xffffffff, nullptr);
+		bool final_write() noexcept
+		{
+			write_visitor vis(0xffff'ffff, nullptr);
            	if(!boost::apply_visitor(vis, protocol_)) {
 				end();
 				std::cerr << "Write final error. (fin)" << std::endl;
@@ -298,10 +315,24 @@ namespace rx {
 
 		//-------------------------------------------------------------//
 		/*!
+			@brief	エリア情報の取得
+		*/
+		//-------------------------------------------------------------//
+		const protocol::areas get_area() const noexcept
+		{
+			get_area_visitor vis;
+			boost::apply_visitor(vis);
+			return vis.areas_;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
 			@brief	終了
 		*/
 		//-------------------------------------------------------------//
-		void end() {
+		void end() noexcept
+		{
 			end_visitor vis;
            	boost::apply_visitor(vis, protocol_);
 		}

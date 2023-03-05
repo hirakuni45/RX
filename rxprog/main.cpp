@@ -2,7 +2,7 @@
 /*!	@file
 	@brief	Renesas RX Series Programmer (Flash Writer)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -82,10 +82,19 @@ namespace {
 
 	void progress_(uint32_t pageall, page_t& page)
 	{
+		std::string s;
+
+		std::cout << '\r';
 		uint32_t pos = progress_num_ * page.n / pageall;
-		for(uint32_t i = 0; i < (pos - page.c); ++i) {
-			std::cout << progress_cha_ << std::flush;
+		for(uint32_t i = 0; i < progress_num_; ++i) {
+			char ch = progress_cha_;
+			if(pos < i) {
+				ch = ' ';
+			}
+			s += ch;
 		}
+		s += (boost::format(" %3d %%") % ((page.n  + 1) * 100 / pageall)).str();
+		std::cout << s << std::flush;
 		page.c = pos;
 	}
 
@@ -96,6 +105,7 @@ namespace {
 		std::string platform;
 
 		std::string	inp_file;
+		std::string	out_file;
 
 		std::string	device;
 		bool	dv = false;
@@ -171,7 +181,11 @@ namespace {
 				}
 				area = false;
 			} else {
-				inp_file = t;
+				if(read) {
+					out_file = t;
+				} else {
+					inp_file = t;
+				}
 			}
 			return ok;
 		}
@@ -198,7 +212,7 @@ namespace {
 ///		cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
 ///		cout << "    --erase-data\t\tPerform data flash erase" << endl;
 ///		cout << "    --id=ID[:,]ID[;,] ...      Specify protect ID (16bytes)" << endl;
-///		cout << "    -r, --read                 Perform data read" << endl;
+		cout << "    -r, --read                 Perform data read" << endl;
 ///		cout << "    --area=ORG[:,]END          Specify read area" << endl;
 		cout << "    -v, --verify               Perform data verify" << endl;
 		cout << "    -w, --write                Perform data write" << endl;
@@ -208,6 +222,18 @@ namespace {
 		cout << "    --device-list              Display device list" << endl;
 		cout << "    --verbose                  Verbose output" << endl;
 		cout << "    -h, --help                 Display this" << endl;
+	}
+
+
+	uint32_t count_ff_(const uint8_t* src, uint32_t num)
+	{
+		uint32_t ffn = 0;
+		for(uint32_t i = 0; i < num; ++i) {
+			if(src[i] == 0xff) {
+				++ffn;
+			}
+		}
+		return ffn;
 	}
 }
 
@@ -231,7 +257,7 @@ int main(int argc, char* argv[])
 		auto defa = conf_in_.get_default();
 		opts.device = defa.device_;
 #ifdef __CYGWIN__
-		opts.platform = "Cygwin(MSYS2)";
+		opts.platform = "MSYS2";
 		opts.com_path = defa.port_win_;
 		opts.com_speed = defa.speed_win_;
 #endif
@@ -284,8 +310,8 @@ int main(int argc, char* argv[])
 //				if(!opts.set_area_(&p[7])) {
 //					opterr = true;
 //				}
-//			} else if(p == "-r" || p == "--read") {
-//				opts.read = true;
+			} else if(p == "-r" || p == "--read") {
+				opts.read = true;
 //			} else if(p == "-i") {
 //				opts.id = true;
 //			} else if(p.find("--id=") == 0) {
@@ -470,14 +496,53 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	//============================ 接続
+	//================================ 接続
 	rx::prog prog_(opts.verbose);
 	if(!prog_.start(opts.com_path, com_speed, rx)) {
 		prog_.end();
 		return -1;
 	}
 
-	//============================ 消去
+	//================================ 読み込み
+	if(opts.read && !opts.out_file.empty()) {
+
+		if(opts.progress) {
+			std::cout << "Read:   " << std::flush;
+		}
+		auto areas = prog_.get_area();
+		if(areas.size() == 0) {  // 領域情報が無い場合
+
+		} else {  // 領域情報がある場合
+
+		}
+		uint32_t pageall = 1;
+		page_t page;
+		for(const auto& a : areas) {
+			uint8_t tmp[256];
+			if(!prog_.read_page(a.org_, tmp)) {
+				prog_.end();
+				return -1;
+			}
+			if(opts.progress) {
+				progress_(pageall, page);
+			} else if(opts.verbose) {
+				std::cout << boost::format("Read:   %08X to %08X") % a.org_ % a.end_ << std::endl;
+			}
+			auto len = a.end_ - a.org_;
+			if(count_ff_(tmp, len) != len) {
+				motsx_.write(a.org_, tmp, len);
+			}
+			++page.n;
+		}
+		if(opts.progress) {
+			std::cout << std::endl << std::flush;
+		}
+		if(!motsx_.save(opts.out_file)) {
+			std::cerr << "Output file write fail: '" << opts.out_file << '\'' << std::endl;
+		}
+	}
+
+	//================================ 消去
 	if(opts.erase) {  // erase
 		auto areas = motsx_.create_area_map();
 
@@ -487,7 +552,7 @@ int main(int argc, char* argv[])
 
 		page_t page;
 		for(const auto& a : areas) {
-			uint32_t adr = a.min_ & 0xffffff00;
+			uint32_t adr = a.min_ & 0xffff'ff00;
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
@@ -511,7 +576,7 @@ int main(int argc, char* argv[])
 	}
 
 	//=============================== 書き込み
-	if(opts.write) {  // write
+	if(opts.write && pageall > 0) {  // write
 		auto areas = motsx_.create_area_map();
 		if(!areas.empty()) {
 			if(!prog_.start_write(true)) {
@@ -525,7 +590,7 @@ int main(int argc, char* argv[])
 		}
 		page_t page;
 		for(const auto& a : areas) {
-			uint32_t adr = a.min_ & 0xffffff00;
+			uint32_t adr = a.min_ & 0xffff'ff00;
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
@@ -561,7 +626,7 @@ int main(int argc, char* argv[])
 		}
 		page_t page;
 		for(const auto& a : areas) {
-			uint32_t adr = a.min_ & 0xffffff00;
+			uint32_t adr = a.min_ & 0xffff'ff00;
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {

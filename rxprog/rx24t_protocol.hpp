@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX24T プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "protocol_base.hpp"
 
 namespace rx24t {
@@ -25,7 +25,7 @@ namespace rx24t {
 
 		rx::protocol::devices		devices_;
 		uint8_t						data_ = 0;
-		rx::protocol::areas			area_;
+		rx::protocol::areas			areas_;
 		rx::protocol::areas			data_areas_;
 		rx::protocol::blocks		blocks_;
 		bool						id_protect_ = false;
@@ -44,6 +44,51 @@ namespace rx24t {
 		*/
 		//-----------------------------------------------------------------//
 		protocol() noexcept { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	デバイスを取得
+			@return デバイス
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_device() const noexcept { return devices_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ユーザー領域を取得
+			@return ユーザー領域
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_area() const noexcept { return areas_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	データ量域有無取得
+			@return データ量域有無（通常、０ｘ１Ｄ）
+		*/
+		//-----------------------------------------------------------------//
+		uint8_t get_data() const noexcept { return data_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	データ量域情報を取得
+			@return データ量域情報
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_data_area() const noexcept { return data_areas_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ブロック情報を取得
+			@return ブロック情報
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_block() const noexcept { return blocks_; }
 
 
 		//-----------------------------------------------------------------//
@@ -79,12 +124,12 @@ namespace rx24t {
 					std::cerr << "Inquiry device error." << std::endl;
 					return false;
 				}
-				auto as = get_device();
+				const auto& dv = get_device();
 				if(verbose_) {
 					int i = 0;
-					for(auto a : as) {
+					for(auto t : dv) {
 						++i;
-						a.info(out_section_(i, as.size()));
+						t.info(out_section_(i, dv.size()));
 					}
 				}
 			}
@@ -109,7 +154,7 @@ namespace rx24t {
 					return false;
 				}
 				if(verbose_) {
-					auto as = get_area();
+					const auto& as = get_area();
 					int i = 0;
 					for(auto a : as) {
 						++i;
@@ -125,7 +170,7 @@ namespace rx24t {
 					return false;
 				}
 				if(verbose_) {
-					auto as = get_data_area();
+					const auto& as = get_data_area();
 					int i = 0;
 					for(auto a : as) {
 						++i;
@@ -291,15 +336,6 @@ namespace rx24t {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	デバイスを取得
-			@return デバイス
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::devices& get_device() const noexcept { return devices_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	ユーザー領域問い合わせ
 			@return エラー無ければ「true」
 		*/
@@ -337,20 +373,11 @@ namespace rx24t {
 				p += 4;
 				a.end_ = get32_big_(p);
 				p += 4;
-				area_.push_back(a);
+				areas_.push_back(a);
 			}
 
 			return true;
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ユーザー領域を取得
-			@return ユーザー領域
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_area() const noexcept { return area_; }
 
 
 		//-----------------------------------------------------------------//
@@ -383,15 +410,6 @@ namespace rx24t {
 
 			return true;
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	データ量域有無取得
-			@return データ量域有無（通常、０ｘ１Ｄ）
-		*/
-		//-----------------------------------------------------------------//
-		uint8_t get_data() const noexcept { return data_; }
 
 
 		//-----------------------------------------------------------------//
@@ -442,15 +460,6 @@ namespace rx24t {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	データ量域情報を取得
-			@return データ量域情報
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_data_area() const noexcept { return data_areas_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	ブロック情報問い合わせ
 			@return エラー無ければ「true」
 		*/
@@ -494,15 +503,6 @@ namespace rx24t {
 
 			return true;
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ブロック情報を取得
-			@return ブロック情報
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::blocks& get_block() const noexcept { return blocks_; }
 
 
 		//-----------------------------------------------------------------//
@@ -897,7 +897,5 @@ namespace rx24t {
 			select_write_area_ = false;
 			return  rx::protocol_base::close();
 		}
-
 	};
-
 }

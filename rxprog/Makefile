@@ -62,18 +62,10 @@ LIBN	+=	$(addprefix -l, $(OPTLIBS))
 #
 # Compiler, Linker Options, Resource_compiler
 #
-ifeq ($(OS),Windows_NT)
 CP	=	g++
 CC	=	gcc
 LK	=	g++
 RC	=
-# PINCS += '-isystem /mingw64/include'
-else
-CP	=	clang++
-CC	=	clang
-LK	=	clang++
-RC	=
-endif
 
 POPT	=	-O2 -std=gnu++17
 COPT	=	-O2
