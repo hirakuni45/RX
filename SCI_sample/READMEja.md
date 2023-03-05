@@ -1,4 +1,4 @@
-Renesas RX220, RX62N, RX631, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
+Renesas RX220, RX62N, RX631, RX63T, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
 =========
 
 [英語版](README.md)
@@ -35,6 +35,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - RX220 の SCI 標準ポートは、「RX220/port_map.hpp」参照。
 - RX62N の SCI 標準ポートは、「RX62x/port_map.hpp」参照。
 - RX631 の SCI 標準ポートは、「RX63x/port_map.hpp」参照。
+- RX63T の SCI 標準ポートは、「RX63T/port_map.hpp」参照。
 - RX24T の SCI 標準ポートは、「RX24T/port_map.hpp」参照。
 - RX66T の SCI 標準ポートは、「RX66T/port_map.hpp」参照。
 - RX72T の SCI 標準ポートは、「RX72T/port_map.hpp」参照。
@@ -89,11 +90,12 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
   #endif
 #elif defined(SIG_RX631)
-	// DIY RX631 board
-	static const char* system_str_ = { "RX631 DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
+	// RX631 GR-CITRUS board
+	static const char* system_str_ = { "RX631 GR-CITRUS" };
+	// GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX63T)
 	// DIY RX63T board
 	static const char* system_str_ = { "RX63T DIY" };

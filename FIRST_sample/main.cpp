@@ -30,14 +30,6 @@ namespace {
 	// P03 に LED を吸い込みで接続する事を想定している。
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-#elif defined(SIG_RX631)
-	// RX631 GR-CITRUS
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX63T)
-	// DIY RX63T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX62N)
 	static constexpr bool LED_ACTIVE = 0;
   #if defined(CQ_FRK)
@@ -47,6 +39,14 @@ namespace {
     // BlueBoard-RX62N_100pin
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
   #endif
+#elif defined(SIG_RX631)
+	// RX631 GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+#elif defined(SIG_RX63T)
+	// DIY RX63T board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX24T)
 	// DIY RX24T board
 	static constexpr bool LED_ACTIVE = 0;

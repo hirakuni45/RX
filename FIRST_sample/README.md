@@ -15,8 +15,9 @@ Sample program of LED blinking using RX microcontroller
 ## Description
 - main.cpp
 - RX220/Makefile
-- RX63T/Makefile
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
+- RX631/Makefile (GR-CITRUS)
+- RX63T/Makefile
 - RX24T/Makefile
 - RX66T/Makefile
 - RX72T/Makefile
@@ -45,10 +46,6 @@ Sample program of LED blinking using RX microcontroller
 	// P03 に LED を吸い込みで接続する事を想定している。
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-#elif defined(SIG_RX63T)
-	// DIY RX63T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX62N)
 	// BlueBoard-RX62N_100pin
 	static constexpr bool LED_ACTIVE = 0;
@@ -57,6 +54,14 @@ Sample program of LED blinking using RX microcontroller
   #else
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
   #endif
+#elif defined(SIG_RX631)
+	// RX631 GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+#elif defined(SIG_RX63T)
+	// DIY RX63T board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX24T)
 	// DIY RX24T board
 	static constexpr bool LED_ACTIVE = 0;
@@ -93,6 +98,7 @@ Sample program of LED blinking using RX microcontroller
 ```
 - For BlueBoard-RX62N_100pin,  use the red LED (D2) on the board.
 - For FRK-RX62N, use LED1 on the board. (yellow) 
+- For GR-CITRUS, use the red LED1 on the board.  (red) 
 - For RX65N Envision kit, use the blue LED on the board.
 - For RX72N Envision kit, use the blue LED on the board.
 
