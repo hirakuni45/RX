@@ -80,10 +80,10 @@ namespace {
 	};
 
 
-	void progress_(uint32_t pageall, page_t& page)
+	void progress_(const char* tag, uint32_t pageall, page_t& page)
 	{
 		std::string s;
-
+		s += tag;
 		std::cout << '\r';
 		uint32_t pos = progress_num_ * page.n / pageall;
 		for(uint32_t i = 0; i < progress_num_; ++i) {
@@ -505,10 +505,6 @@ int main(int argc, char* argv[])
 
 	//================================ 読み込み
 	if(opts.read && !opts.out_file.empty()) {
-
-		if(opts.progress) {
-			std::cout << "Read:   " << std::flush;
-		}
 		auto areas = prog_.get_area();
 		if(areas.size() == 0) {  // 領域情報が無い場合
 
@@ -524,7 +520,7 @@ int main(int argc, char* argv[])
 				return -1;
 			}
 			if(opts.progress) {
-				progress_(pageall, page);
+				progress_("Read:   ", pageall, page);
 			} else if(opts.verbose) {
 				std::cout << boost::format("Read:   %08X to %08X") % a.org_ % a.end_ << std::endl;
 			}
@@ -546,17 +542,13 @@ int main(int argc, char* argv[])
 	if(opts.erase) {  // erase
 		auto areas = motsx_.create_area_map();
 
-		if(opts.progress) {
-			std::cout << "Erase:  " << std::flush;
-		}
-
 		page_t page;
 		for(const auto& a : areas) {
 			uint32_t adr = a.min_ & 0xffff'ff00;
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
-					progress_(pageall, page);
+					progress_("Erase:  ", pageall, page);
 				} else if(opts.verbose) {
 					std::cout << boost::format("Erase: %08X to %08X") % adr % (adr + 255) << std::endl;
 				}
@@ -585,16 +577,13 @@ int main(int argc, char* argv[])
 			}
 		}
 		
-		if(opts.progress) {
-			std::cout << "Write:  " << std::flush;
-		}
 		page_t page;
 		for(const auto& a : areas) {
 			uint32_t adr = a.min_ & 0xffff'ff00;
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
-					progress_(pageall, page);
+					progress_("Write:  ", pageall, page);
 				} else if(opts.verbose) {
 					std::cout << boost::format("Write: %08X to %08X") % adr % (adr + 255) << std::endl;
 				}
@@ -621,16 +610,13 @@ int main(int argc, char* argv[])
 	//================================ ベリファイ
 	if(opts.verify) {  // verify
 		auto areas = motsx_.create_area_map();
-		if(opts.progress) {
-			std::cout << "Verify: " << std::flush;
-		}
 		page_t page;
 		for(const auto& a : areas) {
 			uint32_t adr = a.min_ & 0xffff'ff00;
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
-					progress_(pageall, page);
+					progress_("Verify: ", pageall, page);
 				} else if(opts.verbose) {
 					std::cout << boost::format("Verify: %08X to %08X") % adr % (adr + 255) << std::endl;
 				}
