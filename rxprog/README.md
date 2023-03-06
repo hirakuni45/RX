@@ -70,6 +70,7 @@ See development environment preparation of 'RX/README.md'
 
 ## Connection terminal list
 
+RX220:
 |Terminal|RX220 (64)|
 |---|---|
 |MD|MD(3)|
@@ -83,8 +84,8 @@ See development environment preparation of 'RX/README.md'
 |User Boot Mode|1|
 
 ---
-
-|Terminal|RX62N (144)|
+RX621/RX62N:
+|Terminal|RX621/RX62N (144)|
 |---|---|
 |MD0|MD0(16)|
 |MD1|MD1(15)|
@@ -99,12 +100,28 @@ See development environment preparation of 'RX/README.md'
 |Single Chip|1|1|
 
 ---
+RX631/RX63N:
+|Terminal|LQFP 48|LQFP 64|TFLGA 64|LQFP 100|TFLGA 100|LQFP 144|TFLGA 145|LQFP 176|LFBGA 176|TFLGA 177|
+|---|---|---|---|---|---|---|---|---|---|---|
+|UB|PC7(21)|PC7(27)|PA6(D5)|PC7(45)|PC7(H7)|PC7(60)|PC7(N9)|PC7(76)|PC7(N10)|PC7(N10)|
+|MD|MD/FINED(2)|MD/FINED(3)|MD/FINED(C2)|MD/FINED(7)|MD/FINED(D3)|MD/FINED(16)|MD/FINED(G3)|MD/FINED(18)|MD/FINED(G3)|MD/FINED(G3)|
+|EMLE|-|EMLE(1)|EMLE(C3)|EMLE(2)|EMLE(B1)|EMLE(10)|EMLE(E4)|EMLE(10)|EMLE(E2)|EMLE(E2)|
+|RXD|P30/RXD1(10)|P30/RXD1(14)|P30/RXD1(E3)|P30/RXD1(20)|P30/RXD1(G3)|P30/RXD1(29)|P30/RXD1(J4)|PF2/RXD1(31)|PF2/RXD1(K3)|PF2/RXD1(K3)|
+|TXD|P26/TXD1(12)|P26/TXD1(16)|P26/TXD1(G2)|P26/TXD1(22)|P26/RXD1(H1)|P26/RXD1(31)|P26/RXD1(K2)|PF0/RXD1(35)|PF0/RXD1(L3)|PF0/RXD1(L3)|
 
+|Mode|UB|MD|
+|---|:---:|:---:|
+|Serial Boot|0|0|
+|USB Boot|1|0|
+|Single Chip|-|1|
+
+---
+RX63T/RX24T/RX66T/RX72T:
 |Terminal|RX63T (64)|RX24T (100)|RX66T (100)|RX72T (144)|
 |---|---|---|---|------|
-|UB|P00(2)|X|UB/P00(4)|UB/P00(9)|
+|UB|P00(2)|-|UB/P00(4)|UB/P00(9)|
 |MD|MD(5)|MD(6)|MD/FINED(6)|MD/FINED(11)|
-|EMLE|EMLE(1)|X|EMLE(2)|EMLE(7)|
+|EMLE|EMLE(1)|-|EMLE(2)|EMLE(7)|
 |RXD|PD5/RXD1(14)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(25)|
 |TXD|PD3/TXD1(16)|PD3/TXD1(22)|PD3/TXD1(22)|PD3/TXD1(27)|
 
@@ -115,8 +132,8 @@ See development environment preparation of 'RX/README.md'
 |Single Chip|-|1|
 
 ---
-
-|Terminal|RX64M (176)|RX71M (176)|RX65N (176)|
+RX64M/RX71M/RX651/RX65N:
+|Terminal|RX64M (176)|RX71M (176)|RX651/RX65N (176)|
 |---|---|---|---|
 |UB|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|
 |MD|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|
@@ -129,6 +146,8 @@ See development environment preparation of 'RX/README.md'
 |Serial Boot|0|0|
 |USB Boot|1|0|
 |Single Chip|-|1|
+
+---
 
 - MD0、MD1、UB、MD、B/UB, and EMLE terminals are pulled up or down with a resistor (approximately 4.7K).
 - Connect appropriate crystals to XTAL and EXTAL.
@@ -210,6 +229,10 @@ R5F56217 {
 	clock = 1200
 	divide_sys = 8
 	divide_ext = 4
+
+...
+
+}
 ```
 
 ---
@@ -281,9 +304,9 @@ rx_prog -d RX71M --verbose
 ### Erase, write, compare (with progress bar, "test_sample.mot" file)
 ```
 rx_prog -d RX71M --progress --write --verify test_sample.mot
-Erase:  #################################################
-Write:  #################################################
-Verify: #################################################
+Erase:  ################################################# 100 %
+Write:  ################################################# 100 %
+Verify: ################################################# 100 %
 ```
    
 ---
@@ -308,9 +331,9 @@ start devmgmt.msc
 FT231XS, FT232RL:
 ```
 Neptune./d/Git/RX/RAYTRACER_sample/RX66T % time rx_prog -d RX66T --progress --erase --write --verify raytracer_sample.mot
-Erase:  #################################################
-Write:  #################################################
-Verify: #################################################
+Erase:  ################################################# 100 %
+Write:  ################################################# 100 %
+Verify: ################################################# 100 %
 
 real    0m16.617s
 user    0m0.202s
@@ -320,9 +343,9 @@ sys     0m0.421s
 CP2102:
 ```
 Neptune./d/Git/RX/RAYTRACER_sample/RX66T % time rx_prog -P COM12 -d RX66T --progress --erase --write --verify raytracer_sample.mot
-Erase:  #################################################
-Write:  #################################################
-Verify: #################################################
+Erase:  ################################################# 100 %
+Write:  ################################################# 100 %
+Verify: ################################################# 100 %
 
 real    0m6.616s
 user    0m0.078s

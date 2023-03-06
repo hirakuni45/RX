@@ -18,7 +18,7 @@ Currently supported and tested devices:
 |---|:-:|:-:|:-:|:-:|:-:|---|
 |RX220|RXv1|No|－|〇|〇|R5F52206|
 |RX631|RXv1|Yes|－|〇|〇|R5F5631F|
-|RX63N|RXv1|Yes|－|－|〇|R5F563NE|
+|RX63N|RXv1|Yes|－|〇|〇|R5F563NE|
 |RX63T|RXv1|Yes|－|〇|〇|R5F563T6|
 |RX621|RXv1|Yes|－|〇|〇|R5F56218|
 |RX62N|RXv1|Yes|－|〇|〇|R5F562N7|
@@ -108,15 +108,15 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr libraries|
 |[/rx600](./RX600)|RX microcontroller common device definition class|
 |[/RX220](./RX220)|RX220 specific device definition class, linker script|
-|[/RX62x](./RX62x)|RX621/RX62N dedicated device definition class, linker script|
-|[/RX24T](./RX24T)|RX24T specific device definition class, linker script|
-|[/RX63x](./RX63x)|RX631/RX63N specific device definition class, linker script|
+|[/RX62x](./RX62x)|RX621/N dedicated device definition class, linker script|
+|[/RX63x](./RX63x)|RX631/N specific device definition class, linker script|
 |[/RX63T](./RX63T)|RX63T specific device definition class, linker script|
-|[/RX64M](./RX64M)|RX64M dedicated device definition class, linker script|
-|[/RX71M](./RX71M)|RX71M dedicated device definition class, linker script|
-|[/RX65x](./RX65x)|Device definition class for RX651 and RX65N, linker script|
+|[/RX24T](./RX24T)|RX24T specific device definition class, linker script|
 |[/RX66T](./RX66T)|RX66T dedicated device definition class, linker script|
 |[/RX72T](./RX72T)|RX72T dedicated device definition class, linker script|
+|[/RX64M](./RX64M)|RX64M dedicated device definition class, linker script|
+|[/RX71M](./RX71M)|RX71M dedicated device definition class, linker script|
+|[/RX65x](./RX65x)|RX651/N specific device definition class, linker script|
 |[/RX72N](./RX72N)|RX72N dedicated device definition class, linker script|
 |[/FreeRTOS](./FreeRTOS)|FreeRTOS for various RX microcontrollers and simple samples|
 |[/ff14](./ff14)|ChaN's fatfs source code and handler for RX microcontrollers|

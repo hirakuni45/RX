@@ -58,7 +58,8 @@ namespace device {
 			if(OSCT == clock_profile::OSC_TYPE::HOCO) return true;
 
 			if(clock_profile::PLL_BASE <= 104'000'000) return false;
-			if(clock_profile::PLL_BASE >= 200'000'000) return false;
+// オーバークロック対応で、とりあえずコメントアウト！
+//			if(clock_profile::PLL_BASE >= 200'000'000) return false;
 			bool ok = false;
 			for(auto n : multi_) {
 				auto ck = clock_profile::BASE * n;
