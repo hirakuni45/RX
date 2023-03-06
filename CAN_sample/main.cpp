@@ -6,7 +6,7 @@
 			「MULTI」を有効にするとマルチチャネルサポート @n
 			「LEGACY」モードの場合、メールボックス直接操作
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -44,19 +44,32 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
   #else
     // BlueBoard-RX62N_100pin
 	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
   #endif
 	typedef device::CAN CAN0_CH;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
+#elif defined(SIG_RX631)
+	// RX631 GR-CITRUS board
+	static const char* system_str_ = { "RX631 GR-CITRUS" };
+	// GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
+	typedef device::CAN0 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 	typedef device::CAN0 CAN0_CH;
 	typedef device::CAN1 CAN1_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
@@ -66,6 +79,7 @@ namespace {
 	static const char* system_str_ = { "RX64M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 	typedef device::CAN0 CAN0_CH;
 	typedef device::CAN1 CAN1_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
@@ -75,22 +89,26 @@ namespace {
 	static const char* system_str_ = { "RX65N" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 	typedef device::CAN0 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 	typedef device::CAN1 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::SECOND;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 	typedef device::CAN0 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #endif
@@ -98,7 +116,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
 
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+	typedef device::sci_io<SCI_CH, RXB, TXB, SCI_PORT> SCI;
 	SCI		sci_;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
