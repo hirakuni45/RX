@@ -117,7 +117,7 @@
 #include "RX63x/system_io.hpp"
 // #include "RX63x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
-// #include "RX63x/dac_out.hpp"
+#include "RX24T/dac_out.hpp"
 
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
 #include "RX63T/lvda.hpp"
