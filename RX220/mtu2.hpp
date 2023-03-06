@@ -1217,24 +1217,25 @@ namespace device {
 	/*!
 		@brief  MTU0 定義クラス
 		@param[in]	per		ペリフェラル型
-		@param[in]	INT		割り込み型
+		@param[in]	INTN	割り込み型 N
+		@param[in]	INTM	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per, typename INT>
+	template <peripheral per, typename INTN, typename INTM>
 	struct mtu0_t : public MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto TGIA = INT::TGIA0;	///< 割り込み genr-A
-		static constexpr auto TGIB = INT::TGIB0;	///< 割り込み genr-B
-		static constexpr auto TGIC = INT::TGIC0;	///< 割り込み genr-C
-		static constexpr auto TGID = INT::TGID0;	///< 割り込み genr-D
-		static constexpr auto TGIE = INT::TGIE0;	///< 割り込み genr-E
-		static constexpr auto TGIF = INT::TGIF0;	///< 割り込み genr-F
-		static constexpr auto TGIU = INT::NONE;		///< 割り込み genr-U
-		static constexpr auto TGIV = INT::NONE;		///< 割り込み genr-V
-		static constexpr auto TGIW = INT::NONE;		///< 割り込み genr-W
-		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
-		static constexpr auto TCIV = INT::TCIV1;	///< 割り込み ovef-V
+		static constexpr auto TGIA = INTN::TGIA0;	///< 割り込み genr-A
+		static constexpr auto TGIB = INTN::TGIB0;	///< 割り込み genr-B
+		static constexpr auto TGIC = INTN::TGIC0;	///< 割り込み genr-C
+		static constexpr auto TGID = INTN::TGID0;	///< 割り込み genr-D
+		static constexpr auto TGIE = INTN::TGIE0;	///< 割り込み genr-E
+		static constexpr auto TGIF = INTN::TGIF0;	///< 割り込み genr-F
+		static constexpr auto TGIU = INTN::NONE;	///< 割り込み genr-U
+		static constexpr auto TGIV = INTN::NONE;	///< 割り込み genr-V
+		static constexpr auto TGIW = INTN::NONE;	///< 割り込み genr-W
+		static constexpr auto TCIU = INTN::NONE;	///< 割り込み undf-U
+		static constexpr auto TCIV = INTM::TCIV0;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2;	///< クロック分周能力
 
@@ -1269,7 +1270,7 @@ namespace device {
 			case CHANNEL::D: return TGID;
 			case CHANNEL::E: return TGIE;
 			case CHANNEL::F: return TGIF;
-			default: return INT::NONE;
+			default: return INTN::NONE;
 			}
 		}
 
@@ -1452,47 +1453,48 @@ namespace device {
 		typedef tgr_abcdef_t<TGRA_, TGRB_, TGRC_, TGRD_, TGRE_, TGRF_, CHANNEL> TGR_;
 		static TGR_ TGR;
 	};
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TCR_ mtu0_t<per, INT>::TCR;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TMDR_ mtu0_t<per, INT>::TMDR;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TMDR_ mtu0_t<per, INT>::TMDR1;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TIORH_ mtu0_t<per, INT>::TIORH;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TIORL_ mtu0_t<per, INT>::TIORL;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TIOR_ mtu0_t<per, INT>::TIOR;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TIER_ mtu0_t<per, INT>::TIER;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TSR_ mtu0_t<per, INT>::TSR;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TBTM_ mtu0_t<per, INT>::TBTM;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TCNT_ mtu0_t<per, INT>::TCNT;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRA_ mtu0_t<per, INT>::TGRA;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRB_ mtu0_t<per, INT>::TGRB;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRC_ mtu0_t<per, INT>::TGRC;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRD_ mtu0_t<per, INT>::TGRD;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRE_ mtu0_t<per, INT>::TGRE;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGRF_ mtu0_t<per, INT>::TGRF;
-	template <peripheral per, typename INT> typename mtu0_t<per, INT>::TGR_ mtu0_t<per, INT>::TGR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TCR_ mtu0_t<per, INTN, INTM>::TCR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TMDR_ mtu0_t<per, INTN, INTM>::TMDR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TMDR_ mtu0_t<per, INTN, INTM>::TMDR1;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TIORH_ mtu0_t<per, INTN, INTM>::TIORH;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TIORL_ mtu0_t<per, INTN, INTM>::TIORL;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TIOR_ mtu0_t<per, INTN, INTM>::TIOR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TIER_ mtu0_t<per, INTN, INTM>::TIER;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TSR_ mtu0_t<per, INTN, INTM>::TSR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TBTM_ mtu0_t<per, INTN, INTM>::TBTM;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TCNT_ mtu0_t<per, INTN, INTM>::TCNT;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TGRA_ mtu0_t<per, INTN, INTM>::TGRA;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TGRB_ mtu0_t<per, INTN, INTM>::TGRB;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TGRC_ mtu0_t<per, INTN, INTM>::TGRC;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TGRD_ mtu0_t<per, INTN, INTM>::TGRD;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TGRE_ mtu0_t<per, INTN, INTM>::TGRE;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TGRF_ mtu0_t<per, INTN, INTM>::TGRF;
+	template <peripheral per, typename INTN, typename INTM> typename mtu0_t<per, INTN, INTM>::TGR_ mtu0_t<per, INTN, INTM>::TGR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU1 定義クラス
 		@param[in]	per		ペリフェラル型
-		@param[in]	INT		割り込み型
+		@param[in]	INTN	割り込み型 N
+		@param[in]	INTM	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per, typename INT>
+	template <peripheral per, typename INTN, typename INTM>
 	struct mtu1_t : public MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto TGIA = INT::TGIA1;	///< 割り込み genr-A
-		static constexpr auto TGIB = INT::TGIB1;	///< 割り込み genr-B
-		static constexpr auto TGIC = INT::NONE;		///< 割り込み genr-C
-		static constexpr auto TGID = INT::NONE;		///< 割り込み genr-D
-		static constexpr auto TGIE = INT::NONE;		///< 割り込み genr-E
-		static constexpr auto TGIF = INT::NONE;		///< 割り込み genr-F
-		static constexpr auto TGIU = INT::NONE;		///< 割り込み genr-U
-		static constexpr auto TGIV = INT::NONE;		///< 割り込み genr-V
-		static constexpr auto TGIW = INT::NONE;		///< 割り込み genr-W
-		static constexpr auto TCIU = INT::TCIU1;	///< 割り込み undf-U
-		static constexpr auto TCIV = INT::TCIV1;	///< 割り込み ovef-V
+		static constexpr auto TGIA = INTN::TGIA1;	///< 割り込み genr-A
+		static constexpr auto TGIB = INTN::TGIB1;	///< 割り込み genr-B
+		static constexpr auto TGIC = INTN::NONE;		///< 割り込み genr-C
+		static constexpr auto TGID = INTN::NONE;		///< 割り込み genr-D
+		static constexpr auto TGIE = INTN::NONE;		///< 割り込み genr-E
+		static constexpr auto TGIF = INTN::NONE;		///< 割り込み genr-F
+		static constexpr auto TGIU = INTN::NONE;		///< 割り込み genr-U
+		static constexpr auto TGIV = INTN::NONE;		///< 割り込み genr-V
+		static constexpr auto TGIW = INTN::NONE;		///< 割り込み genr-W
+		static constexpr auto TCIU = INTM::TCIU1;	///< 割り込み undf-U
+		static constexpr auto TCIV = INTM::TCIV1;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT1;	///< クロック分周能力
 
@@ -1519,7 +1521,7 @@ namespace device {
 			switch(ch) {
 			case CHANNEL::A: return TGIA;
 			case CHANNEL::B: return TGIB;
-			default: return INT::NONE;
+			default: return INTN::NONE;
 			}
 		}
 
@@ -1647,42 +1649,43 @@ namespace device {
 		typedef tgr_ab_t<TGRA_, TGRB_, CHANNEL> TGR_;
 		static TGR_ TGR;
 	};
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TCR_ mtu1_t<per, INT>::TCR;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TMDR_ mtu1_t<per, INT>::TMDR;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TMDR_ mtu1_t<per, INT>::TMDR1;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TIORH_ mtu1_t<per, INT>::TIORH;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TIOR_ mtu1_t<per, INT>::TIOR;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TIER_ mtu1_t<per, INT>::TIER;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TSR_ mtu1_t<per, INT>::TSR;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TICCR_ mtu1_t<per, INT>::TICCR;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TCNT_ mtu1_t<per, INT>::TCNT;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TGRA_ mtu1_t<per, INT>::TGRA;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TGRB_ mtu1_t<per, INT>::TGRB;
-	template <peripheral per, typename INT> typename mtu1_t<per, INT>::TGR_ mtu1_t<per, INT>::TGR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TCR_ mtu1_t<per, INTN, INTM>::TCR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TMDR_ mtu1_t<per, INTN, INTM>::TMDR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TMDR_ mtu1_t<per, INTN, INTM>::TMDR1;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TIORH_ mtu1_t<per, INTN, INTM>::TIORH;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TIOR_ mtu1_t<per, INTN, INTM>::TIOR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TIER_ mtu1_t<per, INTN, INTM>::TIER;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TSR_ mtu1_t<per, INTN, INTM>::TSR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TICCR_ mtu1_t<per, INTN, INTM>::TICCR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TCNT_ mtu1_t<per, INTN, INTM>::TCNT;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TGRA_ mtu1_t<per, INTN, INTM>::TGRA;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TGRB_ mtu1_t<per, INTN, INTM>::TGRB;
+	template <peripheral per, typename INTN, typename INTM> typename mtu1_t<per, INTN, INTM>::TGR_ mtu1_t<per, INTN, INTM>::TGR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU2 定義クラス
 		@param[in]	per		ペリフェラル型
-		@param[in]	INT		割り込み型
+		@param[in]	INTN	割り込み型 N
+		@param[in]	INTM	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per, typename INT>
+	template <peripheral per, typename INTN, typename INTM>
 	struct mtu2_t : public MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto TGIA = INT::TGIA2;	///< 割り込み genr-A
-		static constexpr auto TGIB = INT::TGIB2;	///< 割り込み genr-B
-		static constexpr auto TGIC = INT::NONE;		///< 割り込み genr-C
-		static constexpr auto TGID = INT::NONE;		///< 割り込み genr-D
-		static constexpr auto TGIE = INT::NONE;		///< 割り込み genr-E
-		static constexpr auto TGIF = INT::NONE;		///< 割り込み genr-F
-		static constexpr auto TGIU = INT::NONE;		///< 割り込み genr-U
-		static constexpr auto TGIV = INT::NONE;		///< 割り込み genr-V
-		static constexpr auto TGIW = INT::NONE;		///< 割り込み genr-W
-		static constexpr auto TCIU = INT::TCIU2;	///< 割り込み undf-U
-		static constexpr auto TCIV = INT::TCIV2;	///< 割り込み ovef-V
+		static constexpr auto TGIA = INTN::TGIA2;	///< 割り込み genr-A
+		static constexpr auto TGIB = INTN::TGIB2;	///< 割り込み genr-B
+		static constexpr auto TGIC = INTN::NONE;		///< 割り込み genr-C
+		static constexpr auto TGID = INTN::NONE;		///< 割り込み genr-D
+		static constexpr auto TGIE = INTN::NONE;		///< 割り込み genr-E
+		static constexpr auto TGIF = INTN::NONE;		///< 割り込み genr-F
+		static constexpr auto TGIU = INTN::NONE;		///< 割り込み genr-U
+		static constexpr auto TGIV = INTN::NONE;		///< 割り込み genr-V
+		static constexpr auto TGIW = INTN::NONE;		///< 割り込み genr-W
+		static constexpr auto TCIU = INTM::TCIU2;	///< 割り込み undf-U
+		static constexpr auto TCIV = INTM::TCIV2;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT2;	///< クロック分周能力
 
@@ -1709,7 +1712,7 @@ namespace device {
 			switch(ch) {
 			case CHANNEL::A: return TGIA;
 			case CHANNEL::B: return TGIB;
-			default: return INT::NONE;
+			default: return INTN::NONE;
 			}
 		}
 
@@ -1829,41 +1832,42 @@ namespace device {
 		typedef tgr_ab_t<TGRA_, TGRB_, CHANNEL> TGR_;
 		static TGR_ TGR;
 	};
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TCR_ mtu2_t<per, INT>::TCR;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TMDR_ mtu2_t<per, INT>::TMDR;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TMDR_ mtu2_t<per, INT>::TMDR1;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TIORH_ mtu2_t<per, INT>::TIORH;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TIOR_ mtu2_t<per, INT>::TIOR;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TIER_ mtu2_t<per, INT>::TIER;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TSR_ mtu2_t<per, INT>::TSR;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TCNT_ mtu2_t<per, INT>::TCNT;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TGRA_ mtu2_t<per, INT>::TGRA;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TGRB_ mtu2_t<per, INT>::TGRB;
-	template <peripheral per, typename INT> typename mtu2_t<per, INT>::TGR_ mtu2_t<per, INT>::TGR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TCR_ mtu2_t<per, INTN, INTM>::TCR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TMDR_ mtu2_t<per, INTN, INTM>::TMDR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TMDR_ mtu2_t<per, INTN, INTM>::TMDR1;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TIORH_ mtu2_t<per, INTN, INTM>::TIORH;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TIOR_ mtu2_t<per, INTN, INTM>::TIOR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TIER_ mtu2_t<per, INTN, INTM>::TIER;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TSR_ mtu2_t<per, INTN, INTM>::TSR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TCNT_ mtu2_t<per, INTN, INTM>::TCNT;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TGRA_ mtu2_t<per, INTN, INTM>::TGRA;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TGRB_ mtu2_t<per, INTN, INTM>::TGRB;
+	template <peripheral per, typename INTN, typename INTM> typename mtu2_t<per, INTN, INTM>::TGR_ mtu2_t<per, INTN, INTM>::TGR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU3 定義クラス
 		@param[in]	per		ペリフェラル型
-		@param[in]	INT		割り込み型
+		@param[in]	INTN	割り込み型 N
+		@param[in]	INTM	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per, typename INT>
+	template <peripheral per, typename INTN, typename INTM>
 	struct mtu3_t : public MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto TGIA = INT::TGIA3;	///< 割り込み genr-A
-		static constexpr auto TGIB = INT::TGIB3;	///< 割り込み genr-B
-		static constexpr auto TGIC = INT::TGIC3;	///< 割り込み genr-C
-		static constexpr auto TGID = INT::TGID3;	///< 割り込み genr-D
-		static constexpr auto TGIE = INT::NONE;		///< 割り込み genr-E
-		static constexpr auto TGIF = INT::NONE;		///< 割り込み genr-F
-		static constexpr auto TGIU = INT::NONE;		///< 割り込み genr-U
-		static constexpr auto TGIV = INT::NONE;		///< 割り込み genr-V
-		static constexpr auto TGIW = INT::NONE;		///< 割り込み genr-W
-		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
-		static constexpr auto TCIV = INT::TCIV3;	///< 割り込み ovef-V
+		static constexpr auto TGIA = INTN::TGIA3;	///< 割り込み genr-A
+		static constexpr auto TGIB = INTN::TGIB3;	///< 割り込み genr-B
+		static constexpr auto TGIC = INTN::TGIC3;	///< 割り込み genr-C
+		static constexpr auto TGID = INTN::TGID3;	///< 割り込み genr-D
+		static constexpr auto TGIE = INTN::NONE;	///< 割り込み genr-E
+		static constexpr auto TGIF = INTN::NONE;	///< 割り込み genr-F
+		static constexpr auto TGIU = INTN::NONE;	///< 割り込み genr-U
+		static constexpr auto TGIV = INTN::NONE;	///< 割り込み genr-V
+		static constexpr auto TGIW = INTN::NONE;	///< 割り込み genr-W
+		static constexpr auto TCIU = INTN::NONE;	///< 割り込み undf-U
+		static constexpr auto TCIV = INTM::TCIV3;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT3;	///< クロック分周能力
 
@@ -1894,7 +1898,7 @@ namespace device {
 			case CHANNEL::B: return TGIB;
 			case CHANNEL::C: return TGIC;
 			case CHANNEL::D: return TGID;
-			default: return INT::NONE;
+			default: return INTN::NONE;
 			}
 		}
 
@@ -2049,45 +2053,46 @@ namespace device {
 		typedef tgr_abcd_t<TGRA_, TGRB_, TGRC_, TGRD_, CHANNEL> TGR_;
 		static TGR_ TGR;
 	};
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TCR_ mtu3_t<per, INT>::TCR;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TMDR_ mtu3_t<per, INT>::TMDR;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TMDR_ mtu3_t<per, INT>::TMDR1;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TIORH_ mtu3_t<per, INT>::TIORH;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TIORL_ mtu3_t<per, INT>::TIORL;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TIOR_ mtu3_t<per, INT>::TIOR;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TIER_ mtu3_t<per, INT>::TIER;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TSR_ mtu3_t<per, INT>::TSR;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TBTM_ mtu3_t<per, INT>::TBTM;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TCNT_ mtu3_t<per, INT>::TCNT;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGRA_ mtu3_t<per, INT>::TGRA;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGRB_ mtu3_t<per, INT>::TGRB;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGRC_ mtu3_t<per, INT>::TGRC;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGRD_ mtu3_t<per, INT>::TGRD;
-	template <peripheral per, typename INT> typename mtu3_t<per, INT>::TGR_ mtu3_t<per, INT>::TGR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TCR_ mtu3_t<per, INTN, INTM>::TCR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TMDR_ mtu3_t<per, INTN, INTM>::TMDR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TMDR_ mtu3_t<per, INTN, INTM>::TMDR1;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TIORH_ mtu3_t<per, INTN, INTM>::TIORH;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TIORL_ mtu3_t<per, INTN, INTM>::TIORL;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TIOR_ mtu3_t<per, INTN, INTM>::TIOR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TIER_ mtu3_t<per, INTN, INTM>::TIER;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TSR_ mtu3_t<per, INTN, INTM>::TSR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TBTM_ mtu3_t<per, INTN, INTM>::TBTM;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TCNT_ mtu3_t<per, INTN, INTM>::TCNT;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TGRA_ mtu3_t<per, INTN, INTM>::TGRA;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TGRB_ mtu3_t<per, INTN, INTM>::TGRB;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TGRC_ mtu3_t<per, INTN, INTM>::TGRC;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TGRD_ mtu3_t<per, INTN, INTM>::TGRD;
+	template <peripheral per, typename INTN, typename INTM> typename mtu3_t<per, INTN, INTM>::TGR_ mtu3_t<per, INTN, INTM>::TGR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU4 定義クラス
 		@param[in]	per		ペリフェラル型
-		@param[in]	INT		割り込み型
+		@param[in]	INTN	割り込み型 N
+		@param[in]	INTN	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per, typename INT>
+	template <peripheral per, typename INTN, typename INTM>
 	struct mtu4_t : public MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto TGIA = INT::TGIA4;	///< 割り込み genr-A
-		static constexpr auto TGIB = INT::TGIB4;	///< 割り込み genr-B
-		static constexpr auto TGIC = INT::TGIC4;	///< 割り込み genr-C
-		static constexpr auto TGID = INT::TGID4;	///< 割り込み genr-D
-		static constexpr auto TGIE = INT::NONE;		///< 割り込み genr-E
-		static constexpr auto TGIF = INT::NONE;		///< 割り込み genr-F
-		static constexpr auto TGIU = INT::NONE;		///< 割り込み genr-U
-		static constexpr auto TGIV = INT::NONE;		///< 割り込み genr-V
-		static constexpr auto TGIW = INT::NONE;		///< 割り込み genr-W
-		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
-		static constexpr auto TCIV = INT::TCIV4;	///< 割り込み ovef-V
+		static constexpr auto TGIA = INTN::TGIA4;	///< 割り込み genr-A
+		static constexpr auto TGIB = INTN::TGIB4;	///< 割り込み genr-B
+		static constexpr auto TGIC = INTN::TGIC4;	///< 割り込み genr-C
+		static constexpr auto TGID = INTN::TGID4;	///< 割り込み genr-D
+		static constexpr auto TGIE = INTN::NONE;	///< 割り込み genr-E
+		static constexpr auto TGIF = INTN::NONE;	///< 割り込み genr-F
+		static constexpr auto TGIU = INTN::NONE;	///< 割り込み genr-U
+		static constexpr auto TGIV = INTN::NONE;	///< 割り込み genr-V
+		static constexpr auto TGIW = INTN::NONE;	///< 割り込み genr-W
+		static constexpr auto TCIU = INTN::NONE;	///< 割り込み undf-U
+		static constexpr auto TCIV = INTM::TCIV4;	///< 割り込み ovef-V
 
 		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT3;	///< クロック分周能力
 
@@ -2120,7 +2125,7 @@ namespace device {
 			case CHANNEL::B: return TGIB;
 			case CHANNEL::C: return TGIC;
 			case CHANNEL::D: return TGID;
-			default: return INT::NONE;
+			default: return INTN::NONE;
 			}
 		}
 
@@ -2307,26 +2312,26 @@ namespace device {
 		typedef tgr_abcd_t<TGRA_, TGRB_, TGRC_, TGRD_, CHANNEL> TGR_;
 		static TGR_ TGR;
 	};
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TCR_ mtu4_t<per, INT>::TCR;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TMDR_ mtu4_t<per, INT>::TMDR;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TMDR_ mtu4_t<per, INT>::TMDR1;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TIORH_ mtu4_t<per, INT>::TIORH;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TIORL_ mtu4_t<per, INT>::TIORL;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TIOR_ mtu4_t<per, INT>::TIOR;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TIER_ mtu4_t<per, INT>::TIER;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TSR_ mtu4_t<per, INT>::TSR;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TBTM_ mtu4_t<per, INT>::TBTM;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TADCR_ mtu4_t<per, INT>::TADCR;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TADCORA_ mtu4_t<per, INT>::TADCORA;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TADCORB_ mtu4_t<per, INT>::TADCORB;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TADCOBRA_ mtu4_t<per, INT>::TADCOBRA;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TADCOBRB_ mtu4_t<per, INT>::TADCOBRB;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TCNT_ mtu4_t<per, INT>::TCNT;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGRA_ mtu4_t<per, INT>::TGRA;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGRB_ mtu4_t<per, INT>::TGRB;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGRC_ mtu4_t<per, INT>::TGRC;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGRD_ mtu4_t<per, INT>::TGRD;
-	template <peripheral per, typename INT> typename mtu4_t<per, INT>::TGR_ mtu4_t<per, INT>::TGR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TCR_ mtu4_t<per, INTN, INTM>::TCR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TMDR_ mtu4_t<per, INTN, INTM>::TMDR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TMDR_ mtu4_t<per, INTN, INTM>::TMDR1;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TIORH_ mtu4_t<per, INTN, INTM>::TIORH;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TIORL_ mtu4_t<per, INTN, INTM>::TIORL;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TIOR_ mtu4_t<per, INTN, INTM>::TIOR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TIER_ mtu4_t<per, INTN, INTM>::TIER;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TSR_ mtu4_t<per, INTN, INTM>::TSR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TBTM_ mtu4_t<per, INTN, INTM>::TBTM;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TADCR_ mtu4_t<per, INTN, INTM>::TADCR;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TADCORA_ mtu4_t<per, INTN, INTM>::TADCORA;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TADCORB_ mtu4_t<per, INTN, INTM>::TADCORB;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TADCOBRA_ mtu4_t<per, INTN, INTM>::TADCOBRA;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TADCOBRB_ mtu4_t<per, INTN, INTM>::TADCOBRB;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TCNT_ mtu4_t<per, INTN, INTM>::TCNT;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TGRA_ mtu4_t<per, INTN, INTM>::TGRA;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TGRB_ mtu4_t<per, INTN, INTM>::TGRB;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TGRC_ mtu4_t<per, INTN, INTM>::TGRC;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TGRD_ mtu4_t<per, INTN, INTM>::TGRD;
+	template <peripheral per, typename INTN, typename INTM> typename mtu4_t<per, INTN, INTM>::TGR_ mtu4_t<per, INTN, INTM>::TGR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2550,11 +2555,19 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TGRW_ mtu5_t<per, INT>::TGRW;
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TGR_ mtu5_t<per, INT>::TGR;
 
-
-	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR> MTU0;
-	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR> MTU1;
-	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR> MTU2;
-	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR> MTU3;
-	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR> MTU4;
+#if defined(SIG_RX220)
+	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR, ICU::VECTOR> MTU0;
+	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR, ICU::VECTOR> MTU1;
+	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR, ICU::VECTOR> MTU2;
+	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR, ICU::VECTOR> MTU3;
+	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR, ICU::VECTOR> MTU4;
 	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR> MTU5;
+#elif defined(SIG_RX631) || defined(SIG_RX63N)
+	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR, ICU::GROUP1> MTU0;
+	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR, ICU::GROUP1> MTU1;
+	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR, ICU::GROUP2> MTU2;
+	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR, ICU::GROUP2> MTU3;
+	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR, ICU::VECTOR> MTU4;
+	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR> MTU5;
+#endif
 }
