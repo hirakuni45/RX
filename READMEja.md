@@ -119,6 +119,7 @@ int main(int argc, char** argv)
 |[/RX66T](./RX66T)|RX66T 専用デバイス定義クラス、リンカースクリプト|
 |[/RX72T](./RX72T)|RX72T 専用デバイス定義クラス、リンカースクリプト|
 |[/RX72N](./RX72N)|RX72N 専用デバイス定義クラス、リンカースクリプト|
+|[/RX72M](./RX72M)|RX72M 専用デバイス定義クラス、リンカースクリプト|
 |[/ff14](./ff14)|ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
 |[/common](./common)|共有クラス、ヘッダーなど|
 |[/chip](./chip)|I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
@@ -134,29 +135,29 @@ int main(int argc, char** argv)
 
 ## サンプル・プロジェクト（アプリケーション）
 
-|ディレクトリ|RX63T|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
-|-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
-|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
-|[/MTU_sample](./MTU_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|MTU サンプルプログラム|
-|[/CAN_sample](./CAN_sample)|－|△|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
-|[/FLASH_sample](./FLASH_sample)|－|－|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
-|[/FreeRTOS](./FreeRTOS)|－|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS 基本動作確認サンプル|
-|[/GPTW_sample](./GPTW_sample)|－|－|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
-|[/I2C_sample](./I2C_sample)|－|－|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
-|[/RAYTRACER_sample](./RAYTRACER_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
-|[/SDCARD_sample](./SDCARD_sample)|－|－|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
-|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
-|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
-|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (DRW2D エンジン利用)|
-|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|△|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
-|[/SYNTH_sample](./SYNTH_sample)|－|－|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
-|[/CALC_sample](./CALC_sample)|－|〇|－|〇|〇|〇|〇|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
-|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
-|[/PSG_sample](./PSG_sample)|－|〇|－|〇|〇|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
-|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
+|ディレクトリ|RX220|RX631|RX63T|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
+|-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
+|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
+|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
+|[/MTU_sample](./MTU_sample)|－|－|－|〇|〇|〇|〇|〇|〇|〇|〇|MTU サンプルプログラム|
+|[/CAN_sample](./CAN_sample)|－|〇|－|△|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
+|[/FLASH_sample](./FLASH_sample)|－|－|－|－|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
+|[/FreeRTOS](./FreeRTOS)|〇|〇|－|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS 基本動作確認サンプル|
+|[/GPTW_sample](./GPTW_sample)|－|－|－|－|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
+|[/I2C_sample](./I2C_sample)|〇|〇|－|－|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
+|[/SDCARD_sample](./SDCARD_sample)|－|－|－|－|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
+|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
+|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
+|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (DRW2D エンジン利用)|
+|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|－|－|△|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
+|[/SYNTH_sample](./SYNTH_sample)|－|－|－|－|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
+|[/CALC_sample](./CALC_sample)|－|〇|－|〇|－|〇|〇|〇|〇|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
+|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
+|[/PSG_sample](./PSG_sample)|－|－|－|〇|－|〇|〇|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
+|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
    
-※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
+※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。   
 ※△：機能が不十分、未動作検証、など。
 
 ---
