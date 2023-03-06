@@ -40,7 +40,7 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
  - C ドライブのルートに展開します
  - 以前は、MSYS2 pacman で mingw64 環境用をインストールしていましたが、最新バージョンで問題が発生する為
 
-```
+```bash
 cd /c/
 tar xfvz /d/Download/boost_1_74_0.tar.gz
 ```
@@ -61,8 +61,8 @@ tar xfvz /d/Download/boost_1_74_0.tar.gz
 - マイコン側の RXD1 端子と、USB シリアルの TXD を接続。
 - マイコン側の TXD1 端子と、USB シリアルの RXD を接続。
 ※ブート時のＳＣＩポート（通常 SCI1 です、要確認ハードウェアーマニュアル）   
-- UB 端子があるデバイスの場合、プルダウンする。(4.7K)
-- EMLE 端子がある場合プルダウンする。（4.7K)
+- UB 端子があるデバイス（USB I/F がある）の場合、プルダウンする。(4.7K)
+- EMLE 端子がある場合プルダウンする。（4.7K）
 - MD 端子を「Low レベル」にして「リセット」信号を入れる。
 - 内臓プログラムを実行する場合は MD 端子を「High レベル」にして、リセット信号を入れる。
 - MDE(13) は 0 (リトルエンディアンとする)
@@ -70,6 +70,7 @@ tar xfvz /d/Download/boost_1_74_0.tar.gz
 ---
 ## 接続端子一覧
 
+RX220:   
 |端子|RX220 (64)|
 |---|---|
 |MD|MD(3)|
@@ -83,8 +84,8 @@ tar xfvz /d/Download/boost_1_74_0.tar.gz
 |User Boot Mode|1|
 
 ---
-
-|端子|RX62N (144)|
+RX621/RX62N:   
+|端子|RX62x (144)|
 |---|---|
 |MD0|MD0(16)|
 |MD1|MD1(15)|
@@ -99,12 +100,28 @@ tar xfvz /d/Download/boost_1_74_0.tar.gz
 |シングルチップ|1|1|
 
 ---
+RX631/RX63N:
+|端子|LQFP 48|LQFP 64|TFLGA 64|LQFP 100|TFLGA 100|LQFP 144|TFLGA 145|LQFP 176|LFBGA 176|TFLGA 177|
+|---|---|---|---|---|---|---|---|---|---|---|
+|UB|PC7(21)|PC7(27)|PA6(D5)|PC7(45)|PC7(H7)|PC7(60)|PC7(N9)|PC7(76)|PC7(N10)|PC7(N10)|
+|MD|MD/FINED(2)|MD/FINED(3)|MD/FINED(C2)|MD/FINED(7)|MD/FINED(D3)|MD/FINED(16)|MD/FINED(G3)|MD/FINED(18)|MD/FINED(G3)|MD/FINED(G3)|
+|EMLE|ー|EMLE(1)|EMLE(C3)|EMLE(2)|EMLE(B1)|EMLE(10)|EMLE(E4)|EMLE(10)|EMLE(E2)|EMLE(E2)|
+|RXD|P30/RXD1(10)|P30/RXD1(14)|P30/RXD1(E3)|P30/RXD1(20)|P30/RXD1(G3)|P30/RXD1(29)|P30/RXD1(J4)|PF2/RXD1(31)|PF2/RXD1(K3)|PF2/RXD1(K3)|
+|TXD|P26/TXD1(12)|P26/TXD1(16)|P26/TXD1(G2)|P26/TXD1(22)|P26/RXD1(H1)|P26/RXD1(31)|P26/RXD1(K2)|PF0/RXD1(35)|PF0/RXD1(L3)|PF0/RXD1(L3)|
 
+|モード|UB|MD|
+|---|:---:|:---:|
+|シリアルブート|0|0|
+|USB ブート|1|0|
+|シングルチップ|-|1|
+
+---
+RX63T/RX24T/RX66T/RX72T:
 |端子|RX63T (64)|RX24T (100)|RX66T (100)|RX72T (144)|
 |---|---|---|---|---|
-|UB|P00(2)|X|UB/P00(4)|UB/P00(9)|
+|UB|P00(2)|ー|UB/P00(4)|UB/P00(9)|
 |MD|MD(5)|MD(6)|MD/FINED(6)|MD/FINED(11)|
-|EMLE|EMLE(1)|X|EMLE(2)|EMLE(7)|
+|EMLE|EMLE(1)|ー|EMLE(2)|EMLE(7)|
 |RXD|PD5/RXD1(14)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(25)|
 |TXD|PD3/TXD1(16)|PD3/TXD1(22)|PD3/TXD1(22)|PD3/TXD1(27)|
 
@@ -115,14 +132,14 @@ tar xfvz /d/Download/boost_1_74_0.tar.gz
 |シングルチップ|-|1|
 
 ---
-
-|端子|RX63[1N] (176)|RX64M (176)|RX71M (176)|RX65[1N] (176)|
-|---|---|---|---|---|
-|UB|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|
-|MD|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|
-|EMLE|EMLE(10)|EMLE(10)|EMLE(10)|EMLE(10)|
-|RXD|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|
-|TXD|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|
+RX64M/RX71M/RX651/RX65N
+|端子|RX64M (176)|RX71M (176)|RX651/RX65N (176)|
+|---|---|---|---|
+|UB|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|
+|MD|MD/FINED(18)|MD/FINED(18)|MD/FINED(18)|
+|EMLE|EMLE(10)|EMLE(10)|EMLE(10)|
+|RXD|PF2/RXD1(31)|PF2/RXD1(31)|PF2/RXD1(31)|
+|TXD|PF0/TXD1(35)|PF0/TXD1(35)|PF0/TXD1(35)|
 
 |モード|UB|MD|
 |---|:---:|:---:|
@@ -294,6 +311,10 @@ R5F56217 {
 	clock = 1200
 	divide_sys = 8
 	divide_ext = 4
+
+...
+
+}
 ```
 
 ---
@@ -342,6 +363,7 @@ R5F572NN (RX72N): Program-Flash: 4096K, RAM: 1024K, Data-Flash: 32K
 - 将来の拡張用です。
 - 「clock、divide_sys、divide_ext」など、接続に必要な情報は、最初にマッチしたグループデバイスのプロファイルが利用されます。
 - 本来、接続時に取得した、デバイス TYP に沿ったデバイスプロファイルを利用すべきですが、その実装がされていません。
+- これは、TYP と、デバイスプロファイルの資料が公開されていない為です。
 - 同じグループで、ハードウェアー仕様が異なるデバイスがあり、rx_prog.conf に異なる定義を行っても、反映されませんので注意が必要です。
 
 ---
@@ -375,9 +397,9 @@ R5F572NN (RX72N): Program-Flash: 4096K, RAM: 1024K, Data-Flash: 32K
 ### 消去、書き込み、比較（プログレスバー付、「test_sample.mot」ファイルの場合）
 ```
  % rx_prog -d RX71M --progress --write --verify test_sample.mot
-Erase:  #################################################
-Write:  #################################################
-Verify: #################################################
+Erase:  ################################################# 100 %
+Write:  ################################################# 100 %
+Verify: ################################################# 100 %
 ```
 
 ---
@@ -403,9 +425,9 @@ start devmgmt.msc
 FT231XS, FT232RL:
 ```
 Neptune./d/Git/RX/RAYTRACER_sample/RX66T % time rx_prog -d RX66T --progress --erase --write --verify raytracer_sample.mot
-Erase:  #################################################
-Write:  #################################################
-Verify: #################################################
+Erase:  ################################################# 100 %
+Write:  ################################################# 100 %
+Verify: ################################################# 100 %
 
 real    0m16.617s
 user    0m0.202s
@@ -415,9 +437,9 @@ sys     0m0.421s
 CP2102:
 ```
 Neptune./d/Git/RX/RAYTRACER_sample/RX66T % time rx_prog -P COM12 -d RX66T --progress --erase --write --verify raytracer_sample.mot
-Erase:  #################################################
-Write:  #################################################
-Verify: #################################################
+Erase:  ################################################# 100 %
+Write:  ################################################# 100 %
+Verify: ################################################# 100 %
 
 real    0m6.616s
 user    0m0.078s
