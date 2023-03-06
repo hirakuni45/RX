@@ -59,6 +59,7 @@ namespace device {
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
 		static constexpr uint32_t	BASE		=  12'000'000;		///< 外部接続クリスタル
+#if 0 
 		static constexpr uint32_t	PLL_BASE	= 192'000'000;		///< PLL ベースクロック（104MHz ～ 200MHz）
 
 		static constexpr uint32_t	ICLK		=  96'000'000;		///< ICLK 周波数（最大100MHz）
@@ -66,6 +67,17 @@ namespace device {
 		static constexpr uint32_t	PCLKB		=  48'000'000;		///< PCLKB 周波数（最大50MHz）
 		static constexpr uint32_t	FCLK		=  48'000'000;		///< FCLK 周波数（最大50MHz）
 		static constexpr uint32_t	BCLK		=  48'000'000;		///< BCLK 周波数（最大100MHz）
+#else
+		// over clock: GR-CITRUS / RAYTRACER_sample で動作確認、問題無く動作する。
+		static constexpr uint32_t	PLL_BASE	= 240'000'000;		///< PLL ベースクロック（104MHz ～ 200MHz）
+
+		static constexpr uint32_t	ICLK		= 120'000'000;		///< ICLK 周波数（最大100MHz）
+		static constexpr uint32_t	PCLKA		= 120'000'000;		///< PCLKA 周波数（最大100MHz）
+		static constexpr uint32_t	PCLKB		=  60'000'000;		///< PCLKB 周波数（最大50MHz）
+		static constexpr uint32_t	FCLK		=  60'000'000;		///< FCLK 周波数（最大50MHz）
+		static constexpr uint32_t	BCLK		=  60'000'000;		///< BCLK 周波数（最大100MHz）
+#endif
+
 #else
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::HOCO;	///< 発信器種別型
 
