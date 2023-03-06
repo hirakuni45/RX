@@ -1,4 +1,4 @@
-Renesas RX65N/RX72N Envision Kit 関数電卓サンプル
+Renesas 関数電卓サンプル
 =========
 
 <img src="../docs/calc_sample.jpg" width="50%">
@@ -7,42 +7,53 @@ Renesas RX65N/RX72N Envision Kit 関数電卓サンプル
    
 ## 概要
 
- - 汎用関数電卓サンプル
- - RX65N/RX72N Envision Kit で利用する場合、GUI での操作が可能
- - グラフィックスを持たないマイコンではコンソールから操作可能
- - gmp mpfr ライブラリを使った、多倍長浮動小数点数
- - 250 桁の内部処理としている（もっと増やす事が出来るが、当面必要十分）
-    
+- 汎用関数電卓サンプル
+- RX65N/RX72N Envision Kit で利用する場合、GUI での操作が可能
+- グラフィックスを持たないマイコンではコンソールから操作可能
+- gmp mpfr ライブラリを使った、多倍長浮動小数点数
+- 250 桁の内部処理としている（もっと増やす事が出来るが、当面必要十分）
+
+---
+
 ## プロジェクト・リスト
 
- - main.cpp
- - calc_gui.hpp
- - calc_symbol.hpp
- - calc_func.hpp
- - calc_cmd.hpp
- - RX62N/Makefile
- - RX64M/Makefile
- - RX71M/Makefile
- - RX66T/Makefile
- - RX72T/Makefile
- - RX65N/Makefile (LCD GUI 対応)
- - RX72N/Makefile (LCD GUI 対応)
-   
+- main.cpp
+- calc_gui.hpp
+- calc_symbol.hpp
+- calc_func.hpp
+- calc_cmd.hpp
+- RX62N/Makefile CUI
+- RX631/Makefile CUI
+- RX64M/Makefile CUI
+- RX71M/Makefile CUI
+- RX66T/Makefile CUI
+- RX72T/Makefile CUI
+- RX65N/Makefile (RX65N Envision Kit 対応)
+- RX72N/Makefile (RX72N Envision Kit 対応)
+
+---
+
 ### 利用ライブラリ
 
- - rxlib/lib/libgmp.a
- - rxlib/lib/libmpfr.a
+- rxlib/lib/libgmp.a
+- rxlib/lib/libmpfr.a
+
+---
 
 ### 主な利用クラス
 
- - common/basic_arith.hpp
- - common/mpfr.hpp
-   
+- common/basic_arith.hpp
+- common/mpfr.hpp
+
+---
+
 ## ビルド方法
 
- - ターゲットディレクトリーに移動
- - make する。
- - calc_sample.mot ファイルをマイコンに書き込む。
+- ターゲットディレクトリーに移動
+- make する。
+- calc_sample.mot ファイルをマイコンに書き込む。
+
+---
 
 ## 利用関数
 
@@ -76,8 +87,9 @@ Renesas RX65N/RX72N Envision Kit 関数電卓サンプル
 - 柔軟で制限の無い１６進表示と変換など
 - 数式処理（微分や積分など）
 
+---
 
-## tan(355/266) の解
+## tan(355/226) の解
 
 ```
 # Rad
@@ -85,7 +97,7 @@ Renesas RX65N/RX72N Envision Kit 関数電卓サンプル
  -7497258.185325587112905071831891248663417267943785263161571
 ```
 
------
+---
    
 License
 ----

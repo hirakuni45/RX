@@ -2,7 +2,7 @@
 /*! @file
     @brief  関数電卓・サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -47,6 +47,13 @@ namespace {
 	typedef device::SCI1 SCI_CH;
   #endif
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+#elif defined(SIG_RX631)
+	// RX631 GR-CITRUS board
+	static const char* system_str_ = { "RX631 GR-CITRUS" };
+	// GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
