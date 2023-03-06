@@ -73,18 +73,6 @@ ifeq ($(RX_DEF),SIG_RX63T_S)
   PROG_ERASE =
 endif
 
-ifeq ($(RX_DEF),SIG_RX631)
-  RX_CPU = RX631
-  RX_CHOOSE = -misa=v1
-  LDSCRIPT	=	../../RX63x/$(DEVICE).ld
-endif
-
-ifeq ($(RX_DEF),SIG_RX63N)
-  RX_CPU = RX63N
-  RX_CHOOSE = -misa=v1
-  LDSCRIPT	=	../../RX63x/$(DEVICE).ld
-endif
-
 ifeq ($(RX_DEF),SIG_RX621)
   RX_CPU = RX621
   RX_CHOOSE = -misa=v1
@@ -97,6 +85,18 @@ ifeq ($(RX_DEF),SIG_RX62N)
   RX_CHOOSE = -misa=v1
   LDSCRIPT	=	../../RX62x/$(DEVICE).ld
   PROG_ERASE =
+endif
+
+ifeq ($(RX_DEF),SIG_RX631)
+  RX_CPU = RX631
+  RX_CHOOSE = -misa=v1
+  LDSCRIPT	=	../../RX63x/$(DEVICE).ld
+endif
+
+ifeq ($(RX_DEF),SIG_RX63N)
+  RX_CPU = RX63N
+  RX_CHOOSE = -misa=v1
+  LDSCRIPT	=	../../RX63x/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX24T)

@@ -50,6 +50,13 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
   #endif
+#elif defined(SIG_RX631)
+	// RX631 GR-CITRUS board
+	static const char* system_str_ = { "RX631 GR-CITRUS" };
+	// GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;

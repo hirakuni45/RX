@@ -1,4 +1,4 @@
-Renesas RX65N/RX72N Envision Kit Calculator Sample
+Calculator Sample
 =========
 
 <img src="../docs/calc_sample.jpg" width="50%">
@@ -7,42 +7,51 @@ Renesas RX65N/RX72N Envision Kit Calculator Sample
    
 ## Overview
 
- - Generic Calculator Applications
- - GUI operation when used with the RX65N/RX72N Envision Kit
- - Operable from the console in microcontrollers that do not have graphics
- - Multiply floating point number using the gmp mpfr library
- - 250 digits of internal processing (could be more, but sufficient for the time being)
+- Generic Calculator Applications
+- GUI operation when used with the RX65N/RX72N Envision Kit
+- Operable from the console in microcontrollers that do not have graphics
+- Multiply floating point number using the gmp mpfr library
+- 250 digits of internal processing (could be more, but sufficient for the time being)
 
 ## Project list
 
- - main.cpp
- - calc_gui.hpp
- - calc_symbol.hpp
- - calc_func.hpp
- - calc_cmd.hpp
- - RX62N/Makefile
- - RX64M/Makefile
- - RX71M/Makefile
- - RX66T/Makefile
- - RX72T/Makefile
- - RX65N/Makefile (for LCD)
- - RX72N/Makefile (for LCD)
+- main.cpp
+- calc_gui.hpp
+- calc_symbol.hpp
+- calc_func.hpp
+- calc_cmd.hpp
+- RX62N/Makefile CUI
+- RX631/Makefile CUI (for GR-CITRUS)
+- RX64M/Makefile CUI
+- RX71M/Makefile CUI
+- RX66T/Makefile CUI
+- RX72T/Makefile CUI
+- RX65N/Makefile GUI (for RX65N Envision Kit)
+- RX72N/Makefile GUI (for RX72N Envision Kit)
+
+---
 
 ### Use Library
 
- - libgmp.a
- - libmpfr.a
+- libgmp.a
+- libmpfr.a
+
+---
 
 ### Main support classes
 
- - common/basic_arith.hpp
- - common/mpfr.hpp
-   
+- common/basic_arith.hpp
+- common/mpfr.hpp
+
+---
+
 ## Build Method
 
- - Go to the target directory
- - Make.
- - Write the calc_sample.mot file to the microcontroller.
+- Go to the target directory
+- Make.
+- Write the calc_sample.mot file to the microcontroller.
+
+---
 
 ## Corresponding function
 
@@ -66,6 +75,8 @@ Renesas RX65N/RX72N Envision Kit Calculator Sample
 |Rad|Angle Method, 2pi|
 |Grad|Angle Method, 400|
 
+---
+
 ## Future Plans
 
 - Wifi-enabled, allowing you to view and type in the browser
@@ -74,7 +85,17 @@ Renesas RX65N/RX72N Envision Kit Calculator Sample
 - Flexible and unrestricted hexadecimal display and conversion, etc.
 - Arithmetic Processing
 
------
+---
+
+## Answer of tan(355/226) 
+
+```
+# Rad
+# tan(355/226)
+ -7497258.185325587112905071831891248663417267943785263161571
+```
+
+----
    
 License
 ----
