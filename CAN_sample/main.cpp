@@ -62,7 +62,7 @@ namespace {
 	static constexpr bool LED_ACTIVE = 1;
 	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
-	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::SECOND;
 	typedef device::CAN0 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX71M)

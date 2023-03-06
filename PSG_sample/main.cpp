@@ -2,7 +2,7 @@
 /*! @file
     @brief  PSG サンプル @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -37,6 +37,22 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
   #endif
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+	typedef device::DA DAC;
+
+#elif defined(SIG_RX631)
+	// RX631 GR-CITRUS board
+	static const char* system_str_ = { "RX631 GR-CITRUS" };
+	// GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::SECOND;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
