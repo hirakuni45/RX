@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T(Version B) D/A 制御
+	@brief	RX62[1N]/RX63[1N]/RX24T(Version B) 10 bits D/A 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -44,49 +44,52 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	スタート @n
-					※RX66T は ampe は機能なし。
+			@brief	スタート
 			@param[in]	otype	出力タイプ
-			@param[in]	ampe	アンプ許可の場合「true」
+			@param[in]	ampe	アンプ許可の場合「true」 @n
+								互換性の為ある（機能しない）
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
 		bool start(output otype, bool ampe) const noexcept
 		{
+			power_mgr::turn(DAC::PERIPHERAL);
+
 			if(otype == output::NONE) {
-				power_mgr::turn(DAC::PERIPHERAL);
 				DAC::DACR.DAE = 0;
 				DAC::DACR = DAC::DACR.DAE.b(0) | DAC::DACR.DAOE0.b(0) | DAC::DACR.DAOE1.b(0);
 				power_mgr::turn(DAC::PERIPHERAL, false);
 				return true;
 			}
 
-			power_mgr::turn(DAC::PERIPHERAL);
-
-			DAC::DADPR.DPSEL = 1;  // 左詰め（下位４ビット無視）
+			DAC::DADPR.DPSEL = 1;  // 左詰め（下位６ビット無視）
 
 			DAC::DACR.DAE = 0;
-
 			bool ch0 = false;
 			bool ch1 = false;
-			if(otype == output::CH0) {
+			switch(otype) {
+			case output::CH0:
 				ch0 = true;
-			} else if(otype == output::CH1) {
+				break;
+			case output::CH1:
 				ch1 = true;
-			} else if(otype == output::CH0_CH1) {
+				break;
+			case output::CH0_CH1:
 				ch0 = true;
 				ch1 = true;
-			} else {
+				break;
+			default:
+				power_mgr::turn(DAC::PERIPHERAL, false);
 				return false;
 			}
 
 			if(ch0) {
-				DAC::DACR.DAOE0 = 1;
 				DAC::enable(DAC::ANALOG::DA0);
+				DAC::DACR.DAOE0 = 1;
 			}
 			if(ch1) {
-				DAC::DACR.DAOE1 = 1;
 				DAC::enable(DAC::ANALOG::DA1);
+				DAC::DACR.DAOE1 = 1;
 			}
 
 			utils::delay::micro_second(3);  // amp start setup time
@@ -109,7 +112,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	電圧出力０ポートアドレスの取得
+			@brief	電圧出力０ポートアドレスの取得 @n
+					32 bits アクセスで、DA0/DA1 を同時に書き込み可能
 			@return 電圧出力０ポートアドレス
 		 */
 		//-----------------------------------------------------------------//
@@ -133,8 +137,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	電圧出力０ポートアドレスの取得
-			@return 電圧出力０ポートアドレス
+			@brief	電圧出力１ポートアドレスの取得
+			@return 電圧出力１ポートアドレス
 		 */
 		//-----------------------------------------------------------------//
 		uint32_t get_out1_adr() const noexcept

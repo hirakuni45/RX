@@ -29,8 +29,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			DA0,	///< P54/DA0
-			DA1,	///< P55/DA1
+			DA0,	///< P03/DA0
+			DA1,	///< P05/DA1
 		};
 
 
@@ -51,6 +51,7 @@ namespace device {
 				if(ena) {
 					PORT0::PDR.B3 = 0;
 					PORT0::PMR.B3 = 0;
+					PORT0::PCR.B3 = 0;
 				}
 				MPC::P03PFS.ASEL = ena;
 				break;
@@ -58,8 +59,9 @@ namespace device {
 				if(ena) {
 					PORT0::PDR.B5 = 0;
 					PORT0::PMR.B5 = 0;
+					PORT0::PCR.B5 = 0;
 				}
-				MPC::P05PFS.ASEL = 1;
+				MPC::P05PFS.ASEL = ena;
 				break;
 			}
 

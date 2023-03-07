@@ -1,4 +1,4 @@
-Renesas RX62N, RX64M, RX71M, RX66T, RX72N CAN sample
+Renesas RX62N, RX631, RX64M, RX71M, RX66T, RX72N CAN sample
 =========
 
 [Japanese](READMEja.md)
@@ -13,6 +13,7 @@ The environment variable "MULTI" is enabled in "main.cpp".
 ## Description
 - main.cpp
 - RX62N/Makefile
+- RX631/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
 - RX66T/Makefile
@@ -38,6 +39,7 @@ See the following sources for the ports to connect the CAN bus transceiver.
 |microcontroller|file|CAN0 Alternate|CAN1 Alternate|
 |-------|--------|:---:|:---:|
 |RX62N  |[RX62x/port_map.hpp](../RX62x/port_map.hpp)|FIRST|X|
+|RX631  |[RX63x/port_map.hpp](../RX63x/port_map.hpp)|FIRST|-|
 |RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|

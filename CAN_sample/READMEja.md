@@ -1,4 +1,4 @@
-Renesas RX62N, RX64M, RX71M, RX66T, RX72T, RX72N CAN 通信サンプル
+Renesas RX62N, RX631, RX64M, RX71M, RX66T, RX72T, RX72N CAN 通信サンプル
 =========
    
 [英語版](README.md)
@@ -14,6 +14,7 @@ CAN が複数チャネルある場合、チャネルを切り替えて通信す�
 
 - main.cpp
 - RX62N/Makefile
+- RX631/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
 - RX66T/Makefile
@@ -38,6 +39,7 @@ CAN バス・トランシーバーを接続するポートは、以下のソー�
 |マイコン|ファイル|CAN0 候補|CAN1 候補|
 |-------|--------|:---:|:---:|
 |RX62N  |[RX62x/port_map.hpp](../RX62x/port_map.hpp)|FIRST|X|
+|RX631  |[RX63x/port_map.hpp](../RX63x/port_map.hpp)|FIRST|-|
 |RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|
@@ -111,9 +113,10 @@ main.cpp には、通過する事が出来る ID リストを使った、フィ�
    
 main.cpp の先頭で、「#define VALID_FILTER」をコメントアウトすると、フィルターをスルーします。
    
-有効な ID テーブルは、以下のようになっています。
+有効な ID テーブルは、以下のようになっています。   
+boost::unordered_set を使っています。   
 
-```
+```C++
 	// 有効な ID だけ通すフィルター
 	typedef boost::unordered_set<uint32_t> VALID;
 //	typedef const boost::unordered_set<uint32_t> VALID;

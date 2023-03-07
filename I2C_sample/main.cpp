@@ -65,6 +65,14 @@ namespace {
 #else
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 #endif
+#elif defined(SIG_RX631)
+	// RX631 GR-CITRUS board
+	static const char* system_str_ = { "RX631 GR-CITRUS" };
+	// GR-CITRUS
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB, device::port_map::ORDER::SECOND> SCI_IO;
+	typedef device::iica_io<device::RIIC0> I2C_IO;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;

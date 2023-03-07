@@ -192,10 +192,12 @@ namespace device {
 			switch(an) {
 			case ANALOG::DA0:
 				PORT0::PCR.B3 = 0;
+				PORT0::PMR.B3 = 0;
 				MPC::P03PFS.ASEL = f;
 				break;
 			case ANALOG::DA1:
 				PORT0::PCR.B5 = 0;
+				PORT0::PMR.B5 = 0;
 				MPC::P05PFS.ASEL = f;
 				break;
 			default:
@@ -269,10 +271,12 @@ namespace device {
 			switch(an) {
 			case ANALOG::DA0:
 				PORT6::PCR.B4 = 0;
+				PORT6::PMR.B4 = 0;
 				MPC::P64PFS.ASEL = 1;
 				break;
 			case ANALOG::DA1:
 				PORT6::PCR.B5 = 0;
+				PORT6::PMR.B5 = 0;
 				MPC::P65PFS.ASEL = 1;
 				break;
 			default:

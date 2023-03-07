@@ -1,4 +1,4 @@
-Renesas RX62N, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T 疑似 PSG 演奏サンプル
+Renesas RX62N, RX631, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T 疑似 PSG 演奏サンプル
 =========
    
 <iframe width="560" height="315" src="https://www.youtube.com/watch?v=4ZHuMYcSQko" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -19,6 +19,7 @@ RX マイコンを使った 疑似 PSG 音楽演奏サンプルです。
 
 - main.cpp
 - RX62N/Makefile
+- RX631/Makefile (for GR-CITRUS)
 - RX64M/Makefile
 - RX71M/Makefile
 - RX65N/Makefile (for RX65N Envision Kit)
@@ -50,6 +51,7 @@ RX マイコンを使った 疑似 PSG 音楽演奏サンプルです。
 - LED が 0.25 秒間隔で点滅する。
 - 音楽の演奏が開始され、DA0/DA1 からアナログ出力（モノラル）
 - RX72N では、SSIE 出力
+- GR-CITRUS（RX631）の D/A 出力は、DA1 のみ。（DA0 は端子がありません）
     
 -----
    
