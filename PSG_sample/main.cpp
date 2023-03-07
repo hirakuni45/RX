@@ -30,12 +30,14 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
   #else
     // BlueBoard-RX62N_100pin
 	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
   #endif
 
 	// D/A 出力では、無音出力は、中間電圧とする。
@@ -65,6 +67,7 @@ namespace {
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
@@ -77,6 +80,7 @@ namespace {
 	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
@@ -90,6 +94,7 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, false> SW2;
 	typedef device::SCI9 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
@@ -103,11 +108,13 @@ namespace {
 	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
@@ -121,6 +128,7 @@ namespace {
 	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
 	typedef device::SCI2 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// SSIE の FIFO サイズの２倍以上（1024）
@@ -134,6 +142,7 @@ namespace {
 	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
@@ -147,7 +156,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+	typedef device::sci_io<SCI_CH, RXB, TXB, SCI_PORT> SCI;
 
 	SCI		sci_;
 
@@ -160,27 +169,27 @@ namespace {
 	// サウンド出力コンテキスト
 	SOUND_OUT	sound_out_(ZERO_LEVEL);
 
-	static constexpr uint16_t SAMPLE = 48'000;  // サンプリング周期（F_CLK は CPU の動作周波数）
+	static constexpr uint16_t SAMPLE = 48'000;  // サンプリング周期
 	static constexpr uint16_t TICK = 100;	// サンプルの楽曲では、１００を前提にしている。
 	static constexpr uint16_t CNUM = 3;		// 同時発音数（大きくすると処理負荷が増えるので注意）
 	typedef utils::psg_base PSG;
 	typedef utils::psg_mng<SAMPLE, TICK, CNUM> PSG_MNG;
 	PSG_MNG		psg_mng_;
 
+
 #ifdef USE_DAC
-//	typedef sound::dac_stream<DAC, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
 	typedef sound::dac_stream<DAC, device::MTU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
-//	typedef sound::dac_stream<DAC, device::CMT1, device::DMAC0, SOUND_OUT> DAC_STREAM;
 	DAC_STREAM	dac_stream_(sound_out_);
 
 	void start_audio_()
 	{
 		auto dmac_intl = device::ICU::LEVEL::_4;
 		auto timer_intl  = device::ICU::LEVEL::_5;
-		if(dac_stream_.start(48'000, dmac_intl, timer_intl)) {
-			utils::format("Start D/A Stream\n");
+		uint32_t freq = 48'000;
+		if(dac_stream_.start(freq, dmac_intl, timer_intl)) {
+			utils::format("Start D/A Stream: %u Hz\n") % freq;
 		} else {
-			utils::format("D/A Stream Not start...\n");
+			utils::format("D/A Stream not start...\n");
 		}
 	}
 #endif
@@ -1249,7 +1258,6 @@ int main(int argc, char** argv)
 	bool lvl = SW2::P();
 #endif
 
-	uint8_t cnt = 0;
 	uint8_t delay = 200;
 
 	cmt_.sync();
@@ -1258,8 +1266,11 @@ int main(int argc, char** argv)
 	uint32_t pos = sound_out_.get_sample_pos();
 	uint32_t min = sound_out_.get_sample_size();
 	uint32_t max = 0;
+
+	uint8_t cnt = 0;
 	while(1) {
 		cmt_.sync();
+
 		{  // 減った分を追加する。
 			auto newpos = sound_out_.get_sample_pos();
 			auto n = newpos - pos;

@@ -107,7 +107,7 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t sample_rate, device::ICU::LEVEL dmac_intl, device::ICU::LEVEL itv_intl, bool amp_ena = true) noexcept
 		{
-			{  // 内臓１２ビット D/A の設定
+			{  // 内臓 D/A の設定
 				bool amp_ena = true;
 				dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
 				dac_out_.out0(0x8000);
@@ -144,7 +144,7 @@ namespace sound {
 		void set_sample_rate(uint32_t freq) noexcept
 		{
     	    if(!itv_mgr_.start(freq, itv_intl_)) {
- //       	    utils::format("ITM start error...\n");
+ //       	    utils::format("ITV start error...\n");
         	} else {
 #if 0
 				utils::format("ITV intr level: %d\n") % static_cast<int>(itv_io_.get_intr_vec());
