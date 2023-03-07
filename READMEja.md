@@ -154,7 +154,7 @@ int main(int argc, char** argv)
 |[/SYNTH_sample](./SYNTH_sample)|－|－|－|－|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
 |[/CALC_sample](./CALC_sample)|－|〇|－|〇|－|〇|〇|〇|〇|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
 |[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
-|[/PSG_sample](./PSG_sample)|－|－|－|〇|－|〇|〇|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
+|[/PSG_sample](./PSG_sample)|－|〇|－|〇|－|〇|〇|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
 |[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。   
