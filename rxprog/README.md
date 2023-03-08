@@ -70,7 +70,7 @@ See development environment preparation of 'RX/README.md'
 
 ## Connection terminal list
 
-RX220:
+### RX220:
 |Terminal|RX220 (64)|
 |---|---|
 |MD|MD(3)|
@@ -78,13 +78,14 @@ RX220:
 |RXD|P30/RXD1(14)|
 |TXD|P26/TXD1(16)|
 
-|Mode|B/UB|
-|---|:---:|
-|Boot Mode|0|
-|User Boot Mode|1|
+|Mode|B/UB|MD|
+|---|:---:|:---:|
+|Boot Mode|0|0|
+|User Boot Mode|1|0|
+|Single Chip|-|1|
 
 ---
-RX621/RX62N:
+### RX621/RX62N:
 |Terminal|RX621/RX62N (144)|
 |---|---|
 |MD0|MD0(16)|
@@ -100,7 +101,7 @@ RX621/RX62N:
 |Single Chip|1|1|
 
 ---
-RX631/RX63N:
+### RX631/RX63N:
 |Terminal|LQFP 48|LQFP 64|TFLGA 64|LQFP 100|TFLGA 100|LQFP 144|TFLGA 145|LQFP 176|LFBGA 176|TFLGA 177|
 |---|---|---|---|---|---|---|---|---|---|---|
 |UB|PC7(21)|PC7(27)|PA6(D5)|PC7(45)|PC7(H7)|PC7(60)|PC7(N9)|PC7(76)|PC7(N10)|PC7(N10)|
@@ -116,7 +117,7 @@ RX631/RX63N:
 |Single Chip|-|1|
 
 ---
-RX63T/RX24T/RX66T/RX72T:
+### RX63T/RX24T/RX66T/RX72T:
 |Terminal|RX63T (64)|RX24T (100)|RX66T (100)|RX72T (144)|
 |---|---|---|---|------|
 |UB|P00(2)|-|UB/P00(4)|UB/P00(9)|
@@ -132,7 +133,7 @@ RX63T/RX24T/RX66T/RX72T:
 |Single Chip|-|1|
 
 ---
-RX64M/RX71M/RX651/RX65N:
+### RX64M/RX71M/RX651/RX65N:
 |Terminal|RX64M (176)|RX71M (176)|RX651/RX65N (176)|
 |---|---|---|---|
 |UB|PC7/UB(76)|PC7/UB(76)|PC7/UB(76)|

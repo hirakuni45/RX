@@ -263,81 +263,113 @@ namespace device {
 				case VECTOR::CMI2:    idx = 0x06; break;
 				case VECTOR::CMI3:    idx = 0x07; break;
 
+				case VECTOR::SPEI0:
+				case VECTOR::SPRI0:
+				case VECTOR::SPTI0:
+				case VECTOR::SPII0:
+					idx = static_cast<uint32_t>(VECTOR::SPEI0);
+					break;
+
 				case VECTOR::TGIA0:
 				case VECTOR::TGIB0:
 				case VECTOR::TGIC0:
-				case VECTOR::TGID0:   idx = 114; break;
+				case VECTOR::TGID0:
+					idx = static_cast<uint32_t>(VECTOR::TGIA0);
+					break;
 				case VECTOR::TCIV0:
 				case VECTOR::TGIE0:
-				case VECTOR::TGIF0:   idx = 118; break;
-
+				case VECTOR::TGIF0:
+					idx = static_cast<uint32_t>(VECTOR::TCIV0);
+					break;
 				case VECTOR::TGIA1:
-				case VECTOR::TGIB1:   idx = 121; break;
+				case VECTOR::TGIB1:
+					idx = static_cast<uint32_t>(VECTOR::TGIA1);
+					break;
 				case VECTOR::TCIV1:
-				case VECTOR::TCIU1:   idx = 123; break;
-
+				case VECTOR::TCIU1:
+					idx = static_cast<uint32_t>(VECTOR::TCIV1);
+					break;
 				case VECTOR::TGIA2:
-				case VECTOR::TGIB2:   idx = 125; break;
+				case VECTOR::TGIB2:
+					idx = static_cast<uint32_t>(VECTOR::TGIA2);
+					break;
 				case VECTOR::TCIV2:
-				case VECTOR::TCIU2:   idx = 127; break;
-
+				case VECTOR::TCIU2:
+					idx = static_cast<uint32_t>(VECTOR::TCIV2);
+					break;
 				case VECTOR::TGIA3:
 				case VECTOR::TGIB3:
 				case VECTOR::TGIC3:
-				case VECTOR::TGID3:   idx = 129; break;
-				case VECTOR::TCIV3:   idx = 133; break;
-
+				case VECTOR::TGID3:
+					idx = static_cast<uint32_t>(VECTOR::TGIA3);
+					break;
+				case VECTOR::TCIV3:
+					idx = static_cast<uint32_t>(VECTOR::TCIV3);
+					break;
 				case VECTOR::TGIA4:
 				case VECTOR::TGIB4:
 				case VECTOR::TGIC4:
-				case VECTOR::TGID4:   idx = 134; break;
-				case VECTOR::TCIV4:   idx = 138; break;
-
+				case VECTOR::TGID4:
+					idx = static_cast<uint32_t>(VECTOR::TGIA4);
+					break;
+				case VECTOR::TCIV4:
+					idx = static_cast<uint32_t>(VECTOR::TCIV4);
+					break;
 				case VECTOR::TGIU5:
 				case VECTOR::TGIV5:
-				case VECTOR::TGIW5:   idx = 139; break;
-
+				case VECTOR::TGIW5:
+					idx = static_cast<uint32_t>(VECTOR::TGIU5);
+					break;
 				case VECTOR::CMIA0:
 				case VECTOR::CMIB0:
-				case VECTOR::OVI0:    idx = 174; break;
-
+				case VECTOR::OVI0:
+					idx = static_cast<uint32_t>(VECTOR::CMIA0);
+					break;
 				case VECTOR::CMIA1:
 				case VECTOR::CMIB1:
-				case VECTOR::OVI1:    idx = 177; break;
-
+				case VECTOR::OVI1:
+					idx = static_cast<uint32_t>(VECTOR::CMIA1);
+					break;
 				case VECTOR::CMIA2:
 				case VECTOR::CMIB2:
-				case VECTOR::OVI2:    idx = 180; break;
-
+				case VECTOR::OVI2:
+					idx = static_cast<uint32_t>(VECTOR::CMIA2);
+					break;
 				case VECTOR::CMIA3:
 				case VECTOR::CMIB3:
-				case VECTOR::OVI3:    idx = 183; break;
-
+				case VECTOR::OVI3:
+					idx = static_cast<uint32_t>(VECTOR::CMIA3);
+					break;
 				case VECTOR::ERI1:
 				case VECTOR::RXI1:
 				case VECTOR::TXI1:
-				case VECTOR::TEI1:    idx = 218; break;
-
+				case VECTOR::TEI1:
+					idx = static_cast<uint32_t>(VECTOR::ERI1);
+					break;
 				case VECTOR::ERI5:
 				case VECTOR::RXI5:
 				case VECTOR::TXI5:
-				case VECTOR::TEI5:    idx = 222; break;
-
+				case VECTOR::TEI5:
+					idx = static_cast<uint32_t>(VECTOR::ERI5);
+					break;
 				case VECTOR::ERI6:
 				case VECTOR::RXI6:
 				case VECTOR::TXI6:
-				case VECTOR::TEI6:    idx = 226; break;
-
+				case VECTOR::TEI6:
+					idx = static_cast<uint32_t>(VECTOR::ERI6);
+					break;
 				case VECTOR::ERI9:
 				case VECTOR::RXI9:
 				case VECTOR::TXI9:
-				case VECTOR::TEI9:    idx = 234; break;
-
+				case VECTOR::TEI9:
+					idx = static_cast<uint32_t>(VECTOR::ERI9);
+					break;
 				case VECTOR::ERI12:
 				case VECTOR::RXI12:
 				case VECTOR::TXI12:
-				case VECTOR::TEI12:   idx = 238; break;
-
+				case VECTOR::TEI12:
+					idx = static_cast<uint32_t>(VECTOR::ERI12);
+					break;
 				default: idx = static_cast<uint32_t>(vec); break;
 				}
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
