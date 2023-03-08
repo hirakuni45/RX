@@ -64,18 +64,18 @@ namespace device {
 			SPTI2		= 46,
 			SPII2		= 47,
 
-			RXF0		= 43,  ///< CAN0
-			TXF0		= 44,
-			RXM0		= 45,
-			TXM0		= 46,
-			RXF1		= 47,  ///< CAN1
-			TXF1		= 48,
-			RXM1		= 49,
-			TXM1		= 50,
-			RXF2		= 51,  ///< CAN2
-			TXF2		= 52,
-			RXM2		= 53,
-			TXM2		= 54,
+			RXF0		= 48,  ///< CAN0
+			TXF0		= 49,
+			RXM0		= 50,
+			TXM0		= 51,
+			RXF1		= 52,  ///< CAN1
+			TXF1		= 53,
+			RXM1		= 54,
+			TXM1		= 55,
+			RXF2		= 56,  ///< CAN2
+			TXF2		= 57,
+			RXM2		= 58,
+			TXM2		= 59,
 
 			CUP			= 62,	///< RTC
 
@@ -499,6 +499,201 @@ namespace device {
 				case VECTOR::CMI1:   idx = 5; break;
 				case VECTOR::CMI2:   idx = 6; break;
 				case VECTOR::CMI3:   idx = 7; break;
+				case VECTOR::SPRI0:
+				case VECTOR::SPTI0:
+				case VECTOR::SPII0:
+					idx = static_cast<uint32_t>(VECTOR::SPRI0);
+					break;
+				case VECTOR::SPRI1:
+				case VECTOR::SPTI1:
+				case VECTOR::SPII1:
+					idx = static_cast<uint32_t>(VECTOR::SPRI1);
+					break;
+				case VECTOR::SPRI2:
+				case VECTOR::SPTI2:
+				case VECTOR::SPII2:
+					idx = static_cast<uint32_t>(VECTOR::SPRI2);
+					break;
+				case VECTOR::RXF0:
+				case VECTOR::TXF0:
+				case VECTOR::RXM0:
+				case VECTOR::TXM0:
+					idx = static_cast<uint32_t>(VECTOR::RXF0);
+					break;
+				case VECTOR::RXF1:
+				case VECTOR::TXF1:
+				case VECTOR::RXM1:
+				case VECTOR::TXM1:
+					idx = static_cast<uint32_t>(VECTOR::RXF1);
+					break;
+				case VECTOR::RXF2:
+				case VECTOR::TXF2:
+				case VECTOR::RXM2:
+				case VECTOR::TXM2:
+					idx = static_cast<uint32_t>(VECTOR::RXF2);
+					break;
+				case VECTOR::SCIX0:
+				case VECTOR::SCIX1:
+				case VECTOR::SCIX2:
+				case VECTOR::SCIX3:
+					idx = static_cast<uint32_t>(VECTOR::SCIX0);
+					break;
+				case VECTOR::TGI0A:
+				case VECTOR::TGI0B:
+				case VECTOR::TGI0C:
+				case VECTOR::TGI0D:
+					idx = static_cast<uint32_t>(VECTOR::TGI0A);
+					break;
+				case VECTOR::TGI1A:
+				case VECTOR::TGI1B:
+					idx = static_cast<uint32_t>(VECTOR::TGI1A);
+					break;
+				case VECTOR::TGI2A:
+				case VECTOR::TGI2B:
+					idx = static_cast<uint32_t>(VECTOR::TGI2A);
+					break;
+				case VECTOR::TGI3A:
+				case VECTOR::TGI3B:
+				case VECTOR::TGI3C:
+				case VECTOR::TGI3D:
+					idx = static_cast<uint32_t>(VECTOR::TGI3A);
+					break;
+				case VECTOR::TGI4A:
+				case VECTOR::TGI4B:
+					idx = static_cast<uint32_t>(VECTOR::TGI4A);
+					break;
+				case VECTOR::TGI5A:
+				case VECTOR::TGI5B:
+					idx = static_cast<uint32_t>(VECTOR::TGI5A);
+					break;
+				case VECTOR::TGI6A:  // TGIA0
+				case VECTOR::TGI6B:  // TGIB0
+				case VECTOR::TGI6C:  // TGIC0
+				case VECTOR::TGI6D:  // TGID0
+					idx = static_cast<uint32_t>(VECTOR::TGI6A);
+					break;
+				case VECTOR::TGIE0:
+				case VECTOR::TGIF0:
+					idx = static_cast<uint32_t>(VECTOR::TGIE0);
+					break;
+				case VECTOR::TGI7A:  // TGIA1
+				case VECTOR::TGI7B:  // TGIB1
+					idx = static_cast<uint32_t>(VECTOR::TGI7A);
+					break;
+				case VECTOR::TGI8A:  // TGIA2
+				case VECTOR::TGI8B:  // TGIB2
+					idx = static_cast<uint32_t>(VECTOR::TGI8A);
+					break;
+				case VECTOR::TGI9A:  // TGIA3
+				case VECTOR::TGI9B:  // TGIB3
+				case VECTOR::TGI9C:  // TGIC3
+				case VECTOR::TGI9D:  // TGID3
+					idx = static_cast<uint32_t>(VECTOR::TGI9A);
+					break;
+				case VECTOR::TGI10A:  // TGIA4
+				case VECTOR::TGI10B:  // TGIB4
+				case VECTOR::TGIC4:
+				case VECTOR::TGID4:
+					idx = static_cast<uint32_t>(VECTOR::TGI10A);
+					break;
+				case VECTOR::TGIU5:
+				case VECTOR::TGIV5:
+				case VECTOR::TGIW5:
+					idx = static_cast<uint32_t>(VECTOR::TGIU5);
+					break;
+				case VECTOR::TGI11A:
+				case VECTOR::TGI11B:
+					idx = static_cast<uint32_t>(VECTOR::TGI11A);
+					break;
+				case VECTOR::OEI1:
+				case VECTOR::OEI2:
+					idx = static_cast<uint32_t>(VECTOR::OEI1);
+					break;
+				case VECTOR::CMIA0:
+				case VECTOR::CMIB0:
+				case VECTOR::OVI0:
+					idx = static_cast<uint32_t>(VECTOR::CMIA0);
+					break;
+				case VECTOR::CMIA1:
+				case VECTOR::CMIB1:
+				case VECTOR::OVI1:
+					idx = static_cast<uint32_t>(VECTOR::CMIA1);
+					break;
+				case VECTOR::CMIA2:
+				case VECTOR::CMIB2:
+				case VECTOR::OVI2:
+					idx = static_cast<uint32_t>(VECTOR::CMIA2);
+					break;
+				case VECTOR::CMIA3:
+				case VECTOR::CMIB3:
+				case VECTOR::OVI3:
+					idx = static_cast<uint32_t>(VECTOR::CMIA3);
+					break;
+				case VECTOR::RXI0:
+				case VECTOR::TXI0:
+				case VECTOR::TEI0:
+					idx = static_cast<uint32_t>(VECTOR::RXI0);
+					break;
+				case VECTOR::RXI1:
+				case VECTOR::TXI1:
+				case VECTOR::TEI1:
+					idx = static_cast<uint32_t>(VECTOR::RXI1);
+					break;
+				case VECTOR::RXI2:
+				case VECTOR::TXI2:
+				case VECTOR::TEI2:
+					idx = static_cast<uint32_t>(VECTOR::RXI2);
+					break;
+				case VECTOR::RXI3:
+				case VECTOR::TXI3:
+				case VECTOR::TEI3:
+					idx = static_cast<uint32_t>(VECTOR::RXI3);
+					break;
+				case VECTOR::RXI4:
+				case VECTOR::TXI4:
+				case VECTOR::TEI4:
+					idx = static_cast<uint32_t>(VECTOR::RXI4);
+					break;
+				case VECTOR::RXI5:
+				case VECTOR::TXI5:
+				case VECTOR::TEI5:
+					idx = static_cast<uint32_t>(VECTOR::RXI5);
+					break;
+				case VECTOR::RXI6:
+				case VECTOR::TXI6:
+				case VECTOR::TEI6:
+					idx = static_cast<uint32_t>(VECTOR::RXI6);
+					break;
+				case VECTOR::RXI7:
+				case VECTOR::TXI7:
+				case VECTOR::TEI7:
+					idx = static_cast<uint32_t>(VECTOR::RXI7);
+					break;
+				case VECTOR::RXI8:
+				case VECTOR::TXI8:
+				case VECTOR::TEI8:
+					idx = static_cast<uint32_t>(VECTOR::RXI8);
+					break;
+				case VECTOR::RXI9:
+				case VECTOR::TXI9:
+				case VECTOR::TEI9:
+					idx = static_cast<uint32_t>(VECTOR::RXI9);
+					break;
+				case VECTOR::RXI10:
+				case VECTOR::TXI10:
+				case VECTOR::TEI10:
+					idx = static_cast<uint32_t>(VECTOR::RXI10);
+					break;
+				case VECTOR::RXI11:
+				case VECTOR::TXI11:
+				case VECTOR::TEI11:
+					idx = static_cast<uint32_t>(VECTOR::RXI11);
+					break;
+				case VECTOR::RXI12:
+				case VECTOR::TXI12:
+				case VECTOR::TEI12:
+					idx = static_cast<uint32_t>(VECTOR::RXI12);
+					break;
 				default: idx = static_cast<uint32_t>(vec); break;
 				}
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
