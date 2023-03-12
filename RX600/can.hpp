@@ -51,7 +51,10 @@ namespace device {
 			@param[in]	v	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_IDE(bool v) { if(v) pad[0] |= 1 << 31; else pad[0] &= ~(1 << 31); }
+		void set_IDE(bool v) {
+			if(v) { pad[0] |=   1 << 31;  }
+			else  { pad[0] &= ~(1 << 31); }
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -109,7 +112,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		void set_EID(uint32_t id) {
-			pad[0] &= ~(0x3ffff);
+			pad[0] &= ~(0x3'ffff);
 			pad[0] |= id;
 		}
 
@@ -120,7 +123,7 @@ namespace device {
 			@return	拡張 ID
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_EID() const { return pad[0] & 0x3ffff; }
+		uint32_t get_EID() const { return pad[0] & 0x3'ffff; }
 
 
 		//-----------------------------------------------------------------//
@@ -460,24 +463,24 @@ namespace device {
 			}
 
 			void copy(uint32_t idx) noexcept {
-				wr32_(io0_::address +  0, rd32_(base + idx * 16 +  0));
-				wr32_(io0_::address +  4, rd32_(base + idx * 16 +  4));
-				wr32_(io0_::address +  8, rd32_(base + idx * 16 +  8));
-				wr32_(io0_::address + 12, rd32_(base + idx * 16 + 12));
+				wr32_(io0_::address + io0_::index +  0, rd32_(base + idx * 16 +  0));
+				wr32_(io0_::address + io0_::index +  4, rd32_(base + idx * 16 +  4));
+				wr32_(io0_::address + io0_::index +  8, rd32_(base + idx * 16 +  8));
+				wr32_(io0_::address + io0_::index + 12, rd32_(base + idx * 16 + 12));
 			}
 
 			void set(const can_frame& src) noexcept {
-				wr32_(io0_::address +  0, src[0]);
-				wr32_(io0_::address +  4, src[1]);
-				wr32_(io0_::address +  8, src[2]);
-				wr32_(io0_::address + 12, src[3]);
+				wr32_(io0_::address + io0_::index +  0, src[0]);
+				wr32_(io0_::address + io0_::index +  4, src[1]);
+				wr32_(io0_::address + io0_::index +  8, src[2]);
+				wr32_(io0_::address + io0_::index + 12, src[3]);
 			}
 
 			void get(can_frame& dst) noexcept {
-				dst[0] = rd32_(io0_::address +  0);
-				dst[1] = rd32_(io0_::address +  4);
-				dst[2] = rd32_(io0_::address +  8);
-				dst[3] = rd32_(io0_::address + 12);
+				dst[0] = rd32_(io0_::address + io0_::index +  0);
+				dst[1] = rd32_(io0_::address + io0_::index +  4);
+				dst[2] = rd32_(io0_::address + io0_::index +  8);
+				dst[3] = rd32_(io0_::address + io0_::index + 12);
 			}
 
 			mb_t& operator [] (uint32_t idx) {
