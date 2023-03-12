@@ -27,8 +27,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct sckcr_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
+		struct sckcr_t : public rw32_t<base, 0b0001'0001> {
+			typedef rw32_t<base, 0b0001'0001> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;

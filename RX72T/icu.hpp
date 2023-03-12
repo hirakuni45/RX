@@ -4,7 +4,7 @@
 	@brief	RX66T/RX72T グループ・ICUC 定義 @n
 			RX66T、RX72T 共通
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -628,6 +628,10 @@ namespace device {
 				case VECTOR::RXM0:
 				case VECTOR::TXM0:
 					idx = static_cast<uint32_t>(VECTOR::RXF0);
+					break;
+				case VECTOR::RD:
+				case VECTOR::WR:
+					idx = static_cast<uint32_t>(VECTOR::RD);
 					break;
 				default: idx = static_cast<uint32_t>(vec); break;
 				}
