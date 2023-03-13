@@ -533,7 +533,7 @@ namespace {
 				analize_.list_all();
 			}
 		} else if(cmd_.cmp_word(0, "clear")) {
-			analize_.clear();
+			analize_.clear_all();
 		} else if(cmd_.cmp_word(0, "dump")) {
 			if(cmdn >= 2) {
 				int32_t val;
