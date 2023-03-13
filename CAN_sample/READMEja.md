@@ -102,21 +102,34 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 - Pmod1 (12) 3.3V
 - Pmod1  (5) GND
 - Pmod1 (11) GND
+
 ---
 
+## can_analize クラスによるパケット情報収集
+
+CAN0 に対応するインスタンスは「[can_analize](common/can_analize.hpp)」クラスによるパケットの収集を行っています。
+
+- 任意の ID、それに関する情報収集。
+- データ列の収集。（最後に取得した８バイトのみ）
+- 受信した回数。
+- boost::unordered_map による、ID の違いによるマッピング。（ハッシュを使っている為、高速）
+
+---
 ## CAN/ID フィルター
 
 main.cpp には、通過する事が出来る ID リストを使った、フィルターのサンプルコードが含まれます。   
-※この機能は、「MULTI」チャネルの場合に利用されます。   
+※この機能は、「MULTI」チャネルを有効にした場合に利用されます。
+※複数チャネルで、CAN1 のインスタンスに対して適用されます。   
    
-フィルターには、「boost/unordered_set」を利用しています。
-   
-main.cpp の先頭で、「#define VALID_FILTER」をコメントアウトすると、フィルターをスルーします。
-   
-有効な ID テーブルは、以下のようになっています。   
-boost::unordered_set を使っています。   
+- フィルターには、「boost/unordered_set」を利用しています。 
+- main.cpp の先頭で、「#define VALID_FILTER」をコメントアウトすると、フィルターを無効にします。 
+- 有効な ID テーブルは、以下のようになっています。
+- boost::unordered_set を使っています。
+- ID の追加、削除など、動的に行えます。cd 
 
 ```C++
+#include <boost/unordered_set.hpp>
+
 	// 有効な ID だけ通すフィルター
 	typedef boost::unordered_set<uint32_t> VALID;
 //	typedef const boost::unordered_set<uint32_t> VALID;
@@ -143,7 +156,7 @@ boost::unordered_set を使っています。
 
 ## リソースの準備
 
-- 特に無し
+- CAN バスに適切な CAN バストランシーバーを接続する。
    
 ---
 
@@ -160,37 +173,10 @@ boost::unordered_set を使っています。
 - ターミナルでシリアル接続を行い、対話式コマンドで通信を行う。
 
 ---
-
-## 対話コマンド
-
-対話形式で、CAN データ送信、受信の確認等が出来ます。
-
-- プログラムを起動すると、常に全ての ID を受信します。
-- ID の数が限界を超えると、メモリ不足でクラッシュするかもしれません。
-- send_loop コマンドにより、乱数で生成した ID、データを連続で送信します。
-- ID を補足する機能（map）は、チャネル０番のみに備わっています。
-- RX64M/RX71M では、２チャネルの CAN を有効にします。
-- CAN1 の受信では、受信したデータを常に表示します。
-- MB-no はメールボックスの番号です。
-- メールボックス関係のコマンドは、デバッグ用です。
-- 受信した CAN フレームは、メモリに格納され、「dump」コマンドで確認出来ます。
-- 同じ ID に新しいデータフレームが来ると、上書きされ、カウンタが進みます。
-
-```
-    ch CH-no               set current CAN channel (CH-no: 0, 1)
-    send CAN-ID [data...]  send data frame
-    stat MB-no             stat mail-box (MB-no: 0 to 31)
-    list MB-no             list mail-box (MB-no: 0 to 31)
-    map [CAN-ID]           Display all collected IDs
-    clear                  clear map
-    dump CAN-ID            dump frame data
-    send_loop NUM          random ID, random DATA, send loop
-    help                   command list (this)
-```
    
------
-   
-License
-----
+## License
+
+boost:
+  [Boost Software License](https://www.boost.org/users/license.html)
 
 [MIT](../LICENSE)

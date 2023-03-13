@@ -93,10 +93,28 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  マップをクリア
+			@brief  マップを全クリア
+			@param[in]	id	CAN/ID
+			@return ID のフレームが見つかった場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void clear() noexcept
+		bool clear(uint32_t id) noexcept
+		{
+			auto it = map_.find(id);
+			if(it == map_.end()) {
+				return false;
+			}
+			map_.erase(it);
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  マップを全クリア
+		*/
+		//-----------------------------------------------------------------//
+		void clear_all() noexcept
 		{
 			map_.clear();
 		}

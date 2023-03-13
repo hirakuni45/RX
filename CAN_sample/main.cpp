@@ -25,7 +25,7 @@
 
 #include "common/command.hpp"
 
-#define VALID_FILTER
+// #define VALID_FILTER
 
 #ifdef VALID_FILTER
 #include <boost/unordered_set.hpp>
@@ -35,7 +35,7 @@
 
 namespace {
 
-	static constexpr uint32_t can_cmd_ver_ = 89;
+	static constexpr uint32_t can_cmd_ver_ = 100;
 
 #if defined(SIG_RX62N)
   #if defined(CQ_FRK)
@@ -58,7 +58,6 @@ namespace {
 #elif defined(SIG_RX631)
 	// RX631 GR-CITRUS board
 	static const char* system_str_ = { "RX631 GR-CITRUS" };
-	// GR-CITRUS
 	static constexpr bool LED_ACTIVE = 1;
 	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
@@ -66,7 +65,7 @@ namespace {
 	typedef device::CAN0 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
+	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
@@ -76,7 +75,7 @@ namespace {
 	static constexpr auto CAN1_PORT = device::port_map::ORDER::FIRST;
 	#define MULTI
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
+	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
@@ -91,7 +90,7 @@ namespace {
 	typedef device::SCI9 SCI_CH;
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
+	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
@@ -105,7 +104,7 @@ namespace {
 	typedef device::CAN1 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::SECOND;
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
+	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
@@ -139,18 +138,11 @@ namespace {
 	typedef utils::can_analize<CAN0> ANALIZE;
 	ANALIZE	analize_(can0_);
 
+	uint32_t	cur_ch_ = 0;
+
 #ifdef MULTI
 	typedef device::can_io<CAN1_CH, CAN_RXB, CAN_TXB, CAN1_PORT> CAN1;
 	CAN1	can1_;
-
-	uint32_t	cur_ch_;
-#endif
-
-	uint32_t	cur_id_;
-	bool		ext_id_;
-
-	typedef utils::command<256> CMD;
-	CMD		cmd_;
 
 #ifdef VALID_FILTER
 	// 有効な ID だけ通すフィルター
@@ -162,12 +154,20 @@ namespace {
 	VALID	valid_{ 0x123, 0x200, 0x300, 0xaaa, 15, 21, 33 };
 	bool	ena_valid_ = true;
 #endif
+#endif
+
+	uint32_t	cur_id_;
+	bool		ext_id_;
+
+	typedef utils::command<256> CMD;
+	CMD		cmd_;
+
 
 	bool get_cmd_id_(uint32_t i, uint32_t& id)
 	{
 		uint32_t v = 0;
 		char tmp[64];
-		cmd_.get_word(1, tmp, sizeof(tmp));
+		cmd_.get_word(i, tmp, sizeof(tmp));
 		if(!(utils::input("%a", tmp) % v).status()) {
 			utils::format("ID parse error: '%s'\n") % tmp;
 			return false;
@@ -200,15 +200,13 @@ namespace {
 	void stat_(uint32_t idx)
 	{
 		uint8_t ret = 0;
-#ifdef MULTI
 		if(cur_ch_ == 0) {
 			ret = can0_.stat_mb(idx);
 		} else if(cur_ch_ == 1) {
+#ifdef MULTI
 			ret = can1_.stat_mb(idx);
-		}
-#else
-		ret = can0_.stat_mb(idx);
 #endif
+		}
 		utils::format("MCTL: 0x%02X (0b%08b)\n")
 			% static_cast<uint16_t>(ret) % static_cast<uint16_t>(ret);
 	}
@@ -216,29 +214,36 @@ namespace {
 
 	void list_(uint32_t idx)
 	{
-#ifdef MULTI
 		if(cur_ch_ == 0) {
 			can0_.list_mb(idx);
 		} else if(cur_ch_ == 1) {
+#ifdef MULTI
 			can1_.list_mb(idx);
+#endif
 		}
-#else
-		can0_.list_mb(idx);
+	}
+
+
+	void status_()
+	{
+		utils::format("CAN0: Send error = %d, Recv error = %d\n")
+			% can0_.get_send_error_count() % can0_.get_recv_error_count();
+#ifdef MULTI
+		utils::format("CAN0: Send error = %d, Recv error = %d\n")
+			% can1_.get_send_error_count() % can1_.get_recv_error_count();
 #endif
 	}
 
 
 	void send_data_(uint32_t id, const uint8_t* src, uint32_t len)
 	{
-#ifdef MULTI
 		if(cur_ch_ == 0) {
 			can0_.send(id, src, len, ext_id_);
 		} else if(cur_ch_ == 1) {
+#ifdef MULTI
 			can1_.send(id, src, len, ext_id_);
-		}
-#else
-		can0_.send(id, src, len, ext_id_);
 #endif
+		}
 	}
 
 
@@ -290,13 +295,12 @@ namespace {
 			} else {
 				utils::format("Current device CAN%d\n") % cur_ch_;
 			}
-#endif
 #ifdef VALID_FILTER
 		} else if(cmd_.cmp_word(0, "valid")) { // valid ID disable/enable
 			if(cmdn >= 2) {
 				if(cmd_.cmp_word(1, "0")) {
 					ena_valid_ = false;
-				} else if(cmd_.cmp_word(1, "0")) {
+				} else if(cmd_.cmp_word(1, "1")) {
 					ena_valid_ = true;
 				}
 			} else {
@@ -308,6 +312,7 @@ namespace {
 				utils::format("%d, ") % n;
 			}
 			utils::format("\n");
+#endif
 #endif
 		} else if(cmd_.cmp_word(0, "ext")) { // ext-id mode
 			ext_id_ = true;
@@ -330,6 +335,8 @@ namespace {
 			} else {
 				error = true;
 			}
+		} else if(cmd_.cmp_word(0, "status")) { // status
+			status_();
 		} else if(cmd_.cmp_word(0, "stat")) { // stat
 			if(cmdn == 2) {
 				int32_t val;
@@ -362,7 +369,16 @@ namespace {
 				analize_.list_all();
 			}
 		} else if(cmd_.cmp_word(0, "clear")) {
-			analize_.clear();
+			if(cmdn >= 2) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
+					error = true;
+				} else {
+					analize_.clear(val);
+				}				
+			} else {
+				analize_.clear_all();
+			}
 		} else if(cmd_.cmp_word(0, "dump")) {
 			if(cmdn >= 2) {
 				int32_t val;
@@ -396,18 +412,19 @@ namespace {
 				% (can_cmd_ver_ / 100) % (can_cmd_ver_ % 100);
 #ifdef MULTI
 			utils::format("    ch CH-no               set current CAN channel (CH-no: 0, 1)\n");
-#endif
 #ifdef VALID_FILTER
 			utils::format("    valid [0/1]            valid ID-filter 0:disable/1:enable\n");
 			utils::format("    valist                 list valid filter IDs\n");
 #endif
+#endif
 			utils::format("    ext                    set ext-id mode\n");
 			utils::format("    std                    set std-id mode\n");
 			utils::format("    send CAN-ID [data...]  send data frame\n");
-			utils::format("    stat MB-no             stat mail-box (MB-no: 0 to 31)\n");
-			utils::format("    list MB-no             list mail-box (MB-no: 0 to 31)\n");
+			utils::format("    stat MB-no             stat MCTLx register (MB-no: 0 to 31)\n");
+			utils::format("    list MB-no             list MBx register (MB-no: 0 to 31)\n");
+			utils::format("    status                 list recv/send error count\n");
+			utils::format("    clear [CAN-ID]         clear map\n");
 			utils::format("    map [CAN-ID]           Display all collected IDs\n");
-			utils::format("    clear                  clear map\n");
 			utils::format("    dump CAN-ID            dump frame data\n");
 			utils::format("    send_loop NUM [-rtr]   random ID, random DATA, send loop (RTR)\n");
 			utils::format("    help                   command list (this)\n");
@@ -533,6 +550,7 @@ int main(int argc, char** argv)
 #endif
 		}
 #endif
+
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
