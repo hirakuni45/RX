@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Fixed FIFO (first in first out) テンプレート
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,7 +42,7 @@ namespace utils {
 			@return	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		constexpr auto size() const noexcept { return SIZE; }
+		static constexpr auto size() noexcept { return SIZE; }
 
 
         //-----------------------------------------------------------------//
