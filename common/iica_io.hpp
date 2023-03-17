@@ -28,6 +28,8 @@ namespace device {
 	template<class IICA, uint32_t TPSZ = 256>
 	class iica_io : public i2c_base {
 
+		static_assert(TPSZ > 16, "TPSZ is too small.");
+
 		struct clock_t {
 			uint8_t	CKS;
 			uint8_t ICBRL;

@@ -6,13 +6,14 @@
 			・CAN ポートに、CAN バス・トランシーバーを接続する。@n
 			・CAN ペリフェラル内蔵 FIFO 機能は使わない設計とする。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
+#include "common/delay.hpp"
 #include "common/format.hpp"
 
 namespace device {
@@ -139,17 +140,21 @@ namespace device {
 
 		static RBF		rbf_;
 		static TBF		tbf_;
+		static uint32_t lost_recv_;
 
-		void sleep_() const { asm("nop"); }
-
+		void sleep_() const noexcept { asm("nop"); }
 
 		static INTERRUPT_FUNC void rxm_task_()
 		{
 			for(uint32_t i = RX_MB_TOP; i < (RX_MB_TOP + RX_MB_NUM); ++i) {
 				if(CAN::MCTL[i].NEWDATA() != 0) {
-					auto& t = rbf_.put_at();
-					CAN::MB[i].get(t);
-					rbf_.put_go();
+					if(rbf_.length() >= (rbf_.size() - 1)) {  // バッファに隙間が無い場合、受信をロストする。
+						lost_recv_++;
+					} else {
+						auto& t = rbf_.put_at();
+						CAN::MB[i].get(t);
+						rbf_.put_go();
+					}
 				}
 				CAN::MCTL[i] = 0;  // RECREQ を落とす
 				CAN::MCTL[i] = 0;  // NEWDATA を落とす
@@ -277,6 +282,7 @@ namespace device {
 			CAN::BCR = CAN::BCR.TSEG1.b(tseg1 - 1) | CAN::BCR.TSEG2.b(tseg2 - 1)
 				| CAN::BCR.BRP.b(brp - 1) | CAN::BCR.SJW.b(sjw - 1) | CAN::BCR.CCLKS.b(0);
 
+			// 全ての ID を受信する為には、MKRx を 0 として、マスクを有効にする。
 			for(uint32_t i = 0; i < 8; ++i) {
 				CAN::MKR[i] = 0;
 			}
@@ -300,6 +306,8 @@ namespace device {
 					CAN::MB[i].IDE = (i >> 1) & 1;
 				}
 			}
+
+			lost_recv_ = 0;
 
 			CAN::MIER = 0;
 			if(intr.error_level != ICU::LEVEL::NONE) {
@@ -675,7 +683,9 @@ namespace device {
 		{
 			// バッファサイズが、最大容量の 15/16 を超えたら、「1」に戻るまで待つ。
 			if(tbf_.length() > (tbf_.size() - (tbf_.size() / 16))) {
-				while(tbf_.length() > 1) sleep_();
+				while(tbf_.length() > 1) {
+					utils::delay::sleep();
+				}
 			}
 
 			auto& t = tbf_.put_at();
@@ -711,11 +721,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ロストした受信フレーム数の取得
+			@return ロストした受信フレーム数
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t get_lost_recv_num() noexcept { return lost_recv_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  受信フレーム数の取得
 			@return 受信フレーム数
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_recv_num() const { return rbf_.length(); }
+		uint32_t get_recv_num() const noexcept { return rbf_.length(); }
 
 
 		//-----------------------------------------------------------------//
@@ -724,7 +743,7 @@ namespace device {
 			@return 受信フレーム
 		*/
 		//-----------------------------------------------------------------//
-		auto get_recv_frame() { return rbf_.get(); }
+		auto get_recv_frame() noexcept { return rbf_.get(); }
 
 
 		//-----------------------------------------------------------------//
@@ -755,4 +774,6 @@ namespace device {
 		RBF can_io<CAN, RBF, TBF, PSEL>::rbf_;
 	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL>
 		TBF can_io<CAN, RBF, TBF, PSEL>::tbf_;
+	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL>
+		uint32_t can_io<CAN, RBF, TBF, PSEL>::lost_recv_ = 0;
 }

@@ -140,6 +140,10 @@ namespace device {
 	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST,
 		typename sci_io_base::FLOW_CTRL FLCT = sci_io_base::FLOW_CTRL::NONE, class RTS = NULL_PORT>
 	class sci_io : public sci_io_base {
+
+		static_assert(RBF::size() > 8, "Receive buffer is too small.");
+		static_assert(SBF::size() > 8, "Transmission buffer is too small.");
+
 	public:
 		typedef SCI sci_type;
 		typedef RBF rbf_type;
@@ -154,9 +158,6 @@ namespace device {
 
 		static RBF	recv_;
 		static SBF	send_;
-
-		static_assert(recv_.size() >= 8, "RECV Buffer too small.");
-		static_assert(send_.size() >= 8, "SEND Buffer too small.");
 
 		ICU::LEVEL	level_;
 		bool		auto_crlf_;
