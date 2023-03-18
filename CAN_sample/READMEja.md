@@ -64,7 +64,7 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 - main.cpp で、CAN ポート候補を変更する事で、アサインするポートを変更出来ます。
 - port_map.hpp には基本的なポート設定が用意されています。
 
-```
+```C++
     static const auto CAN0_PORT = device::port_map::option::FIRST;
     static const auto CAN1_PORT = device::port_map::option::FIRST;
 ```
@@ -82,7 +82,7 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 - 電源 5V
 - I/O 3.3V、5V 選択可
 - 最大 5 Mbit/s
-
+   
 ---
 
 ### RX64M/RX71M の場合
@@ -108,12 +108,22 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 
 ## can_analize クラスによるパケット情報収集
 
-CAN0 に対応するインスタンスは「[can_analize](common/can_analize.hpp?ts=4)」クラスによるパケットの収集を行っています。
+CAN0 に対応するインスタンスは「[can_analize](../common/can_analize.hpp?ts=4)」クラスによるパケットの収集を行っています。
 
 - 任意の ID、それに関する情報収集。
 - データ列の収集。（最後に取得した８バイトのみ）
 - 受信した回数。
-- boost::unordered_map による、ID の違いによるマッピング。（ハッシュを使っている為、高速）
+- std::map による、ID の違いによるマッピング。（表示順番が整列されて表示）
+- boost::unordered_map を使う事も出来ます。（その場合、CAN-ID の表示順番は不定です）
+- boost::unordered_map を使うと実行バイナリが若干小さくなります。（記憶割り当ても小さくなります） 
+   
+|プロジェクト|RX62N|RX631|RX64M|RX71M|RX72N|RX66T|RX72T|
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|動作確認|－|〇|〇|－|－|－|〇|
+   
+動作確認：   
+実際に CAN バスを接続し、相互の通信を行って通信を確認した。   
+ハードに依存する port_map クラスの実装が適切で、コンパイルが通れば、問題無いと思います。   
 
 ---
 
@@ -162,13 +172,13 @@ CAN command version: 1.00
 
 - 有効な ID リストを表示。
 
-### ext コマンド
-
-- 拡張 ID モードにする。
-
 ### std コマンド
 
-- 標準 ID モードにする。
+- 標準 ID モードにする。（11 ビット）
+
+### ext コマンド
+
+- 拡張 ID モードにする。（29 ビット）
 
 ### send CAN-ID [data...] コマンド
 
@@ -255,7 +265,11 @@ main.cpp には、通過する事が出来る ID リストを使った、フィ�
 ## リソースの準備
 
 - CAN バスに適切な CAN バストランシーバーを接続する。
-   
+- CAN バスにターミネーター抵抗を接続する。
+
+CAN-BUS トランシーバー SN65HVD230 の参考回路：   
+<img src="../docs/CAN_IF.png" width="75%">
+
 ---
 
 ## ビルド方法
@@ -269,7 +283,7 @@ main.cpp には、通過する事が出来る ID リストを使った、フィ�
 
 - LED が 0.25 秒間隔で点滅する。
 - ターミナルでシリアル接続を行い、対話式コマンドで通信を行う。
-
+   
 ---
    
 ## License

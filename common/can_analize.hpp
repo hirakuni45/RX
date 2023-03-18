@@ -4,13 +4,13 @@
 	@brief	CAN 通信解析クラス @n
 			std::map を使う場合、Makefile でのリンクを修正する (USER_DEFS = m stdc++) @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <boost/unordered_map.hpp>
-// #include <map>
+#include <map>
 #include "common/can_io.hpp"
 #include "common/format.hpp"
 
@@ -37,8 +37,11 @@ namespace utils {
 			info_t(uint32_t count, const FRAME& frame) : count_(count), frame_(frame) { }
 		};
 
-		typedef boost::unordered_map<uint32_t, info_t> MAP;
-//		typedef std::map<uint32_t, info_t> MAP;
+		// boost::unordered_map か std::map の選択
+		// std::map: 自動で ID の順序が整列する。
+		// boost::unordered_map: ハッシュによるので順番は不明。
+//		typedef boost::unordered_map<uint32_t, info_t> MAP;
+		typedef std::map<uint32_t, info_t> MAP;
 		MAP			map_;
 
 		void list_line_(const info_t& t) const
