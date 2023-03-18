@@ -27,7 +27,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	CAN_sample/main.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ m
+USER_LIBS	=	stdc++ m
 
 USER_DEFS	=
 

@@ -2,7 +2,7 @@
 #=======================================================================
 #	RX62N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -30,7 +30,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	CAN_sample/main.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ m
+USER_LIBS	=	stdc++ m
 
 USER_DEFS   +=
 
