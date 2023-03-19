@@ -34,18 +34,34 @@ CAN が複数チャネルある場合、チャネルを切り替えて通信す�
    
 ### CAN ポート設定
 
-CAN バス・トランシーバーを接続するポートは、以下のソースを参照して下さい。
+CAN バス・トランシーバーを接続するポートは、以下のソースを参照して下さい。   
+**実際に接続する場合、ハードウェアーマニュアルを参照して確認して下さい。**    
 
 |マイコン|ファイル|CAN0 候補|CAN1 候補|
 |-------|--------|:---:|:---:|
 |RX62N  |[RX62x/port_map.hpp](../RX62x/port_map.hpp)|FIRST|X|
 |RX631  |[RX63x/port_map.hpp](../RX63x/port_map.hpp)|FIRST|-|
-|RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
-|RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
+|RX64M  |[RX64M/port_map.hpp](../RX64M/port_map.hpp)|FIRST|FIRST|
+|RX65N  |[RX65x/port_map.hpp](../RX65x/port_map.hpp)|FIRST|X|
+|RX71M  |[RX64M/port_map.hpp](../RX64M/port_map.hpp)|FIRST|FIRST|
+|RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|
 |RX72T  |[RX72T/port_map.hpp](../RX72T/port_map.hpp)|FIRST|X|
-|RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
-   
+RX65N: RX65N Envision Kit
+RX72N: RX72N Envision Kit
+
+CAN0:      
+|マイコン|FIRST/CRX0|FIRST/CTX0|\||SECOND/CRX0|SECOND/CTX0|
+|-------|:---:|:---:|-|:---:|:---:|
+|RX62N  |P33|P32|\||-|-|
+|RX631  |P33|P32|\||PD2|PD1|
+|RX64M  |P33|P32|\||PD2|PD1|
+|RX65N  |P33|P32|\||PD2|PD1|
+|RX71M  |P33|P32|\||PD2|PD1|
+|RX72N  |P33|P32|\||PD2|PD1|
+|RX66T  |P22|P23|\||PA1|PA0|
+|RX72T  |P22|P23|\||PA1|PA0|
+
 RX64M の場合 (port_map.hpp FIRST 候補)
 ```C++
             case peripheral::CAN0:
@@ -85,13 +101,35 @@ RX64M の場合 (port_map.hpp FIRST 候補)
    
 ---
 
+### RX62N の場合
+
+- CAN0 を利用
+- FRK-RX62N(CQ 出版社) で動作確認
+
+### RX631 の場合
+
+- CAN0 を利用
+- GR-CITRUS で動作確認
+
 ### RX64M/RX71M の場合
 
-- 複数チャネル対応
+- CAN0/CAN1 複数チャネル対応
+- DIY ボードで動作確認
    
-### RX66T、RX72T の場合
+### RX66T/RX72T の場合
 
-- シングルチャネル
+- CAN0 を利用
+- DIY ボードで動作確認
+
+### RX65N Envision Kit の場合
+
+- プログラムは複数チャネルに対応していますが、CAN ポートにアクセス出来ない為、シングルチャネルです。
+- CAN0 を使います。
+- CN13 (2) P32 (CTX0)
+- CN13 (3) P33 (CRX0)
+- CN8  (2) 3.3V
+- CN8  (4) GND
+- CN8  (5) GND
 
 ### RX72N Envision Kit の場合
 
@@ -117,9 +155,9 @@ CAN0 に対応するインスタンスは「[can_analize](../common/can_analize.
 - boost::unordered_map を使う事も出来ます。（その場合、CAN-ID の表示順番は不定です）
 - boost::unordered_map を使うと実行バイナリが若干小さくなります。（記憶割り当ても小さくなります） 
    
-|プロジェクト|RX62N|RX631|RX64M|RX71M|RX72N|RX66T|RX72T|
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|動作確認|－|〇|〇|－|－|－|〇|
+|プロジェクト|RX62N|RX631|RX64M|RX65N|RX71M|RX72N|RX66T|RX72T|
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|動作確認|〇|〇|〇|－|－|－|－|〇|
    
 動作確認：   
 実際に CAN バスを接続し、相互の通信を行って通信を確認した。   
