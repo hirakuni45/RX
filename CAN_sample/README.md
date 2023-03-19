@@ -34,17 +34,31 @@ The environment variable "MULTI" is enabled in "main.cpp".
    
 ### CAN port setting
 
-See the following sources for the ports to connect the CAN bus transceiver.
+See the following sources for the ports to connect the CAN bus transceiver.   
+**For actual connection, refer to the hardware manual for confirmation.**   
 
 |microcontroller|file|CAN0 Alternate|CAN1 Alternate|
 |-------|--------|:---:|:---:|
 |RX62N  |[RX62x/port_map.hpp](../RX62x/port_map.hpp)|FIRST|X|
 |RX631  |[RX63x/port_map.hpp](../RX63x/port_map.hpp)|FIRST|-|
-|RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
-|RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
+|RX64M  |[RX64M/port_map.hpp](../RX64M/port_map.hpp)|FIRST|FIRST|
+|RX65N  |[RX65x/port_map.hpp](../RX65x/port_map.hpp)|FIRST|X|
+|RX71M  |[RX64M/port_map.hpp](../RX64M/port_map.hpp)|FIRST|FIRST|
+|RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|
 |RX72T  |[RX72T/port_map.hpp](../RX72T/port_map.hpp)|FIRST|X|
-|RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
+   
+CAN0:      
+|microcontroller|FIRST/CRX0|FIRST/CTX0|\||SECOND/CRX0|SECOND/CTX0|
+|-------|:---:|:---:|-|:---:|:---:|
+|RX62N  |P33|P32|\||-|-|
+|RX631  |P33|P32|\||PD2|PD1|
+|RX64M  |P33|P32|\||PD2|PD1|
+|RX65N  |P33|P32|\||PD2|PD1|
+|RX71M  |P33|P32|\||PD2|PD1|
+|RX72N  |P33|P32|\||PD2|PD1|
+|RX66T  |P22|P23|\||PA1|PA0|
+|RX72T  |P22|P23|\||PA1|PA0|
    
 For RX64M (port_map.hpp FIRST candidate)
 ```C++
@@ -85,18 +99,40 @@ For RX64M (port_map.hpp FIRST candidate)
    
 ---
 
+### In the case of RX62N
+
+- Use CAN0, single channel
+- Operation check with FRK-RX62N(CQ 出版社)
+
+### In the case of RX631
+
+- Use CAN0, single channel
+- Operation check with GR-CITRUS
+
 ### In the case of RX64M/RX71M
 
-- Multi-channel support
+- Use CAN0/CAN1, Multi-channel support
+- Operation check with DIY-board
    
-### In the case of the RX66T/RX72T
+### In the case of RX66T/RX72T
 
-- single channel
+- Use CAN0, single channel
+- Operation check with DIY-board
 
-### In the case of the RX72N Envision Kit
+### In the case of the 'RX65N Envision Kit'
 
 - The program supports multiple channels, but it is a single channel because it does not have access to the CAN port.
-- Use CAN1
+- Use CAN0, single channel
+- CN13 (2) P32 (CTX0)
+- CN13 (3) P33 (CRX0)
+- CN8  (2) 3.3V
+- CN8  (4) GND
+- CN8  (5) GND
+
+### In the case of the 'RX72N Envision Kit'
+
+- The program supports multiple channels, but it is a single channel because it does not have access to the CAN port.
+- Use CAN1, single channel
 - Pmod1  (1) P54_SS    (CTX1)
 - Pmod1  (7) P55/IRQ10 (CRX1)
 - Pmod1  (6) 3.3V
@@ -118,9 +154,9 @@ The instance corresponding to CAN0 collects packets by "[can_analize](../common/
 - You can also use boost::unordered_map. (In this case, the display order of CAN-IDs is unordered.)
 - The execution binary is slightly smaller when using boost::unordered_map. (In that case, the memory allocation is also smaller.)
 
-|Project|RX62N|RX631|RX64M|RX71M|RX72N|RX66T|RX72T|
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|Operation check|－|〇|〇|－|－|－|〇|
+|Project|RX62N|RX631|RX64M|RX65N|RX71M|RX72N|RX66T|RX72T|
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|Operation check|〇|〇|〇|－|－|－|－|〇|
 
 Operation check:
 Verified communication by actually connecting the CAN bus and communicating with each other.    

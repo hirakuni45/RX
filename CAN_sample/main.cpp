@@ -85,10 +85,12 @@ namespace {
 	static constexpr auto CAN1_PORT = device::port_map::ORDER::FIRST;
 //	#define MULTI
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N" };
+	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
+	typedef device::CAN0 CAN0_CH;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
