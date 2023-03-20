@@ -29,7 +29,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	OBD2_sample/main.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ m
+USER_LIBS	=	stdc++ m
 
 USER_DEFS	=
 

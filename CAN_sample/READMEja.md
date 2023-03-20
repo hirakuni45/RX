@@ -1,4 +1,4 @@
-Renesas RX62N, RX631, RX64M, RX71M, RX66T, RX72T, RX72N CAN 通信サンプル
+Renesas RX62N, RX631, RX64M, RX65N, RX72N, RX71M, RX66T, RX72T CAN 通信サンプル
 =========
    
 [英語版](README.md)
@@ -16,10 +16,11 @@ CAN が複数チャネルある場合、チャネルを切り替えて通信す�
 - RX62N/Makefile
 - RX631/Makefile
 - RX64M/Makefile
+- RX65N/Makefile
 - RX71M/Makefile
+- RX72N/Makefile
 - RX66T/Makefile
 - RX72T/Makefile
-- RX72N/Makefile
 - README.md
 - READMEja.md
    

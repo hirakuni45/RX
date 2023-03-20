@@ -1,4 +1,4 @@
-Renesas RX62N, RX631, RX64M, RX71M, RX66T, RX72T, RX72N CAN Communication Sample
+Renesas RX62N, RX631, RX64M, RX65N, RX72N, RX71M, RX66T, RX72T CAN Communication Sample
 =========
 
 [Japanese](READMEja.md)
@@ -16,10 +16,11 @@ The environment variable "MULTI" is enabled in "main.cpp".
 - RX62N/Makefile
 - RX631/Makefile
 - RX64M/Makefile
+- RX65N/Makefile
 - RX71M/Makefile
+- RX72N/Makefile
 - RX66T/Makefile
 - RX72T/Makefile
-- RX72N/Makefile
 - README.md
 - READMEja.md
 
