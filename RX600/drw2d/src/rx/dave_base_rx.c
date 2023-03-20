@@ -25,6 +25,8 @@
 // static void d1_registerprotectdisable();
 // static void d1_mstp_set(bool enable, int mstp_char, int mstp_num);
 
+static d1_device_rx d1_device_rx_;
+
 //--------------------------------------------------------------------------
 //
 d1_device * d1_opendevice(long flags)
@@ -35,11 +37,12 @@ d1_device * d1_opendevice(long flags)
     INTERNAL_NOT_USED(flags);
 
     /* get new device context structure */
-    handle = (d1_device_rx *)malloc(sizeof(d1_device_rx));
-    if (!handle)
-    {
-        return NULL;
-    }
+///    handle = (d1_device_rx *)malloc(sizeof(d1_device_rx));
+///    if (!handle)
+///    {
+///        return NULL;
+///    }
+	handle = &d1_device_rx_;
 
     /* init device data */
     handle->dlist_indirect = 0;
@@ -78,7 +81,7 @@ int d1_closedevice(d1_device *handle)
     d1_registerprotectenable();
 #endif
 
-    free (handle);
+///    free (handle);
     return ret;
 }
 
