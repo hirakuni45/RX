@@ -1,4 +1,5 @@
 #pragma once
+#ifndef NO_CLOCK_PROFILE
 //=========================================================================//
 /*!	@file
 	@brief	RX220 グループ・クロック。プロファイル @n
@@ -8,7 +9,7 @@
 			外部クロック入力でも最大は 20MHz となる。 @n
 			最大速度を出す場合は、HOCO を利用する事になる。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -94,3 +95,5 @@ namespace device {
 		static constexpr bool		DELAY_T2	= true;			///< 微調整として、「nop」を１つ追加
 	};
 }
+
+#endif
