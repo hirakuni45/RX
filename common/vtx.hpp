@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	各種頂点の定義 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/glfw_app/blob/master/LICENSE
 */
@@ -21,7 +21,7 @@ namespace vtx {
 //       マシンでは、その傾向は逆転する。
 //       RXv2 コアでは、float 型は高速だが double 型は遅い。
 //       RXv2 コアには、「fsqrt」（float 型専用の平方根命令がある）
-#if defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX24T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+#if defined(SIG_RX24T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 	inline float fsqrt(float x)
 	{
 		__asm __volatile(
