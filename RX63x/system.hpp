@@ -1037,12 +1037,48 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ソフトウェアリセットレジスタ（SWRR）@n
+			@brief  ソフトウェアリセットレジスタ（SWRR） @n
 					0xA501 を書き込むとリセットされます。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef rw16_t<0x0008'00C2> SWRR_;
 		static SWRR_ SWRR;
+
+
+		//=========================== 温度センサ =================================
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  温度センサコントロールレジスタ (TSCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tscr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B4>  TSOE;
+
+			bit_rw_t <io_, bitpos::B7>  TSEN;
+		};
+		typedef tscr_t<0x0008'C500> TSCR_;
+		static TSCR_ TSCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  温度センサ校正データレジスタ (TSCDRH, TSCDRL)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef ro8_t<0xFEFF'FAD3> TSCDRH_;
+		static TSCDRH_ TSCDRH;
+
+		typedef ro8_t<0xFEFF'FAD2> TSCDRL_;
+		static TSCDRL_ TSCDRL;
 	};
 	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
 	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
@@ -1086,6 +1122,9 @@ namespace device {
 	template<class _> typename system_t<_>::RSTSR1_ system_t<_>::RSTSR1;
 	template<class _> typename system_t<_>::RSTSR2_ system_t<_>::RSTSR2;
 	template<class _> typename system_t<_>::SWRR_ system_t<_>::SWRR;
+	template<class _> typename system_t<_>::TSCR_ system_t<_>::TSCR;
+	template<class _> typename system_t<_>::TSCDRH_ system_t<_>::TSCDRH;
+	template<class _> typename system_t<_>::TSCDRL_ system_t<_>::TSCDRL;
 
 	typedef system_t<void> SYSTEM;
 }

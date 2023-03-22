@@ -16,7 +16,6 @@
 */
 //=========================================================================//
 #include "RX600/system.hpp"
-#include "RX600/flash.hpp"
 
 namespace device {
 
