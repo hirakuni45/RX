@@ -113,9 +113,10 @@
 #include "RX63x/s12ad.hpp"
 #include "RX63x/ad.hpp"
 #include "RX63x/da.hpp"
+#include "RX63x/flash.hpp"
 
 #include "RX63x/system_io.hpp"
-// #include "RX63x/flash_io.hpp"
+#include "RX62x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX24T/dac_out.hpp"
 
@@ -175,7 +176,7 @@
 #include "RX600/rtc.hpp"
 #include "RX600/rtc_io.hpp"
 #include "RX600/wdta.hpp"
-#include "RX600/flash.hpp"
+#include "RX64M/flash.hpp"
 #include "RX600/ssi.hpp"
 #include "RX600/src.hpp"
 #include "RX600/sdhi.hpp"

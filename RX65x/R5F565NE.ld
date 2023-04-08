@@ -174,6 +174,19 @@ SECTIONS
     LONG (_start);
   }
 
+  /* Option Setting Memory: OFS0 */ 
+  .ofs0 (0xFE7F5D04) :
+  {
+    PROVIDE (__ofs0 = .);
+    *(.ofs0)
+  }
+  /* Option Setting Memory: OFS1 */ 
+  .ofs1 (0xFE7F5D08) :
+  {
+    PROVIDE (__ofs1 = .);
+    *(.ofs1)
+  }
+
   /* The rest are all not normally part of the runtime image.  */
 
   /* Stabs debugging sections.  */
