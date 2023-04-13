@@ -32,8 +32,13 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, bool ena = true, ORDER opt = ORDER::FIRST) noexcept
+		static bool turn(peripheral per, bool ena = true, ORDER order = ORDER::FIRST) noexcept
         {
+			if(order == ORDER::BYPASS) return true;
+
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
             bool ret = true;
             switch(per)
             {
@@ -85,6 +90,9 @@ namespace device {
                     ret = false;
                     break;
             }
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+
             return ret;
         }
     };

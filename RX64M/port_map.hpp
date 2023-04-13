@@ -1123,9 +1123,9 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_ethernet(peripheral per, bool ena, ORDER opt) noexcept
+		static bool turn_ethernet(peripheral per, bool ena, ORDER odr) noexcept
 		{
-			if(opt == ORDER::BYPASS) {  // バイパス
+			if(odr == ORDER::BYPASS) {  // バイパス
 				return true;
 			}
 			if(per == peripheral::ETHERC0) ;
@@ -1141,7 +1141,7 @@ namespace device {
 			uint8_t  mii = ena ? 0b010001 : 0;
 			uint8_t rmii = ena ? 0b010010 : 0;
 			if(per == peripheral::ETHERC0) {  // chanel-0
-				switch(opt) {
+				switch(odr) {
 				case ORDER::FIRST_RMII:
 
 //					PORT3::PMR.B4 = 0;
