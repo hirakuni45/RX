@@ -30,18 +30,20 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ffsystem.c \
 				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
+                r_net/r_byteq_v1.30/r_byteq.c \
+				r_net/T4_src/r_dhcp_client.c \
                 r_net/driver/phy.c \
                 r_net/driver/r_ether.c \
-                r_net/r_byteq_v1.30/r_byteq.c \
                 r_net/driver/driver.c \
                 r_net/T4_src/config_tcpudp.c \
                 r_net/T4_src/ether.c \
                 r_net/T4_src/ip.c \
                 r_net/T4_src/udp.c \
                 r_net/T4_src/tcp.c \
-                r_net/T4_src/tcp_api.c \
-                r_net/T4_src/r_dhcp_client.c \
-				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
+                r_net/T4_src/tcp_api.c
+                
+
+#				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
 				FreeRTOS/Source/portable/MemMang/heap_4.c \
 				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
@@ -67,7 +69,8 @@ PSOURCES	=	main.cpp \
 
 USER_LIBS	=	supc++
 
-USER_DEFS	=	RTOS FAT_FS FAT_FS_NUM=4
+# USER_DEFS	=	RTOS FAT_FS FAT_FS_NUM=4
+USER_DEFS	=	FAT_FS FAT_FS_NUM=4
 
 INC_APP		=	. ../../ \
 				../../FreeRTOS/Source/include \
@@ -83,6 +86,7 @@ CP_OPT		=	-Wall -Werror \
 				-Wno-unused-function \
 				-Wno-stringop-truncation \
 				-fno-exceptions
+
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

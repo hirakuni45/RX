@@ -96,6 +96,7 @@
 #include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
 #include "RX64M/port_map_qspi.hpp"
+#include "RX64M/port_map_ether.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -112,6 +113,7 @@
 #include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
 #include "RX64M/port_map_qspi.hpp"
+#include "RX64M/port_map_ether.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 

@@ -311,7 +311,7 @@ extern "C" {
 		cmt_.at_task().set_task_10ms(task);
 	}
 
-
+#if 0
 	void vApplicationMallocFailedHook(void)
 	{
 		/* Called if a call to pvPortMalloc() fails because there is insufficient
@@ -387,6 +387,7 @@ extern "C" {
 		device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
 		device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, intr);
 	}
+#endif
 }
 
 int main(int argc, char** argv);
@@ -417,14 +418,19 @@ int main(int argc, char** argv)
 	cmd_.set_prompt("# ");
 
 	device::power_mgr::turn(device::peripheral::ETHERC0);
-	device::port_map::turn(device::peripheral::ETHERC0);
+	{
+		auto f = device::port_map::turn_ethernet(device::peripheral::ETHERC0, true, device::port_map::ORDER::FIRST_RMII);
+		if(!f) {
+			utils::format("Ethernet portmap fail...\n");
+		}
+	}
 
 	set_interrupt_task(INT_Excep_ICU_GROUPAL1,
 		static_cast<uint32_t>(device::ICU::VECTOR::GROUPAL1));
 
 	ethernet_.start();
 	{
-		static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+		static constexpr uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 		net::ip_address ipa(192, 168, 0, 20);
 		bool dhcp = true;
 		if(dhcp) {
@@ -442,7 +448,7 @@ int main(int argc, char** argv)
 		utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 	}
 
-	https_.start("RX HTTP Server");
+	https_.start("RX71M HTTP Server");
 //	telnets_.start("Graviton TELNET Server");
 //	ftps_.start("Graviton FTP Server", "Renesas_RX71M", "GRAVITON", "GRAVITON");
 
@@ -457,7 +463,6 @@ int main(int argc, char** argv)
 		ethernet_.service();
 
 		https_.service(100);
-
 //		telnets_.service(100);
 //		ftps_.service(100);
 
