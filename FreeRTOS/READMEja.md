@@ -1,4 +1,4 @@
-Renesas RX マイコン FreeRTOS カーネル (V10.4.6)
+Renesas RX マイコン FreeRTOS カーネル (V202212.00)
 =========
 
 <img src="../docs/Logo_freeRTOS.png" width="50%">
@@ -22,7 +22,7 @@ Amazon FreeRTOS カーネルを RX マイコン用にポーティングしたコ
 - RX220/Makefile の環境変数の設定で、このサイズを変更出来ます。
 - RX24T/Makefile の環境変数の設定で、このサイズを変更出来ます。
 　　　
-```
+```C
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( RTOS_HEAP_SIZE * 1024 ) )
 ``` 
    
@@ -36,7 +36,7 @@ Amazon FreeRTOS カーネルを RX マイコン用にポーティングしたコ
 - [main.cpp](main.cpp)
 - READMEja.md
 - README.md
-- Source (FreeRTOS Kernel sources)
+- [Source (FreeRTOS Kernel sources)](Source)
 - [RX220/Makefile](RX220/Makefile)
 - [RX62N/Makefile](RX62N/Makefile)
 - [RX631/Makefile](RX631/Makefile)
@@ -57,7 +57,7 @@ Amazon FreeRTOS カーネルを RX マイコン用にポーティングしたコ
 - Source/portable/GCC/RX600v2/port.c
 - Source/portable/GCC/RX700v3_DPFPU/port.c
 
-```
+```C
 /* Hardware specifics. */
 #if ( configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H == 1 )
 
@@ -106,7 +106,7 @@ BaseType_t xPortStartScheduler( void )
 - SWINT 関係のリソースにアクセスしないので、「iodefine.h」のインクルードが必要ありません。
 - アプリケーション内で、タイマー関係（CMT）の設定を終えた後に、SWINT 関係の設定を行っています。
 
-```
+```C++
     void vApplicationSetupTimerInterrupt(void)
     {
         uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
@@ -125,7 +125,7 @@ BaseType_t xPortStartScheduler( void )
 - Source/portable/GCC/RX600v2/portmacro.h
 - Source/portable/GCC/RX700v3_DPFPU/portmacro.h
 
-```
+```C
 #define portYIELD()                         \
     __asm volatile                          \
     (                                       \
@@ -159,7 +159,7 @@ FrrRTOS では、ハードウェアーリソースとして、タイマー割り
 
 このサンプルでは、CMT0 を割り当てています。
 
-```
+```C++
     typedef device::cmt_mgr<device::CMT0> CMT;
     CMT         cmt_;
 ```

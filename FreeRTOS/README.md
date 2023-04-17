@@ -1,5 +1,5 @@
 
-Renesas RX microcontroller FreeRTOS kernel (V10.4.6)
+Renesas RX microcontroller FreeRTOS kernel (V202212.00)
 =========
 
 <img src="../docs/Logo_freeRTOS.png" width="50%">
@@ -23,7 +23,7 @@ The code is basically for gcc.
 - The size can be changed in the RX220/Makefile's environment variable settings.   
 - The size can be changed in the RX24T/Makefile's environment variable settings.   
 　　　
-```
+```C
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( RTOS_HEAP_SIZE * 1024 ) )
 ``` 
    
@@ -39,7 +39,7 @@ Other microcontrollers use malloc/free memory allocation, so memory is allocated
 - [main.cpp](main.cpp)
 - READMEja.md
 - README.md
-- Source (FreeRTOS Kernel sources)
+- [Source (FreeRTOS Kernel sources)](Source)
 - [RX220/Makefile](RX220/Makefile)
 - [RX62N/Makefile](RX62N/Makefile)
 - [RX631/Makefile](RX631/Makefile)
@@ -61,7 +61,7 @@ Other microcontrollers use malloc/free memory allocation, so memory is allocated
 - Source/portable/GCC/RX600v2/port.c
 - Source/portable/GCC/RX700v3_DPFPU/port.c
 
-```
+```C
 /* Hardware specifics. */
 #if ( configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H == 1 )
 
@@ -110,7 +110,7 @@ BaseType_t xPortStartScheduler( void )
 - We don't need to include the "iodefine.h" because we don't access the SWINT-related resources.
 - In the application, after the timer-related (CMT) settings are finished, the SWINT-related settings are done.
 
-```
+```C++
     void vApplicationSetupTimerInterrupt(void)
     {
         uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
@@ -129,7 +129,7 @@ BaseType_t xPortStartScheduler( void )
 - Source/portable/GCC/RX600v2/portmacro.h
 - Source/portable/GCC/RX700v3_DPFPU/portmacro.h
 
-```
+```C
 #define portYIELD()                         \
     __asm volatile                          \
     (                                       \
@@ -162,7 +162,7 @@ The FrrRTOS uses a timer interrupt CMT as a hardware resource.
 
 In this example, we have assigned CMT0.
 
-```
+```C++
     typedef device::cmt_mgr<device::CMT0> CMT;
     CMT         cmt_;
 ```

@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX24T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2020, 2021 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -25,7 +25,6 @@ CSOURCES	=	common/init.c \
 				common/syscalls.c \
 				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
 				FreeRTOS/Source/portable/MemMang/heap_1.c \
-				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
 				FreeRTOS/Source/list.c \
 				FreeRTOS/Source/queue.c \
@@ -37,7 +36,7 @@ PSOURCES	=	FreeRTOS/main.cpp
 
 USER_LIBS	=
 
-USER_DEFS	+=	RTOS RTOS_HEAP_SIZE=10
+USER_DEFS	+=	RTOS RTOS_HEAP_SIZE=8
 
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
