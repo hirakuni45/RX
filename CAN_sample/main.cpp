@@ -496,7 +496,10 @@ int main(int argc, char** argv)
 	utils::format("CAN command version: %d.%02d\n") % (can_cmd_ver_ / 100) % (can_cmd_ver_ % 100);
 
 	{  // CAN 開始
-		if(!can0_.start(CAN::SPEED::_1M)) {
+		constexpr auto can_speed = CAN::SPEED::_1M;
+		// コンパイル時、CAN 速度が設定可能か評価する。
+		static_assert(CAN0::probe_speed(can_speed), "CAN divider indivisible.");
+		if(!can0_.start(can_speed)) {
 			utils::format("Can't start CAN0...\n");
 		} else {
 			utils::format("CAN0: SPEED: %u [bps], BRP: %u, TSEG1: %u, TSEG2: %u, SJW: %u\n")

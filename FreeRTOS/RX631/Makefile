@@ -25,7 +25,6 @@ CSOURCES	=	common/init.c \
 				common/syscalls.c \
 				FreeRTOS/Source/portable/GCC/RX600/port.c \
 				FreeRTOS/Source/portable/MemMang/heap_3.c \
-				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
 				FreeRTOS/Source/list.c \
 				FreeRTOS/Source/queue.c \

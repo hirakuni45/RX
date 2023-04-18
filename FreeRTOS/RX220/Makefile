@@ -2,7 +2,7 @@
 #=======================================================================
 #	RX220 Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -24,7 +24,6 @@ CSOURCES	=	common/init.c \
 				common/syscalls.c \
 				FreeRTOS/Source/portable/GCC/RX200/port.c \
 				FreeRTOS/Source/portable/MemMang/heap_1.c \
-				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
 				FreeRTOS/Source/list.c \
 				FreeRTOS/Source/queue.c \

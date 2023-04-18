@@ -31,7 +31,6 @@ CSOURCES	=	common/init.c \
 				common/time.c \
 				FreeRTOS/Source/portable/GCC/RX700v3_DPFPU/port.c \
 				FreeRTOS/Source/portable/MemMang/heap_3.c \
-				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
 				FreeRTOS/Source/list.c \
 				FreeRTOS/Source/queue.c \

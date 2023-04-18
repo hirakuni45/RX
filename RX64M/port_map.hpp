@@ -1143,11 +1143,9 @@ namespace device {
 			if(per == peripheral::ETHERC0) {  // chanel-0
 				switch(odr) {
 				case ORDER::FIRST_RMII:
-
 //					PORT3::PMR.B4 = 0;
 //					MPC::P34PFS.PSEL = mii;   // ET0_LINKSTA
 //					PORT3::PMR.B4 = enable;
-
 					PORT7::PMR.B1 = 0;
 					PORT7::PMR.B2 = 0;
 //					PORT7::PMR.B3 = 0;
@@ -1280,8 +1278,7 @@ namespace device {
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, channel ch, bool ena = true, ORDER opt = ORDER::FIRST)
-			noexcept
+		static bool turn(peripheral per, channel ch, bool ena = true, ORDER opt = ORDER::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可

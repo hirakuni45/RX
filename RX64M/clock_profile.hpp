@@ -72,7 +72,7 @@ namespace device {
 #endif
 		static constexpr uint32_t	DELAY_MS	= ICLK / 4285714;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 		static constexpr bool		DELAY_T1	= false;			///< 微調整として、「nop」を１つ追加
-    };
+	};
 }
 
 #endif

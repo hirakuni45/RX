@@ -276,6 +276,18 @@ R5F572NN (RX72N): Program-Flash: 4096K, RAM: 1024K, Data-Flash: 32K
    
 ---
 
+### Current Implementation Dependency
+
+- The current implementation does not implement a mechanism for device information profiles defined in rx_prog.conf to be referenced or evaluated during flash programming.
+- This is for future extension.
+- Information required for connection, such as "clock, divide_sys, divide_ext", is based on the profile of the first matched group device.
+- Originally, the device profile obtained at the time of connection, in line with the device TYP, should be used, but this has not been implemented.
+- This is because the TYP and device profile documents are not publicly available.
+- Note that there are devices in the same group with different hardware specifications, and even if different definitions are made in rx_prog.conf, they will not be reflected.
+- Rewriting of OFS option setting memory is not supported.
+
+---
+
 ### Connection check
 ![R5F564ML](../docs/RX_boards.jpg)
 ```
