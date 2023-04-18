@@ -2,8 +2,8 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX グループ・CAN I/O 制御 @n
-			・CAN クロックは、正確に一致しない場合、エラーとする。@n
-			・CAN ポートに、CAN バス・トランシーバーを接続する。@n
+			・CAN クロックは、正確に一致しない場合、エラーとする。 @n
+			・CAN ポートに、CAN バス・トランシーバーを接続する。 @n
 			・CAN ペリフェラル内蔵 FIFO 機能は使わない設計とする。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2023 Kunihito Hiramatsu @n
@@ -187,6 +187,23 @@ namespace device {
 		static void ers_task_() {
 		}
 
+		static constexpr uint32_t get_tq_(SPEED speed) noexcept
+		{
+			// 通信速度に対する、TQ 値 8 to 25 で適切な値を選ぶ
+			// より大きい値で適合した値を選択
+			uint32_t tq = 25;
+			while(1) {
+				if((CAN::PCLK % (static_cast<uint32_t>(speed) * tq)) == 0) {
+					break;
+				}
+				tq--;
+				if(tq < 8) {  // ８以下はエラー
+					return 0;
+				}
+			}
+			return tq;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -194,6 +211,19 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		can_io() noexcept : mode_(MODE::RESET) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  通信速度が設定可能か検査
+			@param[in]	speed	通信速度型
+			@return 可能なら「true」を返す。
+		*/
+		//-----------------------------------------------------------------//
+		static constexpr bool probe_speed(SPEED speed) noexcept
+		{
+			return get_tq_(speed) >= 8;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -217,16 +247,10 @@ namespace device {
 
 			// 通信速度に対する、TQ 値 8 to 25 で適切な値を選ぶ
 			// より大きい値で適合した値を選択
-			uint32_t tq = 25;
-			while(1) {
-				if((CAN::PCLK % (static_cast<uint32_t>(speed) * tq)) == 0) {
-					break;
-				}
-				tq--;
-				if(tq < 8) {  // 割り切れない場合エラーとする
-					format("(1)BRP divider indivisible...\n");
-					return false;
-				}
+			uint32_t tq = get_tq_(speed);
+			if(tq < 8) {
+				format("(1)CAN divider indivisible...\n");
+				return false;
 			}
 
 			if(!power_mgr::turn(CAN::PERIPHERAL)) {
