@@ -187,14 +187,24 @@ namespace device {
 		static void ers_task_() {
 		}
 
-		static constexpr uint32_t get_tq_(SPEED speed) noexcept
+		static constexpr uint32_t get_tq_(bool clock_source, SPEED speed) noexcept
 		{
 			// 通信速度に対する、TQ 値 8 to 25 で適切な値を選ぶ
 			// より大きい値で適合した値を選択
 			uint32_t tq = 25;
 			while(1) {
-				if((CAN::PCLK % (static_cast<uint32_t>(speed) * tq)) == 0) {
-					break;
+				if(!clock_source) {
+					if((CAN::PCLK % (static_cast<uint32_t>(speed) * tq)) == 0) {
+						break;
+					}
+				} else {
+					if(clock_profile::OSCT == clock_profile::OSC_TYPE::XTAL || clock_profile::OSCT == clock_profile::OSC_TYPE::EXT) {
+						if((clock_profile::BASE % (static_cast<uint32_t>(speed) * tq)) == 0) {
+							break;
+						}
+					} else {
+						return 0;
+					}
 				}
 				tq--;
 				if(tq < 8) {  // ８以下はエラー
@@ -222,7 +232,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static constexpr bool probe_speed(SPEED speed) noexcept
 		{
-			return get_tq_(speed) >= 8;
+			if(get_tq_(false, speed) >= 8) return true;  // PCLKB 選択
+			else if(get_tq_(true, speed) >= 8) return true;  // XTAL(EXTAL) 選択
+			else return false;
 		}
 
 
@@ -241,30 +253,37 @@ namespace device {
 		{
 			if(intr.rxm_level == ICU::LEVEL::NONE || intr.txm_level == ICU::LEVEL::NONE) {
 				// 割り込み未使用では、常に失敗する。
-				format("(0)RX/TX interrup level...\n");
+				format("(0) RX/TX Interrupt level cannot be set to 0...\n");
 				return false;
 			}
 
 			// 通信速度に対する、TQ 値 8 to 25 で適切な値を選ぶ
 			// より大きい値で適合した値を選択
-			uint32_t tq = get_tq_(speed);
+			bool clock_source = 0;
+			uint32_t clock_base = CAN::PCLK;
+			uint32_t tq = get_tq_(clock_source, speed);
 			if(tq < 8) {
-				format("(1)CAN divider indivisible...\n");
-				return false;
+				clock_source = 1;
+				clock_base = clock_profile::BASE;
+				tq = get_tq_(clock_source, speed);
+				if(tq < 8) {
+					format("(1) CAN divider indivisible...\n");
+					return false;
+				}
 			}
 
 			if(!power_mgr::turn(CAN::PERIPHERAL)) {
-				format("(2)fail power manager...\n");
+				format("(2) fail power manager...\n");
 				return false;
 			}
 			if(!port_map::turn(CAN::PERIPHERAL, true, PSEL)) {
 				power_mgr::turn(CAN::PERIPHERAL, false);
-				format("(3)fail port mapping...\n");
+				format("(3) fail port mapping...\n");
 				return false;
 			}
 
 			// 動作クロックの設定
-			uint32_t brp = CAN::PCLK / (static_cast<uint32_t>(speed) * tq);
+			uint32_t brp = clock_base / (static_cast<uint32_t>(speed) * tq);
 			uint32_t tseg1 = 16;
 			uint32_t tseg2 = 8;
 			uint32_t sjw = 4;  // とりあえず固定
@@ -277,21 +296,21 @@ namespace device {
 				tseg1--;
 				if(tq == (1 + tseg1 + tseg2)) break;
 				else if(tseg1 < 4) {
-					format("(4)TSEG1 value indivisible...\n");
+					format("(4) TSEG1 value indivisible...\n");
 					return false;
 				}
 
 				tseg1--;
 				if(tq == (1 + tseg1 + tseg2)) break;
 				else if(tseg1 < 4) {
-					format("(5)TSEG1 value indivisible...\n");
+					format("(5) TSEG1 value indivisible...\n");
 					return false;
 				}
 
 				tseg2--;
 				if(tq == (1 + tseg1 + tseg2)) break;
 				else if(tseg2 < 2) {
-					format("(6)TSEG2 value indivisible...\n");
+					format("(6) TSEG2 value indivisible...\n");
 					return false;
 				}
 			}
@@ -304,7 +323,7 @@ namespace device {
 			CAN::CTLR.SLPM = 0;  // BCR レジスタを設定するので、スリープモードを解除
 			while(CAN::STR.SLPST() != 0) sleep_();  // スリープモードを抜けた事を確認
 			CAN::BCR = CAN::BCR.TSEG1.b(tseg1 - 1) | CAN::BCR.TSEG2.b(tseg2 - 1)
-				| CAN::BCR.BRP.b(brp - 1) | CAN::BCR.SJW.b(sjw - 1) | CAN::BCR.CCLKS.b(0);
+				| CAN::BCR.BRP.b(brp - 1) | CAN::BCR.SJW.b(sjw - 1) | CAN::BCR.CCLKS.b(clock_source);
 
 			// 全ての ID を受信する為には、MKRx を 0 として、マスクを有効にする。
 			for(uint32_t i = 0; i < 8; ++i) {
@@ -516,8 +535,13 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_speed() const noexcept {
-			return CAN::PCLK
-				/ (get_bcr_brp() * (1 + get_bcr_tseg1() + get_bcr_tseg2()));
+			uint32_t base;
+			if(CAN::BCR.CCLKS()) {
+				base = CAN::PCLK;
+			} else {
+				base = clock_profile::BASE;
+			}
+			return base / (get_bcr_brp() * (1 + get_bcr_tseg1() + get_bcr_tseg2()));
 		}
 
 
