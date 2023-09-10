@@ -51,6 +51,10 @@ namespace {
 	// DIY RX24T board
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+#elif defined(SIG_RX26T)
+	// DIY RX26T board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX71M)
 	// DIY RX72M board
 	static constexpr bool LED_ACTIVE = 0;
