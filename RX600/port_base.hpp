@@ -207,8 +207,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  オープンドレイン制御レジスタ 0（ODR0）@n
-					※RX24T
+			@brief  オープンドレイン制御レジスタ 0（ODR0）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -230,6 +229,41 @@ namespace device {
 		static ODR0_ ODR0;
 	};
 	template <uint32_t base> typename odr_ox_t<base>::ODR0_ ODR0;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ODR 定義 (ODR1)
+		@param[in]	base	ベースアドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct odr_xo_t {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オープンドレイン制御レジスタ 1（ODR1）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct odr1_t : public rw8_t<ofs> {
+
+			typedef rw8_t<ofs>  io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> B0;
+			bit_rw_t<io_, bitpos::B2> B2;
+			bit_rw_t<io_, bitpos::B4> B4;
+			bit_rw_t<io_, bitpos::B6> B6;
+		};
+		typedef odr1_t<base> ODR1_;
+		static ODR1_ ODR1;
+	};
+	template <uint32_t base> typename odr_xo_t<base>::ODR1_ ODR1;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
