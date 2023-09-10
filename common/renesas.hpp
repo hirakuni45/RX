@@ -60,6 +60,17 @@
 #include "RX24T/adc_in.hpp"
 #include "RX24T/dac_out.hpp"
 
+#elif defined(SIG_RX26T)
+
+#include "RX26T/port.hpp"
+
+#include "RX26T/flash.hpp"
+
+#include "RX600/system_io.hpp"
+// #include "RX600/dmac_mgr.hpp"
+// #include "RX600/dac_out.hpp"
+// #include "RX600/flash_io.hpp"
+
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/lvd.hpp"
 #include "RX62x/bus.hpp"

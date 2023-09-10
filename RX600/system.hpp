@@ -1,13 +1,14 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	システム定義（クロック発生回路、）@n
+	@brief	システム定義（クロック発生回路、） @n
+			・RX26T @n
 			・RX64M/RX71M @n
 			・RX651/RX65N @n
 			・RX66T @n
 			・RX72M/RX72T/RX72N
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -959,6 +960,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>	MSTPD6;
 			bit_rw_t<io_, bitpos::B7>	MSTPD7;
 
+			bit_rw_t<io_, bitpos::B10>	MSTPD10;
+
 #if defined(SIG_RX72M)
 			bit_rw_t<io_, bitpos::B11>	MSTPD11;
 #endif
@@ -974,6 +977,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B23>	MSTPD23;
 
+			bit_rw_t<io_, bitpos::B26>	MSTPD26;
 			bit_rw_t<io_, bitpos::B27>	MSTPD27;
 		};
 		typedef mstpcrd_t<0x0008'001C> MSTPCRD_;

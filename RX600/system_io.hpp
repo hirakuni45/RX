@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX651/RX65N/RX66T/RX72T/RX72N/RX72M グループ・システム制御 @n
+	@brief	RX26T/RX64M/RX71M/RX651/RX65N/RX66T/RX72T/RX72N/RX72M グループ・システム制御 @n
 			※RX24T は構成が大きく異なるので、RX24T/system_io.hpp に分離しています。@n
 			※ USB を使う場合：96MHz, 144MHz, 192MHz, 240MHz のいづれか @n
 			RX72x 系では、内部 PLL2 回路が追加され、Ethernet などに必要な 25MHz を得る為 @n
@@ -37,11 +37,7 @@ namespace device {
 			if(OSCT == clock_profile::OSC_TYPE::XTAL) {
 				if(clock_profile::BASE < 8'000'000 || clock_profile::BASE > 24'000'000) ok = false;
 			} else if(OSCT == clock_profile::OSC_TYPE::EXT) {
-#if defined(SIG_RX72N) || defined(SIG_RX72M)
-				if(clock_profile::BASE > 30'000'000) ok = false;
-#else
-				if(clock_profile::BASE > 24'000'000) ok = false;
-#endif
+				if(clock_profile::BASE > clock_profile::EXT_LIMIT) ok = false;
 			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {  // 16MHz, 18MHz, 20MHz
 				if(clock_profile::BASE != 16'000'000 && clock_profile::BASE != 18'000'000 && clock_profile::BASE != 20'000'000) ok = false;
 			}
@@ -98,6 +94,7 @@ namespace device {
 			}
 		}
 
+#ifndef SIG_RX26T
 		static constexpr uint32_t usb_div_() noexcept
 		{
 			if(clock_profile::TURN_USB) {
@@ -107,7 +104,7 @@ namespace device {
 				return 0b0001 + 1;
 			}
 		}
-
+#endif
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -183,7 +180,9 @@ namespace device {
 			// ※RX72N, RX72M などは BCLK: 1/3 を選択する事が出来る。
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
 			static_assert(check_clock_div_(clock_profile::ICLK), "ICLK can't divided.");
+#ifndef SIG_RX26T
 			static_assert(check_clock_div_bus_(clock_profile::BCLK), "BCLK can't divided.");
+#endif
 			static_assert(check_clock_div_(clock_profile::PCLKA), "PCLKA can't divided.");
 			static_assert(check_clock_div_(clock_profile::PCLKB), "PCLKB can't divided.");
 			static_assert(check_clock_div_(clock_profile::PCLKC), "PCLKC can't divided.");
@@ -191,17 +190,19 @@ namespace device {
 
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
+#ifndef SIG_RX26T
 								  | device::SYSTEM::SCKCR.BCK.b(clock_div_bus_(clock_profile::BCLK))
+#endif
 								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
 								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(clock_profile::PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
-
+#ifndef SIG_RX26T
 			static_assert(usb_div_() >= 2 && usb_div_() <= 5, "USB Clock can't divided.");
 			// 1/2:0b0001, 1/3:0b0010, 1/4:0b0011, 1/5:0b0100
 			device::SYSTEM::SCKCR2.UCK = usb_div_() - 1;
-
-			// マイクロコントローラによっては、FCLK 周期を事前に設定する必要がある。
+#endif
+			// マイクロコントローラによっては、ICLK をブーストする前に FCLK 周期を設定する必要がある。
 			device::FLASH::set_eepfclk(clock_profile::FCLK);
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
@@ -214,14 +215,14 @@ namespace device {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 			}
 
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
+#if defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX26T)
 #else
 			device::SYSTEM::SOSCWTCR = 0b01010;
 			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
 #endif
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 
-#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 			// ROM キャッシュを有効（標準）
 			device::SYSTEM::ROMCE = 1;
 #endif

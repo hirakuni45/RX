@@ -254,8 +254,11 @@ namespace device {
 	private:
 		// アライメントを使う場合、注意
 		volatile descriptor_s	rx_descriptors_[RXDN] __attribute__ ((aligned(32)));
+		volatile uint8_t tmp1[32];
 		volatile descriptor_s	tx_descriptors_[TXDN] __attribute__ ((aligned(32)));
+		volatile uint8_t tmp2[32];
 		volatile etherbuffer_s	ether_buffers_ __attribute__ ((aligned(32)));
+		volatile uint8_t tmp3[32];
 		volatile descriptor_s*	app_rx_desc_;
 		volatile descriptor_s*	app_tx_desc_;
 
@@ -367,17 +370,24 @@ namespace device {
 				uint32_t a = reinterpret_cast<uint32_t>(&ether_buffers_);
 				if(a & 0x1f) {  // 32 bytes aligned test
 					debug_format("Alignd error: Ether buffer adr: %08X\n") % a;
+				} else {
+					debug_format("Ether buffer adr: %08X\n") % a;
 				}
 			}
 			uint32_t rxa = reinterpret_cast<uint32_t>(app_rx_desc_);
 			if(rxa & 0x1f) {  // 32 bytes aligned test
 				debug_format("Alignd error: Ether RX adr: %08X\n") % rxa;
+			} else {
+				debug_format("Ether RX adr: %08X\n") % rxa;
 			}
+			EDMAC::RDLAR = rxa;
+
 			uint32_t txa = reinterpret_cast<uint32_t>(app_tx_desc_);
 			if(txa & 0x1f) {  // 32 bytes aligned test
 				debug_format("Alignd error: Ether TX adr: %08X\n") % txa;
+			} else {
+				debug_format("Ether TX adr: %08X\n") % txa;
 			}
-			EDMAC::RDLAR = rxa;
 			EDMAC::TDLAR = txa;
 
 //			utils::format("Ether RX adr: %08X\n") % EDMAC::RDLAR();

@@ -82,8 +82,8 @@ Data flash specifications for each microcontroller:
 |RX24T|8K|64|1|4|
 |RX66T|32K|64|4|3||
 |RX72T|32K|64|4|3|
-|RX64M|64K|64|4|-|
-|RX71M|64K|64|4|-|
+|RX64M|64K|64|4|3|
+|RX71M|64K|64|4|3|
 |RX65N|32K|64|4|4|4|-|
 |RX72N|32K|64|4|4|4|4
    

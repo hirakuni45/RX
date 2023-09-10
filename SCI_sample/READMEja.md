@@ -351,25 +351,25 @@ extern "C" {
 ## サポートされている通信プロトコル
 
 ```C++
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	SCI 通信プロトコル型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class PROTOCOL : uint8_t {
-			B7_N_1S,	///< 7 ビット、No-Parity、1 Stop Bit
-			B7_E_1S,	///< 7 ビット、Even(偶数)、1 Stop Bit
-			B7_O_1S,	///< 7 ビット、Odd (奇数)、1 Stop Bit
-			B7_N_2S,	///< 7 ビット、No-Parity、2 Stop Bits
-			B7_E_2S,	///< 7 ビット、Even(偶数)、2 Stop Bits
-			B7_O_2S,	///< 7 ビット、Odd (奇数)、2 Stop Bits
-			B8_N_1S,	///< 8 ビット、No-Parity、1 Stop Bit
-			B8_E_1S,	///< 8 ビット、Even(偶数)、1 Stop Bit
-			B8_O_1S,	///< 8 ビット、Odd (奇数)、1 Stop Bit
-			B8_N_2S,	///< 8 ビット、No-Parity、2 Stop Bits
-			B8_E_2S,	///< 8 ビット、Even(偶数)、2 Stop Bits
-			B8_O_2S,	///< 8 ビット、Odd (奇数)、2 Stop Bits
-		};
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	SCI 通信プロトコル型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class PROTOCOL : uint8_t {
+		B7_N_1S,	///< 7 ビット、No-Parity、1 Stop Bit
+		B7_E_1S,	///< 7 ビット、Even(偶数)、1 Stop Bit
+		B7_O_1S,	///< 7 ビット、Odd (奇数)、1 Stop Bit
+		B7_N_2S,	///< 7 ビット、No-Parity、2 Stop Bits
+		B7_E_2S,	///< 7 ビット、Even(偶数)、2 Stop Bits
+		B7_O_2S,	///< 7 ビット、Odd (奇数)、2 Stop Bits
+		B8_N_1S,	///< 8 ビット、No-Parity、1 Stop Bit
+		B8_E_1S,	///< 8 ビット、Even(偶数)、1 Stop Bit
+		B8_O_1S,	///< 8 ビット、Odd (奇数)、1 Stop Bit
+		B8_N_2S,	///< 8 ビット、No-Parity、2 Stop Bits
+		B8_E_2S,	///< 8 ビット、Even(偶数)、2 Stop Bits
+		B8_O_2S,	///< 8 ビット、Odd (奇数)、2 Stop Bits
+	};
 ```
 
 - 何も設定しない場合、通信プロトコルは「B8_N_1S」が使われます。

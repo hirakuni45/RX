@@ -31,15 +31,16 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
                 r_net/r_byteq_v1.30/r_byteq.c \
-				r_net/T4_src/r_dhcp_client.c \
                 r_net/driver/phy.c \
                 r_net/driver/r_ether.c \
                 r_net/driver/driver.c \
+				r_net/T4_src/r_dhcp_client.c \
                 r_net/T4_src/config_tcpudp.c \
                 r_net/T4_src/ether.c \
                 r_net/T4_src/ip.c \
                 r_net/T4_src/udp.c \
                 r_net/T4_src/tcp.c \
+                r_net/T4_src/tcp2.c \
                 r_net/T4_src/tcp_api.c
                 
 
@@ -93,8 +94,9 @@ CC_OPT		=	-Wall -Werror \
 				-Wno-unused-function \
 				-Wno-maybe-uninitialized \
 				-Wno-unused-but-set-variable \
-				-Wno-strict-aliasing \
 				-fno-exceptions
+
+#				-Wno-strict-aliasing
 
 ifeq ($(BUILD),debug)
     CC_OPT += -g -DDEBUG
