@@ -3,7 +3,8 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX24T グループ・クロック。プロファイル @n
-            クロックジェネレータで発生させる周波数の定義
+            クロックジェネレータで発生させる周波数の定義 @n
+			※簡単な実験では、120MHz は、普通に動作する、それ以上は、怪しい・・
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2021, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -38,15 +39,16 @@ namespace device {
 			HOCO,		///< 内蔵高速オンチップオシレーター（BASE には 8MHz を設定）
 			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
 		};
-
+#if 1
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 10'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）
-
-//		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
-//		static constexpr uint32_t   BASE		=  8'000'000;		///< HOCO 指定の固定値
-#if 0
-		// オーバークロックプロファイル
-		static constexpr uint32_t   PLL_BASE	= 120'000'000;		///< PLL ベースクロック（最大80MHz）
+#else
+		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
+		static constexpr uint32_t   BASE		=  8'000'000;		///< HOCO 指定の固定値
+#endif
+#if 1
+		// オーバークロックプロファイル 120MHz
+		static constexpr uint32_t   PLL_BASE	= 120'000'000;		///< PLL ベースクロック
 
 		static constexpr uint32_t   ICLK		= 120'000'000;		///< ICLK 周波数（最大80MHz）
 		static constexpr uint32_t   PCLKA		= 120'000'000;		///< PCLKA 周波数（最大80MHz）
