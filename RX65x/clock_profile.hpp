@@ -25,6 +25,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class clock_profile {
 	public:
+
+		static constexpr uint32_t	EXT_LIMIT   = 24'000'000;		///< 外部クロック入力最大値
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発信器タイプ @n
@@ -38,7 +41,7 @@ namespace device {
 			HOCO,		///< 内蔵高速オンチップオシレーター
 			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
 		};
-
+#if 1
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
 
 		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
@@ -46,7 +49,15 @@ namespace device {
 
 		static constexpr uint32_t	BASE		=  12'000'000;		///< 外部接続クリスタル
 		static constexpr uint32_t	PLL_BASE	= 240'000'000;		///< PLL ベースクロック（最大240MHz）
+#else
+		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::HOCO;	///< 発信器種別型
 
+		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
+		static constexpr bool       TURN_USB    = false;			///< USB を使う場合「true」
+
+		static constexpr uint32_t	BASE		=  20'000'000;		///< 外部接続クリスタル
+		static constexpr uint32_t	PLL_BASE	= 240'000'000;		///< PLL ベースクロック（最大240MHz）
+#endif
 		static constexpr uint32_t	ICLK		= 120'000'000;		///< ICLK 周波数（最大120MHz）
 		static constexpr uint32_t	PCLKA		= 120'000'000;		///< PCLKA 周波数（最大120MHz）
 		static constexpr uint32_t	PCLKB		=  60'000'000;		///< PCLKB 周波数（最大60MHz）
