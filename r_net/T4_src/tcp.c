@@ -2,7 +2,7 @@
 /*!	@file
 	@brief	TCP
 			Copyright 2017 Kunihito Hiramatsu
-	@author	•½¼–Mm (hira@rvf-rc45.net)
+	@author	ï¿½ï¿½ï¿½ï¿½ï¿½Mï¿½m (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "net_config.h"
@@ -865,7 +865,7 @@ int _tcp_rcv_rst(void)
                 /* tcp_cls_cep */
             case _TCP_API_CLSCP:
                 _tcp_init_tcb(_tcp_tcb);
-                /* ƒGƒ‰[ƒR[ƒhFE_OK */
+                /* ï¿½Gï¿½ï¿½ï¿½[ï¿½Rï¿½[ï¿½hï¿½FE_OK */
                 *(areq->error) = E_OK;
 
                 if (areq->tmout == TMO_NBLK)
@@ -2235,7 +2235,7 @@ void _tcp_cancel_api(int ercd)
             break;
             /****** tcp_cls_cep *****/
         case _TCP_API_CLSCP:
-            /* RST‘—MŽè‘±‚«i‘—MŒã‚ÉTCB‰Šú‰»j */
+            /* RSTï¿½ï¿½ï¿½Mï¿½è‘±ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½Mï¿½ï¿½ï¿½TCBï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½j */
             _tcp_tcb->hdr_flg = _TCPF_RST;
             _tcp_tcb->flag |=
                 (_TCBF_NEED_SEND | _TCBF_SND_TCP | _TCBF_NEED_INIT | _TCBF_NEED_API);
