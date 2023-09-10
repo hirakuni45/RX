@@ -5,7 +5,7 @@
 			R5F563T[ECB]: 32K @n
 			R5F563T[654]:  8K
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,8 +23,6 @@ namespace device {
 	struct flash_t {
 
 		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
-//		static constexpr uint32_t DATA_FLASH_SIZE  = 32768;		///< データ・フラッシュ、サイズ
-//		static constexpr uint32_t DATA_FLASH_BLOCK = 1024;		///< データ・フラッシュ、ブロックサイズ
 		static constexpr uint32_t DATA_FLASH_SIZE  = 8192;		///< データ・フラッシュ、サイズ
 		static constexpr uint32_t DATA_FLASH_BLOCK = 256;		///< データ・フラッシュ、ブロックサイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 2;			///< データ・フラッシュ最小書き込みサイズ

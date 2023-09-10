@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX631/RX63N グループ・フラッシュ 定義
+	@brief	RX631/RX63N グループ・フラッシュ 定義 @n
+			G バージョン時「G_VERSION」を有効にする。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -23,7 +24,7 @@ namespace device {
 		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
 		static constexpr uint32_t DATA_FLASH_SIZE = 32768;		///< データ・フラッシュ、サイズ
 		static constexpr uint32_t DATA_FLASH_BLOCK = 2048;		///< データ・フラッシュ、ブロックサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 8;			///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 2;			///< データ・フラッシュ最小書き込みサイズ
 
 #ifdef G_VERSION
 		static constexpr auto ID_NUM = 4;						///< 個別識別子数（Gバージョン）
@@ -504,6 +505,17 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  FCU E2 データフラッシュコマンドレジスタ
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<DATA_FLASH_ORG> FCU_DATA_CMD8_;
+		static FCU_DATA_CMD8_ FCU_DATA_CMD8;
+		typedef rw16_t<DATA_FLASH_ORG> FCU_DATA_CMD16_;
+		static FCU_DATA_CMD16_ FCU_DATA_CMD16;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3)  @n
 					G バージョンのみ @n
 					ROM 0xFFFF'FFE8 to 0xFFFF'FFF7 互換性ダミー
@@ -548,6 +560,8 @@ namespace device {
 	template<class _> typename flash_t<_>::FPESTAT_ flash_t<_>::FPESTAT;
 	template<class _> typename flash_t<_>::DFLBCSTAT_ flash_t<_>::DFLBCSTAT;
 	template<class _> typename flash_t<_>::PCKAR_ flash_t<_>::PCKAR;
+	template<class _> typename flash_t<_>::FCU_DATA_CMD8_ flash_t<_>::FCU_DATA_CMD8;
+	template<class _> typename flash_t<_>::FCU_DATA_CMD16_ flash_t<_>::FCU_DATA_CMD16;
 	template<class _> typename flash_t<_>::UIDR0_ flash_t<_>::UIDR0;
 	template<class _> typename flash_t<_>::UIDR1_ flash_t<_>::UIDR1;
 	template<class _> typename flash_t<_>::UIDR2_ flash_t<_>::UIDR2;

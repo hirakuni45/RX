@@ -1,16 +1,19 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX621/RX62N グループ FLASH 制御
+	@brief	RX621/RX62N, RX631/RX63N グループ FLASH 制御 @n
+			このファイルは、「renesas.hpp」にインクルードされる前提なので、個別にインクルードしない。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstring>
 #include "common/delay.hpp"
-#include "RX62x/flash.hpp"
+#include "common/format.hpp"
+
+#define FIO_DEBUG
 
 namespace device {
 
@@ -20,22 +23,106 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class flash_io {
+
+#ifdef FIO_DEBUG
+		typedef utils::format debug_format;
+#else
+		typedef utils::null_format debug_format;
+#endif
+
 	public:
-		static constexpr auto DATA_FLASH_SIZE  = FLASH::DATA_FLASH_SIZE;
-		static constexpr auto DATA_FLASH_BLOCK = FLASH::DATA_FLASH_BLOCK;
-		static constexpr auto DATA_FLASH_BANK  = FLASH::DATA_FLASH_SIZE / FLASH::DATA_FLASH_BLOCK;
-		static constexpr auto DATA_WORD_SIZE   = FLASH::DATA_WORD_SIZE;
+		static constexpr auto DATA_FLASH_SIZE  = FLASH::DATA_FLASH_SIZE;	///< データフラッシュ、サイズ（バイト）
+		static constexpr auto DATA_FLASH_BLOCK = FLASH::DATA_FLASH_BLOCK;	///< データフラッシュ、ブロック数
+		static constexpr auto DATA_FLASH_BANK  = FLASH::DATA_FLASH_SIZE / FLASH::DATA_FLASH_BLOCK;	///< データフラッシュ、バンク数
+		static constexpr auto DATA_WORD_SIZE   = FLASH::DATA_WORD_SIZE;		///< データフラッシュ、ワードサイズ（最小書き込みバイト）
 
 	private:
 		enum class MODE : uint8_t {
+			NONE,
 			RD,
 			PE,
 		};
 
 		MODE	mode_;
 
+		bool	trans_farm_;
+
+		enum class FCU_CMD : uint8_t {
+			NORMAL,		///< ノーマルモード移行
+			ST_READ,	///< ステータスリードモード移行
+			LKB_READ,	///< ロックビットリードモード移行
+			SET_CLOCK,	///< 周辺クロック通知
+
+		};
+
+		void step_frdy_(uint32_t timeout_ms) noexcept
+		{
+			while(FLASH::FSTATR0.FRDY() == 0) {
+				utils::delay::micro_second(1);
+				--timeout_ms;
+				if(timeout_ms == 0) {
+					debug_format("FRDY timeout. FCU initialize...\n");
+					// FCU 初期化
+					
+				}
+			}
+		}
+
+
+		void fcu_cmd_(FCU_CMD cmd) noexcept
+		{
+			switch(cmd) {
+			case FCU_CMD::SET_CLOCK:
+				FLASH::PCKAR = clock_profile::FCLK / 1'000'000;
+				FLASH::FCU_DATA_CMD8 = 0xE9;
+				FLASH::FCU_DATA_CMD8 = 0x03;
+				FLASH::FCU_DATA_CMD16 = 0x0F0F;
+				FLASH::FCU_DATA_CMD16 = 0x0F0F;
+				FLASH::FCU_DATA_CMD16 = 0x0F0F;
+				FLASH::FCU_DATA_CMD8 = 0xD0;
+				step_frdy_(clock_profile::FCLK / 1'000'000 * 60);
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		bool turn_break_() const noexcept
+		{
+#if 0
+			faci_cmd_(FACI::BREAK);
+
+			// break (4 bytes): FCLK 20MHz to 60MHz max 20us
+			//                  FCLK 4MHz max 32us
+			// * 1.1
+			uint32_t cnt = 22;
+			if(clock_profile::FCLK < 20000000) cnt = 36;
+			while(device::FLASH::FSTATR.FRDY() == 0) {
+				utils::delay::micro_second(1);
+				--cnt;
+				if(cnt == 0) break;
+			}
+			if(cnt == 0) {
+				debug_format("FACI 'turn_break_' timeout\n");
+				return false;
+			}
+
+			if(device::FLASH::FASTAT.CMDLK() == 0) {
+				return true;
+			} else {
+				debug_format("FACI 'turn_break_' fail\n");
+				return false;
+			}
+#endif
+			return true;
+		}
+
 		void turn_rd_() noexcept
 		{
+			if(mode_ == MODE::RD) {
+				return;
+			}
 #if 0
 			if(FLASH::FENTRYR.FENTRYD() == 0) return;
 			FLASH::FENTRYR.FENTRYD = 0;  // read mode
@@ -48,10 +135,14 @@ namespace device {
 			device::FLASH::FENTRYR = 0xAA00;
 			while(device::FLASH::FENTRYR() != 0) ;
 #endif
+			mode_ = MODE::RD;
 		}
 
 		void turn_pe_() noexcept
 		{
+			if(mode_ == MODE::PE) {
+				return;
+			}
 #if 0
 			if(device::FLASH::FENTRYR.FENTRYD() != 0) return;
 			device::FLASH::FENTRYR.FENTRYD = 1;  // P/E mode
@@ -73,6 +164,51 @@ namespace device {
 			if(frq > 32) frq = 32;
 			device::FLASH::FISR.PCKA = frq - 1;
 #endif
+			mode_ = MODE::PE;
+		}
+
+		bool init_fcu_() noexcept
+		{
+			if(trans_farm_) return true;
+
+			/// FCU ファームウェア格納領域 0xFEFF'E000h ～ 0xFEFF'FFFFh 8Kバイト
+			/// FCU-RAM 領域 0x007F'8000h ～ 0x007F'9FFFh 8Kバイト
+			if(device::FLASH::FENTRYR() != 0) {
+				device::FLASH::FENTRYR = 0xAA00;
+
+				uint32_t wait = 4;
+				while(device::FLASH::FENTRYR() != 0) {
+					if(wait > 0) {
+						--wait;
+					} else {
+						debug_format("FCU Tras FARM timeout\n");
+						return false;
+					}
+				}
+			}
+
+			device::FLASH::FCURAME = 0xC401;  // Write only
+
+			const uint32_t* src = reinterpret_cast<const uint32_t*>(0xFEFF'E000);  // Farm master
+			uint32_t* dst = reinterpret_cast<uint32_t*>(0x007F8000);  // Farm section
+			for(uint32_t i = 0; i < (8192 / 4); ++i) {
+				*dst++ = *src++;
+			}
+#if 0
+			device::FLASH::FCURAME = 0xC400;
+
+			turn_pe_();
+
+			auto f = turn_break_();			
+			if(f) {
+				turn_rd_();
+				trans_farm_ = true;
+			} else {
+				turn_break_();
+				debug_format("FACI Tras FARM lock\n");
+			}
+#endif
+			return trans_farm_;
 		}
 
 	public:
@@ -81,7 +217,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io() noexcept : mode_(MODE::RD)
+		flash_io() noexcept : mode_(MODE::NONE), trans_farm_(false)
 		{ }
 
 
@@ -92,11 +228,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void start() noexcept
 		{
+			fcu_cmd_(FCU_CMD::SET_CLOCK);
 
-			FLASH::PCKAR = clock_profile::FCLK / 1'000'000;
+			init_fcu_();
 
-//			FLASH::DFLCTL.DFLEN = 1;
-			utils::delay::micro_second(5);  // tDSTOP by high speed
 			turn_rd_();
 		}
 
@@ -248,7 +383,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ユニーク ID 数を取得 @n
-					RX64M などユニーク ID をサポートしない場合は「０」が返る。
+					ユニーク ID をサポートしない場合は「０」が返る。
 			@return ユニーク ID 数
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -260,8 +395,9 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ユニーク ID の取得 @no
-					RX64M などユニーク ID をサポートしない場合、特定の ROM 領域を返す。 
+			@brief  ユニーク ID の取得 @n
+					ユニーク ID をサポートしない場合、特定の ROM 領域を返す。 @n
+					各マイコン「flash.hpp」を参照 
 			@param[in]	idx		ID 番号（０～３）
 			@return ID 値
 		*/

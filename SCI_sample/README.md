@@ -284,11 +284,11 @@ extern "C" {
    
 If you specify otherwise:
 
-```
-		uint8_t intr = 2;                       // interrupt level (if 0 is specified, polling operation is used)
-		uint32_t baud = 115200;                 // baud rate (any integer value can be specified)
-		auto protocol = SCI::PROTOCOL::B8_E_2S; // 8 bits, Even, 2 Stop Bits
-		sci_.start(baud, intr, protocol);
+```C++
+	constexpr uint32_t baud = 115200;        // Baud rate (any integer value can be specified)
+	auto intr = device::ICU::LEVEL::_2;      // Interrupt level (specifying NONE results in a polling operation)
+	auto protocol = SCI::PROTOCOL::B8_E_2S;  // 8 bits, Even, 2 Stop Bits
+	sci_.start(baud, intr, protocol);
 ```
 
 ---
@@ -297,34 +297,34 @@ If you specify otherwise:
 
 - The baud rate is specified as an integer.
 
-```
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief SCI baud rate type (standardized value specified in serial communication).
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class BAUDRATE : uint32_t {
-			B110    =    110,	///<    110 B.P.S.
-			B150    =    150,	///<    150 B.P.S.
-			B300    =    300,	///<    300 B.P.S.
-			B600    =    600,	///<    600 B.P.S.
-			B1200   =   1200,	///<   1200 B.P.S.
-			B2400   =   2400,	///<   2400 B.P.S.
-			B4800   =   4800,	///<   4800 B.P.S.
-			B9600   =   9600,	///<   9600 B.P.S.
-			B19200  =  19200,	///<  19200 B.P.S.
-			B38400  =  38400,	///<  38400 B.P.S.
-			B57600  =  57600,	///<  57600 B.P.S.
-			B76800  =  76800,	///<  76800 B.P.S.
-			B96000  =  96000,	///<  96000 B.P.S.
-			B115200 = 115200,	///< 115200 B.P.S.
-		};
+```C++
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief SCI baud rate type (standardized value specified in serial communication).
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class BAUDRATE : uint32_t {
+		B110    =    110,	///<    110 B.P.S.
+		B150    =    150,	///<    150 B.P.S.
+		B300    =    300,	///<    300 B.P.S.
+		B600    =    600,	///<    600 B.P.S.
+		B1200   =   1200,	///<   1200 B.P.S.
+		B2400   =   2400,	///<   2400 B.P.S.
+		B4800   =   4800,	///<   4800 B.P.S.
+		B9600   =   9600,	///<   9600 B.P.S.
+		B19200  =  19200,	///<  19200 B.P.S.
+		B38400  =  38400,	///<  38400 B.P.S.
+		B57600  =  57600,	///<  57600 B.P.S.
+		B76800  =  76800,	///<  76800 B.P.S.
+		B96000  =  96000,	///<  96000 B.P.S.
+		B115200 = 115200,	///< 115200 B.P.S.
+	};
 ```
 
-```
-		uint8_t intr = 2;                        // interrupt level (0 means polling operation)
-		auto protocol = SCI::PROTOCOL::B8_E_2S;  // 8 bits, Even, 2 Stop Bits
-		sci_.start(SCI::BAUDRATE::B115200, intr, protocol);  // 115200 B.P.S.
+```C++
+	auto intr = device::ICU:LEVEL::_2;       // Interrupt level (specifying NONE results in a polling operation)
+	auto protocol = SCI::PROTOCOL::B8_E_2S;  // 8 bits, Even, 2 Stop Bits
+	sci_.start(SCI::BAUDRATE::B115200, intr, protocol);  // 115200 B.P.S.
 ```
 
 ---
