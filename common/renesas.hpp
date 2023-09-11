@@ -39,8 +39,8 @@
 
 #elif defined(SIG_RX24T)
 #include "RX24T/lvda.hpp"
-#include "RX600/bus.hpp"
 #include "RX600/cac.hpp"
+#include "RX600/bus.hpp"
 #include "RX24T/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX24T/poe3.hpp"
@@ -61,15 +61,19 @@
 #include "RX24T/dac_out.hpp"
 
 #elif defined(SIG_RX26T)
-
+#include "RX24T/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/bus.hpp"
+#include "RX600/dmac.hpp"
+#include "RX600/elc.hpp"
 #include "RX26T/port.hpp"
 
 #include "RX26T/flash.hpp"
 
 #include "RX600/system_io.hpp"
-// #include "RX600/dmac_mgr.hpp"
-// #include "RX600/dac_out.hpp"
 // #include "RX600/flash_io.hpp"
+#include "RX600/dmac_mgr.hpp"
+// #include "RX600/dac_out.hpp"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/lvd.hpp"

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・ELC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,13 +40,13 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  ELCON;
 		};
-		typedef elcr_t<base + 0x00> ERCR_;
-		static  ERCR_ ERCR;
+		typedef elcr_t<base + 0x00> ELCR_;
+		static  ELCR_ ELCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  イベントリンク設定レジスタ n（ELSRn）@n
+			@brief  イベントリンク設定レジスタ n（ELSRn） @n
 					（n = 0、3、4、7、10 ～ 13、15、16、18 ～ 28、33、35 ～ 38、41 ～ 45）
 		*/
 		//-----------------------------------------------------------------//
@@ -414,7 +414,7 @@ namespace device {
 		typedef elsegr_t<base + 0x2D> ELSEGR_;
 		static  ELSEGR_ ELSEGR;
 	};
-	template <uint32_t base, peripheral per> typename elc_t<base, per>::ERCR_ elc_t<base, per>::ERCR;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELCR_ elc_t<base, per>::ELCR;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR0_ elc_t<base, per>::ELSR0;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR3_ elc_t<base, per>::ELSR3;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR4_ elc_t<base, per>::ELSR4;
