@@ -40,9 +40,9 @@ CSOURCES	=	common/init.c \
                 r_net/T4_src/ip.c \
                 r_net/T4_src/udp.c \
                 r_net/T4_src/tcp.c \
-                r_net/T4_src/tcp2.c \
                 r_net/T4_src/tcp_api.c
-                
+
+#                r_net/T4_src/tcp2.c
 
 #				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
 				FreeRTOS/Source/portable/MemMang/heap_4.c \
