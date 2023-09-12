@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・ELC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,13 +40,13 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  ELCON;
 		};
-		typedef elcr_t<base + 0x00> ERCR_;
-		static  ERCR_ ERCR;
+		typedef elcr_t<base + 0x00> ELCR_;
+		static  ELCR_ ELCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  イベントリンク設定レジスタ n（ELSRn）@n
+			@brief  イベントリンク設定レジスタ n（ELSRn） @n
 					（n = 0、3、4、7、10 ～ 13、15、16、18 ～ 28、33、35 ～ 38、41 ～ 45）
 		*/
 		//-----------------------------------------------------------------//
@@ -58,6 +58,7 @@ namespace device {
 		static  ELSR4_ ELSR4;
 		typedef rw8_t<base + 0x08>  ELSR7_;
 		static  ELSR7_ ELSR7;
+
 		typedef rw8_t<base + 0x0B>  ELSR10_;
 		static  ELSR10_ ELSR10;
 		typedef rw8_t<base + 0x0C>  ELSR11_;
@@ -66,10 +67,12 @@ namespace device {
 		static  ELSR12_ ELSR12;
 		typedef rw8_t<base + 0x0E>  ELSR13_;
 		static  ELSR13_ ELSR13;
+
 		typedef rw8_t<base + 0x10>  ELSR15_;
 		static  ELSR15_ ELSR15;
 		typedef rw8_t<base + 0x11>  ELSR16_;
 		static  ELSR16_ ELSR16;
+
 		typedef rw8_t<base + 0x13>  ELSR18_;
 		static  ELSR18_ ELSR18;
 		typedef rw8_t<base + 0x14>  ELSR19_;
@@ -92,6 +95,7 @@ namespace device {
 		static  ELSR27_ ELSR27;
 		typedef rw8_t<base + 0x1D>  ELSR28_;
 		static  ELSR28_ ELSR28;
+
 		typedef rw8_t<base + 0x31>  ELSR33_;
 		static  ELSR33_ ELSR33;
 		typedef rw8_t<base + 0x33>  ELSR35_;
@@ -102,6 +106,7 @@ namespace device {
 		static  ELSR37_ ELSR37;
 		typedef rw8_t<base + 0x36>  ELSR38_;
 		static  ELSR38_ ELSR38;
+
 		typedef rw8_t<base + 0x39>  ELSR41_;
 		static  ELSR41_ ELSR41;
 		typedef rw8_t<base + 0x3A>  ELSR42_;
@@ -112,6 +117,32 @@ namespace device {
 		static  ELSR44_ ELSR44;
 		typedef rw8_t<base + 0x3D>  ELSR45_;
 		static  ELSR45_ ELSR45;
+		typedef rw8_t<base + 0x44>  ELSR46_;
+		static  ELSR46_ ELSR46;
+		typedef rw8_t<base + 0x45>  ELSR47_;
+		static  ELSR47_ ELSR47;
+		typedef rw8_t<base + 0x46>  ELSR48_;
+		static  ELSR48_ ELSR48;
+		typedef rw8_t<base + 0x47>  ELSR49_;
+		static  ELSR49_ ELSR49;
+		typedef rw8_t<base + 0x48>  ELSR50_;
+		static  ELSR50_ ELSR50;
+		typedef rw8_t<base + 0x49>  ELSR51_;
+		static  ELSR51_ ELSR51;
+		typedef rw8_t<base + 0x4A>  ELSR52_;
+		static  ELSR52_ ELSR52;
+		typedef rw8_t<base + 0x4B>  ELSR53_;
+		static  ELSR53_ ELSR53;
+		typedef rw8_t<base + 0x4C>  ELSR54_;
+		static  ELSR54_ ELSR54;
+		typedef rw8_t<base + 0x4D>  ELSR55_;
+		static  ELSR55_ ELSR55;
+		typedef rw8_t<base + 0x4E>  ELSR56_;
+		static  ELSR56_ ELSR56;
+		typedef rw8_t<base + 0x4F>  ELSR57_;
+		static  ELSR57_ ELSR57;
+		typedef rw8_t<base + 0x58>  ELSR58_;
+		static  ELSR58_ ELSR58;
 
 
 		//-----------------------------------------------------------------//
@@ -129,6 +160,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2>  MTU0MD;
+
 			bits_rw_t<io_, bitpos::B6, 2>  MTU3MD;
 		};
 		typedef elopa_t<base + 0x1F> ELOPA_;
@@ -196,6 +228,29 @@ namespace device {
 		};
 		typedef elopd_t<base + 0x22> ELOPD_;
 		static  ELOPD_ ELOPD;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	イベントリンクオプション設定レジスタ E（ELOPE）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct elope_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>  MTU6MD;
+			bits_rw_t<io_, bitpos::B2, 2>  MTU7MD;
+
+			bits_rw_t<io_, bitpos::B6, 2>  MTU9MD;
+		};
+		typedef elope_t<base + 0x3E> ELOPE_;
+		static  ELOPE_ ELOPE;
 
 
 		//-----------------------------------------------------------------//
@@ -328,6 +383,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  PGC;
 			bit_rw_t <io_, bitpos::B2>     PGCOVE;
+
 			bits_rw_t<io_, bitpos::B4, 3>  PGCO;
 		};
 		typedef pgcn_t<base + 0x25> PGC1_;
@@ -408,13 +464,14 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  SEG;	// write-only
+
 			bit_rw_t<io_, bitpos::B6>  WE;
 			bit_rw_t<io_, bitpos::B7>  WI;	// write-only
 		};
 		typedef elsegr_t<base + 0x2D> ELSEGR_;
 		static  ELSEGR_ ELSEGR;
 	};
-	template <uint32_t base, peripheral per> typename elc_t<base, per>::ERCR_ elc_t<base, per>::ERCR;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELCR_ elc_t<base, per>::ELCR;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR0_ elc_t<base, per>::ELSR0;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR3_ elc_t<base, per>::ELSR3;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR4_ elc_t<base, per>::ELSR4;
@@ -446,10 +503,24 @@ namespace device {
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR43_ elc_t<base, per>::ELSR43;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR44_ elc_t<base, per>::ELSR44;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR45_ elc_t<base, per>::ELSR45;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR46_ elc_t<base, per>::ELSR46;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR47_ elc_t<base, per>::ELSR47;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR48_ elc_t<base, per>::ELSR48;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR49_ elc_t<base, per>::ELSR49;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR50_ elc_t<base, per>::ELSR50;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR51_ elc_t<base, per>::ELSR51;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR52_ elc_t<base, per>::ELSR52;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR53_ elc_t<base, per>::ELSR53;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR54_ elc_t<base, per>::ELSR54;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR55_ elc_t<base, per>::ELSR55;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR56_ elc_t<base, per>::ELSR56;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR57_ elc_t<base, per>::ELSR57;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELSR58_ elc_t<base, per>::ELSR58;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELOPA_ elc_t<base, per>::ELOPA;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELOPB_ elc_t<base, per>::ELOPB;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELOPC_ elc_t<base, per>::ELOPC;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELOPD_ elc_t<base, per>::ELOPD;
+	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELOPE_ elc_t<base, per>::ELOPE;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELOPF_ elc_t<base, per>::ELOPF;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELOPH_ elc_t<base, per>::ELOPH;
 	template <uint32_t base, peripheral per> typename elc_t<base, per>::ELOPI_ elc_t<base, per>::ELOPI;

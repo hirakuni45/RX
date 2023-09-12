@@ -90,11 +90,11 @@
 #include "RX600/system.hpp"
 #include "RX26T/power_mgr.hpp"
 #include "RX26T/icu.hpp"
-// #include "RX26T/icu_mgr.hpp"
-// #include "RX26T/port_map.hpp"
+#include "RX26T/icu_mgr.hpp"
+#include "RX26T/port_map.hpp"
 // #include "RX26T/port_map_mtu.hpp"
 // #include "RX26T/port_map_gpt.hpp"
-// #include "RX26T/port_map_irq.hpp"
+#include "RX26T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX64M)

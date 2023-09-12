@@ -1,16 +1,16 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72T グループ・ポート・マッピング (GPTW0 - GPTW9) 
+	@brief	RX26T グループ・ポート・マッピング (GPTW0 - GPTW9) 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX72T/peripheral.hpp"
-#include "RX66T/port.hpp"
-#include "RX66T/mpc.hpp"
+#include "RX26T/peripheral.hpp"
+#include "RX26T/port.hpp"
+#include "RX26T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -732,54 +732,15 @@ namespace device {
 		}
 
 
-		static bool gptw_(CHANNEL ch, bool ena, ORDER order) noexcept
-		{
-			bool ret = true;
-#if 0
-			switch(ch) {
-			case CHANNEL::RA:
-				switch(order) {
-				case ORDER::FIRST:
-					break;
-				case ORDER::SECOND:
-					break;
-				case ORDER::THIRD:
-					break;
-				case ORDER::FOURTH:
-					break;
-				case ORDER::FIFTH:
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::RB:
-
-				break;
-			case CHANNEL::RC:
-
-				break;
-			case CHANNEL::RD:
-
-				break;
-			default:
-				ret = false;
-				break;
-			}
-#endif
-			return ret;
-		}
-
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  GPTW[0-9]、チャネル別ポート切り替え
-			@param[in]	per	周辺機器タイプ型
-			@param[in]	ch	チャネル型
-			@param[in]	ena	無効にする場合「false」
+			@param[in]	per		周辺機器タイプ
+			@param[in]	ch		チャネル
+			@param[in]	ena		無効にする場合「false」
 			@param[in]	order	候補を選択する場合
-			@param[in]	neg	反転入出力の場合「true」
+			@param[in]	neg		反転入出力の場合「true」
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -791,61 +752,40 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
-#if 0
-			if(ch == CHANNEL::RA || ch == CHANNEL::RB || ch == CHANNEL::RC || ch == CHANNEL::RD) {
-				switch(per) {
-				case peripheral::GPTW0:
-				case peripheral::GPTW1:
-				case peripheral::GPTW2:
-				case peripheral::GPTW3:
-				case peripheral::GPTW4:
-				case peripheral::GPTW5:
-				case peripheral::GPTW6:
-				case peripheral::GPTW7:
-				case peripheral::GPTW8:
-				case peripheral::GPTW9:
-					ret = gptw_(ch, ena, order);
-					break;
-				default:
-					break;
-				}
-			} else {
-#endif
-				switch(per) {
-				case peripheral::GPTW0:
-					ret = gptw0_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW1:
-					ret = gptw1_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW2:
-					ret = gptw2_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW3:
-					ret = gptw3_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW4:
-					ret = gptw4_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW5:
-					ret = gptw5_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW6:
-					ret = gptw6_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW7:
-					ret = gptw7_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW8:
-					ret = gptw8_(ch, ena, neg, order);
-					break;
-				case peripheral::GPTW9:
-					ret = gptw9_(ch, ena, neg, order);
-					break;
-				default:
-					break;
-				}
-//			}
+			switch(per) {
+			case peripheral::GPTW0:
+				ret = gptw0_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW1:
+				ret = gptw1_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW2:
+				ret = gptw2_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW3:
+				ret = gptw3_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW4:
+				ret = gptw4_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW5:
+				ret = gptw5_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW6:
+				ret = gptw6_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW7:
+				ret = gptw7_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW8:
+				ret = gptw8_(ch, ena, neg, order);
+				break;
+			case peripheral::GPTW9:
+				ret = gptw9_(ch, ena, neg, order);
+				break;
+			default:
+				break;
+			}
 
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 

@@ -1,18 +1,18 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX66T/RX72T グループ・ポート・マッピング (MTU) @n
+	@brief	RX26T グループ・ポート・マッピング (MTU) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8, MTU9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX72T/peripheral.hpp"
-#include "RX66T/port.hpp"
-#include "RX66T/mpc.hpp"
+#include "RX26T/peripheral.hpp"
+#include "RX26T/port.hpp"
+#include "RX26T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -1014,4 +1014,3 @@ namespace device {
 		}
 	};
 }
-

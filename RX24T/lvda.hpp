@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T グループ LVDA 定義
+	@brief	RX24T/RX26T グループ LVDA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -160,12 +160,17 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>     LVD1RIE;
+			bit_rw_t < io_, bitpos::B0>		LVD1RIE;
+#ifdef SIG_RX26T
+			bit_rw_t < io_, bitpos::B1>		LVD1DFDIS;
+#endif
+			bit_rw_t < io_, bitpos::B2>		LVD1CMPE;
 
-			bit_rw_t <io_, bitpos::B2>     LVD1CMPE;
-
-			bit_rw_t <io_, bitpos::B6>     LVD1RI;
-			bit_rw_t <io_, bitpos::B7>     LVD1RN;
+#ifdef SIG_RX26T
+			bits_rw_t <io_, bitpos::B4, 2>	LVD1FSAMP;
+#endif
+			bit_rw_t < io_, bitpos::B6>		LVD1RI;
+			bit_rw_t < io_, bitpos::B7>		LVD1RN;
 		};
 		typedef lvd1cr0_t<0x0008'C29A>  LVD1CR0_;
 		static  LVD1CR0_ LVD1CR0;
@@ -185,12 +190,17 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>     LVD2RIE;
+			bit_rw_t <io_, bitpos::B0>		LVD2RIE;
+#ifdef SIG_RX26T
+			bit_rw_t <io_, bitpos::B1>		LVD2DFDIS;
+#endif
+			bit_rw_t <io_, bitpos::B2>		LVD2CMPE;
 
-			bit_rw_t <io_, bitpos::B2>     LVD2CMPE;
-
-			bit_rw_t <io_, bitpos::B6>     LVD2RI;
-			bit_rw_t <io_, bitpos::B7>     LVD2RN;
+#ifdef SIG_RX26T
+			bits_rw_t <io_, bitpos::B4, 2>	LVD2FSAMP;
+#endif
+			bit_rw_t <io_, bitpos::B6>		LVD2RI;
+			bit_rw_t <io_, bitpos::B7>		LVD2RN;
 		};
 		typedef lvd2cr0_t<0x0008'C29B>  LVD2CR0_;
 		static  LVD2CR0_ LVD2CR0;

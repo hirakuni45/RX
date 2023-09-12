@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600/RX700 バス定義
+	@brief	RX24T/RX26T/RX600/RX700 バス定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -651,6 +651,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>    IA;
 			bit_rw_t <io_, bitpos::B1>    TO;
+
 			bits_rw_t<io_, bitpos::B4, 3> MST;
 		};
 		typedef bersr1_t<0x0008'1308> BERSR1_;

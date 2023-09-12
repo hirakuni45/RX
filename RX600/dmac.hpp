@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ　DMACa 定義
+	@brief	RX600 グループ　DMACAa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -49,7 +49,18 @@ namespace device {
 			@brief  DMA 転送カウントレジスタ (DMCRA)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x08> DMCRA_;
+		template <uint32_t ofs>
+		struct dmcra_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  16>  DMCRAL;
+			bits_rw_t<io_, bitpos::B16, 10>  DMCRAH;
+		};
+		typedef dmcra_t<base + 0x08> DMCRA_;
 		static DMCRA_ DMCRA;
 
 
@@ -77,7 +88,9 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0,  2>   DCTG;
+
 			bits_rw_t<io_, bitpos::B8,  2>   SZ;
+
 			bits_rw_t<io_, bitpos::B12, 2>   DTS;
 			bits_rw_t<io_, bitpos::B14, 2>   MD;
 		};
@@ -124,8 +137,10 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0,  5>   DARA;
+
 			bits_rw_t<io_, bitpos::B6,  2>   DM;
 			bits_rw_t<io_, bitpos::B8,  5>   SARA;
+
 			bits_rw_t<io_, bitpos::B14, 2>   SM;
 		};
 		typedef dmamd_t<base + 0x14> DMAMD_;
@@ -176,6 +191,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>   SWREQ;
+
 			bit_rw_t<io_, bitpos::B4>   CLRS;
 		};
 		typedef dmreq_t<base + 0x1D> DMREQ_;
@@ -197,7 +213,9 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>   ESIF;
+
 			bit_rw_t<io_, bitpos::B4>   DTIF;
+
 			bit_rw_t<io_, bitpos::B7>   ACT;
 		};
 		typedef dmsts_t<base + 0x1E> DMSTS_;
