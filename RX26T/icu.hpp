@@ -609,7 +609,7 @@ namespace device {
 				uint32_t idx = 0;
 				switch(vec) {
 				case VECTOR::BUSERR: idx = 0; break;
-				case VECTOR::GROUPIE0: idx = 0; break;
+//				case VECTOR::GROUPIE0: idx = 0; break;
 				case VECTOR::RAMERR: idx = 0; break;
 				case VECTOR::FIFERR: idx = 1; break;
 				case VECTOR::FRDYI:  idx = 2; break;
