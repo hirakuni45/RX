@@ -1330,4 +1330,3 @@ namespace device {
 		}
 	};
 }
-

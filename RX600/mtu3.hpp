@@ -20,7 +20,7 @@ namespace device {
 	template <class _>
 	struct mtu_base_t {
 
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
+#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 		static constexpr auto PCLK = clock_profile::PCLKC;
 #else
 		static constexpr auto PCLK = clock_profile::PCLKA;
@@ -34,7 +34,7 @@ namespace device {
 			MTU2,	///< MTU2:  RX621 / RX62N
 			MTU3,	///< MTU3:  RX63T
 			MTU3a,	///< MTU3a: RX64M / RX71M / RX651 / RX65N / RX72N / RX72M
-			MTU3d,	///< MTU3d: RX24T / RX66T / RX72T
+			MTU3d,	///< MTU3d: RX24T / RX26T / RX66T / RX72T
 		};
 
 
@@ -4658,7 +4658,7 @@ namespace device {
 	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR> MTU6;
 	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR> MTU7;
 	typedef mtu9_t<peripheral::MTU9, ICU::VECTOR> MTU9;
-#elif defined(SIG_RX66T) || defined(SIG_RX72T)  // MTU3d
+#elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)  // MTU3d 選択型割り込み
 	typedef mtu0_t<peripheral::MTU0, ICU::SELECTA> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::SELECTA> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::SELECTA> MTU2;
