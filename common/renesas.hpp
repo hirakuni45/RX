@@ -69,6 +69,8 @@
 #include "RX26T/port.hpp"
 // #include "RX600/mtu3.hpp"
 
+#include "RX600/sci_k.hpp"
+#include "RX600/sci_h.hpp"
 
 #include "RX26T/flash.hpp"
 
