@@ -11,7 +11,13 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "common/device.hpp"
+#if defined(SIG_RX66T)
+#include "RX66T/peripheral.hpp"
+#elif defined(SIG_RX72T)
+#include "RX72T/peripheral.hpp"
+#endif
+#include "RX66T/port.hpp"
+#include "RX66T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
