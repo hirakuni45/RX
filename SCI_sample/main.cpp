@@ -2,7 +2,7 @@
 /*! @file
     @brief  SCI (UART) サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -62,6 +62,11 @@ namespace {
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX26T)
+	static const char* system_str_ = { "RX26T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;

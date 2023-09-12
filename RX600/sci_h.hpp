@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ SCIh 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,7 +12,7 @@
 
 namespace device {
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX651) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX26T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX651) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCIh 定義クラス
