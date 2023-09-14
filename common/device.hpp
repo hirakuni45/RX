@@ -92,8 +92,8 @@
 #include "RX26T/icu.hpp"
 #include "RX26T/icu_mgr.hpp"
 #include "RX26T/port_map.hpp"
-// #include "RX26T/port_map_mtu.hpp"
-// #include "RX26T/port_map_gpt.hpp"
+#include "RX26T/port_map_mtu.hpp"
+#include "RX26T/port_map_gptw.hpp"
 #include "RX26T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
