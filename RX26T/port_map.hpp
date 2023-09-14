@@ -54,7 +54,6 @@ namespace device {
 			return true;
 		}
 
-
 		static bool sci5_(ORDER opt, bool enable)
 		{
 			uint8_t sel = enable ? 0b00'1010 : 0;
@@ -454,22 +453,27 @@ namespace device {
 			}
 			return true;
 		}
-
+#endif
 
 		static bool sci12_(ORDER opt, bool enable)
 		{
-			uint8_t sel;
+			uint8_t sel = enable ? 0b00'1100 : 0; 
 			switch(opt) {
+			case ORDER::FIRST_I2C:
+			case ORDER::FIRST_SPI:
+			// P82/SCK6
+				PORT8::PMR.B2 = 0;
+				MPC::P82PFS.PSEL = sel;
+				PORT8::PMR.B2 = enable;
 			case ORDER::FIRST:
-			// P00/RXD12 (4/100) (/144)
-			// P01/TXD12 (7/100) (/144)
-				sel = enable ? 0b001011 : 0; 
-				PORTB::PMR.B6 = 0;
-				PORTB::PMR.B5 = 0;
-				MPC::PB6PFS.PSEL = sel;
-				MPC::PB5PFS.PSEL = sel;
-				PORTB::PMR.B6 = enable;
-				PORTB::PMR.B5 = enable;
+			// P00/RXD12
+				PORT0::PMR.B0 = 0;
+				MPC::P00PFS.PSEL = sel;
+				PORT0::PMR.B0 = enable;
+			// P01/TXD12
+				PORT0::PMR.B1 = 0;
+				MPC::P01PFS.PSEL = sel;
+				PORT0::PMR.B1 = enable;
 				break;
 			default:
 				return false;
@@ -477,7 +481,7 @@ namespace device {
 			return true;
 		}
 
-
+#if 0
 		static bool rspi0_(ORDER opt, bool enable)
 		{
 			uint8_t sel = enable ? 0b001101 : 0;
@@ -750,10 +754,11 @@ namespace device {
 			case peripheral::RSCI11:
 				ret = rsci11_(odr, ena);
 				break;
+#endif
 			case peripheral::SCI12:
 				ret = sci12_(odr, ena);
 				break;
-
+#if 0
 			case peripheral::RSPI0:
 				ret = rspi0_(odr, ena);
 				break;
