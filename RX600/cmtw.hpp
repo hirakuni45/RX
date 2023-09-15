@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M, RX65x, RX71M, RX72M, RX72N グループ・CMTW 定義
+	@brief	RX26T, RX64M, RX65x, RX71M, RX72M, RX72N グループ・CMTW 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n

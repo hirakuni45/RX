@@ -4,7 +4,7 @@
 	@brief	RX220 RIIC @n
 			RX621/RX62N RIIC 定義 @n
 			RX631/RX63N RIIC 定義 @n
-			RX24T/RX66T/RX72T/RX64M/RX71M/RX65N RIICa 定義
+			RX24T/RX26T/RX66T/RX72T/RX64M/RX71M/RX65N RIICa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -505,7 +505,7 @@ namespace device {
 		ICU::GROUPBL1, ICU::GROUPBL1::EEI1, ICU::GROUPBL1::TEI1, clock_profile::PCLKB> RIIC1;
 	typedef riica_t<0x0008'8340, peripheral::RIIC2, ICU::VECTOR::ICTXI2, ICU::VECTOR::ICRXI2,
 		ICU::GROUPBL1, ICU::GROUPBL1::EEI2, ICU::GROUPBL1::TEI2, clock_profile::PCLKB> RIIC2;
-#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::GROUPBL1, ICU::GROUPBL1::EEI0, ICU::GROUPBL1::TEI0, clock_profile::PCLKB> RIIC0;
 #endif
