@@ -69,8 +69,20 @@
 #include "RX26T/port.hpp"
 // #include "RX600/mtu3.hpp"
 
+#include "RX600/gptw.hpp"
+#include "RX600/hrpwm.hpp"
+
+#include "RX600/tmr.hpp"
+#include "RX600/cmtw.hpp"
+#include "RX600/wdta.hpp"
 #include "RX600/sci_k.hpp"
 #include "RX600/sci_h.hpp"
+// #include "RX600/rsci.hpp"
+// #include "RX600/ri3c.hpp"
+// #include "RX600/canfd.hpp"
+// #include "RX600/rspia.hpp"
+#include "RX600/crca.hpp"
+// #include "RX600/tfuv2.hpp"
 
 #include "RX26T/flash.hpp"
 

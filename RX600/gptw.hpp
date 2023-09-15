@@ -1,11 +1,12 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72N/RX72M/RX66T/RX72T 汎用 PWM タイマ（GPTW）定義 @n
+	@brief	RX72N/RX72M/RX66T/RX72T/RX26T 汎用 PWM タイマ（GPTW）定義 @n
+			RX26T:       GPTW0 - GPTW7 @n
 			RX72N/RX72M: GPTW0 - GPTW3 @n
 			RX66T/RX72T: GPTW0 - GPTW9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -48,7 +49,7 @@ namespace device {
 		static constexpr auto GTCIU = gtciu;	///< GTCIUn 割り込みベクタ
 		static constexpr auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
 
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
+#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 		static constexpr uint32_t PCLK = clock_profile::PCLKC;	///< カウント基準クロック
 #elif defined(SIG_RX72N) || defined(SIG_RX72M)
 		static constexpr uint32_t PCLK = clock_profile::PCLKA;	///< カウント基準クロック
@@ -1367,7 +1368,8 @@ namespace device {
 	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR_
 		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR;
 
-#if defined(SIG_RX72N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) 
+
+#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M) 
 	typedef gptw_t<0x000C'2000, peripheral::GPTW0,
 		ICU::SELECTA::GTCIA0, ICU::SELECTA::GTCIB0, ICU::SELECTA::GTCIC0,
 		ICU::SELECTA::GTCID0, ICU::SELECTA::GDTE0,  ICU::SELECTA::GTCIE0,
@@ -1386,7 +1388,7 @@ namespace device {
 		ICU::SELECTA::GTCIF3, ICU::SELECTA::GTCIV3, ICU::SELECTA::GTCIU3> GPTW3;
 #endif
 
-#if defined(SIG_RX66T) || defined(SIG_RX72T) 
+#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) 
 	typedef gptw_t<0x000C'2400, peripheral::GPTW4,
 		ICU::SELECTA::GTCIA4, ICU::SELECTA::GTCIB4, ICU::SELECTA::GTCIC4,
 		ICU::SELECTA::GTCID4, ICU::SELECTA::GDTE4,  ICU::SELECTA::GTCIE4,
@@ -1403,6 +1405,9 @@ namespace device {
 		ICU::SELECTA::GTCIA7, ICU::SELECTA::GTCIB7, ICU::SELECTA::GTCIC7,
 		ICU::SELECTA::GTCID7, ICU::SELECTA::GDTE7,  ICU::SELECTA::GTCIE7,
 		ICU::SELECTA::GTCIF7, ICU::SELECTA::GTCIV7, ICU::SELECTA::GTCIU7> GPTW7;
+#endif
+
+#if defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef gptw_t<0x000C'2800, peripheral::GPTW8,
 		ICU::SELECTA::GTCIA8, ICU::SELECTA::GTCIB8, ICU::SELECTA::GTCIC8,
 		ICU::SELECTA::GTCID8, ICU::SELECTA::GDTE8,  ICU::SELECTA::GTCIE8,

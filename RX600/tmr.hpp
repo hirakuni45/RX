@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・8 ビットタイマ（TMR）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -254,7 +254,7 @@ namespace device {
 		ICU::SELECTB::CMIA2, ICU::SELECTB::CMIB2, ICU::SELECTB::OVI2, clock_profile::PCLKB> TMR2;
 	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::SELECTB,
 		ICU::SELECTB::CMIA3, ICU::SELECTB::CMIB3, ICU::SELECTB::OVI3, clock_profile::PCLKB> TMR3;
-#elif defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX24T) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
 		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
 	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,
