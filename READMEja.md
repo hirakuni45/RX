@@ -27,8 +27,9 @@ Renesas RX Microcontroller
 |RX65N|RXv2|Yes|－|〇|〇|〇|R5F565NE|
 |RX72N|RXv3|Yes|Yes|〇|〇|〇|R5F572ND/N|
 |RX72M|RXv3|Yes|Yes|△|△|△|R5F572MD/N|
-|RX63T|RXv1|Yes|－|〇|〇|〇|R5F563T6|
 |RX24T|RXv2|Yes|－|〇|〇|〇|R5F524T8/A|
+|RX26T|RXv3|Yes|ー|ー|ー|ー|R5F526TF|
+|RX63T|RXv1|Yes|－|〇|〇|〇|R5F563T6|
 |RX66T|RXv3|Yes|－|〇|〇|〇|R5F566TA/E/F/K|
 |RX72T|RXv3|Yes|－|〇|〇|〇|R5F572TF/K|
 
