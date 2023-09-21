@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX64M/RX71M/RX65x グループ・R12DA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 /// R12DA モジュールが無いデバイスでエラーとする
@@ -211,7 +211,7 @@ namespace device {
 
 	typedef r12da_a_t<peripheral::R12DA> R12DA;
 
-#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	12 ビット D/A コンバータ（R12DAb）
