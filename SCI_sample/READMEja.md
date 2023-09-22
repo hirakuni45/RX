@@ -1,4 +1,4 @@
-Renesas RX220, RX62N, RX631, RX63T, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
+Renesas RX220, RX62N, RX631, RX63T, RX24T, RX26T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
 =========
 
 [英語版](README.md)
@@ -18,6 +18,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - RX62N/Makefile
 - RX631/Makefile
 - RX24T/Makefile
+- RX26T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
 - RX65N/Makefile
@@ -37,6 +38,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 - RX631 の SCI 標準ポートは、「RX63x/port_map.hpp」参照。
 - RX63T の SCI 標準ポートは、「RX63T/port_map.hpp」参照。
 - RX24T の SCI 標準ポートは、「RX24T/port_map.hpp」参照。
+- RX26T の SCI 標準ポートは、「RX26T/port_map.hpp」参照。
 - RX66T の SCI 標準ポートは、「RX66T/port_map.hpp」参照。
 - RX72T の SCI 標準ポートは、「RX72T/port_map.hpp」参照。
 - RX64M/RX71M の SCI 標準ポートは、「RX64M/port_map.hpp」参照。
@@ -104,6 +106,11 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX26T)
+	static const char* system_str_ = { "RX26T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
