@@ -159,6 +159,23 @@ namespace {
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
 
+#elif defined(SIG_RX26T)
+	static const char* system_str_ = { "RX26T" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
+	typedef device::SCI1 SCI_CH;
+	static const uint16_t LCD_X = 320;
+	static const uint16_t LCD_Y = 240;
+	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
+	typedef device::PORT<device::PORT5, device::bitpos::B3> WR;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> RS;
+	typedef device::PORT<device::PORT5, device::bitpos::B1> CS;
+	typedef device::PORT_BYTE<device::PORT4> DA;
+	typedef device::bus_rw8<CS, RS, RD, WR, DA> BUS;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT         tft_;
+
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;

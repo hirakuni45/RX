@@ -1,4 +1,4 @@
-Renesas RX220, RX62N、RX63T, RX24T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
+Renesas RX220, RX62N、RX63T, RX24T, RX26T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
 =========
    
 [英語版](README.md)
@@ -19,6 +19,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - RX631/Makefile (GR-CITRUS)
 - RX63T/Makefile
 - RX24T/Makefile
+- RX26T/Makefile
 - RX66T/Makefile
 - RX72T/Makefile
 - RX64M/Makefile
@@ -64,6 +65,10 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
 #elif defined(SIG_RX24T)
 	// DIY RX24T board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+#elif defined(SIG_RX26T)
+	// DIY RX26T board
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX71M)
