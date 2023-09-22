@@ -17,9 +17,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX26TF chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0000FA00 /* 64K - stack_size (U:1024 + I:512) */
-	USTACK (w) : ORIGIN = 0x00003C00, LENGTH = 4 /* ustack 1024 bytes */
-	ISTACK (w) : ORIGIN = 0x00004000, LENGTH = 4 /* istack 512 bytes  */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0000F400 /* 64K - stack_size (U:2048 + I:1024) */
+	USTACK (w) : ORIGIN = 0x0000FC00, LENGTH = 4 /* ustack  bytes */
+	ISTACK (w) : ORIGIN = 0x00010000, LENGTH = 4 /* istack 1024 bytes  */
 	ROM (w)    : ORIGIN = 0xFFF80000, LENGTH = 0x0007FFD0 /* 512K */
 }
 
