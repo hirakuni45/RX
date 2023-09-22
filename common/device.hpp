@@ -87,7 +87,7 @@
 #elif defined(SIG_RX26T)
 #include "RX26T/clock_profile.hpp"
 #include "RX26T/peripheral.hpp"
-#include "RX600/system.hpp"
+#include "RX26T/system.hpp"
 #include "RX26T/power_mgr.hpp"
 #include "RX26T/icu.hpp"
 #include "RX26T/icu_mgr.hpp"
