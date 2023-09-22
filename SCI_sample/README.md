@@ -1,4 +1,4 @@
-Renesas RX220, RX62N, RX631, RX63T, RX24T, RX66T, RX72T, RX64M, RX71M, RX65N, RX72N SCI (UART) sample
+Renesas RX220, RX62N, RX631, RX63T, RX24T, RX26T, RX66T, RX72T, RX64M, RX71M, RX65N, RX72N SCI (UART) sample
 =========
 
 [Japanese](READMEja.md)
@@ -18,6 +18,7 @@ SCI (UART) sample program using RX microcontroller
  - RX631/Makefile
  - RX63T/Makefile
  - RX24T/Makefile
+ - RX26T/Makefile
  - RX64M/Makefile
  - RX71M/Makefile
  - RX65N/Makefile
@@ -37,6 +38,7 @@ SCI (UART) sample program using RX microcontroller
 - For the RX631's SCI standard port, refer to "RX63x/port_map.hpp".
 - For the RX63T's SCI standard port, refer to "RX63T/port_map.hpp".
 - For the RX24T SCI standard port, refer to "RX24T/port_map.hpp".
+- For the RX26T SCI standard port, refer to "RX26T/port_map.hpp".
 - For the SCI standard port of RX66T, refer to "RX66T/port_map.hpp".
 - For the RX72T SCI standard port, refer to "RX72T/port_map.hpp".
 - For the RX64M/RX71M SCI standard ports, refer to "RX64M/port_map.hpp".
@@ -100,6 +102,11 @@ SCI (UART) sample program using RX microcontroller
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX26T)
+	static const char* system_str_ = { "RX26T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;

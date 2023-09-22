@@ -22,6 +22,7 @@ Renesas 関数電卓サンプル
 - calc_symbol.hpp
 - calc_func.hpp
 - calc_cmd.hpp
+- RX26T/Makefile CUI
 - RX62N/Makefile CUI
 - RX631/Makefile CUI
 - RX64M/Makefile CUI

@@ -380,19 +380,6 @@ namespace device {
 		static UIDR1_ UIDR1;
 		static UIDR2_ UIDR2;
 		static UIDR3_ UIDR3;
-	
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  EEPFCLK レジスタの設定 @n
-					RX72N, RX72M にあるレジスタで、クロックジェネレーターの @n
-					FCLK を変更する前に設定する必要がある。 @n
-					この API は、system_io クラス、boost_master_clock から呼び出される。 @n
-					互換性の為、空の関数を定義
-			@param[in]	fclk	FCLK 周波数
-		*/
-		//-----------------------------------------------------------------//
-		static void set_eepfclk(uint32_t fclk) { }
 	};
 	typedef flash_t<void> FLASH;
 

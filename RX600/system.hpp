@@ -2,7 +2,6 @@
 //=====================================================================//
 /*!	@file
 	@brief	システム定義（クロック発生回路、） @n
-			・RX26T @n
 			・RX64M/RX71M @n
 			・RX651/RX65N @n
 			・RX66T @n
@@ -355,7 +354,9 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2> PLIDIV;
+
 			bit_rw_t <io_, bitpos::B4>    PLLSRCSEL;
+
 			bits_rw_t<io_, bitpos::B8, 6> STC;
 		};
 		typedef pllcr_t<0x0008'0028> PLLCR_;
@@ -1068,6 +1069,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>	   PRC1;
 
 			bit_rw_t <io_, bitpos::B3>     PRC3;
+
 			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
 		};
 		typedef prcr_t<0x0008'03FE> PRCR_;

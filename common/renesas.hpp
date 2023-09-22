@@ -68,10 +68,10 @@
 #include "RX600/elc.hpp"
 #include "RX26T/port.hpp"
 // #include "RX600/mtu3.hpp"
-
+// #include "RX600/poe3d.hpp"
 #include "RX600/gptw.hpp"
 #include "RX600/hrpwm.hpp"
-
+// #include "RX600/poeg.hpp"
 #include "RX600/tmr.hpp"
 #include "RX600/cmtw.hpp"
 #include "RX600/wdta.hpp"
@@ -83,10 +83,14 @@
 // #include "RX600/rspia.hpp"
 #include "RX600/crca.hpp"
 // #include "RX600/tfuv2.hpp"
-
+// #include "RX72T/s12adh.hpp"
+#include "RX600/r12da.hpp"
+// #include "RX600/temps.hpp"
+#include "RX600/cmpc.hpp"
+// #include "RX600/doca.hpp"
 #include "RX26T/flash.hpp"
 
-#include "RX600/system_io.hpp"
+#include "RX26T/system_io.hpp"
 // #include "RX600/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 // #include "RX600/dac_out.hpp"
