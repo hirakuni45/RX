@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include "RX26T/peripheral.hpp"
-#include "RX600/system.hpp"
+#include "RX26T/system.hpp"
 
 namespace device {
 
