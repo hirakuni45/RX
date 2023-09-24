@@ -627,9 +627,34 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef rw16_t<0x0008'00C2> SWRR_;
 		static SWRR_ SWRR;
-	};
-	typedef system_t<void> SYSTEM;
 
+
+//------  RSCI 機能  --------//
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  製品機能選択レジスタ 0 (PRDFR0)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct prdfr0_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B10, 2>  SCI5RXD;
+
+			bits_rw_t<io_, bitpos::B16, 2>  SCI8RXD;
+			bits_rw_t<io_, bitpos::B18, 2>  SCI9RXD;
+
+			bits_rw_t<io_, bitpos::B22, 2>  SCI11RXD;
+		};
+		typedef prdfr0_t<0x0008'00D0> PRDFR0_;
+		static PRDFR0_ PRDFR0;
+	};
 	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
 	template<class _> typename system_t<_>::SCKCR2_ system_t<_>::SCKCR2;
 	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
@@ -662,4 +687,7 @@ namespace device {
 	template<class _> typename system_t<_>::RSTSR2_ system_t<_>::RSTSR2;
 #endif
 	template<class _> typename system_t<_>::SWRR_ system_t<_>::SWRR;
+	template<class _> typename system_t<_>::PRDFR0_ system_t<_>::PRDFR0;
+
+	typedef system_t<void> SYSTEM;
 }
