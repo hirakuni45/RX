@@ -77,7 +77,7 @@
 #include "RX600/wdta.hpp"
 #include "RX600/sci_k.hpp"
 #include "RX600/sci_h.hpp"
-// #include "RX600/rsci.hpp"
+#include "RX600/rsci.hpp"
 // #include "RX600/ri3c.hpp"
 // #include "RX600/canfd.hpp"
 // #include "RX600/rspia.hpp"
