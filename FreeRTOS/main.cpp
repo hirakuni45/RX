@@ -84,6 +84,10 @@ namespace {
 	static const char* system_str_ = { "RX24T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX26T)
+	static const char* system_str_ = { "RX26T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
