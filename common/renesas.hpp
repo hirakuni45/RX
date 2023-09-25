@@ -67,7 +67,7 @@
 #include "RX600/dmac.hpp"
 #include "RX600/elc.hpp"
 #include "RX26T/port.hpp"
-// #include "RX600/mtu3.hpp"
+#include "RX600/mtu3.hpp"
 // #include "RX600/poe3d.hpp"
 #include "RX600/gptw.hpp"
 #include "RX600/hrpwm.hpp"
@@ -93,7 +93,7 @@
 #include "RX26T/system_io.hpp"
 // #include "RX600/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
-// #include "RX600/dac_out.hpp"
+#include "RX600/dac_out.hpp"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/lvd.hpp"
