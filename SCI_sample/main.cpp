@@ -11,6 +11,7 @@
 
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
+#include "common/scif_io.hpp"
 #include "common/cmt_mgr.hpp"
 #include "common/command.hpp"
 
@@ -75,11 +76,15 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+// SCIF を使う場合
+//	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+// SCIF を使う場合
+//	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	static constexpr bool LED_ACTIVE = 0;

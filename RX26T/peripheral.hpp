@@ -116,6 +116,6 @@ namespace device {
 		CMPC4,		///< コンパレーター４
 		CMPC5,		///< コンパレーター５
 
-		DOC,		///< データ演算回路 (DOCA)
+		DOCA,		///< データ演算回路 (DOCA)
 	};
 }

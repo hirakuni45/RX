@@ -1,8 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・RSCI 定義 @n
-			「製品機能選択レジスタ０」は、'system.hpp' に定義がある。
+	@brief	RX600 グループ・RSCI 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -21,6 +20,19 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base>
 	struct rsci_base_t {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  製品機能選択肢 @n
+					「製品機能選択レジスタ０」は、'system.hpp' に定義がある。
+		*/
+		//-----------------------------------------------------------------//
+		enum class RXDSEL : uint8_t {
+			RXD,	///< RXD 端子からの入力信号
+			COMP3,	///< COMP3 レベル検出信号
+			COMP4	///< COMP4 レベル検出信号
+		};
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -712,12 +724,26 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 tei, ICU::GROUPBL1 eri>
 	struct rsci8_t : public rsci_base_t<base> {
 
+		typedef rsci_base_t<base> RSCI_BASE;
+
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TXI		 = txi;		///< 受信割り込みベクター
 		static constexpr auto RXI		 = rxi;		///< 送信割り込みベクター
 		static constexpr auto TEI		 = tei;		///< 送信終了割り込みベクター
 		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
 		static constexpr auto PCLK		 = clock_profile::PCLKB;	///< PCLK 周波数
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  製品機能選択
+			@param[in]	sel	製品機能選択肢
+		*/
+		//-----------------------------------------------------------------//
+		static void set_prdfr(typename RSCI_BASE::RXDSEL sel) noexcept
+		{
+			SYSTEM::PRDFR0.SCI8RXD = static_cast<uint8_t>(sel);
+		}
 	};
 
 
@@ -735,12 +761,26 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 tei, ICU::GROUPBL1 eri>
 	struct rsci9_t : public rsci_base_t<base>, rsci_9b_t<base> {
 
+		typedef rsci_base_t<base> RSCI_BASE;
+
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TXI		 = txi;		///< 受信割り込みベクター
 		static constexpr auto RXI		 = rxi;		///< 送信割り込みベクター
 		static constexpr auto TEI		 = tei;		///< 送信終了割り込みベクター
 		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
 		static constexpr auto PCLK		 = clock_profile::PCLKB;	///< PCLK 周波数
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  製品機能選択
+			@param[in]	sel	製品機能選択肢
+		*/
+		//-----------------------------------------------------------------//
+		static void set_prdfr(typename RSCI_BASE::RXDSEL sel) noexcept
+		{
+			SYSTEM::PRDFR0.SCI9RXD = static_cast<uint8_t>(sel);
+		}
 	};
 
 
@@ -758,12 +798,26 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
 	struct rscib_t : public rsci_base_t<base>, rsci_9b_t<base> {
 
+		typedef rsci_base_t<base> RSCI_BASE;
+
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TXI		 = txi;		///< 受信割り込みベクター
 		static constexpr auto RXI		 = rxi;		///< 送信割り込みベクター
 		static constexpr auto TEI		 = tei;		///< 送信終了割り込みベクター
 		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
 		static constexpr auto PCLK		 = clock_profile::PCLKA;	///< PCLK 周波数
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  製品機能選択
+			@param[in]	sel	製品機能選択肢
+		*/
+		//-----------------------------------------------------------------//
+		static void set_prdfr(typename RSCI_BASE::RXDSEL sel) noexcept
+		{
+			SYSTEM::PRDFR0.SCI11RXD = static_cast<uint8_t>(sel);
+		}
 
 
 		//-----------------------------------------------------------------//

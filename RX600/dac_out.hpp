@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72T/RX72N グループ D/A 制御
+	@brief	RX26T/RX64M/RX71M/RX72M/RX65N/RX66T/RX72T/RX72N グループ D/A 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -84,7 +84,7 @@ namespace device {
 				DAC::DACR.DAOE0 = 1;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				DAC::DAAMPCR.DAAMP0 = ampe;
-#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 				DAC::DADSELR.OUTDA0 = 1;
 #endif
 				DAC::enable(DAC::ANALOG::DA0);
@@ -93,7 +93,7 @@ namespace device {
 				DAC::DACR.DAOE1 = 1;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				DAC::DAAMPCR.DAAMP1 = ampe;
-#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 				DAC::DADSELR.OUTDA1 = 1;
 #endif
 				DAC::enable(DAC::ANALOG::DA1);

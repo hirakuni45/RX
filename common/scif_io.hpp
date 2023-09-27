@@ -1,12 +1,12 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・SCIF I/O 制御（FIFO 内臓型）@n
+	@brief	RX グループ・SCIF I/O 制御（FIFO 内臓型） @n
 			※内臓のFIFOバッファを利用しない実装（扱いにくいので使わない） @n
-			SCIF は、RX64M/RX71M 専用となっている。 @n
+			現状 SCIF は、RX64M/RX71M 専用となっている。 @n
 			SCIF8 ～ SCIF11
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,28 +18,104 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCIF I/O 制御クラス
-		@param[in]	SCIF		SCIF 定義クラス
-		@param[in]	RECV_BUFF	受信バッファクラス
-		@param[in]	SEND_BUFF	送信バッファクラス
-		@param[in]	PSEL		ポート選択
+		@brief  SCI I/O ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCIF, class RECV_BUFF, class SEND_BUFF,
-		port_map::ORDER PSEL = port_map::ORDER::FIRST>
-	class scif_io {
+	class scif_io_base {
+	public:
 
-		static RECV_BUFF recv_;
-		static SEND_BUFF send_;
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	SCI 通信プロトコル型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class PROTOCOL : uint8_t {
+			B7_N_1S,	///< 7 ビット、No-Parity、 1 Stop Bit
+			B7_E_1S,	///< 7 ビット、Even(偶数)、1 Stop Bit
+			B7_O_1S,	///< 7 ビット、Odd (奇数)、1 Stop Bit
+			B7_N_2S,	///< 7 ビット、No-Parity、 2 Stop Bits
+			B7_E_2S,	///< 7 ビット、Even(偶数)、2 Stop Bits
+			B7_O_2S,	///< 7 ビット、Odd (奇数)、2 Stop Bits
+			B8_N_1S,	///< 8 ビット、No-Parity、 1 Stop Bit
+			B8_E_1S,	///< 8 ビット、Even(偶数)、1 Stop Bit
+			B8_O_1S,	///< 8 ビット、Odd (奇数)、1 Stop Bit
+			B8_N_2S,	///< 8 ビット、No-Parity、 2 Stop Bits
+			B8_E_2S,	///< 8 ビット、Even(偶数)、2 Stop Bits
+			B8_O_2S,	///< 8 ビット、Odd (奇数)、2 Stop Bits
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	SCI ボーレート型（シリアル通信で標準的に指定する定型値）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class BAUDRATE : uint32_t {
+			B110    =    110,	///<    110 B.P.S.
+			B150    =    150,	///<    150 B.P.S.
+			B300    =    300,	///<    300 B.P.S.
+			B600    =    600,	///<    600 B.P.S.
+			B1200   =   1200,	///<   1200 B.P.S.
+			B2400   =   2400,	///<   2400 B.P.S.
+			B4800   =   4800,	///<   4800 B.P.S.
+			B9600   =   9600,	///<   9600 B.P.S.
+			B19200  =  19200,	///<  19200 B.P.S.
+			B38400  =  38400,	///<  38400 B.P.S.
+			B57600  =  57600,	///<  57600 B.P.S.
+			B76800  =  76800,	///<  76800 B.P.S.
+			B96000  =  96000,	///<  96000 B.P.S.
+			B115200 = 115200,	///< 115200 B.P.S.
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	フロー制御型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class FLOW_CTRL : uint8_t {
+			NONE,		///< フロー制御をしない
+			SOFT,		///< ソフトフロー制御
+			HARD,		///< ハードフロー制御（RTS ポートを使う）
+			SOFT_HARD,	///< ソフトフローとハードフロー制御
+			RS485,		///< ポートを使い、RS485 レシーバーの DE を制御（送信時「1」となる）
+		};
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCIF I/O 制御クラス
+		@param[in]	SCIF	SCIF 定義クラス
+		@param[in]	RBF		受信バッファクラス
+		@param[in]	SBF		送信バッファクラス
+		@param[in]	PSEL	ポート選択
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class SCIF, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
+	class scif_io : public scif_io_base {
+
+		static_assert(RBF::size() > 8, "Receive buffer is too small.");
+		static_assert(SBF::size() > 8, "Transmission buffer is too small.");
+
+	public:
+		typedef SCIF sci_type;
+		typedef RBF  rbf_type;
+		typedef SBF  sbf_type;
+
+	private:
+		static RBF	recv_;
+		static SBF	send_;
 		static volatile bool send_stall_;
 
-		uint8_t	level_;
-		bool	crlf_;
+		ICU::LEVEL	level_;
+		bool		auto_crlf_;
+		uint32_t	baud_;
 
 		// ※必要なら、実装する
 		void sleep_() { asm("nop"); }
 
-		static INTERRUPT_FUNC void recv_task_()
+		static INTERRUPT_FUNC void rxi_task_()
 		{
 			bool err = false;
 			///< フレーミングエラー/パリティエラー状態確認
@@ -58,7 +134,7 @@ namespace device {
 			}
 		}
 
-		static INTERRUPT_FUNC void send_task_()
+		static INTERRUPT_FUNC void txi_task_()
 		{
 			if(send_.length() > 0) {
 				SCIF::FTDR = send_.get();
@@ -70,21 +146,65 @@ namespace device {
 			SCIF::FSR.TDFE = 0;
 		}
 
-		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) noexcept
+		void set_intr_() noexcept
 		{
-			if(level_) {
-				icu_mgr::set_task(rx_vec, recv_task_);
-				icu_mgr::set_task(tx_vec, send_task_);
+			if(level_ != ICU::LEVEL::NONE) {
+				icu_mgr::set_interrupt(SCIF::RXI, rxi_task_, level_);
+				icu_mgr::set_interrupt(SCIF::TXI, txi_task_, level_);
 			} else {
-				icu_mgr::set_task(rx_vec, nullptr);
-				icu_mgr::set_task(tx_vec, nullptr);
+				icu_mgr::set_interrupt(SCIF::RXI, nullptr, level_);
+				icu_mgr::set_interrupt(SCIF::TXI, nullptr, level_);
 			}
 		}
 
-		void set_intr_() noexcept
+		static constexpr bool calc_rate_(uint32_t baud,
+			uint8_t& brr_, uint8_t& cks_, uint8_t& mddr_, bool& abcs_, bool& bgdm_, bool& brme_) noexcept
 		{
-			set_vector_(SCIF::get_rx_vec(), SCIF::get_tx_vec());
-			icu_mgr::set_level(SCIF::PERIPHERAL, level_);
+			// BGDM が使える場合、1/8 スタート
+			uint32_t mtx = 8;
+			uint32_t limit = 1024;
+			if(!SCIF::SEMR_BGDM) {  // BGDM が使えない場合 1/16 スタート
+				mtx = 16;
+				limit = 512;
+			}
+			uint32_t brr = SCIF::PCLK / mtx / baud;
+			uint8_t cks = 0;
+			while(brr > limit) {
+				brr >>= 2;
+				++cks;
+				if(cks >= 4) {  // 範囲外の速度（低速）
+					return false;
+				}
+			}
+
+			// BGDM フラグの設定
+			bool bgdm = true;
+			if(SCIF::SEMR_BGDM) {
+				if(brr > 512) { brr >>= 1; bgdm = false; mtx <<= 1; }
+			} else {
+				bgdm = false;
+			}
+			bool abcs = true;
+			if(brr > 256) { brr >>= 1; abcs = false; mtx <<= 1; }
+
+			bool brme = false;
+			if(SCIF::SEMR_BRME) {  // 微調整機能が使える場合
+				uint32_t rate = SCIF::PCLK / mtx / brr / (1 << (cks * 2));
+				uint32_t mddr = (baud << 9) / rate;
+				++mddr;
+				mddr >>= 1;
+				if(mddr >= 128 && mddr < 256) {  // 微調整を行う場合
+					mddr_ = mddr;
+					brme = true;
+				}
+			}
+
+			brr_ = brr;
+			cks_ = cks;
+			abcs_ = abcs;
+			bgdm_ = bgdm;
+			brme_ = brme;
+			return true;
 		}
 
 	public:
@@ -94,7 +214,61 @@ namespace device {
 			@param[in]	crlf	LF 時、CR の送出をしない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		scif_io(bool crlf = true) noexcept : level_(0), crlf_(crlf) { }
+		scif_io(bool crlf = true) noexcept : level_(ICU::LEVEL::NONE), auto_crlf_(crlf), baud_(0)
+		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	LF 時、CR 自動送出
+			@param[in]	f	「false」なら無効
+		 */
+		//-----------------------------------------------------------------//
+		void auto_crlf(bool f = true) noexcept { auto_crlf_ = f; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ボーレートの設定誤差を検証 @n
+					8 ビット 1 ストップビット、パリティ無しの場合、限界は 3.9% 程度
+			@param[in]	baud	ボーレート
+			@param[in]	thper	許容誤差（標準値は 3.2%） @n
+						100 分率を 10 倍した値を設定
+			@return 誤差範囲なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		static constexpr bool probe_baud(uint32_t baud, uint32_t thper = 32) noexcept
+		{
+			uint8_t brr = 0;
+			uint8_t cks = 0;
+			uint8_t mddr = 0;
+			bool abcs = false;
+			bool bgdm = false;
+			bool brme = false;
+			if(!calc_rate_(baud, brr, cks, mddr, abcs, bgdm, brme)) {
+				return false;
+			}
+
+			uint32_t mtx = 8;
+			if(SCIF::SEMR_BGDM) {
+				if(!bgdm) mtx <<= 1;
+			} else {
+				mtx <<= 1;
+			}
+			if(!abcs) mtx <<= 1;
+			auto cbaud = SCIF::PCLK / mtx / (1 << (static_cast<uint32_t>(cks) * 2)) / static_cast<uint32_t>(brr);
+			if(brme) {
+				cbaud *= mddr;
+				cbaud /= 256;
+			}
+
+			auto d = baud * thper;
+			if((cbaud * 1000) < (baud * 1000 - d) || (baud * 1000 + d) < (cbaud * 1000)) {
+				return false;
+			}
+
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -102,45 +276,103 @@ namespace device {
 			@brief  ボーレートを設定して、SCI を有効にする
 			@param[in]	baud	ボーレート
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
+			@param[in]	prot	通信プロトコル（指定無しの場合、８ビット、パリティ無し、１ストップビット）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t baud, ICU::LEVEL level = ICU::LEVEL::NONE) noexcept
+		bool start(uint32_t baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
 		{
-			send_stall_ = true;
+			uint8_t brr;
+			uint8_t cks;
+			uint8_t mddr;
+			bool abcs;
+			bool bgdm;
+			bool brme;
+			if(!calc_rate_(baud, brr, cks, mddr, abcs, bgdm, brme)) {
+				return false;
+			}
 
+			send_stall_ = true;
 			level_ = level;
 
 			SCIF::SCR = 0x00;			// TE, RE disable.
 
 			port_map::turn(SCIF::PERIPHERAL, true, PSEL);
 
-			uint32_t brr = F_PCLKA / baud / 32;
-			uint8_t cks = 0;
-			while(brr > 512) {
-				brr >>= 2;
-				++cks;
-			}
-			if(cks > 3) return false;
-			bool abcs0 = 0;
-			if(brr > 256) { brr /= 2; abcs0 = 1; }
-
 			power_mgr::turn(SCIF::PERIPHERAL);
 
 			set_intr_();
+
+			bool stop = 0;  // STOP
+			bool pm = 0;  // PM
+			bool pe = 0;  // PE
+			bool chr = 0;  // CHR
+			switch(prot) {
+			case PROTOCOL::B7_N_1S:
+				chr = 1;
+			case PROTOCOL::B8_N_1S:
+				stop = 0;
+				pm = 0;
+				pe = 0;
+				break;
+			case PROTOCOL::B7_E_1S:
+				chr = 1;
+			case PROTOCOL::B8_E_1S:
+				stop = 0;
+				pm = 0;
+				pe = 1;
+				break;
+			case PROTOCOL::B7_O_1S:
+				chr = 1;
+			case PROTOCOL::B8_O_1S:
+				stop = 0;
+				pm = 1;
+				pe = 1;
+				break;
+			case PROTOCOL::B7_N_2S:
+				chr = 1;
+			case PROTOCOL::B8_N_2S:
+				stop = 1;
+				pm = 0;
+				pe = 0;
+				break;
+			case PROTOCOL::B7_E_2S:
+				chr = 1;
+			case PROTOCOL::B8_E_2S:
+				stop = 1;
+				pm = 0;
+				pe = 1;
+				break;
+			case PROTOCOL::B7_O_2S:
+				chr = 1;
+			case PROTOCOL::B8_O_2S:
+				stop = 1;
+				pm = 1;
+				pe = 1;
+				break;
+			default:
+				return false;
+			}
 
 			// FIFO: しきい値
 			SCIF::FTCR = SCIF::FTCR.TTRGS.b() | SCIF::FTCR.TFTC.b(1)
 				| SCIF::FTCR.RTRGS.b() | SCIF::FTCR.RFTC.b(1);
 
-			// 8 bits, 1 stop bit, no-parrity
-			SCIF::SMR = cks;
-			SCIF::SEMR.ABCS0 = abcs0;
-			if(brr) --brr;
+			SCIF::SMR = SCIF::SMR.CKS.b(cks) | SCIF::SMR.STOP.b(stop) | SCIF::SMR.PM.b(pm) | SCIF::SMR.PE.b(pe)
+					  | SCIF::SMR.CHR.b(chr);
 
+			if(brme) {
+				SCIF::SEMR.MDDRS = 1;
+				SCIF::MDDR = mddr;
+				SCIF::SEMR.MDDRS = 0;
+			}
+			SCIF::SEMR = SCIF::SEMR.ABCS0.b(abcs) | SCIF::SEMR.BRME.b(brme) | SCIF::SEMR.BGDM.b(bgdm);
+
+			if(brr) --brr;
+			SCIF::SEMR.MDDRS = 0;
 			SCIF::BRR = static_cast<uint8_t>(brr);
 
-			if(level) {
+			if(level_ != ICU::LEVEL::NONE) {
 				SCIF::SCR = SCIF::SCR.RIE.b() | SCIF::SCR.TE.b() | SCIF::SCR.RE.b();
 			} else {
 				SCIF::SCR = SCIF::SCR.TE.b() | SCIF::SCR.RE.b();
@@ -152,11 +384,69 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	CRLF 自動送出
-			@param[in]	f	「false」なら無効
+			@brief  ボーレート型を使い SCI を有効にする
+			@param[in]	baud	ボーレート型
+			@param[in]	level	割り込みレベル（０の場合ポーリング）
+			@param[in]	prot	通信プロトコル（標準は、８ビット、パリティ無し、１ストップ）
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(BAUDRATE baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
+		{
+			return start(static_cast<uint32_t>(baud), level, prot);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	BRR レジスタ値を取得
+			@return BRR レジスタ値
 		 */
 		//-----------------------------------------------------------------//
-		void auto_crlf(bool f = true) noexcept { crlf_ = f; }
+		uint8_t get_brr() const noexcept { return SCIF::BRR(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	設定ボーレートを取得
+			@param[in]	real	「true」にした場合、内部で設定された実際の値
+			@return ボーレート
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_baud_rate(bool real = false) const noexcept
+		{
+			if(real) {
+				SCIF::SEMR.MDDRS = 0;
+				uint32_t brr = SCIF::BRR();
+				uint32_t cks = 1 << (SCIF::SMR.CKS() * 2);
+				uint32_t mtx = 8;
+				if(SCIF::SEMR_BGDM) {
+					if(!SCIF::SEMR.BGDM()) mtx <<= 1;
+				} else {
+					mtx <<= 1;
+				}
+				if(!SCIF::SEMR.ABCS0()) mtx <<= 1;
+				auto baud = SCIF::PCLK / mtx / cks / (brr + 1);
+				if(SCIF::SEMR_BRME && SCIF::SEMR.BRME()) {
+					SCIF::SEMR.MDDRS = 1;
+					baud *= SCIF::MDDR();
+					baud /= 256;
+					SCIF::SEMR.MDDRS = 0;
+				}
+				return baud;
+			} else {
+				return baud_;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	MDDR レジスタ値を取得（ボーレート周期補正）
+			@return MDRR レジスタ値
+		 */
+		//-----------------------------------------------------------------//
+		uint8_t get_mdrr() const noexcept { return SCIF::MDDR(); }
 
 
 		//-----------------------------------------------------------------//
@@ -181,7 +471,7 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		void putch(char ch) noexcept {
-			if(crlf_ && ch == '\n') {
+			if(auto_crlf_ && ch == '\n') {
 				putch('\r');
 			}
 

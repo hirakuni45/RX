@@ -1,28 +1,21 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・SCIF 定義
+	@brief	RX600 グループ・SCIF 定義（RX64M/RX71M）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
-
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCIF 定義基底クラス (SCIF)
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	txi		送信割り込み
-		@param[in]	rxi		受信割り込み
-		@param[in]	tei		送信終了割り込み
-		@param[in]	eri		エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base>
@@ -270,15 +263,15 @@ namespace device {
 	};
 	template <uint32_t base> typename scif_base_t<base>::FRDR_ scif_base_t<base>::FRDR;
 	template <uint32_t base> typename scif_base_t<base>::FTDR_ scif_base_t<base>::FTDR;
-	template <uint32_t base> typename scif_base_t<base>::SMR_ scif_base_t<base>::SMR;
-	template <uint32_t base> typename scif_base_t<base>::SCR_ scif_base_t<base>::SCR;
-	template <uint32_t base> typename scif_base_t<base>::FSR_ scif_base_t<base>::FSR;
-	template <uint32_t base> typename scif_base_t<base>::BRR_ scif_base_t<base>::BRR;
+	template <uint32_t base> typename scif_base_t<base>::SMR_  scif_base_t<base>::SMR;
+	template <uint32_t base> typename scif_base_t<base>::SCR_  scif_base_t<base>::SCR;
+	template <uint32_t base> typename scif_base_t<base>::FSR_  scif_base_t<base>::FSR;
+	template <uint32_t base> typename scif_base_t<base>::BRR_  scif_base_t<base>::BRR;
 	template <uint32_t base> typename scif_base_t<base>::MDDR_ scif_base_t<base>::MDDR;
-	template <uint32_t base> typename scif_base_t<base>::FCR_ scif_base_t<base>::FCR;
-	template <uint32_t base> typename scif_base_t<base>::FDR_ scif_base_t<base>::FDR;
+	template <uint32_t base> typename scif_base_t<base>::FCR_  scif_base_t<base>::FCR;
+	template <uint32_t base> typename scif_base_t<base>::FDR_  scif_base_t<base>::FDR;
 	template <uint32_t base> typename scif_base_t<base>::SPTR_ scif_base_t<base>::SPTR;
-	template <uint32_t base> typename scif_base_t<base>::LSR_ scif_base_t<base>::LSR;
+	template <uint32_t base> typename scif_base_t<base>::LSR_  scif_base_t<base>::LSR;
 	template <uint32_t base> typename scif_base_t<base>::FTCR_ scif_base_t<base>::FTCR;
 	template <uint32_t base> typename scif_base_t<base>::SEMR_ scif_base_t<base>::SEMR;
 
@@ -322,5 +315,4 @@ namespace device {
 		ICU::GROUPAL0::TEIF10, ICU::GROUPAL0::ERIF10>  SCIF10;
 	typedef scif_t<0x000D'0060, peripheral::SCIF11, ICU::VECTOR::TXIF11, ICU::VECTOR::RXIF11,
 		ICU::GROUPAL0::TEIF11, ICU::GROUPAL0::ERIF11>  SCIF11;
-#endif
 }

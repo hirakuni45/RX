@@ -1,4 +1,4 @@
-Renesas RX62N, RX631, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T 疑似 PSG 演奏サンプル
+Renesas RX62N, RX631, RX26T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T 疑似 PSG 演奏サンプル
 =========
    
 <iframe width="560" height="315" src="https://www.youtube.com/watch?v=4ZHuMYcSQko" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -18,8 +18,10 @@ RX マイコンを使った 疑似 PSG 音楽演奏サンプルです。
 ## プロジェクト・リスト
 
 - main.cpp
+
 - RX62N/Makefile
 - RX631/Makefile (for GR-CITRUS)
+- RX26T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
 - RX65N/Makefile (for RX65N Envision Kit)

@@ -4364,20 +4364,20 @@ namespace device {
 		typedef nfcr_t<0x000C1298> NFCR_;
 		static  NFCR_ NFCR;
 	};
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TCR_ mtu8_t<per, INT>::TCR;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TCR2_ mtu8_t<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TCR_   mtu8_t<per, INT>::TCR;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TCR2_  mtu8_t<per, INT>::TCR2;
 	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TMDR1_ mtu8_t<per, INT>::TMDR1;
 	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TIORH_ mtu8_t<per, INT>::TIORH;
 	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TIORL_ mtu8_t<per, INT>::TIORL;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TIOR_ mtu8_t<per, INT>::TIOR;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TIER_ mtu8_t<per, INT>::TIER;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TCNT_ mtu8_t<per, INT>::TCNT;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRA_ mtu8_t<per, INT>::TGRA;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRB_ mtu8_t<per, INT>::TGRB;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRC_ mtu8_t<per, INT>::TGRC;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRD_ mtu8_t<per, INT>::TGRD;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGR_ mtu8_t<per, INT>::TGR;
-	template <peripheral per, typename INT> typename mtu8_t<per, INT>::NFCR_ mtu8_t<per, INT>::NFCR;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TIOR_  mtu8_t<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TIER_  mtu8_t<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TCNT_  mtu8_t<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRA_  mtu8_t<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRB_  mtu8_t<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRC_  mtu8_t<per, INT>::TGRC;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGRD_  mtu8_t<per, INT>::TGRD;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::TGR_   mtu8_t<per, INT>::TGR;
+	template <peripheral per, typename INT> typename mtu8_t<per, INT>::NFCR_  mtu8_t<per, INT>::NFCR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -4620,23 +4620,23 @@ namespace device {
 		typedef nfcr_t<0x000C'1296> NFCR_;
 		static  NFCR_ NFCR;
 	};
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TCR_ mtu9_t<per, INT>::TCR;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TCR2_ mtu9_t<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TCR_   mtu9_t<per, INT>::TCR;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TCR2_  mtu9_t<per, INT>::TCR2;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TMDR1_ mtu9_t<per, INT>::TMDR1;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIORH_ mtu9_t<per, INT>::TIORH;
 	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIORL_ mtu9_t<per, INT>::TIORL;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIOR_ mtu9_t<per, INT>::TIOR;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIER_ mtu9_t<per, INT>::TIER;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TBTM_ mtu9_t<per, INT>::TBTM;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TCNT_ mtu9_t<per, INT>::TCNT;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRA_ mtu9_t<per, INT>::TGRA;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRB_ mtu9_t<per, INT>::TGRB;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRC_ mtu9_t<per, INT>::TGRC;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRD_ mtu9_t<per, INT>::TGRD;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRE_ mtu9_t<per, INT>::TGRE;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRF_ mtu9_t<per, INT>::TGRF;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGR_ mtu9_t<per, INT>::TGR;
-	template <peripheral per, typename INT> typename mtu9_t<per, INT>::NFCR_ mtu9_t<per, INT>::NFCR;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIOR_  mtu9_t<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TIER_  mtu9_t<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TBTM_  mtu9_t<per, INT>::TBTM;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TCNT_  mtu9_t<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRA_  mtu9_t<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRB_  mtu9_t<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRC_  mtu9_t<per, INT>::TGRC;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRD_  mtu9_t<per, INT>::TGRD;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRE_  mtu9_t<per, INT>::TGRE;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGRF_  mtu9_t<per, INT>::TGRF;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::TGR_   mtu9_t<per, INT>::TGR;
+	template <peripheral per, typename INT> typename mtu9_t<per, INT>::NFCR_  mtu9_t<per, INT>::NFCR;
 
 #if defined(SIG_RX63T) || defined(SIG_RX63T_S)  // MTU3
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR> MTU0;

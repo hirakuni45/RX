@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・CAN 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,237 +7,20 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
+#include "RX600/can_frame.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	CAN フレーム構造・クラス @n
-				・RX CAN のメールボックス構造を表現したもの @n
-				・内部は、32 ビット x 4 ワードの単純な構造 @n
-				pad[0]::B31 = IDE @n
-				pad[0]::B30 = RTR @n
-				pad[0]::B28-B18 = SID @n
-				pad[0]::B17-B0  = EID @n
-				pad[1]::B20-B16 = DLC @n
-				pad[1]::B15-B8  = DATA0 @n
-				pad[1]::B7-B0   = DATA1 @n
-				pad[2]::B31-B24 = DATA2 @n
-				pad[2]::B23-B16 = DATA3 @n
-				pad[2]::B15-B8  = DATA4 @n
-				pad[2]::B7-B0   = DATA5 @n
-				pad[3]::B31-B24 = DATA6 @n
-				pad[3]::B23-B16 = DATA7 @n
-				pad[3]::B15-B0  = TS
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class can_frame {
-		uint32_t	pad[4];
-
-	public:
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  コンストラクタ
-		*/
-		//-----------------------------------------------------------------//
-		can_frame() : pad{ 0 } { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	IDE の設定
-			@param[in]	v	値
-		*/
-		//-----------------------------------------------------------------//
-		void set_IDE(bool v) {
-			if(v) { pad[0] |=   1 << 31;  }
-			else  { pad[0] &= ~(1 << 31); }
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	IDE の取得
-			@return		IDE
-		*/
-		//-----------------------------------------------------------------//
-		bool get_IDE() const { return (pad[0] >> 31) & 1; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	RTR の設定
-			@param[in]	v	値
-		*/
-		//-----------------------------------------------------------------//
-		void set_RTR(bool v) { if(v) pad[0] |= 1 << 30; else pad[0] &= ~(1 << 30); }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	RTR の取得
-			@return		RTR
-		*/
-		//-----------------------------------------------------------------//
-		bool get_RTR() const { return (pad[0] >> 30) & 1; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	標準 ID の設定
-			@param[in]	id	標準 ID
-		*/
-		//-----------------------------------------------------------------//
-		void set_SID(uint32_t id) {
-			pad[0] &= ~(0x7ff << 18);
-			pad[0] |= (id << 18);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	標準 ID の取得
-			@return	標準 ID
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_SID() const { return (pad[0] >> 18) & 0x7ff; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	拡張 ID の設定
-			@param[in]	id	拡張 ID
-		*/
-		//-----------------------------------------------------------------//
-		void set_EID(uint32_t id) {
-			pad[0] &= ~(0x3'ffff);
-			pad[0] |= id;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	拡張 ID の取得
-			@return	拡張 ID
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_EID() const { return pad[0] & 0x3'ffff; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	DLC の設定
-			@param[in]	n	DLC
-		*/
-		//-----------------------------------------------------------------//
-		void set_DLC(uint32_t n) {
-			pad[1] &= ~(0xf << 16);
-			pad[1] |=  (n << 16);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	DLC の取得
-			@return	DLC
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_DLC() const { return (pad[1] >> 16) & 0xf; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	DATA の設定
-			@param[in]	idx	インデックス（０～７）
-			@param[in]	d	設定値
-		*/
-		//-----------------------------------------------------------------//
-		void set_DATA(uint32_t idx, uint8_t d) {
-			uint32_t sfc = (~(idx + 6) & 0x3) << 3;
-			uint32_t ofs = (idx + 6) >> 2;
-			pad[ofs] &= ~(0xff << sfc);
-			pad[ofs] |= static_cast<uint32_t>(d) << sfc;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	DATA の取得
-			@param[in]	idx	インデックス（０～７）
-			@return 値
-		*/
-		//-----------------------------------------------------------------//
-		uint8_t get_DATA(uint32_t idx) const {
-			uint32_t sfc = (~(idx + 6) & 0x3) << 3;
-			uint32_t ofs = (idx + 6) >> 2;
-			return pad[ofs] >> sfc;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	TS の設定
-			@param[in]	ts	値
-		*/
-		//-----------------------------------------------------------------//
-		void set_TS(uint16_t ts) {
-			pad[3] &= 0xffff0000;
-			pad[3] |= ts;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	TS の取得
-			@return 値
-		*/
-		//-----------------------------------------------------------------//
-		uint16_t get_TS() const { return pad[3] & 0xffff; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	統合 ID の設定 (STD + EID)
-			@param[in]	id	統合 ID
-		*/
-		//-----------------------------------------------------------------//
-		void set_id(uint32_t id) { set_SID(id); set_EID(id >> 11); }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	統合 ID の取得
-			@return 統合 ID
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_id() const {
-			if(get_IDE() == 0) {
-				return get_SID();
-			} else {
-	 			return get_SID() | (get_EID() << 11);
-			}
-		}
-
-
-		const uint32_t& operator [] (uint32_t idx) const { return pad[idx]; }
-
-		uint32_t& operator [] (uint32_t idx) { return pad[idx]; }
-	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
 		@brief	CAN ベース・モジュール（CAN）
 		@param[in]	base	ベースアドレス
-		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base>
 	struct can_t {
-
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -826,31 +609,31 @@ namespace device {
 		typedef tcr_t<base + 0x0658> TCR_;
 		static  TCR_ TCR;
 	};
-	template <uint32_t base, peripheral per> typename can_t<base, per>::CTLR_ can_t<base, per>::CTLR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::BCR_ can_t<base, per>::BCR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR_ can_t<base, per>::MKR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::FIDCR0_ can_t<base, per>::FIDCR0;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::FIDCR1_ can_t<base, per>::FIDCR1;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKIVLR_ can_t<base, per>::MKIVLR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MB_ can_t<base, per>::MB;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MIER_ can_t<base, per>::MIER;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MCTL_ can_t<base, per>::MCTL;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::RFCR_ can_t<base, per>::RFCR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::RFPCR_ can_t<base, per>::RFPCR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::TFCR_ can_t<base, per>::TFCR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::TFPCR_ can_t<base, per>::TFPCR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::STR_ can_t<base, per>::STR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MSMR_ can_t<base, per>::MSMR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MSSR_ can_t<base, per>::MSSR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::CSSR_ can_t<base, per>::CSSR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::AFSR_ can_t<base, per>::AFSR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::EIER_ can_t<base, per>::EIER;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::EIFR_ can_t<base, per>::EIFR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::RECR_ can_t<base, per>::RECR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::TECR_ can_t<base, per>::TECR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::ECSR_ can_t<base, per>::ECSR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::TSR_ can_t<base, per>::TSR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::TCR_ can_t<base, per>::TCR;
+	template <uint32_t base> typename can_t<base>::CTLR_   can_t<base>::CTLR;
+	template <uint32_t base> typename can_t<base>::BCR_    can_t<base>::BCR;
+	template <uint32_t base> typename can_t<base>::MKR_    can_t<base>::MKR;
+	template <uint32_t base> typename can_t<base>::FIDCR0_ can_t<base>::FIDCR0;
+	template <uint32_t base> typename can_t<base>::FIDCR1_ can_t<base>::FIDCR1;
+	template <uint32_t base> typename can_t<base>::MKIVLR_ can_t<base>::MKIVLR;
+	template <uint32_t base> typename can_t<base>::MB_     can_t<base>::MB;
+	template <uint32_t base> typename can_t<base>::MIER_   can_t<base>::MIER;
+	template <uint32_t base> typename can_t<base>::MCTL_   can_t<base>::MCTL;
+	template <uint32_t base> typename can_t<base>::RFCR_   can_t<base>::RFCR;
+	template <uint32_t base> typename can_t<base>::RFPCR_  can_t<base>::RFPCR;
+	template <uint32_t base> typename can_t<base>::TFCR_   can_t<base>::TFCR;
+	template <uint32_t base> typename can_t<base>::TFPCR_  can_t<base>::TFPCR;
+	template <uint32_t base> typename can_t<base>::STR_    can_t<base>::STR;
+	template <uint32_t base> typename can_t<base>::MSMR_   can_t<base>::MSMR;
+	template <uint32_t base> typename can_t<base>::MSSR_   can_t<base>::MSSR;
+	template <uint32_t base> typename can_t<base>::CSSR_   can_t<base>::CSSR;
+	template <uint32_t base> typename can_t<base>::AFSR_   can_t<base>::AFSR;
+	template <uint32_t base> typename can_t<base>::EIER_   can_t<base>::EIER;
+	template <uint32_t base> typename can_t<base>::EIFR_   can_t<base>::EIFR;
+	template <uint32_t base> typename can_t<base>::RECR_   can_t<base>::RECR;
+	template <uint32_t base> typename can_t<base>::TECR_   can_t<base>::TECR;
+	template <uint32_t base> typename can_t<base>::ECSR_   can_t<base>::ECSR;
+	template <uint32_t base> typename can_t<base>::TSR_    can_t<base>::TSR;
+	template <uint32_t base> typename can_t<base>::TCR_    can_t<base>::TCR;
 
 
 #if defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX63T) || defined(SIG_RX63T_S)
@@ -868,7 +651,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::GROUP0 ers>
-	struct can_norm_t : can_t<base, per> {
+	struct can_norm_t : can_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
 		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター
@@ -904,7 +689,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::VECTOR ers>
-	struct can_norm_t : can_t<base, per> {
+	struct can_norm_t : can_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		static constexpr auto PCLK = clock_profile::PCLK;	///< クロック周波数
 		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター
@@ -932,7 +719,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::GROUPBE0 ers>
-	struct can_norm_t : can_t<base, per> {
+	struct can_norm_t : can_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
 		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター
@@ -960,7 +749,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
 		ICU::SELECTB rxf, ICU::SELECTB txf, ICU::SELECTB rxm, ICU::SELECTB txm, ICU::GROUPBE0 ers>
-	struct can_seli_t : can_t<base, per> {
+	struct can_seli_t : can_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
 		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター

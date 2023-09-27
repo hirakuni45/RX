@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX24T グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 
 namespace device {
@@ -236,15 +236,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct oscovfsr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
+		struct oscovfsr_t : public ro8_t<base> {
+			typedef ro8_t<base> io_;
 			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
 
 			bit_ro_t<ro8_t<base>, bitpos::B0> MOOVF;
+
 			bit_ro_t<ro8_t<base>, bitpos::B2> PLOVF;
+			bit_ro_t<ro8_t<base>, bitpos::B3> HCOVF;
 		};
 		typedef oscovfsr_t<0x0008'003C> OSCOVFSR_;
 		static OSCOVFSR_ OSCOVFSR;

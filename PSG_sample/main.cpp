@@ -110,6 +110,19 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
+#elif defined(SIG_RX26T)
+	static const char* system_str_ = { "RX26T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
+	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
+
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	#define USE_DAC
+	typedef device::R12DA DAC;
+
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
