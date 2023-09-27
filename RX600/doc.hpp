@@ -16,13 +16,10 @@ namespace device {
 	/*!
 		@brief  データ演算回路（DOC）
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base>
 	struct doc_t {
-
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -67,12 +64,9 @@ namespace device {
 		static  DODSR_ DODSR;
 
 	};
-	template <uint32_t base, peripheral per>
-		typename doc_t<base, per>::DOCR_ doc_t<base, per>::DOCR;
-	template <uint32_t base, peripheral per>
-		typename doc_t<base, per>::DODIR_ doc_t<base, per>::DODIR;
-	template <uint32_t base, peripheral per>
-		typename doc_t<base, per>::DODSR_ doc_t<base, per>::DODSR;
+	template <uint32_t base> typename doc_t<base>::DOCR_  doc_t<base>::DOCR;
+	template <uint32_t base> typename doc_t<base>::DODIR_ doc_t<base>::DODIR;
+	template <uint32_t base> typename doc_t<base>::DODSR_ doc_t<base>::DODSR;
 
 
 #if defined(SIG_RX220) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX24T)
@@ -80,13 +74,15 @@ namespace device {
 	/*!
 		@brief  データ演算回路（DOC）
 		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
 		@param[in]	vec		割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR vec>
-	struct doc_norm_t : public doc_t<base, per> {
+	struct doc_norm_t : public doc_t<base> {
 
-		static constexpr auto INTRV = vec;	///< 割り込みベクター
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto INTRV = vec;		///< 割り込みベクター
 
 	};
 	typedef doc_norm_t<0x0008'B080, peripheral::DOC, ICU::VECTOR::DOPCF> DOC;
@@ -95,13 +91,15 @@ namespace device {
 	/*!
 		@brief  データ演算回路（DOC）
 		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
 		@param[in]	vec		割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::GROUPBL0 vec>
-	struct doc_gbl0_t : public doc_t<base, per> {
+	struct doc_gbl0_t : public doc_t<base> {
 
-		static constexpr auto INTRV = vec;	///< 割り込みベクター
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto INTRV = vec;		///< 割り込みベクター
 
 	};
 	typedef doc_gbl0_t<0x0008'B080, peripheral::DOC, ICU::GROUPBL0::DOPCI> DOC;
