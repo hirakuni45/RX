@@ -79,7 +79,7 @@
 #include "RX600/sci_h.hpp"
 #include "RX600/rsci.hpp"
 // #include "RX600/ri3c.hpp"
-// #include "RX600/canfd.hpp"
+#include "RX600/canfd.hpp"
 // #include "RX600/rspia.hpp"
 #include "RX600/crca.hpp"
 // #include "RX600/tfuv2.hpp"
@@ -87,7 +87,7 @@
 #include "RX600/r12da.hpp"
 // #include "RX600/temps.hpp"
 #include "RX600/cmpc.hpp"
-// #include "RX600/doca.hpp"
+#include "RX600/doca.hpp"
 #include "RX26T/flash.hpp"
 
 #include "RX26T/system_io.hpp"
