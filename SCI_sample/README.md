@@ -7,7 +7,7 @@ Renesas RX220, RX62N, RX631, RX63T, RX24T, RX26T, RX66T, RX72T, RX64M, RX71M, RX
 
 ## Overview
 
-SCI (UART) sample program using RX microcontroller
+SCI/SCIF/RSCI (UART) sample program using RX microcontroller
 
 ---
 
@@ -38,10 +38,10 @@ SCI (UART) sample program using RX microcontroller
 - For the RX631's SCI standard port, refer to "RX63x/port_map.hpp".
 - For the RX63T's SCI standard port, refer to "RX63T/port_map.hpp".
 - For the RX24T SCI standard port, refer to "RX24T/port_map.hpp".
-- For the RX26T SCI standard port, refer to "RX26T/port_map.hpp".
+- For the RX26T SCI/RSCI standard port, refer to "RX26T/port_map.hpp".
 - For the SCI standard port of RX66T, refer to "RX66T/port_map.hpp".
 - For the RX72T SCI standard port, refer to "RX72T/port_map.hpp".
-- For the RX64M/RX71M SCI standard ports, refer to "RX64M/port_map.hpp".
+- For the RX64M/RX71M SCI/SCIF standard ports, refer to "RX64M/port_map.hpp".
 - For the RX65x SCI standard ports, refer to "RX65x/port_map.hpp".
 - For the standard SCI port of RX72N, refer to "RX72N/port_map.hpp".
 - For BlueBoard-RX62N_100pin, use D2 LED on the board. (red) 
@@ -110,16 +110,22 @@ SCI (UART) sample program using RX microcontroller
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+// RSCI を使う場合：
+//	typedef device::rsci_io<device::RSCI8, RXB, TXB> SCI;
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+// SCIF を使う場合：
+//	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+// SCIF を使う場合：
+//	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	static constexpr bool LED_ACTIVE = 0;

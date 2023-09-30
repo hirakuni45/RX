@@ -41,23 +41,20 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct rdr_t : public rw32_t<ofs> {
-			typedef rw32_t<ofs> io_;
-			using io_::operator =;
+		struct rdr_t : public ro32_t<ofs> {
+			typedef ro32_t<ofs> io_;
 			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 9>  RDAT;
-			bit_rw_t <io_, bitpos::B9>	   MPB;
-			bit_rw_t <io_, bitpos::B10>	   DR;
-			bit_rw_t <io_, bitpos::B11>	   PER;
-			bit_rw_t <io_, bitpos::B12>	   FER;
+			bits_ro_t<io_, bitpos::B0, 9>  RDAT;
+			bit_ro_t <io_, bitpos::B9>	   MPB;
+			bit_ro_t <io_, bitpos::B10>	   DR;
+			bit_ro_t <io_, bitpos::B11>	   PER;
+			bit_ro_t <io_, bitpos::B12>	   FER;
 
-			bit_rw_t <io_, bitpos::B24>    ORER;
+			bit_ro_t <io_, bitpos::B24>    ORER;
 
-			bit_rw_t <io_, bitpos::B27>    APER;
-			bit_rw_t <io_, bitpos::B28>    AFER;
+			bit_ro_t <io_, bitpos::B27>    APER;
+			bit_ro_t <io_, bitpos::B28>    AFER;
 		};
 		typedef rdr_t<base + 0x00> RDR_;
 		static  RDR_ RDR;
@@ -733,6 +730,14 @@ namespace device {
 		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
 		static constexpr auto PCLK		 = clock_profile::PCLKB;	///< PCLK 周波数
 
+		//ボーレート微調整
+		static constexpr bool SEMR_BRME  = true;	///< SEMR.BRME が利用可能な場合「true」
+		// ボーレート倍速
+		static constexpr bool SEMR_BGDM  = true;	///< SEMR.BGDM が利用可能な場合「true」
+		// ノイズフィルタ
+		static constexpr bool SEMR_NFEN  = true;	///< SEMR.NFEN が利用可能な場合「true」
+		// 調歩同期基本クロックセレクト拡張
+		static constexpr bool SEMR_ABCSE = true;	///< SEMR.ABCSE が利用可能な場合「true」
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -770,6 +775,14 @@ namespace device {
 		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
 		static constexpr auto PCLK		 = clock_profile::PCLKB;	///< PCLK 周波数
 
+		//ボーレート微調整
+		static constexpr bool SEMR_BRME  = true;	///< SEMR.BRME が利用可能な場合「true」
+		// ボーレート倍速
+		static constexpr bool SEMR_BGDM  = true;	///< SEMR.BGDM が利用可能な場合「true」
+		// ノイズフィルタ
+		static constexpr bool SEMR_NFEN  = true;	///< SEMR.NFEN が利用可能な場合「true」
+		// 調歩同期基本クロックセレクト拡張
+		static constexpr bool SEMR_ABCSE = true;	///< SEMR.ABCSE が利用可能な場合「true」
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -807,6 +820,14 @@ namespace device {
 		static constexpr auto ERI		 = eri;		///< 受信エラー割り込みベクター
 		static constexpr auto PCLK		 = clock_profile::PCLKA;	///< PCLK 周波数
 
+		//ボーレート微調整
+		static constexpr bool SEMR_BRME  = true;	///< SEMR.BRME が利用可能な場合「true」
+		// ボーレート倍速
+		static constexpr bool SEMR_BGDM  = true;	///< SEMR.BGDM が利用可能な場合「true」
+		// ノイズフィルタ
+		static constexpr bool SEMR_NFEN  = true;	///< SEMR.NFEN が利用可能な場合「true」
+		// 調歩同期基本クロックセレクト拡張
+		static constexpr bool SEMR_ABCSE = true;	///< SEMR.ABCSE が利用可能な場合「true」
 
 		//-----------------------------------------------------------------//
 		/*!

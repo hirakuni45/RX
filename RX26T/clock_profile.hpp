@@ -61,14 +61,14 @@ namespace device {
 		static constexpr uint32_t   FCLK		=   60'000'000;		///< FCLK 周波数（最大 60MHz）
 #else
 		// オーバークロック実験用
-		static constexpr uint32_t   PLL_BASE	=  228'000'000;		///< PLL ベースクロック（最大 120 to 240MHz）
+		static constexpr uint32_t   PLL_BASE	=  240'000'000;		///< PLL ベースクロック（最大 120 to 240MHz）
 
-		static constexpr uint32_t   ICLK		=  114'000'000;		///< ICLK 周波数（最大 120MHz）
-		static constexpr uint32_t   PCLKA		=  114'000'000;		///< PCLKA 周波数（最大 120MHz）
-		static constexpr uint32_t   PCLKB		=   57'000'000;		///< PCLKB 周波数（最大 60MHz）
-		static constexpr uint32_t   PCLKC		=  114'000'000;		///< PCLKB 周波数（最大 120MHz）
-		static constexpr uint32_t   PCLKD		=   57'000'000;		///< PCLKD 周波数（最大 60MHz）
-		static constexpr uint32_t   FCLK		=   57'000'000;		///< FCLK 周波数（最大 60MHz）
+		static constexpr uint32_t   ICLK		=  120'000'000;		///< ICLK 周波数（最大 120MHz）
+		static constexpr uint32_t   PCLKA		=  120'000'000;		///< PCLKA 周波数（最大 120MHz）
+		static constexpr uint32_t   PCLKB		=   60'000'000;		///< PCLKB 周波数（最大 60MHz）
+		static constexpr uint32_t   PCLKC		=  120'000'000;		///< PCLKB 周波数（最大 120MHz）
+		static constexpr uint32_t   PCLKD		=   60'000'000;		///< PCLKD 周波数（最大 60MHz）
+		static constexpr uint32_t   FCLK		=   60'000'000;		///< FCLK 周波数（最大 60MHz）
 #endif
 
 		static constexpr uint32_t	DELAY_MS	= ICLK / 3'065'133;	///< ソフトウェアー遅延における定数（1マイクロ秒）

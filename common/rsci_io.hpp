@@ -1,12 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・SCIF I/O 制御（FIFO 内臓型） @n
-			※内臓のFIFOバッファを利用しない実装（扱いにくいので使わない） @n
-			現状 SCIF は、RX64M/RX71M 専用となっている。 @n
-			SCIF8 ～ SCIF11
+	@brief	RX グループ・RSCI I/O 制御 @n
+			※内臓のFIFOバッファを利用しない実装（扱いにくいので使わない）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,10 +16,10 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCI I/O ベース・クラス
+		@brief  RSCI I/O ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class scif_io_base {
+	class rsci_io_base {
 	public:
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -85,32 +83,33 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCIF I/O 制御クラス
+		@brief  RSCI I/O 制御クラス
 		@param[in]	SCIF	SCIF 定義クラス
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
 		@param[in]	PSEL	ポート選択
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCIF, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
-	class scif_io : public scif_io_base {
+	template <class RSCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
+	class rsci_io : public rsci_io_base {
 
 		static_assert(RBF::size() > 8, "Receive buffer is too small.");
 		static_assert(SBF::size() > 8, "Transmission buffer is too small.");
 
 	public:
-		typedef SCIF sci_type;
+		typedef RSCI sci_type;
 		typedef RBF  rbf_type;
 		typedef SBF  sbf_type;
 
 	private:
 		static RBF	recv_;
 		static SBF	send_;
-		static volatile uint16_t errc_;
 
 		ICU::LEVEL	level_;
 		bool		auto_crlf_;
 		uint32_t	baud_;
+
+		static volatile uint16_t errc_;
 
 		// ※必要なら、実装する
 		void sleep_() { asm("nop"); }
@@ -119,41 +118,37 @@ namespace device {
 		{
 			bool err = false;
 			///< フレーミングエラー/パリティエラー状態確認
-			if(SCIF::FSR.PER()) {
-				SCIF::FSR.PER = 0;
+			if(RSCI::RDR.PER()) {
 				err = true;
 			}
-			if(SCIF::FSR.FER()) {
-				SCIF::FSR.FER = 0;
+			if(RSCI::RDR.FER()) {
 				err = true;
 			}
-			volatile uint8_t data = SCIF::FRDR();
-			SCIF::FSR.RDF = 0;
-			if(!err) {
-				recv_.put(data);
+			volatile uint8_t rd = RSCI::RDR.RDAT();
+			if(err) {
 				++errc_;
+			} else {
+				recv_.put(rd);
 			}
 		}
 
 		static INTERRUPT_FUNC void txi_task_()
 		{
 			if(send_.length() > 0) {
-				SCIF::FTDR = send_.get();
+				RSCI::TDR.TDAT = send_.get();
+			} else {
+				RSCI::SCR0.TIE = 0;
 			}
-			if(send_.length() == 0) {
-				SCIF::SCR.TIE = 0;
-			}
-			SCIF::FSR.TDFE = 0;
 		}
 
 		void set_intr_() noexcept
 		{
 			if(level_ != ICU::LEVEL::NONE) {
-				icu_mgr::set_interrupt(SCIF::RXI, rxi_task_, level_);
-				icu_mgr::set_interrupt(SCIF::TXI, txi_task_, level_);
+				icu_mgr::set_interrupt(RSCI::RXI, rxi_task_, level_);
+				icu_mgr::set_interrupt(RSCI::TXI, txi_task_, level_);
 			} else {
-				icu_mgr::set_interrupt(SCIF::RXI, nullptr, level_);
-				icu_mgr::set_interrupt(SCIF::TXI, nullptr, level_);
+				icu_mgr::set_interrupt(RSCI::RXI, nullptr, level_);
+				icu_mgr::set_interrupt(RSCI::TXI, nullptr, level_);
 			}
 		}
 
@@ -163,11 +158,11 @@ namespace device {
 			// BGDM が使える場合、1/8 スタート
 			uint32_t mtx = 8;
 			uint32_t limit = 1024;
-			if(!SCIF::SEMR_BGDM) {  // BGDM が使えない場合 1/16 スタート
+			if(!RSCI::SEMR_BGDM) {  // BGDM が使えない場合 1/16 スタート
 				mtx = 16;
 				limit = 512;
 			}
-			uint32_t brr = SCIF::PCLK / mtx / baud;
+			uint32_t brr = RSCI::PCLK / mtx / baud;
 			uint8_t cks = 0;
 			while(brr > limit) {
 				brr >>= 2;
@@ -179,7 +174,7 @@ namespace device {
 
 			// BGDM フラグの設定
 			bool bgdm = true;
-			if(SCIF::SEMR_BGDM) {
+			if(RSCI::SEMR_BGDM) {
 				if(brr > 512) { brr >>= 1; bgdm = false; mtx <<= 1; }
 			} else {
 				bgdm = false;
@@ -188,8 +183,9 @@ namespace device {
 			if(brr > 256) { brr >>= 1; abcs = false; mtx <<= 1; }
 
 			bool brme = false;
-			if(SCIF::SEMR_BRME) {  // 微調整機能が使える場合
-				uint32_t rate = SCIF::PCLK / mtx / brr / (1 << (cks * 2));
+			mddr_ = 0xff;
+			if(RSCI::SEMR_BRME) {  // 微調整機能が使える場合
+				uint32_t rate = RSCI::PCLK / mtx / brr / (1 << (cks * 2));
 				uint32_t mddr = (baud << 9) / rate;
 				++mddr;
 				mddr >>= 1;
@@ -214,19 +210,10 @@ namespace device {
 			@param[in]	crlf	LF 時、CR の送出をしない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		scif_io(bool crlf = true) noexcept : level_(ICU::LEVEL::NONE), auto_crlf_(crlf), baud_(0)
+		rsci_io(bool crlf = true) noexcept : level_(ICU::LEVEL::NONE), auto_crlf_(crlf), baud_(0)
 		{
 			errc_ = 0;
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	LF 時、CR 自動送出
-			@param[in]	f	「false」なら無効
-		 */
-		//-----------------------------------------------------------------//
-		void auto_crlf(bool f = true) noexcept { auto_crlf_ = f; }
 
 
 		//-----------------------------------------------------------------//
@@ -236,6 +223,15 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		static auto get_error_count() noexcept { return errc_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	LF 時、CR 自動送出
+			@param[in]	f	「false」なら無効
+		 */
+		//-----------------------------------------------------------------//
+		void auto_crlf(bool f = true) noexcept { auto_crlf_ = f; }
 
 
 		//-----------------------------------------------------------------//
@@ -261,13 +257,13 @@ namespace device {
 			}
 
 			uint32_t mtx = 8;
-			if(SCIF::SEMR_BGDM) {
+			if(RSCI::SEMR_BGDM) {
 				if(!bgdm) mtx <<= 1;
 			} else {
 				mtx <<= 1;
 			}
 			if(!abcs) mtx <<= 1;
-			auto cbaud = SCIF::PCLK / mtx / (1 << (static_cast<uint32_t>(cks) * 2)) / static_cast<uint32_t>(brr);
+			auto cbaud = RSCI::PCLK / mtx / (1 << (static_cast<uint32_t>(cks) * 2)) / static_cast<uint32_t>(brr);
 			if(brme) {
 				cbaud *= mddr;
 				cbaud /= 256;
@@ -305,11 +301,11 @@ namespace device {
 
 			level_ = level;
 
-			SCIF::SCR = 0x00;			// TE, RE disable.
+			RSCI::SCR0 = 0x0000;	// TE, RE disable.
 
-			port_map::turn(SCIF::PERIPHERAL, true, PSEL);
+			port_map::turn(RSCI::PERIPHERAL, true, PSEL);
 
-			power_mgr::turn(SCIF::PERIPHERAL);
+			power_mgr::turn(RSCI::PERIPHERAL);
 
 			set_intr_();
 
@@ -363,29 +359,19 @@ namespace device {
 			default:
 				return false;
 			}
-
-			// FIFO: しきい値
-			SCIF::FTCR = SCIF::FTCR.TTRGS.b() | SCIF::FTCR.TFTC.b(1)
-				| SCIF::FTCR.RTRGS.b() | SCIF::FTCR.RFTC.b(1);
-
-			SCIF::SMR = SCIF::SMR.CKS.b(cks) | SCIF::SMR.STOP.b(stop) | SCIF::SMR.PM.b(pm) | SCIF::SMR.PE.b(pe)
-					  | SCIF::SMR.CHR.b(chr);
-
-			if(brme) {
-				SCIF::SEMR.MDDRS = 1;
-				SCIF::MDDR = mddr;
-				SCIF::SEMR.MDDRS = 0;
-			}
-			SCIF::SEMR = SCIF::SEMR.ABCS0.b(abcs) | SCIF::SEMR.BRME.b(brme) | SCIF::SEMR.BGDM.b(bgdm);
+			RSCI::SCR1.PE = pe;
+			RSCI::SCR1.PM = pm;
+			RSCI::SCR3.CHR = chr;
+			RSCI::SCR3.STOP = stop;
 
 			if(brr) --brr;
-			SCIF::SEMR.MDDRS = 0;
-			SCIF::BRR = static_cast<uint8_t>(brr);
+			RSCI::SCR2 = RSCI::SCR2.CKS.b(cks) | RSCI::SCR2.MDDR.b(mddr) | RSCI::SCR2.BRR.b(brr)
+					   | RSCI::SCR2.ABCS.b(abcs) | RSCI::SCR2.BGDM.b(bgdm) | RSCI::SCR2.BRME.b(brme);
 
 			if(level_ != ICU::LEVEL::NONE) {
-				SCIF::SCR = SCIF::SCR.RIE.b() | SCIF::SCR.TE.b() | SCIF::SCR.RE.b();
+				RSCI::SCR0 = RSCI::SCR0.RIE.b() | RSCI::SCR0.TE.b() | RSCI::SCR0.RE.b();
 			} else {
-				SCIF::SCR = SCIF::SCR.TE.b() | SCIF::SCR.RE.b();
+				RSCI::SCR0 = RSCI::SCR0.TE.b() | RSCI::SCR0.RE.b();
 			}
 
 			return true;
@@ -413,10 +399,7 @@ namespace device {
 			@return BRR レジスタ値
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t get_brr() const noexcept {
-			SCIF::SEMR.MDDRS = 0;
-			return SCIF::BRR();
-		}
+		uint8_t get_brr() const noexcept { return RSCI::SCR2.BRR(); }
 
 
 		//-----------------------------------------------------------------//
@@ -429,20 +412,18 @@ namespace device {
 		uint32_t get_baud_rate(bool real = false) const noexcept
 		{
 			if(real) {
-				SCIF::SEMR.MDDRS = 0;
-				uint32_t brr = SCIF::BRR();
-				uint32_t cks = 1 << (SCIF::SMR.CKS() * 2);
+				uint32_t brr = RSCI::SCR2.BRR();
+				uint32_t cks = 1 << (RSCI::SCR2.CKS() * 2);
 				uint32_t mtx = 8;
-				if(SCIF::SEMR_BGDM) {
-					if(!SCIF::SEMR.BGDM()) mtx <<= 1;
+				if(RSCI::SEMR_BGDM) {
+					if(!RSCI::SCR2.BGDM()) mtx <<= 1;
 				} else {
 					mtx <<= 1;
 				}
-				if(!SCIF::SEMR.ABCS0()) mtx <<= 1;
-				auto baud = SCIF::PCLK / mtx / cks / (brr + 1);
-				if(SCIF::SEMR_BRME && SCIF::SEMR.BRME()) {
-					SCIF::SEMR.MDDRS = 1;
-					baud *= SCIF::MDDR();
+				if(!RSCI::SCR2.ABCS()) mtx <<= 1;
+				auto baud = RSCI::PCLK / mtx / cks / (brr + 1);
+				if(RSCI::SEMR_BRME && RSCI::SCR2.BRME()) {
+					baud *= RSCI::SCR2.MDDR();
 					baud /= 256;
 				}
 				return baud;
@@ -458,10 +439,7 @@ namespace device {
 			@return MDRR レジスタ値
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t get_mdrr() const noexcept {
-			SCIF::SEMR.MDDRS = 1;
-			return SCIF::MDDR();
-		}
+		uint8_t get_mdrr() const noexcept { return RSCI::SCR2.MDDR(); }
 
 
 		//-----------------------------------------------------------------//
@@ -470,7 +448,8 @@ namespace device {
 			@return　バッファのサイズ
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t send_length() const noexcept {
+		uint32_t send_length() const noexcept
+		{
 			if(level_ != ICU::LEVEL::NONE) {
 				return send_.length();
 			} else {
@@ -485,33 +464,25 @@ namespace device {
 			@param[in]	ch	文字コード
 		 */
 		//-----------------------------------------------------------------//
-		void putch(char ch) noexcept {
+		void putch(char ch) noexcept
+		{
 			if(auto_crlf_ && ch == '\n') {
 				putch('\r');
 			}
 
 			if(level_ != ICU::LEVEL::NONE) {
-//				volatile bool b = SCI::SSR.ORER();
-//				if(b) {
-//					SCI::SSR.ORER = 0;
-//				}
 				/// 送信バッファの容量が７／８の場合は、空になるまで待つ。
 				if(send_.length() >= (send_.size() * 7 / 8)) {
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-				if(SCIF::SCR.TIE() == 0) {
-					while(SCIF::FSR.TDFE() == 0) sleep_();
-					SCIF::FTDR = send_.get();
-					SCIF::FSR.TDFE = 0;
-					if(send_.length() > 0) {
-						SCIF::SCR.TIE = 1;
-					}
+				if(RSCI::SCR0.TIE() == 0) {
+					RSCI::SCR0.TIE = 1;
+					RSCI::TDR.TDAT = send_.get();
 				}
 			} else {
-				while(SCIF::FSR.TDFE() == 0) sleep_();
-				SCIF::FSR.TDFE = 0;
-				SCIF::FTDR = ch;
+				while(RSCI::SSR.TDRE() == 0) sleep_();
+				RSCI::TDR.TDAT = ch;
 			}
 		}
 
@@ -522,17 +493,29 @@ namespace device {
 			@return	入力文字数
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t recv_length() noexcept {
+		uint32_t recv_length() noexcept
+		{
 			if(level_ != ICU::LEVEL::NONE) {
 				return recv_.length();
 			} else {
-				if(SCIF::FSR.PER()) {	///< パリティ・エラー状態確認
-					SCIF::FSR.PER = 0;	///< パリティ・エラークリア
+				if(RSCI::RDR.PER()) {	///< パリティ・エラー状態確認
 				}
-				if(SCIF::FSR.FER()) {	///< フレーミング・エラー状態確認
-					SCIF::FSR.FER = 0;	///< フレーミング・エラークリア
+				if(RSCI::RDR.FER()) {	///< フレーミング・エラー状態確認
 				}
-				return SCIF::FSR.RDF();
+				return RSCI::SSR.RDRF();
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	入力文字を捨てる
+		 */
+		//-----------------------------------------------------------------//
+		void flush_recv() noexcept
+		{
+			if(recv_length() > 0) {
+				recv_.clear();
 			}
 		}
 
@@ -543,14 +526,14 @@ namespace device {
 			@return 文字コード
 		 */
 		//-----------------------------------------------------------------//
-		char getch() noexcept {
+		char getch() noexcept
+		{
 			if(level_ != ICU::LEVEL::NONE) {
 				while(recv_.length() == 0) sleep_();
 				return recv_.get();
 			} else {
 				while(recv_length() == 0) sleep_();
-				char ch = SCIF::FRDR();	///< 受信データ読み出し
-				SCIF::FSR.RDF = 0;
+				char ch = RSCI::RDR.RDAT();	///< 受信データ読み出し
 				return ch;
 			}
 		}
@@ -562,17 +545,22 @@ namespace device {
 			@param[in]	s	出力ストリング
 		 */
 		//-----------------------------------------------------------------//
-		void puts(const char* s) noexcept {
+		void puts(const char* s) noexcept
+		{
 			char ch;
 			while((ch = *s++) != 0) {
 				putch(ch);
 			}
 		}
+
+
+		char operator () () noexcept { return getch(); }
+		void operator = (char ch) noexcept { putch(ch); }
+		void operator = (const char* str) noexcept { puts(str); }
 	};
-	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
-		RBF scif_io<SCIF, RBF, SBF, PSEL>::recv_;
-	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
-		SBF scif_io<SCIF, RBF, SBF, PSEL>::send_;
-	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
-		volatile uint16_t scif_io<SCIF, RBF, SBF, PSEL>::errc_;
+
+	template<class RSCI, class RBF, class SBF, port_map::ORDER PSEL> RBF rsci_io<RSCI, RBF, SBF, PSEL>::recv_;
+	template<class RSCI, class RBF, class SBF, port_map::ORDER PSEL> SBF rsci_io<RSCI, RBF, SBF, PSEL>::send_;
+	template<class RSCI, class RBF, class SBF, port_map::ORDER PSEL>
+		volatile uint16_t rsci_io<RSCI, RBF, SBF, PSEL>::errc_;
 }
