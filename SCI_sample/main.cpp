@@ -1,6 +1,8 @@
 //=====================================================================//
 /*! @file
-    @brief  SCI (UART) サンプル
+    @brief  SCI (UART) サンプル @n
+			RX64M/RX71M に搭載された、SCIF を利用する場合、「scif_io」クラスを利用。 @n
+			RX26T に搭載された、RSCI を利用する場合、「rsci_io」クラスを利用。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -12,6 +14,7 @@
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/scif_io.hpp"
+#include "common/rsci_io.hpp"
 #include "common/cmt_mgr.hpp"
 #include "common/command.hpp"
 
@@ -71,19 +74,21 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+// RSCI を使う場合：
+//	typedef device::rsci_io<device::RSCI8, RXB, TXB> SCI;
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-// SCIF を使う場合
+// SCIF を使う場合：
 //	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-// SCIF を使う場合
+// SCIF を使う場合：
 //	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
