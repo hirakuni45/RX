@@ -106,7 +106,7 @@ namespace device {
 	private:
 		static RBF	recv_;
 		static SBF	send_;
-		static volatile bool send_stall_;
+		static volatile uint16_t errc_;
 
 		ICU::LEVEL	level_;
 		bool		auto_crlf_;
@@ -131,6 +131,7 @@ namespace device {
 			SCIF::FSR.RDF = 0;
 			if(!err) {
 				recv_.put(data);
+				++errc_;
 			}
 		}
 
@@ -141,7 +142,6 @@ namespace device {
 			}
 			if(send_.length() == 0) {
 				SCIF::SCR.TIE = 0;
-				send_stall_ = true;
 			}
 			SCIF::FSR.TDFE = 0;
 		}
@@ -215,7 +215,9 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		scif_io(bool crlf = true) noexcept : level_(ICU::LEVEL::NONE), auto_crlf_(crlf), baud_(0)
-		{ }
+		{
+			errc_ = 0;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -225,6 +227,15 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		void auto_crlf(bool f = true) noexcept { auto_crlf_ = f; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	エラー数の取得
+			@return エラー数
+		 */
+		//-----------------------------------------------------------------//
+		static auto get_error_count() noexcept { return errc_; }
 
 
 		//-----------------------------------------------------------------//
@@ -292,7 +303,6 @@ namespace device {
 				return false;
 			}
 
-			send_stall_ = true;
 			level_ = level;
 
 			SCIF::SCR = 0x00;			// TE, RE disable.
@@ -403,7 +413,10 @@ namespace device {
 			@return BRR レジスタ値
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t get_brr() const noexcept { return SCIF::BRR(); }
+		uint8_t get_brr() const noexcept {
+			SCIF::SEMR.MDDRS = 0;
+			return SCIF::BRR();
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -431,7 +444,6 @@ namespace device {
 					SCIF::SEMR.MDDRS = 1;
 					baud *= SCIF::MDDR();
 					baud /= 256;
-					SCIF::SEMR.MDDRS = 0;
 				}
 				return baud;
 			} else {
@@ -446,7 +458,10 @@ namespace device {
 			@return MDRR レジスタ値
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t get_mdrr() const noexcept { return SCIF::MDDR(); }
+		uint8_t get_mdrr() const noexcept {
+			SCIF::SEMR.MDDRS = 1;
+			return SCIF::MDDR();
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -485,17 +500,14 @@ namespace device {
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-
-				SCIF::SCR.TIE = 0;
-				if(send_stall_) {
+				if(SCIF::SCR.TIE() == 0) {
 					while(SCIF::FSR.TDFE() == 0) sleep_();
 					SCIF::FTDR = send_.get();
 					SCIF::FSR.TDFE = 0;
 					if(send_.length() > 0) {
-						send_stall_ = false;
+						SCIF::SCR.TIE = 1;
 					}
 				}
-				SCIF::SCR.TIE = !send_stall_;
 			} else {
 				while(SCIF::FSR.TDFE() == 0) sleep_();
 				SCIF::FSR.TDFE = 0;
@@ -557,11 +569,10 @@ namespace device {
 			}
 		}
 	};
-
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::ORDER PSEL>
-		RECV_BUFF scif_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::recv_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::ORDER PSEL>
-		SEND_BUFF scif_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::send_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::ORDER PSEL>
-		volatile bool scif_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::send_stall_;
+	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
+		RBF scif_io<SCIF, RBF, SBF, PSEL>::recv_;
+	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
+		SBF scif_io<SCIF, RBF, SBF, PSEL>::send_;
+	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
+		volatile uint16_t scif_io<SCIF, RBF, SBF, PSEL>::errc_;
 }
