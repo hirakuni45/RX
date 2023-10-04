@@ -26,6 +26,11 @@
 // debug monitor を有効にする場合
 // #define MEMORY_MONITOR
 
+#ifdef __TFU
+// TFU の実験コードを有効にする場合
+// #define TEST_TFU
+#endif
+
 namespace {
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
@@ -194,6 +199,15 @@ int main(int argc, char** argv)
 
 #ifndef MEMORY_MONITOR
 	cmd_.set_prompt("# ");
+#endif
+
+#ifdef TEST_TFU
+	{
+		auto a = 3.1415926535897932384626433832795f * 0.25f;
+		auto si = __builtin_rx_sinf(a);
+		auto co = __builtin_rx_cosf(a);
+		utils::format("%.7f, %.7f\n") % si % co;
+	}
 #endif
 
 	LED::DIR = 1;
