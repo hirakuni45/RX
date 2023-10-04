@@ -82,7 +82,7 @@
 #include "RX600/canfd.hpp"
 // #include "RX600/rspia.hpp"
 #include "RX600/crca.hpp"
-// #include "RX600/tfuv2.hpp"
+#include "RX600/tfu.hpp"
 // #include "RX72T/s12adh.hpp"
 #include "RX600/r12da.hpp"
 // #include "RX600/temps.hpp"
