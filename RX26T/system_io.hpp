@@ -10,6 +10,7 @@
 */
 //=========================================================================//
 #include "RX26T/system.hpp"
+#include "RX26T/clock_profile.hpp"
 
 namespace device {
 
@@ -100,17 +101,6 @@ namespace device {
 				return;
 			}
 
-			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
-			// ... MAX x30.0
-			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) >= 20, "PLL_BASE clock divider underflow.");
-			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) <= 60, "PLL_BASE clock divider overflow.");
-			static_assert((clock_profile::PLL_BASE * 2 % clock_profile::BASE) == 0, "PLL_BASE clock can't divided.");
-			uint32_t n = clock_profile::PLL_BASE * 2 / clock_profile::BASE;
-			n -= 20;
-			device::SYSTEM::PLLCR.STC = n + 0b01'0011;  // base x10
-			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
-
 			// 1/64 以上、分周出来ない設定は不可
 			// ※RX72N, RX72M などは BCLK: 1/3 を選択する事が出来る。
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
@@ -127,7 +117,19 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(clock_profile::PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
 
+			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
+			// ... MAX x30.0
+			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) >= 20, "PLL_BASE clock divider underflow. (x10)");
+			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) <= 60, "PLL_BASE clock divider overflow. (x30)");
+			static_assert((clock_profile::PLL_BASE * 2 % clock_profile::BASE) == 0, "PLL_BASE clock can't divided.");
+			device::SYSTEM::PLLCR.STC = (clock_profile::PLL_BASE * 2 / clock_profile::BASE) - 1;
+			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
+			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
+
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
+			{  // dummy read register
+				volatile auto tmp = device::SYSTEM::SCKCR3();
+			}
 
 			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
@@ -138,6 +140,10 @@ namespace device {
 			}
 
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
+
+#if defined(__TFU)
+			__init_tfu();
+#endif
 		}
 	};
 
