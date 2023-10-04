@@ -21,7 +21,8 @@
 		"functional": "cpp",
 		"*.ipp": "cpp",
 		"tuple": "cpp",
-		"cstdint": "cpp"
+		"cstdint": "cpp",
+		"random": "cpp"
 	},
     "editor.detectIndentation": false,
     "editor.insertSpaces": false
