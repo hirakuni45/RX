@@ -7,7 +7,7 @@
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-#  GNU-RX 8.3.0 specific command line options:
+#  GNU-RX 8.3.0 202305 specific command line options:
 #  --mbig-endian-data
 #  --mlittle-endian-data [default]
 #  --m32bit-doubles [default]
@@ -22,13 +22,15 @@
 #  --misa=<v1|v2|v3>
 #  --mno-allow-string-insns  --mgcc-abi
 #  --mrx-abi [default]
+#  -mtfu-version=      Specify RX TFU version.
+#  -mtfu=              Enable the use of RX TFU instructions.
 #=======================================================================
 
 # System include path for each environment
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
 # C++.boost root
-LOCAL_PATH  =   /c/boost_1_74_0
+# LOCAL_PATH  =   /c/boost_1_74_0
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)
@@ -54,14 +56,14 @@ PROG_VERIFY = --verify
 ifeq ($(RX_DEF),SIG_RX220)
   RX_CPU = RX220
   RX_CHOOSE = -mcpu=rx200
-  LDSCRIPT	=	../../RX220/$(DEVICE).ld
+  LDSCRIPT	= ../../RX220/$(DEVICE).ld
   PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX63T)
   RX_CPU = RX63T
   RX_CHOOSE = -misa=v1
-  LDSCRIPT	=	../../RX63T/$(DEVICE).ld
+  LDSCRIPT	= ../../RX63T/$(DEVICE).ld
   PROG_ERASE =
 endif
 
@@ -69,60 +71,62 @@ ifeq ($(RX_DEF),SIG_RX63T_S)
 # 64/48 pin package
   RX_CPU = RX63T
   RX_CHOOSE = -misa=v1
-  LDSCRIPT	=	../../RX63T/$(DEVICE).ld
+  LDSCRIPT	= ../../RX63T/$(DEVICE).ld
   PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX621)
   RX_CPU = RX621
   RX_CHOOSE = -misa=v1
-  LDSCRIPT	=	../../RX62x/$(DEVICE).ld
+  LDSCRIPT	= ../../RX62x/$(DEVICE).ld
   PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX62N)
   RX_CPU = RX62N
   RX_CHOOSE = -misa=v1
-  LDSCRIPT	=	../../RX62x/$(DEVICE).ld
+  LDSCRIPT	= ../../RX62x/$(DEVICE).ld
   PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX631)
   RX_CPU = RX631
   RX_CHOOSE = -misa=v1
-  LDSCRIPT	=	../../RX63x/$(DEVICE).ld
+  LDSCRIPT	= ../../RX63x/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX63N)
   RX_CPU = RX63N
   RX_CHOOSE = -misa=v1
-  LDSCRIPT	=	../../RX63x/$(DEVICE).ld
+  LDSCRIPT	= ../../RX63x/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX24T)
   RX_CPU = RX24T
   RX_CHOOSE = -misa=v2
-  LDSCRIPT	=	../../RX24T/$(DEVICE).ld
+  LDSCRIPT	= ../../RX24T/$(DEVICE).ld
   PROG_VERIFY =
 endif
 
 ifeq ($(RX_DEF),SIG_RX26T)
   RX_CPU = RX26T
   RX_CHOOSE = -misa=v3
-  LDSCRIPT	=	../../RX26T/$(DEVICE).ld
+  # TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic
+  LDSCRIPT	= ../../RX26T/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX64M)
   RX_CPU = RX64M
   RX_CHOOSE = -mcpu=rx64m
-  LDSCRIPT	=	../../RX64M/$(DEVICE).ld
+  LDSCRIPT	= ../../RX64M/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX71M)
   RX_CPU = RX71M
   AS_OPT	+=	--defsym MEMWAIT=1
   RX_CHOOSE = -mcpu=rx71m
-  LDSCRIPT	=	../../RX71M/$(DEVICE).ld
+  LDSCRIPT	= ../../RX71M/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX65N)
@@ -131,20 +135,22 @@ ifeq ($(RX_DEF),SIG_RX65N)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v2
-  LDSCRIPT	=	../../RX65x/$(DEVICE).ld
+  LDSCRIPT	= ../../RX65x/$(DEVICE).ld
 endif
 
 # The RX66T cpu does not support the 'SAVE' and 'RSTR' instructions.
 ifeq ($(RX_DEF),SIG_RX66T)
   RX_CPU = RX66T
   RX_CHOOSE = -mcpu=rx66T
-  LDSCRIPT	=	../../RX66T/$(DEVICE).ld
+  LDSCRIPT	= ../../RX66T/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX72T)
   RX_CPU = RX72T
   RX_CHOOSE = -mcpu=rx72T
-  LDSCRIPT	=	../../RX72T/$(DEVICE).ld
+  # TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  LDSCRIPT	= ../../RX72T/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX72N)
@@ -153,7 +159,9 @@ ifeq ($(RX_DEF),SIG_RX72N)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v3
-  LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+  # TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  LDSCRIPT	= ../../RX72N/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX72M)
@@ -162,7 +170,9 @@ ifeq ($(RX_DEF),SIG_RX72M)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v3
-  LDSCRIPT	=	../../RX72M/$(DEVICE).ld
+  # TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  LDSCRIPT	= ../../RX72M/$(DEVICE).ld
 endif
 
 # Renesas GNU-RX gcc compiler version check
@@ -171,13 +181,13 @@ TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 # Renesas GNU-RX (8.3.0) compiler 
 ifeq ($(TARGET_ISA_TEXT),)
   # for plain gcc-7.5.0 current gcc source build
-  AS_DEFS		=	-mcpu=rx600
-  CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
-  CP_DEFS		=	-mcpu=rx600
+  AS_DEFS	+=	-mcpu=rx600
+  CC_DEFS	+=	-mcpu=rx600 -Wa,-mcpu=rxv2
+  CP_DEFS	+=	-mcpu=rx600
 else # Renesas GNU-RX gcc-8.3.0
-  AS_DEFS		=	$(RX_CHOOSE)
-  CC_DEFS		=	$(RX_CHOOSE)
-  CP_DEFS		=	$(RX_CHOOSE)
+  AS_DEFS	+=	$(RX_CHOOSE)
+  CC_DEFS	+=	$(RX_CHOOSE) $(TFU_DEF)
+  CP_DEFS	+=	$(RX_CHOOSE) $(TFU_DEF)
 endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
@@ -187,7 +197,7 @@ CINCS		=	$(SYSINCS) $(APPINCS)
 PINCS		=	$(SYSINCS) $(APPINCS)
 LIBINCS		=	$(addprefix -L, $(LIB_ROOT))
 DEFS		=	$(addprefix -D, $(USER_DEFS))
-DEFS	  +=	$(addprefix -D, $(RX_DEF))
+DEFS	   +=	$(addprefix -D, $(RX_DEF))
 LIBS		=	$(addprefix -l, $(USER_LIBS))
 
 # You should not have to change anything below here.
