@@ -14,24 +14,24 @@ Currently, a dedicated writing program has been implemented that has been tested
 Development is now possible in multiple environments.   
 
 Currently supported and tested devices:   
-|Series|Core|FPU|DFPU|Operation check|rx_prog supports|Linker file|
-|---|:-:|:-:|:-:|:-:|:-:|---|
-|RX220|RXv1|No|－|〇|〇|〇|R5F52206|
-|RX621|RXv1|Yes|－|〇|〇|〇|R5F56218|
-|RX62N|RXv1|Yes|－|〇|〇|〇|R5F562N7/8|
-|RX631|RXv1|Yes|－|〇|〇|〇|R5F5631F|
-|RX63N|RXv1|Yes|－|〇|〇|〇|R5F563NE|
-|RX64M|RXv2|Yes|－|〇|〇|〇|R5F564MF/G/J/L|
-|RX71M|RXv2|Yes|－|〇|〇|〇|R5F571MF/G/J/L|
-|RX651|RXv2|Yes|－|〇|〇|〇|R5F5651E|
-|RX65N|RXv2|Yes|－|〇|〇|〇|R5F565NE|
-|RX72N|RXv3|Yes|Yes|〇|〇|〇|R5F572ND/N|
-|RX72M|RXv3|Yes|Yes|△|△|△|R5F572MD/N|
-|RX24T|RXv2|Yes|－|〇|〇|〇|R5F524T8/A|
-|RX26T|RXv3|Yes|ー|ー|ー|ー|R5F526TF|
-|RX63T|RXv1|Yes|－|〇|〇|〇|R5F563T6|
-|RX66T|RXv3|Yes|－|〇|〇|〇|R5F566TA/E/F/K|
-|RX72T|RXv3|Yes|－|〇|〇|〇|R5F572TF/K|
+|Series|Core|FPU|TFU|DFPU|Operation check|rx_prog supports|Linker file|
+|---|:-:|:-:|:-:|:-:|:-:|:-:|---|
+|RX220|RXv1|－|－|－|〇|〇|〇|R5F52206|
+|RX621|RXv1|Yes|－|－|〇|〇|〇|R5F56218|
+|RX62N|RXv1|Yes|－|－|〇|〇|〇|R5F562N7/8|
+|RX631|RXv1|Yes|－|－|〇|〇|〇|R5F5631F|
+|RX63N|RXv1|Yes|－|－|〇|〇|〇|R5F563NE|
+|RX64M|RXv2|Yes|－|－|〇|〇|〇|R5F564MF/G/J/L|
+|RX71M|RXv2|Yes|－|－|〇|〇|〇|R5F571MF/G/J/L|
+|RX651|RXv2|Yes|－|－|〇|〇|〇|R5F5651E|
+|RX65N|RXv2|Yes|－|－|〇|〇|〇|R5F565NE|
+|RX72N|RXv3|Yes|V1|Yes|〇|〇|〇|R5F572ND/N|
+|RX72M|RXv3|Yes|V1|Yes|△|△|△|R5F572MD/N|
+|RX24T|RXv2|Yes|－|－|〇|〇|〇|R5F524T8/A|
+|RX26T|RXv3|Yes|V2|ー|〇|△|ー|R5F526TF|
+|RX63T|RXv1|Yes|－|－|〇|〇|〇|R5F563T6|
+|RX66T|RXv3|Yes|－|－|〇|〇|〇|R5F566TA/E/F/K|
+|RX72T|RXv3|Yes|V1|－|〇|〇|〇|R5F572TF/K|
     
 - The directory structure is updated daily.
 - Some features are still under construction.

@@ -1254,8 +1254,6 @@ namespace device {
 		static NCRC1_ NCRC1;
 #endif
 	};
-	typedef system_t<void> SYSTEM;
-
 	template<class _> typename system_t<_>::SPCC_ system_t<_>::SPCC;
 	template<class _> typename system_t<_>::OFS0_ system_t<_>::OFS0;
 	template<class _> typename system_t<_>::OFS1_ system_t<_>::OFS1;
@@ -1330,4 +1328,6 @@ namespace device {
 	template<class _> typename system_t<_>::NCRC0_ system_t<_>::NCRC0;
 	template<class _> typename system_t<_>::NCRC1_ system_t<_>::NCRC1;
 #endif
+
+	typedef system_t<void> SYSTEM;
 }
