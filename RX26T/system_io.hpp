@@ -70,10 +70,10 @@ namespace device {
 		{
 			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC0.b() | device::SYSTEM::PRCR.PRC1.b();
 
-///			device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
-
 			// ベースクロック周波数の検査
 			static_assert(check_base_clock_(), "BASE out of range.");
+
+//			device::SYSTEM::MOSCWTCR = 0x53;  // リセット時、初期値を利用
 
 			// メインクロック強制発振とドライブ能力設定
 			if(OSCT == clock_profile::OSC_TYPE::XTAL) {
@@ -82,10 +82,16 @@ namespace device {
 				else if(clock_profile::BASE > 16'000'000) modrv2 = 0b01;
 				else if(clock_profile::BASE > 8'000'000) modrv2 = 0b10;
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(modrv2);
-				device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
+				device::SYSTEM::MOSCCR.MOSTP = 0;  // メインクロック発振器動作
+				{
+					volatile auto tmp = device::SYSTEM::MOSCCR();
+				}
 				while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) { asm("nop"); }
 			} else if(OSCT == clock_profile::OSC_TYPE::EXT) {
 				device::SYSTEM::MOSCCR.MOSTP = 1;		// メインクロック発振器停止
+				{
+					volatile auto tmp = device::SYSTEM::MOSCCR();
+				}
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MOSEL.b();
 			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {  // 高速オンチップオシレータ
 				uint8_t frq = 0b00;
@@ -94,6 +100,9 @@ namespace device {
 				else if(clock_profile::BASE == 20'000'000) frq = 0b10;
 				device::SYSTEM::HOCOCR2.HCFRQ = frq;
 				device::SYSTEM::HOCOCR.HCSTP = 0;  // 動作
+				{
+					volatile auto tmp = device::SYSTEM::HOCOCR();
+				}
 				while(device::SYSTEM::OSCOVFSR.HCOVF() == 0) { asm("nop"); }
 				device::SYSTEM::PLLCR.PLLSRCSEL = 1;
 			} else {
@@ -110,12 +119,17 @@ namespace device {
 			static_assert(check_clock_div_(clock_profile::PCLKC), "PCLKC can't divided.");
 			static_assert(check_clock_div_(clock_profile::PCLKD), "PCLKD can't divided.");
 
+			// 未定義ビット B16 ～ B19 (ICKS) に ICK と同じ値をセット。
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
+								  | device::SYSTEM::SCKCR.ICKS.b(clock_div_(clock_profile::ICLK))
 								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
 								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(clock_profile::PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
+			{
+				volatile auto tmp = device::SYSTEM::SCKCR();
+			}
 
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
 			// ... MAX x30.0
@@ -123,7 +137,10 @@ namespace device {
 			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) <= 60, "PLL_BASE clock divider overflow. (x30)");
 			static_assert((clock_profile::PLL_BASE * 2 % clock_profile::BASE) == 0, "PLL_BASE clock can't divided.");
 			device::SYSTEM::PLLCR.STC = (clock_profile::PLL_BASE * 2 / clock_profile::BASE) - 1;
-			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
+			device::SYSTEM::PLLCR2.PLLEN = 0;  // PLL 動作
+			{
+				volatile auto tmp = device::SYSTEM::PLLCR2();
+			}
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
@@ -142,6 +159,9 @@ namespace device {
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 
 #if defined(__TFU)
+			device::TFU::FXSCIOC.IUF = 0;
+			device::TFU::FXSCIOC.OF = 0;
+			device::TFU::FXATIOC.OUF = 0;
 			__init_tfu();
 #endif
 		}

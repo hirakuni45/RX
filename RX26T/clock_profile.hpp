@@ -20,8 +20,7 @@ namespace device {
 				・PLL_BASE は、BASE の 0.5 倍単位 @n
 				・他は、PLL_BASE を基数とする整数除算値 @n
 				・選択出来ない値を指定すると、コンパイルエラーとなる @n
-				・詳細はハードウェアーマニュアル参照の事 @n
-				※PLL の範囲は、120MHz～240MHz となっているが、240MHz では不安定で動作しない。 @n
+				・詳細はハードウェアーマニュアル参照の事
 				そこで、PLL 常用周波数は 120MHz とした。
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -51,7 +50,7 @@ namespace device {
 		static constexpr uint32_t   BASE		=  16'000'000;		///< HOCO 指定の固定値 (16, 18, 20MHz)
 #endif
 #if 1
-		static constexpr uint32_t   PLL_BASE	=  120'000'000;		///< PLL ベースクロック（最大 120 to 240MHz）
+		static constexpr uint32_t   PLL_BASE	=  240'000'000;		///< PLL ベースクロック（最大 120 to 240MHz）
 
 		static constexpr uint32_t   ICLK		=  120'000'000;		///< ICLK 周波数（最大 120MHz）
 		static constexpr uint32_t   PCLKA		=  120'000'000;		///< PCLKA 周波数（最大 120MHz）
@@ -63,7 +62,7 @@ namespace device {
 		// オーバークロック実験用
 		static constexpr uint32_t   PLL_BASE	=  204'000'000;		///< PLL ベースクロック（最大 120 to 240MHz）
 
-		static constexpr uint32_t   ICLK		=  102'000'000;		///< ICLK 周波数（最大 120MHz）
+		static constexpr uint32_t   ICLK		=  204'000'000;		///< ICLK 周波数（最大 120MHz）
 		static constexpr uint32_t   PCLKA		=  102'000'000;		///< PCLKA 周波数（最大 120MHz）
 		static constexpr uint32_t   PCLKB		=   51'000'000;		///< PCLKB 周波数（最大 60MHz）
 		static constexpr uint32_t   PCLKC		=  102'000'000;		///< PCLKB 周波数（最大 120MHz）
