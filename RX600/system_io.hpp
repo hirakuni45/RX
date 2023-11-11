@@ -119,10 +119,10 @@ namespace device {
 		{
 			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC0.b() | device::SYSTEM::PRCR.PRC1.b();
 
-			device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
-
 			// ベースクロック周波数の検査
 			static_assert(check_base_clock_(), "BASE out of range.");
+
+//			device::SYSTEM::MOSCWTCR = 0x53;
 
 			// メインクロック強制発振とドライブ能力設定
 			if(OSCT == clock_profile::OSC_TYPE::XTAL) {
@@ -131,10 +131,16 @@ namespace device {
 				else if(clock_profile::BASE > 16'000'000) modrv2 = 0b01;
 				else if(clock_profile::BASE > 8'000'000) modrv2 = 0b10;
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(modrv2);
-				device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
+				device::SYSTEM::MOSCCR.MOSTP = 0;  // メインクロック発振器動作
+				{
+					volatile auto tmp = device::SYSTEM::MOSCCR();
+				}
 				while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) { asm("nop"); }
 			} else if(OSCT == clock_profile::OSC_TYPE::EXT) {
-				device::SYSTEM::MOSCCR.MOSTP = 1;		// メインクロック発振器停止
+				device::SYSTEM::MOSCCR.MOSTP = 1;  // メインクロック発振器停止
+				{
+					volatile auto tmp = device::SYSTEM::MOSCCR();
+				}
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MOSEL.b();
 			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {  // 高速オンチップオシレータ
 				uint8_t frq;
@@ -144,6 +150,9 @@ namespace device {
 				else frq = 0b00;
 				device::SYSTEM::HOCOCR2.HCFRQ = frq;
 				device::SYSTEM::HOCOCR.HCSTP = 0;  // 動作
+				{
+					volatile auto tmp = device::SYSTEM::HOCOCR();
+				}
 				while(device::SYSTEM::OSCOVFSR.HCOVF() == 0) { asm("nop"); }
 				device::SYSTEM::PLLCR.PLLSRCSEL = 1;
 			} else {
@@ -168,17 +177,6 @@ namespace device {
 				volatile auto tmp = device::SYSTEM::MEMWAIT();  // 読み出しを行う
 			}
 #endif
-			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
-			// ... MAX x30.0
-			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) >= 20, "PLL_BASE clock divider underflow.");
-			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) <= 60, "PLL_BASE clock divider overflow.");
-			static_assert((clock_profile::PLL_BASE * 2 % clock_profile::BASE) == 0, "PLL_BASE clock can't divided.");
-			uint32_t n = clock_profile::PLL_BASE * 2 / clock_profile::BASE;
-			n -= 20;
-			device::SYSTEM::PLLCR.STC = n + 0b010011;  // base x10
-			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
-
 			// 1/64 以上、分周出来ない設定は不可
 			// ※RX72N, RX72M などは BCLK: 1/3 を選択する事が出来る。
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
@@ -196,6 +194,21 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
 								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(clock_profile::PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
+			{
+				volatile auto tmp = device::SYSTEM::SCKCR();
+			}
+
+			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
+			// ... MAX x30.0
+			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) >= 20, "PLL_BASE clock divider underflow.");
+			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) <= 60, "PLL_BASE clock divider overflow.");
+			static_assert((clock_profile::PLL_BASE * 2 % clock_profile::BASE) == 0, "PLL_BASE clock can't divided.");
+			device::SYSTEM::PLLCR.STC = (clock_profile::PLL_BASE * 2 / clock_profile::BASE) - 1;
+			device::SYSTEM::PLLCR2.PLLEN = 0;  // PLL 動作
+			{
+				volatile auto tmp = device::SYSTEM::PLLCR2();
+			}
+			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
 
 			static_assert(usb_div_() >= 2 && usb_div_() <= 5, "USB Clock can't divided.");
 			// 1/2:0b0001, 1/3:0b0010, 1/4:0b0011, 1/5:0b0100
@@ -204,7 +217,10 @@ namespace device {
 			// マイクロコントローラによっては、ICLK をブーストする前に FCLK 周期を設定する必要がある。
 			device::FLASH::set_eepfclk(clock_profile::FCLK);
 
-			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
+			device::SYSTEM::SCKCR3.CKSEL = 0b100;  // PLL 選択
+			{  // dummy read register
+				volatile auto tmp = device::SYSTEM::SCKCR3();
+			}
 
 			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
