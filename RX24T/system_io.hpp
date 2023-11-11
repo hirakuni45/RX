@@ -77,16 +77,23 @@ namespace device {
 			device::SYSTEM::OPCCR = 0;  // 高速モード選択
 			while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
 
-			device::SYSTEM::MOSCWTCR = 9;	// 4ms wait
+//			device::SYSTEM::MOSCWTCR = 4;  // リセット時の値
 
 			// メインクロック・ドライブ能力設定、内部発信
 			switch(OSCT) {
 			case clock_profile::OSC_TYPE::XTAL:
-				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV21.b(clock_profile::BASE >= 10000000);
+				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV21.b(clock_profile::BASE >= 10'000'000);
 				device::SYSTEM::MOSCCR.MOSTP = 0;  // メインクロック発振器動作
+				{
+					volatile auto tmp = device::SYSTEM::MOSCCR();
+				}
+				while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) { asm("nop"); }
 				break;
 			case clock_profile::OSC_TYPE::EXT:
 				device::SYSTEM::MOSCCR.MOSTP = 1;  // メインクロック発振器停止
+				{
+					volatile auto tmp = device::SYSTEM::MOSCCR();
+				}
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MOSEL.b(1);
 				break;
 			case clock_profile::OSC_TYPE::HOCO:
@@ -104,12 +111,7 @@ namespace device {
 			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) >= 7, "PLL_BASE clock divider underflow.");
 			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) <= 31, "PLL_BASE clock divider overflow.");
 			static_assert((clock_profile::PLL_BASE * 2 % clock_profile::BASE) == 0, "PLL_BASE clock can't divided.");
-			uint32_t n = clock_profile::PLL_BASE * 2 / clock_profile::BASE;
-
-			device::SYSTEM::PLLCR.STC = n - 1;
-
-			device::SYSTEM::PLLCR2.PLLEN = 0;	// PLL 動作
-			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
+			device::SYSTEM::PLLCR.STC = (clock_profile::PLL_BASE * 2 / clock_profile::BASE) - 1;
 
 			// 1/64 以上、分周出来ない設定は不可
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
@@ -124,6 +126,12 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
 
+			device::SYSTEM::PLLCR2.PLLEN = 0;	// PLL 動作
+			{
+				volatile auto tmp = device::SYSTEM::PLLCR2();
+			}
+			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
+
 			// メモリーの WAIT 設定
 			if(clock_profile::ICLK > 64'000'000) {
 				device::SYSTEM::MEMWAIT = 0b10; // 64MHz 以上 wait 設定
@@ -134,12 +142,15 @@ namespace device {
 			}
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択
+			{  // dummy read register
+				volatile auto tmp = device::SYSTEM::SCKCR3();
+			}
 
 			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
-				device::SYSTEM::ILOCOCR.ILCSTP = 1;  ///< 低速オンチップオシレータ停止
-				device::SYSTEM::HOCOCR.HCSTP = 1;  ///< 高速オンチップオシレータ停止
+				device::SYSTEM::ILOCOCR.ILCSTP = 1;  // 低速オンチップオシレータ停止
+				device::SYSTEM::HOCOCR.HCSTP = 1;  // 高速オンチップオシレータ停止
 			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {
-				device::SYSTEM::ILOCOCR.ILCSTP = 1;  ///< 低速オンチップオシレータ停止
+				device::SYSTEM::ILOCOCR.ILCSTP = 1;  // 低速オンチップオシレータ停止
 			}
 
 			// クロック関係書き込み不許可

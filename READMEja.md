@@ -7,9 +7,14 @@ Renesas RX Microcontroller
 ## 概要
 
 これはルネサス RX マイコンと、そのコンパイラである rx-elf-gcc,g++ によるプログラムです。  
-※現在、Renesas GNU-RX gcc 8.3.0 をメインに使って開発しています。  
-※GNU-RX は、C++17 に対応したコンパイラで、RXv3、DFPU、TFU に対応しており、最適化も優れています。   
-※RX26T を利用する場合 TFUv2 に対応する場合、202305 以降のバージョンが必要。
+
+### 現在、Renesas GNU-RX gcc 8.3.0 をメインに使って開発しています。
+- [Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/)からダウンロード出来ます。
+- gcc 8.3.0 は、C++17 に対応したコンパイラで、RXv3、DFPU、TFU に対応しており、最適化も優れています。   
+- RX26T を利用する場合 TFUv2 に対応する、202305 以降のバージョンが必要です。
+- 202305 は、TFU の mathlib オプションを使うと、C++ のコンパイルで、cmath をインクルードするとエラーが発生するようです。
+
+---
 
 現在は、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
 複数の環境で、開発が出来るようになっています。
@@ -121,6 +126,7 @@ int main(int argc, char** argv)
 |[/RX72N](./RX72N)|RX72N デバイス定義クラス、リンカースクリプト|
 |[/RX72M](./RX72M)|RX72M デバイス定義クラス、リンカースクリプト|
 |[/RX24T](./RX24T)|RX24T デバイス定義クラス、リンカースクリプト|
+|[/RX26T](./RX26T)|RX26T デバイス定義クラス、リンカースクリプト|
 |[/RX63T](./RX63T)|RX63T デバイス定義クラス、リンカースクリプト|
 |[/RX66T](./RX66T)|RX66T デバイス定義クラス、リンカースクリプト|
 |[/RX72T](./RX72T)|RX72T デバイス定義クラス、リンカースクリプト|
@@ -139,27 +145,27 @@ int main(int argc, char** argv)
 
 ## サンプル・プロジェクト（アプリケーション）
 
-|ディレクトリ|RX220|RX631|RX63T|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
-|-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
-|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
-|[/MTU_sample](./MTU_sample)|－|－|－|〇|〇|〇|〇|〇|〇|〇|〇|MTU サンプルプログラム|
-|[/CAN_sample](./CAN_sample)|－|〇|－|〇|－|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
-|[/FLASH_sample](./FLASH_sample)|－|－|－|－|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
-|[/FreeRTOS](./FreeRTOS)|〇|〇|－|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS 基本動作確認サンプル|
-|[/GPTW_sample](./GPTW_sample)|－|－|－|－|△|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
-|[/I2C_sample](./I2C_sample)|〇|〇|－|－|〇|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
-|[/RAYTRACER_sample](./RAYTRACER_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
-|[/SDCARD_sample](./SDCARD_sample)|－|－|－|－|〇|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
-|[/SIDE_sample](./SIDE_sample)|－|－|－|－|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
-|[/NESEMU_sample](./NESEMU_sample)|－|－|－|－|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
-|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (DRW2D エンジン利用)|
-|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|－|－|△|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
-|[/SYNTH_sample](./SYNTH_sample)|－|－|－|－|〇|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
-|[/CALC_sample](./CALC_sample)|－|〇|－|〇|－|〇|〇|〇|〇|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
-|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
-|[/PSG_sample](./PSG_sample)|－|〇|－|〇|－|〇|〇|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
-|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|－|－|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
+|ディレクトリ|RX220|RX631|RX63T|RX62N|RX24T|RX26T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|内容|
+|-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
+|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|LED 点滅プログラム|
+|[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|シリアル通信サンプルプログラム|
+|[/MTU_sample](./MTU_sample)|－|－|－|〇|〇|ー|〇|〇|〇|〇|〇|〇|MTU サンプルプログラム|
+|[/CAN_sample](./CAN_sample)|－|〇|－|〇|－|ー|〇|〇|〇|〇|△|〇|CAN 通信サンプルプログラム|
+|[/FLASH_sample](./FLASH_sample)|－|－|－|－|ー|〇|〇|〇|〇|〇|〇|〇|内臓データフラッシュ操作サンプル|
+|[/FreeRTOS](./FreeRTOS)|〇|〇|－|〇|〇|〇|〇|〇|〇|〇|〇|〇|FreeRTOS 基本動作確認サンプル|
+|[/GPTW_sample](./GPTW_sample)|－|－|－|－|△|ー|〇|〇|－|－|△|〇|GPTW PWM サンプルプログラム|
+|[/I2C_sample](./I2C_sample)|〇|〇|－|－|〇|ー|〇|〇|〇|〇|〇|〇|I2C デバイス・アクセス・サンプル|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|－|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|レイトレーシング・ベンチマーク|
+|[/SDCARD_sample](./SDCARD_sample)|－|－|－|－|〇|ー|〇|〇|〇|△|〇|〇|SD カードの動作サンプル|
+|[/SIDE_sample](./SIDE_sample)|－|－|－|ー|－|－|－|－|－|－|〇|〇|Envision Kit, Space Invaders エミュレーター|
+|[/NESEMU_sample](./NESEMU_sample)|－|－|－|ー|－|－|－|－|－|－|〇|〇|Envision Kit, NES エミュレーター|
+|[/GUI_sample](./GUI_sample)|－|－|－|－|－|－|ー|－|－|－|〇|〇|GUI サンプル、Graphics User Interface (DRW2D エンジン利用)|
+|[/AUDIO_sample](./AUDIO_sample)|－|－|－|－|－|ー|－|△|〇|△|〇|〇|MP3/WAV オーディオプレイヤー (FreeRTOS)|
+|[/SYNTH_sample](./SYNTH_sample)|－|－|－|－|ー|ー|〇|〇|〇|〇|〇|〇|FM 音源シンセサイザー・エミュレータ|
+|[/CALC_sample](./CALC_sample)|－|〇|－|〇|－|〇|〇|〇|〇|〇|〇|〇|関数電卓サンプル (gmp, mpfr ライブラリ)|
+|[/DSOS_sample](./DSOS_sample)|－|－|－|－|－|－|ー|－|－|－|△|〇|デジタルストレージオシロスコープサンプル|
+|[/PSG_sample](./PSG_sample)|－|〇|－|〇|－|〇|〇|〇|〇|〇|〇|〇|疑似 PSG 音源演奏サンプル|
+|[/TUSB_HOST_sample](./TUSB_HOST_sample/)|－|－|ー|－|－|－|－|－|－|－|〇|〇|TinyUSB/Host サンプル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。   
 ※△：機能が不十分、未動作検証、など。
@@ -281,7 +287,7 @@ Renesas GNU-RX 8.3.0 に搭載された機能：
 
 - RXv3 コアサポート
 - 倍精度浮動小数点命令の生成
-- RX66T/RX72T/RX72N/RX72M 内蔵 TFU（三角関数演算器）のサポート
+- RX72T/RX72N/RX72M 内蔵 TFU（三角関数演算器）のサポート
 
 ---
 

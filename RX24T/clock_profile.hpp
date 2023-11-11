@@ -18,7 +18,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  クロック・プロファイル・クラス @n
-				・PLL_BASE は、BASE の 0.5 倍単位 @n
+				・PLL_BASE は、BASE の 0.5 倍単位（4 ～ 15.5 倍） @n
 				・他は、PLL_BASE を基数とする整数除算値 @n
 				・選択出来ない値を指定すると、コンパイルエラーとなる @n
 				・詳細はハードウェアーマニュアル参照の事
@@ -46,7 +46,16 @@ namespace device {
 		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		=  8'000'000;		///< HOCO 指定の固定値
 #endif
+
 #if 1
+		static constexpr uint32_t   PLL_BASE	=  80'000'000;		///< PLL ベースクロック（最大80MHz）
+
+		static constexpr uint32_t   ICLK		=  80'000'000;		///< ICLK 周波数（最大80MHz）
+		static constexpr uint32_t   PCLKA		=  80'000'000;		///< PCLKA 周波数（最大80MHz）
+		static constexpr uint32_t   PCLKB		=  40'000'000;		///< PCLKB 周波数（最大40MHz）
+		static constexpr uint32_t   PCLKD		=  40'000'000;		///< PCLKD 周波数（最大40MHz）
+		static constexpr uint32_t   FCLK		=  20'000'000;		///< FCLK 周波数（最大32MHz）
+#else
 		// オーバークロックプロファイル 120MHz
 		static constexpr uint32_t   PLL_BASE	= 120'000'000;		///< PLL ベースクロック
 
@@ -55,14 +64,6 @@ namespace device {
 		static constexpr uint32_t   PCLKB		=  60'000'000;		///< PCLKB 周波数（最大40MHz）
 		static constexpr uint32_t   PCLKD		=  60'000'000;		///< PCLKD 周波数（最大40MHz）
 		static constexpr uint32_t   FCLK		=  30'000'000;		///< FCLK 周波数（最大32MHz）
-#else
-		static constexpr uint32_t   PLL_BASE	=  80'000'000;		///< PLL ベースクロック（最大80MHz）
-
-		static constexpr uint32_t   ICLK		=  80'000'000;		///< ICLK 周波数（最大80MHz）
-		static constexpr uint32_t   PCLKA		=  80'000'000;		///< PCLKA 周波数（最大80MHz）
-		static constexpr uint32_t   PCLKB		=  40'000'000;		///< PCLKB 周波数（最大40MHz）
-		static constexpr uint32_t   PCLKD		=  40'000'000;		///< PCLKD 周波数（最大40MHz）
-		static constexpr uint32_t   FCLK		=  20'000'000;		///< FCLK 周波数（最大32MHz）
 #endif
 		static constexpr uint32_t	DELAY_MS	= ICLK / 4444444;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 		static constexpr bool		DELAY_T1	= false;			///< 微調整として、「nop」を１つ追加

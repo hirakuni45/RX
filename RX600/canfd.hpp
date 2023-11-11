@@ -88,6 +88,105 @@ namespace device {
 		static  CHCR_ CHCR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  チャネルステータスレジスタ (CHSR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct chsr_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_ro_t <in_, bitpos::B0>      RSTST;
+			bit_ro_t <in_, bitpos::B1>      HLTST;
+			bit_ro_t <in_, bitpos::B2>      SLPST;
+			bit_ro_t <in_, bitpos::B3>      EPST;
+			bit_ro_t <in_, bitpos::B4>      BOST;
+			bit_ro_t <in_, bitpos::B5>      TRMST;
+			bit_ro_t <in_, bitpos::B6>      RECST;
+			bit_ro_t <in_, bitpos::B7>      CRDY;
+			bit_ro_t <io_, bitpos::B8>      RESI;
+
+			bits_ro_t<in_, bitpos::B16, 8>  REC;
+			bits_ro_t<in_, bitpos::B24, 8>  TEC;
+		};
+		typedef chsr_t<base + 0x08> CHSR_;
+		static  CHSR_ CHSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  チャネルエラーステータスレジスタ (CHESR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct chesr_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_ro_t <io_, bitpos::B0>      BEDF;
+			bit_ro_t <io_, bitpos::B1>      EWDF;
+			bit_ro_t <io_, bitpos::B2>      EPDF;
+			bit_ro_t <io_, bitpos::B3>      BOEDF;
+			bit_ro_t <io_, bitpos::B4>      BORDF;
+			bit_ro_t <io_, bitpos::B5>      OLDF;
+			bit_ro_t <io_, bitpos::B6>      BLDF;
+			bit_ro_t <io_, bitpos::B7>      ALDF;
+			bit_ro_t <io_, bitpos::B8>      SEDF;
+			bit_ro_t <io_, bitpos::B9>      FEDF;
+			bit_ro_t <io_, bitpos::B10>     AEDF;
+			bit_ro_t <io_, bitpos::B11>     CEDF;
+			bit_ro_t <io_, bitpos::B12>     B1BDF;
+			bit_ro_t <io_, bitpos::B13>     B0EDF;
+			bit_ro_t <io_, bitpos::B14>     ADEDF;
+
+			bits_ro_t<in_, bitpos::B16, 15> CRC;
+		};
+		typedef chesr_t<base + 0x0C> CHESR_;
+		static  CHESR_ CHESR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  データビットレート設定レジスタ (DBCR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct dbcr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>  BRP;
+			bits_rw_t<io_, bitpos::B8,  5>  TSEG1;
+			bits_rw_t<io_, bitpos::B16, 4>  TSEG2;
+			bits_rw_t<io_, bitpos::B24, 4>  SJW;
+		};
+		typedef dbcr_t<base + 0x100> DBCR_;
+		static  DBCR_ DBCR;
+
+
+
+
+
+
+
 
 #if 0
 		//-----------------------------------------------------------------//
@@ -206,8 +305,14 @@ namespace device {
 		static  MB_ MB;
 #endif
 	};
-	template <uint32_t base> typename canfd_base_t<base>::NBCR_ canfd_base_t<base>::NBCR;
-	template <uint32_t base> typename canfd_base_t<base>::CHCR_ canfd_base_t<base>::CHCR;
+	template <uint32_t base> typename canfd_base_t<base>::NBCR_  canfd_base_t<base>::NBCR;
+	template <uint32_t base> typename canfd_base_t<base>::CHCR_  canfd_base_t<base>::CHCR;
+	template <uint32_t base> typename canfd_base_t<base>::CHSR_  canfd_base_t<base>::CHSR;
+	template <uint32_t base> typename canfd_base_t<base>::CHESR_ canfd_base_t<base>::CHESR;
+	template <uint32_t base> typename canfd_base_t<base>::DBCR_  canfd_base_t<base>::DBCR;
+
+
+
 
 
 

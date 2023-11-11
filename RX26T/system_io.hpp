@@ -111,7 +111,6 @@ namespace device {
 			}
 
 			// 1/64 以上、分周出来ない設定は不可
-			// ※RX72N, RX72M などは BCLK: 1/3 を選択する事が出来る。
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
 			static_assert(check_clock_div_(clock_profile::ICLK), "ICLK can't divided.");
 			static_assert(check_clock_div_(clock_profile::PCLKA), "PCLKA can't divided.");
@@ -143,17 +142,17 @@ namespace device {
 			}
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
 
-			device::SYSTEM::SCKCR3.CKSEL = 0b100;   ///< PLL 選択
+			device::SYSTEM::SCKCR3.CKSEL = 0b100;   // PLL 選択
 			{  // dummy read register
 				volatile auto tmp = device::SYSTEM::SCKCR3();
 			}
 
 			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
-				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
-				device::SYSTEM::HOCOCR.HCSTP = 1;  ///< 高速オンチップオシレータ停止
-				device::SYSTEM::HOCOPCR.HOCOPCNT = 1;  ///< 高速オンチップオシレーター電源 OFF
+				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
+				device::SYSTEM::HOCOCR.HCSTP = 1;  // 高速オンチップオシレータ停止
+				device::SYSTEM::HOCOPCR.HOCOPCNT = 1;  // 高速オンチップオシレーター電源 OFF
 			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {
-				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
+				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
 			}
 
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
