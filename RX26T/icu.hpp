@@ -133,7 +133,7 @@ namespace device {
 
 			RFDREQ0		= 140,	///< CANFD
 			RFDREQ1		= 141,	///< CANFD
-			CFDREQ9		= 142,	///< CANFD0
+			CFDREQ0		= 142,	///< CANFD0
 
 			CMIA0		= 146,	///< TMR0: CMIA0
 			CMIB0		= 147,	///< TMR0: CMIB0
@@ -360,144 +360,144 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class SELECTA : uint8_t {
-			NONE = 0,	///< なし
+			NONE = 0,		///< なし
 
-			TGIA0 = 1,	///< MTU0（TGRAのインプットキャプチャ /コンペアマッチ）
-			TGIB0,		///< MTU0（TGRBのインプットキャプチャ /コンペアマッチ）
-			TGIC0,		///< MTU0（TGRCのインプットキャプチャ /コンペアマッチ）
-			TGID0,		///< MTU0（TGRDのインプットキャプチャ /コンペアマッチ）
-			TCIV0,		///< MTU0（TCNTのオーバフロー）
-			TGIE0,		///< MTU0（TGREのインプットキャプチャ /コンペアマッチ）
-			TGIF0,		///< MTU0（TGRFのインプットキャプチャ /コンペアマッチ）
+			TGIA0 = 1,		///< MTU0（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB0,			///< MTU0（TGRBのインプットキャプチャ /コンペアマッチ）
+			TGIC0,			///< MTU0（TGRCのインプットキャプチャ /コンペアマッチ）
+			TGID0,			///< MTU0（TGRDのインプットキャプチャ /コンペアマッチ）
+			TCIV0,			///< MTU0（TCNTのオーバフロー）
+			TGIE0,			///< MTU0（TGREのインプットキャプチャ /コンペアマッチ）
+			TGIF0,			///< MTU0（TGRFのインプットキャプチャ /コンペアマッチ）
 
-			TGIA1 = 8,	///< MTU1（TGRAのインプットキャプチャ /コンペアマッチ）
-			TGIB1,		///< MTU1（TGRBのインプットキャプチャ /コンペアマッチ）
-			TCIV1,		///< MTU1（TCNTのオーバフロー）
-			TCIU1,		///< MTU1（TCNTのアンダフロー）
+			TGIA1 = 8,		///< MTU1（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB1,			///< MTU1（TGRBのインプットキャプチャ /コンペアマッチ）
+			TCIV1,			///< MTU1（TCNTのオーバフロー）
+			TCIU1,			///< MTU1（TCNTのアンダフロー）
 
-			TGIA2 = 12,	///< MTU2（TGRAのインプットキャプチャ /コンペアマッチ）
-			TGIB2,		///< MTU2（TGRBのインプットキャプチャ /コンペアマッチ）
-			TCIV2,		///< MTU2（TCNTのオーバフロー）
-			TCIU2,		///< MTU2（TCNTのアンダフロー）
+			TGIA2 = 12,		///< MTU2（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB2,			///< MTU2（TGRBのインプットキャプチャ /コンペアマッチ）
+			TCIV2,			///< MTU2（TCNTのオーバフロー）
+			TCIU2,			///< MTU2（TCNTのアンダフロー）
 
-			TGIA3 = 16,	///< MTU3（TGRAのインプットキャプチャ /コンペアマッチ）
-			TGIB3,		///< MTU3（TGRBのインプットキャプチャ /コンペアマッチ）
-			TGIC3,		///< MTU3（TGRCのインプットキャプチャ /コンペアマッチ）
-			TGID3,		///< MTU3（TGRDのインプットキャプチャ /コンペアマッチ）
-			TCIV3,		///< MTU3（TCNTのオーバフロー）
+			TGIA3 = 16,		///< MTU3（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB3,			///< MTU3（TGRBのインプットキャプチャ /コンペアマッチ）
+			TGIC3,			///< MTU3（TGRCのインプットキャプチャ /コンペアマッチ）
+			TGID3,			///< MTU3（TGRDのインプットキャプチャ /コンペアマッチ）
+			TCIV3,			///< MTU3（TCNTのオーバフロー）
 
-			TGIA4 = 21,	///< MTU4（TGRAのインプットキャプチャ /コンペアマッチ）
-			TGIB4,		///< MTU4（TGRBのインプットキャプチャ /コンペアマッチ）
-			TGIC4,		///< MTU4（TGRCのインプットキャプチャ /コンペアマッチ）
-			TGID4,		///< MTU4（TGRDのインプットキャプチャ /コンペアマッチ）
-			TCIV4,		///< MTU4（TCNTのオーバフロー /アンダフロー（相補PWMモード時のみ））
+			TGIA4 = 21,		///< MTU4（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB4,			///< MTU4（TGRBのインプットキャプチャ /コンペアマッチ）
+			TGIC4,			///< MTU4（TGRCのインプットキャプチャ /コンペアマッチ）
+			TGID4,			///< MTU4（TGRDのインプットキャプチャ /コンペアマッチ）
+			TCIV4,			///< MTU4（TCNTのオーバフロー /アンダフロー（相補PWMモード時のみ））
 
-			TGIU5 = 27,	///< MTU5（TGRUのインプットキャプチャ /コンペアマッチ）
-			TGIV5,		///< MTU5（TGRVのインプットキャプチャ /コンペアマッチ）
-			TGIW5,		///< MTU5（TGRWのインプットキャプチャ /コンペアマッチ）
+			TGIU5 = 27,		///< MTU5（TGRUのインプットキャプチャ /コンペアマッチ）
+			TGIV5,			///< MTU5（TGRVのインプットキャプチャ /コンペアマッチ）
+			TGIW5,			///< MTU5（TGRWのインプットキャプチャ /コンペアマッチ）
 
-			TGIA6 = 30,	///< MTU6（TGRAのインプットキャプチャ /コンペアマッチ）
-			TGIB6,		///< MTU6（TGRBのインプットキャプチャ /コンペアマッチ）
-			TGIC6,		///< MTU6（TGRCのインプットキャプチャ /コンペアマッチ）
-			TGID6,		///< MTU6（TGRDのインプットキャプチャ /コンペアマッチ）
-			TCIV6,		///< MTU6（TCNTのオーバフロー）
+			TGIA6 = 30,		///< MTU6（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB6,			///< MTU6（TGRBのインプットキャプチャ /コンペアマッチ）
+			TGIC6,			///< MTU6（TGRCのインプットキャプチャ /コンペアマッチ）
+			TGID6,			///< MTU6（TGRDのインプットキャプチャ /コンペアマッチ）
+			TCIV6,			///< MTU6（TCNTのオーバフロー）
 
-			TGIA7 = 35,	///< MTU7（TGRAのインプットキャプチャ /コンペアマッチ）
-			TGIB7,		///< MTU7（TGRBのインプットキャプチャ /コンペアマッチ）
-			TGIC7,		///< MTU7（TGRCのインプットキャプチャ /コンペアマッチ）
-			TGID7,		///< MTU7（TGRDのインプットキャプチャ /コンペアマッチ）
-			TCIV7,		///< MTU7（TCNTのオーバフロー /アンダフロー (相補PWMモード時のみ))
+			TGIA7 = 35,		///< MTU7（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB7,			///< MTU7（TGRBのインプットキャプチャ /コンペアマッチ）
+			TGIC7,			///< MTU7（TGRCのインプットキャプチャ /コンペアマッチ）
+			TGID7,			///< MTU7（TGRDのインプットキャプチャ /コンペアマッチ）
+			TCIV7,			///< MTU7（TCNTのオーバフロー /アンダフロー (相補PWMモード時のみ))
 
-			TGIA9 = 47,	///< MTU9（TGRAのインプットキャプチャ /コンペアマッチ）
-			TGIB9,		///< MTU9（TGRBのインプットキャプチャ /コンペアマッチ）
-			TGIC9,		///< MTU9（TGRCのインプットキャプチャ /コンペアマッチ）
-			TGID9,		///< MTU9（TGRDのインプットキャプチャ /コンペアマッチ）
-			TGIV9,		///< MTU9（TCNTのオーバフロー）
-			TGIE9,		///< MTU9 (TGREのコンペアマッチ)
-			TGIF9,		///< MTU9 (TGRFのコンペアマッチ)
+			TGIA9 = 47,		///< MTU9（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB9,			///< MTU9（TGRBのインプットキャプチャ /コンペアマッチ）
+			TGIC9,			///< MTU9（TGRCのインプットキャプチャ /コンペアマッチ）
+			TGID9,			///< MTU9（TGRDのインプットキャプチャ /コンペアマッチ）
+			TGIV9,			///< MTU9（TCNTのオーバフロー）
+			TGIE9,			///< MTU9 (TGREのコンペアマッチ)
+			TGIF9,			///< MTU9 (TGRFのコンペアマッチ)
 
-			GTCIA0 = 56,///< GPTW0 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIB0,		///< GPTW0 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIC0,		///< GPTW0 (GTCCRC レジスタのコンペアマッチ)
-			GTCID0,		///< GPTW0 (GTCCRD レジスタのコンペアマッチ)
-			GDTE0,		///< GPTW0 (デッドタイムエラー)
-			GTCIE0,		///< GPTW0 (GTCCRE レジスタのコンペアマッチ)
-			GTCIF0,		///< GPTW0 (GTCCRF レジスタのコンペアマッチ)
-			GTCIV0,		///< GPTW0 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
-			GTCIU0,		///< GPTW0 (GTCNT カウンタのアンダフロー)
+			GTCIA0 = 56,	///< GPTW0 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB0,			///< GPTW0 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC0,			///< GPTW0 (GTCCRC レジスタのコンペアマッチ)
+			GTCID0,			///< GPTW0 (GTCCRD レジスタのコンペアマッチ)
+			GDTE0,			///< GPTW0 (デッドタイムエラー)
+			GTCIE0,			///< GPTW0 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF0,			///< GPTW0 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV0,			///< GPTW0 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU0,			///< GPTW0 (GTCNT カウンタのアンダフロー)
 
-			GTCIA1 = 65,///< GPTW1 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIB1,		///< GPTW1 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIC1,		///< GPTW1 (GTCCRC レジスタのコンペアマッチ)
-			GTCID1,		///< GPTW1 (GTCCRD レジスタのコンペアマッチ)
-			GDTE1,		///< GPTW1 (デッドタイムエラー)
-			GTCIE1,		///< GPTW1 (GTCCRE レジスタのコンペアマッチ)
-			GTCIF1,		///< GPTW1 (GTCCRF レジスタのコンペアマッチ)
-			GTCIV1,		///< GPTW1 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
-			GTCIU1,		///< GPTW1 (GTCNT カウンタのアンダフロー)
+			GTCIA1 = 65,	///< GPTW1 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB1,			///< GPTW1 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC1,			///< GPTW1 (GTCCRC レジスタのコンペアマッチ)
+			GTCID1,			///< GPTW1 (GTCCRD レジスタのコンペアマッチ)
+			GDTE1,			///< GPTW1 (デッドタイムエラー)
+			GTCIE1,			///< GPTW1 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF1,			///< GPTW1 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV1,			///< GPTW1 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU1,			///< GPTW1 (GTCNT カウンタのアンダフロー)
 
-			GTCIA2 = 74,///< GPTW2 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIB2,		///< GPTW2 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIC2,		///< GPTW2 (GTCCRC レジスタのコンペアマッチ)
-			GTCID2,		///< GPTW2 (GTCCRD レジスタのコンペアマッチ)
-			GDTE2,		///< GPTW2 (デッドタイムエラー)
-			GTCIE2,		///< GPTW2 (GTCCRE レジスタのコンペアマッチ)
-			GTCIF2,		///< GPTW2 (GTCCRF レジスタのコンペアマッチ)
-			GTCIV2,		///< GPTW2 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
-			GTCIU2,		///< GPTW2 (GTCNT カウンタのアンダフロー)
+			GTCIA2 = 74,	///< GPTW2 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB2,			///< GPTW2 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC2,			///< GPTW2 (GTCCRC レジスタのコンペアマッチ)
+			GTCID2,			///< GPTW2 (GTCCRD レジスタのコンペアマッチ)
+			GDTE2,			///< GPTW2 (デッドタイムエラー)
+			GTCIE2,			///< GPTW2 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF2,			///< GPTW2 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV2,			///< GPTW2 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU2,			///< GPTW2 (GTCNT カウンタのアンダフロー)
 
-			GTCIA3 = 83,///< GPTW3 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIB3,		///< GPTW3 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIC3,		///< GPTW3 (GTCCRC レジスタのコンペアマッチ)
-			GTCID3,		///< GPTW3 (GTCCRD レジスタのコンペアマッチ)
-			GDTE3,		///< GPTW3 (デッドタイムエラー)
-			GTCIE3,		///< GPTW3 (GTCCRE レジスタのコンペアマッチ)
-			GTCIF3,		///< GPTW3 (GTCCRF レジスタのコンペアマッチ)
-			GTCIV3,		///< GPTW3 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
-			GTCIU3,		///< GPTW3 (GTCNT カウンタのアンダフロー)
+			GTCIA3 = 83,	///< GPTW3 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB3,			///< GPTW3 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC3,			///< GPTW3 (GTCCRC レジスタのコンペアマッチ)
+			GTCID3,			///< GPTW3 (GTCCRD レジスタのコンペアマッチ)
+			GDTE3,			///< GPTW3 (デッドタイムエラー)
+			GTCIE3,			///< GPTW3 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF3,			///< GPTW3 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV3,			///< GPTW3 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU3,			///< GPTW3 (GTCNT カウンタのアンダフロー)
 
-			GTCIA4 = 92,///< GPTW4 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIB4,		///< GPTW4 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIC4,		///< GPTW4 (GTCCRC レジスタのコンペアマッチ)
-			GTCID4,		///< GPTW4 (GTCCRD レジスタのコンペアマッチ)
-			GDTE4,		///< GPTW4 (デッドタイムエラー)
-			GTCIE4,		///< GPTW4 (GTCCRE レジスタのコンペアマッチ)
-			GTCIF4,		///< GPTW4 (GTCCRF レジスタのコンペアマッチ)
-			GTCIV4,		///< GPTW4 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
-			GTCIU4,		///< GPTW4 (GTCNT カウンタのアンダフロー)
+			GTCIA4 = 92,	///< GPTW4 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB4,			///< GPTW4 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC4,			///< GPTW4 (GTCCRC レジスタのコンペアマッチ)
+			GTCID4,			///< GPTW4 (GTCCRD レジスタのコンペアマッチ)
+			GDTE4,			///< GPTW4 (デッドタイムエラー)
+			GTCIE4,			///< GPTW4 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF4,			///< GPTW4 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV4,			///< GPTW4 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU4,			///< GPTW4 (GTCNT カウンタのアンダフロー)
 
-			GTCIA5 =101,///< GPTW5 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIB5,		///< GPTW5 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIC5,		///< GPTW5 (GTCCRC レジスタのコンペアマッチ)
-			GTCID5,		///< GPTW5 (GTCCRD レジスタのコンペアマッチ)
-			GDTE5,		///< GPTW5 (デッドタイムエラー)
-			GTCIE5,		///< GPTW5 (GTCCRE レジスタのコンペアマッチ)
-			GTCIF5,		///< GPTW5 (GTCCRF レジスタのコンペアマッチ)
-			GTCIV5,		///< GPTW5 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
-			GTCIU5,		///< GPTW5 (GTCNT カウンタのアンダフロー)
+			GTCIA5 =101,	///< GPTW5 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB5,			///< GPTW5 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC5,			///< GPTW5 (GTCCRC レジスタのコンペアマッチ)
+			GTCID5,			///< GPTW5 (GTCCRD レジスタのコンペアマッチ)
+			GDTE5,			///< GPTW5 (デッドタイムエラー)
+			GTCIE5,			///< GPTW5 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF5,			///< GPTW5 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV5,			///< GPTW5 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU5,			///< GPTW5 (GTCNT カウンタのアンダフロー)
 
-			GTCIA6 =110,///< GPTW6 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIB6,		///< GPTW6 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIC6,		///< GPTW6 (GTCCRC レジスタのコンペアマッチ)
-			GTCID6,		///< GPTW6 (GTCCRD レジスタのコンペアマッチ)
-			GDTE6,		///< GPTW6 (デッドタイムエラー)
-			GTCIE6,		///< GPTW6 (GTCCRE レジスタのコンペアマッチ)
-			GTCIF6,		///< GPTW6 (GTCCRF レジスタのコンペアマッチ)
-			GTCIV6,		///< GPTW6 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
-			GTCIU6,		///< GPTW6 (GTCNT カウンタのアンダフロー)
+			GTCIA6 =110,	///< GPTW6 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB6,			///< GPTW6 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC6,			///< GPTW6 (GTCCRC レジスタのコンペアマッチ)
+			GTCID6,			///< GPTW6 (GTCCRD レジスタのコンペアマッチ)
+			GDTE6,			///< GPTW6 (デッドタイムエラー)
+			GTCIE6,			///< GPTW6 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF6,			///< GPTW6 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV6,			///< GPTW6 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU6,			///< GPTW6 (GTCNT カウンタのアンダフロー)
 
-			GTCIA7 =119,///< GPTW7 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIB7,		///< GPTW7 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
-			GTCIC7,		///< GPTW7 (GTCCRC レジスタのコンペアマッチ)
-			GTCID7,		///< GPTW7 (GTCCRD レジスタのコンペアマッチ)
-			GDTE7,		///< GPTW7 (デッドタイムエラー)
-			GTCIE7,		///< GPTW7 (GTCCRE レジスタのコンペアマッチ)
-			GTCIF7,		///< GPTW7 (GTCCRF レジスタのコンペアマッチ)
-			GTCIV7,		///< GPTW7 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
-			GTCIU7,		///< GPTW7 (GTCNT カウンタのアンダフロー)
+			GTCIA7 =119,	///< GPTW7 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB7,			///< GPTW7 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC7,			///< GPTW7 (GTCCRC レジスタのコンペアマッチ)
+			GTCID7,			///< GPTW7 (GTCCRD レジスタのコンペアマッチ)
+			GDTE7,			///< GPTW7 (デッドタイムエラー)
+			GTCIE7,			///< GPTW7 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF7,			///< GPTW7 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV7,			///< GPTW7 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU7,			///< GPTW7 (GTCNT カウンタのアンダフロー)
 
-			SPCI = 146,	///< RSPIA0 / SPCI
-			SPCI0,		///< RSPI0 / SPCI
+			SPCI = 146,		///< RSPIA0 / SPCI
+			SPCI0,			///< RSPI0 / SPCI
 
 			RSCI11 = 151,	///< RSCI11 / AED
 			EC1EI,			///< CANFD / EC1EI
