@@ -210,7 +210,7 @@ namespace device {
 				SYSTEM::MSTPCRD.MSTPD5 = f;
 				break;
 
-			case peripheral::CANFD0:
+			case peripheral::CANFD:
 				SYSTEM::MSTPCRD.MSTPD10 = f;
 				break;
 

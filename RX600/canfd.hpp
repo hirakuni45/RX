@@ -922,11 +922,570 @@ namespace device {
 		static  DTSR_ DTSR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信メッセージバッファ n 制御レジスタ (TMCR[n]) (n = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmcr_t : public rw8_index_t<ofs> {
+			typedef rw8_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j <= 3) { io_::index = j; } }
+
+			bit_rw_t <io_, bitpos::B0>       TXRQ;
+			bit_rw_t <io_, bitpos::B1>       TARQ;
+			bit_rw_t <io_, bitpos::B2>       ONESHOT;
+
+			tmcr_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmcr_t<base + 0x70> TMCR_;
+		static  TMCR_ TMCR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信メッセージバッファ n ステータスレジスタ (TMSR[n]) (n = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmsr_t : public rw8_index_t<ofs> {
+			typedef rw8_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j <= 3) { io_::index = j; } }
+
+			bit_ro_t <io_, bitpos::B0>       TXSF;
+			bits_rw_t<io_, bitpos::B1, 2>    TXRF;
+			bit_ro_t <io_, bitpos::B3>       TXRQS;
+			bit_ro_t <io_, bitpos::B4>       TARQS;
+
+			tmsr_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmsr_t<base + 0x74> TMSR_;
+		static  TMSR_ TMSR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信メッセージバッファ送信要求ステータスレジスタ 0 (TMTRSR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmtrsr0_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
 
+			bit_ro_t <in_, bitpos::B0>      TXRQS0;
+			bit_ro_t <in_, bitpos::B1>      TXRQS1;
+			bit_ro_t <in_, bitpos::B2>      TXRQS2;
+			bit_ro_t <in_, bitpos::B3>      TXRQS3;
+		};
+		typedef tmtrsr0_t<base + 0x78> TMTRSR0_;
+		static  TMTRSR0_ TMTRSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信メッセージバッファ送信アボート要求ステータスレジスタ 0 (TMARSR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmarsr0_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+
+			bit_ro_t <in_, bitpos::B0>      TARQS0;
+			bit_ro_t <in_, bitpos::B1>      TARQS1;
+			bit_ro_t <in_, bitpos::B2>      TARQS2;
+			bit_ro_t <in_, bitpos::B3>      TARQS3;
+		};
+		typedef tmarsr0_t<base + 0x7C> TMARSR0_;
+		static  TMARSR0_ TMARSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信メッセージバッファ送信完了ステータスレジスタ 0 (TMTCSR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmtcsr0_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+
+			bit_ro_t <in_, bitpos::B0>      TXCF0;
+			bit_ro_t <in_, bitpos::B1>      TXCF1;
+			bit_ro_t <in_, bitpos::B2>      TXCF2;
+			bit_ro_t <in_, bitpos::B3>      TXCF3;
+		};
+		typedef tmtcsr0_t<base + 0x80> TMTCSR0_;
+		static  TMTCSR0_ TMTCSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信メッセージバッファ送信アボートステータスレジスタ 0 (TMTASR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmtasr0_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+
+			bit_ro_t <in_, bitpos::B0>      TAF0;
+			bit_ro_t <in_, bitpos::B1>      TAF1;
+			bit_ro_t <in_, bitpos::B2>      TAF2;
+			bit_ro_t <in_, bitpos::B3>      TAF3;
+		};
+		typedef tmtasr0_t<base + 0x84> TMTASR0_;
+		static  TMTASR0_ TMTASR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信メッセージバッファ割り込み許可レジスタ 0 (TMIER0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmier0_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      TMIE0;
+			bit_rw_t <io_, bitpos::B1>      TMIE1;
+			bit_rw_t <io_, bitpos::B2>      TMIE2;
+			bit_rw_t <io_, bitpos::B3>      TMIE3;
+		};
+		typedef tmier0_t<base + 0x88> TMIER0_;
+		static  TMIER0_ TMIER0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信キュー 0 設定レジスタ (TQCR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tqcr0_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      TQE;
+
+			bit_rw_t <io_, bitpos::B5>      TQIE;
+
+			bit_rw_t <io_, bitpos::B7>      TQIM;
+
+			bits_rw_t<io_, bitpos::B8, 2>   QDS;
+		};
+		typedef tqcr0_t<base + 0x8C> TQCR0_;
+		static  TQCR0_ TQCR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信キュー 0 ステータスレジスタ (TQSR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tqsr0_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_ro_t <in_, bitpos::B0>      EMPTY;
+			bit_ro_t <in_, bitpos::B1>      FULL;
+			bit_rw_t <io_, bitpos::B2>      TQIF;
+
+			bits_ro_t<in_, bitpos::B8, 3>   FLVL;
+		};
+		typedef tqsr0_t<base + 0x90> TQSR0_;
+		static  TQSR0_ TQSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信キュー 0 ポインタ制御レジスタ (TQPCR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tqpcr0_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>   VAL;
+		};
+		typedef tqpcr0_t<base + 0x94> TQPCR0_;
+		static  TQPCR0_ TQPCR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信履歴設定レジスタ (THCR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thcr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      THE;
+
+			bit_rw_t <io_, bitpos::B8>      THIE;
+			bit_rw_t <io_, bitpos::B9>      THIM;
+			bit_rw_t <io_, bitpos::B10>     THRC;
+		};
+		typedef thcr_t<base + 0x98> THCR_;
+		static  THCR_ THCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信履歴ステータスレジスタ (THSR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thsr_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_ro_t <in_, bitpos::B0>      EMPTY;
+			bit_ro_t <in_, bitpos::B1>      FULL;
+			bit_rw_t <io_, bitpos::B2>      LOST;
+			bit_rw_t <io_, bitpos::B3>      THIF;
+
+			bits_ro_t<in_, bitpos::B8, 4>   FLVL;
+		};
+		typedef thsr_t<base + 0x9C> THSR_;
+		static  THSR_ THSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信履歴アクセスレジスタ 0 (THACR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thacr0_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+
+			bits_ro_t<in_, bitpos::B0, 3>   BT;
+			bits_ro_t<in_, bitpos::B3, 2>   BN;
+
+			bits_ro_t<in_, bitpos::B16, 16> TS;
+		};
+		typedef thacr0_t<base + 0x740> THACR0_;
+		static  THACR0_ THACR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信履歴アクセスレジスタ 1 (THACR1)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thacr1_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+
+			bits_ro_t<in_, bitpos::B0,  16> PTR;
+
+			bits_ro_t<in_, bitpos::B16, 2>  IFL;
+		};
+		typedef thacr1_t<base + 0x744> THACR1_;
+		static  THACR1_ THACR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信履歴ポインタ制御レジスタ (THPCR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thpcr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>   VAL;
+		};
+		typedef thpcr_t<base + 0xA0> THPCR_;
+		static  THPCR_ THPCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グローバルリセット制御レジスタ (GRCR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct grcr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      SRST;
+
+			bits_rw_t<io_, bitpos::B8, 8>   KEY;
+		};
+		typedef grcr_t<base + 0xD8> GRCR_;
+		static  GRCR_ GRCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グローバルテストモード設定レジスタ (GTMCR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct gtmcr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B16, 4>  RTPS;
+		};
+		typedef gtmcr_t<base + 0xA8> GTMCR_;
+		static  GTMCR_ GTMCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グローバルテストモード許可レジスタ (GTMER)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct gtmer_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B2>      RTME;
+		};
+		typedef gtmer_t<base + 0xAC> GTMER_;
+		static  GTMER_ GTMER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グローバル CAN FD 設定レジスタ (GFDCFG)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct gfdcfg_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      PXEDIS;
+
+			bits_rw_t<io_, bitpos::B8, 2>   TSCPS;
+		};
+		typedef gfdcfg_t<base + 0xB0> GFDCFG_;
+		static  GFDCFG_ GFDCFG;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グローバルテストモードロックキーレジスタ (GTMLKR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct gtmlkr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>  VAL;
+		};
+		typedef gtmlkr_t<base + 0xB8> GTMLKR_;
+		static  GTMLKR_ GTMLKR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  RAM テストページアクセスレジスタ (RTPAR[k]) (k = 0 ～ 63)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rtpar_t : public rw8_index_t<ofs> {
+			typedef rw8_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j <= 63) { io_::index = j * 4; } }
+
+			rtpar_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef rtpar_t<base + 0x280> RTPAR_;
+		static  RTPAR_ RTPAR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アクセプタンスフィルタ無効エントリ設定レジスタ (AFIGSR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct afigsr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5>   IGES;
+		};
+		typedef afigsr_t<base + 0xC0> AFIGSR_;
+		static  AFIGSR_ AFIGSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アクセプタンスフィルタ無効エントリ許可レジスタ (AFIGER)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct afiger_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      IGEE;
+
+			bits_rw_t<io_, bitpos::B8, 8>   KEY;
+		};
+		typedef afiger_t<base + 0xC4> AFIGER_;
+		static  AFIGER_ AFIGER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信メッセージバッファ割り込み許可レジスタ (RMIER)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rmier_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      RMIE0;
+			bit_rw_t <io_, bitpos::B1>      RMIE1;
+			bit_rw_t <io_, bitpos::B2>      RMIE2;
+			bit_rw_t <io_, bitpos::B3>      RMIE3;
+			bit_rw_t <io_, bitpos::B4>      RMIE4;
+			bit_rw_t <io_, bitpos::B5>      RMIE5;
+			bit_rw_t <io_, bitpos::B6>      RMIE6;
+			bit_rw_t <io_, bitpos::B7>      RMIE7;
+			bit_rw_t <io_, bitpos::B8>      RMIE8;
+			bit_rw_t <io_, bitpos::B9>      RMIE9;
+			bit_rw_t <io_, bitpos::B10>     RMIE10;
+			bit_rw_t <io_, bitpos::B11>     RMIE11;
+			bit_rw_t <io_, bitpos::B12>     RMIE12;
+			bit_rw_t <io_, bitpos::B13>     RMIE13;
+			bit_rw_t <io_, bitpos::B14>     RMIE14;
+			bit_rw_t <io_, bitpos::B15>     RMIE15;
+			bit_rw_t <io_, bitpos::B16>     RMIE16;
+			bit_rw_t <io_, bitpos::B17>     RMIE17;
+			bit_rw_t <io_, bitpos::B18>     RMIE18;
+			bit_rw_t <io_, bitpos::B19>     RMIE19;
+			bit_rw_t <io_, bitpos::B20>     RMIE20;
+			bit_rw_t <io_, bitpos::B21>     RMIE21;
+			bit_rw_t <io_, bitpos::B22>     RMIE22;
+			bit_rw_t <io_, bitpos::B23>     RMIE23;
+			bit_rw_t <io_, bitpos::B24>     RMIE24;
+			bit_rw_t <io_, bitpos::B25>     RMIE25;
+			bit_rw_t <io_, bitpos::B26>     RMIE26;
+			bit_rw_t <io_, bitpos::B27>     RMIE27;
+			bit_rw_t <io_, bitpos::B28>     RMIE28;
+			bit_rw_t <io_, bitpos::B29>     RMIE29;
+			bit_rw_t <io_, bitpos::B30>     RMIE30;
+			bit_rw_t <io_, bitpos::B31>     RMIE31;
+		};
+		typedef rmier_t<base + 0x38> RMIER_;
+		static  RMIER_ RMIER;
 
 #if 0
 		//-----------------------------------------------------------------//
@@ -1015,6 +1574,7 @@ namespace device {
 		typedef mb_t MB_;
 		static  MB_ MB;
 #endif
+
 	};
 	template <uint32_t base> typename canfd_base_t<base>::NBCR_    canfd_base_t<base>::NBCR;
 	template <uint32_t base> typename canfd_base_t<base>::CHCR_    canfd_base_t<base>::CHCR;
@@ -1054,41 +1614,165 @@ namespace device {
 	template <uint32_t base> typename canfd_base_t<base>::RFISR_   canfd_base_t<base>::RFISR;
 	template <uint32_t base> typename canfd_base_t<base>::DTCR_    canfd_base_t<base>::DTCR;
 	template <uint32_t base> typename canfd_base_t<base>::DTSR_    canfd_base_t<base>::DTSR;
+	template <uint32_t base> typename canfd_base_t<base>::TMCR_    canfd_base_t<base>::TMCR;
+	template <uint32_t base> typename canfd_base_t<base>::TMSR_    canfd_base_t<base>::TMSR;
+	template <uint32_t base> typename canfd_base_t<base>::TMTRSR0_ canfd_base_t<base>::TMTRSR0;
+	template <uint32_t base> typename canfd_base_t<base>::TMARSR0_ canfd_base_t<base>::TMARSR0;
+	template <uint32_t base> typename canfd_base_t<base>::TMTCSR0_ canfd_base_t<base>::TMTCSR0;
+	template <uint32_t base> typename canfd_base_t<base>::TMTASR0_ canfd_base_t<base>::TMTASR0;
+	template <uint32_t base> typename canfd_base_t<base>::TMIER0_  canfd_base_t<base>::TMIER0;
+	template <uint32_t base> typename canfd_base_t<base>::TQCR0_   canfd_base_t<base>::TQCR0;
+	template <uint32_t base> typename canfd_base_t<base>::TQSR0_   canfd_base_t<base>::TQSR0;
+	template <uint32_t base> typename canfd_base_t<base>::TQPCR0_  canfd_base_t<base>::TQPCR0;
+	template <uint32_t base> typename canfd_base_t<base>::THCR_    canfd_base_t<base>::THCR;
+	template <uint32_t base> typename canfd_base_t<base>::THSR_    canfd_base_t<base>::THSR;
+	template <uint32_t base> typename canfd_base_t<base>::THACR0_  canfd_base_t<base>::THACR0;
+	template <uint32_t base> typename canfd_base_t<base>::THACR1_  canfd_base_t<base>::THACR1;
+	template <uint32_t base> typename canfd_base_t<base>::THPCR_   canfd_base_t<base>::THPCR;
+	template <uint32_t base> typename canfd_base_t<base>::GRCR_    canfd_base_t<base>::GRCR;
+	template <uint32_t base> typename canfd_base_t<base>::GTMCR_   canfd_base_t<base>::GTMCR;
+	template <uint32_t base> typename canfd_base_t<base>::GTMER_   canfd_base_t<base>::GTMER;
+	template <uint32_t base> typename canfd_base_t<base>::GFDCFG_  canfd_base_t<base>::GFDCFG;
+	template <uint32_t base> typename canfd_base_t<base>::GTMLKR_  canfd_base_t<base>::GTMLKR;
+	template <uint32_t base> typename canfd_base_t<base>::RTPAR_   canfd_base_t<base>::RTPAR;
+	template <uint32_t base> typename canfd_base_t<base>::AFIGSR_  canfd_base_t<base>::AFIGSR;
+	template <uint32_t base> typename canfd_base_t<base>::AFIGER_  canfd_base_t<base>::AFIGER;
+	template <uint32_t base> typename canfd_base_t<base>::RMIER_   canfd_base_t<base>::RMIER;
 
 
-
-
-
-
-
-#if 0
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	CAN モジュール（CAN 通常割り込み型 + グループ割り込み BE0）
+		@brief	CANFD ECC 制御モジュール（CANFD_ecc）
 		@param[in]	base	ベースアドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	rxf		受信 FIFO 割り込み
-		@param[in]	txf		送信 FIFO 割り込み
-		@param[in]	rxm		メールボックス受信割り込み
-		@param[in]	txm		メールボックス送信割り込み
-		@param[in]	ers		エラー割り込み（BE0 グループ割り込み）
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::GROUPBE0 ers>
-	struct canfd_t : canfd_base_t<base> {
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct canfd_ecc_t {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ECC 制御 / ステータスレジスタ (ECCSR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct eccsr_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_ro_t <in_, bitpos::B0>      ECCEF;
+			bit_ro_t <in_, bitpos::B1>      EC1EF;
+			bit_ro_t <in_, bitpos::B2>      EC2EF;
+			bit_rw_t <io_, bitpos::B3>      EC1EIE;
+			bit_rw_t <io_, bitpos::B4>      EC2EIE;
+			bit_rw_t <io_, bitpos::B5>      EC1ECD;
+			bit_rw_t <io_, bitpos::B6>      ECEDE;
+
+			bit_rw_t <io_, bitpos::B9>      EC1EC;
+			bit_rw_t <io_, bitpos::B10>     EC2EC;
+			bit_ro_t <in_, bitpos::B11>     ECOVF;
+
+			bits_rw_t<io_, bitpos::B14, 2>  ECEDWC;
+			bit_ro_t <in_, bitpos::B16>     EC1EAS;
+			bit_ro_t <in_, bitpos::B17>     EC2EAS;
+		};
+		typedef eccsr_t<base + 0x00> ECCSR_;
+		static  ECCSR_ ECCSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ECC テストモードレジスタ (ECTMR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct ectmr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B1>      ECDIS;
+
+			bit_rw_t <io_, bitpos::B7>      ECTME;
+
+			bits_rw_t<io_, bitpos::B14, 2>  ECTMWC;
+		};
+		typedef ectmr_t<base + 0x04> ECTMR_;
+		static  ECTMR_ ECTMR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ECC デコーダテストデータレジスタ (ECTDR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw32_t<base + 0x0C> ECTDR_;
+		static  ECTDR_ ECTDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ECC エラーアドレスレジスタ (ECEAR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct ecear_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 11>  ADR;
+		};
+		typedef ecear_t<base + 0x10> ECEAR_;
+		static  ECEAR_ ECEAR;
+	};
+	template <uint32_t base> typename canfd_ecc_t<base>::ECCSR_ canfd_ecc_t<base>::ECCSR;
+	template <uint32_t base> typename canfd_ecc_t<base>::ECTMR_ canfd_ecc_t<base>::ECTMR;
+	template <uint32_t base> typename canfd_ecc_t<base>::ECTDR_ canfd_ecc_t<base>::ECTDR;
+	template <uint32_t base> typename canfd_ecc_t<base>::ECEAR_ canfd_ecc_t<base>::ECEAR;
+
+
+#if defined(SIG_RX26T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	CANFD モジュール (CANFD ECC コア) for RX26T
+		@param[in]	base	ベースアドレス
+		@param[in]	ecc		ECC 制御アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, uint32_t ecc>
+	struct canfd_t : canfd_base_t<base>, canfd_ecc_t<ecc> {
+
+		static constexpr auto PERIPHERAL = peripheral::CANFD;	///< ペリフェラル型
 
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
-		static constexpr auto RXF = rxf;	///< RXF 割り込みベクター
-		static constexpr auto TXF = txf;	///< TXF 割り込みベクター
-		static constexpr auto RXM = rxm;	///< RXM 割り込みベクター
-		static constexpr auto TXM = txm;	///< TXM 割り込みベクター
-		static constexpr auto ERS = ers;	///< ERS 割り込みベクター
+
+		static constexpr auto GB0V = ICU::VECTOR::RFDREQ0;	///< グローバル０・割り込みベクター
+		static constexpr auto GB1V = ICU::VECTOR::RFDREQ1;	///< グローバル１・割り込みベクター
+		static constexpr auto CH0V = ICU::VECTOR::CFDREQ0;	///< チャネル０・割り込みベクター
+
+		static constexpr auto CHEV = ICU::GROUPBL2::CHEI;	///< チャネルエラー・割り込みベクター
+		static constexpr auto CFRV = ICU::GROUPBL2::CFRI;	///< 共通 FIFO 受信・割り込みベクター
+		static constexpr auto GLEV = ICU::GROUPBL2::GLEI;	///< グローバルエラー・割り込みベクター
+		static constexpr auto RFRV = ICU::GROUPBL2::RFRI;	///< 受信 FIFO 割り込みベクター
+		static constexpr auto CHTV = ICU::GROUPBL2::CHTI;	///< チャネル送信・割り込みベクター
+		static constexpr auto RMRV = ICU::GROUPBL2::RMRI;	///< 受信メッセージバッファ・割り込みベクター
+
+		static constexpr auto EC1V = ICU::SELECTA::EC1EI;	///< １ビット ECC エラー・割り込みベクター
+		static constexpr auto EC2V = ICU::SELECTA::EC2EI;	///< ２ビット ECC エラー・割り込みベクター
+		static constexpr auto ECOV = ICU::SELECTA::ECOVI;	///< ECC オーバーフロー・割り込みベクター
 	};
-	typedef canfd_t<0x000A'0800, peripheral::CANFD0,
-		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
-		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::GROUPBE0::ERS0> CAN0;
+	typedef canfd_t<0x000A'8000, 0x000E'D000> CANFD;
 #endif
 }
