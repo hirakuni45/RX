@@ -574,7 +574,7 @@ namespace device {
 				ret = ri3c0_(odr, ena);
 				break;
 
-			case peripheral::CANFD0:
+			case peripheral::CANFD:
 				ret = canfd0_(odr, ena);
 				break;
 
