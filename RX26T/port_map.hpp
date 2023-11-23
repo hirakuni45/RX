@@ -567,13 +567,13 @@ namespace device {
 			case peripheral::RSPIA0:
 				ret = rspia0_(odr, ena);
 				break;
+
 			case peripheral::RIIC0:
 				ret = riic0_(odr, ena);
 				break;
 			case peripheral::RI3C0:
 				ret = ri3c0_(odr, ena);
 				break;
-
 			case peripheral::CANFD:
 				ret = canfd0_(odr, ena);
 				break;
