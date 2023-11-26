@@ -646,12 +646,655 @@ namespace device {
 		static  ICSIER_ ICSIER;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	通信ステータスレジスタ (ICCSR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct iccsr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bit_rw_t <io_, bitpos::B0>      TDRE;
+			bit_rw_t <io_, bitpos::B1>      RDRF;
+			bit_rw_t <io_, bitpos::B2>      IQEFF;
+			bit_rw_t <io_, bitpos::B3>      CQEF;
+			bit_rw_t <io_, bitpos::B4>      RQFF;
+			bit_rw_t <io_, bitpos::B5>      DTAF;
+
+			bit_rw_t <io_, bitpos::B9>      DTEF;
+
+			bit_rw_t <io_, bitpos::B20>     SQFF;
+		};
+		typedef iccsr_t<base + 0x1E0> ICCSR_;
+		static  ICCSR_ ICCSR;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	通信ステータス検出許可レジスタ (ICCSER)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct iccser_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bit_rw_t <io_, bitpos::B0>      TDE;
+			bit_rw_t <io_, bitpos::B1>      RDE;
+			bit_rw_t <io_, bitpos::B2>      IQEFDE;
+			bit_rw_t <io_, bitpos::B3>      CQEDE;
+			bit_rw_t <io_, bitpos::B4>      RQFDE;
+			bit_rw_t <io_, bitpos::B5>      DTADE;
+
+			bit_rw_t <io_, bitpos::B9>      DTEDE;
+
+			bit_rw_t <io_, bitpos::B20>     SQFDE;
+		};
+		typedef iccser_t<base + 0x1E4> ICCSER_;
+		static  ICCSER_ ICCSER;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	通信ステータス割り込み許可レジスタ (ICCSIER)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct iccsier_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bit_rw_t <io_, bitpos::B0>      TIE;
+			bit_rw_t <io_, bitpos::B1>      RIE;
+			bit_rw_t <io_, bitpos::B2>      IQEFIE;
+			bit_rw_t <io_, bitpos::B3>      CQEIE;
+			bit_rw_t <io_, bitpos::B4>      RQFIE;
+			bit_rw_t <io_, bitpos::B5>      DTAIE;
+
+			bit_rw_t <io_, bitpos::B9>      DTEIE;
+
+			bit_rw_t <io_, bitpos::B20>     SQFIE;
+		};
+		typedef iccsier_t<base + 0x1E8> ICCSIER_;
+		static  ICCSIER_ ICCSIER;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	バスステータスレジスタ (ICBSR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icbsr_t : public ro32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+	
+			bit_ro_t <in_, bitpos::B0>      BFREE;
+			bit_ro_t <in_, bitpos::B1>      BVAL;
+			bit_ro_t <in_, bitpos::B2>      BIDL;
+		};
+		typedef icbsr_t<base + 0x210> ICBSR_;
+		static ICBSR_ ICBSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ターゲットデバイスアドレステーブルレジスタ (ICTDATR[m]) (m = 0 ～ 3)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct ictdatr_t : public rw32_index_t<ofs> {
+			typedef rw32_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j <= 3) { io_::index = j * 8; } }
+
+			bits_rw_t<io_, bitpos::B0,  7>  SADR;
+
+			bit_rw_t <io_, bitpos::B12>     IBIPL;
+			bit_rw_t <io_, bitpos::B13>     TIRRJ;
+			bit_rw_t <io_, bitpos::B14>     CRRRJ;
+			bit_rw_t <io_, bitpos::B15>     IBITSE;
+
+			bits_rw_t<io_, bitpos::B16, 8>  DADR;
+
+			bits_rw_t<io_, bitpos::B29, 2>  NACKRC;
+			bit_rw_t <io_, bitpos::B31>     TYPE;
+
+			ictdatr_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef ictdatr_t<base + 0x224> ICTDATR_;
+		static  ICTDATR_ ICTDATR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	拡張ターゲットデバイスアドレステーブルレジスタ (ICEDATR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icedatr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0,  7>  SADR;
+
+			bits_rw_t<io_, bitpos::B16, 8>  DADR;
+
+			bits_rw_t<io_, bitpos::B29, 2>  NACKRC;
+			bit_rw_t <io_, bitpos::B31>     TYPE;
+		};
+		typedef icedatr_t<base + 0x2A0> ICEDATR_;
+		static  ICEDATR_ ICEDATR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	デバイスアドレスレジスタ 0 (ICDAR0)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icear0_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 10>  SADR;
+
+			bit_rw_t <io_, bitpos::B12>     IBIPL;
+
+			bits_rw_t<io_, bitpos::B16, 7>  DADR;
+		};
+		typedef icear0_t<base + 0x2B0> ICEAR0_;
+		static  ICEAR0_ ICEAR0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ターゲットデバイス特性テーブルレジスタ (ICTDCTR[m]) (m = 0 ～ 3)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct ictdctr_t : public rw32_index_t<ofs> {
+			typedef rw32_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j <= 3) { io_::index = j * 4; } }
+
+			bit_rw_t <io_, bitpos::B8>      LIMIT;
+			bit_rw_t <io_, bitpos::B9>      IBIRQC;
+			bit_rw_t <io_, bitpos::B10>     IBIPL;
+			bit_rw_t <io_, bitpos::B11>     OFLC;
+
+			bits_rw_t<io_, bitpos::B14, 2>  ROLE;
+
+			ictdctr_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef ictdctr_t<base + 0x2D0> ICTDCTR_;
+		static  ICTDCTR_ ICTDCTR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	デバイス特性テーブルレジスタ (ICDCTR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icdctr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 8>   DCR;
+			bit_rw_t <io_, bitpos::B8>      LIMIT;
+			bit_rw_t <io_, bitpos::B9>      IBIRQC;
+			bit_rw_t <io_, bitpos::B10>     IBIPL;
+			bit_rw_t <io_, bitpos::B11>     OFLC;
+
+			bits_rw_t<io_, bitpos::B14, 2>  ROLE;
+		};
+		typedef icdctr_t<base + 0x320> ICDCTR_;
+		static  ICDCTR_ ICDCTR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	支給 ID 下位レジスタ (ICPIDLR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icpidlr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 16>  VAL;
+		};
+		typedef icpidlr_t<base + 0x324> ICPIDLR_;
+		static  ICPIDLR_ ICPIDLR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	支給 ID 上位レジスタ (ICPIDHR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icpidhr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 16>  VAL;
+		};
+		typedef icpidhr_t<base + 0x328> ICPIDHR_;
+		static  ICPIDHR_ ICPIDHR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	デバイスアドレスモニタレジスタ 0 (ICDAMR0)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icdamr0_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B16, 10> TADR;
+
+			bit_rw_t <io_, bitpos::B30>     SAV;
+			bit_rw_t <io_, bitpos::B31>     DAV;
+		};
+		typedef icdamr0_t<base + 0x330> ICDAMR0_;
+		static  ICDAMR0_ ICDAMR0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ターゲットイベントレジスタ (ICTEVR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct ictevr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bit_rw_t <io_, bitpos::B0>      ENINT;
+			bit_rw_t <io_, bitpos::B1>      ENCR;
+
+			bit_rw_t <io_, bitpos::B3>      ENHJ;
+		};
+		typedef ictevr_t<base + 0x350> ICTEVR_;
+		static  ICTEVR_ ICTEVR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	アクティビティステートレジスタ (ICASR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icasr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bit_rw_t <io_, bitpos::B0>      ENTAS0;
+			bit_rw_t <io_, bitpos::B1>      ENTAS1;
+			bit_rw_t <io_, bitpos::B2>      ENTAS2;
+			bit_rw_t <io_, bitpos::B3>      ENTAS3;
+		};
+		typedef icasr_t<base + 0x354> ICASR_;
+		static  ICASR_ ICASR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	最大ライト長レジスタ (ICMWLR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icmwlr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 16>   NWL;
+		};
+		typedef icmwlr_t<base + 0x358> ICMWLR_;
+		static  ICMWLR_ ICMWLR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	最大リード長レジスタ (ICMRLR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icmrlr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 16>   MRL;
+			bits_rw_t<io_, bitpos::B16, 8>   IBPL;
+		};
+		typedef icmrlr_t<base + 0x35C> ICMRLR_;
+		static  ICMRLR_ ICMRLR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	テストモードレジスタ (ICTMR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct ictmr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 8>    TM;
+		};
+		typedef ictmr_t<base + 0x360> ICTMR_;
+		static  ICTMR_ ICTMR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	デバイスステータスレジスタ (ICDSR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icdsr_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 4>    PNDINT;
+
+			bit_ro_t <in_, bitpos::B5>       PERR;
+			bits_rw_t<io_, bitpos::B6, 2>    CAS;
+			bits_rw_t<io_, bitpos::B8, 8>    VRSV;
+		};
+		typedef icdsr_t<base + 0x364> ICDSR_;
+		static  ICDSR_ ICDSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	最高ライト速度レジスタ (ICMWSR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icmwsr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 3>    MSWDR;
+		};
+		typedef icmwsr_t<base + 0x368> ICMWSR_;
+		static  ICMWSR_ ICMWSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	最高リード速度レジスタ (ICMRSR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icmrsr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 3>    MSRDR;
+			bits_rw_t<io_, bitpos::B3, 3>    TSCO;
+		};
+		typedef icmrsr_t<base + 0x36C> ICMRSR_;
+		static  ICMRSR_ ICMRSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	最大リード応答時間レジスタ (ICMTTR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icmttr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 24>   MRTT;
+
+			bit_rw_t <io_, bitpos::B31>      MRTTE;
+		};
+		typedef icmttr_t<base + 0x370> ICMTTR_;
+		static  ICMTTR_ ICMTTR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイミングサポート情報レジスタ (ICTSIR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct ictsir_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B8,  8>   FREQ;
+			bits_rw_t<io_, bitpos::B16, 8>   INAC;
+		};
+		typedef ictsir_t<base + 0x374> ICTSIR_;
+		static  ICTSIR_ ICTSIR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ビットカウントレジスタ (ICBCR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icbcr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 5>    BC;
+		};
+		typedef icbcr_t<base + 0x380> ICBCR_;
+		static  ICBCR_ ICBCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	キューバッファステータスレジスタ (ICQBSR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icqbsr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0,  8>   CQFL;
+			bits_rw_t<io_, bitpos::B8,  8>   RQFL;
+			bits_rw_t<io_, bitpos::B16, 8>   IQFL;
+			bits_rw_t<io_, bitpos::B24, 5>   ISC;
+		};
+		typedef icqbsr_t<base + 0x394> ICQBSR_;
+		static  ICQBSR_ ICQBSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	データバッファステータスレジスタ (ICDBSR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icdbsr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 8>    TBFL;
+			bits_rw_t<io_, bitpos::B8, 8>    RBFL;
+		};
+		typedef icdbsr_t<base + 0x398> ICDBSR_;
+		static  ICDBSR_ ICDBSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	受信ステータスキューステータスレジスタ (ICSQSR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icsqsr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+	
+			bits_rw_t<io_, bitpos::B0, 8>    SQFL;
+		};
+		typedef icsqsr_t<base + 0x3C0> ICSQSR_;
+		static  ICSQSR_ ICSQSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	内部ステータスモニタレジスタ (ICIMR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct icimr_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+	
+			bit_ro_t <in_, bitpos::B0>       SCLI;
+			bit_ro_t <in_, bitpos::B1>       SDAI;
+			bit_ro_t <in_, bitpos::B2>       SCLO;
+			bit_ro_t <in_, bitpos::B3>       SDAO;
+		};
+		typedef icimr_t<base + 0x3CC> ICIMR_;
+		static  ICIMR_ ICIMR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	コントローラエラーカウントレジスタ (ICCECR)
+			@param[in]	ofs		レジスタ・アドレス・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct iccecr_t : public rw32_t<ofs> {
+			typedef ro32_t<ofs> in_;
+			using in_::operator ();
+	
+			bits_ro_t<in_, bitpos::B0, 8>    CE2C;
+		};
+		typedef iccecr_t<base + 0x3D0> ICCECR_;
+		static  ICCECR_ ICCECR;
 	};
 	template <uint32_t base> typename ri3c_core_t<base>::ICMR_    ri3c_core_t<base>::ICMR;
 	template <uint32_t base> typename ri3c_core_t<base>::ICCR_    ri3c_core_t<base>::ICCR;
@@ -684,39 +1327,56 @@ namespace device {
 	template <uint32_t base> typename ri3c_core_t<base>::ICSR2_   ri3c_core_t<base>::ICSR2;
 	template <uint32_t base> typename ri3c_core_t<base>::ICSER_   ri3c_core_t<base>::ICSER;
 	template <uint32_t base> typename ri3c_core_t<base>::ICSIER_  ri3c_core_t<base>::ICSIER;
+	template <uint32_t base> typename ri3c_core_t<base>::ICCSR_   ri3c_core_t<base>::ICCSR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICCSER_  ri3c_core_t<base>::ICCSER;
+	template <uint32_t base> typename ri3c_core_t<base>::ICCSIER_ ri3c_core_t<base>::ICCSIER;
+	template <uint32_t base> typename ri3c_core_t<base>::ICBSR_   ri3c_core_t<base>::ICBSR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICTDATR_ ri3c_core_t<base>::ICTDATR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICEDATR_ ri3c_core_t<base>::ICEDATR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICEAR0_  ri3c_core_t<base>::ICEAR0;
+	template <uint32_t base> typename ri3c_core_t<base>::ICTDCTR_ ri3c_core_t<base>::ICTDCTR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICDCTR_  ri3c_core_t<base>::ICDCTR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICPIDLR_ ri3c_core_t<base>::ICPIDLR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICPIDHR_ ri3c_core_t<base>::ICPIDHR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICDAMR0_ ri3c_core_t<base>::ICDAMR0;
+	template <uint32_t base> typename ri3c_core_t<base>::ICTEVR_  ri3c_core_t<base>::ICTEVR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICASR_   ri3c_core_t<base>::ICASR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICMWLR_  ri3c_core_t<base>::ICMWLR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICMRLR_  ri3c_core_t<base>::ICMRLR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICTMR_   ri3c_core_t<base>::ICTMR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICDSR_   ri3c_core_t<base>::ICDSR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICMWSR_  ri3c_core_t<base>::ICMWSR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICMRSR_  ri3c_core_t<base>::ICMRSR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICMTTR_  ri3c_core_t<base>::ICMTTR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICTSIR_  ri3c_core_t<base>::ICTSIR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICBCR_   ri3c_core_t<base>::ICBCR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICQBSR_  ri3c_core_t<base>::ICQBSR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICDBSR_  ri3c_core_t<base>::ICDBSR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICSQSR_  ri3c_core_t<base>::ICSQSR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICIMR_   ri3c_core_t<base>::ICIMR;
+	template <uint32_t base> typename ri3c_core_t<base>::ICCECR_  ri3c_core_t<base>::ICCECR;
 
 
-
-
-#if 0
+#if defined(SIG_RX26T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  I3C バスインタフェース (RI3C)
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	txi		「送信データエンプティ」割り込みベクター
-		@param[in]	rxi		「受信データフル」割り込みベクター
-		@param[in]	eei		「通信エラー、通信イベント」割り込みベクター
-		@param[in]	tei		「送信終了」割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR eei, ICU::VECTOR tei>
+	template <uint32_t base, peripheral per>
 	struct ri3c_t : ri3c_core_t<base> {
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TXI  = txi;		///< 受信割り込みベクター
-		static constexpr auto RXI  = rxi;		///< 送信割り込みベクター
-		static constexpr auto EEI  = eei;		///< 通信エラー、イベント割り込みベクター
-		static constexpr auto TEI  = tei;		///< 送信終了割り込みベクター
+		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
+		static constexpr auto TXI   = ICU::VECTOR::TXI;		///< 送信データエンプティ・割り込みベクター
+		static constexpr auto RXI   = ICU::VECTOR::RXI;		///< 受信データフル・割り込みベクター
+		static constexpr auto IBII  = ICU::VECTOR::IBII;	///< IBI キューエンプティ／フル・割り込みベクター
+		static constexpr auto CMDI  = ICU::VECTOR::CMDI;	///< コマンドキューエンプティ・割り込みベクター
+		static constexpr auto RESPI = ICU::VECTOR::RESPI;	///< レスポンスキューフル・割り込みベクター
+		static constexpr auto RCVI  = ICU::VECTOR::RCVI;	///< 受信ステータスキューフル・割り込みベクター
+		static constexpr auto EEI   = ICU::GROUPAL1::EEI;	///< 通信エラー/通信イベント・割り込みベクター
 		static constexpr auto PCLK = clock_profile::PCLKA;	///< クロック周波数
 	};
-//	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR eei, ICU::VECTOR tei, uint32_t pclk>
-//		typename riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTL_ riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTL;
-
-
-#if defined(SIG_RX26T)
-	typedef riica_t<0x000E'C000, peripheral::RI3C0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
-		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
-#endif
+	typedef ri3c_t<0x000E'C000, peripheral::RI3C0> RI3C0;
 #endif
 }
