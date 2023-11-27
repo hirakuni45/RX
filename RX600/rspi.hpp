@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=============================================================================//
 /*!	@file
 	@brief	RX600 グループ・RSPI[abc] 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,28 +7,19 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=============================================================================//
 #include "common/device.hpp"
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  シリアルペリフェラルインタフェースクラス
+		@brief  シリアルペリフェラルインタフェースベースクラス
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	txv		送信割り込みベクター
-		@param[in]	rxv		受信割り込みベクター
-		@param[in]	pclk	PCLK 周波数
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-	struct rspi_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct rspi_base_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -122,6 +113,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> IDLNF;
 			bit_rw_t<io_, bitpos::B2> MODF;
 			bit_rw_t<io_, bitpos::B3> PERF;
+
 			bit_rw_t<io_, bitpos::B5> SPTEF;
 
 			bit_rw_t<io_, bitpos::B7> SPRF;
@@ -220,7 +212,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B4>    SPRDTD;
 			bit_rw_t <io_, bitpos::B5>    SPLW;
-			bit_rw_t <io_, bitpos::B6>    SPBYT;
+			bit_rw_t <io_, bitpos::B6>    SPBYT;	// RSPI[cd]
 		};
 		typedef spdcr_t<base + 0x0B> SPDCR_;
 		static SPDCR_ SPDCR;
@@ -352,62 +344,88 @@ namespace device {
 		static SPCMD6_ SPCMD6;
 		static SPCMD7_ SPCMD7;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCR_ rspi_t<base, per, txv, rxv, pclk>::SPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SSLP_ rspi_t<base, per, txv, rxv, pclk>::SSLP;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPPCR_ rspi_t<base, per, txv, rxv, pclk>::SPPCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPSR_ rspi_t<base, per, txv, rxv, pclk>::SPSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPDR_ rspi_t<base, per, txv, rxv, pclk>::SPDR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPSCR_ rspi_t<base, per, txv, rxv, pclk>::SPSCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPSSR_ rspi_t<base, per, txv, rxv, pclk>::SPSSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPBR_ rspi_t<base, per, txv, rxv, pclk>::SPBR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPDCR_ rspi_t<base, per, txv, rxv, pclk>::SPDCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCKD_ rspi_t<base, per, txv, rxv, pclk>::SPCKD;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SSLND_ rspi_t<base, per, txv, rxv, pclk>::SSLND;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPND_ rspi_t<base, per, txv, rxv, pclk>::SPND;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCR2_ rspi_t<base, per, txv, rxv, pclk>::SPCR2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD0_ rspi_t<base, per, txv, rxv, pclk>::SPCMD0;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD1_ rspi_t<base, per, txv, rxv, pclk>::SPCMD1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD2_ rspi_t<base, per, txv, rxv, pclk>::SPCMD2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD3_ rspi_t<base, per, txv, rxv, pclk>::SPCMD3;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD4_ rspi_t<base, per, txv, rxv, pclk>::SPCMD4;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD5_ rspi_t<base, per, txv, rxv, pclk>::SPCMD5;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD6_ rspi_t<base, per, txv, rxv, pclk>::SPCMD6;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD7_ rspi_t<base, per, txv, rxv, pclk>::SPCMD7;
+	template <uint32_t base> typename rspi_base_t<base>::SPCR_   rspi_base_t<base>::SPCR;
+	template <uint32_t base> typename rspi_base_t<base>::SSLP_   rspi_base_t<base>::SSLP;
+	template <uint32_t base> typename rspi_base_t<base>::SPPCR_  rspi_base_t<base>::SPPCR;
+	template <uint32_t base> typename rspi_base_t<base>::SPDR_   rspi_base_t<base>::SPDR;
+	template <uint32_t base> typename rspi_base_t<base>::SPSCR_  rspi_base_t<base>::SPSCR;
+	template <uint32_t base> typename rspi_base_t<base>::SPSSR_  rspi_base_t<base>::SPSSR;
+	template <uint32_t base> typename rspi_base_t<base>::SPBR_   rspi_base_t<base>::SPBR;
+	template <uint32_t base> typename rspi_base_t<base>::SPCKD_  rspi_base_t<base>::SPCKD;
+	template <uint32_t base> typename rspi_base_t<base>::SSLND_  rspi_base_t<base>::SSLND;
+	template <uint32_t base> typename rspi_base_t<base>::SPND_   rspi_base_t<base>::SPND;
+	template <uint32_t base> typename rspi_base_t<base>::SPCR2_  rspi_base_t<base>::SPCR2;
+	template <uint32_t base> typename rspi_base_t<base>::SPCMD0_ rspi_base_t<base>::SPCMD0;
+	template <uint32_t base> typename rspi_base_t<base>::SPCMD1_ rspi_base_t<base>::SPCMD1;
+	template <uint32_t base> typename rspi_base_t<base>::SPCMD2_ rspi_base_t<base>::SPCMD2;
+	template <uint32_t base> typename rspi_base_t<base>::SPCMD3_ rspi_base_t<base>::SPCMD3;
+	template <uint32_t base> typename rspi_base_t<base>::SPCMD4_ rspi_base_t<base>::SPCMD4;
+	template <uint32_t base> typename rspi_base_t<base>::SPCMD5_ rspi_base_t<base>::SPCMD5;
+	template <uint32_t base> typename rspi_base_t<base>::SPCMD6_ rspi_base_t<base>::SPCMD6;
+	template <uint32_t base> typename rspi_base_t<base>::SPCMD7_ rspi_base_t<base>::SPCMD7;
 
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  シリアルペリフェラルインタフェースクラス (c)
+		@brief  シリアルペリフェラルインタフェースクラス (RSPIa)
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	rxv		受信割り込みベクター
 		@param[in]	txv		送信割り込みベクター
 		@param[in]	pclk	PCLK 周波数
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
-	struct rspi_c_t : public rspi_t<base, per, txv, rxv, pclk> {
+	struct rspi_a_t : public rspi_base_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr bool BYTE_ACCESS = false;	///< バイトアクセス機能
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  シリアルペリフェラルインタフェースクラス (RSPIb)
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	rxv		受信割り込みベクター
+		@param[in]	txv		送信割り込みベクター
+		@param[in]	pclk	PCLK 周波数
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+	struct rspi_b_t : public rspi_base_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr bool BYTE_ACCESS = false;	///< バイトアクセス機能
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  シリアルペリフェラルインタフェースクラス (RSPIc)
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	rxv		受信割り込みベクター
+		@param[in]	txv		送信割り込みベクター
+		@param[in]	pclk	PCLK 周波数
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+	struct rspi_c_t : public rspi_base_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr bool BYTE_ACCESS = true;	///< バイトアクセス機能
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -431,50 +449,94 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
 		typename rspi_c_t<base, per, txv, rxv, pclk>::SPDCR2_ rspi_c_t<base, per, txv, rxv, pclk>::SPDCR2;
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  シリアルペリフェラルインタフェースクラス (RSPId)
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	rxv		受信割り込みベクター
+		@param[in]	txv		送信割り込みベクター
+		@param[in]	pclk	PCLK 周波数
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+	struct rspi_d_t : public rspi_base_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
+		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr bool BYTE_ACCESS = true;	///< バイトアクセス機能
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RSPI データコントロールレジスタ 2 (SPDCR2)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct spdcr2_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  BYSW;
+		};
+		typedef spdcr2_t<base + 0x20> SPDCR2_;
+		static SPDCR2_ SPDCR2;
+	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_d_t<base, per, txv, rxv, pclk>::SPDCR2_ rspi_d_t<base, per, txv, rxv, pclk>::SPDCR2;
+
+
 #if defined(SIG_RX220) || defined(SIG_RX24T)
-	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
+	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKB>  RSPI0;
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLK>  RSPI0;
-	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
+	typedef rspi_a_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
 		clock_profile::PCLK>  RSPI1;
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
 	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKB>  RSPI0;
-	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
+	typedef rspi_a_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
 		clock_profile::PCLKB>  RSPI1;
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
-	typedef rspi_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
+	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKB>  RSPI0;
-	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
+	typedef rspi_a_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
 		clock_profile::PCLKB>  RSPI1;
-	typedef rspi_t<0x0008'83C0, peripheral::RSPI2, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
+	typedef rspi_a_t<0x0008'83C0, peripheral::RSPI2, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
 		clock_profile::PCLKB>  RSPI2;
 #elif defined(SIG_RX64M)
-	typedef rspi_t<0x000D'0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
+	typedef rspi_a_t<0x000D'0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI;
 #elif defined(SIG_RX71M)
-	typedef rspi_t<0x000D'0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
+	typedef rspi_a_t<0x000D'0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI;
 	typedef rspi_t<0x000D'0120, peripheral::RSPI2, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI2;
 #elif defined(SIG_RX65N)
-	typedef rspi_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
+	typedef rspi_a_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI0;
-	typedef rspi_t<0x000D'0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
+	typedef rspi_a_t<0x000D'0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
 		clock_profile::PCLKA>  RSPI1;
-	typedef rspi_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
+	typedef rspi_a_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
 		clock_profile::PCLKA>  RSPI2;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef rspi_c_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI0;
 #elif defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
-	typedef rspi_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
+	typedef rspi_a_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI0;
-	typedef rspi_t<0x000D'0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
+	typedef rspi_a_t<0x000D'0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
 		clock_profile::PCLKA>  RSPI1;
-	typedef rspi_t<0x000D'0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
+	typedef rspi_a_t<0x000D'0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
 		clock_profile::PCLKA>  RSPI2;
 #endif
 }

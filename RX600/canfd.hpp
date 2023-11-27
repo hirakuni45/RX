@@ -967,10 +967,10 @@ namespace device {
 
 			void set_index(uint32_t j) { if(j <= 3) { io_::index = j; } }
 
-			bit_ro_t <io_, bitpos::B0>       TXSF;
+			bit_rw_t <io_, bitpos::B0>       TXSF;
 			bits_rw_t<io_, bitpos::B1, 2>    TXRF;
-			bit_ro_t <io_, bitpos::B3>       TXRQS;
-			bit_ro_t <io_, bitpos::B4>       TARQS;
+			bit_rw_t <io_, bitpos::B3>       TXRQS;
+			bit_rw_t <io_, bitpos::B4>       TARQS;
 
 			tmsr_t& operator [] (uint32_t idx) {
 				set_index(idx);
