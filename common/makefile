@@ -30,7 +30,7 @@
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
 # C++.boost root
-# LOCAL_PATH  =   /c/boost_1_74_0
+LOCAL_PATH  =   /c/boost_1_74_0
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)
