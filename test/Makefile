@@ -74,8 +74,8 @@ else # Renesas GNU-RX gcc
 AS_DEFS		=	-misa=v3
 CC_DEFS		=	-misa=v3
 # CP_DEFS		=	-misa=v3 -mdfpu -mtfu=intrinsic,mathlib
-CP_DEFS		=	-misa=v3 -mtfu=intrinsic,mathlib
-# CP_DEFS		=	-misa=v3 -mdfpu
+# CP_DEFS		=	-misa=v3 -mtfu=intrinsic,mathlib
+CP_DEFS		=	-misa=v3
 endif
 
 # Include path for each environment
