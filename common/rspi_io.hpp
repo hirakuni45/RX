@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX グループ・RSPI I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
@@ -225,8 +225,11 @@ namespace device {
 
 			RSPI::SPPCR = 0x00;	 // Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	 // sequence length: 1 
-			// BYTE access
-			RSPI::SPDCR = RSPI::SPDCR.SPBYT.b(1);
+
+			if(RSPI::BYTE_ACCESS) {  // BYTE access
+				RSPI::SPDCR = RSPI::SPDCR.SPBYT.b(1);
+			}
+
 			RSPI::SPND  = 0b011;  // 4 RSPCK + 2 PCLK
 			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
 				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(DLEN::W8))
