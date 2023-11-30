@@ -652,6 +652,16 @@ namespace device {
 		};
 		typedef prdfr0_t<0x0008'00D0> PRDFR0_;
 		static PRDFR0_ PRDFR0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  温度センサ校正データレジスタ (TSCDR) @n
+					※下位１２ビット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef rw32_t<0x007F'B17C> DSCDR_;
+		static DSCDR_ DSCDR;
 	};
 	template<class _> typename system_t<_>::SCKCR_    system_t<_>::SCKCR;
 	template<class _> typename system_t<_>::SCKCR2_   system_t<_>::SCKCR2;
@@ -686,6 +696,7 @@ namespace device {
 #endif
 	template<class _> typename system_t<_>::SWRR_     system_t<_>::SWRR;
 	template<class _> typename system_t<_>::PRDFR0_   system_t<_>::PRDFR0;
+	template<class _> typename system_t<_>::DSCDR_    system_t<_>::DSCDR;
 
 	typedef system_t<void> SYSTEM;
 }

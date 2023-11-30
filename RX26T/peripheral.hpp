@@ -43,7 +43,7 @@ namespace device {
 		MTU7,		///< マルチファンクションタイマパルスユニット 3 (MTU3d) 7
 		MTU9,		///< マルチファンクションタイマパルスユニット 3 (MTU3d) 9
 
-		POE3,		///< ポートアウトプットイネーブル 3 (POE3D)
+		POE3D,		///< ポートアウトプットイネーブル 3 (POE3D)
 
 		GPTW0,		///< 汎用 PWM タイマ (GPTWa) 0
 		GPTW1,		///< 汎用 PWM タイマ (GPTWa) 1
