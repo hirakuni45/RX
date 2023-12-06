@@ -7,7 +7,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//========================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
