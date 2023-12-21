@@ -29,7 +29,7 @@ namespace utils {
 			@param[in]	cnt	ループ回数
 		*/
 		//-----------------------------------------------------------------//
-		static void loop(uint32_t cnt) noexcept
+		static void loop(uint32_t cnt) noexcept __attribute__((noinline,noclone))
 		{
 			while(cnt > 0) {
 				asm("nop");
@@ -46,7 +46,7 @@ namespace utils {
 			@param[in]	us	待ち時間（マイクロ秒）
 		*/
 		//-----------------------------------------------------------------//
-		static void micro_second(uint32_t us) noexcept
+		static void micro_second(uint32_t us) noexcept __attribute__((noinline,noclone))
 		{
 			while(us > 0) {
 #if defined (SIG_RX220)
