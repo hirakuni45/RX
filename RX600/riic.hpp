@@ -2,6 +2,7 @@
 //=============================================================================//
 /*!	@file
 	@brief	RX220 RIIC @n
+			RX231 RIIC @n
 			RX621/RX62N RIIC 定義 @n
 			RX631/RX63N RIIC 定義 @n
 			RX24T/RX26T/RX66T/RX72T/RX64M/RX71M/RX65N RIICa 定義
@@ -485,7 +486,7 @@ namespace device {
 		static constexpr auto PCLK = pclk;		///< クロック周波数
 	};
 
-#if defined(SIG_RX220) || defined(SIG_RX24T)
+#if defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX24T)
 	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
