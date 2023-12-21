@@ -1,7 +1,18 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX600 グループ・RSPI[abc] 制御
+	@brief	RX600 グループ・RSPI[abc] 制御 @n
+			RX220 @n
+			RX231 @n
+			RX24T @n
+			RX621/RX62N @n
+			RX63T @n
+			RX631/RX63N @n
+			RX64M @n
+			RX71M @n
+			RX65N @n
+			RX66T/RX72T @n
+			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -493,7 +504,7 @@ namespace device {
 		typename rspi_d_t<base, per, txv, rxv, pclk>::SPDCR2_ rspi_d_t<base, per, txv, rxv, pclk>::SPDCR2;
 
 
-#if defined(SIG_RX220) || defined(SIG_RX24T)
+#if defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX24T)
 	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKB>  RSPI0;
 #elif defined(SIG_RX621) || defined(SIG_RX62N)

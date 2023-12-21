@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ルネサス RX ペリフェラル／デバイス選択
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -36,6 +36,30 @@
 #include "RX220/system_io.hpp"
 // #include "RX220/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+
+#elif defined(SIG_RX231)
+// #include "RX220/lvda.hpp"
+// #include "RX600/cac.hpp"
+// #include "RX220/bus.hpp"
+// #include "RX600/dmac.hpp"
+// #include "RX220/elc.hpp"
+#include "RX231/port.hpp"
+// #include "RX220/mtu2.hpp"
+// #include "RX220/poe2.hpp"
+// #include "RX600/tmr.hpp"
+// #include "RX220/rtc.hpp"
+#include "RX600/sci_g.hpp"
+// #include "RX600/sci_h.hpp"
+// #include "RX220/irda.hpp"
+// #include "RX600/crc.hpp"
+// #include "RX220/s12ad.hpp"
+// #include "RX220/cmpa.hpp"
+// #include "RX600/doc.hpp"
+// #include "RX220/flash.hpp"
+
+#include "RX231/system_io.hpp"
+// #include "RX220/flash_io.hpp"
+// #include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX24T)
 #include "RX24T/lvda.hpp"

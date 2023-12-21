@@ -3,6 +3,7 @@
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー @n
 			RX220 @n
+			RX231 @n
 			RX621/RX62N @n
 			RX631/RX63N @n
 			RX63T @n
@@ -14,7 +15,7 @@
 			RX72M @n
 			RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -31,6 +32,18 @@
 #include "RX220/port_map.hpp"
 #include "RX220/port_map_mtu.hpp"
 #include "RX220/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX231)
+#include "RX231/clock_profile.hpp"
+#include "RX231/peripheral.hpp"
+#include "RX231/system.hpp"
+#include "RX231/power_mgr.hpp"
+#include "RX231/icu.hpp"
+#include "RX231/icu_mgr.hpp"
+// #include "RX231/port_map.hpp"
+// #include "RX231/port_map_mtu.hpp"
+// #include "RX231/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
