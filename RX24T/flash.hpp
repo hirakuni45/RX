@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX24T グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,7 +7,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 
 namespace device {
@@ -41,7 +41,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DFLEN;
 		};
-		typedef dflctl_t<0x007FC090> DFLCTL_;
+		typedef dflctl_t<0x007F'C090> DFLCTL_;
 		static DFLCTL_ DFLCTL;
 
 
@@ -60,10 +60,11 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>     FENTRY0;
+
 			bit_rw_t <io_, bitpos::B7>     FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8>  FEKEY;
 		};
-		typedef fentryr_t<0x007FFFB2> FENTRYR_;
+		typedef fentryr_t<0x007F'FFB2> FENTRYR_;
 		static FENTRYR_ FENTRYR;
 
 
@@ -72,7 +73,7 @@ namespace device {
 			@brief  プロテクト解除レジスタ (FPR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x007FC180> FPR_;
+		typedef rw8_t<0x007F'C180> FPR_;
 		static FPR_ FPR;
 
 
@@ -89,7 +90,7 @@ namespace device {
 
 			bit_ro_t<io_, bitpos::B0> PERR;
 		};
-		typedef fpsr_t<0x007FC184> FPSR_;
+		typedef fpsr_t<0x007F'C184> FPSR_;
 		static FPSR_ FPSR;
 
 
@@ -108,12 +109,14 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B1>  FMS0;
+
 			bit_rw_t<io_, bitpos::B3>  RPDIS;
 			bit_rw_t<io_, bitpos::B4>  FMS1;
+
 			bit_rw_t<io_, bitpos::B6>  LVPE;
 			bit_rw_t<io_, bitpos::B7>  FMS2;
 		};
-		typedef fpmcr_t<0x007FC100> FPMCR_;
+		typedef fpmcr_t<0x007F'C100> FPMCR_;
 		static FPMCR_ FPMCR;
 
 
@@ -132,9 +135,10 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 5>  PCKA;
+
 			bits_rw_t<io_, bitpos::B6, 2>  SAS;
 		};
-		typedef fisr_t<0x007FC1D8> FISR_;
+		typedef fisr_t<0x007F'C1D8> FISR_;
 		static FISR_ FISR;
 
 
@@ -154,7 +158,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  FRESET;
 		};
-		typedef fresetr_t<0x007FC124> FRESETR_;
+		typedef fresetr_t<0x007F'C124> FRESETR_;
 		static FRESETR_ FRESETR;
 
 
@@ -174,7 +178,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  EXS;
 		};
-		typedef fasr_t<0x007FC104> FASR_;
+		typedef fasr_t<0x007F'C104> FASR_;
 		static FASR_ FASR;
 
 
@@ -193,10 +197,11 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 4>  CMD;
+
 			bit_rw_t <io_, bitpos::B6>     STOP;
 			bit_rw_t <io_, bitpos::B7>     OPST;
 		};
-		typedef fcr_t<0x007FC114> FCR_;
+		typedef fcr_t<0x007F'C114> FCR_;
 		static FCR_ FCR;
 
 
@@ -215,9 +220,10 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 3>  CMD;
+
 			bit_rw_t <io_, bitpos::B7>     OPST;
 		};
-		typedef fexcr_t<0x007FC1DC> FEXCR_;
+		typedef fexcr_t<0x007F'C1DC> FEXCR_;
 		static FEXCR_ FEXCR;
 
 
@@ -226,7 +232,7 @@ namespace device {
 			@brief  フラッシュ処理開始アドレスレジスタ H (FSARH)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x007FC110> FSARH_;
+		typedef rw16_t<0x007F'C110> FSARH_;
 		static FSARH_ FSARH;
 
 
@@ -235,7 +241,7 @@ namespace device {
 			@brief  フラッシュ処理開始アドレスレジスタ L (FSARL)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x007FC108> FSARL_;
+		typedef rw16_t<0x007F'C108> FSARL_;
 		static FSARL_ FSARL;
 
 
@@ -253,7 +259,7 @@ namespace device {
 			@brief  フラッシュ処理終了アドレスレジスタ L (FEARL)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x007FC118> FEARL_;
+		typedef rw16_t<0x007F'C118> FEARL_;
 		static FEARL_ FEARL;
 
 
@@ -262,10 +268,10 @@ namespace device {
 			@brief  フラッシュライトバッファ n レジスタ (FWBn) (n = 0 ～ 3)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x007FC130> FWB0_;
-		typedef rw16_t<0x007FC138> FWB1_;
-		typedef rw16_t<0x007FC140> FWB2_;
-		typedef rw16_t<0x007FC144> FWB3_;
+		typedef rw16_t<0x007F'C130> FWB0_;
+		typedef rw16_t<0x007F'C138> FWB1_;
+		typedef rw16_t<0x007F'C140> FWB2_;
+		typedef rw16_t<0x007F'C144> FWB3_;
 		static FWB0_ FWB0;
 		static FWB1_ FWB1;
 		static FWB2_ FWB2;
@@ -285,11 +291,12 @@ namespace device {
 
 			bit_ro_t<io_, bitpos::B0>  ERERR;
 			bit_ro_t<io_, bitpos::B1>  PRGERR;
+
 			bit_ro_t<io_, bitpos::B3>  BCERR;
 			bit_ro_t<io_, bitpos::B4>  ILGLERR;
 			bit_ro_t<io_, bitpos::B5>  EILGLERR;
 		};
-		typedef fstatr0_t<0x007FC1F0> FSTATR0_;
+		typedef fstatr0_t<0x007F'C1F0> FSTATR0_;
 		static FSTATR0_ FSTATR0;
 
 
@@ -307,7 +314,7 @@ namespace device {
 			bit_ro_t<io_, bitpos::B6>  FRDY;
 			bit_ro_t<io_, bitpos::B7>  EXRDY;
 		};
-		typedef fstatr1_t<0x007FC12C> FSTATR1_;
+		typedef fstatr1_t<0x007F'C12C> FSTATR1_;
 		static FSTATR1_ FSTATR1;
 
 
@@ -316,7 +323,7 @@ namespace device {
 			@brief  フラッシュエラーアドレスモニタレジスタ H (FEAMH)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x007FC1E8> FEAMH_;
+		typedef rw16_t<0x007F'C1E8> FEAMH_;
 		static FEAMH_ FEAMH;
 
 
@@ -325,7 +332,7 @@ namespace device {
 			@brief  フラッシュエラーアドレスモニタレジスタ L (FEAML)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x007FC1E0> FEAML_;
+		typedef rw16_t<0x007F'C1E0> FEAML_;
 		static FEAML_ FEAML;
 
 
@@ -345,7 +352,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>  SASMF;
 		};
-		typedef fscmr_t<0x007FC1C0> FSCMR_;
+		typedef fscmr_t<0x007F'C1C0> FSCMR_;
 		static FSCMR_ FSCMR;
 
 
@@ -354,7 +361,7 @@ namespace device {
 			@brief  フラッシュアクセスウィンドウ開始アドレスモニタレジスタ (FAWSMR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x007FC1C8> FAWSMR_;
+		typedef rw16_t<0x007F'C1C8> FAWSMR_;
 		static FAWSMR_ FAWSMR;
 
 
@@ -363,7 +370,7 @@ namespace device {
 			@brief  フラッシュアクセスウィンドウ終了アドレスモニタレジスタ (FAWEMR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x007FC1D0> FAWEMR_;
+		typedef rw16_t<0x007F'C1D0> FAWEMR_;
 		static FAWEMR_ FAWEMR;
 
 
@@ -372,10 +379,10 @@ namespace device {
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<0x007FC350> UIDR0_;
-		typedef ro32_t<0x007FC354> UIDR1_;
-		typedef ro32_t<0x007FC358> UIDR2_;
-		typedef ro32_t<0x007FC35C> UIDR3_;
+		typedef ro32_t<0x007F'C350> UIDR0_;
+		typedef ro32_t<0x007F'C354> UIDR1_;
+		typedef ro32_t<0x007F'C358> UIDR2_;
+		typedef ro32_t<0x007F'C35C> UIDR3_;
 		static UIDR0_ UIDR0;
 		static UIDR1_ UIDR1;
 		static UIDR2_ UIDR2;
