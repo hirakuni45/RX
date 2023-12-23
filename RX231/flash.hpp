@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・フラッシュ 定義
+	@brief	RX231 グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -387,49 +387,7 @@ namespace device {
 		static UIDR1_ UIDR1;
 		static UIDR2_ UIDR2;
 		static UIDR3_ UIDR3;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ROM キャッシュ許可レジスタ (ROMCE)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct romce_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  ROMCEN;
-		};
-		typedef romce_t<0x00081000> ROMCE_;
-		static ROMCE_ ROMCE;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ROM キャッシュ無効化レジスタ (ROMCIV)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct romciv_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  ROMCIV;
-		};
-		typedef romciv_t<0x00081004> ROMCIV_;
-		static ROMCIV_ ROMCIV;
 	};
-	typedef flash_t<void> FLASH;
-
 	template<class _> typename flash_t<_>::DFLCTL_  flash_t<_>::DFLCTL;
 	template<class _> typename flash_t<_>::FENTRYR_ flash_t<_>::FENTRYR;
 	template<class _> typename flash_t<_>::FPR_     flash_t<_>::FPR;
@@ -460,6 +418,5 @@ namespace device {
 	template<class _> typename flash_t<_>::UIDR2_   flash_t<_>::UIDR2;
 	template<class _> typename flash_t<_>::UIDR3_   flash_t<_>::UIDR3;
 
-	template<class _> typename flash_t<_>::ROMCE_   flash_t<_>::ROMCE;
-	template<class _> typename flash_t<_>::ROMCIV_  flash_t<_>::ROMCIV;
+	typedef flash_t<void> FLASH;
 }

@@ -1,13 +1,18 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX24T/RX26T/RX66T/RX72T CAC 定義
+	@brief	CAC 定義 @n
+			RX24T/RX26T @n
+			RX64M/RX71M @n
+			RX651/RX65N @n
+			RX66T/RX72T @n
+			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -177,7 +182,7 @@ namespace device {
 	template <peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::  CALLVR_ cac_t<per, INT, ferr, mend, ovff>::CALLVR;
 	template <peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::  CACNTBR_ cac_t<per, INT, ferr, mend, ovff>::CACNTBR;
 
-#if defined(SIG_RX220) || defined(SIG_RX24T)
+#if defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX24T)
 	typedef cac_t<peripheral::CAC,
 		ICU::VECTOR, ICU::VECTOR::FERRF, ICU::VECTOR::MENDF, ICU::VECTOR::OVFF> CAC;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
