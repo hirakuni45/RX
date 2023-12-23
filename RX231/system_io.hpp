@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX231 システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,7 +7,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX231/system.hpp"
 #include "RX231/clock_profile.hpp"
 
@@ -92,21 +92,15 @@ namespace device {
 #endif
 
 	public:
-		//-------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		/*!
 			@brief  システム・クロックの設定
 			@return エラーなら「false」
 		*/
-		//-------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		static bool boost_master_clock()
 		{
 			static_assert(check_base_clock_(), "BASE to overflow.");
-			static_assert(check_clock_div_(clock_profile::ICLK),  "ICLK can't divided.");
-			static_assert(check_clock_div_(clock_profile::PCLKA), "PCLKA can't divided.");
-			static_assert(check_clock_div_(clock_profile::PCLKB), "PCLKB can't divided.");
-			static_assert(check_clock_div_(clock_profile::PCLKD), "PCLKD can't divided.");
-			static_assert(check_clock_div_(clock_profile::FCLK),  "FCLK can't divided.");
-			static_assert(check_clock_div_(clock_profile::BCLK),  "BCLK can't divided.");
 
 			// クロック関係書き込み許可
 			SYSTEM::PRCR = SYSTEM::PRCR.PRKEY.b(0xA5) | SYSTEM::PRCR.PRC0.b(1);
@@ -150,16 +144,49 @@ namespace device {
 				return true;  // LOCO (125KHz)
 			}
 
+			static_assert(check_clock_div_(clock_profile::ICLK),  "ICLK can't divided.");
+			static_assert(check_clock_div_(clock_profile::PCLKA), "PCLKA can't divided.");
+			static_assert(check_clock_div_(clock_profile::PCLKB), "PCLKB can't divided.");
+			static_assert(check_clock_div_(clock_profile::PCLKD), "PCLKD can't divided.");
+			static_assert(check_clock_div_(clock_profile::FCLK),  "FCLK can't divided.");
+			static_assert(check_clock_div_(clock_profile::BCLK),  "BCLK can't divided.");
+
 			SYSTEM::SCKCR = SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
 						  | SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
 						  | SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
 						  | SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD))
-						  | SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK));
+						  | SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
+						  | SYSTEM::SCKCR.BCK.b(clock_div_(clock_profile::BCLK));
 
-			device::SYSTEM::SOSCWTCR = 0b01011;
-			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
+			{
+				volatile auto tmp = device::SYSTEM::SCKCR();  // dummy read
+			}
 
-			SYSTEM::PRCR = SYSTEM::PRCR.PRKEY.b(0xA5);
+			// Master PLL settings
+			// Min: x4 (0b000111), Max: 13.5 (0b011010)
+			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) >= 8, "PLL_BASE clock divider underflow. (x10)");
+			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) <= 27, "PLL_BASE clock divider overflow. (x30)");
+			static_assert((clock_profile::PLL_BASE * 2 % clock_profile::BASE) == 0, "PLL_BASE clock can't divided.");
+			device::SYSTEM::PLLCR.STC = (clock_profile::PLL_BASE * 2 / clock_profile::BASE) - 1;
+			device::SYSTEM::PLLCR2.PLLEN = 0;  // PLL 動作
+			{
+				volatile auto tmp = device::SYSTEM::PLLCR2();
+			}
+			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
+
+			device::SYSTEM::SCKCR3.CKSEL = 0b100;   // PLL 選択
+			{  // dummy read register
+				volatile auto tmp = device::SYSTEM::SCKCR3();
+			}
+
+			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
+				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
+				device::SYSTEM::HOCOCR.HCSTP = 1;  // 高速オンチップオシレータ停止
+			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {
+				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
+			}
+
+			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 
 			return true;
 		}

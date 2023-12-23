@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=============================================================================//
 /*!	@file
 	@brief	RX231 グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,17 +7,17 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=============================================================================//
 #include "common/io_utils.hpp"
 #include "RX600/icu_base.hpp"
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  RX231 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
 	struct icu_t : public ICU_BASE, ICU_IRQ8 {
 
@@ -27,169 +27,223 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR {
-			NONE    = 0,	///< none
+			NONE		= 0,	///< none
 
-			BUSERR  = 16,   ///< BSC
+			BUSERR		= 16,   ///< BSC
 
-			FRDYI   = 23,   ///< FCU
+			FRDYI		= 23,   ///< FCU
 
-			SWINT   = 27,   ///< ICU
-			CMI0    = 28,   ///< CMT0
-			CMI1    = 29,   ///< CMT1
-			CMI2    = 30,   ///< CMT2
-			CMI3    = 31,   ///< CMT3
-			FERRF   = 32,	///< CAC
-			MENDF   = 33,	///< CAC
-			OVFF    = 34,	///< CAC
+			SWINT		= 27,   ///< ICU
+			CMI0		= 28,   ///< CMT0
+			CMI1		= 29,   ///< CMT1
+			CMI2		= 30,   ///< CMT2
+			CMI3		= 31,   ///< CMT3
+			FERRF		= 32,	///< CAC
+			MENDF		= 33,	///< CAC
+			OVFF		= 34,	///< CAC
 
+			D0FIFO0		= 36,	///< USB0
+			D1FIFO0		= 37,
+			USBI0		= 38,
 
+			SBFAI		= 40,	///< SDHI
+			CDETI		= 41,
+			CACI		= 42,
+			SDACI		= 43,
 
+			SPEI0		= 44,	///< RSPI0
+			SPRI0		= 45,
+			SPTI0		= 46,
+			SPII0		= 47,
 
-			SPEI0   = 44,	///< RSPI0
-			SPRI0   = 45,	///< RSPI0
-			SPTI0   = 46,	///< RSPI0
-			SPII0   = 47,	///< RSPI0
+			COMFRXINT	= 52,	///< RSCAN
+			RXFINT		= 53,
+			TXINT		= 54,
+			CHERRINT	= 55,
+			GLERRINT	= 56,
 
-			DOPCF	= 57,	///< DOC
+			DOPCF		= 57,	///< DOC
 
-			CUP		= 63,	///< RTC
-			IRQ0    = 64,	///< ICU
-			IRQ1    = 65,
-			IRQ2    = 66,
-			IRQ3    = 67,
-			IRQ4    = 68,
-			IRQ5    = 69,
-			IRQ6    = 70,
-			IRQ7    = 71,
+			CMPB0		= 58,	///< CMPB0
+			CMPB1		= 59,
 
-			LVD1	= 88,   ///< LVD/CMPA
-			LVD2    = 89,	///< LVD/CMPA
+			CTSUWR		= 60,	///< CTSU
+			CTSURD		= 61,
+			CTSUFN		= 62,
 
-			ALM		= 92,	///< RTC
-			PRD		= 93,	///< RTC
+			CUP			= 63,	///< RTC
 
-			S12ADI0	= 102,	///< S12AD
-			GBADI	= 103,	///< S12AD
+			IRQ0		= 64,	///< ICU
+			IRQ1		= 65,
+			IRQ2		= 66,
+			IRQ3		= 67,
+			IRQ4		= 68,
+			IRQ5		= 69,
+			IRQ6		= 70,
+			IRQ7		= 71,
 
-			ELSR18I	= 106,	///< ELC
+			ELSR8I		= 80,	///< ELC
 
-			TGIA0   = 114,  ///< MTU0
-			TGIB0   = 115,  ///< MTU0
-			TGIC0   = 116,  ///< MTU0
-			TGID0   = 117,  ///< MTU0
-			TCIV0   = 118,  ///< MTU0
-			TGIE0   = 119,  ///< MTU0
-			TGIF0   = 120,  ///< MTU0
-			TGIA1   = 121,  ///< MTU1
-			TGIB1   = 122,  ///< MTU1
-			TCIV1   = 123,  ///< MTU1
-			TCIU1   = 124,  ///< MTU1
-			TGIA2   = 125,  ///< MTU2
-			TGIB2   = 126,  ///< MTU2
-			TCIV2   = 127,  ///< MTU2
-			TCIU2   = 128,  ///< MTU2
-			TGIA3   = 129,  ///< MTU3
-			TGIB3   = 130,  ///< MTU3
-			TGIC3   = 131,  ///< MTU3
-			TGID3   = 132,  ///< MTU3
-			TCIV3   = 133,  ///< MTU3
-			TGIA4   = 134,  ///< MTU4
-			TGIB4   = 135,  ///< MTU4
-			TGIC4   = 136,  ///< MTU4
-			TGID4   = 137,  ///< MTU4
-			TCIV4   = 138,  ///< MTU4
-			TGIU5   = 139,  ///< MTU5
-			TGIV5   = 140,  ///< MTU5
-			TGIW5   = 141,  ///< MTU5
+			LVD1		= 88,   ///< LVD/CMPA
+			LVD2    	= 89,	///< LVD/CMPA
 
-			TGI0A   = 142,	///< TPU0
-			TGI0B   = 143,	///< TPU0
-			TGI0C   = 144,	///< TPU0
-			TGI0D   = 145,	///< TPU0
-			TCI0V   = 146,	///< TPU0
-			TGI1A   = 147,	///< TPU1
-			TGI1B   = 148,	///< TPU1
-			TCI1V   = 149,	///< TPU1
-			TCI1U   = 150,	///< TPU1
-			TGI2A   = 151,	///< TPU2
-			TGI2B   = 152,	///< TPU2
-			TCI2V   = 153,	///< TPU2
-			TCI2U   = 154,	///< TPU2
-			TGI3A   = 155,	///< TPU3
-			TGI3B   = 156,	///< TPU3
-			TGI3C   = 157,	///< TPU3
-			TGI3D   = 158,	///< TPU3
-			TCI3V   = 159,	///< TPU3
-			TGI4A   = 160,	///< TPU4
-			TGI4B   = 161,	///< TPU4
-			TCI4V   = 162,	///< TPU4
-			TCI4U   = 163,	///< TPU4
-			TGI5A   = 164,	///< TPU5
-			TGI5B   = 165,	///< TPU5
-			TCI5V   = 166,	///< TPU5
-			TCI5U   = 167,	///< TPU5
+			USBR0		= 90,	///< USB0
 
-			OEI1	= 170,	///< POE
-			OEI2	= 171,	///< POE
+			VBTLVDI		= 91,	///< VBATT
 
-			CMIA0   = 174,	///< TMR0: CMIA0
-			CMIB0   = 175,	///< TMR0: CMIB0
-			OVI0    = 176,	///< TMR0: OVI0
-			CMIA1   = 177,	///< TMR1: CMIA1
-			CMIB1   = 178,	///< TMR1: CMIB1
-			OVI1    = 179,	///< TMR1: OVI1
-			CMIA2   = 180,	///< TMR2: CMIA2
-			CMIB2   = 181,	///< TMR2: CMIB2
-			OVI2    = 182,	///< TMR2: OVI2
-			CMIA3   = 183,	///< TMR3: CMIA3
-			CMIB3   = 184,	///< TMR3: CMIB3
-			OVI3    = 185,	///< TMR3: OVI3
+			ALM			= 92,	///< RTC
+			PRD			= 93,	///< RTC
 
-			DMACI0  = 198,  ///< DMACA
-			DMACI1  = 199,  ///< DMACA
-			DMACI2  = 200,  ///< DMACA
-			DMACI3  = 201,  ///< DMACA
+			S12ADI0		= 102,	///< S12AD
+			GBADI		= 103,	///< S12AD
 
-			ERI0    = 214,  ///< SCI0
-			RXI0    = 215,  ///< SCI0
-			TXI0    = 216,  ///< SCI0
-			TEI0    = 217,  ///< SCI0
-			ERI1    = 218,  ///< SCI1
-			RXI1    = 219,  ///< SCI1
-			TXI1    = 220,  ///< SCI1
-			TEI1    = 221,  ///< SCI1
+			CMPB2		= 104,	///< CMPB1
+			CMPB3		= 105,
 
-			ERI5    = 222,  ///< SCI5
-			RXI5    = 223,  ///< SCI5
-			TXI5    = 224,  ///< SCI5
-			TEI5    = 225,  ///< SCI5
-			ERI6    = 226,  ///< SCI6
-			RXI6    = 227,  ///< SCI6
-			TXI6    = 228,  ///< SCI6
-			TEI6    = 229,  ///< SCI6
+			ELSR18I		= 106,	///< ELC
+			ELSR19I		= 107,
 
-			ERI8    = 230,  ///< SCI8
-			RXI8    = 231,  ///< SCI8
-			TXI8    = 232,  ///< SCI8
-			TEI8    = 233,  ///< SCI8
-			ERI9    = 234,  ///< SCI9
-			RXI9    = 235,  ///< SCI9
-			TXI9    = 236,  ///< SCI9
-			TEI9    = 237,  ///< SCI9
+			SSIF0		= 108,	///< SSI0
+			SSIRXI0		= 109,
+			SSITXI0		= 110,
 
-			ERI12   = 238,  ///< SCI12
-			RXI12   = 239,  ///< SCI12
-			TXI12   = 240,  ///< SCI12
-			TEI12   = 241,  ///< SCI12
-			SCIX0	= 242,	///< SCI12
-			SCIX1	= 243,	///< SCI12
-			SCIX2	= 244,	///< SCI12
-			SCIX3	= 245,	///< SCI12
+			RD			= 111,	///< TSIP
+			WR			= 112,
+			ERR			= 113,
 
-			ICEEI0  = 246,  ///< RIIC0 (EEI0)
-			ICRXI0  = 247,  ///< RIIC0 (RXI0)
-			ICTXI0  = 248,  ///< RIIC0 (TXI0)
-			ICTEI0  = 249,  ///< RIIC0 (TEI0)
+			TGIA0		= 114,  ///< MTU0
+			TGIB0		= 115,
+			TGIC0		= 116,
+			TGID0		= 117,
+			TCIV0		= 118,
+			TGIE0		= 119,
+			TGIF0		= 120,
+
+			TGIA1		= 121,  ///< MTU1
+			TGIB1		= 122,
+			TCIV1		= 123,
+			TCIU1		= 124,
+
+			TGIA2		= 125,  ///< MTU2
+			TGIB2		= 126,
+			TCIV2		= 127,
+			TCIU2		= 128,
+
+			TGIA3		= 129,  ///< MTU3
+			TGIB3		= 130,
+			TGIC3		= 131,
+			TGID3		= 132,
+			TCIV3		= 133,
+
+			TGIA4		= 134,  ///< MTU4
+			TGIB4		= 135,
+			TGIC4		= 136,
+			TGID4		= 137,
+			TCIV4		= 138,
+
+			TGIU5		= 139,  ///< MTU5
+			TGIV5		= 140,
+			TGIW5		= 141,
+
+			TGI0A		= 142,	///< TPU0
+			TGI0B		= 143,
+			TGI0C		= 144,
+			TGI0D		= 145,
+			TCI0V		= 146,
+
+			TGI1A		= 147,	///< TPU1
+			TGI1B		= 148,
+			TCI1V		= 149,
+			TCI1U		= 150,
+
+			TGI2A		= 151,	///< TPU2
+			TGI2B		= 152,
+			TCI2V		= 153,
+			TCI2U		= 154,
+
+			TGI3A		= 155,	///< TPU3
+			TGI3B		= 156,
+			TGI3C		= 157,
+			TGI3D		= 158,
+			TCI3V		= 159,
+
+			TGI4A		= 160,	///< TPU4
+			TGI4B		= 161,
+			TCI4V		= 162,
+			TCI4U		= 163,
+
+			TGI5A		= 164,	///< TPU5
+			TGI5B		= 165,
+			TCI5V		= 166,
+			TCI5U		= 167,
+
+			OEI1		= 170,	///< POE
+			OEI2		= 171,
+
+			CMIA0		= 174,	///< TMR0: CMIA0
+			CMIB0		= 175,	///< TMR0: CMIB0
+			OVI0		= 176,	///< TMR0: OVI0
+
+			CMIA1		= 177,	///< TMR1: CMIA1
+			CMIB1		= 178,	///< TMR1: CMIB1
+			OVI1		= 179,	///< TMR1: OVI1
+
+			CMIA2		= 180,	///< TMR2: CMIA2
+			CMIB2		= 181,	///< TMR2: CMIB2
+			OVI2		= 182,	///< TMR2: OVI2
+
+			CMIA3		= 183,	///< TMR3: CMIA3
+			CMIB3		= 184,	///< TMR3: CMIB3
+			OVI3		= 185,	///< TMR3: OVI3
+
+			DMACI0		= 198,  ///< DMACA
+			DMACI1		= 199,
+			DMACI2		= 200,
+			DMACI3		= 201,
+
+			ERI0		= 214,  ///< SCI0
+			RXI0		= 215,  ///< SCI0
+			TXI0		= 216,  ///< SCI0
+			TEI0		= 217,  ///< SCI0
+
+			ERI1		= 218,  ///< SCI1
+			RXI1		= 219,  ///< SCI1
+			TXI1		= 220,  ///< SCI1
+			TEI1		= 221,  ///< SCI1
+
+			ERI5		= 222,  ///< SCI5
+			RXI5		= 223,  ///< SCI5
+			TXI5		= 224,  ///< SCI5
+			TEI5		= 225,  ///< SCI5
+
+			ERI6		= 226,  ///< SCI6
+			RXI6		= 227,  ///< SCI6
+			TXI6		= 228,  ///< SCI6
+			TEI6		= 229,  ///< SCI6
+
+			ERI8		= 230,  ///< SCI8
+			RXI8		= 231,  ///< SCI8
+			TXI8		= 232,  ///< SCI8
+			TEI8		= 233,  ///< SCI8
+
+			ERI9		= 234,  ///< SCI9
+			RXI9		= 235,  ///< SCI9
+			TXI9		= 236,  ///< SCI9
+			TEI9		= 237,  ///< SCI9
+
+			ERI12		= 238,  ///< SCI12
+			RXI12		= 239,  ///< SCI12
+			TXI12		= 240,  ///< SCI12
+			TEI12		= 241,  ///< SCI12
+			SCIX0		= 242,	///< SCI12
+			SCIX1		= 243,	///< SCI12
+			SCIX2		= 244,	///< SCI12
+			SCIX3		= 245,	///< SCI12
+
+			ICEEI0		= 246,  ///< RIIC0 (EEI0)
+			ICRXI0		= 247,  ///< RIIC0 (RXI0)
+			ICTXI0		= 248,  ///< RIIC0 (TXI0)
+			ICTEI0		= 249,  ///< RIIC0 (TEI0)
 		};
 
 
@@ -202,13 +256,13 @@ namespace device {
 		template <uint32_t base>
 		struct ir_t {
 
-			//-------------------------------------------------------------//
+			//-----------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
 				@param[in]	vec		割り込みベクター型
 				@return IR レジスターの参照
 			*/
-			//-------------------------------------------------------------//
+			//-----------------------------------------------------------------//
 			volatile uint8_t& operator [] (VECTOR vec) noexcept {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
@@ -298,7 +352,20 @@ namespace device {
 				case VECTOR::SPII0:
 					idx = static_cast<uint32_t>(VECTOR::SPEI0);
 					break;
-
+				case VECTOR::CTSUWR:
+				case VECTOR::CTSURD:
+				case VECTOR::CTSUFN:
+					idx = static_cast<uint32_t>(VECTOR::CTSUWR);
+					break;
+				case VECTOR::SSIF0:
+				case VECTOR::SSIRXI0:
+				case VECTOR::SSITXI0:
+					idx = static_cast<uint32_t>(VECTOR::SSIF0);
+					break;
+				case VECTOR::RD:
+				case VECTOR::WR:
+					idx = static_cast<uint32_t>(VECTOR::RD);
+					break;
 				case VECTOR::TGIA0:
 				case VECTOR::TGIB0:
 				case VECTOR::TGIC0:
