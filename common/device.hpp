@@ -41,7 +41,7 @@
 #include "RX231/power_mgr.hpp"
 #include "RX231/icu.hpp"
 #include "RX231/icu_mgr.hpp"
-// #include "RX231/port_map.hpp"
+#include "RX231/port_map.hpp"
 // #include "RX231/port_map_mtu.hpp"
 // #include "RX231/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
