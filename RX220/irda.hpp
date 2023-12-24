@@ -1,13 +1,15 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX220 グループ・IrDA 定義
+	@brief	IrDA 定義 @n
+			RX220 @n
+			RX231
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -36,7 +38,6 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B2>     IRRXINV;
 			bit_rw_t <io_, bitpos::B3>     IRTXINV;
-
 			bits_rw_t<io_, bitpos::B4, 3>  IRCKS;
 			bit_rw_t <io_, bitpos::B7>     IRE;
 		};
