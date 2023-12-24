@@ -42,6 +42,12 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX231)
+	// RX231 DIY ボード
+	static const char* system_str_ = { "RX231 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX62N)
   #if defined(CQ_FRK)
     // FRK-RX62N(CQ 出版社)

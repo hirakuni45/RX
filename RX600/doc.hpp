@@ -69,7 +69,7 @@ namespace device {
 	template <uint32_t base> typename doc_t<base>::DODSR_ doc_t<base>::DODSR;
 
 
-#if defined(SIG_RX220) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX24T)
+#if defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX24T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データ演算回路（DOC）
