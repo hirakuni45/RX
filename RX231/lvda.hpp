@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 グループ LVDAa 定義
+	@brief	RX231 グループ LVDAa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -118,9 +118,6 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>   EXVREFFINP1;
-			bit_rw_t<io_, bitpos::B1>   EXVCCINP1;
-			bit_rw_t<io_, bitpos::B2>   EXVREFFINP2;
 			bit_rw_t<io_, bitpos::B3>   EXVCCINP2;
 
 			bit_rw_t<io_, bitpos::B5>   LVD1E;
@@ -145,7 +142,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 4>   LVD1LVL;
-			bits_rw_t<io_, bitpos::B4, 4>   LVD2LVL;
+			bits_rw_t<io_, bitpos::B4, 2>   LVD2LVL;
 		};
 		typedef lvdlvlr_t<0x0008'C298>  LVDLVLR_;
 		static  LVDLVLR_ LVDLVLR;
@@ -166,10 +163,9 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>     LVD1RIE;
-			bit_rw_t <io_, bitpos::B1>     LVD1DFDIS;
+
 			bit_rw_t <io_, bitpos::B2>     LVD1CMPE;
 
-			bits_rw_t<io_, bitpos::B4, 2>  LVD1FSAMP;
 			bit_rw_t <io_, bitpos::B6>     LVD1RI;
 			bit_rw_t <io_, bitpos::B7>     LVD1RN;
 		};
@@ -192,10 +188,9 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>     LVD2RIE;
-			bit_rw_t <io_, bitpos::B1>     LVD2DFDIS;
+
 			bit_rw_t <io_, bitpos::B2>     LVD2CMPE;
 
-			bits_rw_t<io_, bitpos::B4, 2>  LVD2FSAMP;
 			bit_rw_t <io_, bitpos::B6>     LVD2RI;
 			bit_rw_t <io_, bitpos::B7>     LVD2RN;
 		};

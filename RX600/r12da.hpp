@@ -34,7 +34,7 @@ namespace device {
 			@brief  D/A データレジスタ 0（DADR0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x00088040> DADR0_;
+		typedef rw16_t<0x0008'8040> DADR0_;
 		static DADR0_ DADR0;
 
 
@@ -43,7 +43,7 @@ namespace device {
 			@brief  D/A データレジスタ 1（DADR1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x00088042> DADR1_;
+		typedef rw16_t<0x0008'8042> DADR1_;
 		static DADR1_ DADR1;
 
 
@@ -65,7 +65,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DAOE0;
 			bit_rw_t<io_, bitpos::B7> DAOE1;
 		};
-		typedef dacr_t<0x00088044> DACR_;
+		typedef dacr_t<0x0008'8044> DACR_;
 		static DACR_ DACR;
 
 
@@ -85,7 +85,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DPSEL;
 		};
-		typedef dadpr_t<0x00088045> DADPR_;
+		typedef dadpr_t<0x0008'8045> DADPR_;
 		static DADPR_ DADPR;
 
 
@@ -105,7 +105,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DAADST;
 		};
-		typedef daadscr_t<0x00088046> DAADSCR_;
+		typedef daadscr_t<0x0008'8046> DAADSCR_;
 		static DAADSCR_ DAADSCR;
 	};
 	template <peripheral per> typename r12da_t<per>::DADR0_ r12da_t<per>::DADR0;
@@ -128,7 +128,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入出力型
+			@brief  アナログ出力型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
@@ -154,7 +154,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DAAMP0;
 			bit_rw_t<io_, bitpos::B7> DAAMP1;
 		};
-		typedef daampcr_t<0x00088048> DAAMPCR_;
+		typedef daampcr_t<0x0008'8048> DAAMPCR_;
 		static DAAMPCR_ DAAMPCR;
 
 
@@ -174,7 +174,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B1> AMADSEL1;
 		};
-		typedef daadusr_t<0x0008C5C0> DAADUSR_;
+		typedef daadusr_t<0x0008'C5C0> DAADUSR_;
 		static DAADUSR_ DAADUSR;
 
 
@@ -211,6 +211,81 @@ namespace device {
 
 	typedef r12da_a_t<peripheral::R12DA> R12DA;
 
+#elif defined(SIG_RX231)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	12 ビット D/A コンバータ（R12DAA）
+		@param[in]	per		ペリフェラル型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <peripheral per>
+	struct r12da_A_t : public r12da_t<per> {
+
+		typedef r12da_t<per> base_type;
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ出力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ANALOG : uint8_t {
+			DA0,
+			DA1,
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  D/A VREF 制御レジスタ（DAVREFCR）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct davrefcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 3> REF;
+		};
+		typedef davrefcr_t<0x0008'8047> DAVREFCR_;
+		static DAVREFCR_ DAVREFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	f	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(ANALOG an, bool f = true)
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+			switch(an) {
+			case ANALOG::DA0:
+				PORT0::PCR.B3 = 0;
+				PORT0::PMR.B3 = 0;
+				MPC::P03PFS.ASEL = 1;
+				break;
+			case ANALOG::DA1:
+				PORT0::PCR.B5 = 0;
+				PORT0::PMR.B5 = 0;
+				MPC::P05PFS.ASEL = 1;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
+	};
+	template <peripheral per> typename r12da_A_t<per>::DAVREFCR_ r12da_A_t<per>::DAVREFCR;
+
+	typedef r12da_A_t<peripheral::R12DA> R12DA;
+
 #elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -225,7 +300,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入出力型
+			@brief  アナログ出力型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
@@ -253,7 +328,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  OUTREF0;
 			bit_rw_t<io_, bitpos::B3>  OUTREF1;
 		};
-		typedef dadselr_t<0x00088049> DADSELR_;
+		typedef dadselr_t<0x0008'8049> DADSELR_;
 		static DADSELR_ DADSELR;
 
 

@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 グループ・RTCc 定義
+	@brief	RX231 グループ・RTCe 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -572,39 +572,276 @@ namespace device {
 		};
 		typedef radj_t<0x0008'C42E> RADJ_;
 		static  RADJ_ RADJ;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  時間キャプチャ制御レジスタ y（RTCCRy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rtccr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> TCCT;
+			bit_rw_t <io_, bitpos::B2>    TCST;
+
+			bits_rw_t<io_, bitpos::B4, 2> TCNF;
+			bit_rw_t <io_, bitpos::B7>    TCEN;
+		};
+		typedef rtccr_t<0x0008'C440> RTCCR0_;
+		static  RTCCR0_ RTCCR0;
+		typedef rtccr_t<0x0008'C442> RTCCR1_;
+		static  RTCCR1_ RTCCR1;
+		typedef rtccr_t<0x0008'C444> RTCCR2_;
+		static  RTCCR2_ RTCCR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  秒キャプチャレジスタ y（RSECCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rseccp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> SEC1;
+			bits_rw_t<io_, bitpos::B4, 3> SEC10;
+		};
+		typedef rseccp_t<0x0008'C452> RSECCP0_;
+		static  RSECCP0_ RSECCP0;
+		typedef rseccp_t<0x0008'C462> RSECCP1_;
+		static  RSECCP1_ RSECCP1;
+		typedef rseccp_t<0x0008'C472> RSECCP2_;
+		static  RSECCP2_ RSECCP2;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  BCNT0 キャプチャレジスタ y（BCNT0CPy）（y=0 ～ 2）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C452> BCNT0CP0_;
+		static  BCNT0CP0_ BCNT0CP0;
+		typedef rw8_t<0x0008'C462> BCNT0CP1_;
+		static  BCNT0CP1_ BCNT0CP1;
+		typedef rw8_t<0x0008'C472> BCNT0CP2_;
+		static  BCNT0CP2_ BCNT0CP2;
+	
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  分キャプチャレジスタ y（RMINCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rmincp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> MIN1;
+			bits_rw_t<io_, bitpos::B4, 3> MIN10;
+		};
+		typedef rmincp_t<0x0008'C454> RMINCP0_;
+		static  RMINCP0_ RMINCP0;
+		typedef rmincp_t<0x0008'C464> RMINCP1_;
+		static  RMINCP1_ RMINCP1;
+		typedef rmincp_t<0x0008'C474> RMINCP2_;
+		static  RMINCP2_ RMINCP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  BCNT1 キャプチャレジスタ y（BCNT1CPy）（y=0 ～ 2）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C454> BCNT1CP0_;
+		static  BCNT1CP0_ BCNT1CP0;
+		typedef rw8_t<0x0008'C464> BCNT1CP1_;
+		static  BCNT1CP1_ BCNT1CP1;
+		typedef rw8_t<0x0008'C474> BCNT1CP2_;
+		static  BCNT1CP2_ BCNT1CP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  時キャプチャレジスタ y（RHRCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rhrcp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> HR1;
+			bits_rw_t<io_, bitpos::B4, 2> HR10;
+			bit_rw_t <io_, bitpos::B6>    PM;
+		};
+		typedef rhrcp_t<0x0008'C456> RHRCP0_;
+		static  RHRCP0_ RHRCP0;
+		typedef rhrcp_t<0x0008'C466> RHRCP1_;
+		static  RHRCP1_ RHRCP1;
+		typedef rhrcp_t<0x0008'C476> RHRCP2_;
+		static  RHRCP2_ RHRCP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  BCNT2 キャプチャレジスタ y（BCNT2CPy）（y=0 ～ 2）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C456> BCNT2CP0_;
+		static  BCNT2CP0_ BCNT2CP0;
+		typedef rw8_t<0x0008'C466> BCNT2CP1_;
+		static  BCNT2CP1_ BCNT2CP1;
+		typedef rw8_t<0x0008'C476> BCNT2CP2_;
+		static  BCNT2CP2_ BCNT2CP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  日キャプチャレジスタ y（RDAYCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rdaycp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> HR1;
+			bits_rw_t<io_, bitpos::B4, 2> HR10;
+			bit_rw_t <io_, bitpos::B6>    PM;
+		};
+		typedef rdaycp_t<0x0008'C45A> RDAYCP0_;
+		static  RDAYCP0_ RDAYCP0;
+		typedef rdaycp_t<0x0008'C46A> RDAYCP1_;
+		static  RDAYCP1_ RDAYCP1;
+		typedef rdaycp_t<0x0008'C47A> RDAYCP2_;
+		static  RDAYCP2_ RDAYCP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  BCNT3 キャプチャレジスタ y（BCNT3CPy）（y=0 ～ 2）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<0x0008'C45A> BCNT3CP0_;
+		static  BCNT3CP0_ BCNT3CP0;
+		typedef rw8_t<0x0008'C46A> BCNT3CP1_;
+		static  BCNT3CP1_ BCNT3CP1;
+		typedef rw8_t<0x0008'C47A> BCNT3CP2_;
+		static  BCNT3CP2_ BCNT3CP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  月キャプチャレジスタ y（RMONCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rmoncp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> HR1;
+			bits_rw_t<io_, bitpos::B4, 2> HR10;
+			bit_rw_t <io_, bitpos::B6>    PM;
+		};
+		typedef rmoncp_t<0x0008'C45C> RMONCP0_;
+		static  RMONCP0_ RMONCP0;
+		typedef rmoncp_t<0x0008'C46C> RMONCP1_;
+		static  RMONCP1_ RMONCP1;
+		typedef rmoncp_t<0x0008'C47C> RMONCP2_;
+		static  RMONCP2_ RMONCP2;
 	};
-	template <peripheral per> typename rtc_t<per>::R64CNT_ rtc_t<per>::R64CNT;
-	template <peripheral per> typename rtc_t<per>::RSECCNT_ rtc_t<per>::RSECCNT;
-	template <peripheral per> typename rtc_t<per>::BCNT0_ rtc_t<per>::BCNT0;
-	template <peripheral per> typename rtc_t<per>::RMINCNT_ rtc_t<per>::RMINCNT;
-	template <peripheral per> typename rtc_t<per>::BCNT1_ rtc_t<per>::BCNT1;
-	template <peripheral per> typename rtc_t<per>::RHRCNT_ rtc_t<per>::RHRCNT;
-	template <peripheral per> typename rtc_t<per>::BCNT2_ rtc_t<per>::BCNT2;
-	template <peripheral per> typename rtc_t<per>::RWKCNT_ rtc_t<per>::RWKCNT;
-	template <peripheral per> typename rtc_t<per>::BCNT3_ rtc_t<per>::BCNT3;
-	template <peripheral per> typename rtc_t<per>::RDAYCNT_ rtc_t<per>::RDAYCNT;
-	template <peripheral per> typename rtc_t<per>::RMONCNT_ rtc_t<per>::RMONCNT;
-	template <peripheral per> typename rtc_t<per>::RYRCNT_ rtc_t<per>::RYRCNT;
-	template <peripheral per> typename rtc_t<per>::RSECAR_ rtc_t<per>::RSECAR;
-	template <peripheral per> typename rtc_t<per>::BCNT0AR_ rtc_t<per>::BCNT0AR;
-	template <peripheral per> typename rtc_t<per>::RMINAR_ rtc_t<per>::RMINAR;
-	template <peripheral per> typename rtc_t<per>::BCNT1AR_ rtc_t<per>::BCNT1AR;
-	template <peripheral per> typename rtc_t<per>::RHRAR_ rtc_t<per>::RHRAR;
-	template <peripheral per> typename rtc_t<per>::BCNT2AR_ rtc_t<per>::BCNT2AR;
-	template <peripheral per> typename rtc_t<per>::RWKAR_ rtc_t<per>::RWKAR;
-	template <peripheral per> typename rtc_t<per>::BCNT3AR_ rtc_t<per>::BCNT3AR;
-	template <peripheral per> typename rtc_t<per>::RDAYAR_ rtc_t<per>::RDAYAR;
+	template <peripheral per> typename rtc_t<per>::R64CNT_   rtc_t<per>::R64CNT;
+	template <peripheral per> typename rtc_t<per>::RSECCNT_  rtc_t<per>::RSECCNT;
+	template <peripheral per> typename rtc_t<per>::BCNT0_    rtc_t<per>::BCNT0;
+	template <peripheral per> typename rtc_t<per>::RMINCNT_  rtc_t<per>::RMINCNT;
+	template <peripheral per> typename rtc_t<per>::BCNT1_    rtc_t<per>::BCNT1;
+	template <peripheral per> typename rtc_t<per>::RHRCNT_   rtc_t<per>::RHRCNT;
+	template <peripheral per> typename rtc_t<per>::BCNT2_    rtc_t<per>::BCNT2;
+	template <peripheral per> typename rtc_t<per>::RWKCNT_   rtc_t<per>::RWKCNT;
+	template <peripheral per> typename rtc_t<per>::BCNT3_    rtc_t<per>::BCNT3;
+	template <peripheral per> typename rtc_t<per>::RDAYCNT_  rtc_t<per>::RDAYCNT;
+	template <peripheral per> typename rtc_t<per>::RMONCNT_  rtc_t<per>::RMONCNT;
+	template <peripheral per> typename rtc_t<per>::RYRCNT_   rtc_t<per>::RYRCNT;
+	template <peripheral per> typename rtc_t<per>::RSECAR_   rtc_t<per>::RSECAR;
+	template <peripheral per> typename rtc_t<per>::BCNT0AR_  rtc_t<per>::BCNT0AR;
+	template <peripheral per> typename rtc_t<per>::RMINAR_   rtc_t<per>::RMINAR;
+	template <peripheral per> typename rtc_t<per>::BCNT1AR_  rtc_t<per>::BCNT1AR;
+	template <peripheral per> typename rtc_t<per>::RHRAR_    rtc_t<per>::RHRAR;
+	template <peripheral per> typename rtc_t<per>::BCNT2AR_  rtc_t<per>::BCNT2AR;
+	template <peripheral per> typename rtc_t<per>::RWKAR_    rtc_t<per>::RWKAR;
+	template <peripheral per> typename rtc_t<per>::BCNT3AR_  rtc_t<per>::BCNT3AR;
+	template <peripheral per> typename rtc_t<per>::RDAYAR_   rtc_t<per>::RDAYAR;
 	template <peripheral per> typename rtc_t<per>::BCNT0AER_ rtc_t<per>::BCNT0AER;
-	template <peripheral per> typename rtc_t<per>::RMONAR_ rtc_t<per>::RMONAR;
+	template <peripheral per> typename rtc_t<per>::RMONAR_   rtc_t<per>::RMONAR;
 	template <peripheral per> typename rtc_t<per>::BCNT1AER_ rtc_t<per>::BCNT1AER;
-	template <peripheral per> typename rtc_t<per>::RYRAR_ rtc_t<per>::RYRAR;
+	template <peripheral per> typename rtc_t<per>::RYRAR_    rtc_t<per>::RYRAR;
 	template <peripheral per> typename rtc_t<per>::BCNT2AER_ rtc_t<per>::BCNT2AER;
-	template <peripheral per> typename rtc_t<per>::RYRAREN_ rtc_t<per>::RYRAREN;
+	template <peripheral per> typename rtc_t<per>::RYRAREN_  rtc_t<per>::RYRAREN;
 	template <peripheral per> typename rtc_t<per>::BCNT3AER_ rtc_t<per>::BCNT3AER;
-	template <peripheral per> typename rtc_t<per>::RCR1_ rtc_t<per>::RCR1;
-	template <peripheral per> typename rtc_t<per>::RCR2_ rtc_t<per>::RCR2;
-	template <peripheral per> typename rtc_t<per>::RCR3_ rtc_t<per>::RCR3;
-	template <peripheral per> typename rtc_t<per>::RADJ_ rtc_t<per>::RADJ;
+	template <peripheral per> typename rtc_t<per>::RCR1_     rtc_t<per>::RCR1;
+	template <peripheral per> typename rtc_t<per>::RCR2_     rtc_t<per>::RCR2;
+	template <peripheral per> typename rtc_t<per>::RCR3_     rtc_t<per>::RCR3;
+	template <peripheral per> typename rtc_t<per>::RADJ_     rtc_t<per>::RADJ;
+	template <peripheral per> typename rtc_t<per>::RTCCR0_   rtc_t<per>::RTCCR0;
+	template <peripheral per> typename rtc_t<per>::RTCCR1_   rtc_t<per>::RTCCR1;
+	template <peripheral per> typename rtc_t<per>::RTCCR2_   rtc_t<per>::RTCCR2;
+	template <peripheral per> typename rtc_t<per>::RSECCP0_  rtc_t<per>::RSECCP0;
+	template <peripheral per> typename rtc_t<per>::RSECCP1_  rtc_t<per>::RSECCP1;
+	template <peripheral per> typename rtc_t<per>::RSECCP2_  rtc_t<per>::RSECCP2;
+	template <peripheral per> typename rtc_t<per>::BCNT0CP0_ rtc_t<per>::BCNT0CP0;
+	template <peripheral per> typename rtc_t<per>::BCNT0CP1_ rtc_t<per>::BCNT0CP1;
+	template <peripheral per> typename rtc_t<per>::BCNT0CP2_ rtc_t<per>::BCNT0CP2;
+	template <peripheral per> typename rtc_t<per>::RMINCP0_  rtc_t<per>::RMINCP0;
+	template <peripheral per> typename rtc_t<per>::RMINCP1_  rtc_t<per>::RMINCP1;
+	template <peripheral per> typename rtc_t<per>::RMINCP2_  rtc_t<per>::RMINCP2;
+	template <peripheral per> typename rtc_t<per>::BCNT1CP0_ rtc_t<per>::BCNT1CP0;
+	template <peripheral per> typename rtc_t<per>::BCNT1CP1_ rtc_t<per>::BCNT1CP1;
+	template <peripheral per> typename rtc_t<per>::BCNT1CP2_ rtc_t<per>::BCNT1CP2;
+	template <peripheral per> typename rtc_t<per>::RHRCP0_   rtc_t<per>::RHRCP0;
+	template <peripheral per> typename rtc_t<per>::RHRCP1_   rtc_t<per>::RHRCP1;
+	template <peripheral per> typename rtc_t<per>::RHRCP2_   rtc_t<per>::RHRCP2;
+	template <peripheral per> typename rtc_t<per>::BCNT2CP0_ rtc_t<per>::BCNT2CP0;
+	template <peripheral per> typename rtc_t<per>::BCNT2CP1_ rtc_t<per>::BCNT2CP1;
+	template <peripheral per> typename rtc_t<per>::BCNT2CP2_ rtc_t<per>::BCNT2CP2;
+	template <peripheral per> typename rtc_t<per>::RDAYCP0_   rtc_t<per>::RDAYCP0;
+	template <peripheral per> typename rtc_t<per>::RDAYCP1_   rtc_t<per>::RDAYCP1;
+	template <peripheral per> typename rtc_t<per>::RDAYCP2_   rtc_t<per>::RDAYCP2;
+	template <peripheral per> typename rtc_t<per>::BCNT3CP0_ rtc_t<per>::BCNT3CP0;
+	template <peripheral per> typename rtc_t<per>::BCNT3CP1_ rtc_t<per>::BCNT3CP1;
+	template <peripheral per> typename rtc_t<per>::BCNT3CP2_ rtc_t<per>::BCNT3CP2;
+	template <peripheral per> typename rtc_t<per>::RMONCP0_  rtc_t<per>::RMONCP0;
+	template <peripheral per> typename rtc_t<per>::RMONCP1_  rtc_t<per>::RMONCP1;
+	template <peripheral per> typename rtc_t<per>::RMONCP2_  rtc_t<per>::RMONCP2;
 
 	typedef rtc_t<peripheral::RTC> RTC;
 }
