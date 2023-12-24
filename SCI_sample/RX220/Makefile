@@ -23,7 +23,6 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-
 PSOURCES	=	SCI_sample/main.cpp
 
 USER_LIBS	=
