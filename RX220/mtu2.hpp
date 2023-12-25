@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX220/RX631/RX63N グループ・MTU2a 定義
+	@brief	RX220/RX231/RX631/RX63N グループ・MTU2a 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -2555,7 +2555,7 @@ namespace device {
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TGRW_ mtu5_t<per, INT>::TGRW;
 	template <peripheral per, typename INT> typename mtu5_t<per, INT>::TGR_ mtu5_t<per, INT>::TGR;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX231)
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR, ICU::VECTOR> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR, ICU::VECTOR> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR, ICU::VECTOR> MTU2;

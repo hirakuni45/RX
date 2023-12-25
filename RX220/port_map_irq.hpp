@@ -310,7 +310,6 @@ namespace device {
 				break;
 			}
 
-
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 
 			return ret;
