@@ -1,16 +1,16 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 グループ・ポート・マッピング (MTU2a) 
+	@brief	RX231 グループ・ポート・マッピング (MTU2a) 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX220/peripheral.hpp"
-#include "RX220/port.hpp"
-#include "RX220/mpc.hpp"
+#include "RX231/peripheral.hpp"
+#include "RX231/port.hpp"
+#include "RX231/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -228,7 +228,6 @@ namespace device {
 			// P17
 			// PC1
 			// PC7
-			// PJ1
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -249,11 +248,6 @@ namespace device {
 					PORTC::PMR.B7 = 0;
 					MPC::PC7PFS.PSEL = sel;  // ok
 					PORTC::PMR.B7 = ena;
-					break;
-				case ORDER::FIFTH:
-					PORTJ::PMR.B1 = 0;
-					MPC::PJ1PFS.PSEL = sel;  // ok
-					PORTJ::PMR.B1 = ena;
 					break;
 				default:
 					ret = false;

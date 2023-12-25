@@ -1,16 +1,16 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 グループ・ポート・マッピング (IRQ)
+	@brief	RX231 グループ・ポート・マッピング (IRQ)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX220/port.hpp"
-#include "RX220/mpc.hpp"
-#include "RX220/icu.hpp"
+#include "RX231/port.hpp"
+#include "RX231/mpc.hpp"
+#include "RX231/icu.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
