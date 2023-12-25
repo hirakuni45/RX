@@ -38,25 +38,23 @@ namespace device {
 					PORT1::PMR.B7 = enable;
 				}
 				break;
-#if 0
 			case peripheral::RSPI0:
 			// PA5/RSPCKA
 			// PA6/MOSIA
-			// P22/MISOA
+			// PA7/MISOA
 				{
 					uint8_t sel = enable ? 0b0'1101 : 0;
-					PORT2::PMR.B4 = 0;
-					PORT2::PMR.B3 = 0;
-					PORT2::PMR.B2 = 0;
-					MPC::P24PFS.PSEL = sel;
-					MPC::P22PFS.PSEL = sel;
-					MPC::P23PFS.PSEL = sel;
-					PORT2::PMR.B4 = enable;
-					PORT2::PMR.B2 = enable;
-					PORT2::PMR.B3 = enable;
+					PORTA::PMR.B5 = 0;
+					PORTA::PMR.B6 = 0;
+					PORTA::PMR.B7 = 0;
+					MPC::PA5PFS.PSEL = sel;
+					MPC::PA6PFS.PSEL = sel;
+					MPC::PA7PFS.PSEL = sel;
+					PORTA::PMR.B5 = enable;
+					PORTA::PMR.B6 = enable;
+					PORTA::PMR.B7 = enable;
 				}
 				break;
-#endif
 			case peripheral::SCI0:
 			// P21/RXD0
 			// P20/TXD0
@@ -85,15 +83,15 @@ namespace device {
 				break;
 			case peripheral::SCI5:
 			case peripheral::IrDA:
-			// PA2/RXD5/IRRXD5
-			// PA4/TXD5/IRTXD5
+			// PA3/RXD5/IRRXD5 (LQFP64:43)
+			// PA4/TXD5/IRTXD5 (LQFP64:42)
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
-					PORTA::PMR.B2 = 0;
+					PORTA::PMR.B3 = 0;
 					PORTA::PMR.B4 = 0;
-					MPC::PA2PFS.PSEL = sel;
+					MPC::PA3PFS.PSEL = sel;
 					MPC::PA4PFS.PSEL = sel;
-					PORTA::PMR.B2 = enable;
+					PORTA::PMR.B3 = enable;
 					PORTA::PMR.B4 = enable;
 				}
 				break;
@@ -176,9 +174,9 @@ namespace device {
 				break;
 #if 0
 			case peripheral::RSPI0:
-			// P24/RSPCKA
-			// P23/MOSIA
-			// P22/MISOA
+			// PC5/RSPCKA
+			// P16/MOSIA
+			// P17/MISOA
 				{
 					uint8_t sel = enable ? 0b0'1101 : 0;
 					PORT2::PMR.B4 = 0;
@@ -244,25 +242,23 @@ namespace device {
 		static bool sub_3rd_(peripheral per, bool enable) noexcept
 		{
 			switch(per) {
-#if 0
 			case peripheral::RSPI0:
-			// P24/RSPCKA
-			// P23/MOSIA
-			// P22/MISOA
+			// PC5/RSPCKA
+			// PC6/MOSIA
+			// PC7/MISOA
 				{
 					uint8_t sel = enable ? 0b0'1101 : 0;
-					PORT2::PMR.B4 = 0;
-					PORT2::PMR.B3 = 0;
-					PORT2::PMR.B2 = 0;
-					MPC::P24PFS.PSEL = sel;
-					MPC::P22PFS.PSEL = sel;
-					MPC::P23PFS.PSEL = sel;
-					PORT2::PMR.B4 = enable;
-					PORT2::PMR.B2 = enable;
-					PORT2::PMR.B3 = enable;
+					PORTC::PMR.B5 = 0;
+					PORTC::PMR.B6 = 0;
+					PORTC::PMR.B7 = 0;
+					MPC::PC5PFS.PSEL = sel;
+					MPC::PC6PFS.PSEL = sel;
+					MPC::PC7PFS.PSEL = sel;
+					PORTC::PMR.B5 = enable;
+					PORTC::PMR.B6 = enable;
+					PORTC::PMR.B7 = enable;
 				}
 				break;
-#endif
 			case peripheral::SCI5:
 			case peripheral::IrDA:
 			// PA3/RXD5
