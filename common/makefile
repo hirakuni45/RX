@@ -56,6 +56,7 @@ PROG_VERIFY = --verify
 ifeq ($(RX_DEF),SIG_RX220)
   RX_CPU = RX220
   RX_CHOOSE = -mcpu=rx200
+  AS_OPT	+=	--defsym NO_FLOAT=1
   LDSCRIPT	= ../../RX220/$(DEVICE).ld
   PROG_ERASE =
 endif
