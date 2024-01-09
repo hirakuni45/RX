@@ -1,15 +1,15 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX64M/RX71M グループ・ポート・マッピング (TPU) @n
 			・TPU 型に従って、タイマー用ポートを設定 @n
 			TPU0, TPU1, TPU2, TPU3, TPU4, TPU5
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX64M/peripheral.hpp"
 #include "RX64M/port.hpp"
 #include "RX64M/mpc.hpp"

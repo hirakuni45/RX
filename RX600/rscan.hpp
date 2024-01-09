@@ -14,15 +14,12 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	RSCAN モジュール（RSCAN）
+		@brief	RSCAN ベース・モジュール（RSCAN）
 		@param[in]	base	ベースアドレス
-		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
-	struct rscan_t {
-
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+	template <uint32_t base>
+	struct rscan_base_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -409,7 +406,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信ルール登録レジスタ jAL (GAFLIDLj) (j = 0 ～ 15)
+			@brief  受信ルール登録レジスタ jAL (GAFLIDL[j]) (j = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -438,7 +435,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信ルール登録レジスタ jAH (GAFLIDHj) (j = 0 ～ 15)
+			@brief  受信ルール登録レジスタ jAH (GAFLIDH[j]) (j = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -470,7 +467,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信ルール登録レジスタ jBL (GAFLMLj) (j = 0 ～ 15)
+			@brief  受信ルール登録レジスタ jBL (GAFLML[j]) (j = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -499,7 +496,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信ルール登録レジスタ jBH (GAFLMHj) (j = 0 ～ 15)
+			@brief  受信ルール登録レジスタ jBH (GAFLMH[j]) (j = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -531,7 +528,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信ルール登録レジスタ jCL (GAFLPLj) (j = 0 ～ 15)
+			@brief  受信ルール登録レジスタ jCL (GAFLPL[j]) (j = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -566,7 +563,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信ルール登録レジスタ jCH (GAFLPHj) (j = 0 ～ 15)
+			@brief  受信ルール登録レジスタ jCH (GAFLPH[j]) (j = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -636,7 +633,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信バッファレジスタ nAL (RMIDLn) (n = 0 ～ 15)
+			@brief  受信バッファレジスタ nAL (RMIDL[n]) (n = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -665,7 +662,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信バッファレジスタ nAH (RMIDHn) (n = 0 ～ 15)
+			@brief  受信バッファレジスタ nAH (RMIDH[n]) (n = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -697,7 +694,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信バッファレジスタ nBL (RMTSn) (n = 0 ～ 15)
+			@brief  受信バッファレジスタ nBL (RMTS[n]) (n = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -726,7 +723,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信バッファレジスタ nBH (RMPTRn) (n = 0 ～ 15)
+			@brief  受信バッファレジスタ nBH (RMPTR[n]) (n = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -756,7 +753,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信バッファレジスタ nCL (RMDF0n) (n = 0 ～ 15)
+			@brief  受信バッファレジスタ nCL (RMDF0[n]) (n = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -786,7 +783,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信バッファレジスタ nCH (RMDF1n) (n = 0 ～ 15)
+			@brief  受信バッファレジスタ nCH (RMDF1[n]) (n = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -816,7 +813,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信バッファレジスタ nDL (RMDF2n) (n = 0 ～ 15)
+			@brief  受信バッファレジスタ nDL (RMDF2[n]) (n = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -846,7 +843,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信バッファレジスタ nDH (RMDF3n) (n = 0 ～ 15)
+			@brief  受信バッファレジスタ nDH (RMDF3[n]) (n = 0 ～ 15)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -876,7 +873,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信 FIFO 制御レジスタ m (RFCCm) (m = 0, 1)
+			@brief  受信 FIFO 制御レジスタ m (RFCC[m]) (m = 0, 1)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -911,7 +908,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信 FIFO ステータスレジスタ m (RFSTSm) (m = 0, 1)
+			@brief  受信 FIFO ステータスレジスタ m (RFSTS[m]) (m = 0, 1)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -945,7 +942,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信 FIFO ポインタ制御レジスタ m (RFPCTRm) (m = 0, 1)
+			@brief  受信 FIFO ポインタ制御レジスタ m (RFPCTR[m]) (m = 0, 1)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -971,7 +968,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信 FIFO アクセスレジスタ mAL (RFIDLm) (m = 0, 1)
+			@brief  受信 FIFO アクセスレジスタ mAL (RFIDL[m]) (m = 0, 1)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -991,13 +988,13 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfidl_t<base + 0xA0> RFIDL_;
+		typedef rfidl_t<base + 0x2A0> RFIDL_;
 		static RFIDL_ RFIDL;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信 FIFO アクセスレジスタ mAH (RFIDHm) (m = 0, 1)
+			@brief  受信 FIFO アクセスレジスタ mAH (RFIDH[m]) (m = 0, 1)
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -1020,57 +1017,1164 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfidh_t<base + 0xA2> RFIDH_;
+		typedef rfidh_t<base + 0x2A2> RFIDH_;
 		static RFIDH_ RFIDH;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信 FIFO アクセスレジスタ mBL (RFTS[m]) (m = 0, 1)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rfts_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator ();
+
+			void set_index(uint32_t j) {
+				if(j < 2) { io_::index = j * 0x10; }
+			}
+
+			bits_ro_t<io_, bitpos::B0, 16>	RFTS;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef rfts_t<base + 0x2A4> RFTS_;
+		static RFTS_ RFTS;
+	
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信 FIFO アクセスレジスタ mBH (RFPTR[m]) (m = 0, 1)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rfptr_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator ();
+
+			void set_index(uint32_t j) {
+				if(j < 2) { io_::index = j * 0x10; }
+			}
+
+			bits_ro_t<io_, bitpos::B0, 12>	RFPTR;
+			bits_ro_t<io_, bitpos::B12, 4>	RFDLC;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef rfptr_t<base + 0x2A6> RFPTR_;
+		static RFPTR_ RFPTR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信 FIFO アクセスレジスタ mCL (RFDF0[m]) (m = 0, 1)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rfdf0_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator ();
+
+			void set_index(uint32_t j) {
+				if(j < 2) { io_::index = j * 0x10; }
+			}
+
+			bits_ro_t<io_, bitpos::B0, 8>	RFDB0;
+			bits_ro_t<io_, bitpos::B8, 8>	RFDB1;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef rfdf0_t<base + 0x2A8> RFDF0_;
+		static RFDF0_ RFDF0;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信 FIFO アクセスレジスタ mCH (RFDF1[m]) (m = 0, 1)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rfdf1_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator ();
 
+			void set_index(uint32_t j) {
+				if(j < 2) { io_::index = j * 0x10; }
+			}
+
+			bits_ro_t<io_, bitpos::B0, 8>	RFDB2;
+			bits_ro_t<io_, bitpos::B8, 8>	RFDB3;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef rfdf1_t<base + 0x2AA> RFDF1_;
+		static RFDF1_ RFDF1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信 FIFO アクセスレジスタ mDL (RFDF2[m]) (m = 0, 1)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rfdf2_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator ();
+
+			void set_index(uint32_t j) {
+				if(j < 2) { io_::index = j * 0x10; }
+			}
+
+			bits_ro_t<io_, bitpos::B0, 8>	RFDB4;
+			bits_ro_t<io_, bitpos::B8, 8>	RFDB5;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef rfdf2_t<base + 0x2AC> RFDF2_;
+		static RFDF2_ RFDF2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信 FIFO アクセスレジスタ mDH (RFDF3[m]) (m = 0, 1)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rfdf3_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator ();
+
+			void set_index(uint32_t j) {
+				if(j < 2) { io_::index = j * 0x10; }
+			}
+
+			bits_ro_t<io_, bitpos::B0, 8>	RFDB6;
+			bits_ro_t<io_, bitpos::B8, 8>	RFDB7;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef rfdf3_t<base + 0x2AE> RFDF3_;
+		static RFDF3_ RFDF3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO 制御レジスタ 0L (CFCCL0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfccl0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>		CFE;
+			bit_rw_t <io_, bitpos::B1>		CFRXIE;
+			bit_rw_t <io_, bitpos::B2>		CFTXIE;
+
+			bits_rw_t<io_, bitpos::B8, 3>	CFDC;
+
+			bit_rw_t <io_, bitpos::B12>		CFIM;
+			bits_rw_t<io_, bitpos::B13, 3>	CFIGCV;
+		};
+		typedef cfccl0_t<base + 0x50>  CFCCL0_;
+		static CFCCL0_ CFCCL0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO 制御レジスタ 0H (CFCCH0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfcch0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>	CFM;
+			bit_rw_t <io_, bitpos::B2>		CFITSS;
+			bit_rw_t <io_, bitpos::B3>		CFITR;
+			bits_rw_t<io_, bitpos::B4, 2>	CFTML;
+
+			bits_rw_t<io_, bitpos::B8, 8>	CFITT;
+		};
+		typedef cfcch0_t<base + 0x52>  CFCCH0_;
+		static CFCCH0_ CFCCH0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO ステータスレジスタ 0 (CFSTS0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfsts0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>		CFEMP;
+			bit_rw_t <io_, bitpos::B1>		CFFLL;
+			bit_rw_t <io_, bitpos::B2>		CFMLT;
+			bit_rw_t <io_, bitpos::B3>		CFRXIF;
+			bit_rw_t <io_, bitpos::B4>		CFTXIF;
+
+			bits_rw_t<io_, bitpos::B8, 6>	CFMC;
+		};
+		typedef cfsts0_t<base + 0x58>  CFSTS0_;
+		static CFSTS0_ CFSTS0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO ポインタ制御レジスタ 0 (CFPCTR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfpctr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>	CFPC;
+		};
+		typedef cfpctr0_t<base + 0x5C>  CFPCTR0_;
+		static CFPCTR0_ CFPCTR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO アクセスレジスタ 0AL (CFIDL0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfidl0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>	CFID;
+		};
+		typedef cfidl0_t<base + 0x2E0>  CFIDL0_;
+		static CFIDL0_ CFIDL0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO アクセスレジスタ 0AH (CFIDH0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfidh0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 13>	CFID;
+			bit_rw_t <io_, bitpos::B13>		THLEN;
+			bit_rw_t <io_, bitpos::B14>		CFRTR;
+			bit_rw_t <io_, bitpos::B15>		CFIDE;
+		};
+		typedef cfidh0_t<base + 0x2E2>  CFIDH0_;
+		static CFIDH0_ CFIDH0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO アクセスレジスタ 0BL (CFTS0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfts0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>	CFTS;
+		};
+		typedef cfts0_t<base + 0x2E4>  CFTS0_;
+		static CFTS0_ CFTS0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO アクセスレジスタ 0BH (CFPTR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfptr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 12>	CFPTR;
+			bits_rw_t<io_, bitpos::B12, 4>	CFDLC;
+		};
+		typedef cfptr0_t<base + 0x2E6>  CFPTR0_;
+		static CFPTR0_ CFPTR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO アクセスレジスタ 0CL (CFDF00)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfdf00_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>	CFDB0;
+			bits_rw_t<io_, bitpos::B8, 8>	CFDB1;
+		};
+		typedef cfdf00_t<base + 0x2E8>  CFDF00_;
+		static CFDF00_ CFDF00;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO アクセスレジスタ 0CH (CFDF10)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfdf10_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>	CFDB2;
+			bits_rw_t<io_, bitpos::B8, 8>	CFDB3;
+		};
+		typedef cfdf10_t<base + 0x2EA>  CFDF10_;
+		static CFDF10_ CFDF10;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO アクセスレジスタ 0DL (CFDF20)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfdf20_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>	CFDB4;
+			bits_rw_t<io_, bitpos::B8, 8>	CFDB5;
+		};
+		typedef cfdf20_t<base + 0x2EC>  CFDF20_;
+		static CFDF20_ CFDF20;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO アクセスレジスタ 0DH (CFDF30)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfdf30_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>	CFDB6;
+			bits_rw_t<io_, bitpos::B8, 8>	CFDB7;
+		};
+		typedef cfdf30_t<base + 0x2EE>  CFDF30_;
+		static CFDF30_ CFDF30;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	受信 FIFO メッセージロストステータスレジスタ (RFMSTS)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rfmsts_t : public ro8_t<ofs> {
+			typedef ro8_t<ofs> in_;
+			using in_::operator ();
+
+			bit_rw_t <in_, bitpos::B0>		RF0MLT;
+			bit_rw_t <in_, bitpos::B1>		RF1MLT;
+		};
+		typedef rfmsts_t<base + 0x60>  RFMSTS_;
+		static RFMSTS_ RFMSTS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO メッセージロストステータスレジスタ (CFMSTS)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfmsts_t : public ro8_t<ofs> {
+			typedef ro8_t<ofs> in_;
+			using in_::operator ();
+
+			bit_rw_t <in_, bitpos::B0>		CF0MLT;
+		};
+		typedef cfmsts_t<base + 0x61>  CFMSTS_;
+		static CFMSTS_ CFMSTS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	受信 FIFO 割り込みステータスレジスタ (RFISTS)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rfists_t : public ro8_t<ofs> {
+			typedef ro8_t<ofs> in_;
+			using in_::operator ();
+
+			bit_rw_t <in_, bitpos::B0>		RF0IF;
+			bit_rw_t <in_, bitpos::B1>		RF1IF;
+		};
+		typedef rfists_t<base + 0x62>  RFISTS_;
+		static RFISTS_ RFISTS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送受信 FIFO 受信割り込みステータスレジスタ (CFISTS)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cfists_t : public ro8_t<ofs> {
+			typedef ro8_t<ofs> in_;
+			using in_::operator ();
+
+			bit_rw_t <in_, bitpos::B0>		CF0IF;
+		};
+		typedef cfists_t<base + 0x63>  CFISTS_;
+		static CFISTS_ CFISTS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信バッファ制御レジスタ p (TMC[p]) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmc_t : public rw8_index_t<ofs> {
+			typedef rw8_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j; }
+			}
+
+			bit_rw_t <io_, bitpos::B0>		TMTR;
+			bit_rw_t <io_, bitpos::B1>		TMTAR;
+			bit_rw_t <io_, bitpos::B2>		TMOM;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmc_t<base + 0x64> TMC_;
+		static TMC_ TMC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファステータスレジスタ p (TMSTS[p]) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmsts_t : public rw8_index_t<ofs> {
+			typedef rw8_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j; }
+			}
+
+			bit_rw_t <io_, bitpos::B0>		TMTSTS;
+			bits_rw_t<io_, bitpos::B1, 2>	TMTRF;
+			bit_rw_t <io_, bitpos::B3>		TMTRM;
+			bit_rw_t <io_, bitpos::B4>		TMTARM;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmsts_t<base + 0x6C> TMSTS_;
+		static TMSTS_ TMSTS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファ送信要求ステータスレジスタ (TMTRSTS)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmtrsts_t : public ro16_t<ofs> {
+			typedef ro16_t<ofs> in_;
+			using in_::operator ();
+
+			bit_ro_t <in_, bitpos::B0>		TMTRSTS0;
+			bit_ro_t <in_, bitpos::B1>		TMTRSTS1;
+			bit_ro_t <in_, bitpos::B2>		TMTRSTS2;
+			bit_ro_t <in_, bitpos::B3>		TMTRSTS3;
+		};
+		typedef tmtrsts_t<base + 0x74>  TMTRSTS_;
+		static TMTRSTS_ TMTRSTS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファ送信完了ステータスレジスタ (TMTCSTS)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmtcsts_t : public ro16_t<ofs> {
+			typedef ro16_t<ofs> in_;
+			using in_::operator ();
+
+			bit_ro_t <in_, bitpos::B0>		TMTCSTS0;
+			bit_ro_t <in_, bitpos::B1>		TMTCSTS1;
+			bit_ro_t <in_, bitpos::B2>		TMTCSTS2;
+			bit_ro_t <in_, bitpos::B3>		TMTCSTS3;
+		};
+		typedef tmtcsts_t<base + 0x76>  TMTCSTS_;
+		static TMTCSTS_ TMTCSTS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファ送信アボートステータスレジスタ (TMTASTS)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmtasts_t : public ro16_t<ofs> {
+			typedef ro16_t<ofs> in_;
+			using in_::operator ();
+
+			bit_ro_t <in_, bitpos::B0>		TMTASTS0;
+			bit_ro_t <in_, bitpos::B1>		TMTASTS1;
+			bit_ro_t <in_, bitpos::B2>		TMTASTS2;
+			bit_ro_t <in_, bitpos::B3>		TMTASTS3;
+		};
+		typedef tmtasts_t<base + 0x78>  TMTASTS_;
+		static TMTASTS_ TMTASTS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファ割り込み許可レジスタ (TMIEC)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmiec_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>		TMIE0;
+			bit_rw_t <io_, bitpos::B1>		TMIE1;
+			bit_rw_t <io_, bitpos::B2>		TMIE2;
+			bit_rw_t <io_, bitpos::B3>		TMIE3;
+		};
+		typedef tmiec_t<base + 0x7A>  TMIEC_;
+		static TMIEC_ TMIEC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファレジスタ pAL (TMIDLp) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmidl_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j * 0x10; }
+			}
+
+			bits_rw_t<io_, bitpos::B0, 16>	TMID;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmidl_t<base + 0x300> TMIDL_;
+		static TMIDL_ TMIDL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファレジスタ pAH (TMIDH[p]) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmidh_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j * 0x10; }
+			}
+
+			bits_rw_t<io_, bitpos::B0, 13>	TMID;
+			bit_rw_t <io_, bitpos::B13>		THLEN;
+			bit_rw_t <io_, bitpos::B14>		TMRTR;
+			bit_rw_t <io_, bitpos::B15>		TMIDE;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmidh_t<base + 0x302> TMIDH_;
+		static TMIDH_ TMIDH;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファレジスタ pBH (TMPTR[p]) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmptr_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j * 0x10; }
+			}
+
+			bits_rw_t<io_, bitpos::B0,  8>	TMPTR;
+			bits_rw_t<io_, bitpos::B12, 4>	TMDLC;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmptr_t<base + 0x306> TMPTR_;
+		static TMPTR_ TMPTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファレジスタ pCL (TMDF0[p]) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmdf0_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j * 0x10; }
+			}
+
+			bits_rw_t<io_, bitpos::B0,  8>	TMDB0;
+			bits_rw_t<io_, bitpos::B8,  8>	TMDB1;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmdf0_t<base + 0x308> TMDF0_;
+		static TMDF0_ TMDF0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファレジスタ pCH (TMDF1[p]) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmdf1_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j * 0x10; }
+			}
+
+			bits_rw_t<io_, bitpos::B0,  8>	TMDB2;
+			bits_rw_t<io_, bitpos::B8,  8>	TMDB3;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmdf1_t<base + 0x30A> TMDF1_;
+		static TMDF1_ TMDF1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファレジスタ pDL (TMDF2[p]) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmdf2_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j * 0x10; }
+			}
+
+			bits_rw_t<io_, bitpos::B0,  8>	TMDB4;
+			bits_rw_t<io_, bitpos::B8,  8>	TMDB5;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmdf2_t<base + 0x30C> TMDF2_;
+		static TMDF2_ TMDF2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信バッファレジスタ pDH (TMDF3[p]) (p = 0 ～ 3)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tmdf3_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 4) { io_::index = j * 0x10; }
+			}
+
+			bits_rw_t<io_, bitpos::B0,  8>	TMDB6;
+			bits_rw_t<io_, bitpos::B8,  8>	TMDB7;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef tmdf3_t<base + 0x30E> TMDF3_;
+		static TMDF3_ TMDF3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信履歴バッファ制御レジスタ (THLCC0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thlcc0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>		THLE;
+
+			bit_rw_t <io_, bitpos::B8>		THLIE;
+			bit_rw_t <io_, bitpos::B9>		THLIM;
+			bit_rw_t <io_, bitpos::B10>		THLDTE;
+		};
+		typedef thlcc0_t<base + 0x7C>  THLCC0_;
+		static THLCC0_ THLCC0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信履歴バッファステータスレジスタ (THLSTS0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thlsts0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+			typedef ro16_t<ofs> in_;
+			using in_::operator ();
+
+			bit_ro_t <in_, bitpos::B0>		THLEMP;
+			bit_ro_t <in_, bitpos::B1>		THLFLL;
+			bit_rw_t <io_, bitpos::B2>		THLELT;
+			bit_rw_t <io_, bitpos::B3>		THLIF;
+
+			bits_ro_t<in_, bitpos::B8, 4>	THLMC;
+		};
+		typedef thlsts0_t<base + 0x80>  THLSTS0_;
+		static THLSTS0_ THLSTS0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信履歴バッファアクセスレジスタ (THLACC0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thlacc0_t : public ro16_t<ofs> {
+			typedef ro16_t<ofs> in_;
+			using in_::operator ();
+
+			bits_ro_t<in_, bitpos::B0, 2>	BT;
+			bits_ro_t<in_, bitpos::B3, 2>	BN;
+
+			bits_ro_t<in_, bitpos::B8, 8>	TID;
+		};
+		typedef thlacc0_t<base + 0x380>  THLACC0_;
+		static THLACC0_ THLACC0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信履歴バッファポインタ制御レジスタ (THLPCTR0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct thlpctr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> o_;
+			using o_::operator =;
+
+			bits_rw_t<o_, bitpos::B0, 8>	THLPC;
+		};
+		typedef thlpctr0_t<base + 0x384>  THLPCTR0_;
+		static THLPCTR0_ THLPCTR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	グローバル RAM ウィンドウ制御レジスタ (GRWCR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct grwcr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>		RPAGE;
+		};
+		typedef grwcr_t<base + 0x8A>  GRWCR_;
+		static GRWCR_ GRWCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	グローバルテスト設定レジスタ (GTSTCFG)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct gtstcfg_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B8, 3>	RTMPS;
+		};
+		typedef gtstcfg_t<base + 0x8C>  GTSTCFG_;
+		static GTSTCFG_ GTSTCFG;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	グローバルテスト制御レジスタ (GTSTCTRL)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct gtstctrl_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B2>		RTIME;
+		};
+		typedef gtstctrl_t<base + 0x8E>  GTSTCTRL_;
+		static GTSTCTRL_ GTSTCTRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	グローバルテストプロテクト解除レジスタ (GLOCKK)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct glockk_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>	LOCK;
+		};
+		typedef glockk_t<base + 0x94>  GLOCKK_;
+		static GLOCKK_ GLOCKK;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	RAM テストレジスタ r (RPGACCr) (r = 0 ～ 127)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct rpgacc_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 128) { io_::index = j * 2; }
+			}
+
+			bits_rw_t<io_, bitpos::B0, 16>	RDTA;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		typedef rpgacc_t<base + 0x280> RPGACC_;
+		static RPGACC_ RPGACC;
 	};
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::CFGL_ rscan_t<base, per>::CFGL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::CFGH_ rscan_t<base, per>::CFGH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::CTRL_ rscan_t<base, per>::CTRL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::CTRH_ rscan_t<base, per>::CTRH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::STSL_ rscan_t<base, per>::STSL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::STSH_ rscan_t<base, per>::STSH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::ERFLL_ rscan_t<base, per>::ERFLL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::ERFLH_ rscan_t<base, per>::ERFLH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GCFGL_ rscan_t<base, per>::GCFGL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GCFGH_ rscan_t<base, per>::GCFGH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GCTRL_ rscan_t<base, per>::GCTRL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GCTRH_ rscan_t<base, per>::GCTRH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GSTS_ rscan_t<base, per>::GSTS;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GERFLL_ rscan_t<base, per>::GERFLL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GTINTSTS_ rscan_t<base, per>::GTINTSTS;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GTSC_ rscan_t<base, per>::GTSC;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GAFLCFG_ rscan_t<base, per>::GAFLCFG;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GAFLIDL_ rscan_t<base, per>::GAFLIDL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GAFLIDH_ rscan_t<base, per>::GAFLIDH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GAFLML_ rscan_t<base, per>::GAFLML;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GAFLMH_ rscan_t<base, per>::GAFLMH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GAFLPL_ rscan_t<base, per>::GAFLPL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::GAFLPH_ rscan_t<base, per>::GAFLPH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMNB_ rscan_t<base, per>::RMNB;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMND0_ rscan_t<base, per>::RMND0;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMIDL_ rscan_t<base, per>::RMIDL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMIDH_ rscan_t<base, per>::RMIDH;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMTS_ rscan_t<base, per>::RMTS;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMPTR_ rscan_t<base, per>::RMPTR;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMDF0_ rscan_t<base, per>::RMDF0;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMDF1_ rscan_t<base, per>::RMDF1;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMDF2_ rscan_t<base, per>::RMDF2;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RMDF3_ rscan_t<base, per>::RMDF3;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RFCC_ rscan_t<base, per>::RFCC;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RFSTS_ rscan_t<base, per>::RFSTS;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RFPCTR_ rscan_t<base, per>::RFPCTR;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RFIDL_ rscan_t<base, per>::RFIDL;
-	template <uint32_t base, peripheral per> typename rscan_t<base, per>::RFIDH_ rscan_t<base, per>::RFIDH;
+
+	template <uint32_t base> typename rscan_base_t<base>::CFGL_ rscan_base_t<base>::CFGL;
+	template <uint32_t base> typename rscan_base_t<base>::CFGH_ rscan_base_t<base>::CFGH;
+	template <uint32_t base> typename rscan_base_t<base>::CTRL_ rscan_base_t<base>::CTRL;
+	template <uint32_t base> typename rscan_base_t<base>::CTRH_ rscan_base_t<base>::CTRH;
+	template <uint32_t base> typename rscan_base_t<base>::STSL_ rscan_base_t<base>::STSL;
+	template <uint32_t base> typename rscan_base_t<base>::STSH_ rscan_base_t<base>::STSH;
+	template <uint32_t base> typename rscan_base_t<base>::ERFLL_ rscan_base_t<base>::ERFLL;
+	template <uint32_t base> typename rscan_base_t<base>::ERFLH_ rscan_base_t<base>::ERFLH;
+	template <uint32_t base> typename rscan_base_t<base>::GCFGL_ rscan_base_t<base>::GCFGL;
+	template <uint32_t base> typename rscan_base_t<base>::GCFGH_ rscan_base_t<base>::GCFGH;
+	template <uint32_t base> typename rscan_base_t<base>::GCTRL_ rscan_base_t<base>::GCTRL;
+	template <uint32_t base> typename rscan_base_t<base>::GCTRH_ rscan_base_t<base>::GCTRH;
+	template <uint32_t base> typename rscan_base_t<base>::GSTS_ rscan_base_t<base>::GSTS;
+	template <uint32_t base> typename rscan_base_t<base>::GERFLL_ rscan_base_t<base>::GERFLL;
+	template <uint32_t base> typename rscan_base_t<base>::GTINTSTS_ rscan_base_t<base>::GTINTSTS;
+	template <uint32_t base> typename rscan_base_t<base>::GTSC_ rscan_base_t<base>::GTSC;
+	template <uint32_t base> typename rscan_base_t<base>::GAFLCFG_ rscan_base_t<base>::GAFLCFG;
+	template <uint32_t base> typename rscan_base_t<base>::GAFLIDL_ rscan_base_t<base>::GAFLIDL;
+	template <uint32_t base> typename rscan_base_t<base>::GAFLIDH_ rscan_base_t<base>::GAFLIDH;
+	template <uint32_t base> typename rscan_base_t<base>::GAFLML_ rscan_base_t<base>::GAFLML;
+	template <uint32_t base> typename rscan_base_t<base>::GAFLMH_ rscan_base_t<base>::GAFLMH;
+	template <uint32_t base> typename rscan_base_t<base>::GAFLPL_ rscan_base_t<base>::GAFLPL;
+	template <uint32_t base> typename rscan_base_t<base>::GAFLPH_ rscan_base_t<base>::GAFLPH;
+	template <uint32_t base> typename rscan_base_t<base>::RMNB_ rscan_base_t<base>::RMNB;
+	template <uint32_t base> typename rscan_base_t<base>::RMND0_ rscan_base_t<base>::RMND0;
+	template <uint32_t base> typename rscan_base_t<base>::RMIDL_ rscan_base_t<base>::RMIDL;
+	template <uint32_t base> typename rscan_base_t<base>::RMIDH_ rscan_base_t<base>::RMIDH;
+	template <uint32_t base> typename rscan_base_t<base>::RMTS_ rscan_base_t<base>::RMTS;
+	template <uint32_t base> typename rscan_base_t<base>::RMPTR_ rscan_base_t<base>::RMPTR;
+	template <uint32_t base> typename rscan_base_t<base>::RMDF0_ rscan_base_t<base>::RMDF0;
+	template <uint32_t base> typename rscan_base_t<base>::RMDF1_ rscan_base_t<base>::RMDF1;
+	template <uint32_t base> typename rscan_base_t<base>::RMDF2_ rscan_base_t<base>::RMDF2;
+	template <uint32_t base> typename rscan_base_t<base>::RMDF3_ rscan_base_t<base>::RMDF3;
+	template <uint32_t base> typename rscan_base_t<base>::RFCC_ rscan_base_t<base>::RFCC;
+	template <uint32_t base> typename rscan_base_t<base>::RFSTS_ rscan_base_t<base>::RFSTS;
+	template <uint32_t base> typename rscan_base_t<base>::RFPCTR_ rscan_base_t<base>::RFPCTR;
+	template <uint32_t base> typename rscan_base_t<base>::RFIDL_ rscan_base_t<base>::RFIDL;
+	template <uint32_t base> typename rscan_base_t<base>::RFIDH_ rscan_base_t<base>::RFIDH;
+	template <uint32_t base> typename rscan_base_t<base>::RFTS_ rscan_base_t<base>::RFTS;
+	template <uint32_t base> typename rscan_base_t<base>::RFPTR_ rscan_base_t<base>::RFPTR;
+	template <uint32_t base> typename rscan_base_t<base>::RFDF0_ rscan_base_t<base>::RFDF0;
+	template <uint32_t base> typename rscan_base_t<base>::RFDF1_ rscan_base_t<base>::RFDF1;
+	template <uint32_t base> typename rscan_base_t<base>::RFDF2_ rscan_base_t<base>::RFDF2;
+	template <uint32_t base> typename rscan_base_t<base>::RFDF3_ rscan_base_t<base>::RFDF3;
+	template <uint32_t base> typename rscan_base_t<base>::CFCCL0_ rscan_base_t<base>::CFCCL0;
+	template <uint32_t base> typename rscan_base_t<base>::CFCCH0_ rscan_base_t<base>::CFCCH0;
+	template <uint32_t base> typename rscan_base_t<base>::CFSTS0_ rscan_base_t<base>::CFSTS0;
+	template <uint32_t base> typename rscan_base_t<base>::CFPCTR0_ rscan_base_t<base>::CFPCTR0;
+	template <uint32_t base> typename rscan_base_t<base>::CFIDL0_ rscan_base_t<base>::CFIDL0;
+	template <uint32_t base> typename rscan_base_t<base>::CFIDH0_ rscan_base_t<base>::CFIDH0;
+	template <uint32_t base> typename rscan_base_t<base>::CFTS0_ rscan_base_t<base>::CFTS0;
+	template <uint32_t base> typename rscan_base_t<base>::CFPTR0_ rscan_base_t<base>::CFPTR0;
+	template <uint32_t base> typename rscan_base_t<base>::CFDF00_ rscan_base_t<base>::CFDF00;
+	template <uint32_t base> typename rscan_base_t<base>::CFDF10_ rscan_base_t<base>::CFDF10;
+	template <uint32_t base> typename rscan_base_t<base>::CFDF20_ rscan_base_t<base>::CFDF20;
+	template <uint32_t base> typename rscan_base_t<base>::CFDF30_ rscan_base_t<base>::CFDF30;
+	template <uint32_t base> typename rscan_base_t<base>::RFMSTS_ rscan_base_t<base>::RFMSTS;
+	template <uint32_t base> typename rscan_base_t<base>::CFMSTS_ rscan_base_t<base>::CFMSTS;
+	template <uint32_t base> typename rscan_base_t<base>::RFISTS_ rscan_base_t<base>::RFISTS;
+	template <uint32_t base> typename rscan_base_t<base>::CFISTS_ rscan_base_t<base>::CFISTS;
+	template <uint32_t base> typename rscan_base_t<base>::TMC_ rscan_base_t<base>::TMC;
+	template <uint32_t base> typename rscan_base_t<base>::TMSTS_ rscan_base_t<base>::TMSTS;
+	template <uint32_t base> typename rscan_base_t<base>::TMTRSTS_ rscan_base_t<base>::TMTRSTS;
+	template <uint32_t base> typename rscan_base_t<base>::TMTCSTS_ rscan_base_t<base>::TMTCSTS;
+	template <uint32_t base> typename rscan_base_t<base>::TMTASTS_ rscan_base_t<base>::TMTASTS;
+	template <uint32_t base> typename rscan_base_t<base>::TMIEC_ rscan_base_t<base>::TMIEC;
+	template <uint32_t base> typename rscan_base_t<base>::TMIDL_ rscan_base_t<base>::TMIDL;
+	template <uint32_t base> typename rscan_base_t<base>::TMIDH_ rscan_base_t<base>::TMIDH;
+	template <uint32_t base> typename rscan_base_t<base>::TMPTR_ rscan_base_t<base>::TMPTR;
+	template <uint32_t base> typename rscan_base_t<base>::TMDF0_ rscan_base_t<base>::TMDF0;
+	template <uint32_t base> typename rscan_base_t<base>::TMDF1_ rscan_base_t<base>::TMDF1;
+	template <uint32_t base> typename rscan_base_t<base>::TMDF2_ rscan_base_t<base>::TMDF2;
+	template <uint32_t base> typename rscan_base_t<base>::TMDF3_ rscan_base_t<base>::TMDF3;
+	template <uint32_t base> typename rscan_base_t<base>::THLCC0_ rscan_base_t<base>::THLCC0;
+	template <uint32_t base> typename rscan_base_t<base>::THLSTS0_ rscan_base_t<base>::THLSTS0;
+	template <uint32_t base> typename rscan_base_t<base>::THLACC0_ rscan_base_t<base>::THLACC0;
+	template <uint32_t base> typename rscan_base_t<base>::THLPCTR0_ rscan_base_t<base>::THLPCTR0;
+	template <uint32_t base> typename rscan_base_t<base>::GRWCR_ rscan_base_t<base>::GRWCR;
+	template <uint32_t base> typename rscan_base_t<base>::GTSTCFG_ rscan_base_t<base>::GTSTCFG;
+	template <uint32_t base> typename rscan_base_t<base>::GTSTCTRL_ rscan_base_t<base>::GTSTCTRL;
+	template <uint32_t base> typename rscan_base_t<base>::GLOCKK_ rscan_base_t<base>::GLOCKK;
+	template <uint32_t base> typename rscan_base_t<base>::RPGACC_ rscan_base_t<base>::RPGACC;
 
 
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	RSCAN モジュール（RX24T/RX231）
+		@param[in]	base	ベースアドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct rscan_t : rscan_base_t<base> {
 
+		static constexpr auto PERIPHERAL = peripheral::RSCAN;		///< ペリフェラル型
 
-	typedef rscan_t<0x000A'8300, peripheral::RSCAN>  RSCAN;
+		static constexpr auto PCLK = clock_profile::PCLKB / 2;		///< 周辺クロック周波数（1/2）
+		static constexpr auto MCLK = clock_profile::BASE;			///< CANMCLK
+
+		static constexpr auto RXINT = ICU::VECTOR::RXFINT;			///< グローバル受信 FIFO 割り込み
+		static constexpr auto GLERRINT = ICU::VECTOR::GLERRINT;		///< グローバルエラー割り込み
+		static constexpr auto TXINT = ICU::VECTOR::TXINT;			///< チャネル送信割り込み
+		static constexpr auto COMFRXINT = ICU::VECTOR::COMFRXINT;	///< 送受信 FIFO 受信割り込み
+		static constexpr auto CHERRIN = ICU::VECTOR::CHERRINT;		///< チャネルエラー割り込み
+	};
+	typedef rscan_t<0x000A'8300> RSCAN;
 }
