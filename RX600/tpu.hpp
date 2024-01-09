@@ -1,15 +1,16 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	16 ビットタイマパルスユニット定義 @n
+			RX231 @n
 			RX631/RX63N @n
 			RX64M/RX71M/RX651/RX65N/RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -468,26 +469,27 @@ namespace device {
 		typename tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD_
 		tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD;
 
-
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX651) || defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX231)
+	// グループベクターには無効表現が無い為、割り込みが無い場合「NUM_」としている。（I/O ドライバーのケアが必要）
 	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
-		ICU::SELECTB, ICU::SELECTB::TGI0A, ICU::SELECTB::TGI0B, ICU::SELECTB::TGI0C, ICU::SELECTB::TGI0D,
-		ICU::SELECTB, ICU::SELECTB::TGI0V, ICU::SELECTB::NONE>  TPU0;
+		ICU::VECTOR, ICU::VECTOR::TGI0A, ICU::VECTOR::TGI0B, ICU::VECTOR::TGI0C, ICU::VECTOR::TGI0D,
+		ICU::VECTOR, ICU::VECTOR::TCI0V, ICU::VECTOR::NONE>  TPU0;
 	typedef tpu_y_t<0x0008'8120, peripheral::TPU1,
-		ICU::SELECTB, ICU::SELECTB::TGI1A, ICU::SELECTB::TGI1B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
-		ICU::SELECTB, ICU::SELECTB::TGI1V, ICU::SELECTB::TGI1U> TPU1;
+		ICU::VECTOR, ICU::VECTOR::TGI1A, ICU::VECTOR::TGI1B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::VECTOR, ICU::VECTOR::TCI1V, ICU::VECTOR::TCI1U> TPU1;
 	typedef tpu_y_t<0x0008'8130, peripheral::TPU2,
-		ICU::SELECTB, ICU::SELECTB::TGI2A, ICU::SELECTB::TGI2B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
-		ICU::SELECTB, ICU::SELECTB::TGI2V, ICU::SELECTB::TGI2U> TPU2;
+		ICU::VECTOR, ICU::VECTOR::TGI2A, ICU::VECTOR::TGI2B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::VECTOR, ICU::VECTOR::TCI2V, ICU::VECTOR::TCI2U> TPU2;
 	typedef tpu_x_t<0x0008'8140, peripheral::TPU3,
-		ICU::SELECTB, ICU::SELECTB::TGI3A, ICU::SELECTB::TGI3B, ICU::SELECTB::TGI3C, ICU::SELECTB::TGI3D,
-		ICU::SELECTB, ICU::SELECTB::TGI3V, ICU::SELECTB::NONE>  TPU3;
+		ICU::VECTOR, ICU::VECTOR::TGI3A, ICU::VECTOR::TGI3B, ICU::VECTOR::TGI3C, ICU::VECTOR::TGI3D,
+		ICU::VECTOR, ICU::VECTOR::TCI3V, ICU::VECTOR::NONE>  TPU3;
 	typedef tpu_y_t<0x0008'8150, peripheral::TPU4,
-		ICU::SELECTB, ICU::SELECTB::TGI4A, ICU::SELECTB::TGI4B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
-		ICU::SELECTB, ICU::SELECTB::TGI4V, ICU::SELECTB::TGI4U> TPU4;
+		ICU::VECTOR, ICU::VECTOR::TGI4A, ICU::VECTOR::TGI4B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::VECTOR, ICU::VECTOR::TCI4V, ICU::VECTOR::TCI4U> TPU4;
 	typedef tpu_y_t<0x0008'8160, peripheral::TPU5,
-		ICU::SELECTB, ICU::SELECTB::TGI5A, ICU::SELECTB::TGI5B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
-		ICU::SELECTB, ICU::SELECTB::TGI5V, ICU::SELECTB::TGI5U> TPU5;
+		ICU::VECTOR, ICU::VECTOR::TGI5A, ICU::VECTOR::TGI5B, ICU::VECTOR::NONE,  ICU::VECTOR::NONE,
+		ICU::VECTOR, ICU::VECTOR::TCI5V, ICU::VECTOR::TCI5U> TPU5;
+
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
 	// グループベクターには無効表現が無い為、割り込みが無い場合「NUM_」としている。（I/O ドライバーのケアが必要）
 	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
@@ -526,5 +528,25 @@ namespace device {
 	typedef tpu_y_t<0x0008'81D0, peripheral::TPU11,
 		ICU::VECTOR, ICU::VECTOR::TGI11A, ICU::VECTOR::TGI11B, ICU::VECTOR::NONE, ICU::VECTOR::NONE,
 		ICU::GROUP5, ICU::GROUP5::TCI11V, ICU::GROUP5::TCI11U> TPU11;
+
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX651) || defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
+		ICU::SELECTB, ICU::SELECTB::TGI0A, ICU::SELECTB::TGI0B, ICU::SELECTB::TGI0C, ICU::SELECTB::TGI0D,
+		ICU::SELECTB, ICU::SELECTB::TGI0V, ICU::SELECTB::NONE>  TPU0;
+	typedef tpu_y_t<0x0008'8120, peripheral::TPU1,
+		ICU::SELECTB, ICU::SELECTB::TGI1A, ICU::SELECTB::TGI1B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB, ICU::SELECTB::TGI1V, ICU::SELECTB::TGI1U> TPU1;
+	typedef tpu_y_t<0x0008'8130, peripheral::TPU2,
+		ICU::SELECTB, ICU::SELECTB::TGI2A, ICU::SELECTB::TGI2B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB, ICU::SELECTB::TGI2V, ICU::SELECTB::TGI2U> TPU2;
+	typedef tpu_x_t<0x0008'8140, peripheral::TPU3,
+		ICU::SELECTB, ICU::SELECTB::TGI3A, ICU::SELECTB::TGI3B, ICU::SELECTB::TGI3C, ICU::SELECTB::TGI3D,
+		ICU::SELECTB, ICU::SELECTB::TGI3V, ICU::SELECTB::NONE>  TPU3;
+	typedef tpu_y_t<0x0008'8150, peripheral::TPU4,
+		ICU::SELECTB, ICU::SELECTB::TGI4A, ICU::SELECTB::TGI4B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB, ICU::SELECTB::TGI4V, ICU::SELECTB::TGI4U> TPU4;
+	typedef tpu_y_t<0x0008'8160, peripheral::TPU5,
+		ICU::SELECTB, ICU::SELECTB::TGI5A, ICU::SELECTB::TGI5B, ICU::SELECTB::NONE,  ICU::SELECTB::NONE,
+		ICU::SELECTB, ICU::SELECTB::TGI5V, ICU::SELECTB::TGI5U> TPU5;
 #endif
 }

@@ -1,14 +1,14 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX64M, RX71M グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化して設定 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX64M/peripheral.hpp"
 #include "RX64M/port.hpp"
 #include "RX64M/mpc.hpp"
