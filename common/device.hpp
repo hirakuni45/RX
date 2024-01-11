@@ -158,6 +158,19 @@
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX671)
+#include "RX671/clock_profile.hpp"
+#include "RX671/peripheral.hpp"
+#include "RX600/system.hpp"
+#include "RX671/power_mgr.hpp"
+#include "RX671/icu.hpp"
+#include "RX671/icu_mgr.hpp"
+// #include "RX671/port_map.hpp"
+// #include "RX671/port_map_mtu.hpp"
+// #include "RX671/port_map_tpu.hpp"
+// #include "RX671/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX72N)
 #include "RX72N/clock_profile.hpp"
 #include "RX72N/peripheral.hpp"
