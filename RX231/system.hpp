@@ -722,66 +722,6 @@ namespace device {
 		static RSTCKCR_ RSTCKCR;
 
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct soscwtcr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 5> SSTS;
-		};
-		typedef soscwtcr_t<0x0008'00A3> SOSCWTCR_;
-		static SOSCWTCR_ SOSCWTCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  HOCO ウェイトコントロールレジスタ 2（HOCOWTCR2）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct hocowtcr2_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 5> HSTS2;
-		};
-		typedef hocowtcr2_t<0x0008'00A9> HOCOWTCR2_;
-		static HOCOWTCR2_ HOCOWTCR2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  フラッシュ HOCO ソフトウェアスタンバイコントロールレジスタ（FHSSBYCR）
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct fhssbycr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 3> SOFTCUT;
-		};
-		typedef fhssbycr_t<0x0008'C28F> FHSSBYCR_;
-		static FHSSBYCR_ FHSSBYCR;
-
-
 		//----  レジスタライトプロテクション機能  ----------------------------//
 
 		//-----------------------------------------------------------------//

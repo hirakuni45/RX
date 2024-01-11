@@ -119,15 +119,5 @@ namespace device {
 		CMPC5,		///< コンパレーター５
 
 		DOC,		///< データ演算回路 (DOC)
-
-		// 仮の仕様
-		IRQ0,
-		IRQ1,
-		IRQ2,
-		IRQ3,
-		IRQ4,
-		IRQ5,
-		IRQ6,
-		IRQ7,
 	};
 }

@@ -41,7 +41,7 @@ namespace device {
 		static constexpr uint32_t   BASE		= 12'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）
 
 		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
-		static constexpr bool       TURN_USB    = false;			///< USB を使う場合「true」
+		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
 		static constexpr uint32_t   PLL_BASE	= 54'000'000;		///< PLL ベースクロック（最大 54MHz）
 
