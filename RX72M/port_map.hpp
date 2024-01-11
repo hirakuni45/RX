@@ -629,39 +629,6 @@ namespace device {
 				}
 				break;
 
-			case peripheral::IRQ0:
-				PORTD::PMR.B0 = 0;
-				MPC::PD0PFS.ISEL = enable;  // PD0
-				break;
-			case peripheral::IRQ1:
-				PORTD::PMR.B1 = 0;
-				MPC::PD1PFS.ISEL = enable;  // PD1
-				break;
-			case peripheral::IRQ2:
-				PORTD::PMR.B2 = 0;
-				MPC::PD2PFS.ISEL = enable;  // PD2
-				break;
-			case peripheral::IRQ3:
-				PORTD::PMR.B3 = 0;
-				MPC::PD3PFS.ISEL = enable;  // PD3
-				break;
-			case peripheral::IRQ4:
-				PORTD::PMR.B4 = 0;
-				MPC::PD4PFS.ISEL = enable;  // PD4
-				break;
-			case peripheral::IRQ5:
-				PORTD::PMR.B5 = 0;
-				MPC::PD5PFS.ISEL = enable;  // PD5
-				break;
-			case peripheral::IRQ6:
-				PORTD::PMR.B6 = 0;
-				MPC::PD6PFS.ISEL = enable;  // PD6
-				break;
-			case peripheral::IRQ7:
-				PORTD::PMR.B7 = 0;
-				MPC::PD7PFS.ISEL = enable;  // PD7
-				break;
-
 			default:
 				ret = false;
 				break;
@@ -840,11 +807,6 @@ namespace device {
 					MPC::PD4PFS.PSEL = sel;  // QSSL-B   (PD4 LQFP176: 142)
 					PORTD::PMR.B4 = enable;
 				}
-				break;
-
-			case peripheral::IRQ4:
-				PORTF::PMR.B5 = 0;
-				MPC::PF5PFS.ISEL = enable;  // PF5
 				break;
 
 			default:

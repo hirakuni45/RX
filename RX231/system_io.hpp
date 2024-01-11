@@ -79,17 +79,17 @@ namespace device {
 			return true;
 		}
 
-#if 0
-		static constexpr uint32_t usb_div_() noexcept
+		static constexpr bool check_usb_clock_() noexcept
 		{
 			if(clock_profile::TURN_USB) {
-				if((clock_profile::PLL_BASE % 48'000'000) != 0) return 0;  // 割り切れない場合
-				return (clock_profile::PLL_BASE / 48'000'000);
-			} else {  // USB を使わない場合は、常に「２」（リセット時の値）を返す
-				return 0b0001 + 1;
+				if((48'000'000 % clock_profile::BASE) != 0) return 0;  // 割り切れない場合
+				auto n = 48'000'000 / clock_profile::BASE;
+				if(n == 4 || n == 6 || n == 8 || n ==12) return true;
+				return false;
+			} else {
+				return true;
 			}
 		}
-#endif
 
 	public:
 		//---------------------------------------------------------------------//
@@ -157,10 +157,12 @@ namespace device {
 						  | SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD))
 						  | SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
 						  | SYSTEM::SCKCR.BCK.b(clock_div_(clock_profile::BCLK));
-
 			{
 				volatile auto tmp = device::SYSTEM::SCKCR();  // dummy read
 			}
+
+			// Memory wait cycle register
+			SYSTEM::MEMWAIT.MEMWAIT = clock_profile::ICLK > 32'000'000;
 
 			// Master PLL settings
 			// Min: x4 (0b000111), Max: 13.5 (0b011010)
@@ -179,12 +181,27 @@ namespace device {
 				volatile auto tmp = device::SYSTEM::SCKCR3();
 			}
 
+			// USB clock generate
+			static_assert(check_usb_clock_(), "USB clock can't divided.");
+			if(clock_profile::TURN_USB) {
+				auto n = 48'000'000 / clock_profile::BASE;
+				device::SYSTEM::UPLLCR = device::SYSTEM::UPLLCR.USTC.b((n << 1) - 1)
+									  |  device::SYSTEM::UPLLCR.UPLIDIV.b(0) | device::SYSTEM::UPLLCR.UCKUPLLSEL.b(1);
+				device::SYSTEM::UPLLCR2.UPLLEN = 0;  // UPLL 動作
+				{
+					volatile auto tmp = device::SYSTEM::UPLLCR2();
+				}
+				while(device::SYSTEM::OSCOVFSR.UPLOVF() == 0) { asm("nop"); }
+			}
+
 			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
 				device::SYSTEM::HOCOCR.HCSTP = 1;  // 高速オンチップオシレータ停止
 			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
 			}
+
+			device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
 
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 

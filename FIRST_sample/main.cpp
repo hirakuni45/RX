@@ -79,6 +79,10 @@ namespace {
 	// Renesas RX65N Envision Kit
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
+#elif defined(SIG_RX671)
+	// DIY RX671 board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
 #elif defined(SIG_RX66T)
 	// DIY RX66T board
 	static constexpr bool LED_ACTIVE = 0;

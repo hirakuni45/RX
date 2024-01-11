@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RXv3 CPU グループ メモリプロテクションユニット（MPU）定義
+	@brief	RXv2/RXv3 CPU グループ メモリプロテクションユニット（MPU）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n

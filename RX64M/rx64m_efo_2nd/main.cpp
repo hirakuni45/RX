@@ -17,7 +17,6 @@
 #include "common/sci_io.hpp"
 #include "common/spi_io.hpp"
 #include "common/rspi_io.hpp"
-#include "common/irq_man.hpp"
 #include "chip/LTC2348_16a.hpp"
 
 // #define UART_DEBUG

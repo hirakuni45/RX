@@ -1,12 +1,17 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX63[1N]/RX64M/RX71M/RX65[1N]/RX72N/RX72M ポート・マッピング (IRQ) @n
+	@brief	ポート・マッピング (IRQ) @n
+			RX63[1N] @n
+			RX64M/RX71M @n
+			RX65[1N] @n
+			RX72N @n
+			RX72M
 			IRQx-DS 端子は、ディープスタンバイからの復帰が有効な端子 @n
 			  通常割り込み入力としても使え、通常「ORDER::FIRST」で選択する。 @n
 			  詳しくは、MPC の解説を参照する事。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -539,7 +544,6 @@ namespace device {
 				ret = false;
 				break;
 			}
-
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 

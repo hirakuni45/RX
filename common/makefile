@@ -146,6 +146,12 @@ ifeq ($(RX_DEF),SIG_RX65N)
   LDSCRIPT	= ../../RX65x/$(DEVICE).ld
 endif
 
+ifeq ($(RX_DEF),SIG_RX671)
+  RX_CPU = RX671
+  RX_CHOOSE = -misa=v2
+  LDSCRIPT	= ../../RX671/$(DEVICE).ld
+endif
+
 # The RX66T cpu does not support the 'SAVE' and 'RSTR' instructions.
 ifeq ($(RX_DEF),SIG_RX66T)
   RX_CPU = RX66T

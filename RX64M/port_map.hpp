@@ -497,7 +497,7 @@ namespace device {
 					PORT6::PMR.B7 = enable;
 				}
 				break;
-
+#if 0
 			case peripheral::IRQ0:
 				PORTD::PMR.B0 = 0;
 				MPC::PD0PFS.ISEL = enable;  // PD0
@@ -530,7 +530,7 @@ namespace device {
 				PORTD::PMR.B7 = 0;
 				MPC::PD7PFS.ISEL = enable;  // PD7
 				break;
-
+#endif
 			default:
 				ret = false;
 				break;
@@ -699,12 +699,12 @@ namespace device {
 					PORTD::PMR.B4 = enable;
 				}
 				break;
-
+#if 0
 			case peripheral::IRQ4:
 				PORTF::PMR.B5 = 0;
 				MPC::PF5PFS.ISEL = enable;  // PF5
 				break;
-
+#endif
 			default:
 				ret = false;
 				break;

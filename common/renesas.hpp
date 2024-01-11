@@ -49,7 +49,7 @@
 #include "RX600/tpu.hpp"
 #include "RX600/tmr.hpp"
 #include "RX231/rtc.hpp"
-// #include "RX231/lpt.hpp"
+#include "RX600/lpt.hpp"
 #include "RX600/usb.hpp"
 #include "RX600/sci_g.hpp"
 #include "RX600/sci_h.hpp"
@@ -259,7 +259,7 @@
 #include "ff14/sdhi_io.hpp"
 #include "RX600/ssi_io.hpp"
 
-#elif defined(SIG_RX65N)
+#elif defined(SIG_RX651) || defined(SIG_RX65N)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/cac.hpp"
@@ -278,8 +278,10 @@
 #include "RX600/s12adf.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/sdram.hpp"
+#if defined(SIG_RX65N)
 #include "RX600/etherc.hpp"
 #include "RX600/edmac.hpp"
+#endif
 #include "RX600/usb.hpp"
 #include "RX600/sci_g.hpp"
 #include "RX600/sci_i.hpp"
@@ -308,7 +310,20 @@
 #include "RX600/dac_out.hpp"
 #include "RX600/flash_io.hpp"
 
-#elif defined(SIG_RX72M) || defined(SIG_RX72N)
+#elif defined(SIG_RX671)
+
+#include "RX671/port.hpp"
+
+#include "RX600/sci_g.hpp"
+#include "RX600/sci_i.hpp"
+#include "RX600/sci_h.hpp"
+#include "RX600/rsci.hpp"
+
+#include "RX600/flash.hpp"
+
+#include "RX600/system_io.hpp"
+
+#elif defined(SIG_RX72N) || defined(SIG_RX72M)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/cac.hpp"

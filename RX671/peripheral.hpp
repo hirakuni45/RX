@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX651/RX65N グループ・ペリフェラル
+	@brief	RX671 グループ・ペリフェラル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,8 +21,6 @@ namespace device {
 
 		CAC,		///< クロック周波数精度測定回路
 
-		ELC,		///< イベントリンクコントローラ
-
 		DMAC0,		///< DMA コントローラ・チャネル０
 		DMAC1,		///< DMA コントローラ・チャネル１
 		DMAC2,		///< DMA コントローラ・チャネル２
@@ -36,6 +34,8 @@ namespace device {
 		EXDMAC0,	///< EXDMA コントローラ・チャネル０
 		EXDMAC1,	///< EXDMA コントローラ・チャネル１
 
+		ELC,		///< イベントリンクコントローラ
+
 		MTU0,		///< マルチファンクションタイマパルスユニット０
 		MTU1,		///< マルチファンクションタイマパルスユニット１
 		MTU2,		///< マルチファンクションタイマパルスユニット２
@@ -48,11 +48,6 @@ namespace device {
 
 		POE3,		///< ポートアウトプットイネーブル
 
-		TMR0,		///< 8 ビットタイマ０
-		TMR1,		///< 8 ビットタイマ１
-		TMR2,		///< 8 ビットタイマ２
-		TMR3,		///< 8 ビットタイマ３
-
 		TPU0,		///< 16 ビットタイマパルスユニット０
 		TPU1,		///< 16 ビットタイマパルスユニット１
 		TPU2,		///< 16 ビットタイマパルスユニット２
@@ -62,6 +57,11 @@ namespace device {
 
 		PPG0,		///< プログラマブルパルスジェネレータ０
 		PPG1,		///< プログラマブルパルスジェネレータ１
+
+		TMR0,		///< 8 ビットタイマ０
+		TMR1,		///< 8 ビットタイマ１
+		TMR2,		///< 8 ビットタイマ２
+		TMR3,		///< 8 ビットタイマ３
 
 		CMT0,		///< コンペアマッチタイマ０（CMT）
 		CMT1,		///< コンペアマッチタイマ１（CMT）
@@ -76,10 +76,8 @@ namespace device {
 		WDTA,		///< ウォッチドッグタイマ
 		IWDT,		///< 独立ウォッチドッグタイマ
 
-		ETHERC0,	///< イーサネットコントローラ 0
-		EDMAC0,		///< Ethernet DMA 0
-
 		USB0,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
+		USB1,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
 
 		SCI0,		///< シリアルコミュニケーションインタフェース (P20:TXD0, P21:RXD0)
 		SCI1,		///< シリアルコミュニケーションインタフェース (PF0:TXD1, PF2:RXD1)
@@ -89,35 +87,46 @@ namespace device {
 		SCI5,		///< シリアルコミュニケーションインタフェース (PA4:TXD5, PA2:RXD5)
 		SCI6,		///< シリアルコミュニケーションインタフェース (P00:TXD6, P01:RXD6)
 		SCI7,		///< シリアルコミュニケーションインタフェース (P90:TXD7, P92:RXD7)
-		SCI8,		///< シリアルコミュニケーションインターフェース
-		SCI9,		///< シリアルコミュニケーションインターフェース
-		SCI10,		///< シリアルコミュニケーションインターフェース
-		SCI11,		///< シリアルコミュニケーションインターフェース
+		SCI8,		///< シリアルコミュニケーションインタフェース
+		SCI9,		///< シリアルコミュニケーションインタフェース
+		SCI10,		///< シリアルコミュニケーションインタフェース
+		SCI11,		///< シリアルコミュニケーションインタフェース
 		SCI12,		///< シリアルコミュニケーションインタフェース
 
-		RIIC0,		///< I 2 C バスインタフェース０（RIICa）
-		RIIC1,		///< I 2 C バスインタフェース１（RIICa）
-		RIIC2,		///< I 2 C バスインタフェース２（RIICa）
+		RSCI10,		///< シリアルコミュニケーションインタフェース (RSCI10)
+		RSCI11,		///< シリアルコミュニケーションインタフェース (RSCI11)
+
+		RIIC0,		///< I 2 C バスインタフェース０（RIIC0a）
+		RIIC1,		///< I 2 C バスインタフェース１（RIIC1a）
+		RIIC2,		///< I 2 C バスインタフェース２（RIIC2a）
+
+		RIICHS0,	///< ハイスピード I2C バスインタフェース
 
 		CAN0,		///< CAN インタフェース（CAN0）
 		CAN1,		///< CAN インタフェース（CAN1）
 
 		RSPI0,		///< シリアルペリフェラルインタフェース（RSPI0）
 		RSPI1,		///< シリアルペリフェラルインタフェース（RSPI1）
+		RSPI2,		///< シリアルペリフェラルインタフェース（RSPI2）
 
-		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
+		RSPIA0,		///< シリアルペリフェラルインタフェース (RSPIA)
+
+		QSPIX,		///< クワッド SPI メモリインタフェース (QSPIX)
 
 		CRC,		///< CRC 演算器（CRCA）
 
 		SDHI,		///< SD ホストインタフェース（SDHI）
-		SDSI,		///< SD スレーブインタフェース（SDSI）
 
-		MMCIF,		///< マルチメディアカードインタフェース（MMCIF）
+		SSIE0,		///< シリアルサウンドインタフェース (SSIE)
 
-		PDC,		///< パラレルデータキャプチャユニット
+		REMC0,		///< リモコン信号受信機能 (REMCa)
 
-		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
-		S12AD1,		///< 12 ビット A/D コンバータ（S12ADC1）
+		CTSU,		///< 静電容量式タッチセンサ (CTSUa)
+
+		TSIP,		///< Trusted Secure IP (TSIP)
+
+		S12AD,		///< 12 ビット A/D コンバータ（S12ADFa）
+		S12AD1,		///< 12 ビット A/D コンバータ（S12ADFa）
 
 		R12DA,		///< 12 ビット D/A コンバータ（R12DA）
 
@@ -125,12 +134,6 @@ namespace device {
 
 		DOC,		///< データ演算回路 (DOC)
 
-		ECCRAM,		///< ECC RAM (32K)
-		STBRAM,		///< Standby RAM (8K)
-
-		GLCDC,		///< グラフィック LCD コントローラ (GLCDC)
-		DRW2D,		///< 2D 描画エンジン (DRW2D)
-
-		ICU,		///< グループ割り込みペリフェラル
+		STBRAM,		///< スタンバイ RAM
 	};
 }
