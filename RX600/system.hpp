@@ -1,9 +1,10 @@
 #pragma once
-//=====================================================================//
+//=============================================================================//
 /*!	@file
 	@brief	システム定義（クロック発生回路、） @n
 			・RX64M/RX71M @n
 			・RX651/RX65N @n
+			・RX671 @n
 			・RX66T @n
 			・RX72M/RX72T/RX72N
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -11,20 +12,20 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=============================================================================//
 #include "common/io_utils.hpp"
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  システム定義基底クラス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
 	struct system_t {
 
-		//----  クロック発生回路  ---------------------------------------------//
+		//----  オプション設定メモリ  -------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -210,6 +211,7 @@ namespace device {
 		typedef syscr1_t<0x0008'0008> SYSCR1_;
 		static SYSCR1_ SYSCR1;
 
+		//----  クロック発生回路  -----------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -230,7 +232,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4> PCKB;
 			bits_rw_t<io_, bitpos::B12, 4> PCKA;
 			bits_rw_t<io_, bitpos::B16, 4> BCK;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t <io_, bitpos::B22>    PSTOP0;
 #endif
 			bit_rw_t <io_, bitpos::B23>    PSTOP1;
@@ -277,7 +280,7 @@ namespace device {
 #endif
 
 
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX671)
   		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT)
@@ -423,7 +426,7 @@ namespace device {
 		static MOSCCR_ MOSCCR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
@@ -525,6 +528,48 @@ namespace device {
 		static HOCOCR2_ HOCOCR2;
 
 
+#if defined(SIG_RX671)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	FLL コントロールレジスタ 1 (FLLCR1)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct fllcr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> FLLEN;
+		};
+		typedef fllcr1_t<0x0008'0039> FLLCR1_;
+		static FLLCR1_ FLLCR1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	FLL コントロールレジスタ 2 (FLLCR2)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct fllcr2_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 11> MPY;
+		};
+		typedef fllcr2_t<0x0008'003A> FLLCR2_;
+		static FLLCR2_ FLLCR2;
+#endif
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発振安定フラグレジスタ（OSCOVFSR）
@@ -540,7 +585,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> MOOVF;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B1> SOOVF;
 #endif
 			bit_rw_t<io_, bitpos::B2> PLOVF;
@@ -601,17 +646,37 @@ namespace device {
 			@brief  メインクロック発振器ウェイトコントロールレジスタ（MOSCWTCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x0008'00A2> MOSCWTCR_;
+		template <uint32_t base>
+		struct moscwtcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8> MSTS;
+		};
+		typedef moscwtcr_t<0x0008'00A2> MOSCWTCR_;
 		static MOSCWTCR_ MOSCWTCR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x0008'00A3> SOSCWTCR_;
+		template <uint32_t base>
+		struct soscwtcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8> SSTS;
+		};
+		typedef soscwtcr_t<0x0008'00A3> SOSCWTCR_;
 		static SOSCWTCR_ SOSCWTCR;
 #endif
 
@@ -630,9 +695,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
 			bit_rw_t <io_, bitpos::B0>     MOFXIN;
 #endif
+
 			bits_rw_t<io_, bitpos::B4, 2>  MODRV2;
 			bit_rw_t <io_, bitpos::B6>     MOSEL;
 		};
@@ -660,7 +726,7 @@ namespace device {
 		static HOCOPCR_ HOCOPCR;
 
 
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CLKOUT 出力コントロールレジスタ (CKOCR)
@@ -682,8 +748,9 @@ namespace device {
 		};
 		typedef ckocr_t<0x0008'003E> CKOCR_;
 		static CKOCR_ CKOCR;
+#endif
 
-
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  特定用途向けクロック制御レジスタ (PACKCR)
@@ -770,7 +837,72 @@ namespace device {
 		static PPLLCR3_ PPLLCR3;
 #endif
 
-		//----  消費電力低減機能  ---------------------------------------------//
+#if defined(SIG_RX671)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ 2 (SOSCCR2)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct sosccr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  SOSTP2;
+		};
+		typedef sosccr2_t<0x0008'CC00> SOSCCR2_;
+		static SOSCCR2_ SOSCCR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バックアップ領域サブクロック制御レジスタ (BKSCCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct bksccr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B6>  SOSEL;
+		};
+		typedef bksccr_t<0x0008'CC01> BKSCCR_;
+		static BKSCCR_ BKSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  高速オンチップオシレータトリミングレジスタ n (HOCOTRRn) (n = 0 ～ 2)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct hocotrr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 9>  HOCOTRD;
+		};
+		typedef hocotrr_t<0x007F'B0E0> HOCOTRR0_;
+		static HOCOTRR0_ HOCOTRR0;
+		typedef hocotrr_t<0x007F'B0E4> HOCOTRR1_;
+		static HOCOTRR1_ HOCOTRR1;
+		typedef hocotrr_t<0x007F'B0E8> HOCOTRR2_;
+		static HOCOTRR2_ HOCOTRR2;
+#endif
+
+		//----  消費電力低減機能  ----------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -866,9 +998,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>	MSTPB8;
 			bit_rw_t<io_, bitpos::B9>	MSTPB9;
 			bit_rw_t<io_, bitpos::B10>	MSTPB10;
-#if defined(SIG_RX72M)
 			bit_rw_t<io_, bitpos::B11>	MSTPB11;
-#endif
 			bit_rw_t<io_, bitpos::B12>	MSTPB12;
 			bit_rw_t<io_, bitpos::B13>	MSTPB13;
 
@@ -876,11 +1006,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B15>	MSTPB15;
 			bit_rw_t<io_, bitpos::B16>	MSTPB16;
 			bit_rw_t<io_, bitpos::B17>	MSTPB17;
-
+			bit_rw_t<io_, bitpos::B18>	MSTPB18;
 			bit_rw_t<io_, bitpos::B19>	MSTPB19;
-#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B20>	MSTPB20;
-#endif
 			bit_rw_t<io_, bitpos::B21>	MSTPB21;
 			bit_rw_t<io_, bitpos::B22>	MSTPB22;
 			bit_rw_t<io_, bitpos::B23>	MSTPB23;
@@ -912,27 +1040,23 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>	MSTPC0;
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
+
 			bit_rw_t<io_, bitpos::B2>	MSTPC2;	///< 拡張 RAM
-#endif
+
 			bit_rw_t<io_, bitpos::B6>	MSTPC6;
 			bit_rw_t<io_, bitpos::B7>	MSTPC7;
 
 			bit_rw_t<io_, bitpos::B17>	MSTPC17;
 
 			bit_rw_t<io_, bitpos::B19>	MSTPC19;
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B22>	MSTPC22;	///< RSPI2
-#endif
 			bit_rw_t<io_, bitpos::B23>	MSTPC23;
 			bit_rw_t<io_, bitpos::B24>	MSTPC24;
 			bit_rw_t<io_, bitpos::B25>	MSTPC25;
 			bit_rw_t<io_, bitpos::B26>	MSTPC26;
 			bit_rw_t<io_, bitpos::B27>	MSTPC27;
-#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B28>	MSTPC28;	///< DRW2D
 			bit_rw_t<io_, bitpos::B29>	MSTPC29;	///< GLCDC
-#endif
 		};
 		typedef mstpcrc_t<0x0008'0018> MSTPCRC_;
 		static MSTPCRC_ MSTPCRC;
@@ -962,13 +1086,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>	MSTPD7;
 
 			bit_rw_t<io_, bitpos::B10>	MSTPD10;
-
-#if defined(SIG_RX72M)
 			bit_rw_t<io_, bitpos::B11>	MSTPD11;
-#endif
-#if defined(SIG_RX65N)
+			bit_rw_t<io_, bitpos::B12>	MSTPD12;
 			bit_rw_t<io_, bitpos::B11>	MSTPD13;
-#endif
 			bit_rw_t<io_, bitpos::B14>	MSTPD14;
 			bit_rw_t<io_, bitpos::B15>	MSTPD15;
 
@@ -1000,6 +1120,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 3>	OPCM;
+
 			bit_rw_t <io_, bitpos::B4>		OPCMTSF;
 		};
 		typedef opccr_t<0x0008'00A0> OPCCR_;
@@ -1021,13 +1142,11 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 3>	RSTCKSEL;
+
 			bit_rw_t <io_, bitpos::B4>		RSTCKEN;
 		};
 		typedef rstckcr_t<0x0008'00A1> RSTCKCR_;
 		static RSTCKCR_ RSTCKCR;
-
-
-//-----------------------------------------------------------------------------//
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1044,11 +1163,18 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2>  DEEPCUT;
+
 			bit_rw_t <io_, bitpos::B6>	   IOKEEP;
 			bit_rw_t <io_, bitpos::B7>	   DPSBY;
 		};
 		typedef dpsbycr_t<0x0008'C280> DPSBYCR_;
 		static DPSBYCR_ DPSBYCR;
+
+
+
+
+
+
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1076,6 +1202,8 @@ namespace device {
 		static PRCR_ PRCR;
 
 
+		//----  温度センサ (TEMPS)  --------------------------------------------//
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  温度センサコントロールレジスタ（TSCR）
@@ -1096,6 +1224,8 @@ namespace device {
 		typedef tscr_t<0x0008'C500> TSCR_;
 		static TSCR_ TSCR;
 
+
+		//----  リセット  ------------------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1172,48 +1302,6 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef rw16_t<0x0008'00C2> SWRR_;
 		static SWRR_ SWRR;
-
-
-#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）
-			@param[in]	base	ベースアドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct romce_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>  ROMCEN;
-		};
-		typedef romce_t<0x0008'1000> ROMCE_;
-		static ROMCE_ ROMCE;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ROM キャッシュ無効化レジスタ（ ROMCIV ）
-			@param[in]	base	ベースアドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct romciv_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>  ROMCIV;
-		};
-		typedef romciv_t<0x0008'1004> ROMCIV_;
-		static ROMCIV_ ROMCIV;
-#endif
 
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
@@ -1316,11 +1404,6 @@ namespace device {
 	template<class _> typename system_t<_>::RSTSR1_ system_t<_>::RSTSR1;
 	template<class _> typename system_t<_>::RSTSR2_ system_t<_>::RSTSR2;
 	template<class _> typename system_t<_>::SWRR_ system_t<_>::SWRR;
-
-#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template<class _> typename system_t<_>::ROMCE_ system_t<_>::ROMCE;
-	template<class _> typename system_t<_>::ROMCIV_ system_t<_>::ROMCIV;
-#endif
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
 	template<class _> typename system_t<_>::NCRG0_ system_t<_>::NCRG0;

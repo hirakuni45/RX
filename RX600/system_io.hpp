@@ -160,7 +160,7 @@ namespace device {
 				return;
 			}
 
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX671)
 			if(clock_profile::ICLK >= 120'000'000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::ROMWT = 0b10;
 			} else if(clock_profile::ICLK >= 100'000'000) {
@@ -237,9 +237,9 @@ namespace device {
 #endif
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 
-#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 			// ROM キャッシュを有効（標準）
-			device::SYSTEM::ROMCE = 1;
+			device::FLASH::ROMCE = 1;
 #endif
 #if defined(__TFU)
 			__init_tfu();

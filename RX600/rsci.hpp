@@ -747,7 +747,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void set_prdfr(typename RSCI_BASE::RXDSEL sel) noexcept
 		{
+#if defined(SIG_RX26T)
 			SYSTEM::PRDFR0.SCI8RXD = static_cast<uint8_t>(sel);
+#endif
 		}
 	};
 
@@ -792,7 +794,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void set_prdfr(typename RSCI_BASE::RXDSEL sel) noexcept
 		{
+#if defined(SIG_RX26T)
 			SYSTEM::PRDFR0.SCI9RXD = static_cast<uint8_t>(sel);
+#endif
 		}
 	};
 
@@ -837,7 +841,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void set_prdfr(typename RSCI_BASE::RXDSEL sel) noexcept
 		{
+#if defined(SIG_RX26T)
 			SYSTEM::PRDFR0.SCI11RXD = static_cast<uint8_t>(sel);
+#endif
 		}
 
 
@@ -938,11 +944,17 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
 		typename rscib_t<base, per, txi, rxi, tei, eri>::RFSCR_ rscib_t<base, per, txi, rxi, tei, eri>::RFSCR;
 
-
+#if defined(SIG_RX26T)
 	typedef rsci8_t<0x000A'1400, peripheral::RSCI8,  ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
 		ICU::GROUPBL1::TEI8, ICU::GROUPBL1::ERI8>  RSCI8;
 	typedef rsci9_t<0x000A'1480, peripheral::RSCI9,  ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
 		ICU::GROUPBL1::TEI9, ICU::GROUPBL1::ERI9>  RSCI9;
 	typedef rscib_t<0x000E'2080, peripheral::RSCI11,  ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
 		ICU::GROUPAL0::TEI11, ICU::GROUPAL0::ERI11>  RSCI11;
+#elif defined(SIG_RX671)
+	typedef rscib_t<0x000E'2000, peripheral::RSCI10,  ICU::VECTOR::RTXI10, ICU::VECTOR::RRXI10,
+		ICU::GROUPAL0::RTEI10, ICU::GROUPAL0::RERI10>  RSCI10;
+	typedef rscib_t<0x000E'2080, peripheral::RSCI11,  ICU::VECTOR::RTXI11, ICU::VECTOR::RRXI11,
+		ICU::GROUPAL0::RTEI11, ICU::GROUPAL0::RERI11>  RSCI11;
+#endif
 }

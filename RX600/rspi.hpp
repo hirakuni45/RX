@@ -11,6 +11,7 @@
 			RX64M @n
 			RX71M @n
 			RX65N @n
+			RX671 @n
 			RX66T/RX72T @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -532,12 +533,12 @@ namespace device {
 		clock_profile::PCLKA>  RSPI;
 	typedef rspi_a_t<0x000D'0120, peripheral::RSPI2, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI2;
-#elif defined(SIG_RX65N)
+#elif defined(SIG_RX65N) || defined(SIG_RX671)
 	typedef rspi_a_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
 		clock_profile::PCLKA>  RSPI0;
 	typedef rspi_a_t<0x000D'0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
 		clock_profile::PCLKA>  RSPI1;
-	typedef rspi_a_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
+	typedef rspi_a_t<0x000D'0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
 		clock_profile::PCLKA>  RSPI2;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef rspi_c_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,

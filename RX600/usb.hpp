@@ -2,7 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・USB[abd] 定義 @n
-			RX64M/RX71M/RX651/RX65N/RX72M/RX72N/RX66T/RX72T
+			RX64M/RX71M/RX651/RX65N/RX671/RX72M/RX72N/RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -1453,6 +1453,11 @@ namespace device {
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef usb_b_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
+#elif defined(SIG_RX671)
+	typedef usb_b_t<0x000A'0000, peripheral::USB0, ICU::SELECTB,
+		ICU::SELECTB::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
+	typedef usb_b_t<0x000A'0200, peripheral::USB1, ICU::SELECTB,
+		ICU::SELECTB::USBI1, ICU::VECTOR::NONE,  ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB1;
 #else
 	typedef usb_b_t<0x000A'0000, peripheral::USB0, ICU::SELECTB,
 		ICU::SELECTB::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
