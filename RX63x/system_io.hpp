@@ -172,7 +172,10 @@ namespace device {
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
 								  | device::SYSTEM::SCKCR.BCK.b(clock_div_(clock_profile::BCLK))
 								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
-								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB));
+								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
+								  | device::SYSTEM::SCKCR.PCKC_.b(0b0001)
+								  | device::SYSTEM::SCKCR.PCKD_.b(0b0001);
+
 
 			static_assert(usb_div_() >= 2 && usb_div_() <= 5, "USB Clock can't divided.");
 			// 1/2:0b0001, 1/3:0b0010, 1/4:0b0011, 1/5:0b0100

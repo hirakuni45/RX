@@ -161,7 +161,5 @@ namespace device {
 		EXTRAM,		///< 拡張 RAM (512K)
 		ECCRAM,		///< ECC RAM (32K)
 		STBRAM,		///< Standby RAM (8K)
-
-		ICU,		///< グループ割り込みペリフェラル
 	};
 }

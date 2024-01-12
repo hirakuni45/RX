@@ -27,13 +27,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct sckcr_t : public rw32_t<base, 0b0001'0001> {
-			typedef rw32_t<base, 0b0001'0001> io_;
+		struct sckcr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
+			bits_rw_t<io_, bitpos::B0,  4> PCKD_;
+			bits_rw_t<io_, bitpos::B4,  4> PCKC_;
 			bits_rw_t<io_, bitpos::B8,  4> PCKB;
 			bits_rw_t<io_, bitpos::B12, 4> PCKA;
 			bits_rw_t<io_, bitpos::B16, 4> BCK;
@@ -1081,6 +1083,7 @@ namespace device {
 		static TSCDRL_ TSCDRL;
 	};
 	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
+	template<class _> typename system_t<_>::SCKCR2_ system_t<_>::SCKCR2;
 	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
 	template<class _> typename system_t<_>::PLLCR_ system_t<_>::PLLCR;
 	template<class _> typename system_t<_>::PLLCR2_ system_t<_>::PLLCR2;

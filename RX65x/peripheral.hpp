@@ -130,7 +130,5 @@ namespace device {
 
 		GLCDC,		///< グラフィック LCD コントローラ (GLCDC)
 		DRW2D,		///< 2D 描画エンジン (DRW2D)
-
-		ICU,		///< グループ割り込みペリフェラル
 	};
 }

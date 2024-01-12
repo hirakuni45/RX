@@ -77,11 +77,11 @@ namespace app {
 			slider_.set_layer(gui::widget::LAYER::_0);
 			slider_.enable();
 
-			at_scenes_base().at_cmt().at_task().enable();
+			at_scenes_base().at_cmt().at_func().enable();
 			lap_best_t_ = 0;
 			lap_best_n_ = 0;
 
-			auto& watch = at_scenes_base().at_cmt().at_task();
+			auto& watch = at_scenes_base().at_cmt().at_func();
 			watch.reset();
 
 			auto& render = at_scenes_base().at_render();
@@ -104,7 +104,7 @@ namespace app {
 			render.line_v(480-1, 0, 272);
 
 			auto& res = at_scenes_base().at_resource();
-			auto& watch = at_scenes_base().at_cmt().at_task();
+			auto& watch = at_scenes_base().at_cmt().at_func();
 
 			auto t = watch.get();
 			auto pos = watch.get_lap_pos();

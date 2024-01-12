@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX63T グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 
 namespace device {
@@ -727,6 +727,7 @@ namespace device {
 		static SWRR_ SWRR;
 	};
 	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
+	template<class _> typename system_t<_>::SCKCR2_ system_t<_>::SCKCR2;
 	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
 	template<class _> typename system_t<_>::PLLCR_ system_t<_>::PLLCR;
 	template<class _> typename system_t<_>::PLLCR2_ system_t<_>::PLLCR2;

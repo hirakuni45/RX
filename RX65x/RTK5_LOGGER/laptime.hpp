@@ -59,7 +59,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() override
 		{
-			at_scenes_base().at_cmt().at_task().enable();
+			at_scenes_base().at_cmt().at_func().enable();
 			lap_best_t_ = 0;
 			lap_best_n_ = 0;
 
@@ -80,7 +80,7 @@ namespace app {
 		{
 			auto& render = at_scenes_base().at_render();
 			auto& res = at_scenes_base().at_resource();
-			auto& watch = at_scenes_base().at_cmt().at_task();
+			auto& watch = at_scenes_base().at_cmt().at_func();
 
 			auto t = watch.get();
 			auto pos = watch.get_lap_pos();

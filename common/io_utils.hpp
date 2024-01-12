@@ -671,16 +671,14 @@ namespace device {
 	/*!
 		@brief  Read/Write 32 bits アクセス・テンプレート
 		@param[in]	adr	アドレス
-		@param[in]	wov	書き込み OR 値（通常０）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <address_type adr, uint32_t wov = 0>
+	template <address_type adr>
 	struct rw32_t {
 
 		typedef uint32_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr auto write_or_value = wov;	///< 書き込み OR 値
 		static constexpr uint8_t BUS = 32;		///< バス幅
 		static constexpr bool RD = true;		///< 読出し
 		static constexpr bool WR = true;		///< 書き込み
@@ -691,7 +689,7 @@ namespace device {
 			@param[in]	data	書き込み値
 		*/
 		//-----------------------------------------------------------------//
-		static void write(value_type data) noexcept { wr32_(adr, data | wov); }
+		static void write(value_type data) noexcept { wr32_(adr, data); }
 
 
 		//-----------------------------------------------------------------//

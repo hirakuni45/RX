@@ -202,6 +202,7 @@ namespace device {
 	template <uint32_t base> typename sci_a_t<base>::SCMR_ sci_a_t<base>::SCMR;
 	template <uint32_t base> typename sci_a_t<base>::BRR_ sci_a_t<base>::BRR;
 	template <uint32_t base> typename sci_a_t<base>::SEMR_ sci_a_t<base>::SEMR;
+	template <uint32_t base> typename sci_a_t<base>::MDDR_ sci_a_t<base>::MDDR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -3,17 +3,12 @@
 /*!	@file
 	@brief	RX26T, RX64M, RX65x, RX71M, RX72M, RX72N グループ・CMTW 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "common/device.hpp"
-
-/// cmtw モジュールが無いデバイスでエラーとする
-#if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
-  #error "cmtw.hpp: This module does not exist"
-#endif
 
 namespace device {
 

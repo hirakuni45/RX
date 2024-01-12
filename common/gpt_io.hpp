@@ -50,16 +50,16 @@ namespace device {
 		@param[in]	GPT		GPTx デバイス・クラス
 		@param[in]	ASEL	GTIOA ポートオーダー
 		@param[in]	BSEL	GTIOB ポートオーダー
-		@param[in]	TASK	GTPR 割り込みタスク（ファンクタ）
+		@param[in]	FUNC	GTPR 割り込み・ファンクタ型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class GPT,
 		port_map_gpt::ORDER ASEL = port_map_gpt::ORDER::FIRST,
 		port_map_gpt::ORDER BSEL = port_map_gpt::ORDER::FIRST,
-		class TASK = utils::null_task>
+		class FUNC = utils::null_task>
 	class gpt_io : public gpt_io_base {
 
-		static TASK		task_;
+		static FUNC		func_;
 
 		uint32_t	freq_;
 
@@ -68,7 +68,7 @@ namespace device {
 
 		static INTERRUPT_FUNC void pr_task_()
 		{
-			task_();
+			func_();
 		}
 
 	public:
@@ -336,4 +336,6 @@ namespace device {
 			intr_vec_ = 0;
 		}
 	};
+	template <class GPT, port_map_gpt::ORDER ASEL, port_map_gpt::ORDER BSEL, class FUNC>
+		FUNC gpt_io<GPT, ASEL, BSEL, FUNC>::func_;
 }

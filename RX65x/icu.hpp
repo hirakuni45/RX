@@ -840,6 +840,7 @@ namespace device {
 	template<class _> typename icu_t<_>::GENBL2_ icu_t<_>::GENBL2;
 	template<class _> typename icu_t<_>::GENAL0_ icu_t<_>::GENAL0;
 	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
+	template<class _> typename icu_t<_>::GCRBE0_ icu_t<_>::GCRBE0;
 	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
 	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
 
