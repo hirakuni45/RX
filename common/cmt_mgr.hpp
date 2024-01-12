@@ -23,11 +23,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  CMT マネージャー・クラス
-		@param[in]	CMT	チャネルクラス
-		@param[in]	TASK	タイマー動作クラス
+		@param[in]	CMT		チャネルクラス
+		@param[in]	FUNC	割り込みファンクタクラス型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class CMT, class TASK = utils::null_task>
+	template <class CMT, class FUNC = utils::null_task>
 	class cmt_mgr {
 	public:
 		typedef CMT cmt_type;	///< CMT チャネル・クラス型
@@ -60,14 +60,14 @@ namespace device {
 
 		void sleep_() const { asm("nop"); }
 
-		static TASK	task_;
+		static FUNC	func_;
 
 		static volatile uint32_t counter_;
 
 		static INTERRUPT_FUNC void i_task_()
 		{
 			++counter_;
-			task_();
+			func_();
 		}
 
 		static constexpr bool calc_freq_(uint32_t freq, uint8_t& cks, uint32_t& cmcor)
@@ -227,7 +227,7 @@ namespace device {
 			} else {
 				auto ref = CMT::CMCNT();
 				while(ref <= CMT::CMCNT()) sleep_();
-				task_();
+				func_();
 				++counter_;
 			}
 		}
@@ -297,13 +297,13 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  TASK クラスの参照
-			@return TASK クラス
+			@brief  FUNC クラスの参照
+			@return FUNC クラス
 		*/
 		//-----------------------------------------------------------------//
-		static TASK& at_task() noexcept { return task_; }
+		static FUNC& at_func() noexcept { return func_; }
 	};
 
-	template <class CMT, class TASK> volatile uint32_t cmt_mgr<CMT, TASK>::counter_ = 0;
-	template <class CMT, class TASK> TASK cmt_mgr<CMT, TASK>::task_;
+	template <class CMT, class FUNC> volatile uint32_t cmt_mgr<CMT, FUNC>::counter_ = 0;
+	template <class CMT, class FUNC> FUNC cmt_mgr<CMT, FUNC>::func_;
 }

@@ -263,9 +263,9 @@ namespace {
 	class MYRTC {
 	public:
 		bool start() noexcept { return true; }
-		bool set_time(time_t t) { cmt_.at_task().set_time(t); return true; }
+		bool set_time(time_t t) { cmt_.at_func().set_time(t); return true; }
 		bool get_time(time_t& t) {
-			t = cmt_.at_task().get_time();
+			t = cmt_.at_func().get_time();
 			return true;
 		}
 	};
@@ -627,7 +627,7 @@ int main(int argc, char** argv)
 			}
 		}
 #else
-		cmt_.at_task().sync_100hz();
+		cmt_.at_func().sync_100hz();
 #endif
 		command_();
 

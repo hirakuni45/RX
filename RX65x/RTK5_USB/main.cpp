@@ -386,7 +386,7 @@ int main(int argc, char** argv)
 
 	uint8_t cnt = 0;
 	while(1) {
-		cmt_.at_task().sync_100hz();
+		cmt_.at_func().sync_100hz();
 
 ///		hmsc_.service();
 		hhid_.service();

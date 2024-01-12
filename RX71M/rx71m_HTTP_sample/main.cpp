@@ -303,12 +303,12 @@ extern "C" {
 
 	unsigned long millis(void)
 	{
-		return cmt_.at_task().get_millis();
+		return cmt_.at_func().get_millis();
 	}
 
 
 	void set_task_10ms(void (*task)(void)) {
-		cmt_.at_task().set_task_10ms(task);
+		cmt_.at_func().set_task_10ms(task);
 	}
 
 #if 0
