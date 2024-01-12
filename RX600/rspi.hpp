@@ -359,10 +359,12 @@ namespace device {
 	template <uint32_t base> typename rspi_base_t<base>::SPCR_   rspi_base_t<base>::SPCR;
 	template <uint32_t base> typename rspi_base_t<base>::SSLP_   rspi_base_t<base>::SSLP;
 	template <uint32_t base> typename rspi_base_t<base>::SPPCR_  rspi_base_t<base>::SPPCR;
+	template <uint32_t base> typename rspi_base_t<base>::SPSR_   rspi_base_t<base>::SPSR;
 	template <uint32_t base> typename rspi_base_t<base>::SPDR_   rspi_base_t<base>::SPDR;
 	template <uint32_t base> typename rspi_base_t<base>::SPSCR_  rspi_base_t<base>::SPSCR;
 	template <uint32_t base> typename rspi_base_t<base>::SPSSR_  rspi_base_t<base>::SPSSR;
 	template <uint32_t base> typename rspi_base_t<base>::SPBR_   rspi_base_t<base>::SPBR;
+	template <uint32_t base> typename rspi_base_t<base>::SPDCR_  rspi_base_t<base>::SPDCR;
 	template <uint32_t base> typename rspi_base_t<base>::SPCKD_  rspi_base_t<base>::SPCKD;
 	template <uint32_t base> typename rspi_base_t<base>::SSLND_  rspi_base_t<base>::SSLND;
 	template <uint32_t base> typename rspi_base_t<base>::SPND_   rspi_base_t<base>::SPND;

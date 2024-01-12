@@ -1355,7 +1355,7 @@ namespace device {
 #if defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N)
 	template<class _> typename system_t<_>::MEMWAIT_ system_t<_>::MEMWAIT;
 #endif
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX671)
 	template<class _> typename system_t<_>::ROMWT_ system_t<_>::ROMWT;
 #endif
 	template<class _> typename system_t<_>::SCKCR2_ system_t<_>::SCKCR2;
@@ -1364,7 +1364,7 @@ namespace device {
 	template<class _> typename system_t<_>::PLLCR2_ system_t<_>::PLLCR2;
 	template<class _> typename system_t<_>::BCKCR_ system_t<_>::BCKCR;
 	template<class _> typename system_t<_>::MOSCCR_ system_t<_>::MOSCCR;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
 	template<class _> typename system_t<_>::SOSCCR_ system_t<_>::SOSCCR;
 #endif
 	template<class _> typename system_t<_>::LOCOCR_ system_t<_>::LOCOCR;
@@ -1376,7 +1376,7 @@ namespace device {
 	template<class _> typename system_t<_>::OSTDSR_ system_t<_>::OSTDSR;
 	template<class _> typename system_t<_>::MOSCWTCR_ system_t<_>::MOSCWTCR;
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
 	template<class _> typename system_t<_>::SOSCWTCR_ system_t<_>::SOSCWTCR;
 #endif
 	template<class _> typename system_t<_>::MOFCR_ system_t<_>::MOFCR;
