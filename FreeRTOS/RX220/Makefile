@@ -12,8 +12,8 @@ DEVICE		=	R5F52206
 
 RX_DEF		=	SIG_RX220
 
-BUILD		=	release
-# BUILD		=	debug
+# BUILD		=	release
+BUILD		=	debug
 
 VPATH		=	../../
 
@@ -35,7 +35,7 @@ PSOURCES	=	FreeRTOS/main.cpp
 
 USER_LIBS	=
 
-USER_DEFS   +=	RTOS RTOS_HEAP_SIZE=10
+USER_DEFS   +=	RTOS RTOS_HEAP_SIZE=8
 
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \

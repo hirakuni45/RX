@@ -1,14 +1,14 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX66T/RX72T グループ・ICUC 定義 @n
-			RX66T、RX72T 共通
+	@brief	RX72T グループ・ICUC 定義 @n
+			RX72T 共通
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX600/icu_utils.hpp"
 #include "RX600/icu_base.hpp"
 
@@ -22,11 +22,11 @@ namespace device {
 	template<class _>
 	struct icuc_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  通常割り込みベクター型
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR : uint8_t {
 			NONE      = 0,		///< none 
 

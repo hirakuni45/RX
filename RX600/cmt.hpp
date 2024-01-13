@@ -1,25 +1,24 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX グループ CMT 定義 @n
-			RX220 @n
-			RX231 @n
-			RX621/RX62N @n
-			RX631/RX63N @n
+			RX220 / RX231 @n
+			RX621 / RX62N @n
+			RX631 / RX63N @n
 			RX63T @n
 			RX24T @n
 			RX26T @n
 			RX64M/RX71M @n
-			RX65N @n
+			RX651/RX65N @n
 			RX671 @n
 			RX66T/RX72T @n
 			RX72N
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
