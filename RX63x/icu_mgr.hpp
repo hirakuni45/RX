@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX631/RX63N グループ・割り込みマネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 #include "RX600/icu_utils.hpp"
 
@@ -663,7 +663,6 @@ namespace device {
 	template <class _> typename icu_mgr_<_>::GROUP5_dispatch_t icu_mgr_<_>::GROUP5_dispatch_;
 	template <class _> typename icu_mgr_<_>::GROUP6_dispatch_t icu_mgr_<_>::GROUP6_dispatch_;
 	template <class _> typename icu_mgr_<_>::GROUP12_dispatch_t icu_mgr_<_>::GROUP12_dispatch_;
-
 
 	typedef icu_mgr_<void> icu_mgr;
 }

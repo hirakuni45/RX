@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CMTW 管理
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -36,7 +36,7 @@ namespace device {
 	/*!
 		@brief  CMTW 管理クラス
 		@param[in]	CMTW	チャネル・クラス
-		@param[in]	FUNC	タイマー動作、ファンクタクラス型
+		@param[in]	FUNC	割り込みファンクタクラス型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class CMTW, class FUNC = utils::null_task>
@@ -60,6 +60,33 @@ namespace device {
 			func_();
 		}
 
+		static constexpr bool calc_freq_(uint32_t freq, uint8_t& cks, uint32_t& cmcor)
+		{
+			if(freq == 0) return false;
+
+			cmcor = CMTW::PCLK / freq / 4;
+			++cmcor;
+			cmcor >>= 1;
+
+			cks = 0;
+			while(cmcor > 65536) {
+				cmcor >>= 2;
+				++cks;
+			}
+			if(cks > 3 || cmcor == 0) {
+				return false;
+			}
+
+			return true;
+		}
+
+		static constexpr uint32_t get_real_freq_(uint8_t cks, uint32_t cmcor)
+		{
+			uint32_t rate = CMTW::PCLK / cmcor;
+			rate /= 8 << (cks * 2);
+			return rate;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -67,6 +94,33 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		cmtw_mgr() : level_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	設定周波数の誤差を検証
+			@param[in]	freq	周波数
+			@param[in]	thper	許容誤差（通常 1.0%） @n
+								百分率を 10 倍した値を設定
+			@return 誤差範囲なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		static constexpr bool probe_freq(uint32_t freq, uint32_t thper = 10) noexcept
+		{
+			uint8_t cks = 0;
+			uint32_t cmcor = 0;
+			if(!calc_freq_(freq, cks, cmcor)) {
+				return false;
+			}
+
+			auto rate = get_real_freq_(cks, cmcor);
+			auto d = freq * thper;
+			if((rate * 1000) < (freq * 1000 - d) || (freq * 1000 + d) < (rate * 1000)) {
+				return false;
+			}
+
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -79,18 +133,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t freq, uint8_t level = 0) noexcept
 		{
-			if(freq == 0) return false;
-
-			uint32_t cmcor = CMTW::PCLK / freq / 4;
-			++cmcor;
-			cmcor >>= 1;
-
-			uint8_t cks = 0;
-			while(cmcor > 65536) {
-				cmcor >>= 2;
-				++cks;
-			}
-			if(cks > 3 || cmcor == 0) {
+			uint8_t cks;
+			uint32_t cmcor;
+			if(!calc_freq_(freq, cks, cmcor)) {
 				return false;
 			}
 
@@ -195,6 +240,6 @@ namespace device {
 		static FUNC& at_func() noexcept { return func_; }
 	};
 
-	template <class CMTW, class FUNC> volatile uint32_t cmtw_io<CMTW, FUNC>::counter_ = 0;
-	template <class CMTW, class FUNC> FUNC cmtw_io<CMTW, FUNC>::task_;
+	template <class CMTW, class FUNC> volatile uint32_t cmtw_mgr<CMTW, FUNC>::counter_ = 0;
+	template <class CMTW, class FUNC> FUNC cmtw_mgr<CMTW, FUNC>::func_;
 }
