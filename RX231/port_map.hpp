@@ -303,10 +303,10 @@ namespace device {
 				ret = sub_1st_(per, ena);
 				break;
 			case ORDER::SECOND:
-//				ret = sub_2nd_(per, ena);
+				ret = sub_2nd_(per, ena);
 				break;
 			case ORDER::THIRD:
-//				ret = sub_3rd_(per, ena);
+				ret = sub_3rd_(per, ena);
 				break;
 			default:
 				ret = false;
