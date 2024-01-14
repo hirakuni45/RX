@@ -1,4 +1,4 @@
-Renesas RX220, RX62N, RX631, RX63T, RX24T, RX26T, RX66T, RX72T, RX64M, RX71M, RX65N, RX72N SCI (UART) sample
+Renesas RX220, RX231, RX62N, RX631, RX63T, RX24T, RX26T, RX66T, RX72T, RX64M, RX71M, RX65N, RX72N SCI (UART) sample
 =========
 
 [Japanese](READMEja.md)
@@ -14,6 +14,7 @@ SCI/SCIF/RSCI (UART) sample program using RX microcontroller
 ## Project list
  - main.cpp
  - RX220/Makefile
+ - RX231/Makefile
  - RX62N/Makefile
  - RX631/Makefile
  - RX63T/Makefile
@@ -34,6 +35,7 @@ SCI/SCIF/RSCI (UART) sample program using RX microcontroller
 - Connect the indicator LEDs to the specified ports.
 - Connect USB serial and SCI ports.
 - Refer to "RX220/port_map.hpp" for the SCI standard port of RX220.
+- Refer to "RX231/port_map.hpp" for the SCI standard port of RX231.
 - For the SCI standard port of RX62N, refer to "RX62x/port_map.hpp".
 - For the RX631's SCI standard port, refer to "RX63x/port_map.hpp".
 - For the RX63T's SCI standard port, refer to "RX63T/port_map.hpp".
@@ -72,6 +74,12 @@ SCI/SCIF/RSCI (UART) sample program using RX microcontroller
 	static const char* system_str_ = { "AE-RX220" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX231)
+	// RX231 DIY ボード
+	static const char* system_str_ = { "RX231 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX62N)
   #if defined(CQ_FRK)
