@@ -116,6 +116,9 @@ namespace device {
 #if defined(SIG_RX631) || defined(SIG_RX63N)
 	// RX631/RX63N では割り込みは、NMI を利用する。
 	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::NONE, clock_profile::PCLKB> WDT;
+#elif defined(SIG_RX231)
+	// WUNI for NMI
+	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::NONE, clock_profile::PCLKB> WDT;
 #else
 	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::WUNI, clock_profile::PCLKB> WDT;
 #endif

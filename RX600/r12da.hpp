@@ -1,19 +1,16 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65x グループ・R12DA 定義
+	@brief	R12DA 定義 @n
+			RX231/RX64M/RX71M/RX65x/RX72N/RX72M @n
+			RX26T/RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "common/device.hpp"
-
-/// R12DA モジュールが無いデバイスでエラーとする
-#if defined(SIG_RX24T)
-#  error "r12da.hpp: This module does not exist"
-#endif
 
 namespace device {
 
@@ -114,7 +111,7 @@ namespace device {
 	template <peripheral per> typename r12da_t<per>::DADPR_ r12da_t<per>::DADPR;
 	template <peripheral per> typename r12da_t<per>::DAADSCR_ r12da_t<per>::DAADSCR;
 
-#if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX72N) 
+#if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M) 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	12 ビット D/A コンバータ（R12DA）
@@ -269,12 +266,12 @@ namespace device {
 			case ANALOG::DA0:
 				PORT0::PCR.B3 = 0;
 				PORT0::PMR.B3 = 0;
-				MPC::P03PFS.ASEL = 1;
+				MPC::P03PFS.ASEL = f;
 				break;
 			case ANALOG::DA1:
 				PORT0::PCR.B5 = 0;
 				PORT0::PMR.B5 = 0;
-				MPC::P05PFS.ASEL = 1;
+				MPC::P05PFS.ASEL = f;
 				break;
 			default:
 				break;
@@ -347,12 +344,12 @@ namespace device {
 			case ANALOG::DA0:
 				PORT6::PCR.B4 = 0;
 				PORT6::PMR.B4 = 0;
-				MPC::P64PFS.ASEL = 1;
+				MPC::P64PFS.ASEL = f;
 				break;
 			case ANALOG::DA1:
 				PORT6::PCR.B5 = 0;
 				PORT6::PMR.B5 = 0;
-				MPC::P65PFS.ASEL = 1;
+				MPC::P65PFS.ASEL = f;
 				break;
 			default:
 				break;

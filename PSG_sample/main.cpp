@@ -28,7 +28,7 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::SCI1 SCI_CH;
-	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::SECOND;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;

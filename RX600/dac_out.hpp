@@ -23,7 +23,7 @@ namespace device {
 	public:
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	出力タイプ
+			@brief	出力タイプ型
 		 */
 		//-----------------------------------------------------------------//
 		enum class output : uint8_t {
@@ -31,6 +31,19 @@ namespace device {
 			CH0,	///< チャネル０
 			CH1,	///< チャネル１
 			CH0_CH1	///< チャネル０、１
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	基準電圧型（RX231 専用）
+		 */
+		//-----------------------------------------------------------------//
+		enum class VREF : uint8_t {
+			NONE = 0b000,		///< 非選択
+			AVCC0 = 0b001,///< AVCC0/AVSS0
+			INTERNAL = 0b011,	///< 内部基準電圧/AVSS0
+			VREFH_VREFL = 0b110	///< VREFH/VREFL
 		};
 
 
@@ -45,13 +58,15 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	スタート @n
-					※RX66T は ampe は機能なし。
+					※RX231 の場合 vref は基準電圧選択 @n
+					※RX66T の場合 ampe は機能なし。
 			@param[in]	otype	出力タイプ
 			@param[in]	ampe	アンプ許可の場合「true」
+			@param[in]	vref	基準電圧選択
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(output otype, bool ampe) const noexcept
+		bool start(output otype, bool ampe, VREF vref = VREF::AVCC0) const noexcept
 		{
 			if(otype == output::NONE) {
 				power_mgr::turn(DAC::PERIPHERAL);
@@ -62,6 +77,10 @@ namespace device {
 			}
 
 			power_mgr::turn(DAC::PERIPHERAL);
+
+#if defined(SIG_RX231)
+			DAC::DAVREFCR.REF = static_cast<uint8_t>(vref);
+#endif
 
 			DAC::DADPR.DPSEL = 1;  // 左詰め（下位４ビット無視）
 
