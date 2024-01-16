@@ -29,7 +29,7 @@ namespace utils {
 			@param[in]	cnt	ループ回数
 		*/
 		//-----------------------------------------------------------------//
-		static void loop(uint32_t cnt) noexcept __attribute__((noinline,noclone))
+		static __attribute__((noinline,noclone)) void loop(uint32_t cnt) noexcept
 		{
 			while(cnt > 0) {
 				asm("nop");
@@ -46,16 +46,12 @@ namespace utils {
 			@param[in]	us	待ち時間（マイクロ秒）
 		*/
 		//-----------------------------------------------------------------//
-		static void micro_second(uint32_t us) noexcept __attribute__((noinline,noclone))
+		static __attribute__((optimize(1))) void micro_second(uint32_t us) noexcept
 		{
 			while(us > 0) {
-#if defined (SIG_RX220)
-				device::clock_profile::delay_us();
-#else
 				for(uint32_t n = 0; n < device::clock_profile::DELAY_MS; ++n) {
 					asm("nop");
 				}
-#endif
 				--us;
 			}
 			if(device::clock_profile::DELAY_T1) { asm("nop"); }

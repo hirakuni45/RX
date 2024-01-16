@@ -1,4 +1,4 @@
-Renesas RX62N, RX631, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Ray tracer sample
+Renesas RX231, RX62N, RX631, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Ray tracer sample
 =========
    
 [Japanese](READMEja.md)
@@ -30,6 +30,7 @@ Ray tracing rendering program using RX microcontroller
 ## Hardware preparation (general)
 - If the base crystal is different, change the typedef parameter.
 - Makefile declares the set frequency for each module.
+- RX231:  54MHz (12MHz)
 - RX62N:  96MHz (12MHz)
 - RX631:  96MHz (12MHz)
 - RX24T:  80MHz (10MHz)
@@ -75,16 +76,17 @@ Ray tracing rendering program using RX microcontroller
    
 |Microcontroller|Core|FPU|fsqrt|Frequency [MHz]|Drawing method|Time [ms]|
 |-------|:---:|:---:|:---:|:---:|---|:---:|
-|RX62N  |RXv1|O|X|96  |8 bits, port-bus |1860 |
-|RX631  |RXv1|O|X|96  |8 bits, port-bus |1868 |
-|RX24T  |RXv2|O|O|80  |8 bits, port-bus |1224 |
-|RX26T  |RXv3|O|O|120 |8 bits, port-bus |692  |
-|RX65N  |RXv2|O|O|120 |Frame Memory     |784  |
-|RX64M  |RXv2|O|O|120 |16 bits, port-bus|751  |
-|RX66T  |RXv3|O|O|160 |8 bits, port-bus |602  |
-|RX72T  |RXv3|O|O|192 |8 bits, port-bus |464  |
-|RX71M  |RXv2|O|O|240 |16 bits, port-bus|439  |
-|RX72N  |RXv3|O|O|240 |Frame Memory     |361  |
+|RX231  |RXv2|O|O|54  |8 bits, port-bus |1736|
+|RX62N  |RXv1|O|X|96  |8 bits, port-bus |1860|
+|RX631  |RXv1|O|X|96  |8 bits, port-bus |1868|
+|RX24T  |RXv2|O|O|80  |8 bits, port-bus |1224|
+|RX26T  |RXv3|O|O|120 |8 bits, port-bus |692 |
+|RX65N  |RXv2|O|O|120 |Frame Memory     |784 |
+|RX64M  |RXv2|O|O|120 |16 bits, port-bus|751 |
+|RX66T  |RXv3|O|O|160 |8 bits, port-bus |602 |
+|RX72T  |RXv3|O|O|192 |8 bits, port-bus |464 |
+|RX71M  |RXv2|O|O|240 |16 bits, port-bus|439 |
+|RX72N  |RXv3|O|O|240 |Frame Memory     |361 |
    
 ---
    

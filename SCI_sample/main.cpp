@@ -1,14 +1,14 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  SCI (UART) サンプル @n
 			RX64M/RX71M に搭載された、SCIF を利用する場合、「scif_io」クラスを利用。 @n
-			RX26T に搭載された、RSCI を利用する場合、「rsci_io」クラスを利用。
+			RX26T/RX671 などに搭載された、RSCI を利用する場合、「rsci_io」クラスを利用。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 
 #include "common/fixed_fifo.hpp"
@@ -46,7 +46,7 @@ namespace {
 	// RX231 DIY ボード
 	static const char* system_str_ = { "RX231 DIY" };
 	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX62N)
   #if defined(CQ_FRK)

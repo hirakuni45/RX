@@ -1,4 +1,4 @@
-Renesas RX220, RX62N, RX631, RX63T, RX24T, RX26T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
+Renesas RX220, RX231, RX62N, RX631, RX63T, RX24T, RX26T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
 =========
 
 [英語版](README.md)
@@ -15,6 +15,7 @@ RX マイコンを使った SCI/SCIF/RSCI (UART) のサンプルプログラム
 
 - main.cpp
 - RX220/Makefile
+- RX231/Makefile
 - RX62N/Makefile
 - RX631/Makefile
 - RX24T/Makefile
@@ -34,6 +35,7 @@ RX マイコンを使った SCI/SCIF/RSCI (UART) のサンプルプログラム
 - インジケーター LED を指定のポートに接続する。
 -  USB シリアルとSCI ポートを接続する。
 - RX220 の SCI 標準ポートは、「RX220/port_map.hpp」参照。
+- RX231 の SCI 標準ポートは、「RX231/port_map.hpp」参照。
 - RX62N の SCI 標準ポートは、「RX62x/port_map.hpp」参照。
 - RX631 の SCI 標準ポートは、「RX63x/port_map.hpp」参照。
 - RX63T の SCI 標準ポートは、「RX63T/port_map.hpp」参照。
@@ -76,6 +78,12 @@ RX マイコンを使った SCI/SCIF/RSCI (UART) のサンプルプログラム
 	static const char* system_str_ = { "AE-RX220" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX231)
+	// RX231 DIY ボード
+	static const char* system_str_ = { "RX231 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX62N)
   #if defined(CQ_FRK)

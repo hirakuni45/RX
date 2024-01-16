@@ -1,4 +1,4 @@
-//=========================================================================//
+//=============================================================================//
 /*! @file
     @brief  ファースト・サンプル（LED 点滅） @n
 			※動作周波数は、RXxxx/clock_profile.hpp を参照。 @n
@@ -20,7 +20,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=========================================================================//
+//=============================================================================//
 #include "common/renesas.hpp"
 
 namespace {
@@ -32,8 +32,8 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
 #elif defined(SIG_RX231)
 	// DIY RX231 board
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX62N)
 	static constexpr bool LED_ACTIVE = 0;
   #if defined(CQ_FRK)

@@ -1,4 +1,4 @@
-Renesas RX220, RX62N、RX63T, RX24T, RX26T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T　LED flashing sample
+Renesas RX220, RX231, RX62N、RX63T, RX24T, RX26T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T　LED flashing sample
 =========
 
 [Japanese](READMEja.md)
@@ -15,6 +15,7 @@ Sample program of LED blinking using RX microcontroller
 ## Description
 - main.cpp
 - RX220/Makefile
+- RX231/Makefile
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
 - RX631/Makefile (GR-CITRUS)
 - RX63T/Makefile
@@ -47,6 +48,10 @@ Sample program of LED blinking using RX microcontroller
 	// P03 に LED を吸い込みで接続する事を想定している。
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+#elif defined(SIG_RX231)
+	// DIY RX231 board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 #elif defined(SIG_RX62N)
 	// BlueBoard-RX62N_100pin
 	static constexpr bool LED_ACTIVE = 0;
