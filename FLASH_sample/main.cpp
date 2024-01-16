@@ -2,7 +2,7 @@
 /*! @file
     @brief  CPU 内蔵 Data Flash 操作サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,6 +26,12 @@ namespace {
 	static const char* system_str_ = { "AE-RX220" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX231)
+	// RX231 DIY ボード
+	static const char* system_str_ = { "RX231 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
 #elif defined(SIG_RX62N)
   #if defined(CQ_FRK)

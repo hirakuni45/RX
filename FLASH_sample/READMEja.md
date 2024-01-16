@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Data Flash サンプル
+Renesas RX231, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Data Flash サンプル
 =========
 
 [English](README.md)
@@ -11,6 +11,7 @@ Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Data Flash サンプル
    
 ## プロジェクト・リスト
  - main.cpp
+ - RX231/Makefile
  - RX24T/Makefile
  - RX64M/Makefile
  - RX71M/Makefile
@@ -61,11 +62,10 @@ Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Data Flash サンプル
 
 ### write org data... (write)
 - 書き込み
-- RX24T では、１バイト毎、他は４バイト毎
+- RX231, RX24T では、１バイト毎、他は４バイト毎
 
 ### uid (unique ID lists)
 - ユニークＩＤの表示
-- RX64M、RX71M などユニークＩＤを持たない機種では、特定のメモリーの内容を表示
 
 ---
 
@@ -74,7 +74,8 @@ Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Data Flash サンプル
 各マイコンにおけるデータフラッシュの仕様など：
 
 |CPU|容量|バンクサイズ|書き込み単位|ユニークＩＤ数|
-|---|----|---|---|---|
+|---|:--:|:-:|:-:|:-:|
+|RX231|8K|64|1|4|
 |RX24T|8K|64|1|4|
 |RX66T|32K|64|4|3|
 |RX72T|32K|64|4|3|

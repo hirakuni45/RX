@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Data Flash サンプル
+Renesas RX231, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Data Flash サンプル
 =========
 
 [Japanese](READMEja.md)
@@ -11,6 +11,7 @@ Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Data Flash サンプル
    
 ## Project list
  - main.cpp
+ - RX231/Makefile
  - RX24T/Makefile
  - RX64M/Makefile
  - RX71M/Makefile
@@ -65,11 +66,10 @@ See [SCI_sample](../SCI_sample/README.md).
 
 ### write org data... (write)
 - Write
-- (on RX24T, every 1 byte, on others, every 4 bytes)
+- (on RX231,RX24T, every 1 byte, on others, every 4 bytes)
 
 ### uid (unique ID lists)
 - Display of unique IDs
-- For RX64M, RX71M and other models that do not have unique IDs, display the contents of a specific memory.
 
 ---
 
@@ -78,7 +78,8 @@ See [SCI_sample](../SCI_sample/README.md).
 Data flash specifications for each microcontroller:
 
 |CPU|Capacity|Bank size|Write unit|Number of unique IDs|
-|---|----|---|---|---|
+|---|:--:|:-:|:-:|:-:|
+|RX231|8K|64|1|4|
 |RX24T|8K|64|1|4|
 |RX66T|32K|64|4|3||
 |RX72T|32K|64|4|3|
