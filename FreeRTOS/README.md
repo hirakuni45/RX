@@ -17,10 +17,11 @@ The code is basically for gcc.
 
 ---
 
-## About the RX24T, RX220 heap size
+## About the RX220, RX231, RX24T heap size
 
-- There is a project for the RX24T, but be aware that the RX24T,RX220's internal memory is small, so be careful when using it in practice.   
+- There is a project for the RX220,RX231,RX24T, but be aware that the RX220,RX231,RX24T's internal memory is small, so be careful when using it in practice.   
 - The size can be changed in the RX220/Makefile's environment variable settings.   
+- The size can be changed in the RX231/Makefile's environment variable settings.   
 - The size can be changed in the RX24T/Makefile's environment variable settings.   
 　　　
 ```C
@@ -41,6 +42,7 @@ Other microcontrollers use malloc/free memory allocation, so memory is allocated
 - README.md
 - [Source (FreeRTOS Kernel sources)](Source)
 - [RX220/Makefile](RX220/Makefile)
+- [RX231/Makefile](RX231/Makefile)
 - [RX62N/Makefile](RX62N/Makefile)
 - [RX631/Makefile](RX631/Makefile)
 - [RX24T/Makefile](RX24T/Makefile)

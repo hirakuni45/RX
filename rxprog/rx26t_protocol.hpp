@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX66T プログラミング・プロトコル・クラス
+	@brief	RX26T プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,14 +14,16 @@
 #include <set>
 #include <boost/format.hpp>
 
-namespace rx66t {
+namespace rx26t {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	RX64M プログラミング・プロトコル・クラス
+		@brief	RX26T プログラミング・プロトコル・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class protocol {
+
+		static constexpr uint32_t PAGE_SIZE = 128; 
 
 		utils::rs232c_io	rs232c_;
 
@@ -47,7 +49,6 @@ namespace rx66t {
 		erase_map erase_map_;
 
 //		uint8_t				last_error_ = 0;
-
 
 		static uint32_t get16_big_(const uint8_t* p) {
 			uint32_t v;
@@ -416,7 +417,7 @@ namespace rx66t {
 			tv.tv_sec  = 1;
 			tv.tv_usec = 0;
 			int ch = rs232c_.recv(tv);
-			if(ch == 0xC1) {
+			if(ch == 0xC2) {
 				connection_ = true;
 				return true;
 			}
@@ -468,12 +469,22 @@ namespace rx66t {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ページサイズを取得
+			@return ページサイズ
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_page_size() const { return PAGE_SIZE; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	エンディアン通知コマンド
 			@param[in]	endian ０ならビッグ、１ならリトル
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool select_endian(uint8_t endian) {
+		bool select_endian(uint8_t endian)
+		{
 
 			if(!connection_) return false;
 
@@ -497,7 +508,8 @@ namespace rx66t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool select_frequency() {
+		bool select_frequency()
+		{
 
 			if(!connection_) return false;
 
@@ -531,7 +543,8 @@ namespace rx66t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) {
+		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed)
+		{
 			if(!connection_) return false;
 
 			switch(speed) {
@@ -600,7 +613,8 @@ namespace rx66t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_id() {
+		bool inquiry_id()
+		{
 
 			if(!connection_) return false;
 
@@ -629,29 +643,21 @@ namespace rx66t {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ページサイズを取得
-			@return ページサイズ
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_page_size() const { return 256; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	イレース・ページ
+			@brief	イレース・ページ（PAGE_SIZE による）
 			@param[in]	address	アドレス
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) {
+		bool erase_page(uint32_t address)
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
 			// ブランク・チェックを行う
 			uint8_t tmp[8];
-			auto org = address & 0xffffff00;
+			auto org = address & ~(PAGE_SIZE - 1);
 			put32_big_(&tmp[0], org);
-			put32_big_(&tmp[4], org + 255);
+			put32_big_(&tmp[4], org + PAGE_SIZE - 1);
 			if(!command_(0x10, tmp, sizeof(tmp))) {
 				return false;
 			}
@@ -701,7 +707,8 @@ namespace rx66t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool select_write_area(bool data) {
+		bool select_write_area(bool data)
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
@@ -714,13 +721,14 @@ namespace rx66t {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ライト・ページ（２５６バイト）
+			@brief	ライト・ページ（PAGE_SIZE による）
 			@param[in]	address	アドレス
 			@param[in]	src	ライト・データ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool write_page(uint32_t address, const uint8_t* src) {
+		bool write_page(uint32_t address, const uint8_t* src)
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 			if(!select_write_area_) return false;
@@ -732,7 +740,7 @@ namespace rx66t {
 
 			uint8_t tmp[8];
 			put32_big_(&tmp[0], address);
-			put32_big_(&tmp[4], address + 255);
+			put32_big_(&tmp[4], address + PAGE_SIZE - 1);
 			if(!command_(0x13, tmp, sizeof(tmp))) {
 				return false;
 			}
@@ -741,7 +749,7 @@ namespace rx66t {
 				return false;
 			}
 
-			if(!com_(0x81, 0x13, 0x03, src, 256)) {
+			if(!com_(0x81, 0x13, 0x03, src, PAGE_SIZE)) {
 				return false;
 			}
 
@@ -763,19 +771,20 @@ namespace rx66t {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	リード・ページ（２５６バイト）
+			@brief	リード・ページ（PAGE_SIZE による）
 			@param[in]	adr	アドレス
 			@param[out]	dst	リード・データ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read_page(uint32_t adr, uint8_t* dst) {
+		bool read_page(uint32_t adr, uint8_t* dst)
+		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
 			uint8_t tmp[8];
 			put32_big_(&tmp[0], adr);
-			put32_big_(&tmp[4], adr + 255);
+			put32_big_(&tmp[4], adr + PAGE_SIZE - 1);
 			if(!command_(0x15, tmp, sizeof(tmp))) {
 				return false;
 			}
@@ -787,7 +796,7 @@ namespace rx66t {
 			if(!com_(0x81, 0x15, 0x03)) {
 				return false;
 			}
-			if(!status_data_(0x15, dst, 256)) {
+			if(!status_data_(0x15, dst, PAGE_SIZE)) {
 				return false;
 			}
 
@@ -801,7 +810,8 @@ namespace rx66t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool end() {
+		bool end()
+		{
 			connection_ = false;
 			pe_turn_on_ = false;
 			select_write_area_ = false;

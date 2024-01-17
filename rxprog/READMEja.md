@@ -17,6 +17,7 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
  - rx_prog.hpp
  - rx_protocol.hpp
  - rx220_protocol.hpp
+ - rx23x_protocol.hpp
  - rx24t_protocol.hpp
  - rx62x_protocol.hpp
  - rx63x_protocol.hpp
@@ -71,7 +72,7 @@ tar xfvz /d/Download/boost_1_74_0.tar.gz
 ## 接続端子一覧
 
 ### RX220:   
-|端子|RX220 (64)|
+|端子|LFQFP 64|
 |---|---|
 |MD|MD(3)|
 |B/UB|PC7(27)|
@@ -83,6 +84,23 @@ tar xfvz /d/Download/boost_1_74_0.tar.gz
 |シリアルブート|0|0|
 |User Boot|1|0|
 |シングルチップ|-|1|
+
+---
+### RX231:   
+|端子|LFQFP 64|LFQFP 100|
+|---|---|---|
+|MD|MD(3)|MD(7)|
+|UB|PC7(27)|PC7(45)|
+|RXD|P30/RXD1(14)|P30/RXD1(20)|
+|TXD|P26/TXD1(16)|P25/TXD1(23)|
+
+|モード|UB|MD|
+|---|:---:|:---:|
+|シリアルブート|0|0|
+|USB ブート|1|0|
+|シングルチップ|-|1|
+
+VCL: 4.7uF   
 
 ---
 ### RX621/RX62N:   
@@ -117,14 +135,15 @@ tar xfvz /d/Download/boost_1_74_0.tar.gz
 |シングルチップ|-|1|
 
 ---
-### RX63T/RX24T/RX66T/RX72T:
-|端子|RX63T (64)|RX24T (100)|RX66T (100)|RX72T (144)|
-|---|---|---|---|---|
-|UB|P00(2)|ー|UB/P00(4)|UB/P00(9)|
-|MD|MD(5)|MD(6)|MD/FINED(6)|MD/FINED(11)|
-|EMLE|EMLE(1)|ー|EMLE(2)|EMLE(7)|
-|RXD|PD5/RXD1(14)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(25)|
-|TXD|PD3/TXD1(16)|PD3/TXD1(22)|PD3/TXD1(22)|PD3/TXD1(27)|
+### RX63T/RX24T/RX26T/RX66T/RX72T:
+|端子|RX63T (64)|RX24T (100)|RX26T (100)|RX66T (100)|RX72T (144)|
+|---|---|---|---|---|---|
+|VCL|0.1uF|4.7uF|0.47uF|0.47uF|0.47uF|0.47uF|
+|UB|P00(2)|ー|ー|UB/P00(4)|UB/P00(9)|
+|MD|MD(5)|MD(6)|MD/FINED(6)|MD/FINED(6)|MD/FINED(11)|
+|EMLE|EMLE(1)|ー|EMLE(2)|EMLE(2)|EMLE(7)|
+|RXD|PD5/RXD1(14)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(20)|PD5/RXD1(25)|
+|TXD|PD3/TXD1(16)|PD3/TXD1(22)|PD3/TXD1(22)|PD3/TXD1(22)|PD3/TXD1(27)|
 
 |モード|UB|MD|
 |---|:---:|:---:|
@@ -349,17 +368,18 @@ R5F56217 {
 ```
  % rx_prog --device-list
 R5F52206 (RX220): Program-Flash:  256K, RAM:   16K, Data-Flash:  8K
+R5F52315 (RX231): Program-Flash:  128K, RAM:   64K, Data-Flash:  8K
+R5F52316 (RX231): Program-Flash:  256K, RAM:   32K, Data-Flash:  8K
+R5F52317 (RX231): Program-Flash:  384K, RAM:   64K, Data-Flash:  8K
+R5F52318 (RX231): Program-Flash:  512K, RAM:   64K, Data-Flash:  8K
 R5F56217 (RX621): Program-Flash:  384K, RAM:   64K, Data-Flash: 32K
 R5F56218 (RX621): Program-Flash:  512K, RAM:   96K, Data-Flash: 32K
 R5F562N7 (RX62N): Program-Flash:  384K, RAM:   64K, Data-Flash: 32K
 R5F562N8 (RX62N): Program-Flash:  512K, RAM:   96K, Data-Flash: 32K
 R5F5631F (RX631): Program-Flash: 2048K, RAM:  256K, Data-Flash: 32K
-R5F563NF (RX63N): Program-Flash: 2048K, RAM:  256K, Data-Flash: 32K
-R5F563T6 (RX63T): Program-Flash:   64K, RAM:    8K, Data-Flash:  8K
-R5F524T8 (RX24T): Program-Flash:  128K, RAM:   16K, Data-Flash:  8K
-R5F524TA (RX24T): Program-Flash:  256K, RAM:   16K, Data-Flash:  8K
+R5F563NE (RX63N): Program-Flash: 2048K, RAM:  128K, Data-Flash: 32K
 R5F564MF (RX64M): Program-Flash: 2048K, RAM:  512K, Data-Flash: 64K
-R5F5671F (RX71M): Program-Flash: 2048K, RAM:  512K, Data-Flash: 64K
+R5F571MF (RX71M): Program-Flash: 2048K, RAM:  512K, Data-Flash: 64K
 R5F564MG (RX64M): Program-Flash: 2560K, RAM:  512K, Data-Flash: 64K
 R5F571MG (RX71M): Program-Flash: 2560K, RAM:  512K, Data-Flash: 64K
 R5F564MJ (RX64M): Program-Flash: 3072K, RAM:  512K, Data-Flash: 64K
@@ -368,16 +388,22 @@ R5F564ML (RX64M): Program-Flash: 4096K, RAM:  512K, Data-Flash: 64K
 R5F571ML (RX71M): Program-Flash: 4096K, RAM:  512K, Data-Flash: 64K
 R5F5651E (RX651): Program-Flash: 2048K, RAM:  640K, Data-Flash: 32K
 R5F565NE (RX65N): Program-Flash: 2048K, RAM:  640K, Data-Flash: 32K
+R5F5671C (RX671): Program-Flash: 1536K, RAM:  384K, Data-Flash:  8K
+R5F5671E (RX671): Program-Flash: 2048K, RAM:  384K, Data-Flash:  8K
+R5F572ND (RX72N): Program-Flash: 2048K, RAM: 1024K, Data-Flash: 32K
+R5F572NN (RX72N): Program-Flash: 4096K, RAM: 1024K, Data-Flash: 32K
+R5F572MD (RX72M): Program-Flash: 2048K, RAM: 1024K, Data-Flash: 32K
+R5F572MN (RX72M): Program-Flash: 4096K, RAM: 1024K, Data-Flash: 32K
+R5F563T6 (RX63T): Program-Flash:   64K, RAM:    8K, Data-Flash:  8K
+R5F524T8 (RX24T): Program-Flash:  128K, RAM:   16K, Data-Flash:  8K
+R5F524TA (RX24T): Program-Flash:  256K, RAM:   16K, Data-Flash:  8K
+R5F526TF (RX26T): Program-Flash:  512K, RAM:   64K, Data-Flash: 16K
 R5F566TA (RX66T): Program-Flash:  256K, RAM:   64K, Data-Flash: 32K
 R5F566TE (RX66T): Program-Flash:  512K, RAM:   64K, Data-Flash: 32K
 R5F566TF (RX66T): Program-Flash:  512K, RAM:  128K, Data-Flash: 32K
 R5F566TK (RX66T): Program-Flash: 1024K, RAM:  128K, Data-Flash: 32K
-R5F572MD (RX72M): Program-Flash: 2048K, RAM: 1024K, Data-Flash: 32K
-R5F572MN (RX72M): Program-Flash: 4096K, RAM: 1024K, Data-Flash: 32K
 R5F572TF (RX72T): Program-Flash:  512K, RAM:  128K, Data-Flash: 32K
 R5F572TK (RX72T): Program-Flash: 1024K, RAM:  128K, Data-Flash: 32K
-R5F572ND (RX72N): Program-Flash: 2048K, RAM: 1024K, Data-Flash: 32K
-R5F572NN (RX72N): Program-Flash: 4096K, RAM: 1024K, Data-Flash: 32K
 ```
 
 ---

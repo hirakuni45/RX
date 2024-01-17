@@ -16,10 +16,11 @@ Amazon FreeRTOS カーネルを RX マイコン用にポーティングしたコ
    
 ---
 
-## RX220, RX24T のヒープサイズについて
+## RX220, RX231, RX24T のヒープサイズについて
 
-- RX220, RX24T 用のプロジェクトがありますが、RX24T, RX220 の内蔵メモリは少なく、実際に利用する場合は、注意して下さい。
+- RX220, RX231, RX24T 用のプロジェクトがありますが、RX220, RX231, RX24T の内蔵メモリは少なく、実際に利用する場合は、注意して下さい。
 - RX220/Makefile の環境変数の設定で、このサイズを変更出来ます。
+- RX231/Makefile の環境変数の設定で、このサイズを変更出来ます。
 - RX24T/Makefile の環境変数の設定で、このサイズを変更出来ます。
 　　　
 ```C
@@ -38,6 +39,7 @@ Amazon FreeRTOS カーネルを RX マイコン用にポーティングしたコ
 - README.md
 - [Source (FreeRTOS Kernel sources)](Source)
 - [RX220/Makefile](RX220/Makefile)
+- [RX220/Makefile](RX231/Makefile)
 - [RX62N/Makefile](RX62N/Makefile)
 - [RX631/Makefile](RX631/Makefile)
 - [RX24T/Makefile](RX24T/Makefile)

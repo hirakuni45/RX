@@ -70,21 +70,10 @@ namespace device {
 		{
 			if(otype == output::NONE) {
 				power_mgr::turn(DAC::PERIPHERAL);
-				DAC::DACR.DAE = 0;
-				DAC::DACR = DAC::DACR.DAE.b(0) | DAC::DACR.DAOE0.b(0) | DAC::DACR.DAOE1.b(0);
+				DAC::DACR = DAC::DACR.RESERVE.b(0b11111);
 				power_mgr::turn(DAC::PERIPHERAL, false);
 				return true;
 			}
-
-			power_mgr::turn(DAC::PERIPHERAL);
-
-#if defined(SIG_RX231)
-			DAC::DAVREFCR.REF = static_cast<uint8_t>(vref);
-#endif
-
-			DAC::DADPR.DPSEL = 1;  // 左詰め（下位４ビット無視）
-
-			DAC::DACR.DAE = 0;
 
 			bool ch0 = false;
 			bool ch1 = false;
@@ -99,8 +88,23 @@ namespace device {
 				return false;
 			}
 
+			power_mgr::turn(DAC::PERIPHERAL);
+
+#if defined(SIG_RX231)
+			{
+				DAC::DAVREFCR.REF = static_cast<uint8_t>(vref);
+				volatile auto tmp = DAC::DAVREFCR();
+			}   
+#endif
+
+			if(DAC::DACR_DAE) {
+				DAC::DACR = DAC::DACR.DAE.b(0) | DAC::DACR.RESERVE.b(0b11111);
+			}
+
+			DAC::DADPR.DPSEL = 1;  // 左詰め（下位４ビット無視）
+
 			if(ch0) {
-				DAC::DACR.DAOE0 = 1;
+				DAC::DACR = DAC::DACR.DAOE0.b(1) | DAC::DACR.RESERVE.b(0b11111);
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				DAC::DAAMPCR.DAAMP0 = ampe;
 #elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
@@ -109,7 +113,7 @@ namespace device {
 				DAC::enable(DAC::ANALOG::DA0);
 			}
 			if(ch1) {
-				DAC::DACR.DAOE1 = 1;
+				DAC::DACR = DAC::DACR.DAOE1.b(1) | DAC::DACR.RESERVE.b(0b11111);
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				DAC::DAAMPCR.DAAMP1 = ampe;
 #elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)

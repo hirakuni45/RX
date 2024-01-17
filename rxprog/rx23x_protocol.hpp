@@ -1,20 +1,20 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T プログラミング・プロトコル・クラス
+	@brief	RX23x プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "protocol_base.hpp"
 
-namespace rx24t {
+namespace rx23x {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	RX24T プログラミング・プロトコル・クラス
+		@brief	RX23x プログラミング・プロトコル・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class protocol : public rx::protocol_base {
@@ -644,14 +644,14 @@ namespace rx24t {
 			if(!read_(head, 1, tv)) {
 				return false;
 			}
-			if(head[0] == 0x26) {
+			if(head[0] == 0x06) {  // ID コードプロテクト無効
 				id_protect_ = false;
-///				std::cout << "Return: 0x26" << std::endl;
-			} else if(head[0] == 0x16) {
+///				std::cout << "Return: 0x06" << std::endl;
+			} else if(head[0] == 0x16) {  // ID コードプロテクト 有効
 				id_protect_ = true;
 ///				std::cout << "Return: 0x16" << std::endl;
-			} else if(head[0] == 0xC0) {
-				if(!read_(head, 1, tv)) {
+			} else if(head[0] == 0xC0) {  // エラーレスポンス
+				if(!read_(head, 1, tv)) {  // エラーコード
 					return false;
 				}
 				last_error_ = head[0];
