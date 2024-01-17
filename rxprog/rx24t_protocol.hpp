@@ -610,13 +610,13 @@ namespace rx24t {
 				return false;
 			}
 
-			if(!command_(0x06)) {
+			if(!command_(0x06)) {  // 通信確認
 				return false;
 			}
 			if(!read_(res, 1)) {
 				return false;
 			}
-			if(res[0] != 0x06) {
+			if(res[0] != 0x06) {  // 通信確認レスポンス
 				return false;
 			}
 			return true;
@@ -650,7 +650,7 @@ namespace rx24t {
 			} else if(head[0] == 0x16) {
 				id_protect_ = true;
 ///				std::cout << "Return: 0x16" << std::endl;
-			} else if(head[0] == 0xc0) {
+			} else if(head[0] == 0xC0) {
 				if(!read_(head, 1, tv)) {
 					return false;
 				}
@@ -671,6 +671,15 @@ namespace rx24t {
 		*/
 		//-----------------------------------------------------------------//
 		bool get_protect() const noexcept { return id_protect_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ページサイズを取得
+			@return ページサイズ
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_page_size() const { return 256; }
 
 
 		//-----------------------------------------------------------------//

@@ -3,15 +3,17 @@
 /*!	@file
 	@brief	RX programmer クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "rx220_protocol.hpp"
+#include "rx23x_protocol.hpp"
+#include "rx24t_protocol.hpp"
+#include "rx26t_protocol.hpp"
 #include "rx62x_protocol.hpp"
 #include "rx63x_protocol.hpp"
-#include "rx24t_protocol.hpp"
 #include "rx64m_protocol.hpp"
 #include "rx65x_protocol.hpp"
 #include "rx66t_protocol.hpp"
@@ -32,7 +34,7 @@ namespace rx {
 		typedef utils::rs232c_io RS232C;
 		RS232C		rs232c_;
 
-		using protocol_type = boost::variant<rx220::protocol, rx62x::protocol, rx63x::protocol, rx24t::protocol, rx64m::protocol, rx65x::protocol, rx66t::protocol, rx72t::protocol>;
+		using protocol_type = boost::variant<rx220::protocol, rx23x::protocol, rx24t::protocol, rx26t::protocol, rx62x::protocol, rx63x::protocol, rx64m::protocol, rx65x::protocol, rx66t::protocol, rx72t::protocol>;
 		protocol_type protocol_;
 
 		std::string out_section_(uint32_t n, uint32_t num) const noexcept {
@@ -56,14 +58,26 @@ namespace rx {
 		};
 
 
+		struct page_size_visitor {
+			using result_type = uint32_t;
+
+			page_size_visitor() { }
+
+			template <class T>
+			uint32_t operator()(T& x) {
+				return x.get_page_size();
+			}
+		};
+
+
 		struct erase_page_visitor {
 			using result_type = bool;
 
 			uint32_t adr_;
 			erase_page_visitor(uint32_t adr) : adr_(adr) { }
 
-    		template <class T>
-    		bool operator()(T& x) {
+			template <class T>
+			bool operator()(T& x) {
 				return x.erase_page(adr_);
 			}
 		};
@@ -152,12 +166,16 @@ namespace rx {
 		{
 			if(rx.cpu_type_ == "RX220") {
 				protocol_ = rx220::protocol();
+			} else if(rx.cpu_type_ == "RX231") {
+				protocol_ = rx23x::protocol();
+			} else if(rx.cpu_type_ == "RX24T") {
+				protocol_ = rx24t::protocol();
 			} else if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N") {
 				protocol_ = rx62x::protocol();
 			} else if(rx.cpu_type_ == "RX631" || rx.cpu_type_ == "RX63N" || rx.cpu_type_ == "RX63T") {
 				protocol_ = rx63x::protocol();
-			} else if(rx.cpu_type_ == "RX24T") {
-				protocol_ = rx24t::protocol();
+			} else if(rx.cpu_type_ == "RX26T") {
+				protocol_ = rx26t::protocol();
 			} else if(rx.cpu_type_ == "RX64M" || rx.cpu_type_ == "RX71M" || rx.cpu_type_ == "RX72M") {
 				protocol_ = rx64m::protocol();
 			} else if(rx.cpu_type_ == "RX651" || rx.cpu_type_ == "RX65N") {
@@ -180,6 +198,19 @@ namespace rx {
 			}
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ページサイズを取得
+			@return ページサイズ
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_page_size() const noexcept
+		{
+			page_size_visitor vis;
+			return boost::apply_visitor(vis, protocol_);
 		}
 
 

@@ -1,12 +1,12 @@
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	Renesas RX Series Programmer (Flash Writer)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <iostream>
 #include "rx_prog.hpp"
 #include "conf_in.hpp"
@@ -16,10 +16,11 @@
 
 namespace {
 
-	const std::string version_ = "1.65";
-	const std::string conf_file_ = "rx_prog.conf";
-	const uint32_t progress_num_ = 50;
-	const char progress_cha_ = '#';
+	static const std::string version_ = "1.77";
+	static const std::string conf_file_ = "rx_prog.conf";
+	static constexpr uint32_t cpr_last_year_ = 2024;
+	static constexpr uint32_t progress_num_ = 50;
+	static constexpr char progress_cha_ = '#';
 
 	utils::conf_in conf_in_;
 	utils::motsx_io motsx_;
@@ -199,7 +200,7 @@ namespace {
 		std::string c = utils::get_file_base(cmd);
 
 		cout << "Renesas RX Series Programmer Version " << version_ << endl;
-		cout << "Copyright (C) 2016, 2022 Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
+		cout << "Copyright (C) 2016, " << cpr_last_year_ << " Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
 		cout << "usage:" << endl;
 		cout << c << " [options] [mot file] ..." << endl;
 		cout << endl;
@@ -543,21 +544,22 @@ int main(int argc, char* argv[])
 		auto areas = motsx_.create_area_map();
 
 		page_t page;
+		auto page_size = prog_.get_page_size();
 		for(const auto& a : areas) {
-			uint32_t adr = a.min_ & 0xffff'ff00;
+			uint32_t adr = a.min_ & ~(page_size - 1);
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
 					progress_("Erase:  ", pageall, page);
 				} else if(opts.verbose) {
-					std::cout << boost::format("Erase: %08X to %08X") % adr % (adr + 255) << std::endl;
+					std::cout << boost::format("Erase: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
 				}
 				if(!prog_.erase_page(adr)) {  // 256 バイト単位で消去要求を送る
 					prog_.end();
 					return -1;
 				}
-				adr += 256;
-				len += 256;
+				adr += page_size;
+				len += page_size;
 				++page.n;
 				usleep(erase_page_wait);	// 2[ms] wait 待ちを入れないとマイコン側がロストする・・
 			}
@@ -578,22 +580,23 @@ int main(int argc, char* argv[])
 		}
 		
 		page_t page;
+		auto page_size = prog_.get_page_size();
 		for(const auto& a : areas) {
-			uint32_t adr = a.min_ & 0xffff'ff00;
+			uint32_t adr = a.min_ & ~(page_size - 1);
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
 					progress_("Write:  ", pageall, page);
 				} else if(opts.verbose) {
-					std::cout << boost::format("Write: %08X to %08X") % adr % (adr + 255) << std::endl;
+					std::cout << boost::format("Write: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
 				}
 				auto mem = motsx_.get_memory(adr);
 				if(!prog_.write(adr, &mem[0])) {
 					prog_.end();
 					return -1;
 				}
-				adr += 256;
-				len += 256;
+				adr += page_size;
+				len += page_size;
 				++page.n;
 				usleep(write_page_wait);	// 5[ms] wait 待ちを入れないとマイコン側がロストする・・
 			}
@@ -611,22 +614,23 @@ int main(int argc, char* argv[])
 	if(opts.verify) {  // verify
 		auto areas = motsx_.create_area_map();
 		page_t page;
+		auto page_size = prog_.get_page_size();
 		for(const auto& a : areas) {
-			uint32_t adr = a.min_ & 0xffff'ff00;
+			uint32_t adr = a.min_ & ~(page_size - 1);
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
 					progress_("Verify: ", pageall, page);
 				} else if(opts.verbose) {
-					std::cout << boost::format("Verify: %08X to %08X") % adr % (adr + 255) << std::endl;
+					std::cout << boost::format("Verify: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
 				}
 				auto mem = motsx_.get_memory(adr);
 				if(!prog_.verify_page(adr, &mem[0])) {
 					prog_.end();
 					return -1;
 				}
-				adr += 256;
-				len += 256;
+				adr += page_size;
+				len += page_size;
 				++page.n;
 			}
 		}
