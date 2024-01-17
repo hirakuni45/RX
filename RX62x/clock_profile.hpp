@@ -47,8 +47,7 @@ namespace device {
 
 		// RXv1 コア（最大 100MHz）
 		// ※96MHz 動作、10uS で調整
-		static constexpr uint32_t	DELAY_MS	= ICLK / 5333333;	///< ソフトウェアー遅延における定数（1マイクロ秒）
-		static constexpr bool		DELAY_T1	= true;				///< 微調整として、「nop」を１つ追加
+		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 	};
 }
 
