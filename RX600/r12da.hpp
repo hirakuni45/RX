@@ -58,9 +58,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B5> DAE;
-			bit_rw_t<io_, bitpos::B6> DAOE0;
-			bit_rw_t<io_, bitpos::B7> DAOE1;
+			bits_rw_t<io_, bitpos::B0, 5> RESERVE;
+			bit_rw_t <io_, bitpos::B5>    DAE;
+			bit_rw_t <io_, bitpos::B6>    DAOE0;
+			bit_rw_t <io_, bitpos::B7>    DAOE1;
 		};
 		typedef dacr_t<0x0008'8044> DACR_;
 		static DACR_ DACR;
@@ -122,6 +123,8 @@ namespace device {
 	struct r12da_a_t : public r12da_t<per> {
 
 		typedef r12da_t<per> base_type;
+
+		static constexpr bool DACR_DAE = true;	///< DAE フラグの有無
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -220,6 +223,8 @@ namespace device {
 
 		typedef r12da_t<per> base_type;
 
+		static constexpr bool DACR_DAE = false;	///< DAE フラグの有無
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  アナログ出力型
@@ -294,6 +299,8 @@ namespace device {
 	struct r12da_b_t : public r12da_t<per> {
 
 		typedef r12da_t<per> base_type;
+
+		static constexpr bool DACR_DAE = true;	///< DAE フラグの有無
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
