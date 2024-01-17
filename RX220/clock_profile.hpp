@@ -9,7 +9,7 @@
 			外部クロック入力でも最大は 20MHz となる。 @n
 			最大速度を出す場合は、HOCO を利用する事になる。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -72,27 +72,7 @@ namespace device {
 		static constexpr uint32_t   FCLK		= 20'000'000;		///< FCLK 周波数（最大4 ～ 32MHz）
 #endif
 
-		/// ソフトウェアー遅延における定数（1マイクロ秒）
-		static void delay_us() noexcept
-		{
-			// 定数（DELAY_MS）で指定すると、ループ数が少なくインライン展開され、予想した時間にならない為、直で’NOP’数で調整する。
-			if(ICLK == 32'000'000) {  // 32MHz 用
-				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
-				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
-				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
-				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
-			} else if(ICLK == 20'000'000) { // 20MHz 用
-				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
-				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
-				asm("nop"); asm("nop"); asm("nop");
-			} else {
-				for(volatile uint8_t i = 0; i < (ICLK / 1'000'000) - 10; ++i) {
-					asm("nop");
-				}
-			}
-		}
-		static constexpr bool		DELAY_T1	= true;			///< 微調整として、「nop」を１つ追加
-		static constexpr bool		DELAY_T2	= true;			///< 微調整として、「nop」を１つ追加
+		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 	};
 }
 

@@ -48,13 +48,23 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		static __attribute__((optimize(1))) void micro_second(uint32_t us) noexcept
 		{
-			while(us > 0) {
-				for(uint32_t n = 0; n < device::clock_profile::DELAY_MS; ++n) {
-					asm("nop");
-				}
-				--us;
-			}
-			if(device::clock_profile::DELAY_T1) { asm("nop"); }
+			asm("cmp #0, %[us]" : : [us] "r" (us) );
+			asm("beq.b micro_second_loop0\n\t"
+			    "micro_second_loop1:");
+				uint32_t lpn = device::clock_profile::DELAY_MS;
+				asm("micro_second_loop2:\n\t"
+				    "sub #1, %[lpn]" : : [lpn] "r" (lpn));
+				asm("bne.b micro_second_loop2"); 
+			asm("sub #1, %[us]" : : [us] "r" (us));
+			asm("bne.b micro_second_loop1\n\t"
+			    "micro_second_loop0:");
+//			while(us > 0) {
+//				for(uint32_t n = 0; n < device::clock_profile::DELAY_MS; ++n) {
+//					asm("nop");
+//				}
+//				if(device::clock_profile::DELAY_T1) { asm("nop"); }
+//				--us;
+//			}
 		}
 
 

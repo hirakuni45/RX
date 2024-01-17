@@ -42,7 +42,7 @@ namespace device {
 
 		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
-
+#if 1
 		static constexpr uint32_t   PLL_BASE	= 54'000'000;		///< PLL ベースクロック（最大 54MHz）
 
 		static constexpr uint32_t   ICLK		= 54'000'000;		///< ICLK 周波数（最大 54MHz）
@@ -51,9 +51,17 @@ namespace device {
 		static constexpr uint32_t   PCLKD		= 54'000'000;		///< PCLKD 周波数（最大 54MHz）
 		static constexpr uint32_t   FCLK		= 27'000'000;		///< FCLK 周波数（最大 1 ～ 32MHz）
 		static constexpr uint32_t	BCLK		= 27'000'000;		///< BCLK 周波数（最大 32MHz）
+#else
+		static constexpr uint32_t   PLL_BASE	= 72'000'000;		///< PLL ベースクロック（最大 54MHz）
 
-		static constexpr uint32_t	DELAY_MS	= ICLK / 4444444;	///< ソフトウェアー遅延における定数（1マイクロ秒）
-		static constexpr bool		DELAY_T1	= true;				///< 微調整として、「nop」を１つ追加
+		static constexpr uint32_t   ICLK		= 72'000'000;		///< ICLK 周波数（最大 54MHz）
+		static constexpr uint32_t   PCLKA		= 72'000'000;		///< PCLKB 周波数（最大 54MHz）
+		static constexpr uint32_t   PCLKB		= 36'000'000;		///< PCLKB 周波数（最大 32MHz）
+		static constexpr uint32_t   PCLKD		= 72'000'000;		///< PCLKD 周波数（最大 54MHz）
+		static constexpr uint32_t   FCLK		= 36'000'000;		///< FCLK 周波数（最大 1 ～ 32MHz）
+		static constexpr uint32_t	BCLK		= 36'000'000;		///< BCLK 周波数（最大 32MHz）
+#endif
+		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 	};
 }
 

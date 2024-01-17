@@ -70,8 +70,7 @@ namespace device {
 		static constexpr uint32_t   FCLK		=   51'000'000;		///< FCLK 周波数（最大 60MHz）
 #endif
 
-		static constexpr uint32_t	DELAY_MS	= ICLK / 3'065'133;	///< ソフトウェアー遅延における定数（1マイクロ秒）
-		static constexpr bool		DELAY_T1	= false;			///< 微調整として、「nop」を１つ追加
+		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 	};
 }
 
