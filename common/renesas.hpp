@@ -60,7 +60,7 @@
 #include "RX600/crc.hpp"
 #include "RX600/sdhi.hpp"
 #include "RX600/ctsu.hpp"
-// #include "RX220/s12ad.hpp"
+#include "RX231/s12ade.hpp"
 #include "RX600/r12da.hpp"
 // #include "RX220/cmpa.hpp"
 #include "RX600/doc.hpp"

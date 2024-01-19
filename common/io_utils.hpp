@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	I/O ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -249,7 +249,7 @@ namespace device {
 		static constexpr bool RD = true;		///< 読出し
 		static constexpr bool WR = true;		///< 書き込み
 
-		static uint32_t index;
+		static inline uint32_t index;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -308,7 +308,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void operator &= (value_type data) noexcept { write(read() & data); }
 	};
-	template <address_type T> uint32_t rw8_index_t<T>::index;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -539,7 +538,7 @@ namespace device {
 		static constexpr bool RD = true;		///< 読出し
 		static constexpr bool WR = true;		///< 書き込み
 
-		static uint32_t index;
+		static inline uint32_t index;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -594,7 +593,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void operator &= (value_type data) noexcept { write(read() & data); }
 	};
-	template <address_type T> uint32_t rw16_index_t<T>::index;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -754,7 +752,7 @@ namespace device {
 		static constexpr bool RD = true;		///< 読出し
 		static constexpr bool WR = true;		///< 書き込み
 
-		static uint32_t index;
+		static inline uint32_t index;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -809,7 +807,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void operator &= (value_type data) noexcept { write(read() & data); }
 	};
-	template <address_type T> uint32_t rw32_index_t<T>::index;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -828,7 +825,7 @@ namespace device {
 		static constexpr bool RD = true;		///< 読出し
 		static constexpr bool WR = true;		///< 書き込み
 
-		static uint32_t	tmp_;
+		static inline uint32_t	tmp_;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -883,7 +880,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void operator &= (value_type data) noexcept { write(read() & data); }
 	};
-	template <address_type adr> uint32_t trw32_t<adr>::tmp_;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1151,23 +1147,15 @@ namespace device {
 		typedef bit_rw_t<T, bitpos::B2> B2_;
 		typedef bit_rw_t<T, bitpos::B1> B1_;
 		typedef bit_rw_t<T, bitpos::B0> B0_;
-		static B7_ B7;	///< B7 アクセス
-		static B6_ B6;	///< B6 アクセス
-		static B5_ B5;	///< B5 アクセス
-		static B4_ B4;	///< B4 アクセス
-		static B3_ B3;	///< B3 アクセス
-		static B2_ B2;	///< B2 アクセス
-		static B1_ B1;	///< B1 アクセス
-		static B0_ B0;	///< B0 アクセス
+		static inline B7_ B7;	///< B7 アクセス
+		static inline B6_ B6;	///< B6 アクセス
+		static inline B5_ B5;	///< B5 アクセス
+		static inline B4_ B4;	///< B4 アクセス
+		static inline B3_ B3;	///< B3 アクセス
+		static inline B2_ B2;	///< B2 アクセス
+		static inline B1_ B1;	///< B1 アクセス
+		static inline B0_ B0;	///< B0 アクセス
 	};
-	template <class T> typename basic_rw_t<T>::B7_ basic_rw_t<T>::B7;
-	template <class T> typename basic_rw_t<T>::B6_ basic_rw_t<T>::B6;
-	template <class T> typename basic_rw_t<T>::B5_ basic_rw_t<T>::B5;
-	template <class T> typename basic_rw_t<T>::B4_ basic_rw_t<T>::B4;
-	template <class T> typename basic_rw_t<T>::B3_ basic_rw_t<T>::B3;
-	template <class T> typename basic_rw_t<T>::B2_ basic_rw_t<T>::B2;
-	template <class T> typename basic_rw_t<T>::B1_ basic_rw_t<T>::B1;
-	template <class T> typename basic_rw_t<T>::B0_ basic_rw_t<T>::B0;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1192,21 +1180,13 @@ namespace device {
 		typedef bit_ro_t<T, bitpos::B2> B2_;
 		typedef bit_ro_t<T, bitpos::B1> B1_;
 		typedef bit_ro_t<T, bitpos::B0> B0_;
-		static B7_ B7;	///< B7 アクセス
-		static B6_ B6;	///< B6 アクセス
-		static B5_ B5;	///< B5 アクセス
-		static B4_ B4;	///< B4 アクセス
-		static B3_ B3;	///< B3 アクセス
-		static B2_ B2;	///< B2 アクセス
-		static B1_ B1;	///< B1 アクセス
-		static B0_ B0;	///< B0 アクセス
+		static inline B7_ B7;	///< B7 アクセス
+		static inline B6_ B6;	///< B6 アクセス
+		static inline B5_ B5;	///< B5 アクセス
+		static inline B4_ B4;	///< B4 アクセス
+		static inline B3_ B3;	///< B3 アクセス
+		static inline B2_ B2;	///< B2 アクセス
+		static inline B1_ B1;	///< B1 アクセス
+		static inline B0_ B0;	///< B0 アクセス
 	};
-	template <class T> typename basic_ro_t<T>::B7_ basic_ro_t<T>::B7;
-	template <class T> typename basic_ro_t<T>::B6_ basic_ro_t<T>::B6;
-	template <class T> typename basic_ro_t<T>::B5_ basic_ro_t<T>::B5;
-	template <class T> typename basic_ro_t<T>::B4_ basic_ro_t<T>::B4;
-	template <class T> typename basic_ro_t<T>::B3_ basic_ro_t<T>::B3;
-	template <class T> typename basic_ro_t<T>::B2_ basic_ro_t<T>::B2;
-	template <class T> typename basic_ro_t<T>::B1_ basic_ro_t<T>::B1;
-	template <class T> typename basic_ro_t<T>::B0_ basic_ro_t<T>::B0;
 }

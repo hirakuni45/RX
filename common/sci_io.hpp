@@ -90,14 +90,14 @@ namespace device {
 
 		const port_map_order::sci_port_t&	port_map_;
 
-		static RBF	recv_;
-		static SBF	send_;
+		static inline RBF	recv_;
+		static inline SBF	send_;
 
 		ICU::LEVEL	level_;
 		bool		auto_crlf_;
 		uint32_t	baud_;
-		static volatile bool		stop_;
-		static volatile uint16_t	errc_;
+		static inline volatile bool		stop_;
+		static inline volatile uint16_t	errc_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept
@@ -675,14 +675,4 @@ namespace device {
 		void operator = (char ch) noexcept { putch(ch); }
 		void operator = (const char* str) noexcept { puts(str); }
 	};
-
-	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, typename sci_io_base::FLOW_CTRL FLCT, class RTS>
-		RBF sci_io<SCI, RBF, SBF, PSEL, FLCT, RTS>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, typename sci_io_base::FLOW_CTRL FLCT, class RTS>
-		SBF sci_io<SCI, RBF, SBF, PSEL, FLCT, RTS>::send_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, typename sci_io_base::FLOW_CTRL FLCT, class RTS>
-		volatile bool sci_io<SCI, RBF, SBF, PSEL, FLCT, RTS>::stop_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL, typename sci_io_base::FLOW_CTRL FLCT, class RTS>
-		volatile uint16_t sci_io<SCI, RBF, SBF, PSEL, FLCT, RTS>::errc_;
 }

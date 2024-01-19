@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX231 グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,7 +18,6 @@ namespace device {
 		@brief  RX231 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct icu_t : public ICU_BASE, ICU_IRQ8 {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -268,7 +267,7 @@ namespace device {
 			}
 		};
 		typedef ir_t<0x0008'7000> IR_;
-		static IR_ IR;
+		static inline IR_ IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -315,7 +314,7 @@ namespace device {
 			}
 		};
 		typedef ier_t<0x0008'7200> IER_;
-		static IER_ IER;
+		static inline IER_ IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -535,7 +534,7 @@ namespace device {
 
 		};
 		typedef ipr_t<0x0008'7300> IPR_;
-		static IPR_ IPR;
+		static inline IPR_ IPR;
 
 
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
@@ -545,22 +544,13 @@ namespace device {
 
 		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
 		typedef rw8_t<0x0008'7400> DMRSR0_;
-		static DMRSR0_ DMRSR0;
+		static inline DMRSR0_ DMRSR0;
 		typedef rw8_t<0x0008'7404> DMRSR1_;
-		static DMRSR1_ DMRSR1;
+		static inline DMRSR1_ DMRSR1;
 		typedef rw8_t<0x0008'7408> DMRSR2_;
-		static DMRSR2_ DMRSR2;
+		static inline DMRSR2_ DMRSR2;
 		typedef rw8_t<0x0008'740C> DMRSR3_;
-		static DMRSR3_ DMRSR3;
+		static inline DMRSR3_ DMRSR3;
 	};
-	typedef icu_t<void> ICU;
-
-	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
-	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
-	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
-	template<class _> typename icu_t<_>::DTCER_ icu_t<_>::DTCER;
-	template<class _> typename icu_t<_>::DMRSR0_ icu_t<_>::DMRSR0;
-	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
-	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
-	template<class _> typename icu_t<_>::DMRSR3_ icu_t<_>::DMRSR3;
+	typedef icu_t ICU;
 }

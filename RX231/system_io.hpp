@@ -161,7 +161,7 @@ namespace device {
 				volatile auto tmp = device::SYSTEM::SCKCR();  // dummy read
 			}
 
-			// Memory wait cycle register
+			// Setup memory wait cycle register
 			SYSTEM::MEMWAIT.MEMWAIT = clock_profile::ICLK > 32'000'000;
 
 			// Master PLL settings
