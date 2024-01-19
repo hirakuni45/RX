@@ -18,7 +18,6 @@ namespace device {
 		@brief  RX621/RX62N 割り込みコントローラ・テンプレート・クラス（ICUa）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct icu_t : public ICU_BASE {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -253,8 +252,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x0008'7000> IR_;
-		static IR_ IR;
+		static inline ir_t<0x0008'7000> IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -300,8 +298,7 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		typedef ier_t<0x0008'7200> IER_;
-		static IER_ IER;
+		static inline ier_t<0x0008'7200> IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -532,19 +529,17 @@ namespace device {
 			}
 
 		};
-		typedef ipr_t<0x0008'7300> IPR_;
-		static IPR_ IPR;
+		static inline ipr_t<0x0008'7300> IPR;
 
 
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
-		typedef dtcer_t<0x0008'7100, VECTOR> DTCER_;
-		static DTCER_ DTCER;
+		static inline dtcer_t<0x0008'7100, VECTOR> DTCER;
 
 		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
-		static DMRSR0_ DMRSR0;
-		static DMRSR1_ DMRSR1;
-		static DMRSR2_ DMRSR2;
-		static DMRSR3_ DMRSR3;
+		static inline DMRSR0_ DMRSR0;
+		static inline DMRSR1_ DMRSR1;
+		static inline DMRSR2_ DMRSR2;
+		static inline DMRSR3_ DMRSR3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -588,63 +583,22 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B2, 2>  IRQMD;
 		};
-		typedef irqcrn_t<0x0008'7500> IRQCR0_;
-		typedef irqcrn_t<0x0008'7501> IRQCR1_;
-		typedef irqcrn_t<0x0008'7502> IRQCR2_;
-		typedef irqcrn_t<0x0008'7503> IRQCR3_;
-		typedef irqcrn_t<0x0008'7504> IRQCR4_;
-		typedef irqcrn_t<0x0008'7505> IRQCR5_;
-		typedef irqcrn_t<0x0008'7506> IRQCR6_;
-		typedef irqcrn_t<0x0008'7507> IRQCR7_;
-		typedef irqcrn_t<0x0008'7508> IRQCR8_;
-		typedef irqcrn_t<0x0008'7509> IRQCR9_;
-		typedef irqcrn_t<0x0008'750A> IRQCR10_;
-		typedef irqcrn_t<0x0008'750B> IRQCR11_;
-		typedef irqcrn_t<0x0008'750C> IRQCR12_;
-		typedef irqcrn_t<0x0008'750D> IRQCR13_;
-		typedef irqcrn_t<0x0008'750E> IRQCR14_;
-		typedef irqcrn_t<0x0008'750F> IRQCR15_;
-		static IRQCR0_ IRQCR0;
-		static IRQCR1_ IRQCR1;
-		static IRQCR2_ IRQCR2;
-		static IRQCR3_ IRQCR3;
-		static IRQCR4_ IRQCR4;
-		static IRQCR5_ IRQCR5;
-		static IRQCR6_ IRQCR6;
-		static IRQCR7_ IRQCR7;
-		static IRQCR8_ IRQCR8;
-		static IRQCR9_ IRQCR9;
-		static IRQCR10_ IRQCR10;
-		static IRQCR11_ IRQCR11;
-		static IRQCR12_ IRQCR12;
-		static IRQCR13_ IRQCR13;
-		static IRQCR14_ IRQCR14;
-		static IRQCR15_ IRQCR15;
+		static inline irqcrn_t<0x0008'7500> IRQCR0;
+		static inline irqcrn_t<0x0008'7501> IRQCR1;
+		static inline irqcrn_t<0x0008'7502> IRQCR2;
+		static inline irqcrn_t<0x0008'7503> IRQCR3;
+		static inline irqcrn_t<0x0008'7504> IRQCR4;
+		static inline irqcrn_t<0x0008'7505> IRQCR5;
+		static inline irqcrn_t<0x0008'7506> IRQCR6;
+		static inline irqcrn_t<0x0008'7507> IRQCR7;
+		static inline irqcrn_t<0x0008'7508> IRQCR8;
+		static inline irqcrn_t<0x0008'7509> IRQCR9;
+		static inline irqcrn_t<0x0008'750A> IRQCR10;
+		static inline irqcrn_t<0x0008'750B> IRQCR11;
+		static inline irqcrn_t<0x0008'750C> IRQCR12;
+		static inline irqcrn_t<0x0008'750D> IRQCR13;
+		static inline irqcrn_t<0x0008'750E> IRQCR14;
+		static inline irqcrn_t<0x0008'750F> IRQCR15;
 	};
-	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
-	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
-	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
-	template<class _> typename icu_t<_>::DTCER_ icu_t<_>::DTCER;
-	template<class _> typename icu_t<_>::DMRSR0_ icu_t<_>::DMRSR0;
-	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
-	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
-	template<class _> typename icu_t<_>::DMRSR3_ icu_t<_>::DMRSR3;
-	template<class _> typename icu_t<_>::IRQCR0_ icu_t<_>::IRQCR0;
-	template<class _> typename icu_t<_>::IRQCR1_ icu_t<_>::IRQCR1;
-	template<class _> typename icu_t<_>::IRQCR2_ icu_t<_>::IRQCR2;
-	template<class _> typename icu_t<_>::IRQCR3_ icu_t<_>::IRQCR3;
-	template<class _> typename icu_t<_>::IRQCR4_ icu_t<_>::IRQCR4;
-	template<class _> typename icu_t<_>::IRQCR5_ icu_t<_>::IRQCR5;
-	template<class _> typename icu_t<_>::IRQCR6_ icu_t<_>::IRQCR6;
-	template<class _> typename icu_t<_>::IRQCR7_ icu_t<_>::IRQCR7;
-	template<class _> typename icu_t<_>::IRQCR8_ icu_t<_>::IRQCR8;
-	template<class _> typename icu_t<_>::IRQCR9_ icu_t<_>::IRQCR9;
-	template<class _> typename icu_t<_>::IRQCR10_ icu_t<_>::IRQCR10;
-	template<class _> typename icu_t<_>::IRQCR11_ icu_t<_>::IRQCR11;
-	template<class _> typename icu_t<_>::IRQCR12_ icu_t<_>::IRQCR12;
-	template<class _> typename icu_t<_>::IRQCR13_ icu_t<_>::IRQCR13;
-	template<class _> typename icu_t<_>::IRQCR14_ icu_t<_>::IRQCR14;
-	template<class _> typename icu_t<_>::IRQCR15_ icu_t<_>::IRQCR15;
-
-	typedef icu_t<void> ICU;
+	typedef icu_t ICU;
 }

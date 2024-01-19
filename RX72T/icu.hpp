@@ -19,8 +19,7 @@ namespace device {
 		@brief  RX66T/RX72T 割り込みコントローラ・テンプレート・クラス（ICUC）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
-	struct icuc_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {
+	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -501,8 +500,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x00087000> IR_;
-		static IR_ IR;
+		static inline ir_t<0x00087000> IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -548,8 +546,7 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		typedef ier_t<0x00087200> IER_;
-		static IER_ IER;
+		static inline ier_t<0x00087200> IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -638,61 +635,51 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		typedef ipr_t<0x00087300> IPR_;
-		static IPR_ IPR;
+		static inline ipr_t<0x00087300> IPR;
 
 
 		/// @brief ソフトウェア割り込み 2 起動レジスタ (SWINT2R)
-		static SWINT2R_ SWINT2R;
+		static inline SWINT2R_ SWINT2R;
 
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
-		typedef dtcer_t<0x0008'7100, VECTOR> DTCER_;
-		static DTCER_ DTCER;
+		static inline dtcer_t<0x0008'7100, VECTOR> DTCER;
 
 		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
-		static DMRSR8N_ DMRSR;
-		static DMRSR0_ DMRSR0;
-		static DMRSR1_ DMRSR1;
-		static DMRSR2_ DMRSR2;
-		static DMRSR3_ DMRSR3;
-		static DMRSR4_ DMRSR4;
-		static DMRSR5_ DMRSR5;
-		static DMRSR6_ DMRSR6;
-		static DMRSR7_ DMRSR7;
+		static inline DMRSR8N_ DMRSR;
+		static inline DMRSR0_ DMRSR0;
+		static inline DMRSR1_ DMRSR1;
+		static inline DMRSR2_ DMRSR2;
+		static inline DMRSR3_ DMRSR3;
+		static inline DMRSR4_ DMRSR4;
+		static inline DMRSR5_ DMRSR5;
+		static inline DMRSR6_ DMRSR6;
+		static inline DMRSR7_ DMRSR7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ BE0 割り込み要求レジスタ（GRPBE0）@n
-					グループ BL0/1 割り込み要求レジスタ（GRPBL0/GRPBL1）@n
-					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
+			@brief  グループ BE0 割り込み要求レジスタ（GRPBE0） @n
+					グループ BL0/1 割り込み要求レジスタ（GRPBL0/GRPBL1） @n
+					グループ AL0 割り込み要求レジスタ（GRPAL0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef grp_t<0x0008'7600, GROUPBE0> GRPBE0_;
-		typedef grp_t<0x0008'7630, GROUPBL0> GRPBL0_;
-		typedef grp_t<0x0008'7634, GROUPBL1> GRPBL1_;
-		typedef grp_t<0x0008'7830, GROUPAL0> GRPAL0_;
-		static GRPBE0_ GRPBE0;
-		static GRPBL0_ GRPBL0;
-		static GRPBL1_ GRPBL1;
-		static GRPAL0_ GRPAL0;
+		static inline grp_t<0x0008'7600, GROUPBE0> GRPBE0;
+		static inline grp_t<0x0008'7630, GROUPBL0> GRPBL0;
+		static inline grp_t<0x0008'7634, GROUPBL1> GRPBL1;
+		static inline grp_t<0x0008'7830, GROUPAL0> GRPAL0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ BE0 割り込み要求許可レジスタ（GENBE0）@n
-					グループ BL0/1 割り込み要求許可レジスタ（GENBL0/GENBL1/GENBL2）@n
-					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
+			@brief  グループ BE0 割り込み要求許可レジスタ（GENBE0） @n
+					グループ BL0/1 割り込み要求許可レジスタ（GENBL0/GENBL1/GENBL2） @n
+					グループ AL0 割り込み要求許可レジスタ（GENAL0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gen_t<0x0008'7640, GROUPBE0> GENBE0_;
-		typedef gen_t<0x0008'7670, GROUPBL0> GENBL0_;
-		typedef gen_t<0x0008'7674, GROUPBL1> GENBL1_;
-		typedef gen_t<0x0008'7870, GROUPAL0> GENAL0_;
-		static GENBE0_ GENBE0;
-		static GENBL0_ GENBL0;
-		static GENBL1_ GENBL1;
-		static GENAL0_ GENAL0;
+		static inline gen_t<0x0008'7640, GROUPBE0> GENBE0;
+		static inline gen_t<0x0008'7670, GROUPBL0> GENBL0;
+		static inline gen_t<0x0008'7674, GROUPBL1> GENBL1;
+		static inline gen_t<0x0008'7870, GROUPAL0> GENAL0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -709,32 +696,7 @@ namespace device {
 			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x00087900, VECTOR, SELECTA> SLIAR_;
-		static SLIAR_ SLIAR;
+		static inline icu_utils::slixr_t<0x00087900, VECTOR, SELECTA> SLIAR;
 	};
-	template<class _> typename icuc_t<_>::IR_ icuc_t<_>::IR;
-	template<class _> typename icuc_t<_>::IER_ icuc_t<_>::IER;
-	template<class _> typename icuc_t<_>::IPR_ icuc_t<_>::IPR;
-	template<class _> typename icuc_t<_>::SWINT2R_ icuc_t<_>::SWINT2R;
-	template<class _> typename icuc_t<_>::DTCER_ icuc_t<_>::DTCER;
-	template<class _> typename icuc_t<_>::DMRSR0_ icuc_t<_>::DMRSR0;
-	template<class _> typename icuc_t<_>::DMRSR1_ icuc_t<_>::DMRSR1;
-	template<class _> typename icuc_t<_>::DMRSR2_ icuc_t<_>::DMRSR2;
-	template<class _> typename icuc_t<_>::DMRSR3_ icuc_t<_>::DMRSR3;
-	template<class _> typename icuc_t<_>::DMRSR4_ icuc_t<_>::DMRSR4;
-	template<class _> typename icuc_t<_>::DMRSR5_ icuc_t<_>::DMRSR5;
-	template<class _> typename icuc_t<_>::DMRSR6_ icuc_t<_>::DMRSR6;
-	template<class _> typename icuc_t<_>::DMRSR7_ icuc_t<_>::DMRSR7;
-	template<class _> typename icuc_t<_>::GRPBE0_ icuc_t<_>::GRPBE0;
-	template<class _> typename icuc_t<_>::GRPBL0_ icuc_t<_>::GRPBL0;
-	template<class _> typename icuc_t<_>::GRPBL1_ icuc_t<_>::GRPBL1;
-	template<class _> typename icuc_t<_>::GRPAL0_ icuc_t<_>::GRPAL0;
-	template<class _> typename icuc_t<_>::GENBE0_ icuc_t<_>::GENBE0;
-	template<class _> typename icuc_t<_>::GENBL0_ icuc_t<_>::GENBL0;
-	template<class _> typename icuc_t<_>::GENBL1_ icuc_t<_>::GENBL1;
-	template<class _> typename icuc_t<_>::GENAL0_ icuc_t<_>::GENAL0;
-	template<class _> typename icuc_t<_>::GCRBE0_ icuc_t<_>::GCRBE0;
-	template<class _> typename icuc_t<_>::SLIAR_ icuc_t<_>::SLIAR;
-
-	typedef icuc_t<void> ICU;
+	typedef icu_t ICU;
 }

@@ -20,7 +20,6 @@ namespace device {
 		@brief  RX631/RX63N 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
 	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -420,8 +419,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x0008'7000> IR_;
-		static IR_ IR;
+		static inline ir_t<0x0008'7000> IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -467,8 +465,7 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		typedef ier_t<0x0008'7200> IER_;
-		static IER_ IER;
+		static inline ier_t<0x0008'7200> IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -699,19 +696,17 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		typedef ipr_t<0x0008'7300> IPR_;
-		static IPR_ IPR;
+		static inline ipr_t<0x0008'7300> IPR;
 
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
-		typedef dtcer_t<0x0008'7100, VECTOR> DTCER_;
-		static DTCER_ DTCER;
+		static inline dtcer_t<0x0008'7100, VECTOR> DTCER;
 
 		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
-		static DMRSR8N_ DMRSR;
-		static DMRSR0_ DMRSR0;
-		static DMRSR1_ DMRSR1;
-		static DMRSR2_ DMRSR2;
-		static DMRSR3_ DMRSR3;
+		static inline DMRSR8N_ DMRSR;
+		static inline DMRSR0_ DMRSR0;
+		static inline DMRSR1_ DMRSR1;
+		static inline DMRSR2_ DMRSR2;
+		static inline DMRSR3_ DMRSR3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -720,22 +715,14 @@ namespace device {
 					GROUP0 ～ GROUP6, GROUP12
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef grp_t<0x0008'C300, GROUP0> GRP00_;
-		typedef grp_t<0x0008'C304, GROUP1> GRP01_;
-		typedef grp_t<0x0008'C308, GROUP2> GRP02_;
-		typedef grp_t<0x0008'C30C, GROUP3> GRP03_;
-		typedef grp_t<0x0008'C310, GROUP4> GRP04_;
-		typedef grp_t<0x0008'C314, GROUP5> GRP05_;
-		typedef grp_t<0x0008'C318, GROUP6> GRP06_;
-		typedef grp_t<0x0008'C330, GROUP12> GRP12_;
-		static GRP00_ GRP00;
-		static GRP01_ GRP01;
-		static GRP02_ GRP02;
-		static GRP03_ GRP03;
-		static GRP04_ GRP04;
-		static GRP05_ GRP05;
-		static GRP06_ GRP06;
-		static GRP12_ GRP12;
+		static inline grp_t<0x0008'C300, GROUP0> GRP00;
+		static inline grp_t<0x0008'C304, GROUP1> GRP01;
+		static inline grp_t<0x0008'C308, GROUP2> GRP02;
+		static inline grp_t<0x0008'C30C, GROUP3> GRP03;
+		static inline grp_t<0x0008'C310, GROUP4> GRP04;
+		static inline grp_t<0x0008'C314, GROUP5> GRP05;
+		static inline grp_t<0x0008'C318, GROUP6> GRP06;
+		static inline grp_t<0x0008'C330, GROUP12> GRP12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -744,22 +731,14 @@ namespace device {
 					GROUP0 ～ GROUP6, GROUP12
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef gen_t<0x0008'C340, GROUP0> GEN00_;
-		typedef gen_t<0x0008'C344, GROUP1> GEN01_;
-		typedef gen_t<0x0008'C348, GROUP2> GEN02_;
-		typedef gen_t<0x0008'C34C, GROUP3> GEN03_;
-		typedef gen_t<0x0008'C350, GROUP4> GEN04_;
-		typedef gen_t<0x0008'C354, GROUP5> GEN05_;
-		typedef gen_t<0x0008'C358, GROUP6> GEN06_;
-		typedef gen_t<0x0008'C370, GROUP12> GEN12_;
-		static GEN00_ GEN00;
-		static GEN01_ GEN01;
-		static GEN02_ GEN02;
-		static GEN03_ GEN03;
-		static GEN04_ GEN04;
-		static GEN05_ GEN05;
-		static GEN06_ GEN06;
-		static GEN12_ GEN12;
+		static inline gen_t<0x0008'C340, GROUP0> GEN00;
+		static inline gen_t<0x0008'C344, GROUP1> GEN01;
+		static inline gen_t<0x0008'C348, GROUP2> GEN02;
+		static inline gen_t<0x0008'C34C, GROUP3> GEN03;
+		static inline gen_t<0x0008'C350, GROUP4> GEN04;
+		static inline gen_t<0x0008'C354, GROUP5> GEN05;
+		static inline gen_t<0x0008'C358, GROUP6> GEN06;
+		static inline gen_t<0x0008'C370, GROUP12> GEN12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -775,46 +754,13 @@ namespace device {
 		typedef gcr_t<0x0008'C390, GROUP4> GCR04_;
 		typedef gcr_t<0x0008'C394, GROUP5> GCR05_;
 		typedef gcr_t<0x0008'C398, GROUP6> GCR06_;
-		static GCR00_ GCR00;
-		static GCR01_ GCR01;
-		static GCR02_ GCR02;
-		static GCR03_ GCR03;
-		static GCR04_ GCR04;
-		static GCR05_ GCR05;
-		static GCR06_ GCR06;
+		static inline GCR00_ GCR00;
+		static inline GCR01_ GCR01;
+		static inline GCR02_ GCR02;
+		static inline GCR03_ GCR03;
+		static inline GCR04_ GCR04;
+		static inline GCR05_ GCR05;
+		static inline GCR06_ GCR06;
 	};
-	template<class _> typename icu_t<_>::IR_  icu_t<_>::IR;
-	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
-	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
-	template<class _> typename icu_t<_>::DTCER_ icu_t<_>::DTCER;
-	template<class _> typename icu_t<_>::DMRSR8N_ icu_t<_>::DMRSR;
-	template<class _> typename icu_t<_>::DMRSR0_ icu_t<_>::DMRSR0;
-	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
-	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
-	template<class _> typename icu_t<_>::DMRSR3_ icu_t<_>::DMRSR3;
-	template<class _> typename icu_t<_>::GRP00_ icu_t<_>::GRP00;
-	template<class _> typename icu_t<_>::GRP01_ icu_t<_>::GRP01;
-	template<class _> typename icu_t<_>::GRP02_ icu_t<_>::GRP02;
-	template<class _> typename icu_t<_>::GRP03_ icu_t<_>::GRP03;
-	template<class _> typename icu_t<_>::GRP04_ icu_t<_>::GRP04;
-	template<class _> typename icu_t<_>::GRP05_ icu_t<_>::GRP05;
-	template<class _> typename icu_t<_>::GRP06_ icu_t<_>::GRP06;
-	template<class _> typename icu_t<_>::GRP12_ icu_t<_>::GRP12;
-	template<class _> typename icu_t<_>::GEN00_ icu_t<_>::GEN00;
-	template<class _> typename icu_t<_>::GEN01_ icu_t<_>::GEN01;
-	template<class _> typename icu_t<_>::GEN02_ icu_t<_>::GEN02;
-	template<class _> typename icu_t<_>::GEN03_ icu_t<_>::GEN03;
-	template<class _> typename icu_t<_>::GEN04_ icu_t<_>::GEN04;
-	template<class _> typename icu_t<_>::GEN05_ icu_t<_>::GEN05;
-	template<class _> typename icu_t<_>::GEN06_ icu_t<_>::GEN06;
-	template<class _> typename icu_t<_>::GEN12_ icu_t<_>::GEN12;
-	template<class _> typename icu_t<_>::GCR00_ icu_t<_>::GCR00;
-	template<class _> typename icu_t<_>::GCR01_ icu_t<_>::GCR01;
-	template<class _> typename icu_t<_>::GCR02_ icu_t<_>::GCR02;
-	template<class _> typename icu_t<_>::GCR03_ icu_t<_>::GCR03;
-	template<class _> typename icu_t<_>::GCR04_ icu_t<_>::GCR04;
-	template<class _> typename icu_t<_>::GCR05_ icu_t<_>::GCR05;
-	template<class _> typename icu_t<_>::GCR06_ icu_t<_>::GCR06;
-
-	typedef icu_t<void> ICU;
+	typedef icu_t ICU;
 }

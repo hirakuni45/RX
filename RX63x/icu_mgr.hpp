@@ -18,26 +18,16 @@ namespace device {
 		@brief  割り込みマネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	class icu_mgr_ {
+	class icu_mgr {
 
-		typedef icu_utils::dispatch<ICU::GROUP0> GROUP0_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUP1> GROUP1_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUP2> GROUP2_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUP3> GROUP3_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUP4> GROUP4_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUP5> GROUP5_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUP6> GROUP6_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUP12> GROUP12_dispatch_t;
-
-		static GROUP0_dispatch_t GROUP0_dispatch_;
-		static GROUP1_dispatch_t GROUP1_dispatch_;
-		static GROUP2_dispatch_t GROUP2_dispatch_;
-		static GROUP3_dispatch_t GROUP3_dispatch_;
-		static GROUP4_dispatch_t GROUP4_dispatch_;
-		static GROUP5_dispatch_t GROUP5_dispatch_;
-		static GROUP6_dispatch_t GROUP6_dispatch_;
-		static GROUP12_dispatch_t GROUP12_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP0>  GROUP0_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP1>  GROUP1_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP2>  GROUP2_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP3>  GROUP3_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP4>  GROUP4_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP5>  GROUP5_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP6>  GROUP6_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP12> GROUP12_dispatch_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -655,14 +645,4 @@ namespace device {
 			}
 		}
 	};
-	template <class _> typename icu_mgr_<_>::GROUP0_dispatch_t icu_mgr_<_>::GROUP0_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUP1_dispatch_t icu_mgr_<_>::GROUP1_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUP2_dispatch_t icu_mgr_<_>::GROUP2_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUP3_dispatch_t icu_mgr_<_>::GROUP3_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUP4_dispatch_t icu_mgr_<_>::GROUP4_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUP5_dispatch_t icu_mgr_<_>::GROUP5_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUP6_dispatch_t icu_mgr_<_>::GROUP6_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUP12_dispatch_t icu_mgr_<_>::GROUP12_dispatch_;
-
-	typedef icu_mgr_<void> icu_mgr;
 }
