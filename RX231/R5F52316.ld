@@ -5,7 +5,7 @@
 			RAM: 32K @n
 			EEPROM: 8K
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,7 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX2206 chip.  */
+/* This memory layout corresponds to the smallest predicted RX2316 chip.  */
 MEMORY {
 	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00007800 /* 32K - stack_size (0x800) */
 	USTACK (w) : ORIGIN = 0x00007E00, LENGTH = 4 /* ustack 1536 bytes */
