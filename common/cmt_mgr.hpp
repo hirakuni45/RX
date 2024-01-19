@@ -60,9 +60,9 @@ namespace device {
 
 		void sleep_() const { asm("nop"); }
 
-		static FUNC	func_;
+		static inline FUNC	func_;
 
-		static volatile uint32_t counter_;
+		static inline volatile uint32_t counter_ = 0;
 
 		static INTERRUPT_FUNC void i_task_()
 		{
@@ -303,7 +303,4 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static FUNC& at_func() noexcept { return func_; }
 	};
-
-	template <class CMT, class FUNC> volatile uint32_t cmt_mgr<CMT, FUNC>::counter_ = 0;
-	template <class CMT, class FUNC> FUNC cmt_mgr<CMT, FUNC>::func_;
 }

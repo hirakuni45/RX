@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・ICU ベース定義（共通部分）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,6 @@ namespace device {
 		@brief  RX グループ割り込みコントローラ、ベースクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct icu_base_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -61,8 +60,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8> FVCT;
 			bit_rw_t <io_, bitpos::B15>   FIEN;
 		};
-		typedef fir_t<0x0008'72F0> FIR_;
-		static FIR_ FIR;
+		static inline fir_t<0x0008'72F0> FIR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -81,8 +79,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  SWINT;
 		};
-		typedef swintr_t<0x0008'72E0> SWINTR_;
-		static SWINTR_ SWINTR;
+		static inline swintr_t<0x0008'72E0> SWINTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -199,8 +196,7 @@ namespace device {
 			bit_ro_t<io_, bitpos::B5> LVD2ST;
 			bit_ro_t<io_, bitpos::B6> RAMST;
 		};
-		typedef nmisr_t<0x0008'7580> NMISR_;
-		static NMISR_ NMISR;
+		static inline nmisr_t<0x0008'7580> NMISR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -225,8 +221,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5> LVD2EN;
 			bit_rw_t<io_, bitpos::B6> RAMEN;
 		};
-		typedef nmier_t<0x0008'7581> NMIER_;
-		static NMIER_ NMIER;
+		static inline nmier_t<0x0008'7581> NMIER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -251,8 +246,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5> LVD2CLR;
 			bit_rw_t<io_, bitpos::B6> RAMCLR;
 		};
-		typedef nmiclr_t<0x0008'7582> NMICLR_;
-		static NMICLR_ NMICLR;
+		static inline nmiclr_t<0x0008'7582> NMICLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -271,8 +265,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B3> NMIMD;
 		};
-		typedef nmicr_t<0x0008'7583> NMICR_;
-		static NMICR_ NMICR;
+		static inline nmicr_t<0x0008'7583> NMICR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -291,8 +284,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> NFLTEN;
 		};
-		typedef nmiflte_t<0x0008'7590> NMIFLTE_;
-		static NMIFLTE_ NMIFLTE;
+		static inline nmiflte_t<0x0008'7590> NMIFLTE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -311,19 +303,9 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> NFCLKSEL;
 		};
-		typedef nmifltc_t<0x0008'7594> NMIFLTC_;
-		static NMIFLTC_ NMIFLTC;
+		static inline nmifltc_t<0x0008'7594> NMIFLTC;
 	};
-	template<class _> typename icu_base_t<_>::FIR_ icu_base_t<_>::FIR;
-	template<class _> typename icu_base_t<_>::SWINTR_ icu_base_t<_>::SWINTR;
-	template<class _> typename icu_base_t<_>::NMISR_ icu_base_t<_>::NMISR;
-	template<class _> typename icu_base_t<_>::NMIER_ icu_base_t<_>::NMIER;
-	template<class _> typename icu_base_t<_>::NMICLR_ icu_base_t<_>::NMICLR;
-	template<class _> typename icu_base_t<_>::NMICR_ icu_base_t<_>::NMICR;
-	template<class _> typename icu_base_t<_>::NMIFLTE_ icu_base_t<_>::NMIFLTE;
-	template<class _> typename icu_base_t<_>::NMIFLTC_ icu_base_t<_>::NMIFLTC;
-
-	typedef icu_base_t<void> ICU_BASE;
+	typedef icu_base_t ICU_BASE;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -331,7 +313,6 @@ namespace device {
 		@brief  RX グループ割り込みコントローラ、IRQ8 クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct icu_irq8_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -350,22 +331,14 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B2, 2>  IRQMD;
 		};
-		typedef irqcrn_t<0x0008'7500> IRQCR0_;
-		typedef irqcrn_t<0x0008'7501> IRQCR1_;
-		typedef irqcrn_t<0x0008'7502> IRQCR2_;
-		typedef irqcrn_t<0x0008'7503> IRQCR3_;
-		typedef irqcrn_t<0x0008'7504> IRQCR4_;
-		typedef irqcrn_t<0x0008'7505> IRQCR5_;
-		typedef irqcrn_t<0x0008'7506> IRQCR6_;
-		typedef irqcrn_t<0x0008'7507> IRQCR7_;
-		static IRQCR0_ IRQCR0;
-		static IRQCR1_ IRQCR1;
-		static IRQCR2_ IRQCR2;
-		static IRQCR3_ IRQCR3;
-		static IRQCR4_ IRQCR4;
-		static IRQCR5_ IRQCR5;
-		static IRQCR6_ IRQCR6;
-		static IRQCR7_ IRQCR7;
+		static inline irqcrn_t<0x0008'7500> IRQCR0;
+		static inline irqcrn_t<0x0008'7501> IRQCR1;
+		static inline irqcrn_t<0x0008'7502> IRQCR2;
+		static inline irqcrn_t<0x0008'7503> IRQCR3;
+		static inline irqcrn_t<0x0008'7504> IRQCR4;
+		static inline irqcrn_t<0x0008'7505> IRQCR5;
+		static inline irqcrn_t<0x0008'7506> IRQCR6;
+		static inline irqcrn_t<0x0008'7507> IRQCR7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -391,8 +364,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> FLTEN6;
 			bit_rw_t<io_, bitpos::B7> FLTEN7;
 		};
-		typedef irqflte0_t<0x0008'7510> IRQFLTE0_;
-		static IRQFLTE0_ IRQFLTE0;
+		static inline irqflte0_t<0x0008'7510> IRQFLTE0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -418,21 +390,9 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> FCLKSEL6;
 			bits_rw_t<io_, bitpos::B14, 2> FCLKSEL7;
 		};
-		typedef irqfltc0_t<0x0008'7514> IRQFLTC0_;
-		static IRQFLTC0_ IRQFLTC0;
+		static inline irqfltc0_t<0x0008'7514> IRQFLTC0;
 	};
-	template<class _> typename icu_irq8_t<_>::IRQCR0_ icu_irq8_t<_>::IRQCR0;
-	template<class _> typename icu_irq8_t<_>::IRQCR1_ icu_irq8_t<_>::IRQCR1;
-	template<class _> typename icu_irq8_t<_>::IRQCR2_ icu_irq8_t<_>::IRQCR2;
-	template<class _> typename icu_irq8_t<_>::IRQCR3_ icu_irq8_t<_>::IRQCR3;
-	template<class _> typename icu_irq8_t<_>::IRQCR4_ icu_irq8_t<_>::IRQCR4;
-	template<class _> typename icu_irq8_t<_>::IRQCR5_ icu_irq8_t<_>::IRQCR5;
-	template<class _> typename icu_irq8_t<_>::IRQCR6_ icu_irq8_t<_>::IRQCR6;
-	template<class _> typename icu_irq8_t<_>::IRQCR7_ icu_irq8_t<_>::IRQCR7;
-	template<class _> typename icu_irq8_t<_>::IRQFLTE0_ icu_irq8_t<_>::IRQFLTE0;
-	template<class _> typename icu_irq8_t<_>::IRQFLTC0_ icu_irq8_t<_>::IRQFLTC0;
-
-	typedef icu_irq8_t<void> ICU_IRQ8;
+	typedef icu_irq8_t ICU_IRQ8;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -440,7 +400,6 @@ namespace device {
 		@brief  RX グループ割り込みコントローラ、IRQ16 クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct icu_irq16_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -459,38 +418,22 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B2, 2>  IRQMD;
 		};
-		typedef irqcrn_t<0x0008'7500> IRQCR0_;
-		typedef irqcrn_t<0x0008'7501> IRQCR1_;
-		typedef irqcrn_t<0x0008'7502> IRQCR2_;
-		typedef irqcrn_t<0x0008'7503> IRQCR3_;
-		typedef irqcrn_t<0x0008'7504> IRQCR4_;
-		typedef irqcrn_t<0x0008'7505> IRQCR5_;
-		typedef irqcrn_t<0x0008'7506> IRQCR6_;
-		typedef irqcrn_t<0x0008'7507> IRQCR7_;
-		typedef irqcrn_t<0x0008'7508> IRQCR8_;
-		typedef irqcrn_t<0x0008'7509> IRQCR9_;
-		typedef irqcrn_t<0x0008'750A> IRQCR10_;
-		typedef irqcrn_t<0x0008'750B> IRQCR11_;
-		typedef irqcrn_t<0x0008'750C> IRQCR12_;
-		typedef irqcrn_t<0x0008'750D> IRQCR13_;
-		typedef irqcrn_t<0x0008'750E> IRQCR14_;
-		typedef irqcrn_t<0x0008'750F> IRQCR15_;
-		static IRQCR0_ IRQCR0;
-		static IRQCR1_ IRQCR1;
-		static IRQCR2_ IRQCR2;
-		static IRQCR3_ IRQCR3;
-		static IRQCR4_ IRQCR4;
-		static IRQCR5_ IRQCR5;
-		static IRQCR6_ IRQCR6;
-		static IRQCR7_ IRQCR7;
-		static IRQCR8_ IRQCR8;
-		static IRQCR9_ IRQCR9;
-		static IRQCR10_ IRQCR10;
-		static IRQCR11_ IRQCR11;
-		static IRQCR12_ IRQCR12;
-		static IRQCR13_ IRQCR13;
-		static IRQCR14_ IRQCR14;
-		static IRQCR15_ IRQCR15;
+		static inline irqcrn_t<0x0008'7500> IRQCR0;
+		static inline irqcrn_t<0x0008'7501> IRQCR1;
+		static inline irqcrn_t<0x0008'7502> IRQCR2;
+		static inline irqcrn_t<0x0008'7503> IRQCR3;
+		static inline irqcrn_t<0x0008'7504> IRQCR4;
+		static inline irqcrn_t<0x0008'7505> IRQCR5;
+		static inline irqcrn_t<0x0008'7506> IRQCR6;
+		static inline irqcrn_t<0x0008'7507> IRQCR7;
+		static inline irqcrn_t<0x0008'7508> IRQCR8;
+		static inline irqcrn_t<0x0008'7509> IRQCR9;
+		static inline irqcrn_t<0x0008'750A> IRQCR10;
+		static inline irqcrn_t<0x0008'750B> IRQCR11;
+		static inline irqcrn_t<0x0008'750C> IRQCR12;
+		static inline irqcrn_t<0x0008'750D> IRQCR13;
+		static inline irqcrn_t<0x0008'750E> IRQCR14;
+		static inline irqcrn_t<0x0008'750F> IRQCR15;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -516,8 +459,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> FLTEN6;
 			bit_rw_t<io_, bitpos::B7> FLTEN7;
 		};
-		typedef irqflte0_t<0x0008'7520> IRQFLTE0_;
-		static IRQFLTE0_ IRQFLTE0;
+		static inline irqflte0_t<0x0008'7520> IRQFLTE0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -543,8 +485,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> FLTEN14;
 			bit_rw_t<io_, bitpos::B7> FLTEN15;
 		};
-		typedef irqflte1_t<0x0008'7521> IRQFLTE1_;
-		static IRQFLTE1_ IRQFLTE1;
+		static inline irqflte1_t<0x0008'7521> IRQFLTE1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -570,8 +511,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> FCLKSEL6;
 			bits_rw_t<io_, bitpos::B14, 2> FCLKSEL7;
 		};
-		typedef irqfltc0_t<0x0008'7528> IRQFLTC0_;
-		static IRQFLTC0_ IRQFLTC0;
+		static inline irqfltc0_t<0x0008'7528> IRQFLTC0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -597,31 +537,9 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> FCLKSEL14;
 			bits_rw_t<io_, bitpos::B14, 2> FCLKSEL15;
 		};
-		typedef irqfltc1_t<0x0008'752A> IRQFLTC1_;
-		static IRQFLTC1_ IRQFLTC1;
+		static inline irqfltc1_t<0x0008'752A> IRQFLTC1;
 	};
-	template<class _> typename icu_irq16_t<_>::IRQCR0_ icu_irq16_t<_>::IRQCR0;
-	template<class _> typename icu_irq16_t<_>::IRQCR1_ icu_irq16_t<_>::IRQCR1;
-	template<class _> typename icu_irq16_t<_>::IRQCR2_ icu_irq16_t<_>::IRQCR2;
-	template<class _> typename icu_irq16_t<_>::IRQCR3_ icu_irq16_t<_>::IRQCR3;
-	template<class _> typename icu_irq16_t<_>::IRQCR4_ icu_irq16_t<_>::IRQCR4;
-	template<class _> typename icu_irq16_t<_>::IRQCR5_ icu_irq16_t<_>::IRQCR5;
-	template<class _> typename icu_irq16_t<_>::IRQCR6_ icu_irq16_t<_>::IRQCR6;
-	template<class _> typename icu_irq16_t<_>::IRQCR7_ icu_irq16_t<_>::IRQCR7;
-	template<class _> typename icu_irq16_t<_>::IRQCR8_ icu_irq16_t<_>::IRQCR8;
-	template<class _> typename icu_irq16_t<_>::IRQCR9_ icu_irq16_t<_>::IRQCR9;
-	template<class _> typename icu_irq16_t<_>::IRQCR10_ icu_irq16_t<_>::IRQCR10;
-	template<class _> typename icu_irq16_t<_>::IRQCR11_ icu_irq16_t<_>::IRQCR11;
-	template<class _> typename icu_irq16_t<_>::IRQCR12_ icu_irq16_t<_>::IRQCR12;
-	template<class _> typename icu_irq16_t<_>::IRQCR13_ icu_irq16_t<_>::IRQCR13;
-	template<class _> typename icu_irq16_t<_>::IRQCR14_ icu_irq16_t<_>::IRQCR14;
-	template<class _> typename icu_irq16_t<_>::IRQCR15_ icu_irq16_t<_>::IRQCR15;
-	template<class _> typename icu_irq16_t<_>::IRQFLTE0_ icu_irq16_t<_>::IRQFLTE0;
-	template<class _> typename icu_irq16_t<_>::IRQFLTE1_ icu_irq16_t<_>::IRQFLTE1;
-	template<class _> typename icu_irq16_t<_>::IRQFLTC0_ icu_irq16_t<_>::IRQFLTC0;
-	template<class _> typename icu_irq16_t<_>::IRQFLTC1_ icu_irq16_t<_>::IRQFLTC1;
-
-	typedef icu_irq16_t<void> ICU_IRQ16;
+	typedef icu_irq16_t ICU_IRQ16;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -629,7 +547,6 @@ namespace device {
 		@brief  グループ型割り込みクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct icu_group_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -816,8 +733,7 @@ namespace device {
 			}
 		};
 	};
-
-	typedef icu_group_t<void> ICU_GROUP;
+	typedef icu_group_t ICU_GROUP;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -825,7 +741,6 @@ namespace device {
 		@brief  選択型割り込みクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct icu_select_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -858,30 +773,18 @@ namespace device {
 			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Bh）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pixr_t<0x0008'7700> PIBR0_;
-		typedef pixr_t<0x0008'7701> PIBR1_;
-		typedef pixr_t<0x0008'7702> PIBR2_;
-		typedef pixr_t<0x0008'7703> PIBR3_;
-		typedef pixr_t<0x0008'7704> PIBR4_;
-		typedef pixr_t<0x0008'7705> PIBR5_;
-		typedef pixr_t<0x0008'7706> PIBR6_;
-		typedef pixr_t<0x0008'7707> PIBR7_;
-		typedef pixr_t<0x0008'7708> PIBR8_;
-		typedef pixr_t<0x0008'7709> PIBR9_;
-		typedef pixr_t<0x0008'770A> PIBRA_;
-		typedef pixr_t<0x0008'770B> PIBRB_;
-		static PIBR0_ PIBR0;
-		static PIBR1_ PIBR1;
-		static PIBR2_ PIBR2;
-		static PIBR3_ PIBR3;
-		static PIBR4_ PIBR4;
-		static PIBR5_ PIBR5;
-		static PIBR6_ PIBR6;
-		static PIBR7_ PIBR7;
-		static PIBR8_ PIBR8;
-		static PIBR9_ PIBR9;
-		static PIBRA_ PIBRA;
-		static PIBRB_ PIBRB;
+		static inline pixr_t<0x0008'7700> PIBR0;
+		static inline pixr_t<0x0008'7701> PIBR1;
+		static inline pixr_t<0x0008'7702> PIBR2;
+		static inline pixr_t<0x0008'7703> PIBR3;
+		static inline pixr_t<0x0008'7704> PIBR4;
+		static inline pixr_t<0x0008'7705> PIBR5;
+		static inline pixr_t<0x0008'7706> PIBR6;
+		static inline pixr_t<0x0008'7707> PIBR7;
+		static inline pixr_t<0x0008'7708> PIBR8;
+		static inline pixr_t<0x0008'7709> PIBR9;
+		static inline pixr_t<0x0008'770A> PIBRA;
+		static inline pixr_t<0x0008'770B> PIBRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -889,44 +792,25 @@ namespace device {
 			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ 12h）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef pixr_t<0x0008'7900> PIAR0_;
-		typedef pixr_t<0x0008'7901> PIAR1_;
-		typedef pixr_t<0x0008'7902> PIAR2_;
-		typedef pixr_t<0x0008'7903> PIAR3_;
-		typedef pixr_t<0x0008'7904> PIAR4_;
-		typedef pixr_t<0x0008'7905> PIAR5_;
-		typedef pixr_t<0x0008'7906> PIAR6_;
-		typedef pixr_t<0x0008'7907> PIAR7_;
-		typedef pixr_t<0x0008'7908> PIAR8_;
-		typedef pixr_t<0x0008'7909> PIAR9_;
-		typedef pixr_t<0x0008'790A> PIARA_;
-		typedef pixr_t<0x0008'790B> PIARB_;
-		typedef pixr_t<0x0008'790C> PIARC_;
-		typedef pixr_t<0x0008'790D> PIARD_;
-		typedef pixr_t<0x0008'790E> PIARE_;
-		typedef pixr_t<0x0008'790F> PIARF_;
-		typedef pixr_t<0x0008'7910> PIAR10_;
-		typedef pixr_t<0x0008'7911> PIAR11_;
-		typedef pixr_t<0x0008'7912> PIAR12_;
-		static PIAR0_ PIAR0;
-		static PIAR1_ PIAR1;
-		static PIAR2_ PIAR2;
-		static PIAR3_ PIAR3;
-		static PIAR4_ PIAR4;
-		static PIAR5_ PIAR5;
-		static PIAR6_ PIAR6;
-		static PIAR7_ PIAR7;
-		static PIAR8_ PIAR8;
-		static PIAR9_ PIAR9;
-		static PIARA_ PIARA;
-		static PIARB_ PIARB;
-		static PIARC_ PIARC;
-		static PIARD_ PIARD;
-		static PIARE_ PIARE;
-		static PIARF_ PIARF;
-		static PIAR10_ PIAR10;
-		static PIAR11_ PIAR11;
-		static PIAR12_ PIAR12;
+		static inline pixr_t<0x0008'7900> PIAR0;
+		static inline pixr_t<0x0008'7901> PIAR1;
+		static inline pixr_t<0x0008'7902> PIAR2;
+		static inline pixr_t<0x0008'7903> PIAR3;
+		static inline pixr_t<0x0008'7904> PIAR4;
+		static inline pixr_t<0x0008'7905> PIAR5;
+		static inline pixr_t<0x0008'7906> PIAR6;
+		static inline pixr_t<0x0008'7907> PIAR7;
+		static inline pixr_t<0x0008'7908> PIAR8;
+		static inline pixr_t<0x0008'7909> PIAR9;
+		static inline pixr_t<0x0008'790A> PIARA;
+		static inline pixr_t<0x0008'790B> PIARB;
+		static inline pixr_t<0x0008'790C> PIARC;
+		static inline pixr_t<0x0008'790D> PIARD;
+		static inline pixr_t<0x0008'790E> PIARE;
+		static inline pixr_t<0x0008'790F> PIARF;
+		static inline pixr_t<0x0008'7910> PIAR10;
+		static inline pixr_t<0x0008'7911> PIAR11;
+		static inline pixr_t<0x0008'7912> PIAR12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -946,8 +830,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>  SELEXD0;
 			bit_rw_t <io_, bitpos::B1>  SELEXD1;
 		};
-		typedef selexdr_t<0x0008'7A01> SELEXDR_;
-		static SELEXDR_ SELEXDR;
+		static inline selexdr_t<0x0008'7A01> SELEXDR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -966,42 +849,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  WPRC;
 		};
-		typedef sliprcr_t<0x0008'7A00> SLIPRCR_;
-		static SLIPRCR_ SLIPRCR;
+		static inline sliprcr_t<0x0008'7A00> SLIPRCR;
 	};
-	template<class _> typename icu_select_t<_>::PIBR0_ icu_select_t<_>::PIBR0;
-	template<class _> typename icu_select_t<_>::PIBR1_ icu_select_t<_>::PIBR1;
-	template<class _> typename icu_select_t<_>::PIBR2_ icu_select_t<_>::PIBR2;
-	template<class _> typename icu_select_t<_>::PIBR3_ icu_select_t<_>::PIBR3;
-	template<class _> typename icu_select_t<_>::PIBR4_ icu_select_t<_>::PIBR4;
-	template<class _> typename icu_select_t<_>::PIBR5_ icu_select_t<_>::PIBR5;
-	template<class _> typename icu_select_t<_>::PIBR6_ icu_select_t<_>::PIBR6;
-	template<class _> typename icu_select_t<_>::PIBR7_ icu_select_t<_>::PIBR7;
-	template<class _> typename icu_select_t<_>::PIBR8_ icu_select_t<_>::PIBR8;
-	template<class _> typename icu_select_t<_>::PIBR9_ icu_select_t<_>::PIBR9;
-	template<class _> typename icu_select_t<_>::PIBRA_ icu_select_t<_>::PIBRA;
-	template<class _> typename icu_select_t<_>::PIBRB_ icu_select_t<_>::PIBRB;
-	template<class _> typename icu_select_t<_>::PIAR0_ icu_select_t<_>::PIAR0;
-	template<class _> typename icu_select_t<_>::PIAR1_ icu_select_t<_>::PIAR1;
-	template<class _> typename icu_select_t<_>::PIAR2_ icu_select_t<_>::PIAR2;
-	template<class _> typename icu_select_t<_>::PIAR3_ icu_select_t<_>::PIAR3;
-	template<class _> typename icu_select_t<_>::PIAR4_ icu_select_t<_>::PIAR4;
-	template<class _> typename icu_select_t<_>::PIAR5_ icu_select_t<_>::PIAR5;
-	template<class _> typename icu_select_t<_>::PIAR6_ icu_select_t<_>::PIAR6;
-	template<class _> typename icu_select_t<_>::PIAR7_ icu_select_t<_>::PIAR7;
-	template<class _> typename icu_select_t<_>::PIAR8_ icu_select_t<_>::PIAR8;
-	template<class _> typename icu_select_t<_>::PIAR9_ icu_select_t<_>::PIAR9;
-	template<class _> typename icu_select_t<_>::PIARA_ icu_select_t<_>::PIARA;
-	template<class _> typename icu_select_t<_>::PIARB_ icu_select_t<_>::PIARB;
-	template<class _> typename icu_select_t<_>::PIARC_ icu_select_t<_>::PIARC;
-	template<class _> typename icu_select_t<_>::PIARD_ icu_select_t<_>::PIARD;
-	template<class _> typename icu_select_t<_>::PIARE_ icu_select_t<_>::PIARE;
-	template<class _> typename icu_select_t<_>::PIARF_ icu_select_t<_>::PIARF;
-	template<class _> typename icu_select_t<_>::PIAR10_ icu_select_t<_>::PIAR10;
-	template<class _> typename icu_select_t<_>::PIAR11_ icu_select_t<_>::PIAR11;
-	template<class _> typename icu_select_t<_>::PIAR12_ icu_select_t<_>::PIAR12;
-	template<class _> typename icu_select_t<_>::SELEXDR_ icu_select_t<_>::SELEXDR;
-	template<class _> typename icu_select_t<_>::SLIPRCR_ icu_select_t<_>::SLIPRCR;
-
-	typedef icu_select_t<void> ICU_SELECT;
+	typedef icu_select_t ICU_SELECT;
 }
