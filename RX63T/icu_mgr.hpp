@@ -19,14 +19,10 @@ namespace device {
 		@brief  割り込みマネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	class icu_mgr_ {
+	class icu_mgr {
 
-		typedef icu_utils::dispatch<ICU::GROUP0> GROUP0_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUP12> GROUP12_dispatch_t;
-
-		static GROUP0_dispatch_t GROUP0_dispatch_;
-		static GROUP12_dispatch_t GROUP12_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP0>  GROUP0_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUP12> GROUP12_dispatch_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -164,7 +160,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group0_handler_() noexcept
 		{
-			GROUP12_dispatch_.run<ICU::GCR00_>(ICU::GCR00, ICU::GRP00());
+			GROUP0_dispatch_.run<ICU::GCR00_>(ICU::GCR00, ICU::GRP00());
 		}
 
 
@@ -273,8 +269,4 @@ namespace device {
 		}
 
 	};
-	template <class _> typename icu_mgr_<_>::GROUP0_dispatch_t icu_mgr_<_>::GROUP0_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUP12_dispatch_t icu_mgr_<_>::GROUP12_dispatch_;
-
-	typedef icu_mgr_<void> icu_mgr;
 }

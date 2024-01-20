@@ -266,8 +266,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x0008'7000> IR_;
-		static inline IR_ IR;
+		static inline ir_t<0x0008'7000> IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -313,8 +312,7 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		typedef ier_t<0x0008'7200> IER_;
-		static inline IER_ IER;
+		static inline ier_t<0x0008'7200> IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -533,24 +531,16 @@ namespace device {
 			}
 
 		};
-		typedef ipr_t<0x0008'7300> IPR_;
-		static inline IPR_ IPR;
-
+		static inline ipr_t<0x0008'7300> IPR;
 
 		/// @brief DTC 転送要求許可レジスタ  (DTCER)
-		typedef dtcer_t<0x0008'7100, VECTOR> DTCER_;
-		static DTCER_ DTCER;
-
+		static inline dtcer_t<0x0008'7100, VECTOR> DTCER;
 
 		/// @brief DMAC 起動要因選択レジスタ m (DMRSRm) (m = DMAC チャネル番号 )
-		typedef rw8_t<0x0008'7400> DMRSR0_;
-		static inline DMRSR0_ DMRSR0;
-		typedef rw8_t<0x0008'7404> DMRSR1_;
-		static inline DMRSR1_ DMRSR1;
-		typedef rw8_t<0x0008'7408> DMRSR2_;
-		static inline DMRSR2_ DMRSR2;
-		typedef rw8_t<0x0008'740C> DMRSR3_;
-		static inline DMRSR3_ DMRSR3;
+		static inline rw8_t<0x0008'7400> DMRSR0;
+		static inline rw8_t<0x0008'7404> DMRSR1;
+		static inline rw8_t<0x0008'7408> DMRSR2;
+		static inline rw8_t<0x0008'740C> DMRSR3;
 	};
 	typedef icu_t ICU;
 }

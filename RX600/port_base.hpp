@@ -349,10 +349,10 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct od_t {
-			typedef rw8_t<PORTX::base_address_ + 0x80> ODR0_;
-			static ODR0_ ODR0;
-			typedef rw8_t<PORTX::base_address_ + 0x81> ODR1_;
-			static ODR1_ ODR1;
+
+			static inline rw8_t<PORTX::base_address_ + 0x80> ODR0;
+
+			static inline rw8_t<PORTX::base_address_ + 0x81> ODR1;
 
 			void operator = (OD_TYPE val) noexcept {
 				uint8_t pos = static_cast<uint8_t>(BPOS);
@@ -365,7 +365,8 @@ namespace device {
 			}
 
 			OD_TYPE operator () () noexcept {
-				uint8_t pos = static_cast<uint8_t>(BPOS);
+
+				auto pos = static_cast<uint8_t>(BPOS);
 				switch(BPOS) {
 				case bitpos::B0:
 					return static_cast<OD_TYPE>(ODR0() & 0b0000'0011);
@@ -398,6 +399,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct port_t {
+
 			static inline bit_rw_t<rw8_t<PORTX::base_address_ + 0x20>, BPOS> PO;  // ポート出力用
 
 			static inline bit_ro_t<ro8_t<PORTX::base_address_ + 0x40>, BPOS> PI;  // ポート入力用
@@ -491,10 +493,10 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct port_t {
-			typedef rw8_t<PORTx::base_address_ + 0x20> PO_;
-			static PO_ PO;	// ポート出力用
-			typedef ro8_t<PORTx::base_address_ + 0x40> PI_;
-			static PI_ PI;  // ポート入力用
+
+			static inline rw8_t<PORTx::base_address_ + 0x20> PO;  // ポート出力用
+
+			static inline ro8_t<PORTx::base_address_ + 0x40> PI;  // ポート入力用
 
 			void operator = (uint8_t val) { PO = val; }
 			uint8_t operator () () { return PI(); }

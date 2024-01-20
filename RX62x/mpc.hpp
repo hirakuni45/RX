@@ -1,15 +1,15 @@
 
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX621/RX62N グループ・ポートファンクション・レジスター定義 @n
 			RX62x では、MPC が無いが、互換性を考えて、MPC クラスとしている。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 
 namespace device {
@@ -18,7 +18,6 @@ namespace device {
 		@brief  MPC クラス（ポート・ファンクション）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
 	struct mpc_t {
 
 		//-----------------------------------------------------------------//
@@ -44,8 +43,7 @@ namespace device {
 			bit_rw_t<io, bitpos::B6> CS6E;
 			bit_rw_t<io, bitpos::B7> CS7E;
 		};
-		typedef pf0cse_t<0x0008'C100> PF0CSE_;
-		static PF0CSE_ PF0CSE;
+		static inline pf0cse_t<0x0008'C100> PF0CSE;
 
 
 		//-----------------------------------------------------------------//
@@ -68,8 +66,7 @@ namespace device {
 			bits_rw_t<io, bitpos::B4, 2> CS6S;
 			bits_rw_t<io, bitpos::B6, 2> CS7S;
 		};
-		typedef pf1css_t<0x0008'C101> PF1CSS_;
-		static PF1CSS_ PF1CSS;
+		static inline pf1css_t<0x0008'C101> PF1CSS;
 
 
 		//-----------------------------------------------------------------//
@@ -93,8 +90,7 @@ namespace device {
 			bits_rw_t<io, bitpos::B4, 2> CS2S;
 			bits_rw_t<io, bitpos::B6, 2> CS3S;
 		};
-		typedef pf2css_t<0x0008'C102> PF2CSS_;
-		static PF2CSS_ PF2CSS;
+		static inline pf2css_t<0x0008'C102> PF2CSS;
 
 
 		//-----------------------------------------------------------------//
@@ -120,8 +116,7 @@ namespace device {
 			bit_rw_t<io, bitpos::B6> A22E;
 			bit_rw_t<io, bitpos::B7> A23E;
 		};
-		typedef pf3bus_t<0x0008'C103> PF3BUS_;
-		static PF3BUS_ PF3BUS;
+		static inline pf3bus_t<0x0008'C103> PF3BUS;
 
 
 		//-----------------------------------------------------------------//
@@ -146,8 +141,7 @@ namespace device {
 			bit_rw_t<io, bitpos::B6>     A14E;
 			bit_rw_t<io, bitpos::B7>     A15E;
 		};
-		typedef pf4bus_t<0x0008'C104> PF4BUS_;
-		static PF4BUS_ PF4BUS;
+		static inline pf4bus_t<0x0008'C104> PF4BUS;
 
 
 		//-----------------------------------------------------------------//
@@ -171,8 +165,7 @@ namespace device {
 			bit_rw_t<io, bitpos::B6>     WR1BC1E;
 			bit_rw_t<io, bitpos::B7>     WR32BC32E;
 		};
-		typedef pf5bus_t<0x0008'C105> PF5BUS_;
-		static PF5BUS_ PF5BUS;
+		static inline pf5bus_t<0x0008'C105> PF5BUS;
 
 
 		//-----------------------------------------------------------------//
@@ -196,8 +189,7 @@ namespace device {
 			bit_rw_t <io, bitpos::B6>    DQM1E;
 			bit_rw_t <io, bitpos::B7>    SDCLKE;
 		};
-		typedef pf6bus_t<0x0008'C106> PF6BUS_;
-		static PF6BUS_ PF6BUS;
+		static inline pf6bus_t<0x0008'C106> PF6BUS;
 
 
 		//-----------------------------------------------------------------//
@@ -217,8 +209,7 @@ namespace device {
 			bits_rw_t<io, bitpos::B4, 2> EDMA0S;
 			bits_rw_t<io, bitpos::B6, 2> EDMA1S;
 		};
-		typedef pf7dma_t<0x0008'C107> PF7DMA_;
-		static PF7DMA_ PF7DMA;
+		static inline pf7dma_t<0x0008'C107> PF7DMA;
 
 
 		//-----------------------------------------------------------------//
@@ -244,8 +235,7 @@ namespace device {
 
 			bit_rw_t<io, bitpos::B7> ITS15;
 		};
-		typedef pf8irq_t<0x0008'C108> PF8IRQ_;
-		static PF8IRQ_ PF8IRQ;
+		static inline pf8irq_t<0x0008'C108> PF8IRQ;
 
 
 		//-----------------------------------------------------------------//
@@ -271,8 +261,7 @@ namespace device {
 			bit_rw_t<io, bitpos::B6> ITS6;
 			bit_rw_t<io, bitpos::B7> ITS7;
 		};
-		typedef pf9irq_t<0x0008'C109> PF9IRQ_;
-		static PF9IRQ_ PF9IRQ;
+		static inline pf9irq_t<0x0008'C109> PF9IRQ;
 
 
 		//-----------------------------------------------------------------//
@@ -291,8 +280,7 @@ namespace device {
 
 			bit_rw_t<io, bitpos::B0> ADTRG0S;
 		};
-		typedef pfaadc_t<0x0008'C10A> PFAADC_;
-		static PFAADC_ PFAADC;
+		static inline pfaadc_t<0x0008'C10A> PFAADC;
 
 
 		//-----------------------------------------------------------------//
@@ -314,8 +302,7 @@ namespace device {
 			bit_rw_t<io, bitpos::B2> TMR2S;
 			bit_rw_t<io, bitpos::B3> TMR3S;
 		};
-		typedef pfbtmr_t<0x0008'C10B> PFBTMR_;
-		static PFBTMR_ PFBTMR;
+		static inline pfbtmr_t<0x0008'C10B> PFBTMR;
 
 
 		//-----------------------------------------------------------------//
@@ -339,8 +326,7 @@ namespace device {
 			bit_rw_t<io, bitpos::B6> MTUS6;
 			bit_rw_t<io, bitpos::B7> TCLKS;
 		};
-		typedef pfcmtu_t<0x0008'C10C> PFCMTU_;
-		static PFCMTU_ PFCMTU;
+		static inline pfcmtu_t<0x0008'C10C> PFCMTU;
 
 
 		//-----------------------------------------------------------------//
@@ -360,8 +346,7 @@ namespace device {
 			bit_rw_t<io, bitpos::B6> MTUS6;
 			bit_rw_t<io, bitpos::B7> TCLKS;
 		};
-		typedef pfdmtu_t<0x0008'C10D> PFDMTU_;
-		static PFDMTU_ PFDMTU;
+		static inline pfdmtu_t<0x0008'C10D> PFDMTU;
 
 
 		//-----------------------------------------------------------------//
@@ -386,8 +371,7 @@ namespace device {
 
 			bit_rw_t<io, bitpos::B7> EE;
 		};
-		typedef pfenet_t<0x0008'C10E> PFENET_;
-		static PFENET_ PFENET;
+		static inline pfenet_t<0x0008'C10E> PFENET;
 
 
 		//-----------------------------------------------------------------//
@@ -410,8 +394,7 @@ namespace device {
 
 			bit_rw_t<io, bitpos::B6> SCI6S;
 		};
-		typedef pffsci_t<0x0008'C10F> PFFSCI_;
-		static PFFSCI_ PFFSCI;
+		static inline pffsci_t<0x0008'C10F> PFFSCI;
 
 
 		//-----------------------------------------------------------------//
@@ -437,10 +420,8 @@ namespace device {
 			bit_rw_t<io, bitpos::B6> SSL2E;
 			bit_rw_t<io, bitpos::B7> SSL3E;
 		};
-		typedef pfxspi_t<0x0008'C110> PFGSPI_;
-		static PFGSPI_ PFGSPI;
-		typedef pfxspi_t<0x0008'C111> PFHSPI_;
-		static PFHSPI_ PFHSPI;
+		static inline pfxspi_t<0x0008'C110> PFGSPI;
+		static inline pfxspi_t<0x0008'C111> PFHSPI;
 
 
 		//-----------------------------------------------------------------//
@@ -459,31 +440,7 @@ namespace device {
 
 			bit_rw_t<io, bitpos::B0> CAN0E;
 		};
-		typedef pfjcan_t<0x0008'C113> PFJCAN_;
-		static PFJCAN_ PFJCAN;
-
-
-
+		static inline pfjcan_t<0x0008'C113> PFJCAN;
 	};
-	template <class _> typename mpc_t<_>::PF0CSE_ mpc_t<_>::PF0CSE;
-	template <class _> typename mpc_t<_>::PF1CSS_ mpc_t<_>::PF1CSS;
-	template <class _> typename mpc_t<_>::PF2CSS_ mpc_t<_>::PF2CSS;
-	template <class _> typename mpc_t<_>::PF3BUS_ mpc_t<_>::PF3BUS;
-	template <class _> typename mpc_t<_>::PF4BUS_ mpc_t<_>::PF4BUS;
-	template <class _> typename mpc_t<_>::PF5BUS_ mpc_t<_>::PF5BUS;
-	template <class _> typename mpc_t<_>::PF6BUS_ mpc_t<_>::PF6BUS;
-	template <class _> typename mpc_t<_>::PF7DMA_ mpc_t<_>::PF7DMA;
-	template <class _> typename mpc_t<_>::PF8IRQ_ mpc_t<_>::PF8IRQ;
-	template <class _> typename mpc_t<_>::PF9IRQ_ mpc_t<_>::PF9IRQ;
-	template <class _> typename mpc_t<_>::PFAADC_ mpc_t<_>::PFAADC;
-	template <class _> typename mpc_t<_>::PFBTMR_ mpc_t<_>::PFBTMR;
-	template <class _> typename mpc_t<_>::PFCMTU_ mpc_t<_>::PFCMTU;
-	template <class _> typename mpc_t<_>::PFDMTU_ mpc_t<_>::PFDMTU;
-	template <class _> typename mpc_t<_>::PFENET_ mpc_t<_>::PFENET;
-	template <class _> typename mpc_t<_>::PFFSCI_ mpc_t<_>::PFFSCI;
-	template <class _> typename mpc_t<_>::PFGSPI_ mpc_t<_>::PFGSPI;
-	template <class _> typename mpc_t<_>::PFHSPI_ mpc_t<_>::PFHSPI;
-	template <class _> typename mpc_t<_>::PFJCAN_ mpc_t<_>::PFJCAN;
-
-	typedef mpc_t<void> MPC;
+	typedef mpc_t MPC;
 }

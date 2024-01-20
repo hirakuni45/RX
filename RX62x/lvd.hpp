@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX621/RX62N LVD 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,6 @@ namespace device {
 		@brief  電圧検出回路（LVD）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
 	struct lvd_t {
 
 		// リセットステータスレジスタ（RSTSR）
@@ -29,8 +28,7 @@ namespace device {
 			@param[in]	base	ベース・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'C28C> LVDKEYR_;
-		static LVDKEYR_ LVDKEYR;
+		static inline rw8_t<0x0008'C28C> LVDKEYR;
 
 
 		//-----------------------------------------------------------------//
@@ -53,11 +51,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  LVD2RI;
 			bit_rw_t<io_, bitpos::B7>  LVD2E;
 		};
-		typedef lvdcr_t<0x0008'C28D>  LVDCR_;
-		static LVDCR_ LVDCR;
+		static inline lvdcr_t<0x0008'C28D>  LVDCR;
 	};
-	template <class _> typename lvd_t<_>::LVDKEYR_ lvd_t<_>::LVDKEYR;
-	template <class _> typename lvd_t<_>::LVDCR_ lvd_t<_>::LVDCR;
-
-	typedef lvd_t<void> LVD;
+	typedef lvd_t LVD;
 }

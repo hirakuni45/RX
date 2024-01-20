@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX621/RX62N S12AD 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,7 +28,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		typedef ro16_t<base + 0x20> ADDR0_;
-		static  ADDR0_ ADDR0;
+		static inline ADDR0_ ADDR0;
 
 
 		//-----------------------------------------------------------------//
@@ -36,8 +36,7 @@ namespace device {
 			@brief  A/D データレジスタ 1（ADDR1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro16_t<base + 0x22> ADDR1_;
-		static  ADDR1_ ADDR1;
+		static inline ro16_t<base + 0x22> ADDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -45,8 +44,7 @@ namespace device {
 			@brief  A/D データレジスタ 2（ADDR2）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro16_t<base + 0x24> ADDR2_;
-		static  ADDR2_ ADDR2;
+		static inline ro16_t<base + 0x24> ADDR2;
 
 
 		//-----------------------------------------------------------------//
@@ -54,8 +52,7 @@ namespace device {
 			@brief  A/D データレジスタ 3（ADDR3）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro16_t<base + 0x26> ADDR3_;
-		static  ADDR3_ ADDR3;
+		static inline ro16_t<base + 0x26> ADDR3;
 
 
 		//-----------------------------------------------------------------//
@@ -63,8 +60,7 @@ namespace device {
 			@brief  A/D データレジスタ 4（ADDR4）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro16_t<base + 0x28> ADDR4_;
-		static  ADDR4_ ADDR4;
+		static inline ro16_t<base + 0x28> ADDR4;
 
 
 		//-----------------------------------------------------------------//
@@ -72,8 +68,7 @@ namespace device {
 			@brief  A/D データレジスタ 5（ADDR5）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro16_t<base + 0x2A> ADDR5_;
-		static  ADDR5_ ADDR5;
+		static inline ro16_t<base + 0x2A> ADDR5;
 
 
 		//-----------------------------------------------------------------//
@@ -81,8 +76,7 @@ namespace device {
 			@brief  A/D データレジスタ 6（ADDR6）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro16_t<base + 0x2C> ADDR6_;
-		static  ADDR6_ ADDR6;
+		static inline ro16_t<base + 0x2C> ADDR6;
 
 
 		//-----------------------------------------------------------------//
@@ -90,8 +84,7 @@ namespace device {
 			@brief  A/D データレジスタ 7（ADDR7）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro16_t<base + 0x2E> ADDR7_;
-		static  ADDR7_ ADDR7;
+		static inline ro16_t<base + 0x2E> ADDR7;
 
 
 		//-----------------------------------------------------------------//
@@ -116,8 +109,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>     ADCS;
 			bit_rw_t <io_, bitpos::B7>     ADST;
 		};
-		typedef adcsr_t<base + 0x00>  ADCSR_;
-		static  ADCSR_ ADCSR;
+		static inline adcsr_t<base + 0x00>  ADCSR;
 
 
 		//-----------------------------------------------------------------//
@@ -136,8 +128,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  ADS;
 		};
-		typedef adads_t<base + 0x08>  ADADS_;
-		static  ADADS_ ADADS;
+		static inline adads_t<base + 0x08>  ADADS;
 
 
 		//-----------------------------------------------------------------//
@@ -156,8 +147,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  ADC;
 		};
-		typedef adadc_t<base + 0x0C>  ADADC_;
-		static  ADADC_ ADADC;
+		static inline adadc_t<base + 0x0C>  ADADC;
 
 
 		//-----------------------------------------------------------------//
@@ -178,8 +168,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>    ADRFMT;
 		};
-		typedef adcer_t<base + 0x0E>  ADCER_;
-		static  ADCER_ ADCER;
+		static inline adcer_t<base + 0x0E>  ADCER;
 
 
 		//-----------------------------------------------------------------//
@@ -198,22 +187,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  ADSTRS;
 		};
-		typedef adstrgr_t<base + 0x10>  ADSTRGR_;
-		static  ADSTRGR_ ADSTRGR;
+		static inline adstrgr_t<base + 0x10>  ADSTRGR;
 	};
-	template <uint32_t base> typename s12ad_base_t<base>::ADDR0_ s12ad_base_t<base>::ADDR0;
-	template <uint32_t base> typename s12ad_base_t<base>::ADDR1_ s12ad_base_t<base>::ADDR1;
-	template <uint32_t base> typename s12ad_base_t<base>::ADDR2_ s12ad_base_t<base>::ADDR2;
-	template <uint32_t base> typename s12ad_base_t<base>::ADDR3_ s12ad_base_t<base>::ADDR3;
-	template <uint32_t base> typename s12ad_base_t<base>::ADDR4_ s12ad_base_t<base>::ADDR4;
-	template <uint32_t base> typename s12ad_base_t<base>::ADDR5_ s12ad_base_t<base>::ADDR5;
-	template <uint32_t base> typename s12ad_base_t<base>::ADDR6_ s12ad_base_t<base>::ADDR6;
-	template <uint32_t base> typename s12ad_base_t<base>::ADDR7_ s12ad_base_t<base>::ADDR7;
-	template <uint32_t base> typename s12ad_base_t<base>::ADCSR_ s12ad_base_t<base>::ADCSR;
-	template <uint32_t base> typename s12ad_base_t<base>::ADADS_ s12ad_base_t<base>::ADADS;
-	template <uint32_t base> typename s12ad_base_t<base>::ADADC_ s12ad_base_t<base>::ADADC;
-	template <uint32_t base> typename s12ad_base_t<base>::ADCER_ s12ad_base_t<base>::ADCER;
-	template <uint32_t base> typename s12ad_base_t<base>::ADSTRGR_ s12ad_base_t<base>::ADSTRGR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -326,8 +301,7 @@ namespace device {
 			@brief  A/D データレジスタ（ADDR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ad_utils::addr_t<ANALOG, BASE::ADDR0_::address> ADDR_;
-		static  ADDR_ ADDR;
+		static inline ad_utils::addr_t<ANALOG, BASE::ADDR0_::address> ADDR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -378,11 +352,8 @@ namespace device {
 				return (rd16_(ofs) >> n) & 1;
 			}
 		};
-		typedef adans_t<base + 0x04> ADANS_;
-		static  ADANS_ ADANS;
+		static inline adans_t<base + 0x04> ADANS;
 	};
-	template <uint32_t base> typename s12ad_t<base>::ADDR_  s12ad_t<base>::ADDR;
-	template <uint32_t base> typename s12ad_t<base>::ADANS_ s12ad_t<base>::ADANS;
 
 	typedef s12ad_t<0x0008'9000> S12AD;
 }

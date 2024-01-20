@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX26T グループ・省電力制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX26T/peripheral.hpp"
 #include "RX26T/system.hpp"
 
@@ -18,8 +18,7 @@ namespace device {
 		@brief  省電力制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	class power_mgr_t {
+	class power_mgr {
 
 		struct pad_t {
 
@@ -32,7 +31,7 @@ namespace device {
 			mtu3_(0), dma_dtc_(0)
 			{ }
 		};
-		static pad_t	pad_;
+		static inline pad_t	pad_;
 
 		static void sr_(bool f, uint8_t& pad, peripheral org, peripheral tgt)
 		{
@@ -230,7 +229,4 @@ namespace device {
 			return ret;
 		}
 	};
-	template<class _> typename power_mgr_t<_>::pad_t power_mgr_t<_>::pad_;
-
-	typedef power_mgr_t<void> power_mgr;
 }

@@ -18,22 +18,13 @@ namespace device {
 		@brief  割り込みマネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	class icu_mgr_ {
+	class icu_mgr {
 
-		typedef icu_utils::dispatch<ICU::GROUPBE0> GROUPBE0_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUPBL0> GROUPBL0_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUPBL1> GROUPBL1_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUPBL2> GROUPBL2_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUPAL0> GROUPAL0_dispatch_t;
-		typedef icu_utils::dispatch<ICU::GROUPAL1> GROUPAL1_dispatch_t;
-
-		static GROUPBE0_dispatch_t GROUPBE0_dispatch_;
-		static GROUPBL0_dispatch_t GROUPBL0_dispatch_;
-		static GROUPBL1_dispatch_t GROUPBL1_dispatch_;
-		static GROUPBL2_dispatch_t GROUPBL2_dispatch_;
-		static GROUPAL0_dispatch_t GROUPAL0_dispatch_;
-		static GROUPAL1_dispatch_t GROUPAL1_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUPBE0> GROUPBE0_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUPBL0> GROUPBL0_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUPBL1> GROUPBL1_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUPAL0> GROUPAL0_dispatch_;
+		static inline icu_utils::dispatch<ICU::GROUPAL1> GROUPAL1_dispatch_;
 
 		static constexpr uint8_t SELECTA_ORG = 208;
 		static constexpr uint8_t SELECTA_END = 255;
@@ -306,7 +297,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group_bl2_handler_() noexcept
 		{
-			GROUPBL2_dispatch_.run(ICU::GRPBL2());
+			// GROUPBL2_dispatch_.run(ICU::GRPBL2());
 		}
 
 
@@ -413,12 +404,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void install_group_task(ICU::GROUPBL2 grpv, icu_utils::GTASK task) noexcept
 		{
+#if 0
 			ICU::GENBL2.set(grpv, false);
 			set_task(get_group_vector(grpv), group_bl2_handler_);
 			GROUPBL2_dispatch_.set_task(grpv, task);
 			if(task != nullptr) {
 				ICU::GENBL2.set(grpv);
 			}
+#endif
 		}
 
 
@@ -602,12 +595,4 @@ namespace device {
 			}
 		}
 	};
-	template <class _> typename icu_mgr_<_>::GROUPBE0_dispatch_t icu_mgr_<_>::GROUPBE0_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUPBL0_dispatch_t icu_mgr_<_>::GROUPBL0_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUPBL1_dispatch_t icu_mgr_<_>::GROUPBL1_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUPBL2_dispatch_t icu_mgr_<_>::GROUPBL2_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUPAL0_dispatch_t icu_mgr_<_>::GROUPAL0_dispatch_;
-	template <class _> typename icu_mgr_<_>::GROUPAL1_dispatch_t icu_mgr_<_>::GROUPAL1_dispatch_;
-
-	typedef icu_mgr_<void> icu_mgr;
 }

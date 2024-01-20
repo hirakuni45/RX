@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,6 @@ namespace device {
 		@brief  システム定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct system_t {
 
 		//-----------------------------------------------------------------//
@@ -43,8 +42,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 			bits_rw_t<io_, bitpos::B28, 4> FCK;
 		};
-		typedef sckcr_t<0x0008'0020> SCKCR_;
-		static SCKCR_ SCKCR;
+		static inline sckcr_t<0x0008'0020> SCKCR;
 
 
 		//-----------------------------------------------------------------//
@@ -63,8 +61,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 3> CKSEL;
 		};
-		typedef sckcr3_t<0x0008'0026> SCKCR3_;
-		static SCKCR3_ SCKCR3;
+		static inline sckcr3_t<0x0008'0026> SCKCR3;
 
 
 		//-----------------------------------------------------------------//
@@ -85,8 +82,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>    PLLSRCSEL;
 			bits_rw_t<io_, bitpos::B8, 6> STC;
 		};
-		typedef pllcr_t<0x0008'0028> PLLCR_;
-		static PLLCR_ PLLCR;
+		static inline pllcr_t<0x0008'0028> PLLCR;
 
 
 		//-----------------------------------------------------------------//
@@ -105,8 +101,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> PLLEN;
 		};
-		typedef pllcr2_t<0x0008'002A> PLLCR2_;
-		static PLLCR2_ PLLCR2;
+		static inline pllcr2_t<0x0008'002A> PLLCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -125,8 +120,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MOSTP;
 		};
-		typedef mosccr_t<0x0008'0032> MOSCCR_;
-		static MOSCCR_ MOSCCR;
+		static inline mosccr_t<0x0008'0032> MOSCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -145,8 +139,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> LCSTP;
 		};
-		typedef lococr_t<0x0008'0034> LOCOCR_;
-		static LOCOCR_ LOCOCR;
+		static inline lococr_t<0x0008'0034> LOCOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -165,8 +158,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> ILCSTP;
 		};
-		typedef ilococr_t<0x0008'0035> ILOCOCR_;
-		static ILOCOCR_ ILOCOCR;
+		static inline ilococr_t<0x0008'0035> ILOCOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -185,8 +177,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> HCSTP;
 		};
-		typedef hococr_t<0x0008'0036> HOCOCR_;
-		static HOCOCR_ HOCOCR;
+		static inline hococr_t<0x0008'0036> HOCOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -205,8 +196,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> HCFRQ;
 		};
-		typedef hococr2_t<0x0008'0037> HOCOCR2_;
-		static HOCOCR2_ HOCOCR2;
+		static inline hococr2_t<0x0008'0037> HOCOCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -225,8 +215,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> HSTS;
 		};
-		typedef hocowtcr_t<0x0008'00A5> HOCOWTCR_;
-		static HOCOWTCR_ HOCOWTCR;
+		static inline hocowtcr_t<0x0008'00A5> HOCOWTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -245,8 +234,7 @@ namespace device {
 			bit_ro_t<ro8_t<base>, bitpos::B2> PLOVF;
 			bit_ro_t<ro8_t<base>, bitpos::B3> HCOVF;
 		};
-		typedef oscovfsr_t<0x0008'003C> OSCOVFSR_;
-		static OSCOVFSR_ OSCOVFSR;
+		static inline oscovfsr_t<0x0008'003C> OSCOVFSR;
 
 
 		//-----------------------------------------------------------------//
@@ -266,8 +254,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> OSTDIE;
 			bit_rw_t<io_, bitpos::B7> OSTDE;
 		};
-		typedef ostdcr_t<0x0008'0040> OSTDCR_;
-		static OSTDCR_ OSTDCR;
+		static inline ostdcr_t<0x0008'0040> OSTDCR;
 
 
 		//-----------------------------------------------------------------//
@@ -286,8 +273,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> OSTDF;
 		};
-		typedef ostdsr_t<0x0008'0041> OSTDSR_;
-		static OSTDSR_ OSTDSR;
+		static inline ostdsr_t<0x0008'0041> OSTDSR;
 
 
 		//-----------------------------------------------------------------//
@@ -306,8 +292,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5> MSTS;
 		};
-		typedef moscwtcr_t<0x0008'00A2> MOSCWTCR_;
-		static MOSCWTCR_ MOSCWTCR;
+		static inline moscwtcr_t<0x0008'00A2> MOSCWTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -327,8 +312,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5> MODRV21;
 			bit_rw_t<io_, bitpos::B6> MOSEL;
 		};
-		typedef mofcr_t<0x0008'C293> MOFCR_;
-		static MOFCR_ MOFCR;
+		static inline mofcr_t<0x0008'C293> MOFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -336,8 +320,7 @@ namespace device {
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x0008'0031> MEMWAIT_;
-		static MEMWAIT_ MEMWAIT;
+		static inline rw8_t<0x0008'0031> MEMWAIT;
 
 
 		//-----------------------------------------------------------------//
@@ -356,8 +339,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B15>	SSBY;
 		};
-		typedef sbycr_t<0x0008'000C> SBYCR_;
-		static SBYCR_ SBYCR;
+		static inline sbycr_t<0x0008'000C> SBYCR;
 
 
 		//-----------------------------------------------------------------//
@@ -394,8 +376,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B28> MSTPA28;
 		};
-		typedef mstpcra_t<0x0008'0010> MSTPCRA_;
-		static MSTPCRA_ MSTPCRA;
+		static inline mstpcra_t<0x0008'0010> MSTPCRA;
 
 
 		//-----------------------------------------------------------------//
@@ -429,8 +410,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30> MSTPB30;
 		};
-		typedef mstpcrb_t<0x0008'0014> MSTPCRB_;
-		static MSTPCRB_ MSTPCRB;
+		static inline mstpcrb_t<0x0008'0014> MSTPCRB;
 
 
 		//-----------------------------------------------------------------//
@@ -453,8 +433,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B31> DSLPE;
 		};
-		typedef mstpcrc_t<0x0008'0018> MSTPCRC_;
-		static MSTPCRC_ MSTPCRC;
+		static inline mstpcrc_t<0x0008'0018> MSTPCRC;
 
 
 		//-----------------------------------------------------------------//
@@ -475,8 +454,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B4>    OPCMTSF;
 		};
-		typedef opccr_t<0x0008'00A0> OPCCR_;
-		static OPCCR_ OPCCR;
+		static inline opccr_t<0x0008'00A0> OPCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -498,31 +476,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B3>    PRC3;
 			bits_rw_t<io_, bitpos::B8, 8> PRKEY;
 		};
-		typedef prcr_t<0x0008'03FE> PRCR_;
-		static PRCR_ PRCR;
+		static inline prcr_t<0x0008'03FE> PRCR;
 	};
-	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
-	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
-	template<class _> typename system_t<_>::PLLCR_ system_t<_>::PLLCR;
-	template<class _> typename system_t<_>::PLLCR2_ system_t<_>::PLLCR2;
-	template<class _> typename system_t<_>::MOSCCR_ system_t<_>::MOSCCR;
-	template<class _> typename system_t<_>::LOCOCR_ system_t<_>::LOCOCR;
-	template<class _> typename system_t<_>::ILOCOCR_ system_t<_>::ILOCOCR;
-	template<class _> typename system_t<_>::HOCOCR_ system_t<_>::HOCOCR;
-	template<class _> typename system_t<_>::HOCOCR2_ system_t<_>::HOCOCR2;
-	template<class _> typename system_t<_>::HOCOWTCR_ system_t<_>::HOCOWTCR;
-	template<class _> typename system_t<_>::OSCOVFSR_ system_t<_>::OSCOVFSR;
-	template<class _> typename system_t<_>::OSTDCR_ system_t<_>::OSTDCR;
-	template<class _> typename system_t<_>::OSTDSR_ system_t<_>::OSTDSR;
-	template<class _> typename system_t<_>::MOSCWTCR_ system_t<_>::MOSCWTCR;
-	template<class _> typename system_t<_>::MOFCR_ system_t<_>::MOFCR;
-	template<class _> typename system_t<_>::MEMWAIT_ system_t<_>::MEMWAIT;
-	template<class _> typename system_t<_>::SBYCR_ system_t<_>::SBYCR;
-	template<class _> typename system_t<_>::MSTPCRA_ system_t<_>::MSTPCRA;
-	template<class _> typename system_t<_>::MSTPCRB_ system_t<_>::MSTPCRB;
-	template<class _> typename system_t<_>::MSTPCRC_ system_t<_>::MSTPCRC;
-	template<class _> typename system_t<_>::OPCCR_ system_t<_>::OPCCR;
-	template<class _> typename system_t<_>::PRCR_ system_t<_>::PRCR;
-
-	typedef system_t<void> SYSTEM;
+	typedef system_t SYSTEM;
 }
