@@ -23,7 +23,6 @@ namespace device {
 		static inline icu_utils::dispatch<ICU::GROUPBE0> GROUPBE0_dispatch_;
 		static inline icu_utils::dispatch<ICU::GROUPBL0> GROUPBL0_dispatch_;
 		static inline icu_utils::dispatch<ICU::GROUPBL1> GROUPBL1_dispatch_;
-		static inline icu_utils::dispatch<ICU::GROUPBL2> GROUPBL2_dispatch_;
 		static inline icu_utils::dispatch<ICU::GROUPAL0> GROUPAL0_dispatch_;
 		static inline icu_utils::dispatch<ICU::GROUPAL1> GROUPAL1_dispatch_;
 
@@ -298,7 +297,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group_bl2_handler_() noexcept
 		{
-			GROUPBL2_dispatch_.run(ICU::GRPBL2());
+			// GROUPBL2_dispatch_.run(ICU::GRPBL2());
 		}
 
 
@@ -405,12 +404,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void install_group_task(ICU::GROUPBL2 grpv, icu_utils::GTASK task) noexcept
 		{
+#if 0
 			ICU::GENBL2.set(grpv, false);
 			set_task(get_group_vector(grpv), group_bl2_handler_);
 			GROUPBL2_dispatch_.set_task(grpv, task);
 			if(task != nullptr) {
 				ICU::GENBL2.set(grpv);
 			}
+#endif
 		}
 
 

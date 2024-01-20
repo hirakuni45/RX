@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX24T グループ A/D 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 #include "common/vect.h"
 
@@ -37,7 +37,7 @@ namespace device {
 
 
 	private:
-		static TASK task_;
+		static inline TASK task_;
 
 		static INTERRUPT_FUNC void adi_task_()
 		{
@@ -130,6 +130,4 @@ namespace device {
 			return ADCU::ADDR(an);
 		}
 	};
-
-	template <class ADCU, class TASK> TASK adc_in<ADCU, TASK>::task_;
 }
