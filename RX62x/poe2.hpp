@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX621/RX62N ポートアウトプットイネーブル 2 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -53,8 +53,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>    POE2F;
 			bit_rw_t <io_, bitpos::B15>    POE3F;
 		};
-		typedef icsr1_t<0x0008'8900> ICSR1_;
-		static  ICSR1_ ICSR1;
+		static inline icsr1_t<0x0008'8900> ICSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -75,8 +74,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B9>   OCE1;
 			bit_rw_t<io_, bitpos::B15>  OSF1;
 		};
-		typedef ocsr1_t<0x0008'8902> OCSR1_;
-		static  OCSR1_ OCSR1;
+		static inline ocsr1_t<0x0008'8902> OCSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -104,8 +102,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>    POE6F;
 			bit_rw_t <io_, bitpos::B15>    POE7F;
 		};
-		typedef icsr2_t<0x0008'8904> ICSR2_;
-		static  ICSR2_ ICSR2;
+		static inline icsr2_t<0x0008'8904> ICSR2;
 
 
 		//-----------------------------------------------------------------//
@@ -126,8 +123,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B9>   OCE2;
 			bit_rw_t<io_, bitpos::B15>  OSF2;
 		};
-		typedef ocsr2_t<0x0008'8906> OCSR2_;
-		static  OCSR2_ OCSR2;
+		static inline ocsr2_t<0x0008'8906> OCSR2;
 
 
 		//-----------------------------------------------------------------//
@@ -150,8 +146,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B12>    POE8F;
 		};
-		typedef icsr3_t<0x0008'8908> ICSR3_;
-		static  ICSR3_ ICSR3;
+		static inline icsr3_t<0x0008'8908> ICSR3;
 
 
 		//-----------------------------------------------------------------//
@@ -174,8 +169,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B12>    POE9F;
 		};
-		typedef icsr4_t<0x0008'890E> ICSR4_;
-		static  ICSR4_ ICSR4;
+		static inline icsr4_t<0x0008'890E> ICSR4;
 
 
 		//-----------------------------------------------------------------//
@@ -197,8 +191,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  CH910HIZ;
 			bit_rw_t<io_, bitpos::B3>  CH6HIZ;
 		};
-		typedef spoer_t<0x0008'890A> SPOER_;
-		static  SPOER_ SPOER;
+		static inline spoer_t<0x0008'890A> SPOER;
 
 
 		//-----------------------------------------------------------------//
@@ -224,8 +217,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  PE6ZE;
 			bit_rw_t<io_, bitpos::B7>  PE7ZE;
 		};
-		typedef poecr1_t<0x0008'890B> POECR1_;
-		static  POECR1_ POECR1;
+		static inline poecr1_t<0x0008'890B> POECR1;
 
 
 		//-----------------------------------------------------------------//
@@ -254,18 +246,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B13>  P2CZEA;
 			bit_rw_t<io_, bitpos::B14>  P1CZEA;
 		};
-		typedef poecr2_t<0x0008'890C> POECR2_;
-		static  POECR2_ POECR2;
+		static inline poecr2_t<0x0008'890C> POECR2;
 	};
-	template <peripheral per> typename poe2_t<per>::ICSR1_ poe2_t<per>::ICSR1;
-	template <peripheral per> typename poe2_t<per>::OCSR1_ poe2_t<per>::OCSR1;
-	template <peripheral per> typename poe2_t<per>::ICSR2_ poe2_t<per>::ICSR2;
-	template <peripheral per> typename poe2_t<per>::OCSR2_ poe2_t<per>::OCSR2;
-	template <peripheral per> typename poe2_t<per>::ICSR3_ poe2_t<per>::ICSR3;
-	template <peripheral per> typename poe2_t<per>::ICSR4_ poe2_t<per>::ICSR4;
-	template <peripheral per> typename poe2_t<per>::SPOER_ poe2_t<per>::SPOER;
-	template <peripheral per> typename poe2_t<per>::POECR1_ poe2_t<per>::POECR1;
-	template <peripheral per> typename poe2_t<per>::POECR2_ poe2_t<per>::POECR2;
 
 	typedef poe2_t<peripheral::POE2> POE2;
 }
