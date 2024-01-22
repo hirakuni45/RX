@@ -225,8 +225,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B3>     CTSUIOC;
 			bit_rw_t <io_, bitpos::B4>     CTSUINIT;
 		};
-		typedef ctsucr0_t<base + 0x00> CTSUCR0_;
-		static CTSUCR0_ CTSUCR0;
+		static inline ctsucr0_t<base + 0x00> CTSUCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -250,8 +249,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  CTSUCLK;
 			bits_rw_t<io_, bitpos::B6, 2>  CTSUMD;
 		};
-		typedef ctsucr1_t<base + 0x01> CTSUCR1_;
-		static CTSUCR1_ CTSUCR1;
+		static inline ctsucr1_t<base + 0x01> CTSUCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -272,8 +270,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  CTSUPRMODE;
 			bit_rw_t <io_, bitpos::B6>     CTSUSOFF;
 		};
-		typedef ctsusdprs_t<base + 0x02> CTSUSDPRS_;
-		static CTSUSDPRS_ CTSUSDPRS;
+		static inline ctsusdprs_t<base + 0x02> CTSUSDPRS;
 
 
 		//-----------------------------------------------------------------//
@@ -292,8 +289,7 @@ namespace device {
 			
 			bits_rw_t<io_, bitpos::B0, 8>  CTSUSST;
 		};
-		typedef ctsusst_t<base + 0x03> CTSUSST_;
-		static CTSUSST_ CTSUSST;
+		static inline ctsusst_t<base + 0x03> CTSUSST;
 
 
 		//-----------------------------------------------------------------//
@@ -312,8 +308,7 @@ namespace device {
 			
 			bits_rw_t<io_, bitpos::B0, 6>  CTSUMCH0;
 		};
-		typedef ctsumch0_t<base + 0x04> CTSUMCH0_;
-		static CTSUMCH0_ CTSUMCH0;
+		static inline ctsumch0_t<base + 0x04> CTSUMCH0;
 
 
 		//-----------------------------------------------------------------//
@@ -332,8 +327,7 @@ namespace device {
 			
 			bits_rw_t<io_, bitpos::B0, 6>  CTSUMCH1;
 		};
-		typedef ctsumch1_t<base + 0x05> CTSUMCH1_;
-		static CTSUMCH1_ CTSUMCH1;
+		static inline ctsumch1_t<base + 0x05> CTSUMCH1;
 
 
 		//-----------------------------------------------------------------//
@@ -382,8 +376,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef ctsuchac_t<base + 0x06> CTSUCHAC_;
-		static CTSUCHAC_ CTSUCHAC;
+		static inline ctsuchac_t<base + 0x06> CTSUCHAC;
 
 
 		//-----------------------------------------------------------------//
@@ -432,8 +425,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef ctsuchtrc_t<base + 0x0B> CTSUCHTRC_;
-		static CTSUCHTRC_ CTSUCHTRC;
+		static inline ctsuchtrc_t<base + 0x0B> CTSUCHTRC;
 
 
 		//-----------------------------------------------------------------//
@@ -454,8 +446,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 2>  CTSUSSCNT;
 		};
-		typedef ctsudclkc_t<base + 0x10> CTSUDCLKC_;
-		static CTSUDCLKC_ CTSUDCLKC;
+		static inline ctsudclkc_t<base + 0x10> CTSUDCLKC;
 
 
 		//-----------------------------------------------------------------//
@@ -466,23 +457,20 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct ctsust_t : public rw8_t<ofs> {
-			typedef ro8_t<ofs> in_;
-			using in_::operator ();
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 			
-			bits_ro_t<in_, bitpos::B0, 3>  CTSUSTC;
+			bits_ro_t<io_, bitpos::B0, 3>  CTSUSTC;
 
-			bit_ro_t <in_, bitpos::B4>     CTSUDTSR;
+			bit_ro_t <io_, bitpos::B4>     CTSUDTSR;
 			bit_rw_t <io_, bitpos::B5>     CTSUSOVF;
 			bit_rw_t <io_, bitpos::B6>     CTSUROVF;
-			bit_ro_t <in_, bitpos::B7>     CTSUPS;
+			bit_ro_t <io_, bitpos::B7>     CTSUPS;
 		};
-		typedef ctsust_t<base + 0x11> CTSUST_;
-		static CTSUST_ CTSUST;
+		static inline ctsust_t<base + 0x11> CTSUST;
 
 
 		//-----------------------------------------------------------------//
@@ -501,8 +489,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 4>  CTSUSSDIV;
 		};
-		typedef ctsussc_t<base + 0x12> CTSUSSC_;
-		static CTSUSSC_ CTSUSSC;
+		static inline ctsussc_t<base + 0x12> CTSUSSC;
 
 
 		//-----------------------------------------------------------------//
@@ -522,8 +509,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 10> CTSUSO;
 			bits_rw_t<io_, bitpos::B10, 6> CTSUSNUM;
 		};
-		typedef ctsuso0_t<base + 0x14> CTSUSO0_;
-		static CTSUSO0_ CTSUSO0;
+		static inline ctsuso0_t<base + 0x14> CTSUSO0;
 
 
 		//-----------------------------------------------------------------//
@@ -544,8 +530,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  5> CTSUSDPA;
 			bits_rw_t<io_, bitpos::B13, 2> CTSUICOG;
 		};
-		typedef ctsuso1_t<base + 0x16> CTSUSO1_;
-		static CTSUSO1_ CTSUSO1;
+		static inline ctsuso1_t<base + 0x16> CTSUSO1;
 
 
 		//-----------------------------------------------------------------//
@@ -564,8 +549,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> CTSUSC;
 		};
-		typedef ctsusc_t<base + 0x18> CTSUSC_;
-		static CTSUSC_ CTSUSC;
+		static inline ctsusc_t<base + 0x18> CTSUSC;
 
 
 		//-----------------------------------------------------------------//
@@ -584,8 +568,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> CTSURC;
 		};
-		typedef ctsurc_t<base + 0x1A> CTSURC_;
-		static CTSURC_ CTSURC;
+		static inline ctsurc_t<base + 0x1A> CTSURC;
 
 
 		//-----------------------------------------------------------------//
@@ -610,25 +593,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>    CTSUICOMP;
 		};
-		typedef ctsuerrs_t<base + 0x1C> CTSUERRS_;
-		static CTSUERRS_ CTSUERRS;
+		static inline ctsuerrs_t<base + 0x1C> CTSUERRS;
 	};
-	template <uint32_t base> typename ctsu_t<base>::CTSUCR0_   ctsu_t<base>::CTSUCR0;
-	template <uint32_t base> typename ctsu_t<base>::CTSUCR1_   ctsu_t<base>::CTSUCR1;
-	template <uint32_t base> typename ctsu_t<base>::CTSUSDPRS_ ctsu_t<base>::CTSUSDPRS;
-	template <uint32_t base> typename ctsu_t<base>::CTSUSST_   ctsu_t<base>::CTSUSST;
-	template <uint32_t base> typename ctsu_t<base>::CTSUMCH0_  ctsu_t<base>::CTSUMCH0;
-	template <uint32_t base> typename ctsu_t<base>::CTSUMCH1_  ctsu_t<base>::CTSUMCH1;
-	template <uint32_t base> typename ctsu_t<base>::CTSUCHAC_  ctsu_t<base>::CTSUCHAC;
-	template <uint32_t base> typename ctsu_t<base>::CTSUCHTRC_ ctsu_t<base>::CTSUCHTRC;
-	template <uint32_t base> typename ctsu_t<base>::CTSUDCLKC_ ctsu_t<base>::CTSUDCLKC;
-	template <uint32_t base> typename ctsu_t<base>::CTSUST_    ctsu_t<base>::CTSUST;
-	template <uint32_t base> typename ctsu_t<base>::CTSUSSC_   ctsu_t<base>::CTSUSSC;
-	template <uint32_t base> typename ctsu_t<base>::CTSUSO0_   ctsu_t<base>::CTSUSO0;
-	template <uint32_t base> typename ctsu_t<base>::CTSUSO1_   ctsu_t<base>::CTSUSO1;
-	template <uint32_t base> typename ctsu_t<base>::CTSUSC_    ctsu_t<base>::CTSUSC;
-	template <uint32_t base> typename ctsu_t<base>::CTSURC_    ctsu_t<base>::CTSURC;
-	template <uint32_t base> typename ctsu_t<base>::CTSUERRS_  ctsu_t<base>::CTSUERRS;
-
-	typedef ctsu_t<0x0008'0980> CTSU;
+	static inline ctsu_t<0x0008'0980> CTSU;
 }

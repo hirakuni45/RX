@@ -114,6 +114,7 @@ namespace device {
 
 		struct task_t {
 			volatile uint32_t	tgr_adr_;		// TGR の実アドレス
+			volatile uint32_t	main_tick_;
 			volatile uint32_t	ovfw_tick_;
 
 			uint32_t	rate_;
@@ -124,7 +125,7 @@ namespace device {
 			capture_t	cap_;
 
 			task_t() : tgr_adr_(MTUX::TGRA.address),
-				ovfw_tick_(0),
+				main_tick_(0), ovfw_tick_(0),
 				rate_(0), tgr_(0), shift_(0), out_(OUTPUT::NONE),
 				cap_()
 			{ }
@@ -162,6 +163,7 @@ namespace device {
 
 		static INTERRUPT_FUNC void match_task_()
 		{
+			++tt_.main_tick_;
 			mtask_();
 		}
 
@@ -416,6 +418,35 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	設定周波数の誤差を検証
+			@param[in]	freq	周波数
+			@param[in]	thper	許容誤差（通常 1.0%） @n
+								百分率を 10 倍した値を設定
+			@return 誤差範囲なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		static constexpr bool probe_freq(uint32_t freq, uint32_t thper = 10) noexcept
+		{
+#if 0
+			uint8_t cks = 0;
+			uint32_t cmcor = 0;
+			if(!calc_freq_(freq, cks, cmcor)) {
+				return false;
+			}
+#endif
+			auto rate = freq;
+//			auto rate = get_real_freq_(cks, cmcor);
+			auto d = freq * thper;
+			if((rate * 1000) < (freq * 1000 - d) || (freq * 1000 + d) < (rate * 1000)) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノーマル・モード（コンペア・マッチ・タイマー）
 			@param[in]	ch		出力チャネル
 			@param[in]	freq	出力周波数
@@ -585,9 +616,6 @@ namespace device {
 
 			return true;
 		}
-
-
-
 
 
 		//-----------------------------------------------------------------//
@@ -840,7 +868,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static OTASK& at_ovfl_task() noexcept { return otask_; }
 	};
-
 	template <class MTUX, class MTASK, class OTASK, port_map_mtu::ORDER PSEL>
 		typename mtu_io<MTUX, MTASK, OTASK, PSEL>::task_t mtu_io<MTUX, MTASK, OTASK, PSEL>::tt_;
 	template <class MTUX, class MTASK, class OTASK, port_map_mtu::ORDER PSEL>

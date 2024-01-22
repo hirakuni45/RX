@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX231 グループ・電力制御クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,8 +18,7 @@ namespace device {
 		@brief  電力制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	struct power_mgr_t {
+	struct power_mgr {
 
 		struct pad_t {
 
@@ -37,7 +36,7 @@ namespace device {
 				dmac_(0)
 			{ }
 		};
-		static pad_t	pad_;
+		static inline pad_t	pad_;
 
 		static void sr_(bool f, uint8_t& pad, peripheral org, peripheral tgt)
 		{
@@ -223,7 +222,4 @@ namespace device {
 			return ret;
 		}
 	};
-	template <class _> typename power_mgr_t<_>::pad_t power_mgr_t<_>::pad_;
-
-	typedef power_mgr_t<void> power_mgr;
 }

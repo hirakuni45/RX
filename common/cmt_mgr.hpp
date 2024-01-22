@@ -301,6 +301,6 @@ namespace device {
 			@return FUNC クラス
 		*/
 		//-----------------------------------------------------------------//
-		static FUNC& at_func() noexcept { return func_; }
+		static auto& at_func() noexcept { return func_; }
 	};
 }

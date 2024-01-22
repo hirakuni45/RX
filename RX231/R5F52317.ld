@@ -2,7 +2,7 @@
 /*!	@file
 	@brief	RX231 R5F52317 リンカー・スクリプト @n
 			ROM: 384K @n
-			RAM: 32K @n
+			RAM: 64K @n
 			EEPROM: 8K
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
@@ -19,9 +19,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX2317 chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00007800 /* 32K - stack_size (0x800) */
-	USTACK (w) : ORIGIN = 0x00007E00, LENGTH = 4 /* ustack 1536 bytes */
-	ISTACK (w) : ORIGIN = 0x00008000, LENGTH = 4 /* istack 512 bytes  */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0000F800 /* 64K - stack_size (0x800) */
+	USTACK (w) : ORIGIN = 0x0000FE00, LENGTH = 4 /* ustack 1536 bytes */
+	ISTACK (w) : ORIGIN = 0x00010000, LENGTH = 4 /* istack 512 bytes  */
 	ROM (w)    : ORIGIN = 0xFFFA0000, LENGTH = 0x0005FFD0 /* 384K */
 }
 

@@ -50,8 +50,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> STR0;
 			bit_rw_t<io_, bitpos::B1> STR1;
 		};
-		typedef cmstr0_t<0x0008'8000> CMSTR0_;
-		static CMSTR0_ CMSTR0;
+		static inline cmstr0_t<0x0008'8000> CMSTR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -71,8 +70,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> STR2;
 			bit_rw_t<io_, bitpos::B1> STR3;
 		};
-		typedef cmstr1_t<0x0008'8010> CMSTR1_;
-		static CMSTR1_ CMSTR1;
+		static inline cmstr1_t<0x0008'8010> CMSTR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -92,8 +90,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 2> CKS;
 			bit_rw_t <io_, bitpos::B6>    CMIE;
 		};
-		typedef cmcr_t<base + 0x00> CMCR_;
-		static CMCR_ CMCR;
+		static inline cmcr_t<base + 0x00> CMCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -101,8 +98,7 @@ namespace device {
 			@brief  CMCNT レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw16_t<base + 0x02> CMCNT_;
-		static CMCNT_ CMCNT;
+		static inline rw16_t<base + 0x02> CMCNT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -110,8 +106,7 @@ namespace device {
 			@brief  CMCOR レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw16_t<base + 0x04> CMCOR_;
-		static CMCOR_ CMCOR;
+		static inline rw16_t<base + 0x04> CMCOR;
 
 
 		//-----------------------------------------------------------------//
@@ -138,11 +133,6 @@ namespace device {
 			} 			
 		}
 	};
-	template <uint32_t base, peripheral per> typename cmt_core_t<base, per>::CMSTR0_ cmt_core_t<base, per>::CMSTR0;
-	template <uint32_t base, peripheral per> typename cmt_core_t<base, per>::CMSTR1_ cmt_core_t<base, per>::CMSTR1;
-	template <uint32_t base, peripheral per> typename cmt_core_t<base, per>::CMCR_   cmt_core_t<base, per>::CMCR;
-	template <uint32_t base, peripheral per> typename cmt_core_t<base, per>::CMCNT_  cmt_core_t<base, per>::CMCNT;
-	template <uint32_t base, peripheral per> typename cmt_core_t<base, per>::CMCOR_  cmt_core_t<base, per>::CMCOR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
