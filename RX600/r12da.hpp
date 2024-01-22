@@ -25,14 +25,12 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  D/A データレジスタ 0（DADR0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008'8040> DADR0_;
-		static DADR0_ DADR0;
+		static inline rw16_t<0x0008'8040> DADR0;
 
 
 		//-----------------------------------------------------------------//
@@ -40,8 +38,7 @@ namespace device {
 			@brief  D/A データレジスタ 1（DADR1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008'8042> DADR1_;
-		static DADR1_ DADR1;
+		static inline rw16_t<0x0008'8042> DADR1;
 
 
 		//-----------------------------------------------------------------//
@@ -63,8 +60,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>    DAOE0;
 			bit_rw_t <io_, bitpos::B7>    DAOE1;
 		};
-		typedef dacr_t<0x0008'8044> DACR_;
-		static DACR_ DACR;
+		static inline dacr_t<0x0008'8044> DACR;
 
 
 		//-----------------------------------------------------------------//
@@ -83,8 +79,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DPSEL;
 		};
-		typedef dadpr_t<0x0008'8045> DADPR_;
-		static DADPR_ DADPR;
+		static inline dadpr_t<0x0008'8045> DADPR;
 
 
 		//-----------------------------------------------------------------//
@@ -103,14 +98,9 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DAADST;
 		};
-		typedef daadscr_t<0x0008'8046> DAADSCR_;
-		static DAADSCR_ DAADSCR;
+		static inline daadscr_t<0x0008'8046> DAADSCR;
 	};
-	template <peripheral per> typename r12da_t<per>::DADR0_ r12da_t<per>::DADR0;
-	template <peripheral per> typename r12da_t<per>::DADR1_ r12da_t<per>::DADR1;
-	template <peripheral per> typename r12da_t<per>::DACR_ r12da_t<per>::DACR;
-	template <peripheral per> typename r12da_t<per>::DADPR_ r12da_t<per>::DADPR;
-	template <peripheral per> typename r12da_t<per>::DAADSCR_ r12da_t<per>::DAADSCR;
+
 
 #if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M) 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -154,8 +144,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DAAMP0;
 			bit_rw_t<io_, bitpos::B7> DAAMP1;
 		};
-		typedef daampcr_t<0x0008'8048> DAAMPCR_;
-		static DAAMPCR_ DAAMPCR;
+		static inline daampcr_t<0x0008'8048> DAAMPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -174,8 +163,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B1> AMADSEL1;
 		};
-		typedef daadusr_t<0x0008'C5C0> DAADUSR_;
-		static DAADUSR_ DAADUSR;
+		static inline daadusr_t<0x0008'C5C0> DAADUSR;
 
 
 		//-----------------------------------------------------------------//
@@ -206,9 +194,6 @@ namespace device {
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 	};
-	template <peripheral per> typename r12da_a_t<per>::DAAMPCR_ r12da_a_t<per>::DAAMPCR;
-	template <peripheral per> typename r12da_a_t<per>::DAADUSR_ r12da_a_t<per>::DAADUSR;
-
 	typedef r12da_a_t<peripheral::R12DA> R12DA;
 
 #elif defined(SIG_RX231)
@@ -252,8 +237,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> REF;
 		};
-		typedef davrefcr_t<0x0008'8047> DAVREFCR_;
-		static DAVREFCR_ DAVREFCR;
+		static inline davrefcr_t<0x0008'8047> DAVREFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -284,8 +268,6 @@ namespace device {
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 	};
-	template <peripheral per> typename r12da_A_t<per>::DAVREFCR_ r12da_A_t<per>::DAVREFCR;
-
 	typedef r12da_A_t<peripheral::R12DA> R12DA;
 
 #elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
@@ -332,8 +314,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  OUTREF0;
 			bit_rw_t<io_, bitpos::B3>  OUTREF1;
 		};
-		typedef dadselr_t<0x0008'8049> DADSELR_;
-		static DADSELR_ DADSELR;
+		static inline dadselr_t<0x0008'8049> DADSELR;
 
 
 		//-----------------------------------------------------------------//
@@ -364,8 +345,6 @@ namespace device {
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 	};
-	template <peripheral per> typename r12da_b_t<per>::DADSELR_ r12da_b_t<per>::DADSELR;
-
 	typedef r12da_b_t<peripheral::R12DA> R12DA;
 #endif
 }

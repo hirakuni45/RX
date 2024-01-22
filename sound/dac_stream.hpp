@@ -41,7 +41,7 @@ namespace sound {
 		};
 		itv_t		itv_t_;
 
-		static void* itv_t_ptr_;
+		static inline void* itv_t_ptr_;
 
 		// ITM 割り込み、SAMPLE_DIV 毎に、ソースバッファから波形メモリに転送
 		class itv_task {
@@ -147,12 +147,12 @@ namespace sound {
  //       	    utils::format("ITV start error...\n");
         	} else {
 #if 0
-				utils::format("ITV intr level: %d\n") % static_cast<int>(itv_io_.get_intr_vec());
-				utils::format("ITV rate (set):  %d [Hz]\n") % itv_io_.get_rate();
-				auto rate = 1.0f - static_cast<float>(itv_io_.get_rate()) / itv_io_.get_rate(true);
+				utils::format("ITV intr vector: %d\n") % static_cast<int>(itv_mgr_.get_intr_vec());
+				utils::format("ITV rate (set):  %d [Hz]\n") % itv_mgr_.get_rate();
+				auto rate = 1.0f - static_cast<float>(itv_mgr_.get_rate()) / itv_mgr_.get_rate(true);
 				rate *= 100.0f;
 				utils::format("ITV rate (real): %d [Hz] (%3.2f [%%])\n")
-					% itv_io_.get_rate(true) % rate;
+					% itv_mgr_.get_rate(true) % rate;
 #endif
 			}
 			sample_rate_ = freq;
@@ -185,6 +185,4 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		uint32_t get_sample_size() const noexcept { return sound_out_.get_sample_size(); }
 	};
-	template<class DAC, class MTU, class DMAC, class SOUND_OUT>
-		void* dac_stream<DAC, MTU, DMAC, SOUND_OUT>::itv_t_ptr_;
 }

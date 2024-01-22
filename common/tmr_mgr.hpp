@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・TMR マネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
@@ -19,13 +19,13 @@ namespace device {
 		@brief  TMR マネージャー・クラス @
 				※１６ビット・モードで利用する場合、TMR は、TMR0、又は、TMR2 を指定する事
 		@param[in]	TMR		TMR チャネルクラス
-		@param[in]	TASK	タイマー動作クラス
+		@param[in]	FUNC	タイマー動作ファンクタ・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class TMR, class TASK = utils::null_task>
+	template <class TMR, class FUNC = utils::null_task>
 	class tmr_mgr {
 
-		static TASK		task_;
+		static inline FUNC	func_;
 
 		ICU::VECTOR		intr_vec_;
 		uint32_t		freq_;
@@ -33,7 +33,7 @@ namespace device {
 
 		static INTERRUPT_FUNC void match_task_()
 		{
-			task_();
+			func_();
 		}
 
 	public:
@@ -164,11 +164,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  TASK クラスの参照
-			@return TASK クラス
+			@brief  ファンクタ・クラスの参照
+			@return ファンクタ・クラス
 		*/
 		//-----------------------------------------------------------------//
-		static auto& at_task() noexcept { return task_; }
+		static auto& at_func() noexcept { return func_; }
 	};
-	template <class TMR, class TASK> TASK tmr_mgr<TMR, TASK>::task_;
 }
