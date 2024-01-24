@@ -18,7 +18,8 @@ namespace device {
 	/*!
 		@brief  クロック・プロファイル・クラス @n
 				・選択出来ない値を指定すると、コンパイルエラーとなる @n
-				・詳細はハードウェアーマニュアル参照の事
+				・このプロセッサは、ICLK の違いで、動作モードを切り替える @n
+				・詳細はハードウェアーマニュアル参照の事 
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class clock_profile {
@@ -52,14 +53,14 @@ namespace device {
 		static constexpr uint32_t   FCLK		= 27'000'000;		///< FCLK 周波数（最大 1 ～ 32MHz）
 		static constexpr uint32_t	BCLK		= 27'000'000;		///< BCLK 周波数（最大 32MHz）
 #else
-		static constexpr uint32_t   PLL_BASE	= 72'000'000;		///< PLL ベースクロック（最大 54MHz）
+		static constexpr uint32_t   PLL_BASE	= 90'000'000;		///< PLL ベースクロック（最大 54MHz）
 
-		static constexpr uint32_t   ICLK		= 72'000'000;		///< ICLK 周波数（最大 54MHz）
-		static constexpr uint32_t   PCLKA		= 72'000'000;		///< PCLKB 周波数（最大 54MHz）
-		static constexpr uint32_t   PCLKB		= 36'000'000;		///< PCLKB 周波数（最大 32MHz）
-		static constexpr uint32_t   PCLKD		= 72'000'000;		///< PCLKD 周波数（最大 54MHz）
-		static constexpr uint32_t   FCLK		= 36'000'000;		///< FCLK 周波数（最大 1 ～ 32MHz）
-		static constexpr uint32_t	BCLK		= 36'000'000;		///< BCLK 周波数（最大 32MHz）
+		static constexpr uint32_t   ICLK		= 90'000'000;		///< ICLK 周波数（最大 54MHz）
+		static constexpr uint32_t   PCLKA		= 90'000'000;		///< PCLKB 周波数（最大 54MHz）
+		static constexpr uint32_t   PCLKB		= 45'000'000;		///< PCLKB 周波数（最大 32MHz）
+		static constexpr uint32_t   PCLKD		= 90'000'000;		///< PCLKD 周波数（最大 54MHz）
+		static constexpr uint32_t   FCLK		= 45'000'000;		///< FCLK 周波数（最大 1 ～ 32MHz）
+		static constexpr uint32_t	BCLK		= 45'000'000;		///< BCLK 周波数（最大 32MHz）
 #endif
 		// 32MHz より高い周波数で動作させる場合、MEMWAIT を設けるので、ソフト遅延を微調整する。
 		static constexpr uint32_t	DELAY_MS	=  ICLK / ((ICLK > 32'000'000) ? 787'402 : 1'000'000) / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）

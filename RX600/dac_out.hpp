@@ -41,7 +41,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		enum class VREF : uint8_t {
 			NONE = 0b000,		///< 非選択
-			AVCC0 = 0b001,///< AVCC0/AVSS0
+			AVCC0 = 0b001,		///< AVCC0/AVSS0
 			INTERNAL = 0b011,	///< 内部基準電圧/AVSS0
 			VREFH_VREFL = 0b110	///< VREFH/VREFL
 		};
@@ -98,13 +98,13 @@ namespace device {
 #endif
 
 			if(DAC::DACR_DAE) {
-				DAC::DACR = DAC::DACR.DAE.b(0) | DAC::DACR.RESERVE.b(0b11111);
+				DAC::DACR = DAC::DACR.RESERVE.b(0b11111);
 			}
 
 			DAC::DADPR.DPSEL = 1;  // 左詰め（下位４ビット無視）
 
+			DAC::DACR = DAC::DACR.DAOE0.b(ch0) | DAC::DACR.DAOE1.b(ch1) | DAC::DACR.RESERVE.b(0b11111);
 			if(ch0) {
-				DAC::DACR = DAC::DACR.DAOE0.b(1) | DAC::DACR.RESERVE.b(0b11111);
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				DAC::DAAMPCR.DAAMP0 = ampe;
 #elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
@@ -113,7 +113,6 @@ namespace device {
 				DAC::enable(DAC::ANALOG::DA0);
 			}
 			if(ch1) {
-				DAC::DACR = DAC::DACR.DAOE1.b(1) | DAC::DACR.RESERVE.b(0b11111);
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				DAC::DAAMPCR.DAAMP1 = ampe;
 #elif defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
@@ -122,7 +121,9 @@ namespace device {
 				DAC::enable(DAC::ANALOG::DA1);
 			}
 
-			utils::delay::micro_second(3);  // amp start setup time
+			if(ampe) {
+				utils::delay::micro_second(3);  // amp start setup time
+			}
 
 			return true;
 		}
