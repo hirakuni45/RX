@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX220 バス定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,6 @@ namespace device {
 		@brief  バス定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct bus_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -35,8 +34,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> STSCLR;
 		};
-		typedef berclr_t<0x0008'1300> BERCLR_;
-		static BERCLR_ BERCLR;
+		static inline berclr_t<0x0008'1300> BERCLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -54,8 +52,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> IGAEN;
 		};
-		typedef beren_t<0x0008'1304> BEREN_;
-		static BEREN_ BEREN;
+		static inline beren_t<0x0008'1304> BEREN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -75,8 +72,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 3> MST;
 		};
-		typedef bersr1_t<0x0008'1308> BERSR1_;
-		static BERSR1_ BERSR1;
+		static inline bersr1_t<0x0008'1308> BERSR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -94,8 +90,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B3, 13> ADDR;
 		};
-		typedef bersr2_t<0x0008'130A> BERSR2_;
-		static BERSR2_ BERSR2;
+		static inline bersr2_t<0x0008'130A> BERSR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -118,14 +113,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B10, 2>  BPFB;
 		};
-		typedef buspri_t<0x0008'1310> BUSPRI_;
-		static BUSPRI_ BUSPRI;
+		static inline buspri_t<0x0008'1310> BUSPRI;
 	};
-	template <class _> typename bus_t<_>::BERCLR_  bus_t<_>::BERCLR;
-	template <class _> typename bus_t<_>::BEREN_   bus_t<_>::BEREN;
-	template <class _> typename bus_t<_>::BERSR1_  bus_t<_>::BERSR1;
-	template <class _> typename bus_t<_>::BERSR2_  bus_t<_>::BERSR2;
-	template <class _> typename bus_t<_>::BUSPRI_  bus_t<_>::BUSPRI;
-
-	typedef bus_t<void> BUS;
+	typedef bus_t BUS;
 }
