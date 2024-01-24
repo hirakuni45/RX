@@ -17,7 +17,7 @@ namespace device {
 		@brief  システム定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct system_t {
+	namespace SYSTEM {
 
 		//----  クロック発生回路  -------------------------------------------//
 
@@ -45,7 +45,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 			bits_rw_t<io_, bitpos::B28, 4> FCK;
 		};
-		static inline sckcr_t<0x0008'0020> SCKCR;
+		typedef sckcr_t<0x0008'0020> SCKCR_;
+		static inline SCKCR_ SCKCR;
 
 
 		//-----------------------------------------------------------------//
@@ -359,7 +360,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5> MSTS;
 		};
-		static inline moscwtcr_t<0x0008'0041> MOSCWTCR;
+		static inline moscwtcr_t<0x0008'00A2> MOSCWTCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -713,6 +714,5 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 8> PRKEY;
 		};
 		static inline prcr_t<0x0008'03FE> PRCR;
-	};
-	typedef system_t SYSTEM;
+	}
 }

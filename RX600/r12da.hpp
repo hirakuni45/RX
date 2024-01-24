@@ -254,11 +254,13 @@ namespace device {
 			switch(an) {
 			case ANALOG::DA0:
 				PORT0::PCR.B3 = 0;
+				PORT0::PDR.B3 = 0;
 				PORT0::PMR.B3 = 0;
 				MPC::P03PFS.ASEL = f;
 				break;
 			case ANALOG::DA1:
 				PORT0::PCR.B5 = 0;
+				PORT0::PDR.B5 = 0;
 				PORT0::PMR.B5 = 0;
 				MPC::P05PFS.ASEL = f;
 				break;

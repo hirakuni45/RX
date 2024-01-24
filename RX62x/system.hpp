@@ -17,7 +17,7 @@ namespace device {
 		@brief  システム定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct system_t {
+	namespace SYSTEM {
 
 		//
 		//===== クロック発生回路
@@ -401,6 +401,5 @@ namespace device {
 		static inline rw8_t<0x0008'C2AD>  DPSBKR29;
 		static inline rw8_t<0x0008'C2AE>  DPSBKR30;
 		static inline rw8_t<0x0008'C2AF>  DPSBKR31;
-	};
-	typedef system_t SYSTEM;
+	}
 }

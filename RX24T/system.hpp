@@ -17,7 +17,7 @@ namespace device {
 		@brief  システム定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct system_t {
+	namespace SYSTEM {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -477,6 +477,5 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 8> PRKEY;
 		};
 		static inline prcr_t<0x0008'03FE> PRCR;
-	};
-	typedef system_t SYSTEM;
+	}
 }
