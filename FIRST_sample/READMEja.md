@@ -1,4 +1,4 @@
-Renesas RX220, RX231, RX62N、RX63T, RX24T, RX26T, RX64M, RX65N, RX71M, RX66T, RX72N, RX72T LED 点滅サンプル
+Renesas RX マイコン LED 点滅サンプル
 =========
    
 [英語版](README.md)
@@ -25,8 +25,8 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - RX72T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
-- RX65N/Makefile (for RX65N Envision Kit)
-- RX72N/Makefile (for RX72N Envision Kit)
+- RX65N/Makefile (RX65N Envision Kit)
+- RX72N/Makefile (RX72N Envision Kit)
 
 ---
 
