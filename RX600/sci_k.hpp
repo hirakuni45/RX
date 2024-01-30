@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ SCIk 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -50,7 +50,12 @@ namespace device {
 		static constexpr bool SPI_SUB   = true;		///< 簡易 SPI が利用可能な場合「true」
 	};
 
-#if defined(SIG_RX26T)
+#if defined(SIG_RX140)
+	typedef scik_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+		ICU::VECTOR, ICU::VECTOR::TEI1, ICU::VECTOR::ERI1> SCI1;
+	typedef scik_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+		ICU::VECTOR, ICU::VECTOR::TEI5, ICU::VECTOR::ERI5> SCI5;
+#elif defined(SIG_RX26T)
 	typedef scik_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::GROUPBL0, ICU::GROUPBL0::TEI1, ICU::GROUPBL0::ERI1> SCI1;
 	typedef scik_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,

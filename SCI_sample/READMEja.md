@@ -1,4 +1,4 @@
-Renesas RX220, RX231, RX62N, RX631, RX63T, RX24T, RX26T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
+Renesas RX マイコン SCI (UART) サンプル
 =========
 
 [英語版](README.md)
@@ -14,6 +14,7 @@ RX マイコンを使った SCI/SCIF/RSCI (UART) のサンプルプログラム
 ## プロジェクト・リスト
 
 - main.cpp
+- RX140/Makefile
 - RX220/Makefile
 - RX231/Makefile
 - RX62N/Makefile
@@ -34,6 +35,7 @@ RX マイコンを使った SCI/SCIF/RSCI (UART) のサンプルプログラム
 - 各マイコンの、クリスタル周波数、各モジュールの周波数は、RXxxx/clock_profile.hpp を参照して下さい。
 - インジケーター LED を指定のポートに接続する。
 -  USB シリアルとSCI ポートを接続する。
+- RX140 の SCI 標準ポートは、「RX140/port_map.hpp」参照。
 - RX220 の SCI 標準ポートは、「RX220/port_map.hpp」参照。
 - RX231 の SCI 標準ポートは、「RX231/port_map.hpp」参照。
 - RX62N の SCI 標準ポートは、「RX62x/port_map.hpp」参照。
@@ -73,7 +75,13 @@ RX マイコンを使った SCI/SCIF/RSCI (UART) のサンプルプログラム
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX140)
+	// RX140 DIY ボード
+	static const char* system_str_ = { "RX140 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTJ, device::bitpos::B1, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX220)
 	// 秋月 RX220 ボード
 	static const char* system_str_ = { "AE-RX220" };
 	static constexpr bool LED_ACTIVE = 0;

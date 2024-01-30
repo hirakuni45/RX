@@ -4,11 +4,11 @@
 	@brief	システム定義（クロック発生回路、） @n
 			・RX64M/RX71M @n
 			・RX651/RX65N @n
+			・RX66T/RX72T @n
 			・RX671 @n
-			・RX66T @n
-			・RX72M/RX72T/RX72N
+			・RX72M/RX72N
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,8 +22,7 @@ namespace device {
 		@brief  システム定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
-	struct system_t {
+	namespace SYSTEM {
 
 		//----  オプション設定メモリ  -------------------------------------------//
 
@@ -106,23 +105,15 @@ namespace device {
 			bits_ro_t<io_, bitpos::B0, 3> MDE;
 		};
 #if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef spcc_t<0xFE7F'5D40> SPCC_;
-		static SPCC_ SPCC;
-		typedef ofs0_t<0xFE7F'5D04> OFS0_;
-		static OFS0_ OFS0;
-		typedef ofs1_t<0xFE7F'5D08> OFS1_;
-		static OFS1_ OFS1;
-		typedef mde_t <0xFE7F'5D00> MDE_;
-		static MDE_ MDE;
+		static inline spcc_t<0xFE7F'5D40> SPCC;
+		static inline ofs0_t<0xFE7F'5D04> OFS0;
+		static inline ofs1_t<0xFE7F'5D08> OFS1;
+		static inline mde_t <0xFE7F'5D00> MDE;
 #else
-		typedef spcc_t<0x0012'0040> SPCC_;
-		static SPCC_ SPCC;
-		typedef ofs0_t<0x0012'0068> OFS0_;
-		static OFS0_ OFS0;
-		typedef ofs1_t<0x0012'006C> OFS1_;
-		static OFS1_ OFS1;
-		typedef mde_t <0x0012'0064> MDE_;
-		static MDE_ MDE;
+		static inline spcc_t<0x0012'0040> SPCC;
+		static inline ofs0_t<0x0012'0068> OFS0;
+		static inline ofs1_t<0x0012'006C> OFS1;
+		static inline mde_t <0x0012'0064> MDE;
 #endif
 
 
@@ -142,8 +133,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  MD;
 		};
-		typedef mdmonr_t<0x0008'0000> MDMONR_;
-		static MDMONR_ MDMONR;
+		static inline mdmonr_t<0x0008'0000> MDMONR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -162,8 +152,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B5>  UBTS;
 		};
-		typedef mdsr_t<0x0008'0002> MDSR_;
-		static MDSR_ MDSR;
+		static inline mdsr_t<0x0008'0002> MDSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -184,8 +173,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>     EXBE;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef syscr0_t<0x0008'0006> SYSCR0_;
-		static SYSCR0_ SYSCR0;
+		static inline syscr0_t<0x0008'0006> SYSCR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -208,8 +196,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  SBYRAME;
 #endif
 		};
-		typedef syscr1_t<0x0008'0008> SYSCR1_;
-		static SYSCR1_ SYSCR1;
+		static inline syscr1_t<0x0008'0008> SYSCR1;
 
 		//----  クロック発生回路  -----------------------------------------------//
 
@@ -240,8 +227,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 			bits_rw_t<io_, bitpos::B28, 4> FCK;
 		};
-		typedef sckcr_t<0x0008'0020> SCKCR_;
-		static SCKCR_ SCKCR;
+		static inline sckcr_t<0x0008'0020> SCKCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -261,8 +247,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
 		};
-		typedef memwait_t<0x0008'6610> MEMWAIT_;
-		static MEMWAIT_ MEMWAIT;
+		static inline memwait_t<0x0008'6610> MEMWAIT;
 
 #elif defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 		template<uint32_t base>
@@ -275,8 +260,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
 		};
-		typedef memwait_t<0x0008'101C> MEMWAIT_;
-		static MEMWAIT_ MEMWAIT;
+		static inline memwait_t<0x0008'101C> MEMWAIT;
 #endif
 
 
@@ -297,8 +281,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> ROMWT;
 		};
-		typedef romwt_t<0x0008'101C> ROMWT_;
-		static ROMWT_ ROMWT;
+		static inline romwt_t<0x0008'101C> ROMWT;
 #endif
 
 
@@ -318,8 +301,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 4> UCK;
 		};
-		typedef sckcr2_t<0x0008'0024> SCKCR2_;
-		static SCKCR2_ SCKCR2;
+		static inline sckcr2_t<0x0008'0024> SCKCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -338,8 +320,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 3> CKSEL;
 		};
-		typedef sckcr3_t<0x0008'0026> SCKCR3_;
-		static SCKCR3_ SCKCR3;
+		static inline sckcr3_t<0x0008'0026> SCKCR3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -362,8 +343,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 6> STC;
 		};
-		typedef pllcr_t<0x0008'0028> PLLCR_;
-		static PLLCR_ PLLCR;
+		static inline pllcr_t<0x0008'0028> PLLCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -382,8 +362,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> PLLEN;
 		};
-		typedef pllcr2_t<0x0008'002A> PLLCR2_;
-		static PLLCR2_ PLLCR2;
+		static inline pllcr2_t<0x0008'002A> PLLCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -402,8 +381,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> BCLKDIV;
 		};
-		typedef bckcr_t<0x0008'0030> BCKCR_;
-		static BCKCR_ BCKCR;
+		static inline bckcr_t<0x0008'0030> BCKCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -422,8 +400,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MOSTP;
 		};
-		typedef mosccr_t<0x0008'0032> MOSCCR_;
-		static MOSCCR_ MOSCCR;
+		static inline mosccr_t<0x0008'0032> MOSCCR;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
@@ -443,8 +420,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SOSTP;
 		};
-		typedef sosccr_t<0x0008'0033> SOSCCR_;
-		static SOSCCR_ SOSCCR;
+		static inline sosccr_t<0x0008'0033> SOSCCR;
 #endif
 
 
@@ -464,8 +440,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> LCSTP;
 		};
-		typedef lococr_t<0x0008'0034> LOCOCR_;
-		static LOCOCR_ LOCOCR;
+		static inline lococr_t<0x0008'0034> LOCOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -484,8 +459,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> ILCSTP;
 		};
-		typedef ilococr_t<0x0008'0035> ILOCOCR_;
-		static ILOCOCR_ ILOCOCR;
+		static inline ilococr_t<0x0008'0035> ILOCOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -504,8 +478,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> HCSTP;
 		};
-		typedef hococr_t<0x0008'0036> HOCOCR_;
-		static HOCOCR_ HOCOCR;
+		static inline hococr_t<0x0008'0036> HOCOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -524,8 +497,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> HCFRQ;
 		};
-		typedef hococr2_t<0x0008'0037> HOCOCR2_;
-		static HOCOCR2_ HOCOCR2;
+		static inline hococr2_t<0x0008'0037> HOCOCR2;
 
 
 #if defined(SIG_RX671)
@@ -545,8 +517,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> FLLEN;
 		};
-		typedef fllcr1_t<0x0008'0039> FLLCR1_;
-		static FLLCR1_ FLLCR1;
+		static inline fllcr1_t<0x0008'0039> FLLCR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -565,8 +536,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 11> MPY;
 		};
-		typedef fllcr2_t<0x0008'003A> FLLCR2_;
-		static FLLCR2_ FLLCR2;
+		static inline fllcr2_t<0x0008'003A> FLLCR2;
 #endif
 
 
@@ -595,8 +565,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5> PPLOVF;
 #endif
 		};
-		typedef oscovfsr_t<0x0008'003C> OSCOVFSR_;
-		static OSCOVFSR_ OSCOVFSR;
+		static inline oscovfsr_t<0x0008'003C> OSCOVFSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -617,8 +586,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> OSTDE;
 		};
-		typedef ostdcr_t<0x0008'0040> OSTDCR_;
-		static OSTDCR_ OSTDCR;
+		static inline ostdcr_t<0x0008'0040> OSTDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -637,8 +605,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> OSTDF;
 		};
-		typedef ostdsr_t<0x0008'0041> OSTDSR_;
-		static OSTDSR_ OSTDSR;
+		static inline ostdsr_t<0x0008'0041> OSTDSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -656,8 +623,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8> MSTS;
 		};
-		typedef moscwtcr_t<0x0008'00A2> MOSCWTCR_;
-		static MOSCWTCR_ MOSCWTCR;
+		static inline moscwtcr_t<0x0008'00A2> MOSCWTCR;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
@@ -676,8 +642,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8> SSTS;
 		};
-		typedef soscwtcr_t<0x0008'00A3> SOSCWTCR_;
-		static SOSCWTCR_ SOSCWTCR;
+		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
 #endif
 
 
@@ -702,8 +667,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  MODRV2;
 			bit_rw_t <io_, bitpos::B6>     MOSEL;
 		};
-		typedef mofcr_t<0x0008'C293> MOFCR_;
-		static MOFCR_ MOFCR;
+		static inline mofcr_t<0x0008'C293> MOFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -722,8 +686,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>	HOCOPCNT;
 		};
-		typedef hocopcr_t<0x0008'C294> HOCOPCR_;
-		static HOCOPCR_ HOCOPCR;
+		static inline hocopcr_t<0x0008'C294> HOCOPCR;
 
 
 #if defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
@@ -746,8 +709,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 3>  CKODIV;
 			bit_rw_t <io_, bitpos::B15>     CKOSTP;
 		};
-		typedef ckocr_t<0x0008'003E> CKOCR_;
-		static CKOCR_ CKOCR;
+		static inline ckocr_t<0x0008'003E> CKOCR;
 #endif
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
@@ -771,8 +733,7 @@ namespace device {
 #endif
 			bit_rw_t<io_, bitpos::B12>  UPLLSEL;
 		};
-		typedef packcr_t<0x0008'0044> PACKCR_;
-		static PACKCR_ PACKCR;
+		static inline packcr_t<0x0008'0044> PACKCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -793,8 +754,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 6>  PPLSTC;
 		};
-		typedef ppllcr_t<0x0008'0048> PPLLCR_;
-		static PPLLCR_ PPLLCR;
+		static inline ppllcr_t<0x0008'0048> PPLLCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -813,8 +773,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  PPLLEN;
 		};
-		typedef ppllcr2_t<0x0008'004A> PPLLCR2_;
-		static PPLLCR2_ PPLLCR2;
+		static inline ppllcr2_t<0x0008'004A> PPLLCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -833,8 +792,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  PPLCK;
 		};
-		typedef ppllcr3_t<0x0008'004B> PPLLCR3_;
-		static PPLLCR3_ PPLLCR3;
+		static inline ppllcr3_t<0x0008'004B> PPLLCR3;
 #endif
 
 #if defined(SIG_RX671)
@@ -854,8 +812,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  SOSTP2;
 		};
-		typedef sosccr2_t<0x0008'CC00> SOSCCR2_;
-		static SOSCCR2_ SOSCCR2;
+		static inline sosccr2_t<0x0008'CC00> SOSCCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -874,8 +831,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B6>  SOSEL;
 		};
-		typedef bksccr_t<0x0008'CC01> BKSCCR_;
-		static BKSCCR_ BKSCCR;
+		static inline bksccr_t<0x0008'CC01> BKSCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -894,12 +850,9 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 9>  HOCOTRD;
 		};
-		typedef hocotrr_t<0x007F'B0E0> HOCOTRR0_;
-		static HOCOTRR0_ HOCOTRR0;
-		typedef hocotrr_t<0x007F'B0E4> HOCOTRR1_;
-		static HOCOTRR1_ HOCOTRR1;
-		typedef hocotrr_t<0x007F'B0E8> HOCOTRR2_;
-		static HOCOTRR2_ HOCOTRR2;
+		static inline hocotrr_t<0x007F'B0E0> HOCOTRR0;
+		static inline hocotrr_t<0x007F'B0E4> HOCOTRR1;
+		static inline hocotrr_t<0x007F'B0E8> HOCOTRR2;
 #endif
 
 		//----  消費電力低減機能  ----------------------------------------------//
@@ -921,8 +874,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14>	OPE;
 			bit_rw_t<io_, bitpos::B15>	SSBY;
 		};
-		typedef sbycr_t<0x0008'000C> SBYCR_;
-		static SBYCR_ SBYCR;
+		static inline sbycr_t<0x0008'000C> SBYCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -969,8 +921,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B31>	ACSE;
 		};
-		typedef mstpcra_t<0x0008'0010> MSTPCRA_;
-		static MSTPCRA_ MSTPCRA;
+		static inline mstpcra_t<0x0008'0010> MSTPCRA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1021,8 +972,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B30>	MSTPB30;
 			bit_rw_t<io_, bitpos::B31>	MSTPB31;
 		};
-		typedef mstpcrb_t<0x0008'0014> MSTPCRB_;
-		static MSTPCRB_ MSTPCRB;
+		static inline mstpcrb_t<0x0008'0014> MSTPCRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1058,8 +1008,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B28>	MSTPC28;	///< DRW2D
 			bit_rw_t<io_, bitpos::B29>	MSTPC29;	///< GLCDC
 		};
-		typedef mstpcrc_t<0x0008'0018> MSTPCRC_;
-		static MSTPCRC_ MSTPCRC;
+		static inline mstpcrc_t<0x0008'0018> MSTPCRC;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1101,8 +1050,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B26>	MSTPD26;
 			bit_rw_t<io_, bitpos::B27>	MSTPD27;
 		};
-		typedef mstpcrd_t<0x0008'001C> MSTPCRD_;
-		static MSTPCRD_ MSTPCRD;
+		static inline mstpcrd_t<0x0008'001C> MSTPCRD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1123,8 +1071,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B4>		OPCMTSF;
 		};
-		typedef opccr_t<0x0008'00A0> OPCCR_;
-		static OPCCR_ OPCCR;
+		static inline opccr_t<0x0008'00A0> OPCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1145,8 +1092,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B4>		RSTCKEN;
 		};
-		typedef rstckcr_t<0x0008'00A1> RSTCKCR_;
-		static RSTCKCR_ RSTCKCR;
+		static inline rstckcr_t<0x0008'00A1> RSTCKCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1167,14 +1113,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	   IOKEEP;
 			bit_rw_t <io_, bitpos::B7>	   DPSBY;
 		};
-		typedef dpsbycr_t<0x0008'C280> DPSBYCR_;
-		static DPSBYCR_ DPSBYCR;
-
-
-
-
-
-
+		static inline dpsbycr_t<0x0008'C280> DPSBYCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1198,8 +1137,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
 		};
-		typedef prcr_t<0x0008'03FE> PRCR_;
-		static PRCR_ PRCR;
+		static inline prcr_t<0x0008'03FE> PRCR;
 
 
 		//----  温度センサ (TEMPS)  --------------------------------------------//
@@ -1221,8 +1159,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>	TSOE;
 			bit_rw_t<io_, bitpos::B7>	TSEN;
 		};
-		typedef tscr_t<0x0008'C500> TSCR_;
-		static TSCR_ TSCR;
+		static inline tscr_t<0x0008'C500> TSCR;
 
 
 		//----  リセット  ------------------------------------------------------//
@@ -1248,8 +1185,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  DPSRSTF;
 		};
-		typedef rstsr0_t<0x0008'C290> RSTSR0_;
-		static RSTSR0_ RSTSR0;
+		static inline rstsr0_t<0x0008'C290> RSTSR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1268,8 +1204,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  CWSF;
 		};
-		typedef rstsr1_t<0x0008'C291> RSTSR1_;
-		static RSTSR1_ RSTSR1;
+		static inline rstsr1_t<0x0008'C291> RSTSR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1290,8 +1225,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>  WDTRF;
 			bit_rw_t <io_, bitpos::B2>  SWRF;
 		};
-		typedef rstsr2_t<0x0008'00C0> RSTSR2_;
-		static RSTSR2_ RSTSR2;
+		static inline rstsr2_t<0x0008'00C0> RSTSR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1300,8 +1234,7 @@ namespace device {
 					0xA501 を書き込むとリセットされます。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw16_t<0x0008'00C2> SWRR_;
-		static SWRR_ SWRR;
+		static inline rw16_t<0x0008'00C2> SWRR;
 
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
@@ -1311,10 +1244,8 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x0008'1040> NCRG0_;
-		static NCRG0_ NCRG0;
-		typedef rw32_t<0x0008'1048> NCRG1_;
-		static NCRG1_ NCRG1;
+		static inline rw32_t<0x0008'1040> NCRG0;
+		static inline rw32_t<0x0008'1048> NCRG1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1336,81 +1267,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B3>      NC3E;
 			bits_rw_t<io_, bitpos::B4, 17>  NCSZ;
 		};
-		typedef ncrcn_t<0x0008'1044> NCRC0_;
-		static NCRC0_ NCRC0;
-		typedef ncrcn_t<0x0008'104C> NCRC1_;
-		static NCRC1_ NCRC1;
+		static inline ncrcn_t<0x0008'1044> NCRC0;
+		static inline ncrcn_t<0x0008'104C> NCRC1;
 #endif
 	};
-	template<class _> typename system_t<_>::SPCC_ system_t<_>::SPCC;
-	template<class _> typename system_t<_>::OFS0_ system_t<_>::OFS0;
-	template<class _> typename system_t<_>::OFS1_ system_t<_>::OFS1;
-	template<class _> typename system_t<_>::MDE_ system_t<_>::MDE;
-
-	template<class _> typename system_t<_>::MDMONR_ system_t<_>::MDMONR;
-	template<class _> typename system_t<_>::MDSR_ system_t<_>::MDSR;
-	template<class _> typename system_t<_>::SYSCR0_ system_t<_>::SYSCR0;
-	template<class _> typename system_t<_>::SYSCR1_ system_t<_>::SYSCR1;
-	template<class _> typename system_t<_>::SCKCR_ system_t<_>::SCKCR;
-#if defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N)
-	template<class _> typename system_t<_>::MEMWAIT_ system_t<_>::MEMWAIT;
-#endif
-#if defined(SIG_RX65N) || defined(SIG_RX671)
-	template<class _> typename system_t<_>::ROMWT_ system_t<_>::ROMWT;
-#endif
-	template<class _> typename system_t<_>::SCKCR2_ system_t<_>::SCKCR2;
-	template<class _> typename system_t<_>::SCKCR3_ system_t<_>::SCKCR3;
-	template<class _> typename system_t<_>::PLLCR_ system_t<_>::PLLCR;
-	template<class _> typename system_t<_>::PLLCR2_ system_t<_>::PLLCR2;
-	template<class _> typename system_t<_>::BCKCR_ system_t<_>::BCKCR;
-	template<class _> typename system_t<_>::MOSCCR_ system_t<_>::MOSCCR;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
-	template<class _> typename system_t<_>::SOSCCR_ system_t<_>::SOSCCR;
-#endif
-	template<class _> typename system_t<_>::LOCOCR_ system_t<_>::LOCOCR;
-	template<class _> typename system_t<_>::ILOCOCR_ system_t<_>::ILOCOCR;
-	template<class _> typename system_t<_>::HOCOCR_ system_t<_>::HOCOCR;
-	template<class _> typename system_t<_>::HOCOCR2_ system_t<_>::HOCOCR2;
-	template<class _> typename system_t<_>::OSCOVFSR_ system_t<_>::OSCOVFSR;
-	template<class _> typename system_t<_>::OSTDCR_ system_t<_>::OSTDCR;
-	template<class _> typename system_t<_>::OSTDSR_ system_t<_>::OSTDSR;
-	template<class _> typename system_t<_>::MOSCWTCR_ system_t<_>::MOSCWTCR;
-
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
-	template<class _> typename system_t<_>::SOSCWTCR_ system_t<_>::SOSCWTCR;
-#endif
-	template<class _> typename system_t<_>::MOFCR_ system_t<_>::MOFCR;
-	template<class _> typename system_t<_>::HOCOPCR_ system_t<_>::HOCOPCR;
-
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
-	template<class _> typename system_t<_>::CKOCR_ system_t<_>::CKOCR;
-	template<class _> typename system_t<_>::PACKCR_ system_t<_>::PACKCR;
-	template<class _> typename system_t<_>::PPLLCR_ system_t<_>::PPLLCR;
-	template<class _> typename system_t<_>::PPLLCR2_ system_t<_>::PPLLCR2;
-	template<class _> typename system_t<_>::PPLLCR3_ system_t<_>::PPLLCR3;
-#endif
-
-	template<class _> typename system_t<_>::SBYCR_ system_t<_>::SBYCR;
-	template<class _> typename system_t<_>::MSTPCRA_ system_t<_>::MSTPCRA;
-	template<class _> typename system_t<_>::MSTPCRB_ system_t<_>::MSTPCRB;
-	template<class _> typename system_t<_>::MSTPCRC_ system_t<_>::MSTPCRC;
-	template<class _> typename system_t<_>::MSTPCRD_ system_t<_>::MSTPCRD;
-	template<class _> typename system_t<_>::OPCCR_ system_t<_>::OPCCR;
-	template<class _> typename system_t<_>::RSTCKCR_ system_t<_>::RSTCKCR;
-	template<class _> typename system_t<_>::DPSBYCR_ system_t<_>::DPSBYCR;
-	template<class _> typename system_t<_>::PRCR_ system_t<_>::PRCR;
-	template<class _> typename system_t<_>::TSCR_ system_t<_>::TSCR;
-	template<class _> typename system_t<_>::RSTSR0_ system_t<_>::RSTSR0;
-	template<class _> typename system_t<_>::RSTSR1_ system_t<_>::RSTSR1;
-	template<class _> typename system_t<_>::RSTSR2_ system_t<_>::RSTSR2;
-	template<class _> typename system_t<_>::SWRR_ system_t<_>::SWRR;
-
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
-	template<class _> typename system_t<_>::NCRG0_ system_t<_>::NCRG0;
-	template<class _> typename system_t<_>::NCRG1_ system_t<_>::NCRG1;
-	template<class _> typename system_t<_>::NCRC0_ system_t<_>::NCRC0;
-	template<class _> typename system_t<_>::NCRC1_ system_t<_>::NCRC1;
-#endif
-
-	typedef system_t<void> SYSTEM;
 }

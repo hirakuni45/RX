@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX231 システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -161,8 +161,17 @@ namespace device {
 				volatile auto tmp = device::SYSTEM::SCKCR();  // dummy read
 			}
 
-			// Setup memory wait cycle register
-			SYSTEM::MEMWAIT.MEMWAIT = clock_profile::ICLK > 32'000'000;
+			if(clock_profile::ICLK > 32'000'000) {
+				// 動作モード切替（高速モードへ変更）
+				while(device::SYSTEM::OPCCR.OPCMTSF() != 0) { asm("nop"); }
+				device::SYSTEM::OPCCR.OPCM = 0b000;
+				while(device::SYSTEM::OPCCR.OPCMTSF() != 0) { asm("nop"); }
+
+				// Setup memory wait cycle register
+				SYSTEM::MEMWAIT.MEMWAIT = 1;
+			} else {
+				SYSTEM::MEMWAIT.MEMWAIT = 0;
+			}
 
 			// Master PLL settings
 			// Min: x4 (0b000111), Max: 13.5 (0b011010)

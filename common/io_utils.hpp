@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	I/O ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,7 +7,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstdint>
 
 namespace device {
@@ -99,9 +99,9 @@ namespace device {
 		typedef uint8_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 8;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 8;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -174,9 +174,9 @@ namespace device {
 		typedef uint8_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 8;		///< バス幅
-		static constexpr bool RD = false;		///< 読出し
-		static constexpr bool WR = false;		///< 書き込み
+		static constexpr uint8_t bus = 8;		///< バス幅
+		static constexpr bool rd = false;		///< 読出し
+		static constexpr bool wr = false;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -245,9 +245,9 @@ namespace device {
 		typedef uint8_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 8;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 8;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		static inline uint32_t index;
 
@@ -322,9 +322,9 @@ namespace device {
 		typedef uint8_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 8;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = false;		///< 書き込み
+		static constexpr uint8_t bus = 8;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = false;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -357,9 +357,9 @@ namespace device {
 		typedef uint8_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 8;		///< バス幅
-		static constexpr bool RD = false;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 8;		///< バス幅
+		static constexpr bool rd = false;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -392,9 +392,9 @@ namespace device {
 		typedef uint16_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 16;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 16;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -463,9 +463,9 @@ namespace device {
 		typedef uint16_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 16;		///< バス幅
-		static constexpr bool RD = false;		///< 読出し
-		static constexpr bool WR = false;		///< 書き込み
+		static constexpr uint8_t bus = 16;		///< バス幅
+		static constexpr bool rd = false;		///< 読出し
+		static constexpr bool wr = false;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -534,9 +534,9 @@ namespace device {
 		typedef uint16_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 16;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 16;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		static inline uint32_t index;
 
@@ -607,9 +607,9 @@ namespace device {
 		typedef uint16_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 16;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = false;		///< 書き込み
+		static constexpr uint8_t bus = 16;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = false;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -642,9 +642,9 @@ namespace device {
 		typedef uint16_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 16;		///< バス幅
-		static constexpr bool RD = false;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 16;		///< バス幅
+		static constexpr bool rd = false;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -677,9 +677,9 @@ namespace device {
 		typedef uint32_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 32;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 32;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -748,9 +748,9 @@ namespace device {
 		typedef uint32_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 32;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 32;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		static inline uint32_t index;
 
@@ -821,9 +821,9 @@ namespace device {
 		typedef uint32_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 32;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 32;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		static inline uint32_t	tmp_;
 
@@ -894,9 +894,9 @@ namespace device {
 		typedef uint32_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 32;		///< バス幅
-		static constexpr bool RD = true;		///< 読出し
-		static constexpr bool WR = false;		///< 書き込み
+		static constexpr uint8_t bus = 32;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = false;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -929,9 +929,9 @@ namespace device {
 		typedef uint32_t value_type;
 
 		static constexpr auto address = adr;	///< アドレス定義
-		static constexpr uint8_t BUS = 32;		///< バス幅
-		static constexpr bool RD = false;		///< 読出し
-		static constexpr bool WR = true;		///< 書き込み
+		static constexpr uint8_t bus = 32;		///< バス幅
+		static constexpr bool rd = false;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
 
 		//-----------------------------------------------------------------//
 		/*!

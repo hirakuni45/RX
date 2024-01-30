@@ -25,7 +25,11 @@
 
 namespace {
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX140)
+	// DIY RX140 board
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTJ, device::bitpos::B1, LED_ACTIVE> LED;
+#elif defined(SIG_RX220)
 	// 秋月 AE-RX220 ボード
 	// P03 に LED を吸い込みで接続する事を想定している。
 	static constexpr bool LED_ACTIVE = 0;

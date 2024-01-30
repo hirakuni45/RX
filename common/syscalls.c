@@ -2,9 +2,11 @@
 /*!	@file
 	@brief	標準ライブラリーハード依存「syscalls」モジュール @n
 			通常は libc.a にアーカイブされているモジュールを @n
-			置き換える。
+			置き換える。 @n
+			・stdin, stdout, stderr とシリアル通信を行う経路制御 @n
+			・FatFs との経路制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2015, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2015, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -354,7 +356,7 @@ off_t lseek(int file, off_t offset, int dir)
 
 //-----------------------------------------------------------------//
 /*!
-	@brief	ファイルの新しい名前を作成する@n
+	@brief	ファイルの新しい名前を作成する @n
 	        link API と厳密には違う動作だけど、内部的には rename
 	@param[in]	oldpath	古いファイル名
 	@param[in]	newpath	新しいファイル名
@@ -560,7 +562,7 @@ int close(int file)
 	@brief	ファイルディスクリプタが端末を参照しているかをチェックする
 	@param[in]	file	ファイル記述子
 	@return		端末を参照するオープンされたファイルディスクリプタ @n
-	            であれば 1 を返す。@n
+	            であれば 1 を返す。 @n
 				そうでなければ 0 を返し、 errno にエラーを示す値を設定する。
 */
 //-----------------------------------------------------------------//

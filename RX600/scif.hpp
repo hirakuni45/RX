@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・SCIF 定義（RX64M/RX71M）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,8 +26,7 @@ namespace device {
 			@brief  レシーブ FIFO データレジスタ (FRDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x0A> FRDR_;
-		static  FRDR_ FRDR;
+		static inline rw8_t<base + 0x0A> FRDR;
 
 
 		//-----------------------------------------------------------------//
@@ -35,40 +34,43 @@ namespace device {
 			@brief  トランスミット FIFO データレジスタ (FTDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x06> FTDR_;
-		static  FTDR_ FTDR;
+		static inline rw8_t<base + 0x06> FTDR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  シリアルモードレジスタ (SMR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct smr_t : public rw16_t<base + 0x00> {
-			typedef rw16_t<base + 0x00> io_;
+		template <uint32_t ofs>
+		struct smr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2> CKS;
+
 			bit_rw_t <io_, bitpos::B3>	  STOP;
 			bit_rw_t <io_, bitpos::B4>	  PM;
 			bit_rw_t <io_, bitpos::B5>	  PE;
 			bit_rw_t <io_, bitpos::B6>	  CHR;
 			bit_rw_t <io_, bitpos::B7>	  CM;
 		};
-		typedef smr_t SMR_;
-		static  SMR_ SMR;
+		static inline smr_t<base + 0x00> SMR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  シリアルコントロールレジスタ (SCR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct scr_t : public rw16_t<base + 0x04> {
-			typedef rw16_t<base + 0x04> io_;
+		template <uint32_t ofs>
+		struct scr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -82,17 +84,18 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  RIE;
 			bit_rw_t <io_, bitpos::B7>	  TIE;
 		};
-		typedef scr_t SCR_;
-		static  SCR_ SCR;
+		static inline scr_t<base + 0x04> SCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  シリアルステータスレジスタ (FSR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct fsr_t : public rw16_t<base + 0x08> {
-			typedef rw16_t<base + 0x08> io_;
+		template <uint32_t ofs>
+		struct fsr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -107,8 +110,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> TEND;
 			bit_rw_t<io_, bitpos::B7> ER;
 		};
-		typedef fsr_t FSR_;
-		static  FSR_ FSR;
+		static inline fsr_t<base + 0x08> FSR;
 
 
 		//-----------------------------------------------------------------//
@@ -116,8 +118,7 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x02> BRR_;
-		static  BRR_ BRR;
+		static inline rw8_t<base + 0x02> BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -127,17 +128,18 @@ namespace device {
 					※SEMR.MDDRS = 1 の場合に有効
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x02> MDDR_;
-		static  MDDR_ MDDR;
+		static inline rw8_t<base + 0x02> MDDR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  FIFO コントロールレジスタ (FCR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct fcr_t : public rw16_t<base + 0x0C> {
-			typedef rw16_t<base + 0x0C> io_;
+		template <uint32_t ofs>
+		struct fcr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -151,33 +153,35 @@ namespace device {
 			bits_rw_t<io_, bitpos::B6, 2>  RTRG;
 			bits_rw_t<io_, bitpos::B8, 3>  RSTRG;
 		};
-		typedef fcr_t FCR_;
-		static  FCR_ FCR;
+		static inline fcr_t<base + 0x0C> FCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  FIFO データ数レジスタ (FDR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct fdr_t : public ro16_t<base + 0x0E> {
-			typedef ro16_t<base + 0x0E> io_;
+		template <uint32_t ofs>
+		struct fdr_t : public ro16_t<ofs> {
+			typedef ro16_t<ofs> io_;
 			using io_::operator ();
 
 			bits_ro_t<io_, bitpos::B0, 5>  R;
 			bits_ro_t<io_, bitpos::B8, 5>  T;
 		};
-		typedef fdr_t FDR_;
-		static  FDR_ FDR;
+		static inline fdr_t<base + 0x0E> FDR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  シリアルポートレジスタ (SPTR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sptr_t : public rw16_t<base + 0x10> {
-			typedef rw16_t<base + 0x10> io_;
+		template <uint32_t ofs>
+		struct sptr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -192,17 +196,18 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  RTS2DT;
 			bit_rw_t<io_, bitpos::B7>  RTS2IO;
 		};
-		typedef sptr_t SPTR_;
-		static  SPTR_ SPTR;
+		static inline sptr_t<base + 0x10> SPTR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ラインステータスレジスタ (LSR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct lsr_t : public rw16_t<base + 0x12> {
-			typedef rw16_t<base + 0x12> io_;
+		template <uint32_t ofs>
+		struct lsr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -212,17 +217,18 @@ namespace device {
 			bits_rw_t<io_, bitpos::B2, 4>  FER;
 			bits_rw_t<io_, bitpos::B8, 4>  PER;
 		};
-		typedef lsr_t LSR_;
-		static  LSR_ LSR;
+		static inline lsr_t<base + 0x12> LSR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  FIFO トリガコントロールレジスタ (FTCR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct ftcr_t : public rw16_t<base + 0x16> {
-			typedef rw16_t<base + 0x16> io_;
+		template <uint32_t ofs>
+		struct ftcr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -233,17 +239,18 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  5>  RFTC;
 			bit_rw_t <io_, bitpos::B15>     RTRGS;
 		};
-		typedef ftcr_t FTCR_;
-		static  FTCR_ FTCR;
+		static inline ftcr_t<base + 0x16> FTCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	シリアル拡張モードレジスタ (SEMR)
+			@param[in]	ofs		アドレス・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct semr_t : public rw16_t<base + 0x14> {
-			typedef rw16_t<base + 0x14> io_;
+		template <uint32_t ofs>
+		struct semr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -258,22 +265,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  BGDM;
 		};
-		typedef semr_t SEMR_;
-		static  SEMR_ SEMR;
+		static inline semr_t<base + 0x14> SEMR;
 	};
-	template <uint32_t base> typename scif_base_t<base>::FRDR_ scif_base_t<base>::FRDR;
-	template <uint32_t base> typename scif_base_t<base>::FTDR_ scif_base_t<base>::FTDR;
-	template <uint32_t base> typename scif_base_t<base>::SMR_  scif_base_t<base>::SMR;
-	template <uint32_t base> typename scif_base_t<base>::SCR_  scif_base_t<base>::SCR;
-	template <uint32_t base> typename scif_base_t<base>::FSR_  scif_base_t<base>::FSR;
-	template <uint32_t base> typename scif_base_t<base>::BRR_  scif_base_t<base>::BRR;
-	template <uint32_t base> typename scif_base_t<base>::MDDR_ scif_base_t<base>::MDDR;
-	template <uint32_t base> typename scif_base_t<base>::FCR_  scif_base_t<base>::FCR;
-	template <uint32_t base> typename scif_base_t<base>::FDR_  scif_base_t<base>::FDR;
-	template <uint32_t base> typename scif_base_t<base>::SPTR_ scif_base_t<base>::SPTR;
-	template <uint32_t base> typename scif_base_t<base>::LSR_  scif_base_t<base>::LSR;
-	template <uint32_t base> typename scif_base_t<base>::FTCR_ scif_base_t<base>::FTCR;
-	template <uint32_t base> typename scif_base_t<base>::SEMR_ scif_base_t<base>::SEMR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -2,6 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX グループ CMT 定義 @n
+			RX140 @n
 			RX220 / RX231 @n
 			RX621 / RX62N @n
 			RX631 / RX63N @n
@@ -52,7 +53,7 @@ namespace device {
 		};
 		static inline cmstr0_t<0x0008'8000> CMSTR0;
 
-
+#ifndef SIG_RX140
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CMSTR1 レジスタ
@@ -71,7 +72,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> STR3;
 		};
 		static inline cmstr1_t<0x0008'8010> CMSTR1;
-
+#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -124,12 +125,14 @@ namespace device {
 			case peripheral::CMT1:
 				CMSTR0.STR1 = ena;
 				break;
+#ifndef SIG_RX140
 			case peripheral::CMT2:
 				CMSTR1.STR2 = ena;
 				break;
 			case peripheral::CMT3:
 				CMSTR1.STR3 = ena;
 				break;
+#endif
 			} 			
 		}
 	};
@@ -173,8 +176,10 @@ namespace device {
 
 	};
 
-
-#if defined(SIG_RX621) || defined(SIG_RX62N)
+#if defined(SIG_RX140)
+	typedef cmt_nom_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
+	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
+#elif defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef cmt_nom_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR::CMI0, clock_profile::PCLK> CMT0;
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLK> CMT1;
 	typedef cmt_nom_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR::CMI2, clock_profile::PCLK> CMT2;

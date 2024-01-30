@@ -5,7 +5,7 @@
 			RX220 @n
 			RX231
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,7 +19,6 @@ namespace device {
 		@brief  IrDA クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
 	struct irda_t {
 
 		//-----------------------------------------------------------------//
@@ -41,11 +40,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3>  IRCKS;
 			bit_rw_t <io_, bitpos::B7>     IRE;
 		};
-		typedef ircr_t<0x0008'8410>  IRCR_;
-		static  IRCR_ IRCR;
-
+		static inline ircr_t<0x0008'8410>  IRCR;
 	};
-	template<class _> typename irda_t<_>::IRCR_ irda_t<_>::IRCR;
-
-	typedef irda_t<void> IrDA;
+	typedef irda_t IrDA;
 }

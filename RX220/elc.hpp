@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX220 グループ・ELC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,8 +40,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  ELCON;
 		};
-		typedef elcr_t<base + 0x00> ELCR_;
-		static  ELCR_ ELCR;
+		static inline elcr_t<base + 0x00> ELCR;
 
 
 		//-----------------------------------------------------------------//
@@ -50,37 +49,25 @@ namespace device {
 					（n= 1 ～ 4、10、12、15、18、20、22、24、25）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x02>  ELSR1_;
-		static  ELSR1_ ELSR1;
-		typedef rw8_t<base + 0x03>  ELSR2_;
-		static  ELSR2_ ELSR2;
-		typedef rw8_t<base + 0x04>  ELSR3_;
-		static  ELSR3_ ELSR3;
-		typedef rw8_t<base + 0x05>  ELSR4_;
-		static  ELSR4_ ELSR4;
+		static inline rw8_t<base + 0x02>  ELSR1;
+		static inline rw8_t<base + 0x03>  ELSR2;
+		static inline rw8_t<base + 0x04>  ELSR3;
+		static inline rw8_t<base + 0x05>  ELSR4;
 	
-		typedef rw8_t<base + 0x0B>  ELSR10_;
-		static  ELSR10_ ELSR10;
+		static inline rw8_t<base + 0x0B>  ELSR10;
 
-		typedef rw8_t<base + 0x0D>  ELSR12_;
-		static  ELSR12_ ELSR12;
+		static inline rw8_t<base + 0x0D>  ELSR12;
 
-		typedef rw8_t<base + 0x10>  ELSR15_;
-		static  ELSR15_ ELSR15;
+		static inline rw8_t<base + 0x10>  ELSR15;
 
-		typedef rw8_t<base + 0x13>  ELSR18_;
-		static  ELSR18_ ELSR18;
+		static inline rw8_t<base + 0x13>  ELSR18;
 
-		typedef rw8_t<base + 0x15>  ELSR20_;
-		static  ELSR20_ ELSR20;
+		static inline rw8_t<base + 0x15>  ELSR20;
 
-		typedef rw8_t<base + 0x17>  ELSR22_;
-		static  ELSR22_ ELSR22;
+		static inline rw8_t<base + 0x17>  ELSR22;
 
-		typedef rw8_t<base + 0x19>  ELSR24_;
-		static  ELSR24_ ELSR24;
-		typedef rw8_t<base + 0x1A>  ELSR25_;
-		static  ELSR25_ ELSR25;
+		static inline rw8_t<base + 0x19>  ELSR24;
+		static inline rw8_t<base + 0x1A>  ELSR25;
 
 
 		//-----------------------------------------------------------------//
@@ -101,8 +88,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  MTU2MD;
 			bits_rw_t<io_, bitpos::B6, 2>  MTU3MD;
 		};
-		typedef elopa_t<base + 0x1F> ELOPA_;
-		static  ELOPA_ ELOPA;
+		static inline elopa_t<base + 0x1F> ELOPA;
 
 
 		//-----------------------------------------------------------------//
@@ -121,8 +107,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  MTU4MD;
 		};
-		typedef elopb_t<base + 0x20> ELOPB_;
-		static  ELOPB_ ELOPB;
+		static inline elopb_t<base + 0x20> ELOPB;
 
 
 		//-----------------------------------------------------------------//
@@ -143,8 +128,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 2>  TMR2MD;
 		};
-		typedef elopd_t<base + 0x22> ELOPD_;
-		static  ELOPD_ ELOPD;
+		static inline elopd_t<base + 0x22> ELOPD;
 
 
 		//-----------------------------------------------------------------//
@@ -170,8 +154,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  PGR6;
 			bit_rw_t<io_, bitpos::B7>  PGR7;
 		};
-		typedef pgr1_t<base + 0x23> PGR1_;
-		static  PGR1_ PGR1;
+		static inline pgr1_t<base + 0x23> PGR1;
 
 
 		//-----------------------------------------------------------------//
@@ -193,8 +176,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 3>  PGCO;
 		};
-		typedef pgc1_t<base + 0x25> PGC1_;
-		static  PGC1_ PGC1;
+		static inline pgc1_t<base + 0x25> PGC1;
 
 
 		//-----------------------------------------------------------------//
@@ -220,8 +202,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  PDBF6;
 			bit_rw_t<io_, bitpos::B7>  PDBF7;
 		};
-		typedef pdbf1_t<base + 0x27> PDBF1_;
-		static  PDBF1_ PDBF1;
+		static inline pdbf1_t<base + 0x27> PDBF1;
 
 
 		//-----------------------------------------------------------------//
@@ -242,10 +223,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B3, 2>  PSP;
 			bits_rw_t<io_, bitpos::B5, 2>  PSM;
 		};
-		typedef peln_t<base + 0x29> PEL0_;
-		static  PEL0_ PEL0;
-		typedef peln_t<base + 0x2A> PEL1_;
-		static  PEL1_ PEL1;
+		static inline peln_t<base + 0x29> PEL0;
+		static inline peln_t<base + 0x2A> PEL1;
 
 
 		//-----------------------------------------------------------------//
@@ -267,31 +246,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  WI;	// write-only
 		};
-		typedef elsegr_t<base + 0x2D> ELSEGR_;
-		static  ELSEGR_ ELSEGR;
+		static inline elsegr_t<base + 0x2D> ELSEGR;
 	};
-	template <uint32_t base> typename elc_t<base>::ELCR_ elc_t<base>::ELCR;
-	template <uint32_t base> typename elc_t<base>::ELSR1_ elc_t<base>::ELSR1;
-	template <uint32_t base> typename elc_t<base>::ELSR2_ elc_t<base>::ELSR2;
-	template <uint32_t base> typename elc_t<base>::ELSR3_ elc_t<base>::ELSR3;
-	template <uint32_t base> typename elc_t<base>::ELSR4_ elc_t<base>::ELSR4;
-	template <uint32_t base> typename elc_t<base>::ELSR10_ elc_t<base>::ELSR10;
-	template <uint32_t base> typename elc_t<base>::ELSR12_ elc_t<base>::ELSR12;
-	template <uint32_t base> typename elc_t<base>::ELSR15_ elc_t<base>::ELSR15;
-	template <uint32_t base> typename elc_t<base>::ELSR18_ elc_t<base>::ELSR18;
-	template <uint32_t base> typename elc_t<base>::ELSR20_ elc_t<base>::ELSR20;
-	template <uint32_t base> typename elc_t<base>::ELSR22_ elc_t<base>::ELSR22;
-	template <uint32_t base> typename elc_t<base>::ELSR24_ elc_t<base>::ELSR24;
-	template <uint32_t base> typename elc_t<base>::ELSR25_ elc_t<base>::ELSR25;
-	template <uint32_t base> typename elc_t<base>::ELOPA_ elc_t<base>::ELOPA;
-	template <uint32_t base> typename elc_t<base>::ELOPB_ elc_t<base>::ELOPB;
-	template <uint32_t base> typename elc_t<base>::ELOPD_ elc_t<base>::ELOPD;
-	template <uint32_t base> typename elc_t<base>::PGR1_ elc_t<base>::PGR1;
-	template <uint32_t base> typename elc_t<base>::PGC1_ elc_t<base>::PGC1;
-	template <uint32_t base> typename elc_t<base>::PDBF1_ elc_t<base>::PDBF1;
-	template <uint32_t base> typename elc_t<base>::PEL0_ elc_t<base>::PEL0;
-	template <uint32_t base> typename elc_t<base>::PEL1_ elc_t<base>::PEL1;
-	template <uint32_t base> typename elc_t<base>::ELSEGR_ elc_t<base>::ELSEGR;
-
 	typedef elc_t<0x0008'B100> ELC;
 }

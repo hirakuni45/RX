@@ -55,7 +55,7 @@ namespace {
   #endif
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -71,7 +71,7 @@ namespace {
 	static constexpr auto SCI_PORT = device::port_map::ORDER::SECOND;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -84,7 +84,7 @@ namespace {
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -97,7 +97,7 @@ namespace {
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -111,7 +111,7 @@ namespace {
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -131,7 +131,7 @@ namespace {
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -144,7 +144,7 @@ namespace {
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -157,9 +157,8 @@ namespace {
 	typedef device::SCI2 SCI_CH;
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
-	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// SSIE の FIFO サイズの２倍以上（1024）
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x0000;
 
 	#define USE_SSIE
@@ -172,7 +171,7 @@ namespace {
 	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -1343,6 +1342,7 @@ int main(int argc, char** argv)
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
+			avg = 0;
 		}
 		if(cnt < 25) {
 			LED::P = 0;

@@ -20,8 +20,7 @@ namespace device {
 		@brief  電力制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	class power_mgr_t {
+	class power_mgr {
 
 		struct pad_t {
 
@@ -45,7 +44,7 @@ namespace device {
 				dsmif_(0)
 			{ }
 		};
-		static pad_t	pad_;
+		static inline pad_t	pad_;
 
 		static void sr_(bool f, uint8_t& pad, peripheral org, peripheral tgt)
 		{
@@ -364,7 +363,4 @@ namespace device {
 			device::SYSTEM::PRCR = 0xA500;
 		}
 	};
-	template<class _> typename power_mgr_t<_>::pad_t power_mgr_t<_>::pad_;
-
-	typedef power_mgr_t<void> power_mgr;
 }

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ SCI ベース定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,8 +26,7 @@ namespace device {
 			@brief  レシーブデータレジスタ (RDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro8_t<base + 0x05> RDR_;
-		static RDR_ RDR;
+		static inline ro8_t<base + 0x05> RDR;
 
 
 		//-----------------------------------------------------------------//
@@ -35,8 +34,7 @@ namespace device {
 			@brief  トランスミットデータレジスタ (TDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x03> TDR_;
-		static TDR_ TDR;
+		static inline rw8_t<base + 0x03> TDR;
 
 
 		//-----------------------------------------------------------------//
@@ -67,8 +65,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  BLK;
 			bit_rw_t <io_, bitpos::B7>	  GM;
 		};
-		typedef smr_t<base + 0x00> SMR_;
-		static SMR_ SMR;
+		static inline smr_t<base + 0x00> SMR;
 
 
 		//-----------------------------------------------------------------//
@@ -93,8 +90,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  RIE;
 			bit_rw_t <io_, bitpos::B7>	  TIE;
 		};
-		typedef scr_t<base + 0x02> SCR_;
-		static SCR_ SCR;
+		static inline scr_t<base + 0x02> SCR;
 
 
 		//-----------------------------------------------------------------//
@@ -121,8 +117,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> RDRF;  // SCIe では利用不可
 			bit_rw_t<io_, bitpos::B7> TDRE;  // SCIe では利用不可
 		};
-		typedef ssr_t<base + 0x04> SSR_;
-		static SSR_ SSR;
+		static inline ssr_t<base + 0x04> SSR;
 
 
  		//-----------------------------------------------------------------//
@@ -146,8 +141,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> BCP2;
 		};
-		typedef scmr_t<base + 0x06> SCMR_;
-		static SCMR_ SCMR;
+		static inline scmr_t<base + 0x06> SCMR;
 
 
 		//-----------------------------------------------------------------//
@@ -155,8 +149,7 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x01> BRR_;
-		static BRR_ BRR;
+		static inline rw8_t<base + 0x01> BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -182,8 +175,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> BGDM;  // 無効
 			bit_rw_t<io_, bitpos::B7> RXDESEL;  // 無効
 		};
-		typedef semr_t<base + 0x07> SEMR_;
-		static SEMR_ SEMR;
+		static inline semr_t<base + 0x07> SEMR;
 
 
 		//-----------------------------------------------------------------//
@@ -191,18 +183,8 @@ namespace device {
 			@brief	モジュレーションデューティレジスタ（MDDR）ダミー
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_null_t<0x00000000> MDDR_;
-		static MDDR_ MDDR;
+		static inline rw8_null_t<0x00000000> MDDR;
 	};
-	template <uint32_t base> typename sci_a_t<base>::RDR_ sci_a_t<base>::RDR;
-	template <uint32_t base> typename sci_a_t<base>::TDR_ sci_a_t<base>::TDR;
-	template <uint32_t base> typename sci_a_t<base>::SMR_ sci_a_t<base>::SMR;
-	template <uint32_t base> typename sci_a_t<base>::SCR_ sci_a_t<base>::SCR;
-	template <uint32_t base> typename sci_a_t<base>::SSR_ sci_a_t<base>::SSR;
-	template <uint32_t base> typename sci_a_t<base>::SCMR_ sci_a_t<base>::SCMR;
-	template <uint32_t base> typename sci_a_t<base>::BRR_ sci_a_t<base>::BRR;
-	template <uint32_t base> typename sci_a_t<base>::SEMR_ sci_a_t<base>::SEMR;
-	template <uint32_t base> typename sci_a_t<base>::MDDR_ sci_a_t<base>::MDDR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -219,8 +201,7 @@ namespace device {
 			@brief  レシーブデータレジスタ (RDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro8_t<base + 0x05> RDR_;
-		static RDR_ RDR;
+		static inline ro8_t<base + 0x05> RDR;
 
 
 		//-----------------------------------------------------------------//
@@ -228,8 +209,7 @@ namespace device {
 			@brief  トランスミットデータレジスタ (TDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x03> TDR_;
-		static TDR_ TDR;
+		static inline rw8_t<base + 0x03> TDR;
 
 
 		//-----------------------------------------------------------------//
@@ -260,8 +240,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  BLK;
 			bit_rw_t <io_, bitpos::B7>	  GM;
 		};
-		typedef smr_t<base + 0x00> SMR_;
-		static SMR_ SMR;
+		static inline smr_t<base + 0x00> SMR;
 
 
 		//-----------------------------------------------------------------//
@@ -286,8 +265,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  RIE;
 			bit_rw_t <io_, bitpos::B7>	  TIE;
 		};
-		typedef scr_t<base + 0x02> SCR_;
-		static SCR_ SCR;
+		static inline scr_t<base + 0x02> SCR;
 
 
 		//-----------------------------------------------------------------//
@@ -314,8 +292,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> RDRF;  // SCIe では利用不可
 			bit_rw_t<io_, bitpos::B7> TDRE;  // SCIe では利用不可
 		};
-		typedef ssr_t<base + 0x04> SSR_;
-		static SSR_ SSR;
+		static inline ssr_t<base + 0x04> SSR;
 
 
  		//-----------------------------------------------------------------//
@@ -339,8 +316,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> BCP2;
 		};
-		typedef scmr_t<base + 0x06> SCMR_;
-		static SCMR_ SCMR;
+		static inline scmr_t<base + 0x06> SCMR;
 
 
 		//-----------------------------------------------------------------//
@@ -348,8 +324,7 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x01> BRR_;
-		static BRR_ BRR;
+		static inline rw8_t<base + 0x01> BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -375,8 +350,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> BGDM;
 			bit_rw_t<io_, bitpos::B7> RXDESEL;
 		};
-		typedef semr_t<base + 0x07> SEMR_;
-		static SEMR_ SEMR;
+		static inline semr_t<base + 0x07> SEMR;
 
 
 		//-----------------------------------------------------------------//
@@ -395,8 +369,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> NFCS;
 		};
-		typedef snfr_t<base + 0x08> SNFR_;
-		static SNFR_ SNFR;
+		static inline snfr_t<base + 0x08> SNFR;
 
 
 		//-----------------------------------------------------------------//
@@ -417,8 +390,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B3, 5> IICDL;
 		};
-		typedef simr1_t<base + 0x09> SIMR1_;
-		static SIMR1_ SIMR1;
+		static inline simr1_t<base + 0x09> SIMR1;
 
 
 		//-----------------------------------------------------------------//
@@ -440,8 +412,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B5> IICACKT;
 		};
-		typedef simr2_t<base + 0x0A> SIMR2_;
-		static SIMR2_ SIMR2;
+		static inline simr2_t<base + 0x0A> SIMR2;
 
 
 		//-----------------------------------------------------------------//
@@ -465,8 +436,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> IICSDAS;
 			bits_rw_t<io_, bitpos::B6, 2> IICSCLS;
 		};
-		typedef simr3_t<base + 0x0B> SIMR3_;
-		static SIMR3_ SIMR3;
+		static inline simr3_t<base + 0x0B> SIMR3;
 
 
 		//-----------------------------------------------------------------//
@@ -485,8 +455,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> IICACKR;
 		};
-		typedef sisr_t<base + 0x0C> SISR_;
-		static SISR_ SISR;
+		static inline sisr_t<base + 0x0C> SISR;
 
 
 		//-----------------------------------------------------------------//
@@ -512,8 +481,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> CKPOL;
 			bit_rw_t<io_, bitpos::B7> CKPH;
 		};
-		typedef spmr_t<base + 0x0D> SPMR_;
-		static SPMR_ SPMR;
+		static inline spmr_t<base + 0x0D> SPMR;
 
 
 		//-----------------------------------------------------------------//
@@ -521,24 +489,8 @@ namespace device {
 			@brief	モジュレーションデューティレジスタ（MDDR）ダミー
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_null_t<0x00000000> MDDR_;
-		static MDDR_ MDDR;
+		static inline rw8_null_t<0x00000000> MDDR;
 	};
-	template <uint32_t base> typename sci_ce_t<base>::RDR_ sci_ce_t<base>::RDR;
-	template <uint32_t base> typename sci_ce_t<base>::TDR_ sci_ce_t<base>::TDR;
-	template <uint32_t base> typename sci_ce_t<base>::SMR_ sci_ce_t<base>::SMR;
-	template <uint32_t base> typename sci_ce_t<base>::SCR_ sci_ce_t<base>::SCR;
-	template <uint32_t base> typename sci_ce_t<base>::SSR_ sci_ce_t<base>::SSR;
-	template <uint32_t base> typename sci_ce_t<base>::SCMR_ sci_ce_t<base>::SCMR;
-	template <uint32_t base> typename sci_ce_t<base>::BRR_ sci_ce_t<base>::BRR;
-	template <uint32_t base> typename sci_ce_t<base>::SEMR_ sci_ce_t<base>::SEMR;
-	template <uint32_t base> typename sci_ce_t<base>::SNFR_ sci_ce_t<base>::SNFR;
-	template <uint32_t base> typename sci_ce_t<base>::SIMR1_ sci_ce_t<base>::SIMR1;
-	template <uint32_t base> typename sci_ce_t<base>::SIMR2_ sci_ce_t<base>::SIMR2;
-	template <uint32_t base> typename sci_ce_t<base>::SIMR3_ sci_ce_t<base>::SIMR3;
-	template <uint32_t base> typename sci_ce_t<base>::SISR_ sci_ce_t<base>::SISR;
-	template <uint32_t base> typename sci_ce_t<base>::SPMR_ sci_ce_t<base>::SPMR;
-	template <uint32_t base> typename sci_ce_t<base>::MDDR_ sci_ce_t<base>::MDDR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -555,8 +507,7 @@ namespace device {
 			@brief  レシーブデータレジスタ (RDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro8_t<base + 0x05> RDR_;
-		static RDR_ RDR;
+		static inline ro8_t<base + 0x05> RDR;
 
 
 		//-----------------------------------------------------------------//
@@ -564,12 +515,9 @@ namespace device {
 			@brief  レシーブデータレジスタ H、L、HL (RDRH 、 RDRL 、 RDRHL)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro8_t<base + 0x10> RDRH_;
-		static RDRH_ RDRH;
-		typedef ro8_t<base + 0x11> RDRL_;
-		static RDRL_ RDRL;
-		typedef ro16_t<base + 0x10> RDRHL_;
-		static RDRHL_ RDRHL;
+		static inline ro8_t<base + 0x10> RDRH;
+		static inline ro8_t<base + 0x11> RDRL;
+		static inline ro16_t<base + 0x10> RDRHL;
 
 
 		//-----------------------------------------------------------------//
@@ -577,8 +525,7 @@ namespace device {
 			@brief  トランスミットデータレジスタ (TDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x03> TDR_;
-		static TDR_ TDR;
+		static inline rw8_t<base + 0x03> TDR;
 
 
 		//-----------------------------------------------------------------//
@@ -586,12 +533,9 @@ namespace device {
 			@brief  トランスミットデータレジスタ H、L、HL（TDRH、TDRL、TDRHL）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x0E> TDRH_;
-		static TDRH_ TDRH;
-		typedef rw8_t<base + 0x0F> TDRL_;
-		static TDRL_ TDRL;
-		typedef rw16_t<base + 0x0E> TDRHL_;
-		static TDRHL_ TDRHL;
+		static inline rw8_t<base + 0x0E> TDRH;
+		static inline rw8_t<base + 0x0F> TDRL;
+		static inline rw16_t<base + 0x0E> TDRHL;
 
 
 		//-----------------------------------------------------------------//
@@ -622,8 +566,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  BLK;
 			bit_rw_t <io_, bitpos::B7>	  GM;
 		};
-		typedef smr_t<base + 0x00> SMR_;
-		static SMR_ SMR;
+		static inline smr_t<base + 0x00> SMR;
 
 
 		//-----------------------------------------------------------------//
@@ -648,8 +591,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  RIE;
 			bit_rw_t <io_, bitpos::B7>	  TIE;
 		};
-		typedef scr_t<base + 0x02> SCR_;
-		static SCR_ SCR;
+		static inline scr_t<base + 0x02> SCR;
 
 
 		//-----------------------------------------------------------------//
@@ -676,8 +618,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> RDRF;  // SCIe では利用不可
 			bit_rw_t<io_, bitpos::B7> TDRE;  // SCIe では利用不可
 		};
-		typedef ssr_t<base + 0x04> SSR_;
-		static SSR_ SSR;
+		static inline ssr_t<base + 0x04> SSR;
 
 
  		//-----------------------------------------------------------------//
@@ -702,8 +643,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> BCP2;
 		};
-		typedef scmr_t<base + 0x06> SCMR_;
-		static SCMR_ SCMR;
+		static inline scmr_t<base + 0x06> SCMR;
 
 
 		//-----------------------------------------------------------------//
@@ -711,8 +651,7 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x01> BRR_;
-		static BRR_ BRR;
+		static inline rw8_t<base + 0x01> BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -720,8 +659,7 @@ namespace device {
 			@brief	モジュレーションデューティレジスタ（MDDR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x12> MDDR_;
-		static MDDR_ MDDR;
+		static inline rw8_t<base + 0x12> MDDR;
 
 
 		//-----------------------------------------------------------------//
@@ -747,8 +685,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> BGDM;
 			bit_rw_t<io_, bitpos::B7> RXDESEL;
 		};
-		typedef semr_t<base + 0x07> SEMR_;
-		static SEMR_ SEMR;
+		static inline semr_t<base + 0x07> SEMR;
 
 
 		//-----------------------------------------------------------------//
@@ -767,8 +704,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> NFCS;
 		};
-		typedef snfr_t<base + 0x08> SNFR_;
-		static SNFR_ SNFR;
+		static inline snfr_t<base + 0x08> SNFR;
 
 
 		//-----------------------------------------------------------------//
@@ -789,8 +725,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B3, 5> IICDL;
 		};
-		typedef simr1_t<base + 0x09> SIMR1_;
-		static SIMR1_ SIMR1;
+		static inline simr1_t<base + 0x09> SIMR1;
 
 
 		//-----------------------------------------------------------------//
@@ -812,8 +747,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B5> IICACKT;
 		};
-		typedef simr2_t<base + 0x0A> SIMR2_;
-		static SIMR2_ SIMR2;
+		static inline simr2_t<base + 0x0A> SIMR2;
 
 
 		//-----------------------------------------------------------------//
@@ -837,8 +771,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> IICSDAS;
 			bits_rw_t<io_, bitpos::B6, 2> IICSCLS;
 		};
-		typedef simr3_t<base + 0x0B> SIMR3_;
-		static SIMR3_ SIMR3;
+		static inline simr3_t<base + 0x0B> SIMR3;
 
 
 		//-----------------------------------------------------------------//
@@ -857,8 +790,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> IICACKR;
 		};
-		typedef sisr_t<base + 0x0C> SISR_;
-		static SISR_ SISR;
+		static inline sisr_t<base + 0x0C> SISR;
 
 
 		//-----------------------------------------------------------------//
@@ -884,30 +816,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> CKPOL;
 			bit_rw_t<io_, bitpos::B7> CKPH;
 		};
-		typedef spmr_t<base + 0x0D> SPMR_;
-		static SPMR_ SPMR;
+		static inline spmr_t<base + 0x0D> SPMR;
 	};
-	template <uint32_t base> typename sci_gj_t<base>::RDR_ sci_gj_t<base>::RDR;
-	template <uint32_t base> typename sci_gj_t<base>::RDRH_ sci_gj_t<base>::RDRH;
-	template <uint32_t base> typename sci_gj_t<base>::RDRL_ sci_gj_t<base>::RDRL;
-	template <uint32_t base> typename sci_gj_t<base>::RDRHL_ sci_gj_t<base>::RDRHL;
-	template <uint32_t base> typename sci_gj_t<base>::TDR_ sci_gj_t<base>::TDR;
-	template <uint32_t base> typename sci_gj_t<base>::TDRH_ sci_gj_t<base>::TDRH;
-	template <uint32_t base> typename sci_gj_t<base>::TDRL_ sci_gj_t<base>::TDRL;
-	template <uint32_t base> typename sci_gj_t<base>::TDRHL_ sci_gj_t<base>::TDRHL;
-	template <uint32_t base> typename sci_gj_t<base>::SMR_ sci_gj_t<base>::SMR;
-	template <uint32_t base> typename sci_gj_t<base>::SCR_ sci_gj_t<base>::SCR;
-	template <uint32_t base> typename sci_gj_t<base>::SSR_ sci_gj_t<base>::SSR;
-	template <uint32_t base> typename sci_gj_t<base>::SCMR_ sci_gj_t<base>::SCMR;
-	template <uint32_t base> typename sci_gj_t<base>::BRR_ sci_gj_t<base>::BRR;
-	template <uint32_t base> typename sci_gj_t<base>::MDDR_ sci_gj_t<base>::MDDR;
-	template <uint32_t base> typename sci_gj_t<base>::SEMR_ sci_gj_t<base>::SEMR;
-	template <uint32_t base> typename sci_gj_t<base>::SNFR_ sci_gj_t<base>::SNFR;
-	template <uint32_t base> typename sci_gj_t<base>::SIMR1_ sci_gj_t<base>::SIMR1;
-	template <uint32_t base> typename sci_gj_t<base>::SIMR2_ sci_gj_t<base>::SIMR2;
-	template <uint32_t base> typename sci_gj_t<base>::SIMR3_ sci_gj_t<base>::SIMR3;
-	template <uint32_t base> typename sci_gj_t<base>::SISR_ sci_gj_t<base>::SISR;
-	template <uint32_t base> typename sci_gj_t<base>::SPMR_ sci_gj_t<base>::SPMR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -941,8 +851,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B13>   ORER;
 			bit_rw_t <io_, bitpos::B14>   RDF;
 		};
-		typedef frdr_t<base + 0x10> FRDR_;
-		static FRDR_ FRDR;
+		static inline frdr_t<base + 0x10> FRDR;
 
 
 		//-----------------------------------------------------------------//
@@ -959,8 +868,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 9> RDAT;
 			bit_rw_t <io_, bitpos::B9>    MPBT;
 		};
-		typedef ftdr_t<base + 0x0E> FTDR_;
-		static FTDR_ FTDR;
+		static inline ftdr_t<base + 0x0E> FTDR;
 
 
 		//-----------------------------------------------------------------//
@@ -986,8 +894,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> RDRF;
 			bit_rw_t<io_, bitpos::B7> TDRE;
 		};
-		typedef ssrfifo_t<base + 0x04> SSRFIFO_;
-		static SSRFIFO_ SSRFIFO;
+		static inline ssrfifo_t<base + 0x04> SSRFIFO;
 
 
 		//-----------------------------------------------------------------//
@@ -1012,8 +919,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4> RTRG;
 			bits_rw_t<io_, bitpos::B12, 4> RSTRG;
 		};
-		typedef fcr_t<base + 0x14> FCR_;
-		static FCR_ FCR;
+		static inline fcr_t<base + 0x14> FCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1034,8 +940,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 5> T;
 		};
-		typedef fdr_t<base + 0x16> FDR_;
-		static FDR_ FDR;
+		static inline fdr_t<base + 0x16> FDR;
 
 
 		//-----------------------------------------------------------------//
@@ -1058,8 +963,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 5> PNUM;
 		};
-		typedef lsr_t<base + 0x18> LSR_;
-		static LSR_ LSR;
+		static inline lsr_t<base + 0x18> LSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1078,8 +982,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 9> CMPD;
 		};
-		typedef cdr_t<base + 0x1A> CDR_;
-		static CDR_ CDR;
+		static inline cdr_t<base + 0x1A> CDR;
 
 
 		//-----------------------------------------------------------------//
@@ -1104,8 +1007,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>     IDSEL;
 			bit_rw_t<io_, bitpos::B7>     DCME;
 		};
-		typedef dccr_t<base + 0x13> DCCR_;
-		static DCCR_ DCCR;
+		static inline dccr_t<base + 0x13> DCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1126,17 +1028,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>     SPB2DT;
 			bit_rw_t<io_, bitpos::B2>     SPB2IO;
 		};
-		typedef sptr_t<base + 0x13> SPTR_;
-		static SPTR_ SPTR;
+		static inline sptr_t<base + 0x13> SPTR;
 	};
-	template <uint32_t base> typename sci_fifo_t<base>::FRDR_ sci_fifo_t<base>::FRDR;
-	template <uint32_t base> typename sci_fifo_t<base>::SSRFIFO_ sci_fifo_t<base>::SSRFIFO;
-	template <uint32_t base> typename sci_fifo_t<base>::FCR_ sci_fifo_t<base>::FCR;
-	template <uint32_t base> typename sci_fifo_t<base>::FDR_ sci_fifo_t<base>::FDR;
-	template <uint32_t base> typename sci_fifo_t<base>::LSR_ sci_fifo_t<base>::LSR;
-	template <uint32_t base> typename sci_fifo_t<base>::CDR_ sci_fifo_t<base>::CDR;
-	template <uint32_t base> typename sci_fifo_t<base>::DCCR_ sci_fifo_t<base>::DCCR;
-	template <uint32_t base> typename sci_fifo_t<base>::SPTR_ sci_fifo_t<base>::SPTR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1164,8 +1057,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> ESME;
 		};
-		typedef esmer_t<base + 0x20> ESMER_;
-		static ESMER_ ESMER;
+		static inline esmer_t<base + 0x20> ESMER;
 
 
 		//-----------------------------------------------------------------//
@@ -1186,8 +1078,7 @@ namespace device {
 			bit_ro_t<io_, bitpos::B2> RXDSF;
 			bit_rw_t<io_, bitpos::B3> BRME;
 		};
-		typedef cr0_t<base + 0x21> CR0_;
-		static CR0_ CR0;
+		static inline cr0_t<base + 0x21> CR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1210,8 +1101,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>    PIBE;
 			bits_ro_t<io_, bitpos::B5, 3> PIBS;
 		};
-		typedef cr1_t<base + 0x22> CR1_;
-		static CR1_ CR1;
+		static inline cr1_t<base + 0x22> CR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1233,8 +1123,7 @@ namespace device {
 			bits_ro_t<io_, bitpos::B4, 2> BCCS;
 			bits_ro_t<io_, bitpos::B6, 2> RTS;
 		};
-		typedef cr2_t<base + 0x23> CR2_;
-		static CR2_ CR2;
+		static inline cr2_t<base + 0x23> CR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1253,8 +1142,7 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B0>    SDST;
 		};
-		typedef cr3_t<base + 0x24> CR3_;
-		static CR3_ CR3;
+		static inline cr3_t<base + 0x24> CR3;
 
 
 		//-----------------------------------------------------------------//
@@ -1276,8 +1164,7 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B4>    SHARPS;
 		};
-		typedef pcr_t<base + 0x25> PCR_;
-		static PCR_ PCR;
+		static inline pcr_t<base + 0x25> PCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1301,8 +1188,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B4>    BCDIE;
 			bit_ro_t <io_, bitpos::B5>    AEDIE;
 		};
-		typedef icr_t<base + 0x26> ICR_;
-		static ICR_ ICR;
+		static inline icr_t<base + 0x26> ICR;
 
 
 		//-----------------------------------------------------------------//
@@ -1323,8 +1209,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B4>    BCDF;
 			bit_ro_t <io_, bitpos::B5>    AEDF;
 		};
-		typedef str_t<base + 0x27> STR_;
-		static STR_ STR;
+		static inline str_t<base + 0x27> STR;
 
 
 		//-----------------------------------------------------------------//
@@ -1348,8 +1233,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B4>    BCDCL;
 			bit_ro_t <io_, bitpos::B5>    AEDCL;
 		};
-		typedef stcr_t<base + 0x28> STCR_;
-		static STCR_ STCR;
+		static inline stcr_t<base + 0x28> STCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1357,8 +1241,7 @@ namespace device {
 			@brief  Control Field 0 データレジスタ（CF0DR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x29> CF0DR_;
-		static CF0DR_ CF0DR;
+		static inline rw8_t<base + 0x29> CF0DR;
 
 
 		//-----------------------------------------------------------------//
@@ -1384,8 +1267,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B6>    DF0CE6;
 			bit_ro_t <io_, bitpos::B7>    DF0CE7;
 		};
-		typedef cf0cr_t<base + 0x2A> CF0CR_;
-		static CF0CR_ CF0CR;
+		static inline cf0cr_t<base + 0x2A> CF0CR;
 
 
 		//-----------------------------------------------------------------//
@@ -1393,8 +1275,7 @@ namespace device {
 			@brief  Control Field 0 受信データレジスタ（CF0RR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x2B> CF0RR_;
-		static CF0RR_ CF0RR;
+		static inline rw8_t<base + 0x2B> CF0RR;
 
 
 		//-----------------------------------------------------------------//
@@ -1402,8 +1283,7 @@ namespace device {
 			@brief  プライマリ Control Field 1 データレジスタ（PCF1DR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x2C> PCF1DR_;
-		static PCF1DR_ PCF1DR;
+		static inline rw8_t<base + 0x2C> PCF1DR;
 
 
 		//-----------------------------------------------------------------//
@@ -1411,8 +1291,7 @@ namespace device {
 			@brief  セカンダリ Control Field 1 データレジスタ（SCF1DR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x2D> SCF1DR_;
-		static SCF1DR_ SCF1DR;
+		static inline rw8_t<base + 0x2D> SCF1DR;
 
 
 		//-----------------------------------------------------------------//
@@ -1438,8 +1317,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B6>    CF1CE6;
 			bit_ro_t <io_, bitpos::B7>    CF1CE7;
 		};
-		typedef cf1cr_t<base + 0x2E> CF1CR_;
-		static CF1CR_ CF1CR;
+		static inline cf1cr_t<base + 0x2E> CF1CR;
 
 
 		//-----------------------------------------------------------------//
@@ -1447,8 +1325,7 @@ namespace device {
 			@brief  Control Field 1 受信データレジスタ（CF1RR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x2F> CF1RR_;
-		static CF1RR_ CF1RR;
+		static inline rw8_t<base + 0x2F> CF1RR;
 
 
 		//-----------------------------------------------------------------//
@@ -1467,8 +1344,7 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B0>    TCST;
 		};
-		typedef tcr_t<base + 0x30> TCR_;
-		static TCR_ TCR;
+		static inline tcr_t<base + 0x30> TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1490,8 +1366,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B3>    TWRC;
 			bits_ro_t<io_, bitpos::B4, 3> TCSS;
 		};
-		typedef tmr_t<base + 0x31> TMR_;
-		static TMR_ TMR;
+		static inline tmr_t<base + 0x31> TMR;
 
 
 		//-----------------------------------------------------------------//
@@ -1499,8 +1374,7 @@ namespace device {
 			@brief  タイマプリスケーラレジスタ（TPRE）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x32> TPRE_;
-		static TPRE_ TPRE;
+		static inline rw8_t<base + 0x32> TPRE;
 
 
 		//-----------------------------------------------------------------//
@@ -1508,26 +1382,6 @@ namespace device {
 			@brief  タイマカウントレジスタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x33> TCNT_;
-		static TCNT_ TCNT;
+		static inline rw8_t<base + 0x33> TCNT;
 	};
-	template <uint32_t base> typename sci_ext_t<base>::ESMER_ sci_ext_t<base>::ESMER;
-	template <uint32_t base> typename sci_ext_t<base>::CR0_ sci_ext_t<base>::CR0;
-	template <uint32_t base> typename sci_ext_t<base>::CR1_ sci_ext_t<base>::CR1;
-	template <uint32_t base> typename sci_ext_t<base>::CR2_ sci_ext_t<base>::CR2;
-	template <uint32_t base> typename sci_ext_t<base>::CR3_ sci_ext_t<base>::CR3;
-	template <uint32_t base> typename sci_ext_t<base>::PCR_ sci_ext_t<base>::PCR;
-	template <uint32_t base> typename sci_ext_t<base>::ICR_ sci_ext_t<base>::ICR;
-	template <uint32_t base> typename sci_ext_t<base>::STR_ sci_ext_t<base>::STR;
-	template <uint32_t base> typename sci_ext_t<base>::STCR_ sci_ext_t<base>::STCR;
-	template <uint32_t base> typename sci_ext_t<base>::CF0DR_ sci_ext_t<base>::CF0DR;
-	template <uint32_t base> typename sci_ext_t<base>::CF0RR_ sci_ext_t<base>::CF0RR;
-	template <uint32_t base> typename sci_ext_t<base>::PCF1DR_ sci_ext_t<base>::PCF1DR;
-	template <uint32_t base> typename sci_ext_t<base>::SCF1DR_ sci_ext_t<base>::SCF1DR;
-	template <uint32_t base> typename sci_ext_t<base>::CF1CR_ sci_ext_t<base>::CF1CR;
-	template <uint32_t base> typename sci_ext_t<base>::CF1RR_ sci_ext_t<base>::CF1RR;
-	template <uint32_t base> typename sci_ext_t<base>::TCR_ sci_ext_t<base>::TCR;
-	template <uint32_t base> typename sci_ext_t<base>::TMR_ sci_ext_t<base>::TMR;
-	template <uint32_t base> typename sci_ext_t<base>::TPRE_ sci_ext_t<base>::TPRE;
-	template <uint32_t base> typename sci_ext_t<base>::TCNT_ sci_ext_t<base>::TCNT;
 }

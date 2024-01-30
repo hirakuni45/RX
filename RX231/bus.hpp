@@ -17,7 +17,7 @@ namespace device {
 		@brief  バス定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct bus_t {
+	struct BUS {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -283,8 +283,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 2>  BPFB;
 			bits_rw_t<io_, bitpos::B12, 2>  BPEB;
 		};
-		typedef buspri_t<0x0008'1310> BUSPRI;
+		static inline buspri_t<0x0008'1310> BUSPRI;
 	};
-
-	typedef bus_t BUS;
 }

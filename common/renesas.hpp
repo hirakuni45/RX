@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ルネサス RX ペリフェラル／デバイス選択
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -13,7 +13,30 @@
 #include "common/delay.hpp"
 #include "common/device.hpp"
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX140)
+#include "RX231/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX140/bus.hpp"
+// #include "RX220/elc.hpp"
+// #include "RX220/port.hpp"
+// #include "RX220/mtu2.hpp"
+// #include "RX220/poe2.hpp"
+#include "RX600/tmr.hpp"
+// #include "RX220/rtc.hpp"
+#include "RX600/sci_k.hpp"
+#include "RX600/sci_g.hpp"
+#include "RX600/sci_h.hpp"
+#include "RX600/crc.hpp"
+// #include "RX220/s12ad.hpp"
+#include "RX140/da.hpp"
+// #include "RX220/cmpa.hpp"
+#include "RX600/doc.hpp"
+#include "RX140/flash.hpp"
+
+#include "RX140/system_io.hpp"
+#include "RX24T/flash_io.hpp"
+
+#elif defined(SIG_RX220)
 #include "RX220/lvda.hpp"
 #include "RX600/cac.hpp"
 #include "RX220/bus.hpp"
@@ -425,4 +448,7 @@
 #include "RX600/iwdt.hpp"
 #include "RX600/riic.hpp"
 #include "RX600/rspi.hpp"
+#if defined(SIG_RX140)
+#else
 #include "RX600/mpu.hpp"
+#endif
