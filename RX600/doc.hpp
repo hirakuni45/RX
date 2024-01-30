@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・DOC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,8 +42,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>     DOPCF;
 			bit_rw_t <io_, bitpos::B6>     DOPCFCL;
 		};
-		typedef docr_t<base + 0x00> DOCR_;
-		static  DOCR_ DOCR;
+		static inline docr_t<base + 0x00> DOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -51,8 +50,7 @@ namespace device {
 			@brief  DOC データインプットレジスタ（DODIR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x02> DODIR_;
-		static  DODIR_ DODIR;
+		static inline rw16_t<base + 0x02> DODIR;
 
 
 		//-----------------------------------------------------------------//
@@ -60,16 +58,10 @@ namespace device {
 			@brief  DOC データセッティングレジスタ（DODSR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x04> DODSR_;
-		static  DODSR_ DODSR;
-
+		static inline rw16_t<base + 0x04> DODSR;
 	};
-	template <uint32_t base> typename doc_t<base>::DOCR_  doc_t<base>::DOCR;
-	template <uint32_t base> typename doc_t<base>::DODIR_ doc_t<base>::DODIR;
-	template <uint32_t base> typename doc_t<base>::DODSR_ doc_t<base>::DODSR;
 
-
-#if defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX24T)
+#if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX24T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データ演算回路（DOC）
@@ -83,7 +75,6 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 		static constexpr auto INTRV = vec;		///< 割り込みベクター
-
 	};
 	typedef doc_norm_t<0x0008'B080, peripheral::DOC, ICU::VECTOR::DOPCF> DOC;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T)
@@ -100,7 +91,6 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 		static constexpr auto INTRV = vec;		///< 割り込みベクター
-
 	};
 	typedef doc_gbl0_t<0x0008'B080, peripheral::DOC, ICU::GROUPBL0::DOPCI> DOC;
 #endif

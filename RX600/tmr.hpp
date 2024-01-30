@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・8 ビットタイマ（TMR）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,30 +16,17 @@ namespace device {
 	/*!
 		@brief  8 ビットタイマ（TMR）
 		@param[in]	base	ベースアドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	INT		割り込み型
-		@param[in]	cmia	CMIA 型割り込みベクター
-		@param[in]	cmib	CMIB 型割り込みベクター
-		@param[in]	ovi		OVI 型割り込みベクター
-		@param[in]	clk		駆動クロック
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-	struct tmr_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto CMIA_VEC = cmia;	///< CMIA 割り込みベクタ
-		static constexpr auto CMIB_VEC = cmib;	///< CMIB 割り込みベクタ
-		static constexpr auto OVI_VEC  = ovi;	///< OVI 割り込みベクタ
-		static constexpr auto PCLK = clk;		///< PCLK 周波数
+	template <uint32_t base>
+	struct tmr_base_t {
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brie	タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x08> TCNT_;
-		static  TCNT_ TCNT;
+		static inline rw8_t<base + 0x08> TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -47,8 +34,7 @@ namespace device {
 			@brie	タイムコンスタントレジスタ A（TCORA）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x04> TCORA_;
-		static  TCORA_ TCORA;
+		static inline rw8_t<base + 0x04> TCORA;
 
 
 		//-----------------------------------------------------------------//
@@ -56,8 +42,7 @@ namespace device {
 			@brie	タイムコンスタントレジスタ B（TCORB）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x06> TCORB_;
-		static  TCORB_ TCORB;
+		static inline rw8_t<base + 0x06> TCORB;
 
 
 		//-----------------------------------------------------------------//
@@ -79,8 +64,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>     CMIEA;
 			bit_rw_t <io_, bitpos::B7>     CMIEB;
 		};
-		typedef tcr_t<base + 0x00> TCR_;
-		static  TCR_ TCR;
+		static inline tcr_t<base + 0x00> TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -101,19 +85,93 @@ namespace device {
 			bits_rw_t<io_, bitpos::B3, 2>  CSS;
 			bit_rw_t <io_, bitpos::B7>     TMRIS;
 		};
-		typedef tccr_t<base + 0x0A> TCCR_;
-		static  TCCR_ TCCR;
+		static inline tccr_t<base + 0x0A> TCCR;
 	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  8 ビットタイマ（TMRa）偶数版
+		@param[in]	base	ベースアドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
+		@param[in]	cmia	CMIA 型割り込みベクター
+		@param[in]	cmib	CMIB 型割り込みベクター
+		@param[in]	ovi		OVI 型割り込みベクター
+		@param[in]	clk		駆動クロック
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCNT_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCNT;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCORA_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCORA;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCORB_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCORB;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCR_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCR;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCCR_ tmr_t<base, per, INT, cmia, cmib, ovi, clk>::TCCR;
+	struct tmra0246_t : public tmr_base_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto CMIA_VEC = cmia;	///< CMIA 割り込みベクタ
+		static constexpr auto CMIB_VEC = cmib;	///< CMIB 割り込みベクタ
+		static constexpr auto OVI_VEC  = ovi;	///< OVI 割り込みベクタ
+		static constexpr auto PCLK = clk;		///< PCLK 周波数
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brie	タイマカウンタ（TCNTW）
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw16_t<base + 0x08> TCNT16;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brie	タイムコンスタントレジスタ A（TCORA）
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw16_t<base + 0x04> TCORA16;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brie	タイムコンスタントレジスタ B（TCORB）
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw16_t<base + 0x06> TCORB16;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイマコントロール／ステータスレジスタ（TCSR）
+			@param[in]	ofs	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tcsr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>  OSA;
+			bits_rw_t<io_, bitpos::B2, 2>  OSB;
+		};
+		static inline tcsr_t<base + 0x02> TCSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイマカウンタスタートレジスタ (TCSTR)
+			@param[in]	ofs	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tcstr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     TCS;
+		};
+		static inline tcstr_t<base + 0x0C> TCSTR;
+	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -129,15 +187,20 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-	struct tmr0246_t : public tmr_t<base, per, INT, cmia, cmib, ovi, clk> {
+	struct tmr0246_t : public tmr_base_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto CMIA_VEC = cmia;	///< CMIA 割り込みベクタ
+		static constexpr auto CMIB_VEC = cmib;	///< CMIB 割り込みベクタ
+		static constexpr auto OVI_VEC  = ovi;	///< OVI 割り込みベクタ
+		static constexpr auto PCLK = clk;		///< PCLK 周波数
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brie	タイマカウンタ（TCNTW）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x08> TCNT16_;
-		static  TCNT16_ TCNT16;
+		static inline rw16_t<base + 0x08> TCNT16;
 
 
 		//-----------------------------------------------------------------//
@@ -145,8 +208,7 @@ namespace device {
 			@brie	タイムコンスタントレジスタ A（TCORA）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x04> TCORA16_;
-		static  TCORA16_ TCORA16;
+		static inline rw16_t<base + 0x04> TCORA16;
 
 
 		//-----------------------------------------------------------------//
@@ -154,8 +216,7 @@ namespace device {
 			@brie	タイムコンスタントレジスタ B（TCORB）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x06> TCORB16_;
-		static  TCORB16_ TCORB16;
+		static inline rw16_t<base + 0x06> TCORB16;
 
 
 		//-----------------------------------------------------------------//
@@ -176,17 +237,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B2, 2>  OSB;
 			bit_rw_t <io_, bitpos::B4>     ADTE;
 		};
-		typedef tcsr_t<base + 0x02> TCSR_;
-		static  TCSR_ TCSR;
+		static inline tcsr_t<base + 0x02> TCSR;
 	};
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCNT16_ tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCNT16;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCORA16_ tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCORA16;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCORB16_ tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCORB16;
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR_ tmr0246_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -202,32 +254,25 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-	struct tmr1357_t : public tmr_t<base, per, INT, cmia, cmib, ovi, clk> {
+	struct tmr1357_t : public tmr_base_t<base> {
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	タイマコントロール／ステータスレジスタ（TCSR）
-			@param[in]	ofs	アドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct tcsr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 2>  OSA;
-			bits_rw_t<io_, bitpos::B2, 2>  OSB;
-		};
-		typedef tcsr_t<base + 0x02> TCSR_;
-		static  TCSR_ TCSR;
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto CMIA_VEC = cmia;	///< CMIA 割り込みベクタ
+		static constexpr auto CMIB_VEC = cmib;	///< CMIB 割り込みベクタ
+		static constexpr auto OVI_VEC  = ovi;	///< OVI 割り込みベクタ
+		static constexpr auto PCLK = clk;		///< PCLK 周波数
 	};
-	template <uint32_t base, peripheral per, typename INT, INT cmia, INT cmib, INT ovi, uint32_t clk>
-		typename tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR_ tmr1357_t<base, per, INT, cmia, cmib, ovi, clk>::TCSR;
 
-#if defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX140)
+	typedef tmra0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
+		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
+	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,
+		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1, clock_profile::PCLKB> TMR1;
+	typedef tmra0246_t<0x0008'8210, peripheral::TMR2, ICU::VECTOR,
+		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLKB> TMR2;
+	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::VECTOR,
+		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLKB> TMR3;
+#elif defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
 		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
 	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,
