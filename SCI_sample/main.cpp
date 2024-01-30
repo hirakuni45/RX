@@ -36,7 +36,13 @@ namespace {
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX140)
+	// RX140 DIY ボード
+	static const char* system_str_ = { "RX140 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTJ, device::bitpos::B1, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX220)
 	// 秋月 RX220 ボード
 	static const char* system_str_ = { "AE-RX220" };
 	static constexpr bool LED_ACTIVE = 0;

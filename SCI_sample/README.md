@@ -1,4 +1,4 @@
-Renesas RX220, RX231, RX62N, RX631, RX63T, RX24T, RX26T, RX66T, RX72T, RX64M, RX71M, RX65N, RX72N SCI (UART) sample
+Renesas RX microcontroller SCI (UART) sample
 =========
 
 [Japanese](READMEja.md)
@@ -13,6 +13,7 @@ SCI/SCIF/RSCI (UART) sample program using RX microcontroller
 
 ## Project list
  - main.cpp
+ - RX140/Makefile
  - RX220/Makefile
  - RX231/Makefile
  - RX62N/Makefile
@@ -34,6 +35,7 @@ SCI/SCIF/RSCI (UART) sample program using RX microcontroller
 - Refer to RXxxx/clock_profile.hpp for each microcontroller, crystal frequency, and frequency of each module.
 - Connect the indicator LEDs to the specified ports.
 - Connect USB serial and SCI ports.
+- Refer to "RX140/port_map.hpp" for the SCI standard port of RX140.
 - Refer to "RX220/port_map.hpp" for the SCI standard port of RX220.
 - Refer to "RX231/port_map.hpp" for the SCI standard port of RX231.
 - For the SCI standard port of RX62N, refer to "RX62x/port_map.hpp".
@@ -69,7 +71,13 @@ SCI/SCIF/RSCI (UART) sample program using RX microcontroller
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX140)
+	// RX140 DIY ボード
+	static const char* system_str_ = { "RX140 DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORTJ, device::bitpos::B1, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX220)
 	// 秋月 RX220 ボード
 	static const char* system_str_ = { "AE-RX220" };
 	static constexpr bool LED_ACTIVE = 0;
