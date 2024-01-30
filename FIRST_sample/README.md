@@ -14,6 +14,7 @@ Sample program of LED blinking using RX microcontroller
 
 ## Description
 - main.cpp
+- RX140/Makefile
 - RX220/Makefile
 - RX231/Makefile
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)

@@ -14,6 +14,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 
 ## プロジェクト・リスト
 - main.cpp
+- RX140/Makefile
 - RX220/Makefile (AE-RX220)
 - RX231/Makefile
 - RX62N/Makefile (BlueBoard-RX62N_100pin / FRK-RX62N)
