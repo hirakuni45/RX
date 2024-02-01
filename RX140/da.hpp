@@ -45,14 +45,25 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void enable(ANALOG an, bool f = true) noexcept
 		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 			switch(an) {
 			case ANALOG::DA0:  // P03
+				PORT0::PCR.B3 = 0;
+				PORT0::PDR.B3 = 0;
+				PORT0::PMR.B3 = 0;
+				MPC::P03PFS.ASEL = f;
 				break;
 			case ANALOG::DA1:  // P05
+				PORT0::PCR.B5 = 0;
+				PORT0::PDR.B5 = 0;
+				PORT0::PMR.B5 = 0;
+				MPC::P05PFS.ASEL = f;
 				break;
 			default:
 				break;
 			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 
 

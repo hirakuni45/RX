@@ -27,4 +27,50 @@ namespace device {
 	typedef portx_t<0x0008'C011, odr_xx_t<0x0008'C0A2> > PORTH;
 	typedef portx_t<0x0008'C012, odr_xx_t<0x0008'C0A4> > PORTJ;
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ポート制御クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct PORT_CTRL {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート切り替えレジスタ A (PSRA)
+			@param[in] base		ベース・アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct psra_t : public rw8_t<base> {
+			typedef rw8_t<base>  io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B6> PSEL6;
+			bit_rw_t<io_, bitpos::B7> PSEL7;
+		};
+		static inline psra_t<0x0008'C121> PSRA;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートリードウェイト制御レジスタ (PRWCNTR)
+			@param[in] base		ベース・アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct prwcntr_t : public rw8_t<base> {
+			typedef rw8_t<base>  io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> WAIT;
+		};
+		static inline prwcntr_t<0x0008'C120> PRWCNTR;
+	};
 }

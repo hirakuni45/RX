@@ -65,7 +65,7 @@ namespace device {
 				device::FLASH::FPMCR = ~0x50;
 				device::FLASH::FPMCR =  0x50;
 			}
-			uint8_t frq = clock_profile::FCLK / 1000000;
+			uint8_t frq = clock_profile::FCLK / 1'000'000;
 			if(frq > 32) frq = 32;
 			device::FLASH::FISR.PCKA = frq - 1;
 		}
