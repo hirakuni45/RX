@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ　DTCa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,13 +15,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データトランスファコントローラ・クラス
-		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per>
-	struct dtc_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+	struct dtc_base_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -39,8 +35,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4> RRS;
 		};
-		typedef dtccr_t<0x0008'2400> DTCCR_;
-		static  DTCCR_ DTCCR;
+		static inline dtccr_t<0x0008'2400> DTCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -48,8 +43,7 @@ namespace device {
 			@brief  DTC ベクタベースレジスタ（DTCVBR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x0008'2404> DTCVBR_;
-		static  DTCVBR_ DTCVBR;
+		static inline rw32_t<0x0008'2404> DTCVBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -68,8 +62,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SHORT;
 		};
-		typedef dtcadmod_t<0x0008'2408> DTCADMOD_;
-		static  DTCADMOD_ DTCADMOD;
+		static inline dtcadmod_t<0x0008'2408> DTCADMOD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -88,8 +81,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DTCST;
 		};
-		typedef dtcst_t<0x0008'240C> DTCST_;
-		static  DTCST_ DTCST;
+		static inline dtcst_t<0x0008'240C> DTCST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -99,24 +91,95 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct dtcsts_t : public rw16_t<base> {
+		struct dtcsts_t : public ro16_t<base> {
+			typedef ro16_t<base> in_;
+			using in_::operator ();
+
+			bits_ro_t<in_, bitpos::B0, 8> VECN;
+
+			bit_ro_t <in_, bitpos::B15>   ACT;
+		};
+		static inline dtcsts_t<0x0008'240E> DTCSTS;
+	};
+
+#if defined(SIG_RX140)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  データトランスファコントローラ・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct dtc_t : public dtc_base_t {
+
+		static constexpr auto PERIPHERAL = peripheral::DTC;	///< ペリフェラル型
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DTC インデックステーブルベースレジスタ (DTCIBR)
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw16_t<0x0008'2410> DTCIBR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  DTC オペレーションレジスタ (DTCOR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct dtcor_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> SQTFRL;
+		};
+		static inline dtcor_t<0x0008'2414> DTCOR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  DTC シーケンス転送許可レジスタ (DTCSQE)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct dtcsqe_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 8> VECN;
-			bit_rw_t <io_, bitpos::B15>   ACT;
-		};
-		typedef dtcsts_t<0x0008'240E> DTCSTS_;
-		static  DTCSTS_ DTCSTS;
-	};
-	template <peripheral per> typename dtc_t<per>::DTCCR_ dtc_t<per>::DTCCR;
-	template <peripheral per> typename dtc_t<per>::DTCVBR_ dtc_t<per>::DTCVBR;
-	template <peripheral per> typename dtc_t<per>::DTCADMOD_ dtc_t<per>::DTCADMOD;
-	template <peripheral per> typename dtc_t<per>::DTCST_ dtc_t<per>::DTCST;
-	template <peripheral per> typename dtc_t<per>::DTCSTS_ dtc_t<per>::DTCSTS;
+			bits_rw_t<io_, bitpos::B0, 8>  VECN;
 
-	typedef dtc_t<peripheral::DTC>  DTC;
+			bit_rw_t <io_, bitpos::B0>     ESPSEL;
+		};
+		static inline dtcsqe_t<0x0008'2416> DTCSQE;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DTC アドレスディスプレースメントレジスタ (DTCDISP)
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw32_t<0x0008'2418> DTCDISP;
+	};
+
+#else
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  データトランスファコントローラ・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct dtc_t : public dtc_base_t {
+
+		static constexpr auto PERIPHERAL = peripheral::DTC;	///< ペリフェラル型
+
+	};
+#endif
+
+	typedef dtc_t DTC;
 }

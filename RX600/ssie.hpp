@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX700 グループ・SSIE 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 #include "common/device.hpp"
 
@@ -70,8 +70,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B28>    TOIEN;
 			bit_rw_t< io_, bitpos::B29>    TUIEN;
 		};
-		typedef ssicr_t<base + 0x00> SSICR_;
-		static SSICR_ SSICR;
+		static inline ssicr_t<base + 0x00> SSICR;
 
 
 		//-----------------------------------------------------------------//
@@ -95,8 +94,7 @@ namespace device {
 			bit_rw_t< rw_, bitpos::B28>    TOIRQ;
 			bit_rw_t< rw_, bitpos::B29>    TUIRQ;
 		};
-		typedef ssisr_t<base + 0x04> SSISR_;
-		static SSISR_ SSISR;
+		static inline ssisr_t<base + 0x04> SSISR;
 
 
 		//-----------------------------------------------------------------//
@@ -124,8 +122,7 @@ namespace device {
 
 			bit_rw_t< io_, bitpos::B31>    AUCKE;
 		};
-		typedef ssifcr_t<base + 0x10> SSIFCR_;
-		static SSIFCR_ SSIFCR;
+		static inline ssifcr_t<base + 0x10> SSIFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -150,8 +147,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B24, 6> TDC;
 		};
-		typedef ssifsr_t<base + 0x14> SSIFSR_;
-		static SSIFSR_ SSIFSR;
+		static inline ssifsr_t<base + 0x14> SSIFSR;
 
 
 		//-----------------------------------------------------------------//
@@ -159,24 +155,19 @@ namespace device {
 			@brief  送信 FIFO データレジスタ（ SSIFTDR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef wo32_t<base + 0x18> SSIFTDR32_;
-		static SSIFTDR32_ SSIFTDR32;
-		typedef wo16_t<base + 0x18> SSIFTDR16_;
-		static SSIFTDR16_ SSIFTDR16;
-		typedef wo8_t<base + 0x18> SSIFTDR8_;
-		static SSIFTDR8_ SSIFTDR8;
+		static inline wo32_t<base + 0x18> SSIFTDR32;
+		static inline wo16_t<base + 0x18> SSIFTDR16;
+		static inline wo8_t<base + 0x18> SSIFTDR8;
+
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  受信 FIFO データレジスタ（ SSIFRDR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x1C> SSIFRDR32_;
-		static SSIFRDR32_ SSIFRDR32;
-		typedef ro16_t<base + 0x1C> SSIFRDR16_;
-		static SSIFRDR16_ SSIFRDR16;
-		typedef ro8_t<base + 0x1C> SSIFRDR8_;
-		static SSIFRDR8_ SSIFRDR8;
+		static inline ro32_t<base + 0x1C> SSIFRDR32;
+		static inline ro16_t<base + 0x1C> SSIFRDR16;
+		static inline ro8_t<base + 0x1C> SSIFRDR8;
 
 
 		//-----------------------------------------------------------------//
@@ -198,8 +189,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>      LRCONT;
 			bit_rw_t <io_, bitpos::B9>      BCKASTP;
 		};
-		typedef ssiofr_t<base + 0x20> SSIOFR_;
-		static SSIOFR_ SSIOFR;
+		static inline ssiofr_t<base + 0x20> SSIOFR;
 
 
 		//-----------------------------------------------------------------//
@@ -220,45 +210,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 5>   TDES;
 		};
-		typedef ssiscr_t<base + 0x24> SSISCR_;
-		static SSISCR_ SSISCR;
+		static inline ssiscr_t<base + 0x24> SSISCR;
 	};
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSICR_ ssie_t<base, per, txi, rxi, ssie>::SSICR;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSISR_ ssie_t<base, per, txi, rxi, ssie>::SSISR;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIFCR_ ssie_t<base, per, txi, rxi, ssie>::SSIFCR;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIFSR_ ssie_t<base, per, txi, rxi, ssie>::SSIFSR;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIFTDR32_ ssie_t<base, per, txi, rxi, ssie>::SSIFTDR32;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIFTDR16_ ssie_t<base, per, txi, rxi, ssie>::SSIFTDR16;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIFTDR8_ ssie_t<base, per, txi, rxi, ssie>::SSIFTDR8;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIFRDR32_ ssie_t<base, per, txi, rxi, ssie>::SSIFRDR32;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIFRDR16_ ssie_t<base, per, txi, rxi, ssie>::SSIFRDR16;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIFRDR8_ ssie_t<base, per, txi, rxi, ssie>::SSIFRDR8;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSIOFR_ ssie_t<base, per, txi, rxi, ssie>::SSIOFR;
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 ssie>
-		typename ssie_t<base, per, txi, rxi, ssie>::SSISCR_ ssie_t<base, per, txi, rxi, ssie>::SSISCR;
 
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)

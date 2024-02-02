@@ -2,11 +2,11 @@
 #=======================================================================
 #	RX140 Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	sci_sample
+TARGET		=	raytracer_sample
 
 DEVICE		=	R5F51403
 
@@ -23,7 +23,7 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	SCI_sample/main.cpp
+PSOURCES	=	RAYTRACER_sample/main.cpp
 
 USER_LIBS	=
 

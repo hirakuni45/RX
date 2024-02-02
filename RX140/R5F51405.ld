@@ -1,8 +1,8 @@
 /* -*- tab-width : 4 -*- */
 /*!	@file
-	@brief	RX140 R5F5140A リンカー・スクリプト @n
-			ROM: 256K @n
-			RAM: 64K @n
+	@brief	RX140 R5F51405 リンカー・スクリプト @n
+			ROM: 128K @n
+			RAM: 32K @n
 			EEPROM: 8K
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
@@ -17,12 +17,12 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX140A chip.  */
+/* This memory layout corresponds to the smallest predicted RX1405 chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0000F800 /* 64K - stack_size (0x800) */
-	USTACK (w) : ORIGIN = 0x0000FE00, LENGTH = 4 /* ustack 1536 bytes */
-	ISTACK (w) : ORIGIN = 0x00010000, LENGTH = 4 /* istack 512 bytes  */
-	ROM (w)    : ORIGIN = 0xFFFC0000, LENGTH = 0x0003FFD0 /* 256K */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00007C00 /* 32K - stack_size (0x400) */
+	USTACK (w) : ORIGIN = 0x00007F00, LENGTH = 4 /* ustack 768 bytes */
+	ISTACK (w) : ORIGIN = 0x00008000, LENGTH = 4 /* istack 256 bytes  */
+	ROM (w)    : ORIGIN = 0xFFFE0000, LENGTH = 0x0002FFD0 /* 128K */
 }
 
 SECTIONS

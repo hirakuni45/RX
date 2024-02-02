@@ -43,8 +43,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>     DORCLR;
 		};
-		typedef crccr_t<base + 0x00> CRCCR_;
-		static CRCCR_ CRCCR;
+		static inline crccr_t<base + 0x00> CRCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -52,12 +51,9 @@ namespace device {
 			@brief  CRC データ入力レジスタ（CRCDIRxx）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x04> CRCDIR32_;
-		static CRCDIR32_ CRCDIR32;
-		typedef rw16_t<base + 0x04> CRCDIR16_;
-		static CRCDIR16_ CRCDIR16;
-		typedef rw8_t<base + 0x04> CRCDIR8_;
-		static CRCDIR8_ CRCDIR8;
+		static inline rw32_t<base + 0x04> CRCDIR32;
+		static inline rw16_t<base + 0x04> CRCDIR16;
+		static inline rw8_t<base + 0x04> CRCDIR8;
 
 
 		//-----------------------------------------------------------------//
@@ -65,20 +61,9 @@ namespace device {
 			@brief  CRC データ出力レジスタ（CRCDORxx）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x08> CRCDOR32_;
-		static CRCDOR32_ CRCDOR32;
-		typedef rw16_t<base + 0x08> CRCDOR16_;
-		static CRCDOR16_ CRCDOR16;
-		typedef rw8_t<base + 0x08> CRCDOR8_;
-		static CRCDOR8_ CRCDOR8;
+		static inline rw32_t<base + 0x08> CRCDOR32;
+		static inline rw16_t<base + 0x08> CRCDOR16;
+		static inline rw8_t<base + 0x08> CRCDOR8;
 	};
-	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCCR_    crca_t<base, per>::CRCCR;
-	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDIR32_ crca_t<base, per>::CRCDIR32;
-	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDIR16_ crca_t<base, per>::CRCDIR16;
-	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDIR8_  crca_t<base, per>::CRCDIR8;
-	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDOR32_ crca_t<base, per>::CRCDOR32;
-	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDOR16_ crca_t<base, per>::CRCDOR16;
-	template <uint32_t base, peripheral per> typename crca_t<base, per>::CRCDOR8_  crca_t<base, per>::CRCDOR8;
-
 	typedef crca_t<0x0008'8280, peripheral::CRC> CRCA;
 }

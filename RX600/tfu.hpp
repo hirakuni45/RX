@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・三角関数演算器 (TFUv2) 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,10 +15,8 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  三角関数演算器 (TFUv2) クラス
-		@param[in]	base	ベースアドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct tfu_t {
 
 		//-----------------------------------------------------------------//
@@ -39,8 +37,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B3, 2>  OF;
 		};
-		typedef fxscioc_t<0x0008'1404> FXSCIOC_;
-		static  FXSCIOC_ FXSCIOC;
+		static inline fxscioc_t<0x0008'1404> FXSCIOC;
 
 
 		//-----------------------------------------------------------------//
@@ -59,8 +56,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B4>     OUF;
 		};
-		typedef fxatioc_t<0x0008'1405> FXATIOC_;
-		static  FXATIOC_ FXATIOC;
+		static inline fxatioc_t<0x0008'1405> FXATIOC;
 
 
 		//-----------------------------------------------------------------//
@@ -80,8 +76,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>     BSYF;
 			bit_rw_t <io_, bitpos::B1>     ERRF;
 		};
-		typedef trgsts_t<0x0008'1408> TRGSTS_;
-		static  TRGSTS_ TRGSTS;
+		static inline trgsts_t<0x0008'1408> TRGSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -90,8 +85,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'1410> FPSCDT0_;
-		static  FPSCDT0_ FPSCDT0;
+		static inline rw32_t<0x0008'1410> FPSCDT0;
 
 
 		//-----------------------------------------------------------------//
@@ -100,8 +94,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'1414> FPSCDT1_;
-		static  FPSCDT1_ FPSCDT1;
+		static inline rw32_t<0x0008'1414> FPSCDT1;
 
 
 		//-----------------------------------------------------------------//
@@ -110,8 +103,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'1418> FPATDT0_;
-		static  FPATDT0_ FPATDT0;
+		static inline rw32_t<0x0008'1418> FPATDT0;
 
 
 		//-----------------------------------------------------------------//
@@ -120,8 +112,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'141C> FPATDT1_;
-		static  FPATDT1_ FPATDT1;
+		static inline rw32_t<0x0008'141C> FPATDT1;
 
 
 		//-----------------------------------------------------------------//
@@ -130,8 +121,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'1420> FXSCDT0_;
-		static  FXSCDT0_ FXSCDT0;
+		static inline rw32_t<0x0008'1420> FXSCDT0;
 
 
 		//-----------------------------------------------------------------//
@@ -140,8 +130,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'1424> FXSCDT1_;
-		static  FXSCDT1_ FXSCDT1;
+		static inline rw32_t<0x0008'1424> FXSCDT1;
 
 
 		//-----------------------------------------------------------------//
@@ -150,8 +139,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'1428> FXATDT0_;
-		static  FXATDT0_ FXATDT0;
+		static inline rw32_t<0x0008'1428> FXATDT0;
 
 
 		//-----------------------------------------------------------------//
@@ -160,8 +148,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'142C> FXATDT1_;
-		static  FXATDT1_ FXATDT1;
+		static inline rw32_t<0x0008'142C> FXATDT1;
 
 
 		//-----------------------------------------------------------------//
@@ -170,8 +157,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'1430> DTSR0_;
-		static  DTSR0_ DTSR0;
+		static inline rw32_t<0x0008'1430> DTSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -180,22 +166,7 @@ namespace device {
 			@param[in]	ofs	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0008'1434> DTSR1_;
-		static  DTSR1_ DTSR1;
+		static inline rw32_t<0x0008'1434> DTSR1;
 	};
-	template<class _> typename tfu_t<_>::FXSCIOC_ tfu_t<_>::FXSCIOC;
-	template<class _> typename tfu_t<_>::FXATIOC_ tfu_t<_>::FXATIOC;
-	template<class _> typename tfu_t<_>::TRGSTS_  tfu_t<_>::TRGSTS;
-	template<class _> typename tfu_t<_>::FPSCDT0_ tfu_t<_>::FPSCDT0;
-	template<class _> typename tfu_t<_>::FPSCDT1_ tfu_t<_>::FPSCDT1;
-	template<class _> typename tfu_t<_>::FPATDT0_ tfu_t<_>::FPATDT0;
-	template<class _> typename tfu_t<_>::FPATDT1_ tfu_t<_>::FPATDT1;
-	template<class _> typename tfu_t<_>::FXSCDT0_ tfu_t<_>::FXSCDT0;
-	template<class _> typename tfu_t<_>::FXSCDT1_ tfu_t<_>::FXSCDT1;
-	template<class _> typename tfu_t<_>::FXATDT0_ tfu_t<_>::FXATDT0;
-	template<class _> typename tfu_t<_>::FXATDT1_ tfu_t<_>::FXATDT1;
-	template<class _> typename tfu_t<_>::DTSR0_   tfu_t<_>::DTSR0;
-	template<class _> typename tfu_t<_>::DTSR1_   tfu_t<_>::DTSR1;
-
-	typedef tfu_t<void> TFU;
+	typedef tfu_t TFU;
 }

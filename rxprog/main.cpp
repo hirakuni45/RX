@@ -16,7 +16,7 @@
 
 namespace {
 
-	static const std::string version_ = "1.77";
+	static const std::string version_ = "1.78";
 	static const std::string conf_file_ = "rx_prog.conf";
 	static constexpr uint32_t cpr_last_year_ = 2024;
 	static constexpr uint32_t progress_num_ = 50;

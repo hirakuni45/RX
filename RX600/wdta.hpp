@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・WDTA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 
 namespace device {
@@ -33,8 +33,7 @@ namespace device {
 			@brief  WDT リフレッシュレジスタ（WDTRR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x00> WDTRR_;
-		static WDTRR_ WDTRR;
+		static inline rw8_t<base + 0x00> WDTRR;
 
 
 		//-----------------------------------------------------------------//
@@ -58,8 +57,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B12, 2> RPSS;
 		};
-		typedef wdtcr_t<base + 0x02> WDTCR_;
-		static WDTCR_ WDTCR;
+		static inline wdtcr_t<base + 0x02> WDTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -81,8 +79,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>    UNDFF;
 			bit_rw_t <io_, bitpos::B15>    REFEF;
 		};
-		typedef wdtsr_t<base + 0x04> WDTSR_;
-		static WDTSR_ WDTSR;
+		static inline wdtsr_t<base + 0x04> WDTSR;
 
 
 		//-----------------------------------------------------------------//
@@ -101,22 +98,10 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  RSTIRQS;
 		};
-		typedef wdtrcr_t<base + 0x06> WDTRCR_;
-		static WDTRCR_ WDTRCR;
+		static inline wdtrcr_t<base + 0x06> WDTRCR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename wdta_t<base, per, ivec, pclk>::WDTRR_ wdta_t<base, per, ivec, pclk>::WDTRR;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename wdta_t<base, per, ivec, pclk>::WDTCR_ wdta_t<base, per, ivec, pclk>::WDTCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename wdta_t<base, per, ivec, pclk>::WDTSR_ wdta_t<base, per, ivec, pclk>::WDTSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename wdta_t<base, per, ivec, pclk>::WDTRCR_ wdta_t<base, per, ivec, pclk>::WDTRCR;
 
-#if defined(SIG_RX631) || defined(SIG_RX63N)
-	// RX631/RX63N では割り込みは、NMI を利用する。
-	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::NONE, clock_profile::PCLKB> WDT;
-#elif defined(SIG_RX231)
+#if defined(SIG_RX231) || defined(SIG_RX631) || defined(SIG_RX63N)
 	// WUNI for NMI
 	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::NONE, clock_profile::PCLKB> WDT;
 #else
