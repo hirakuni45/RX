@@ -166,7 +166,7 @@ namespace rx {
 		{
 			if(rx.cpu_type_ == "RX220") {
 				protocol_ = rx220::protocol();
-			} else if(rx.cpu_type_ == "RX231") {
+			} else if(rx.cpu_type_ == "RX140" || rx.cpu_type_ == "RX231") {
 				protocol_ = rx23x::protocol();
 			} else if(rx.cpu_type_ == "RX24T") {
 				protocol_ = rx24t::protocol();
