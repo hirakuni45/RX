@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・SRC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 #include "common/device.hpp"
 
@@ -29,8 +29,7 @@ namespace device {
 			@brief  入力データレジスタ（ SRCID ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0009'DFF0> SRCID_;
-		static  SRCID_ SRCID;
+		static inline rw32_t<0x0009'DFF0> SRCID;
 
 
 		//-----------------------------------------------------------------//
@@ -38,8 +37,7 @@ namespace device {
 			@brief  出力データレジスタ（ SRCOD ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x0009'DFF4> SRCOD_;
-		static  SRCOD_ SRCOD;
+		static inline rw32_t<0x0009'DFF4> SRCOD;
 
 
 		//-----------------------------------------------------------------//
@@ -60,8 +58,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B8>     IEN;
 			bit_rw_t< io_, bitpos::B9>     IED;
 		};
-		typedef srcidctrl_t<0x0009'DFF8> SRCIDCTRL_;
-		static  SRCIDCTRL_ SRCIDCTRL;
+		static inline srcidctrl_t<0x0009'DFF8> SRCIDCTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -83,8 +80,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B9>     OED;
 			bit_rw_t< io_, bitpos::B10>    OCH;
 		};
-		typedef srcodctrl_t<0x0009'DFFA> SRCODCTRL_;
-		static  SRCODCTRL_ SRCODCTRL;
+		static inline srcodctrl_t<0x0009'DFFA> SRCODCTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -112,8 +108,7 @@ namespace device {
 
 			bit_rw_t< io_, bitpos::B15>    FICRAE;
 		};
-		typedef srcctrl_t<0x0009'DFFC> SRCCTRL_;
-		static  SRCCTRL_ SRCCTRL;
+		static inline srcctrl_t<0x0009'DFFC> SRCCTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -142,8 +137,7 @@ namespace device {
 			bits_rw_t<ro_, bitpos::B11, 5> OFDN;
 
 		};
-		typedef srcstat_t<0x0009'DFFE> SRCSTAT_;
-		static  SRCSTAT_ SRCSTAT;
+		static inline srcstat_t<0x0009'DFFE> SRCSTAT;
 
 
 		//-----------------------------------------------------------------//
@@ -162,17 +156,7 @@ namespace device {
 
 //			void operator[] (uint16_t idx) { put(idx, val); }
 		};
-		typedef srcfctr_t<0x00098000> SRCFCTR_;
-		static  SRCFCTR_ SRCFCTR;
+		static inline srcfctr_t<0x0009'8000> SRCFCTR;
 	};
-	template <peripheral per> typename src_t<per>::SRCID_ src_t<per>::SRCID;
-	template <peripheral per> typename src_t<per>::SRCOD_ src_t<per>::SRCOD;
-	template <peripheral per> typename src_t<per>::SRCIDCTRL_ src_t<per>::SRCIDCTRL;
-	template <peripheral per> typename src_t<per>::SRCODCTRL_ src_t<per>::SRCODCTRL;
-	template <peripheral per> typename src_t<per>::SRCCTRL_ src_t<per>::SRCCTRL;
-	template <peripheral per> typename src_t<per>::SRCSTAT_ src_t<per>::SRCSTAT;
-	template <peripheral per> typename src_t<per>::SRCFCTR_ src_t<per>::SRCFCTR;
-
-
 	typedef src_t<peripheral::SRC> SRC;
 }

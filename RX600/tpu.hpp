@@ -6,7 +6,7 @@
 			RX631/RX63N @n
 			RX64M/RX71M/RX651/RX65N/RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,8 +40,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B3, 2> CKEG;
 			bits_rw_t<io_, bitpos::B5, 3> CCLR;
 		};
-		typedef tcr_t TCR_;
-		static TCR_ TCR;
+		static inline tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -62,8 +61,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>     ICSELB;
 			bit_rw_t <io_, bitpos::B7>     ICSELD;
 		};
-		typedef tmdr_t TMDR_;
-		static TMDR_ TMDR;
+		static inline tmdr_t TMDR;
 
 
 		//-----------------------------------------------------------------//
@@ -81,8 +79,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> IOA;
 			bits_rw_t<io_, bitpos::B4, 4> IOB;
 		};
-		typedef tiorh_t TIORH_;
-		static TIORH_ TIORH;
+		static inline tiorh_t TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -106,8 +103,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  TTGE;
 		};
-		typedef tier_t TIER_;
-		static TIER_ TIER;
+		static inline tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -131,8 +127,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  TCFD;
 		};
-		typedef tsr_t TSR_;
-		static TSR_ TSR;
+		static inline tsr_t TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -140,8 +135,7 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x06> TCNT_;
-		static TCNT_ TCNT;
+		static inline rw16_t<base + 0x06> TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -149,8 +143,7 @@ namespace device {
 			@brief  タイマジェネラルレジスタ A（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x08> TGRA_;
-		static TGRA_ TGRA;
+		static inline rw16_t<base + 0x08> TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -158,8 +151,7 @@ namespace device {
 			@brief  タイマジェネラルレジスタ B（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x0A> TGRB_;
-		static TGRB_ TGRB;
+		static inline rw16_t<base + 0x0A> TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -181,8 +173,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>  CST4;
 			bit_rw_t <io_, bitpos::B5>  CST5;
 		};
-		typedef tstr_t TSTR_;
-		static TSTR_ TSTR;
+		static inline tstr_t TSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -204,8 +195,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>  SYNC4;
 			bit_rw_t <io_, bitpos::B5>  SYNC5;
 		};
-		typedef tsyr_t TSYR_;
-		static TSYR_ TSYR;
+		static inline tsyr_t TSYR;
 
 
 		//-----------------------------------------------------------------//
@@ -227,20 +217,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 2>  NFCS;
 		};
-		typedef nfcr_t NFCR_;
-		static NFCR_ NFCR;
+		static inline nfcr_t NFCR;
 	};
-	template <uint32_t base> typename tpu_base_t<base>::TCR_   tpu_base_t<base>::TCR;
-	template <uint32_t base> typename tpu_base_t<base>::TMDR_  tpu_base_t<base>::TMDR;
-	template <uint32_t base> typename tpu_base_t<base>::TIORH_ tpu_base_t<base>::TIORH;
-	template <uint32_t base> typename tpu_base_t<base>::TIER_  tpu_base_t<base>::TIER;
-	template <uint32_t base> typename tpu_base_t<base>::TSR_   tpu_base_t<base>::TSR;
-	template <uint32_t base> typename tpu_base_t<base>::TCNT_  tpu_base_t<base>::TCNT;
-	template <uint32_t base> typename tpu_base_t<base>::TGRA_  tpu_base_t<base>::TGRA;
-	template <uint32_t base> typename tpu_base_t<base>::TGRB_  tpu_base_t<base>::TGRB;
-	template <uint32_t base> typename tpu_base_t<base>::TSTR_  tpu_base_t<base>::TSTR;
-	template <uint32_t base> typename tpu_base_t<base>::TSYR_  tpu_base_t<base>::TSYR;
-	template <uint32_t base> typename tpu_base_t<base>::NFCR_  tpu_base_t<base>::NFCR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -288,8 +266,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> IOC;
 			bits_rw_t<io_, bitpos::B4, 4> IOD;
 		};
-		typedef tiorl_t TIORL_;
-		static TIORL_ TIORL;
+		static inline tiorl_t TIORL;
 
 
 		//-----------------------------------------------------------------//
@@ -297,8 +274,7 @@ namespace device {
 			@brief  タイマジェネラルレジスタ C（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x0C> TGRC_;
-		static TGRC_ TGRC;
+		static inline rw16_t<base + 0x0C> TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -306,8 +282,7 @@ namespace device {
 			@brief  タイマジェネラルレジスタ D（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x0E> TGRD_;
-		static TGRD_ TGRD;
+		static inline rw16_t<base + 0x0E> TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -341,18 +316,6 @@ namespace device {
 			}
 		}
 	};
-	template <uint32_t base, peripheral per,
-		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
-		typename tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TIORL_
-		tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TIORL;
-	template <uint32_t base, peripheral per,
-		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
-		typename tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRC_
-		tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRC;
-	template <uint32_t base, peripheral per,
-		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
-		typename tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD_
-		tpu_x_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -401,8 +364,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> IOC;
 			bits_rw_t<io_, bitpos::B4, 4> IOD;
 		};
-		typedef tiorl_t TIORL_;
-		static TIORL_ TIORL;
+		static inline tiorl_t TIORL;
 
 
 		//-----------------------------------------------------------------//
@@ -411,8 +373,7 @@ namespace device {
 					※ダミーアクセス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_null_t<base + 0x0C> TGRC_;
-		static TGRC_ TGRC;
+		static inline rw16_null_t<base + 0x0C> TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -421,8 +382,7 @@ namespace device {
 					※ダミーアクセス
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_null_t<base + 0x0E> TGRD_;
-		static TGRD_ TGRD;
+		static inline rw16_null_t<base + 0x0E> TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -456,18 +416,7 @@ namespace device {
 			}
 		}
 	};
-	template <uint32_t base, peripheral per,
-		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
-		typename tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TIORL_
-		tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TIORL;
-	template <uint32_t base, peripheral per,
-		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
-		typename tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRC_
-		tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRC;
-	template <uint32_t base, peripheral per,
-		typename TGI, TGI tgia, TGI tgib, TGI tgic, TGI tgid, typename TCI, TCI tciv, TCI tciu>
-		typename tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD_
-		tpu_y_t<base, per, TGI, tgia, tgib, tgic, tgid, TCI, tciv, tciu>::TGRD;
+
 
 #if defined(SIG_RX231)
 	// グループベクターには無効表現が無い為、割り込みが無い場合「NUM_」としている。（I/O ドライバーのケアが必要）

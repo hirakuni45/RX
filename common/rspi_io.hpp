@@ -180,9 +180,9 @@ namespace device {
 			default:
 				break;
 			}
-			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
-				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(dlen))
-				| RSPI::SPCMD0.CPOL.b(cpol) | RSPI::SPCMD0.CPHA.b(cpha);
+			RSPI::SPCMD[0] = RSPI::SPCMD.BRDV.b(brdv)
+				| RSPI::SPCMD.SPB.b(static_cast<uint8_t>(dlen))
+				| RSPI::SPCMD.CPOL.b(cpol) | RSPI::SPCMD.CPHA.b(cpha);
 
 			RSPI::SPCR.SPMS = 1;
 			RSPI::SPCR.MSTR = 1;
@@ -231,9 +231,9 @@ namespace device {
 			}
 
 			RSPI::SPND  = 0b011;  // 4 RSPCK + 2 PCLK
-			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
-				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(DLEN::W8))
-				| RSPI::SPCMD0.CPHA.b(1) | RSPI::SPCMD0.CPOL.b(1) | RSPI::SPCMD0.SPNDEN.b(1);
+			RSPI::SPCMD[0] = RSPI::SPCMD.BRDV.b(brdv)
+				| RSPI::SPCMD.SPB.b(static_cast<uint8_t>(DLEN::W8))
+				| RSPI::SPCMD.CPHA.b(1) | RSPI::SPCMD.CPOL.b(1) | RSPI::SPCMD.SPNDEN.b(1);
 
 			// RSPCK 自動停止有効
 			RSPI::SPCR2 = RSPI::SPCR2.SCKASE.b(1);
@@ -355,7 +355,7 @@ namespace device {
 			if(real) {
 				static constexpr uint8_t n[4] = { 1, 2, 4, 8 };
 				uint32_t spd = static_cast<uint32_t>(RSPI::PCLK)
-						/ (2 * static_cast<uint32_t>(RSPI::SPBR() + 1) * static_cast<uint32_t>(n[RSPI::SPCMD0.BRDV()]));
+						/ (2 * static_cast<uint32_t>(RSPI::SPBR() + 1) * static_cast<uint32_t>(n[RSPI::SPCMD[0].BRDV()]));
 				return spd;
 			} else {
 				return speed_;

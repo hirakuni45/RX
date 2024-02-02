@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX631/RX63N/RX64M/RX71M グループ・PDC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,10 +15,18 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	パラレルデータキャプチャユニット（PDC）
+		@param[in]	per	ペリフェラル
+		@param[in]	GPT	グループ割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
+	template <peripheral per, typename GPT>
 	struct pdc_t {
+
+		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
+		static constexpr auto PCDFI = ICU::VECTOR::PCDFI;	///< 受信データレディ割り込み
+		static constexpr auto PCFEI = GPT::PCFEI;			///< フレームエンド割り込み
+		static constexpr auto PCERI = GPT::PCERI;			///< エラー割り込み
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -48,8 +56,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B11, 3>  PCKDIV;
 			bit_rw_t <io_, bitpos::B14>     EDS;
 		};
-		typedef pccr0_t<0x000A'0500>  PCCR0_;
-		static  PCCR0_ PCCR0;
+		static inline pccr0_t<0x000A'0500>  PCCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -68,8 +75,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>      PCE;
 		};
-		typedef pccr1_t<0x000A'0504>  PCCR1_;
-		static  PCCR1_ PCCR1;
+		static inline pccr1_t<0x000A'0504>  PCCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -94,8 +100,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>  VERF;
 			bit_rw_t<io_, bitpos::B6>  HERF;
 		};
-		typedef pcsr_t<0x000A'0508>  PCSR_;
-		static  PCSR_ PCSR;
+		static inline pcsr_t<0x000A'0508>  PCSR;
 
 
 		//-----------------------------------------------------------------//
@@ -112,8 +117,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  VSYNC;
 			bit_rw_t<io_, bitpos::B1>  HSYNC;
 		};
-		typedef pcmonr_t<0x000A'050C>  PCMONR_;
-		static  PCMONR_ PCMONR;
+		static inline pcmonr_t<0x000A'050C>  PCMONR;
 
 
 		//-----------------------------------------------------------------//
@@ -121,8 +125,7 @@ namespace device {
 			@brief  PDC 受信データレジスタ（ PCDR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x000A'0510>  PCDR_;
-		static  PCDR_ PCDR;
+		static inline rw32_t<0x000A'0510>  PCDR;
 
 
 		//-----------------------------------------------------------------//
@@ -142,8 +145,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  12>  VST;
 			bits_rw_t<io_, bitpos::B16, 12>  VSZ;
 		};
-		typedef vcr_t<0x000A'0514>  VCR_;
-		static  VCR_ VCR;
+		static inline vcr_t<0x000A'0514>  VCR;
 
 
 		//-----------------------------------------------------------------//
@@ -163,38 +165,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  12>  HST;
 			bits_rw_t<io_, bitpos::B16, 12>  HSZ;
 		};
-		typedef hcr_t<0x000A'0518>  HCR_;
-		static  HCR_ HCR;
-	};
-	template <class _> typename pdc_t<_>::PCCR0_  pdc_t<_>::PCCR0;
-	template <class _> typename pdc_t<_>::PCCR1_  pdc_t<_>::PCCR1;
-	template <class _> typename pdc_t<_>::PCSR_   pdc_t<_>::PCSR;
-	template <class _> typename pdc_t<_>::PCMONR_ pdc_t<_>::PCMONR;
-	template <class _> typename pdc_t<_>::PCDR_   pdc_t<_>::PCDR;
-	template <class _> typename pdc_t<_>::VCR_    pdc_t<_>::VCR;
-	template <class _> typename pdc_t<_>::HCR_    pdc_t<_>::HCR;
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief	パラレルデータキャプチャユニット（PDC）
-		@param[in]	per	ペリフェラル
-		@param[in]	GTI	グループ割り込み型
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per, typename GPT>
-	struct pdc_x_t : public pdc_t<void> {
-
-		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
-		static constexpr auto PCDFI = ICU::VECTOR::PCDFI;	///< 受信データレディ割り込み
-		static constexpr auto PCFEI = GPT::PCFEI;			///< フレームエンド割り込み
-		static constexpr auto PCERI = GPT::PCERI;			///< エラー割り込み
-
+		static inline hcr_t<0x000A'0518>  HCR;
 	};
 
 #if defined(SIG_RX631) || defined(SIG_RX63N)
-	typedef pdc_x_t<peripheral::PDC, ICU::VECTOR> PDC;
+	typedef pdc_t<peripheral::PDC, ICU::VECTOR> PDC;
 #else
-	typedef pdc_x_t<peripheral::PDC, ICU::GROUPBL0> PDC;
+	typedef pdc_t<peripheral::PDC, ICU::GROUPBL0> PDC;
 #endif
 }

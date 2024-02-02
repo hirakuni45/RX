@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・DOCA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -41,8 +41,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3>  DCSEL;
 			bit_rw_t <io_, bitpos::B7>     DOPCIE;
 		};
-		typedef docr_t<base + 0x00> DOCR_;
-		static  DOCR_ DOCR;
+		static inline docr_t<base + 0x00> DOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -58,8 +57,7 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B0>     DOPCF;
 		};
-		typedef dosr_t<base + 0x04> DOSR_;
-		static  DOSR_  DOSR;
+		static inline dosr_t<base + 0x04> DOSR;
 
 
 		//-----------------------------------------------------------------//
@@ -78,8 +76,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>     DOPCFCL;
 		};
-		typedef doscr_t<base + 0x08> DOSCR_;
-		static  DOSCR_ DOSCR;
+		static inline doscr_t<base + 0x08> DOSCR;
 
 
 		//-----------------------------------------------------------------//
@@ -87,8 +84,7 @@ namespace device {
 			@brief  DOC データインプットレジスタ（DODIR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x0C> DODIR_;
-		static  DODIR_ DODIR;
+		static inline rw32_t<base + 0x0C> DODIR;
 
 
 		//-----------------------------------------------------------------//
@@ -96,8 +92,7 @@ namespace device {
 			@brief  DOC データセッティングレジスタ 0（DODSR0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x10> DODSR0_;
-		static  DODSR0_ DODSR0;
+		static inline rw32_t<base + 0x10> DODSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -105,15 +100,8 @@ namespace device {
 			@brief  DOC データセッティングレジスタ 1（DODSR1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x14> DODSR1_;
-		static  DODSR1_ DODSR1;
+		static inline rw32_t<base + 0x14> DODSR1;
 	};
-	template <uint32_t base> typename doca_t<base>::DOCR_   doca_t<base>::DOCR;
-	template <uint32_t base> typename doca_t<base>::DOSR_   doca_t<base>::DOSR;
-	template <uint32_t base> typename doca_t<base>::DOSCR_  doca_t<base>::DOSCR;
-	template <uint32_t base> typename doca_t<base>::DODIR_  doca_t<base>::DODIR;
-	template <uint32_t base> typename doca_t<base>::DODSR0_ doca_t<base>::DODSR0;
-	template <uint32_t base> typename doca_t<base>::DODSR1_ doca_t<base>::DODSR1;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
