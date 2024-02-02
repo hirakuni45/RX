@@ -1,14 +1,14 @@
 #pragma once
-//=============================================================================//
+//=========================================================================//
 /*! @file
     @brief  mpfr ラッパークラス @n
 			GNU gmp, mpfr の C++ ラッパー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=============================================================================//
+//=========================================================================//
 #include <cmath>
 #include <mpfr.h>
 
@@ -26,7 +26,7 @@ namespace mpfr {
 		mpfr_t		t_;
 		mpfr_rnd_t	rnd_;
 
-		static uint32_t ref_count_;
+		static inline uint32_t ref_count_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -467,7 +467,4 @@ namespace mpfr {
 			return out;
 		}
 	};
-
-	// テンプレート関数、実態の定義
-	template<uint32_t num> uint32_t value<num>::ref_count_;
 }

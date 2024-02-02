@@ -4,7 +4,7 @@
 	@brief	Arithmetic テンプレート @n
 			※テキストの数式を展開して、計算結果を得る。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2015, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2015, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */

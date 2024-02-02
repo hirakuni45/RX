@@ -26,8 +26,8 @@ namespace device {
 		{
 			switch(per) {
 			case peripheral::RIIC0:
-			// P16/SCL0
-			// P17/SDA0
+			// P16/SCL0 (LFQFP64:18)
+			// P17/SDA0 (LFQFP64:17)
 				{
 					uint8_t sel = enable ? 0b0'1111 : 0;
 					PORT1::PMR.B6 = 0;
@@ -53,6 +53,19 @@ namespace device {
 					PORTB::PMR.B0 = enable;
 					PORTA::PMR.B6 = enable;
 					PORTC::PMR.B7 = enable;
+				}
+				break;
+			case peripheral::RSCAN:
+			// P14/CTXD0 (LFQFP64:20)
+			// P15/CRXD0 (LFQFP64:19)
+				{
+					uint8_t sel = enable ? 0b1'0000 : 0;
+					PORT1::PMR.B4 = 0;
+					PORT1::PMR.B5 = 0;
+					MPC::P14PFS.PSEL = sel;
+					MPC::P15PFS.PSEL = sel;
+					PORT1::PMR.B4 = enable;
+					PORT1::PMR.B5 = enable;
 				}
 				break;
 			case peripheral::SCI1:
@@ -177,9 +190,22 @@ namespace device {
 				}
 				break;
 #endif
+			case peripheral::RSCAN:
+			// P54/CTXD0 (LFQFP64:26)
+			// P55/CRXD0 (LFQFP64:25)
+				{
+					uint8_t sel = enable ? 0b1'0000 : 0;
+					PORT5::PMR.B4 = 0;
+					PORT5::PMR.B5 = 0;
+					MPC::P54PFS.PSEL = sel;
+					MPC::P55PFS.PSEL = sel;
+					PORT5::PMR.B4 = enable;
+					PORT5::PMR.B5 = enable;
+				}
+				break;
 			case peripheral::SCI1:  // for BOOT serial port
-			// P30/RXD1
-			// P26/TXD1
+			// P30/RXD1 (LFQFP64:14)
+			// P26/TXD1 (LFQFP64:16)
 				{
 					uint8_t sel = enable ? 0b0'1010 : 0;
 					PORT3::PMR.B0 = 0;
