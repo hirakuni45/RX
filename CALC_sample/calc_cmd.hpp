@@ -3,7 +3,7 @@
 /*! @file
     @brief  四則演算コマンドライン
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,7 +16,9 @@
 #include "common/fixed_string.hpp"
 
 #include "common/basic_arith.hpp"
+
 #include "common/mpfr.hpp"
+
 #include "calc_func.hpp"
 #include "calc_symbol.hpp"
 
