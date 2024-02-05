@@ -660,7 +660,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		static inline ir_t<0x00087000> IR;
+		static inline ir_t<0x0008'7000> IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -706,7 +706,7 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		static inline ier_t<0x00087200> IER;
+		static inline ier_t<0x0008'7200> IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -745,7 +745,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		static inline ipr_t<0x00087300> IPR;
+		static inline ipr_t<0x0008'7300> IPR;
 
 		/// @brief ソフトウェア割り込み 2 起動レジスタ (SWINT2R)
 		static inline SWINT2R_ SWINT2R;
@@ -821,7 +821,7 @@ namespace device {
 			@brief  選択型割り込み B 要因選択レジスタ n（SLIBRn）（n = 144 ～ 207）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static inline icu_utils::slixr_t<0x00087700, VECTOR, SELECTB> SLIBR;
+		static inline icu_utils::slixr_t<0x0008'7700, VECTOR, SELECTB> SLIBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -829,7 +829,7 @@ namespace device {
 			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static inline icu_utils::slixr_t<0x00087900, VECTOR, SELECTA> SLIAR;
+		static inline icu_utils::slixr_t<0x0008'7900, VECTOR, SELECTA> SLIAR;
 	};
 	typedef icu_t ICU;
 }

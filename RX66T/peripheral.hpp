@@ -103,6 +103,8 @@ namespace device {
 
 		CRC,		///< CRC 演算器 (CRCA)
 
+		TSIP,		///< Trusted Secure IP (TSIP-Lite)
+
 		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
 		S12AD1,		///< 12 ビット A/D コンバータ（S12ADC）
 		S12AD2,		///< 12 ビット A/D コンバータ（S12ADC）
@@ -119,5 +121,8 @@ namespace device {
 		CMPC5,		///< コンパレーター５
 
 		DOC,		///< データ演算回路 (DOC)
+
+		ECCRAM,		///< ECC RAM (32K)
+
 	};
 }
