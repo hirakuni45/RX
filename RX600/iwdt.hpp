@@ -33,8 +33,7 @@ namespace device {
 			@brief  IWDT リフレッシュレジスタ（IWDTRR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x00> IWDTRR_;
-		static IWDTRR_ IWDTRR;
+		static inline rw8_t<base + 0x00> IWDTRR;
 
 
 		//-----------------------------------------------------------------//
@@ -58,8 +57,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B12, 2> RPSS;
 		};
-		typedef iwdtcr_t<base + 0x02> IWDTCR_;
-		static IWDTCR_ IWDTCR;
+		static inline iwdtcr_t<base + 0x02> IWDTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -81,8 +79,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>    UNDFF;
 			bit_rw_t <io_, bitpos::B15>    REFEF;
 		};
-		typedef iwdtsr_t<base + 0x04> IWDTSR_;
-		static IWDTSR_ IWDTSR;
+		static inline iwdtsr_t<base + 0x04> IWDTSR;
 
 
 		//-----------------------------------------------------------------//
@@ -101,8 +98,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  RSTIRQS;
 		};
-		typedef iwdtrcr_t<base + 0x06> IWDTRCR_;
-		static IWDTRCR_ IWDTRCR;
+		static inline iwdtrcr_t<base + 0x06> IWDTRCR;
 
 
 		//-----------------------------------------------------------------//
@@ -121,20 +117,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  SLCSTP;
 		};
-		typedef iwdtcstpr_t<base + 0x08> IWDTCSTPR_;
-		static IWDTCSTPR_ IWDTCSTPR;
+		static inline iwdtcstpr_t<base + 0x08> IWDTCSTPR;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename iwdt_t<base, per, ivec, pclk>::IWDTRR_ iwdt_t<base, per, ivec, pclk>::IWDTRR;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename iwdt_t<base, per, ivec, pclk>::IWDTCR_ iwdt_t<base, per, ivec, pclk>::IWDTCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename iwdt_t<base, per, ivec, pclk>::IWDTSR_ iwdt_t<base, per, ivec, pclk>::IWDTSR;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename iwdt_t<base, per, ivec, pclk>::IWDTRCR_ iwdt_t<base, per, ivec, pclk>::IWDTRCR;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec, uint32_t pclk>
-		typename iwdt_t<base, per, ivec, pclk>::IWDTCSTPR_ iwdt_t<base, per, ivec, pclk>::IWDTCSTPR;
-
 
 #if defined(SIG_RX220) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef iwdt_t<0x0008'8030, peripheral::IWDT, ICU::VECTOR::NONE, 125'000> IWDT;

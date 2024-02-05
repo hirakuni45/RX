@@ -74,8 +74,7 @@ namespace device {
 			@brief  D/A データレジスタ 0（DADR0）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008'80C0> DADR0_;
-		static DADR0_ DADR0;
+		static inline rw16_t<0x0008'80C0> DADR0;
 
 
 		//-----------------------------------------------------------------//
@@ -83,8 +82,7 @@ namespace device {
 			@brief  D/A データレジスタ 1（DADR1）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<0x0008'80C2> DADR1_;
-		static DADR1_ DADR1;
+		static inline rw16_t<0x0008'80C2> DADR1;
 
 
 		//-----------------------------------------------------------------//
@@ -105,8 +103,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DAOE0;
 			bit_rw_t<io_, bitpos::B7> DAOE1;
 		};
-		typedef dacr_t<0x0008'80C4> DACR_;
-		static DACR_ DACR;
+		static inline dacr_t<0x0008'80C4> DACR;
 
 
 		//-----------------------------------------------------------------//
@@ -125,8 +122,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DPSEL;
 		};
-		typedef dadpr_t<0x0008'80C5> DADPR_;
-		static DADPR_ DADPR;
+		static inline dadpr_t<0x0008'80C5> DADPR;
 
 
 		//-----------------------------------------------------------------//
@@ -145,14 +141,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DAADST;
 		};
-		typedef daadscr_t<0x0008'80C6> DAADSCR_;
-		static DAADSCR_ DAADSCR;
+		static inline daadscr_t<0x0008'80C6> DAADSCR;
 	};
-	template <peripheral per> typename da_t<per>::DADR0_ da_t<per>::DADR0;
-	template <peripheral per> typename da_t<per>::DADR1_ da_t<per>::DADR1;
-	template <peripheral per> typename da_t<per>::DACR_  da_t<per>::DACR;
-	template <peripheral per> typename da_t<per>::DADPR_ da_t<per>::DADPR;
-	template <peripheral per> typename da_t<per>::DAADSCR_ da_t<per>::DAADSCR;
-
 	typedef da_t<peripheral::DA> DA;
 }

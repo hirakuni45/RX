@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T/RX26T/RX66T/RX72T グループ・CMPCa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -53,8 +53,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B5, 2>  CDFS;
 			bit_rw_t <io_, bitpos::B7>     HCMPON;
 		};
-		typedef cmpctl_t<base + 0x00> CMPCTL_;
-		static  CMPCTL_ CMPCTL;
+		static inline cmpctl_t<base + 0x00> CMPCTL;
 
 
 		//-----------------------------------------------------------------//
@@ -73,8 +72,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  CMPSEL;
 		};
-		typedef cmpsel0_t<base + 0x04> CMPSEL0_;
-		static  CMPSEL0_ CMPSEL0;
+		static inline cmpsel0_t<base + 0x04> CMPSEL0;
 
 
 		//-----------------------------------------------------------------//
@@ -93,8 +91,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  CVRS;
 		};
-		typedef cmpsel1_t<base + 0x08> CMPSEL1_;
-		static  CMPSEL1_ CMPSEL1;
+		static inline cmpsel1_t<base + 0x08> CMPSEL1;
 
 
 		//-----------------------------------------------------------------//
@@ -113,8 +110,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  CMPMON0;
 		};
-		typedef cmpmon_t<base + 0x0C> CMPMON_;
-		static  CMPMON_ CMPMON;
+		static inline cmpmon_t<base + 0x0C> CMPMON;
 
 
 		//-----------------------------------------------------------------//
@@ -133,19 +129,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  CPOE;
 		};
-		typedef cmpioc_t<base + 0x10> CMPIOC_;
-		static  CMPIOC_ CMPIOC;
+		static inline cmpioc_t<base + 0x10> CMPIOC;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-		typename cmpc_t<base, per, ivec>::CMPCTL_  cmpc_t<base, per, ivec>::CMPCTL;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-		typename cmpc_t<base, per, ivec>::CMPSEL0_ cmpc_t<base, per, ivec>::CMPSEL0;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-		typename cmpc_t<base, per, ivec>::CMPSEL1_ cmpc_t<base, per, ivec>::CMPSEL1;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-		typename cmpc_t<base, per, ivec>::CMPMON_  cmpc_t<base, per, ivec>::CMPMON;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-		typename cmpc_t<base, per, ivec>::CMPIOC_  cmpc_t<base, per, ivec>::CMPIOC;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -175,8 +160,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  CVRS;
 		};
-		typedef cmpsel1_t<base + 0x08> CMPSEL1_;
-		static  CMPSEL1_ CMPSEL1;
+		static inline cmpsel1_t<base + 0x08> CMPSEL1;
 
 
 		//-----------------------------------------------------------------//
@@ -195,14 +179,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  CNFS;
 		};
-		typedef cmpctl2_t<base + 0x18> CMPCTL2_;
-		static  CMPCTL2_ CMPCTL2;
+		static inline cmpctl2_t<base + 0x18> CMPCTL2;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-		typename cmpca_t<base, per, ivec>::CMPSEL1_  cmpca_t<base, per, ivec>::CMPSEL1;
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-		typename cmpca_t<base, per, ivec>::CMPCTL2_  cmpca_t<base, per, ivec>::CMPCTL2;
-
 
 #if defined(SIG_RX24T)
 	typedef cmpc_t<0x000A'0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
