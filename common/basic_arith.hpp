@@ -14,19 +14,19 @@
 
 namespace utils {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	Arithmetic クラス
 		@param[in]	NVAL	基本型
 		@param[in]	SYMBOL	変数クラス型
 		@param[in]	FUNC	関数クラス型
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class NVAL, class SYMBOL, class FUNC>
 	struct basic_arith {
 
-		static constexpr uint32_t NUMBER_NUM = 50;  ///< 最大桁数
-		static constexpr uint32_t NEST_MAX   = 10;  ///< 最大ネスト
+		static constexpr uint32_t NUMBER_NUM = 50;  	///< 最大桁数
+		static constexpr uint32_t NEST_MAX   = 10;  	///< 最大ネスト
 		static constexpr uint8_t CODE_SYM    = 0x80;	///< 変数の短縮コード（64個）
 		static constexpr uint8_t CODE_FUNC   = 0xC0;	///< 関数の短縮コード（64個）
 
@@ -37,12 +37,11 @@ namespace utils {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class error : uint8_t {
 			fatal,				///< エラー
+			buffer_fatal,		///< バッファーに関するエラー
 			number_fatal,		///< 数字の変換に関するエラー
-			zero_divide,		///< ０除算エラー
 			binary_fatal,		///< ２進データの変換に関するエラー
-			octal_fatal,		///< ８進データの変換に関するエラー
-			hexdecimal_fatal,	///< １６進データの変換に関するエラー
-			num_fatal,			///< 数値の変換に関するエラー
+			hexadecimal_fatal,	///< １６進データの変換に関するエラー
+			zero_divide,		///< ０除算エラー
 			nest_fatal,			///< 深度が制限を超えたエラー
 			symbol_fatal,		///< シンボルデータの変換に関するエラー
 			func_fatal,			///< 関数の変換に関するエラー
@@ -102,7 +101,6 @@ namespace utils {
 		NVAL number_() noexcept
 		{
 			bool minus = false;
-			char tmp[NUMBER_NUM];
 
 			// 符号、反転の判定
 			if(ch_ == '-') {
@@ -152,27 +150,70 @@ namespace utils {
 
 			if(ch_ == '(') {
 				nval = factor_();
-			} else {
+			} else {  // 0 - 9
+				char tmp[NUMBER_NUM];
 				uint32_t idx = 0;
-				while(ch_ != 0) {
-					if(ch_ == '+') break;
-					else if(ch_ == '-') break;
-					else if(ch_ == '*') break;
-					else if(ch_ == '/') break;
-					else if(ch_ == ')') break;
-					else if(ch_ == '^') break;
-					else if((ch_ >= '0' && ch_ <= '9') || ch_=='.' || ch_=='e' || ch_=='E') {
-						tmp[idx] = ch_;
-						idx++;
+				auto base = NVAL::BASE::DEC;
+				char back = 0;
+				do {
+					if(ch_ == '+' || ch_ == '-') {
+						if(base == NVAL::BASE::DEC && (back == 'E' || back == 'e')) {
+							tmp[idx] = ch_;
+							++idx;
+						} else {
+							break;
+						}
+					} else if(ch_ == '*' || ch_ == '/' || ch_ == ')' || ch_ == '^') {
+						break;
 					} else {
-						error_.set(error::fatal);
+						if(idx == 1 && back == '0') {
+							if(ch_ == 'X' || ch_ == 'x') {
+								base = NVAL::BASE::HEX;
+								ch_ = *tx_++;
+								continue;
+							} else if(ch_ == 'B' || ch_ == 'b') {
+								base = NVAL::BASE::BIN;
+								ch_ = *tx_++;
+								continue;
+							}
+						}
+						if(base == NVAL::BASE::DEC) {
+							if((ch_ >= '0' && ch_ <= '9') || ch_=='.' || ch_=='e' || ch_=='E') {
+								tmp[idx] = ch_;
+								idx++;
+							} else {
+								error_.set(error::number_fatal);
+								break;
+							}
+						} else if(base == NVAL::BASE::HEX) {
+							if((ch_ >= '0' && ch_ <= '9') || (ch_ >= 'A' && ch_ <= 'F')
+								|| (ch_ >= 'a' && ch_ <= 'f') || ch_ == '.') {
+								tmp[idx] = ch_;
+								idx++;
+							} else {
+								error_.set(error::number_fatal);
+								break;
+							}
+						} else if(base == NVAL::BASE::BIN) {
+							if(ch_ == '0' || ch_ == '1' || ch_ == '.') {
+								tmp[idx] = ch_;
+								idx++;
+							} else {
+								error_.set(error::number_fatal);
+								break;
+							}
+						}
+					}
+					if(idx >= (NUMBER_NUM - 1)) {
+						error_.set(error::buffer_fatal);
 						break;
 					}
+					back = ch_;
 					ch_ = *tx_++;
-				}
+				} while(ch_ != 0) ;
 				tmp[idx] = 0;
 				if(error_() == 0) {
-					nval.assign(tmp);
+					nval.assign(tmp, base);
 				}
 			}
 
@@ -400,7 +441,7 @@ namespace utils {
 		{
 			char ch;
 			while(len > 1 && (ch = *in++) != 0) {
-				uint8_t n = static_cast<uint8_t>(ch);
+				auto n = static_cast<uint8_t>(ch);
 				if(n < CODE_SYM) {
 					*out++ = ch;
 					len--;

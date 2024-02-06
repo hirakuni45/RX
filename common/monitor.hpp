@@ -213,7 +213,7 @@ namespace utils {
 				utils::format("r[ead] [org]            Read memory.\n");
 				utils::format("w[rite] org data ...    Write memory.\n");
 				utils::format("bus [124]               Current bus width\n");
-				utils::format("sym address name        Set symbol\n");
+//				utils::format("sym address name        Set symbol\n");
 //				utils::format("list [name] ...         List symbol\n");
 				return;
 			}
@@ -234,10 +234,10 @@ namespace utils {
 					opr = OPR::WRITE;
 				} else if(cmd_.cmp_word(0, "bus")) {
 					opr = OPR::BUS;
-				} else if(cmd_.cmp_word(0, "sym")) {
-					opr = OPR::SYM;
-				} else if(cmd_.cmp_word(0, "list")) {
-					opr = OPR::LIST;
+//				} else if(cmd_.cmp_word(0, "sym")) {
+//					opr = OPR::SYM;
+//				} else if(cmd_.cmp_word(0, "list")) {
+//					opr = OPR::LIST;
 				}
 			}
 			if(opr == OPR::NONE) {
@@ -252,7 +252,7 @@ namespace utils {
 			uint32_t end = address_ + 16 - step_();
 			uint32_t m = 0;
 			while(n < cmdn) {
-				char tmp[256];
+				char tmp[64];
 				cmd_.get_word(n, tmp, sizeof(tmp));
 				uint32_t v = 0;
 				if((utils::input("%x", tmp) % v).status()) {
@@ -261,28 +261,23 @@ namespace utils {
 						end = v + 16;
 						++m;
 					} else {
-						if(m >= 2) {
-							org = end;
+						if(opr == OPR::WRITE) {
+							wr_(org, v);
+							org += step_();
+							++m;
+						} else if(opr == OPR::DUMP) {
+							if(m >= 2) {
+								org = end;
+							}
+							end = v;
+							++m;
 						}
-						end = v;
-						++m;
 					}
 					if(opr == OPR::READ) {
 						v &= mask_();
 						read_(v);
 						address_ = v;
 						address_ += step_();
-					} else if(m >= 2) {
-						if(opr == OPR::SYM) {
-							if(sym_cnt_ < SYM_MAX) {
-								sym_adr_[sym_cnt_] = org;
-								sym_str_[sym_cnt_] = tmp;
-								++sym_cnt_;
-							}
-						} else if(opr == OPR::WRITE) {
-							wr_(org, v);
-							org += step_();
-						}
 					}
 				} else {
 					utils::format("Value: '%s' ?\n") % tmp;
@@ -290,6 +285,16 @@ namespace utils {
 				}
 				++n;
 			}
+#if 0
+						} else if(opr == OPR::SYM) {
+							// symbol name error check...
+							if(sym_cnt_ < SYM_MAX) {
+								sym_adr_[sym_cnt_] = org;
+								sym_str_[sym_cnt_] = tmp;
+								++sym_cnt_;
+								m = 0;
+							}
+#endif
 			switch(opr) {
 			case OPR::DUMP:
 				if(org > end) {

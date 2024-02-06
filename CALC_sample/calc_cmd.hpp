@@ -88,15 +88,18 @@ namespace app {
 			if(cmd[0] == 0) return;
 
 			if(strcmp(cmd, "help") == 0 || strcmp(cmd, "?") == 0) {
-				utils::format("  PI\n");
-				utils::format("  LOG2\n");
-				utils::format("  EULER\n");
-				utils::format("  ANS\n");
+				utils::format("  PI         constant\n");
+				utils::format("  LOG2       constant\n");
+				utils::format("  EULER      constant\n");
+				utils::format("  ANS        constant\n");
 				utils::format("  V[0-9]     Memory symbol 0..9\n");
 				utils::format("  Min[0-9]   Memory In 0..9\n");
 				utils::format("  Rad        0 to 2*PI\n");
 				utils::format("  Grad       0 to 400\n");
 				utils::format("  Deg        0 to 360\n");
+				utils::format("  Dec        Decimal mode\n");
+				utils::format("  Hex        Hexadecimal mode\n");
+				utils::format("  Bin        Binary mode\n");
 				utils::format("  sin(x)\n");
 				utils::format("  cos(x)\n");
 				utils::format("  tan(x)\n");
@@ -128,6 +131,15 @@ namespace app {
 			} else if(strcmp(cmd, "Deg") == 0) {
 				func_.set_atype(FUNC::ATYPE::Deg);
 				return;
+			} else if(strcmp(cmd, "Dec") == 0) {
+				func_.set_vtype(FUNC::VTYPE::Dec);
+				return;
+			} else if(strcmp(cmd, "Hex") == 0) {
+				func_.set_vtype(FUNC::VTYPE::Hex);
+				return;
+			} else if(strcmp(cmd, "Bin") == 0) {
+				func_.set_vtype(FUNC::VTYPE::Bin);
+				return;
 			}
 
 			if(arith_.analize(cmd)) {
@@ -135,8 +147,16 @@ namespace app {
 				auto ans = arith_();
 				symbol_.set_value(SYMBOL::NAME::ANS, ans);
 
+				char cnv = 'f';
+				if(func_.get_vtype() == FUNC::VTYPE::Dec) {
+					cnv = 'f';
+				} else if(func_.get_vtype() == FUNC::VTYPE::Hex) {
+					cnv = 'a';
+				} else if(func_.get_vtype() == FUNC::VTYPE::Bin) {
+					cnv = 'b';
+				}
 				char tmp[ANS_NUM+1];
-				ans(ANS_NUM, tmp, sizeof(tmp));
+				ans(ANS_NUM, tmp, sizeof(tmp), cnv);
 				// zero supless
 				auto l = strlen(tmp);
 				while(l > 0) {

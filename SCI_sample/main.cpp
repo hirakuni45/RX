@@ -21,10 +21,12 @@
 #include "common/format.hpp"
 #include "common/input.hpp"
 
-#include "common/monitor.hpp"
-
 // debug monitor を有効にする場合
 // #define MEMORY_MONITOR
+
+#ifdef MEMORY_MONITOR
+#include "common/monitor.hpp"
+#endif
 
 #ifdef __TFU
 // TFU の実験コードを有効にする場合

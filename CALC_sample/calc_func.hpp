@@ -3,7 +3,7 @@
 /*! @file
     @brief  電卓関数クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -46,7 +46,7 @@ namespace utils {
 
 		//=============================================================//
 		/*!
-			@brief  角度表現定義
+			@brief  角度表現型
 		*/
 		//=============================================================//
 		enum class ATYPE : uint8_t {
@@ -55,6 +55,19 @@ namespace utils {
 			Grad	///< グラード (400)
 		};
 
+
+		//=============================================================//
+		/*!
+			@brief  数値表現型
+		*/
+		//=============================================================//
+		enum class VTYPE : uint8_t {
+			Dec,	///< １０進
+			Hex,	///< １６進
+			Bin		///< ２進
+		};
+
+
 	private:
 		NVAL	pai_;
 		NVAL	rad_;
@@ -62,6 +75,7 @@ namespace utils {
 		NVAL	c2_;
 
 		ATYPE	atype_;
+		VTYPE	vtype_;
 
 	public:
 		//-------------------------------------------------------------//
@@ -71,7 +85,8 @@ namespace utils {
 		//-------------------------------------------------------------//
 		calc_func() noexcept :
 			rad_(360), grad_(400), c2_(2),
-			atype_(ATYPE::Deg) { }
+			atype_(ATYPE::Deg), vtype_(VTYPE::Dec)
+		{ }
 
 
 		//-------------------------------------------------------------//
@@ -111,20 +126,39 @@ namespace utils {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief  角度タイプの指定
-			@param[in]	atype	角度表現
+			@brief  角度型の指定
+			@param[in]	t	角度型
 		*/
 		//-------------------------------------------------------------//
-		void set_atype(ATYPE atype) noexcept { atype_ = atype; }
+		void set_atype(ATYPE t) noexcept { atype_ = t; }
 
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief  角度タイプの取得
-			@return	角度表現
+			@brief  角度型の取得
+			@return	角度型
 		*/
 		//-------------------------------------------------------------//
-		ATYPE get_atype() const noexcept { return atype_; }
+		auto get_atype() const noexcept { return atype_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  数値型の指定
+			@param[in]	t	数値型
+		*/
+		//-------------------------------------------------------------//
+		void set_vtype(VTYPE t) noexcept { vtype_ = t; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  角度型の取得
+			@return	角度型
+		*/
+		//-------------------------------------------------------------//
+		auto get_vtype() const noexcept { return vtype_; }
+
 
 
 		//-------------------------------------------------------------//
