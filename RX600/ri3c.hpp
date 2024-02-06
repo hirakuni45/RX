@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX26T RI3C
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -37,8 +37,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>      OMS;
 		};
-		typedef icmr_t<base + 0x00> ICMR_;
-		static  ICMR_ ICMR;
+		static inline icmr_t<base + 0x00> ICMR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -63,8 +62,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B30>     RESUME;
 			bit_rw_t<io_, bitpos::B31>     ICE;
 		};
-		typedef iccr_t<base + 0x14> ICCR_;
-		static  ICCR_ ICCR;
+		static inline iccr_t<base + 0x14> ICCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -85,8 +83,7 @@ namespace device {
 	
 			bit_rw_t <io_, bitpos::B31>     DAV;
 		};
-		typedef iccar_t<base + 0x18> ICCAR_;
-		static  ICCAR_ ICCAR;
+		static inline iccar_t<base + 0x18> ICCAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -113,8 +110,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B16>     ISRST;
 		};
-		typedef icrcr_t<base + 0x20> ICRCR_;
-		static  ICRCR_ ICRCR;
+		static inline icrcr_t<base + 0x20> ICRCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -135,8 +131,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>      WP;
 		};
-		typedef icmmr_t<base + 0x24> ICMMR_;
-		static  ICMMR_ ICMMR;
+		static inline icmmr_t<base + 0x24> ICMMR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -155,8 +150,7 @@ namespace device {
 	
 			bit_rw_t <io_, bitpos::B10>     BERF;
 		};
-		typedef icisr_t<base + 0x30> ICISR_;
-		static  ICISR_ ICISR;
+		static inline icisr_t<base + 0x30> ICISR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -175,8 +169,7 @@ namespace device {
 	
 			bit_rw_t <io_, bitpos::B10>     BERDE;
 		};
-		typedef iciser_t<base + 0x34> ICISER_;
-		static  ICISER_ ICISER;
+		static inline iciser_t<base + 0x34> ICISER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -195,8 +188,7 @@ namespace device {
 	
 			bit_rw_t <io_, bitpos::B10>     BERIE;
 		};
-		typedef icisier_t<base + 0x38> ICISIER_;
-		static  ICISIER_ ICISIER;
+		static inline icisier_t<base + 0x38> ICISIER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -212,8 +204,7 @@ namespace device {
 	
 			bits_ro_t<in_, bitpos::B19, 5>  INDEX;
 		};
-		typedef icdctir_t<base + 0x44> ICDCTIR_;
-		static  ICDCTIR_ ICDCTIR;
+		static inline icdctir_t<base + 0x44> ICDCTIR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -235,8 +226,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B3>      RTIRN;
 		};
-		typedef icincr_t<base + 0x58> ICINCR_;
-		static  ICINCR_ ICINCR;
+		static inline icincr_t<base + 0x58> ICINCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -255,8 +245,7 @@ namespace device {
 	
 			bit_rw_t <io_, bitpos::B16>     TA0DE;
 		};
-		typedef ictcr_t<base + 0x64> ICTCR_;
-		static  ICTCR_ ICTCR;
+		static inline ictcr_t<base + 0x64> ICTCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -281,8 +270,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B31>     ODDBL;
 		};
-		typedef icsbr_t<base + 0x74> ICSBR_;
-		static  ICSBR_ ICSBR;
+		static inline icsbr_t<base + 0x74> ICSBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -305,8 +293,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B24, 6>  PPHW;
 		};
-		typedef icebr_t<base + 0x78> ICEBR_;
-		static  ICEBR_ ICEBR;
+		static inline icebr_t<base + 0x78> ICEBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -325,8 +312,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 9>   VAL;
 		};
-		typedef icbftr_t<base + 0x7C> ICBFTR_;
-		static  ICBFTR_ ICBFTR;
+		static inline icbftr_t<base + 0x7C> ICBFTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -345,8 +331,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 9>   VAL;
 		};
-		typedef icbatr_t<base + 0x80> ICBATR_;
-		static  ICBATR_ ICBATR;
+		static inline icbatr_t<base + 0x80> ICBATR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -365,8 +350,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 18>  VAL;
 		};
-		typedef icbitr_t<base + 0x84> ICBITR_;
-		static  ICBITR_ ICBITR;
+		static inline icbitr_t<base + 0x84> ICBITR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -387,8 +371,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>      SCLO;
 			bit_rw_t <io_, bitpos::B2>      SOWP;
 		};
-		typedef icocr_t<base + 0x88> ICOCR_;
-		static  ICOCR_ ICOCR;
+		static inline icocr_t<base + 0x88> ICOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -411,8 +394,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>      TMOH;
 			bits_rw_t<io_, bitpos::B6, 2>   TMOM;
 		};
-		typedef ictor_t<base + 0x90> ICTOR_;
-		static  ICTOR_ ICTOR;
+		static inline ictor_t<base + 0x90> ICTOR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -436,8 +418,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>     PBSE;
 			bit_rw_t <io_, bitpos::B31>     APSE;
 		};
-		typedef icstcr_t<base + 0xB0> ICSTCR_;
-		static  ICSTCR_ ICSTCR;
+		static inline icstcr_t<base + 0xB0> ICSTCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -456,8 +437,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B16, 16> DLGTH;
 		};
-		typedef ictdlr_t<base + 0xC0> ICTDLR_;
-		static  ICTDLR_ ICTDLR;
+		static inline ictdlr_t<base + 0xC0> ICTDLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -465,8 +445,7 @@ namespace device {
 			@brief	コマンドキューレジスタ (ICCQR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x150> ICCQR_;
-		static  ICCQR_ ICCQR;
+		typedef rw32_t<base + 0x150> ICCQR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -474,8 +453,7 @@ namespace device {
 			@brief	レスポンスキューレジスタ (ICRQR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x154> ICRQR_;
-		static  ICRQR_ ICRQR;
+		typedef rw32_t<base + 0x154> ICRQR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -483,8 +461,7 @@ namespace device {
 			@brief	送受信データレジスタ (ICDR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x158> ICDR_;
-		static  ICDR_ ICDR;
+		typedef rw32_t<base + 0x158> ICDR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -492,8 +469,7 @@ namespace device {
 			@brief	IBI キューレジスタ (ICIQR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x17C> ICIQR_;
-		static  ICIQR_ ICIQR;
+		typedef rw32_t<base + 0x17C> ICIQR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -501,8 +477,7 @@ namespace device {
 			@brief	受信ステータスキューレジスタ (ICSQR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x180> ICSQR_;
-		static  ICSQR_ ICSQR;
+		typedef rw32_t<base + 0x180> ICSQR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -524,8 +499,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 8>  IDSS;
 			bits_rw_t<io_, bitpos::B24, 8>  IQTH;
 		};
-		typedef icqbtcr_t<base + 0x190> ICQBTCR_;
-		static  ICQBTCR_ ICQBTCR;
+		static inline icqbtcr_t<base + 0x190> ICQBTCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -550,8 +524,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B24, 3>  RSTH;
 		};
-		typedef icdbtcr_t<base + 0x194> ICDBTCR_;
-		static  ICDBTCR_ ICDBTCR;
+		static inline icdbtcr_t<base + 0x194> ICDBTCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -570,8 +543,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B0, 8>   SQTH;
 		};
-		typedef icsqtcr_t<base + 0x1C0> ICSQTCR_;
-		static  ICSQTCR_ ICSQTCR;
+		static inline icsqtcr_t<base + 0x1C0> ICSQTCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -594,8 +566,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B20>     TMOF;
 		};
-		typedef icsr2_t<base + 0x1D0> ICSR2_;
-		static  ICSR2_ ICSR2;
+		static inline icsr2_t<base + 0x1D0> ICSR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -618,8 +589,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B20>     TMOE;
 		};
-		typedef icser_t<base + 0x1D4> ICSER_;
-		static  ICSER_ ICSER;
+		static inline icser_t<base + 0x1D4> ICSER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -642,8 +612,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B20>     TMOIE;
 		};
-		typedef icsier_t<base + 0x1D8> ICSIER_;
-		static  ICSIER_ ICSIER;
+		static inline icsier_t<base + 0x1D8> ICSIER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -671,8 +640,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B20>     SQFF;
 		};
-		typedef iccsr_t<base + 0x1E0> ICCSR_;
-		static  ICCSR_ ICCSR;
+		static inline iccsr_t<base + 0x1E0> ICCSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -700,8 +668,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B20>     SQFDE;
 		};
-		typedef iccser_t<base + 0x1E4> ICCSER_;
-		static  ICCSER_ ICCSER;
+		static inline iccser_t<base + 0x1E4> ICCSER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -729,8 +696,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B20>     SQFIE;
 		};
-		typedef iccsier_t<base + 0x1E8> ICCSIER_;
-		static  ICCSIER_ ICCSIER;
+		static inline iccsier_t<base + 0x1E8> ICCSIER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -748,8 +714,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B1>      BVAL;
 			bit_ro_t <in_, bitpos::B2>      BIDL;
 		};
-		typedef icbsr_t<base + 0x210> ICBSR_;
-		static ICBSR_ ICBSR;
+		static inline icbsr_t<base + 0x210> ICBSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -785,8 +750,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef ictdatr_t<base + 0x224> ICTDATR_;
-		static  ICTDATR_ ICTDATR;
+		static inline ictdatr_t<base + 0x224> ICTDATR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -810,8 +774,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B29, 2>  NACKRC;
 			bit_rw_t <io_, bitpos::B31>     TYPE;
 		};
-		typedef icedatr_t<base + 0x2A0> ICEDATR_;
-		static  ICEDATR_ ICEDATR;
+		static inline icedatr_t<base + 0x2A0> ICEDATR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -834,8 +797,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 7>  DADR;
 		};
-		typedef icear0_t<base + 0x2B0> ICEAR0_;
-		static  ICEAR0_ ICEAR0;
+		static inline icear0_t<base + 0x2B0> ICEAR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -866,8 +828,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef ictdctr_t<base + 0x2D0> ICTDCTR_;
-		static  ICTDCTR_ ICTDCTR;
+		static inline ictdctr_t<base + 0x2D0> ICTDCTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -892,8 +853,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B14, 2>  ROLE;
 		};
-		typedef icdctr_t<base + 0x320> ICDCTR_;
-		static  ICDCTR_ ICDCTR;
+		static inline icdctr_t<base + 0x320> ICDCTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -912,8 +872,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B0, 16>  VAL;
 		};
-		typedef icpidlr_t<base + 0x324> ICPIDLR_;
-		static  ICPIDLR_ ICPIDLR;
+		static inline icpidlr_t<base + 0x324> ICPIDLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -932,8 +891,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B0, 16>  VAL;
 		};
-		typedef icpidhr_t<base + 0x328> ICPIDHR_;
-		static  ICPIDHR_ ICPIDHR;
+		static inline icpidhr_t<base + 0x328> ICPIDHR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -955,8 +913,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>     SAV;
 			bit_rw_t <io_, bitpos::B31>     DAV;
 		};
-		typedef icdamr0_t<base + 0x330> ICDAMR0_;
-		static  ICDAMR0_ ICDAMR0;
+		static inline icdamr0_t<base + 0x330> ICDAMR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -978,8 +935,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B3>      ENHJ;
 		};
-		typedef ictevr_t<base + 0x350> ICTEVR_;
-		static  ICTEVR_ ICTEVR;
+		static inline ictevr_t<base + 0x350> ICTEVR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1001,8 +957,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>      ENTAS2;
 			bit_rw_t <io_, bitpos::B3>      ENTAS3;
 		};
-		typedef icasr_t<base + 0x354> ICASR_;
-		static  ICASR_ ICASR;
+		static inline icasr_t<base + 0x354> ICASR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1021,8 +976,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B0, 16>   NWL;
 		};
-		typedef icmwlr_t<base + 0x358> ICMWLR_;
-		static  ICMWLR_ ICMWLR;
+		static inline icmwlr_t<base + 0x358> ICMWLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1042,8 +996,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 16>   MRL;
 			bits_rw_t<io_, bitpos::B16, 8>   IBPL;
 		};
-		typedef icmrlr_t<base + 0x35C> ICMRLR_;
-		static  ICMRLR_ ICMRLR;
+		static inline icmrlr_t<base + 0x35C> ICMRLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1062,8 +1015,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B0, 8>    TM;
 		};
-		typedef ictmr_t<base + 0x360> ICTMR_;
-		static  ICTMR_ ICTMR;
+		static inline ictmr_t<base + 0x360> ICTMR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1088,8 +1040,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B6, 2>    CAS;
 			bits_rw_t<io_, bitpos::B8, 8>    VRSV;
 		};
-		typedef icdsr_t<base + 0x364> ICDSR_;
-		static  ICDSR_ ICDSR;
+		static inline icdsr_t<base + 0x364> ICDSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1108,8 +1059,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B0, 3>    MSWDR;
 		};
-		typedef icmwsr_t<base + 0x368> ICMWSR_;
-		static  ICMWSR_ ICMWSR;
+		static inline icmwsr_t<base + 0x368> ICMWSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1129,8 +1079,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 3>    MSRDR;
 			bits_rw_t<io_, bitpos::B3, 3>    TSCO;
 		};
-		typedef icmrsr_t<base + 0x36C> ICMRSR_;
-		static  ICMRSR_ ICMRSR;
+		static inline icmrsr_t<base + 0x36C> ICMRSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1151,8 +1100,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B31>      MRTTE;
 		};
-		typedef icmttr_t<base + 0x370> ICMTTR_;
-		static  ICMTTR_ ICMTTR;
+		static inline icmttr_t<base + 0x370> ICMTTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1172,8 +1120,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>   FREQ;
 			bits_rw_t<io_, bitpos::B16, 8>   INAC;
 		};
-		typedef ictsir_t<base + 0x374> ICTSIR_;
-		static  ICTSIR_ ICTSIR;
+		static inline ictsir_t<base + 0x374> ICTSIR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1192,8 +1139,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B0, 5>    BC;
 		};
-		typedef icbcr_t<base + 0x380> ICBCR_;
-		static  ICBCR_ ICBCR;
+		static inline icbcr_t<base + 0x380> ICBCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1215,8 +1161,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 8>   IQFL;
 			bits_rw_t<io_, bitpos::B24, 5>   ISC;
 		};
-		typedef icqbsr_t<base + 0x394> ICQBSR_;
-		static  ICQBSR_ ICQBSR;
+		static inline icqbsr_t<base + 0x394> ICQBSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1236,8 +1181,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>    TBFL;
 			bits_rw_t<io_, bitpos::B8, 8>    RBFL;
 		};
-		typedef icdbsr_t<base + 0x398> ICDBSR_;
-		static  ICDBSR_ ICDBSR;
+		static inline icdbsr_t<base + 0x398> ICDBSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1256,8 +1200,7 @@ namespace device {
 	
 			bits_rw_t<io_, bitpos::B0, 8>    SQFL;
 		};
-		typedef icsqsr_t<base + 0x3C0> ICSQSR_;
-		static  ICSQSR_ ICSQSR;
+		static inline icsqsr_t<base + 0x3C0> ICSQSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1276,8 +1219,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>       SCLO;
 			bit_ro_t <in_, bitpos::B3>       SDAO;
 		};
-		typedef icimr_t<base + 0x3CC> ICIMR_;
-		static  ICIMR_ ICIMR;
+		static inline icimr_t<base + 0x3CC> ICIMR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1293,69 +1235,8 @@ namespace device {
 	
 			bits_ro_t<in_, bitpos::B0, 8>    CE2C;
 		};
-		typedef iccecr_t<base + 0x3D0> ICCECR_;
-		static  ICCECR_ ICCECR;
+		static inline iccecr_t<base + 0x3D0> ICCECR;
 	};
-	template <uint32_t base> typename ri3c_core_t<base>::ICMR_    ri3c_core_t<base>::ICMR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICCR_    ri3c_core_t<base>::ICCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICCAR_   ri3c_core_t<base>::ICCAR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICRCR_   ri3c_core_t<base>::ICRCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICMMR_   ri3c_core_t<base>::ICMMR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICISR_   ri3c_core_t<base>::ICISR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICISER_  ri3c_core_t<base>::ICISER;
-	template <uint32_t base> typename ri3c_core_t<base>::ICISIER_ ri3c_core_t<base>::ICISIER;
-	template <uint32_t base> typename ri3c_core_t<base>::ICDCTIR_ ri3c_core_t<base>::ICDCTIR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICINCR_  ri3c_core_t<base>::ICINCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICTCR_   ri3c_core_t<base>::ICTCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICSBR_   ri3c_core_t<base>::ICSBR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICEBR_   ri3c_core_t<base>::ICEBR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICBFTR_  ri3c_core_t<base>::ICBFTR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICBATR_  ri3c_core_t<base>::ICBATR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICBITR_  ri3c_core_t<base>::ICBITR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICOCR_   ri3c_core_t<base>::ICOCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICTOR_   ri3c_core_t<base>::ICTOR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICSTCR_  ri3c_core_t<base>::ICSTCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICTDLR_  ri3c_core_t<base>::ICTDLR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICCQR_   ri3c_core_t<base>::ICCQR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICRQR_   ri3c_core_t<base>::ICRQR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICDR_    ri3c_core_t<base>::ICDR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICIQR_   ri3c_core_t<base>::ICIQR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICSQR_   ri3c_core_t<base>::ICSQR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICQBTCR_ ri3c_core_t<base>::ICQBTCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICDBTCR_ ri3c_core_t<base>::ICDBTCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICSQTCR_ ri3c_core_t<base>::ICSQTCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICSR2_   ri3c_core_t<base>::ICSR2;
-	template <uint32_t base> typename ri3c_core_t<base>::ICSER_   ri3c_core_t<base>::ICSER;
-	template <uint32_t base> typename ri3c_core_t<base>::ICSIER_  ri3c_core_t<base>::ICSIER;
-	template <uint32_t base> typename ri3c_core_t<base>::ICCSR_   ri3c_core_t<base>::ICCSR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICCSER_  ri3c_core_t<base>::ICCSER;
-	template <uint32_t base> typename ri3c_core_t<base>::ICCSIER_ ri3c_core_t<base>::ICCSIER;
-	template <uint32_t base> typename ri3c_core_t<base>::ICBSR_   ri3c_core_t<base>::ICBSR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICTDATR_ ri3c_core_t<base>::ICTDATR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICEDATR_ ri3c_core_t<base>::ICEDATR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICEAR0_  ri3c_core_t<base>::ICEAR0;
-	template <uint32_t base> typename ri3c_core_t<base>::ICTDCTR_ ri3c_core_t<base>::ICTDCTR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICDCTR_  ri3c_core_t<base>::ICDCTR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICPIDLR_ ri3c_core_t<base>::ICPIDLR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICPIDHR_ ri3c_core_t<base>::ICPIDHR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICDAMR0_ ri3c_core_t<base>::ICDAMR0;
-	template <uint32_t base> typename ri3c_core_t<base>::ICTEVR_  ri3c_core_t<base>::ICTEVR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICASR_   ri3c_core_t<base>::ICASR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICMWLR_  ri3c_core_t<base>::ICMWLR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICMRLR_  ri3c_core_t<base>::ICMRLR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICTMR_   ri3c_core_t<base>::ICTMR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICDSR_   ri3c_core_t<base>::ICDSR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICMWSR_  ri3c_core_t<base>::ICMWSR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICMRSR_  ri3c_core_t<base>::ICMRSR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICMTTR_  ri3c_core_t<base>::ICMTTR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICTSIR_  ri3c_core_t<base>::ICTSIR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICBCR_   ri3c_core_t<base>::ICBCR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICQBSR_  ri3c_core_t<base>::ICQBSR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICDBSR_  ri3c_core_t<base>::ICDBSR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICSQSR_  ri3c_core_t<base>::ICSQSR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICIMR_   ri3c_core_t<base>::ICIMR;
-	template <uint32_t base> typename ri3c_core_t<base>::ICCECR_  ri3c_core_t<base>::ICCECR;
-
 
 #if defined(SIG_RX26T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

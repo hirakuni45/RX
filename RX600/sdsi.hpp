@@ -49,7 +49,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B11>  FN1ACC;
 		};
-		static fn1accr_t<0x0000> FN1ACCR;
+		static inline fn1accr_t<0x0000> FN1ACCR;
 
 
 		//-----------------------------------------------------------------//
@@ -70,7 +70,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  CMD53WIREN;
 			bit_rw_t<io_, bitpos::B2>  CMD53RIREN;
 		};
-		static intencr1_t<0x0004> INTENCR1;
+		static inline intencr1_t<0x0004> INTENCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -91,7 +91,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  CMD53W;
 			bit_rw_t<io_, bitpos::B2>  CMD53R;
 		};
-		static intsr1_t<0x0005> INTSR1;
+		static inline intsr1_t<0x0005> INTSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -114,7 +114,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>  SDBMODE;
 			bit_rw_t<io_, bitpos::B4>  SDOPCODE;
 		};
-		static sdcmdcr_t<0x0006> SDCMDCR;
+		static inline sdcmdcr_t<0x0006> SDCMDCR;
 
 
 		//-----------------------------------------------------------------//
@@ -130,7 +130,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 8>  SDCMDACCADD;
 		};
-		static sdcadd0r_t<0x0007> SDCADD0R;
+		static inline sdcadd0r_t<0x0007> SDCADD0R;
 
 
 		//-----------------------------------------------------------------//
@@ -146,7 +146,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 8>  SDCMDACCADD;
 		};
-		static sdcadd1r_t<0x0008> SDCADD1R;
+		static inline sdcadd1r_t<0x0008> SDCADD1R;
 
 
 		//-----------------------------------------------------------------//
@@ -162,7 +162,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 8>  SDCMDACCADD;
 		};
-		static sdcadd2r_t<0x0009> SDCADD2R;
+		static inline sdcadd2r_t<0x0009> SDCADD2R;
 
 
 		//-----------------------------------------------------------------//
@@ -183,7 +183,7 @@ namespace device {
 			bit_ro_t<io_, bitpos::B1>  EPS;
 			bit_ro_t<io_, bitpos::B2>  EMPC;
 		};
-		static sdsicr1_t<0x000A> SDSICR1;
+		static inline sdsicr1_t<0x000A> SDSICR1;
 
 
 		//-----------------------------------------------------------------//
@@ -203,7 +203,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  DMAEN;
 			bit_rw_t<io_, bitpos::B1>  DMALOCKEN;
 		};
-		static dmacr1_t<0x000B> DMACR1;
+		static inline dmacr1_t<0x000B> DMACR1;
 
 
 		//-----------------------------------------------------------------//
@@ -222,7 +222,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 9>  CMD53BLK;
 		};
-		static blkcnt_t<0x000C> BLKCNT;
+		static inline blkcnt_t<0x000C> BLKCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -241,7 +241,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 12>  CMD53BYT;
 		};
-		static bytcnt_t<0x000E> BYTCNT;
+		static inline bytcnt_t<0x000E> BYTCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -260,7 +260,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 32>  DMAADD;
 		};
-		static dmatraddr_t<0x0010> DMATRADDR;
+		static inline dmatraddr_t<0x0010> DMATRADDR;
 
 
 

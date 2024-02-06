@@ -1,24 +1,24 @@
 #pragma once
-//=========================================================================//
+//=============================================================================//
 /*!	@file
 	@brief	マルチメディアカードインタフェース（MMCIF）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=========================================================================//
+//=============================================================================//
 #include "common/device.hpp"
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  マルチメディアカードインタフェースクラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per>
 	struct mmcif_t {
 
@@ -64,8 +64,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 6>  CMD;
 			bit_rw_t <io_, bitpos::B30>     BOOT;
 		};
-		typedef cecmdset_t<base + 0x00> CECMDSET_;
-		static  CECMDSET_ CECMDSET;
+		static inline cecmdset_t<base + 0x00> CECMDSET;
 
 
 		//-----------------------------------------------------------------//
@@ -73,8 +72,7 @@ namespace device {
 			@brief  アーギュメントレジスタ（ CEARG ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x08>  CEARG_;
-		static  CEARG_ CEARG;
+		static inline rw32_t<base + 0x08>  CEARG;
 
 
 		//-----------------------------------------------------------------//
@@ -82,8 +80,7 @@ namespace device {
 			@brief  自動 CMD12 アーギュメントレジスタ（ CEARGCMD12 ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x0C>  CEARGCMD12_;
-		static  CEARGCMD12_ CEARGCMD12;
+		static inline rw32_t<base + 0x0C>  CEARGCMD12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -102,8 +99,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B3>  BREAK;
 		};
-		typedef cecmdctrl_t<base + 0x10> CECMDCTRL_;
-		static  CECMDCTRL_ CECMDCTRL;
+		static inline cecmdctrl_t<base + 0x10> CECMDCTRL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -123,8 +119,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  16>  BLKSIZ;
 			bits_rw_t<io_, bitpos::B16, 16>  BLKCNT;
 		};
-		typedef ceblockset_t<base + 0x14> CEBLOCKSET_;
-		static  CEBLOCKSET_ CEBLOCKSET;
+		static inline ceblockset_t<base + 0x14> CEBLOCKSET;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -151,8 +146,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B24>      MMCBUSBSY;
 		};
-		typedef ceclkctrl_t<base + 0x18> CECLKCTRL_;
-		static  CECLKCTRL_ CECLKCTRL;
+		static inline ceclkctrl_t<base + 0x18> CECLKCTRL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -173,8 +167,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B25>      DMAWEN;
 			bit_rw_t <io_, bitpos::B26>      DMATYP;
 		};
-		typedef cebufacc_t<base + 0x1C> CEBUFACC_;
-		static  CEBUFACC_ CEBUFACC;
+		static inline cebufacc_t<base + 0x1C> CEBUFACC;
 
 
 		//-----------------------------------------------------------------//
@@ -182,8 +175,7 @@ namespace device {
 			@brief  レスポンスレジスタ 3 (CERESP3)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x20>  CERESP3_;
-		static  CERESP3_ CERESP3;
+		static inline ro32_t<base + 0x20>  CERESP3;
 
 
 		//-----------------------------------------------------------------//
@@ -191,8 +183,7 @@ namespace device {
 			@brief  レスポンスレジスタ 2 (CERESP2)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x24>  CERESP2_;
-		static  CERESP2_ CERESP2;
+		static inline ro32_t<base + 0x24>  CERESP2;
 
 
 		//-----------------------------------------------------------------//
@@ -200,8 +191,7 @@ namespace device {
 			@brief  レスポンスレジスタ 1 (CERESP1)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x28>  CERESP1_;
-		static  CERESP1_ CERESP1;
+		static inline ro32_t<base + 0x28>  CERESP1;
 
 
 		//-----------------------------------------------------------------//
@@ -209,8 +199,7 @@ namespace device {
 			@brief  レスポンスレジスタ 0 (CERESP0)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x2C>  CERESP0_;
-		static  CERESP0_ CERESP0;
+		static inline ro32_t<base + 0x2C>  CERESP0;
 
 
 		//-----------------------------------------------------------------//
@@ -218,8 +207,7 @@ namespace device {
 			@brief  自動 CMD12 レスポンスレジスタ (CERESPCMD12)
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x30>  CERESPCMD12_;
-		static  CERESPCMD12_ CERESPCMD12;
+		static inline ro32_t<base + 0x30>  CERESPCMD12;
 
 
 		//-----------------------------------------------------------------//
@@ -227,8 +215,7 @@ namespace device {
 			@brief  データレジスタ (CEDATA)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x34>  CEDATA_;
-		static  CEDATA_ CEDATA;
+		static inline rw32_t<base + 0x34>  CEDATA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -250,8 +237,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 4>   SBTACKTO;
 			bits_rw_t<io_, bitpos::B28, 4>   SBTCLKDIV;
 		};
-		typedef ceboot_t<base + 0x3C> CEBOOT_;
-		static  CEBOOT_ CEBOOT;
+		static inline ceboot_t<base + 0x3C> CEBOOT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -292,8 +278,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B25>  CMD12RBE;
 			bit_rw_t<io_, bitpos::B26>  CMD12DRE;
 		};
-		typedef ceint_t<base + 0x40> CEINT_;
-		static  CEINT_ CEINT;
+		static inline ceint_t<base + 0x40> CEINT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -334,8 +319,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B25>  MCMD12RBE;
 			bit_rw_t<io_, bitpos::B26>  MCMD12DRE;
 		};
-		typedef ceinten_t<base + 0x44> CEINTEN_;
-		static  CEINTEN_ CEINTEN;
+		static inline ceinten_t<base + 0x44> CEINTEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -358,8 +342,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>      CMDSIG;
 			bit_rw_t <io_, bitpos::B31>      CMDSEQ;
 		};
-		typedef cehoststs1_t<base + 0x48> CEHOSTSTS1_;
-		static  CEHOSTSTS1_ CEHOSTSTS1;
+		static inline cehoststs1_t<base + 0x48> CEHOSTSTS1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -399,8 +382,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B30>     CRC16E;
 			bit_ro_t <io_, bitpos::B31>     CRCSTE;
 		};
-		typedef cehoststs2_t<base + 0x4C> CEHOSTSTS2_;
-		static  CEHOSTSTS2_ CEHOSTSTS2;
+		static inline cehoststs2_t<base + 0x4C> CEHOSTSTS2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -424,8 +406,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B13>  CDRISE;
 			bit_rw_t <io_, bitpos::B14>  CDSIG;
 		};
-		typedef cedetect_t<base + 0x70> CEDETECT_;
-		static  CEDETECT_ CEDETECT;
+		static inline cedetect_t<base + 0x70> CEDETECT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -446,8 +427,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B21>  RESNOUT;
 		};
-		typedef ceaddmode_t<base + 0x74> CEADDMODE_;
-		static  CEADDMODE_ CEADDMODE;
+		static inline ceaddmode_t<base + 0x74> CEADDMODE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -468,31 +448,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B31>     SWRST;
 		};
-		typedef ceversion_t<base + 0x7C> CEVERSION_;
-		static  CEVERSION_ CEVERSION;
+		static inline ceversion_t<base + 0x7C> CEVERSION;
 	};
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CECMDSET_ mmcif_t<base, per>::CECMDSET;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEARG_ mmcif_t<base, per>::CEARG;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEARGCMD12_ mmcif_t<base, per>::CEARGCMD12;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CECMDCTRL_ mmcif_t<base, per>::CECMDCTRL;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEBLOCKSET_ mmcif_t<base, per>::CEBLOCKSET;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CECLKCTRL_ mmcif_t<base, per>::CECLKCTRL;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEBUFACC_ mmcif_t<base, per>::CEBUFACC;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CERESP3_ mmcif_t<base, per>::CERESP3;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CERESP2_ mmcif_t<base, per>::CERESP2;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CERESP1_ mmcif_t<base, per>::CERESP1;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CERESP0_ mmcif_t<base, per>::CERESP0;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CERESPCMD12_ mmcif_t<base, per>::CERESPCMD12;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEDATA_ mmcif_t<base, per>::CEDATA;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEBOOT_ mmcif_t<base, per>::CEBOOT;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEINT_ mmcif_t<base, per>::CEINT;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEINTEN_ mmcif_t<base, per>::CEINTEN;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEHOSTSTS1_ mmcif_t<base, per>::CEHOSTSTS1;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEHOSTSTS2_ mmcif_t<base, per>::CEHOSTSTS2;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEDETECT_ mmcif_t<base, per>::CEDETECT;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEADDMODE_ mmcif_t<base, per>::CEADDMODE;
-	template <uint32_t base, peripheral per> typename mmcif_t<base, per>::CEVERSION_ mmcif_t<base, per>::CEVERSION;
-
-
 	typedef mmcif_t<0x0008'8500, peripheral::MMCIF> MMCIF;
 }

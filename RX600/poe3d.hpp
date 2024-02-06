@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX26T ポートアウトプットイネーブル 3 (POE3D)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -44,8 +44,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     INV;
 		};
-		typedef icsr1_t<base + 0x00> ICSR1_;
-		static  ICSR1_ ICSR1;
+		static inline icsr1_t<base + 0x00> ICSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -70,8 +69,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     INV;
 		};
-		typedef icsr2_t<base + 0x04> ICSR2_;
-		static  ICSR2_ ICSR2;
+		static inline icsr2_t<base + 0x04> ICSR2;
 
 
 		//-----------------------------------------------------------------//
@@ -97,8 +95,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     INV;
 		};
-		typedef icsr3_t<base + 0x08> ICSR3_;
-		static  ICSR3_ ICSR3;
+		static inline icsr3_t<base + 0x08> ICSR3;
 
 
 		//-----------------------------------------------------------------//
@@ -124,8 +121,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     INV;
 		};
-		typedef icsr4_t<base + 0x16> ICSR4_;
-		static  ICSR4_ ICSR4;
+		static inline icsr4_t<base + 0x16> ICSR4;
 
 
 		//-----------------------------------------------------------------//
@@ -151,8 +147,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     INV;
 		};
-		typedef icsr5_t<base + 0x18> ICSR5_;
-		static  ICSR5_ ICSR5;
+		static inline icsr5_t<base + 0x18> ICSR5;
 
 
 		//-----------------------------------------------------------------//
@@ -173,8 +168,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B12>     OSTSTF;
 		};
-		typedef icsr6_t<base + 0x1C> ICSR6_;
-		static  ICSR6_ ICSR6;
+		static inline icsr6_t<base + 0x1C> ICSR6;
 
 
 		//-----------------------------------------------------------------//
@@ -200,8 +194,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     INV;
 		};
-		typedef icsr7_t<base + 0x20> ICSR7_;
-		static  ICSR7_ ICSR7;
+		static inline icsr7_t<base + 0x20> ICSR7;
 
 
 		//-----------------------------------------------------------------//
@@ -227,8 +220,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     INV;
 		};
-		typedef icsr8_t<base + 0x40> ICSR8_;
-		static  ICSR8_ ICSR8;
+		static inline icsr8_t<base + 0x40> ICSR8;
 
 
 		//-----------------------------------------------------------------//
@@ -250,8 +242,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     OSF1;
 		};
-		typedef ocsr1_t<base + 0x02> OCSR1_;
-		static  OCSR1_ OCSR1;
+		static inline ocsr1_t<base + 0x02> OCSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -273,8 +264,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     OSF2;
 		};
-		typedef ocsr2_t<base + 0x06> OCSR2_;
-		static  OCSR2_ OCSR2;
+		static inline ocsr2_t<base + 0x06> OCSR2;
 
 
 		//-----------------------------------------------------------------//
@@ -296,8 +286,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     OSF3;
 		};
-		typedef ocsr3_t<base + 0x2A> OCSR3_;
-		static  OCSR3_ OCSR3;
+		static inline ocsr3_t<base + 0x2A> OCSR3;
 
 
 		//-----------------------------------------------------------------//
@@ -319,8 +308,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     OSF4;
 		};
-		typedef ocsr4_t<base + 0x46> OCSR4_;
-		static  OCSR4_ OCSR4;
+		static inline ocsr4_t<base + 0x46> OCSR4;
 
 
 		//-----------------------------------------------------------------//
@@ -342,8 +330,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     OSF5;
 		};
-		typedef ocsr5_t<base + 0x48> OCSR5_;
-		static  OCSR5_ OCSR5;
+		static inline ocsr5_t<base + 0x48> OCSR5;
 
 
 		//-----------------------------------------------------------------//
@@ -369,8 +356,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>      OLSEN;
 		};
-		typedef alr1_t<base + 0x1A> ALR1_;
-		static  ALR1_ ALR1;
+		static inline alr1_t<base + 0x1A> ALR1;
 
 
 		//-----------------------------------------------------------------//
@@ -396,8 +382,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>      OLSEN;
 		};
-		typedef alr2_t<base + 0x1E> ALR2_;
-		static  ALR2_ ALR2;
+		static inline alr2_t<base + 0x1E> ALR2;
 
 
 		//-----------------------------------------------------------------//
@@ -423,8 +408,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>      OLSEN;
 		};
-		typedef alr3_t<base + 0x2C> ALR3_;
-		static  ALR3_ ALR3;
+		static inline alr3_t<base + 0x2C> ALR3;
 
 
 		//-----------------------------------------------------------------//
@@ -450,8 +434,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>      OLSEN;
 		};
-		typedef alr4_t<base + 0x4A> ALR4_;
-		static  ALR4_ ALR4;
+		static inline alr4_t<base + 0x4A> ALR4;
 
 
 		//-----------------------------------------------------------------//
@@ -473,8 +456,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>      OLSEN;
 		};
-		typedef alr5_t<base + 0x4C> ALR5_;
-		static  ALR5_ ALR5;
+		static inline alr5_t<base + 0x4C> ALR5;
 
 
 		//-----------------------------------------------------------------//
@@ -503,8 +485,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B9>      GPT46HIZ;
 			bit_rw_t <io_, bitpos::B10>     GPT79HIZ;
 		};
-		typedef spoer_t<base + 0x2E> SPOER_;
-		static  SPOER_ SPOER;
+		static inline spoer_t<base + 0x2E> SPOER;
 
 
 		//-----------------------------------------------------------------//
@@ -526,8 +507,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>      MTU0CZE;
 			bit_rw_t <io_, bitpos::B3>      MTU0DZE;
 		};
-		typedef poecr1_t<base + 0x0B> POECR1_;
-		static  POECR1_ POECR1;
+		static inline poecr1_t<base + 0x0B> POECR1;
 
 
 		//-----------------------------------------------------------------//
@@ -552,8 +532,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B9>      MTU4ACZE;
 			bit_rw_t <io_, bitpos::B10>     MTU3BDZE;
 		};
-		typedef poecr2_t<base + 0x0C> POECR2_;
-		static  POECR2_ POECR2;
+		static inline poecr2_t<base + 0x0C> POECR2;
 
 
 		//-----------------------------------------------------------------//
@@ -579,8 +558,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>      GPT6ABZE;
 			bit_rw_t <io_, bitpos::B7>      GPT7ABZE;
 		};
-		typedef poecr3_t<base + 0x0E> POECR3_;
-		static  POECR3_ POECR3;
+		static inline poecr3_t<base + 0x0E> POECR3;
 
 
 		//-----------------------------------------------------------------//
@@ -607,8 +585,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDMT34ZE;
 		};
-		typedef poecr4_t<base + 0x10> POECR4_;
-		static  POECR4_ POECR4;
+		static inline poecr4_t<base + 0x10> POECR4;
 
 
 		//-----------------------------------------------------------------//
@@ -635,8 +612,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDMT67ZE;
 		};
-		typedef poecr4b_t<base + 0x4E> POECR4B_;
-		static  POECR4B_ POECR4B;
+		static inline poecr4b_t<base + 0x4E> POECR4B;
 
 
 		//-----------------------------------------------------------------//
@@ -663,8 +639,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDMT0ZE;
 		};
-		typedef poecr5_t<base + 0x12> POECR5_;
-		static  POECR5_ POECR5;
+		static inline poecr5_t<base + 0x12> POECR5;
 
 
 		//-----------------------------------------------------------------//
@@ -691,8 +666,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDGPT01ZE;
 		};
-		typedef poecr6_t<base + 0x14> POECR6_;
-		static  POECR6_ POECR6;
+		static inline poecr6_t<base + 0x14> POECR6;
 
 
 		//-----------------------------------------------------------------//
@@ -719,8 +693,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDGPT23ZE;
 		};
-		typedef poecr6b_t<base + 0x50> POECR6B_;
-		static  POECR6B_ POECR6B;
+		static inline poecr6b_t<base + 0x50> POECR6B;
 
 
 		//-----------------------------------------------------------------//
@@ -742,8 +715,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>      MTU9CZE;
 			bit_rw_t <io_, bitpos::B3>      MTU9DZE;
 		};
-		typedef poecr7_t<base + 0x22> POECR7_;
-		static  POECR7_ POECR7;
+		static inline poecr7_t<base + 0x22> POECR7;
 
 
 		//-----------------------------------------------------------------//
@@ -770,8 +742,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDMT9ZE;
 		};
-		typedef poecr8_t<base + 0x24> POECR8_;
-		static  POECR8_ POECR8;
+		static inline poecr8_t<base + 0x24> POECR8;
 
 
 		//-----------------------------------------------------------------//
@@ -798,8 +769,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDGPT02ZE;
 		};
-		typedef poecr9_t<base + 0x52> POECR9_;
-		static  POECR9_ POECR9;
+		static inline poecr9_t<base + 0x52> POECR9;
 
 
 		//-----------------------------------------------------------------//
@@ -826,8 +796,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDGPT46ZE;
 		};
-		typedef poecr10_t<base + 0x54> POECR10_;
-		static  POECR10_ POECR10;
+		static inline poecr10_t<base + 0x54> POECR10;
 
 
 		//-----------------------------------------------------------------//
@@ -854,8 +823,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      IC8ADDGPT79ZE;
 		};
-		typedef poecr11_t<base + 0x56> POECR11_;
-		static  POECR11_ POECR11;
+		static inline poecr11_t<base + 0x56> POECR11;
 
 
 		//-----------------------------------------------------------------//
@@ -882,8 +850,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B10>     MTU9CME;
 			bit_rw_t <io_, bitpos::B11>     MTU9DME;
 		};
-		typedef pmmcr0_t<base + 0x30> PMMCR0_;
-		static  PMMCR0_ PMMCR0;
+		static inline pmmcr0_t<base + 0x30> PMMCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -914,8 +881,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B12>     MTU4CME;
 			bit_rw_t <io_, bitpos::B13>     MTU3DME;
 		};
-		typedef pmmcr1_t<base + 0x32> PMMCR1_;
-		static  PMMCR1_ PMMCR1;
+		static inline pmmcr1_t<base + 0x32> PMMCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -949,8 +915,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>     GPT7AME;
 			bit_rw_t <io_, bitpos::B15>     GPT7BME;
 		};
-		typedef pmmcr2_t<base + 0x34> PMMCR2_;
-		static  PMMCR2_ PMMCR2;
+		static inline pmmcr2_t<base + 0x34> PMMCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -974,8 +939,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>      C4FLAG;
 			bit_rw_t <io_, bitpos::B5>      C5FLAG;
 		};
-		typedef poecmpfr_t<base + 0x26> POECMPFR_;
-		static  POECMPFR_ POECMPFR;
+		static inline poecmpfr_t<base + 0x26> POECMPFR;
 
 
 		//-----------------------------------------------------------------//
@@ -999,8 +963,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>      POEREQ4;
 			bit_rw_t <io_, bitpos::B5>      POEREQ5;
 		};
-		typedef poecmpsel_t<base + 0x28> POECMPSEL_;
-		static  POECMPSEL_ POECMPSEL;
+		static inline poecmpsel_t<base + 0x28> POECMPSEL;
 
 
 		//-----------------------------------------------------------------//
@@ -1031,8 +994,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef poecmpex_t<base + 0x38> POECMPEX_;
-		static  POECMPEX_ POECMPEX;
+		static inline poecmpex_t<base + 0x38> POECMPEX;
 
 
 		//-----------------------------------------------------------------//
@@ -1052,8 +1014,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M0ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M0BSEL;
 		};
-		typedef m0selr1_t<base + 0x60> M0SELR1_;
-		static  M0SELR1_ M0SELR1;
+		static inline m0selr1_t<base + 0x60> M0SELR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1073,8 +1034,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M0CSEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M0DSEL;
 		};
-		typedef m0selr2_t<base + 0x61> M0SELR2_;
-		static  M0SELR2_ M0SELR2;
+		static inline m0selr2_t<base + 0x61> M0SELR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1094,8 +1054,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M3BSEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M3DSEL;
 		};
-		typedef m3selr_t<base + 0x62> M3SELR_;
-		static  M3SELR_ M3SELR;
+		static inline m3selr_t<base + 0x62> M3SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1115,8 +1074,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M4ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M4CSEL;
 		};
-		typedef m4selr1_t<base + 0x63> M4SELR1_;
-		static  M4SELR1_ M4SELR1;
+		static inline m4selr1_t<base + 0x63> M4SELR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1136,8 +1094,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M4BSEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M4DSEL;
 		};
-		typedef m4selr2_t<base + 0x64> M4SELR2_;
-		static  M4SELR2_ M4SELR2;
+		static inline m4selr2_t<base + 0x64> M4SELR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1157,8 +1114,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M6BSEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M6DSEL;
 		};
-		typedef m6selr_t<base + 0x65> M6SELR_;
-		static  M6SELR_ M6SELR;
+		static inline m6selr_t<base + 0x65> M6SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1178,8 +1134,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M7ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M7CSEL;
 		};
-		typedef m7selr1_t<base + 0x66> M7SELR1_;
-		static  M7SELR1_ M7SELR1;
+		static inline m7selr1_t<base + 0x66> M7SELR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1199,8 +1154,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M7BSEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M7DSEL;
 		};
-		typedef m7selr2_t<base + 0x67> M7SELR2_;
-		static  M7SELR2_ M7SELR2;
+		static inline m7selr2_t<base + 0x67> M7SELR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1220,8 +1174,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M9ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M9BSEL;
 		};
-		typedef m9selr1_t<base + 0x68> M9SELR1_;
-		static  M9SELR1_ M9SELR1;
+		static inline m9selr1_t<base + 0x68> M9SELR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1241,8 +1194,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   M9CSEL;
 			bits_rw_t<io_, bitpos::B4, 4>   M9DSEL;
 		};
-		typedef m9selr2_t<base + 0x69> M9SELR2_;
-		static  M9SELR2_ M9SELR2;
+		static inline m9selr2_t<base + 0x69> M9SELR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1262,8 +1214,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   G0ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   G0BSEL;
 		};
-		typedef g0selr_t<base + 0x6A> G0SELR_;
-		static  G0SELR_ G0SELR;
+		static inline g0selr_t<base + 0x6A> G0SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1283,8 +1234,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   G1ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   G1BSEL;
 		};
-		typedef g1selr_t<base + 0x6B> G1SELR_;
-		static  G1SELR_ G1SELR;
+		static inline g1selr_t<base + 0x6B> G1SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1304,8 +1254,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   G2ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   G2BSEL;
 		};
-		typedef g2selr_t<base + 0x6C> G2SELR_;
-		static  G2SELR_ G2SELR;
+		static inline g2selr_t<base + 0x6C> G2SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1325,8 +1274,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   G3ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   G3BSEL;
 		};
-		typedef g3selr_t<base + 0x6D> G3SELR_;
-		static  G3SELR_ G3SELR;
+		static inline g3selr_t<base + 0x6D> G3SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1346,8 +1294,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   G4ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   G4BSEL;
 		};
-		typedef g4selr_t<base + 0x6E> G4SELR_;
-		static  G4SELR_ G4SELR;
+		static inline g4selr_t<base + 0x6E> G4SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1367,8 +1314,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   G5ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   G5BSEL;
 		};
-		typedef g5selr_t<base + 0x6F> G5SELR_;
-		static  G5SELR_ G5SELR;
+		static inline g5selr_t<base + 0x6F> G5SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1388,8 +1334,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   G6ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   G6BSEL;
 		};
-		typedef g6selr_t<base + 0x70> G6SELR_;
-		static  G6SELR_ G6SELR;
+		static inline g6selr_t<base + 0x70> G6SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1409,8 +1354,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>   G7ASEL;
 			bits_rw_t<io_, bitpos::B4, 4>   G7BSEL;
 		};
-		typedef g7selr_t<base + 0x71> G7SELR_;
-		static  G7SELR_ G7SELR;
+		static inline g7selr_t<base + 0x71> G7SELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1429,8 +1373,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   POE0MS;
 		};
-		typedef imcr0_t<base + 0x5C> IMCR0_;
-		static  IMCR0_ IMCR0;
+		static inline imcr0_t<base + 0x5C> IMCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1449,8 +1392,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   POE4MS;
 		};
-		typedef imcr1_t<base + 0x5D> IMCR1_;
-		static  IMCR1_ IMCR1;
+		static inline imcr1_t<base + 0x5D> IMCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1469,8 +1411,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   POE8MS;
 		};
-		typedef imcr2_t<base + 0x5E> IMCR2_;
-		static  IMCR2_ IMCR2;
+		static inline imcr2_t<base + 0x5E> IMCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1489,8 +1430,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   POE10MS;
 		};
-		typedef imcr3_t<base + 0x5F> IMCR3_;
-		static  IMCR3_ IMCR3;
+		static inline imcr3_t<base + 0x5F> IMCR3;
 
 
 		//-----------------------------------------------------------------//
@@ -1509,8 +1449,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   POE11MS;
 		};
-		typedef imcr4_t<base + 0x74> IMCR4_;
-		static  IMCR4_ IMCR4;
+		static inline imcr4_t<base + 0x74> IMCR4;
 
 
 		//-----------------------------------------------------------------//
@@ -1529,8 +1468,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   POE12MS;
 		};
-		typedef imcr5_t<base + 0x75> IMCR5_;
-		static  IMCR5_ IMCR5;
+		static inline imcr5_t<base + 0x75> IMCR5;
 
 
 		//-----------------------------------------------------------------//
@@ -1549,8 +1487,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   POE9MS;
 		};
-		typedef imcr6_t<base + 0x76> IMCR6_;
-		static  IMCR6_ IMCR6;
+		static inline imcr6_t<base + 0x76> IMCR6;
 
 
 		//-----------------------------------------------------------------//
@@ -1569,8 +1506,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   CMP0MS;
 		};
-		typedef imcr9_t<base + 0x79> IMCR9_;
-		static  IMCR9_ IMCR9;
+		static inline imcr9_t<base + 0x79> IMCR9;
 
 
 		//-----------------------------------------------------------------//
@@ -1589,8 +1525,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   CMP1MS;
 		};
-		typedef imcr10_t<base + 0x7A> IMCR10_;
-		static  IMCR10_ IMCR10;
+		static inline imcr10_t<base + 0x7A> IMCR10;
 
 
 		//-----------------------------------------------------------------//
@@ -1609,8 +1544,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   CMP2MS;
 		};
-		typedef imcr11_t<base + 0x7B> IMCR11_;
-		static  IMCR11_ IMCR11;
+		static inline imcr11_t<base + 0x7B> IMCR11;
 
 
 		//-----------------------------------------------------------------//
@@ -1629,8 +1563,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   CMP3MS;
 		};
-		typedef imcr12_t<base + 0x7C> IMCR12_;
-		static  IMCR12_ IMCR12;
+		static inline imcr12_t<base + 0x7C> IMCR12;
 
 
 		//-----------------------------------------------------------------//
@@ -1649,8 +1582,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   CMP4MS;
 		};
-		typedef imcr13_t<base + 0x7D> IMCR13_;
-		static  IMCR13_ IMCR13;
+		static inline imcr13_t<base + 0x7D> IMCR13;
 
 
 		//-----------------------------------------------------------------//
@@ -1669,78 +1601,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>   CMP5MS;
 		};
-		typedef imcr14_t<base + 0x7E> IMCR14_;
-		static  IMCR14_ IMCR14;
+		static inline imcr14_t<base + 0x7E> IMCR14;
 	};
-	template <uint32_t base> typename poe3d_base_t<base>::ICSR1_     poe3d_base_t<base>::ICSR1;
-	template <uint32_t base> typename poe3d_base_t<base>::ICSR2_     poe3d_base_t<base>::ICSR2;
-	template <uint32_t base> typename poe3d_base_t<base>::ICSR3_     poe3d_base_t<base>::ICSR3;
-	template <uint32_t base> typename poe3d_base_t<base>::ICSR4_     poe3d_base_t<base>::ICSR4;
-	template <uint32_t base> typename poe3d_base_t<base>::ICSR5_     poe3d_base_t<base>::ICSR5;
-	template <uint32_t base> typename poe3d_base_t<base>::ICSR6_     poe3d_base_t<base>::ICSR6;
-	template <uint32_t base> typename poe3d_base_t<base>::ICSR7_     poe3d_base_t<base>::ICSR7;
-	template <uint32_t base> typename poe3d_base_t<base>::ICSR8_     poe3d_base_t<base>::ICSR8;
-	template <uint32_t base> typename poe3d_base_t<base>::OCSR1_     poe3d_base_t<base>::OCSR1;
-	template <uint32_t base> typename poe3d_base_t<base>::OCSR2_     poe3d_base_t<base>::OCSR2;
-	template <uint32_t base> typename poe3d_base_t<base>::OCSR3_     poe3d_base_t<base>::OCSR3;
-	template <uint32_t base> typename poe3d_base_t<base>::OCSR4_     poe3d_base_t<base>::OCSR4;
-	template <uint32_t base> typename poe3d_base_t<base>::OCSR5_     poe3d_base_t<base>::OCSR5;
-	template <uint32_t base> typename poe3d_base_t<base>::ALR1_      poe3d_base_t<base>::ALR1;
-	template <uint32_t base> typename poe3d_base_t<base>::ALR2_      poe3d_base_t<base>::ALR2;
-	template <uint32_t base> typename poe3d_base_t<base>::ALR3_      poe3d_base_t<base>::ALR3;
-	template <uint32_t base> typename poe3d_base_t<base>::ALR4_      poe3d_base_t<base>::ALR4;
-	template <uint32_t base> typename poe3d_base_t<base>::ALR5_      poe3d_base_t<base>::ALR5;
-	template <uint32_t base> typename poe3d_base_t<base>::SPOER_     poe3d_base_t<base>::SPOER;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR1_    poe3d_base_t<base>::POECR1;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR2_    poe3d_base_t<base>::POECR2;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR3_    poe3d_base_t<base>::POECR3;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR4_    poe3d_base_t<base>::POECR4;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR4B_   poe3d_base_t<base>::POECR4B;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR5_    poe3d_base_t<base>::POECR5;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR6_    poe3d_base_t<base>::POECR6;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR6B_   poe3d_base_t<base>::POECR6B;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR7_    poe3d_base_t<base>::POECR7;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR8_    poe3d_base_t<base>::POECR8;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR9_    poe3d_base_t<base>::POECR9;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR10_   poe3d_base_t<base>::POECR10;
-	template <uint32_t base> typename poe3d_base_t<base>::POECR11_   poe3d_base_t<base>::POECR11;
-	template <uint32_t base> typename poe3d_base_t<base>::PMMCR0_    poe3d_base_t<base>::PMMCR0;
-	template <uint32_t base> typename poe3d_base_t<base>::PMMCR1_    poe3d_base_t<base>::PMMCR1;
-	template <uint32_t base> typename poe3d_base_t<base>::PMMCR2_    poe3d_base_t<base>::PMMCR2;
-	template <uint32_t base> typename poe3d_base_t<base>::POECMPFR_  poe3d_base_t<base>::POECMPFR;
-	template <uint32_t base> typename poe3d_base_t<base>::POECMPSEL_ poe3d_base_t<base>::POECMPSEL;
-	template <uint32_t base> typename poe3d_base_t<base>::POECMPEX_  poe3d_base_t<base>::POECMPEX;
-	template <uint32_t base> typename poe3d_base_t<base>::M0SELR1_   poe3d_base_t<base>::M0SELR1;
-	template <uint32_t base> typename poe3d_base_t<base>::M0SELR2_   poe3d_base_t<base>::M0SELR2;
-	template <uint32_t base> typename poe3d_base_t<base>::M3SELR_    poe3d_base_t<base>::M3SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::M4SELR1_   poe3d_base_t<base>::M4SELR1;
-	template <uint32_t base> typename poe3d_base_t<base>::M4SELR2_   poe3d_base_t<base>::M4SELR2;
-	template <uint32_t base> typename poe3d_base_t<base>::M6SELR_    poe3d_base_t<base>::M6SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::M7SELR1_   poe3d_base_t<base>::M7SELR1;
-	template <uint32_t base> typename poe3d_base_t<base>::M7SELR2_   poe3d_base_t<base>::M7SELR2;
-	template <uint32_t base> typename poe3d_base_t<base>::M9SELR1_   poe3d_base_t<base>::M9SELR1;
-	template <uint32_t base> typename poe3d_base_t<base>::M9SELR2_   poe3d_base_t<base>::M9SELR2;
-	template <uint32_t base> typename poe3d_base_t<base>::G0SELR_    poe3d_base_t<base>::G0SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::G1SELR_    poe3d_base_t<base>::G1SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::G2SELR_    poe3d_base_t<base>::G2SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::G3SELR_    poe3d_base_t<base>::G3SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::G4SELR_    poe3d_base_t<base>::G4SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::G5SELR_    poe3d_base_t<base>::G5SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::G6SELR_    poe3d_base_t<base>::G6SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::G7SELR_    poe3d_base_t<base>::G7SELR;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR0_     poe3d_base_t<base>::IMCR0;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR1_     poe3d_base_t<base>::IMCR1;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR2_     poe3d_base_t<base>::IMCR2;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR3_     poe3d_base_t<base>::IMCR3;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR4_     poe3d_base_t<base>::IMCR4;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR5_     poe3d_base_t<base>::IMCR5;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR6_     poe3d_base_t<base>::IMCR6;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR9_     poe3d_base_t<base>::IMCR9;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR10_    poe3d_base_t<base>::IMCR10;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR11_    poe3d_base_t<base>::IMCR11;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR12_    poe3d_base_t<base>::IMCR12;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR13_    poe3d_base_t<base>::IMCR13;
-	template <uint32_t base> typename poe3d_base_t<base>::IMCR14_    poe3d_base_t<base>::IMCR14;
 
 #if defined(SIG_RX26T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1754,6 +1616,6 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = peripheral::POE3D;	///< ペリフェラル型
 	};
-	typedef poe3d_t<0x0009'E400> POE3D;
+	static inline poe3d_t<0x0009'E400> POE3D;
 #endif
 }

@@ -49,8 +49,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> IICRST;
 			bit_rw_t<io_, bitpos::B7> ICE;
 		};
-		typedef iccr1_t<base + 0x00> ICCR1_;
-		static ICCR1_ ICCR1;
+		static inline iccr1_t<base + 0x00> ICCR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -75,8 +74,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> MST;
 			bit_rw_t<io_, bitpos::B7> BBSY;
 		};
-		typedef iccr2_t<base + 0x01> ICCR2_;
-		static ICCR2_ ICCR2;
+		static inline iccr2_t<base + 0x01> ICCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -98,8 +96,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3> CKS;
 			bit_rw_t <io_, bitpos::B7>    MTWP;
 		};
-		typedef icmr1_t<base + 0x02> ICMR1_;
-		static ICMR1_ ICMR1;
+		static inline icmr1_t<base + 0x02> ICMR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -122,8 +119,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3> SDDL;
 			bit_rw_t <io_, bitpos::B7>    DLCS;
 		};
-		typedef icmr2_t<base + 0x03> ICMR2_;
-		static ICMR2_ ICMR2;
+		static inline icmr2_t<base + 0x03> ICMR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -148,8 +144,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>    WAIT;
 			bit_rw_t <io_, bitpos::B7>    SMBS;
 		};
-		typedef icmr3_t<base + 0x04> ICMR3_;
-		static ICMR3_ ICMR3;
+		static inline icmr3_t<base + 0x04> ICMR3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -175,8 +170,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> SCLE;
 			bit_rw_t<io_, bitpos::B7> FMPE;
 		};
-		typedef icfer_t<base + 0x05> ICFER_;
-		static ICFER_ ICFER;
+		static inline icfer_t<base + 0x05> ICFER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -202,8 +196,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> HOAE;
 		};
-		typedef icser_t<base + 0x06> ICSER_;
-		static ICSER_ ICSER;
+		static inline icser_t<base + 0x06> ICSER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -229,8 +222,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> TEIE;
 			bit_rw_t<io_, bitpos::B7> TIE;
 		};
-		typedef icier_t<base + 0x07> ICIER_;
-		static ICIER_ ICIER;
+		static inline icier_t<base + 0x07> ICIER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -256,8 +248,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> HOA;
 		};
-		typedef icsr1_t<base + 0x08> ICSR1_;
-		static ICSR1_ ICSR1;
+		static inline icsr1_t<base + 0x08> ICSR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -283,8 +274,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> TEND;
 			bit_rw_t<io_, bitpos::B7> TDRE;
 		};
-		typedef icsr2_t<base + 0x09> ICSR2_;
-		static ICSR2_ ICSR2;
+		static inline icsr2_t<base + 0x09> ICSR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -304,12 +294,9 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>    SVA0;
 			bits_rw_t<io_, bitpos::B1, 7> SVA;
 		};
-		typedef sarly_t<base + 0x0A> SARL0_;
-		typedef sarly_t<base + 0x0C> SARL1_;
-		typedef sarly_t<base + 0x0E> SARL2_;
-		static SARL0_ SARL0;
-		static SARL1_ SARL1;
-		static SARL2_ SARL2;
+		static inline sarly_t<base + 0x0A> SARL0;
+		static inline sarly_t<base + 0x0C> SARL1;
+		static inline sarly_t<base + 0x0E> SARL2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -329,12 +316,9 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>    FS;
 			bits_rw_t<io_, bitpos::B1, 2> SVA;
 		};
-		typedef saruy_t<base + 0x0B> SARU0_;
-		typedef saruy_t<base + 0x0D> SARU1_;
-		typedef saruy_t<base + 0x0F> SARU2_;
-		static SARU0_ SARU0;
-		static SARU1_ SARU1;
-		static SARU2_ SARU2;
+		static inline saruy_t<base + 0x0B> SARU0;
+		static inline saruy_t<base + 0x0D> SARU1;
+		static inline saruy_t<base + 0x0F> SARU2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -353,8 +337,7 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 5> BRL;
 		};
-		typedef icbrl_t<base + 0x10> ICBRL_;
-		static ICBRL_ ICBRL;
+		static inline icbrl_t<base + 0x10> ICBRL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -373,8 +356,7 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 5> BRH;
 		};
-		typedef icbrh_t<base + 0x11> ICBRH_;
-		static ICBRH_ ICBRH;
+		static inline icbrh_t<base + 0x11> ICBRH;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -382,8 +364,7 @@ namespace device {
 			@brief  I 2 C バス送信データレジスタ (ICDRT)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<base + 0x12> ICDRT_;
-		static ICDRT_ ICDRT;
+		static inline rw8_t<base + 0x12> ICDRT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -391,29 +372,8 @@ namespace device {
 			@brief  I 2 C バス受信データレジスタ (ICDRR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<base + 0x13> ICDRR_;
-		static ICDRR_ ICDRR;
+		static inline rw8_t<base + 0x13> ICDRR;
 	};
-	template <uint32_t base> typename riic_core_t<base>::ICCR1_ riic_core_t<base>::ICCR1;
-	template <uint32_t base> typename riic_core_t<base>::ICCR2_ riic_core_t<base>::ICCR2;
-	template <uint32_t base> typename riic_core_t<base>::ICMR1_ riic_core_t<base>::ICMR1;
-	template <uint32_t base> typename riic_core_t<base>::ICMR2_ riic_core_t<base>::ICMR2;
-	template <uint32_t base> typename riic_core_t<base>::ICMR3_ riic_core_t<base>::ICMR3;
-	template <uint32_t base> typename riic_core_t<base>::ICFER_ riic_core_t<base>::ICFER;
-	template <uint32_t base> typename riic_core_t<base>::ICSER_ riic_core_t<base>::ICSER;
-	template <uint32_t base> typename riic_core_t<base>::ICIER_ riic_core_t<base>::ICIER;
-	template <uint32_t base> typename riic_core_t<base>::ICSR1_ riic_core_t<base>::ICSR1;
-	template <uint32_t base> typename riic_core_t<base>::ICSR2_ riic_core_t<base>::ICSR2;
-	template <uint32_t base> typename riic_core_t<base>::SARL0_ riic_core_t<base>::SARL0;
-	template <uint32_t base> typename riic_core_t<base>::SARL1_ riic_core_t<base>::SARL1;
-	template <uint32_t base> typename riic_core_t<base>::SARL2_ riic_core_t<base>::SARL2;
-	template <uint32_t base> typename riic_core_t<base>::SARU0_ riic_core_t<base>::SARU0;
-	template <uint32_t base> typename riic_core_t<base>::SARU1_ riic_core_t<base>::SARU1;
-	template <uint32_t base> typename riic_core_t<base>::SARU2_ riic_core_t<base>::SARU2;
-	template <uint32_t base> typename riic_core_t<base>::ICBRL_ riic_core_t<base>::ICBRL;
-	template <uint32_t base> typename riic_core_t<base>::ICBRH_ riic_core_t<base>::ICBRH;
-	template <uint32_t base> typename riic_core_t<base>::ICDRT_ riic_core_t<base>::ICDRT;
-	template <uint32_t base> typename riic_core_t<base>::ICDRR_ riic_core_t<base>::ICDRR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -444,8 +404,7 @@ namespace device {
 			@brief  タイムアウト 内部カウンタ（TMOCNTL）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<base + 0x0A> TMOCNTL_;
-		static TMOCNTL_ TMOCNTL;
+		static inline rw8_t<base + 0x0A> TMOCNTL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -453,13 +412,8 @@ namespace device {
 			@brief  タイムアウト 内部カウンタ（TMOCNTU）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<base + 0x0B> TMOCNTU_;
-		static TMOCNTU_ TMOCNTU;
+		static inline rw8_t<base + 0x0B> TMOCNTU;
 	};
-	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR eei, ICU::VECTOR tei, uint32_t pclk>
-		typename riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTL_ riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTL;
-	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR eei, ICU::VECTOR tei, uint32_t pclk>
-		typename riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTU_ riic_t<base, per, txi, rxi, eei, tei, pclk>::TMOCNTU;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

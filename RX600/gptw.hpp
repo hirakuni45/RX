@@ -6,7 +6,7 @@
 			RX72N/RX72M: GPTW0 - GPTW3 @n
 			RX66T/RX72T: GPTW0 - GPTW9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -77,8 +77,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>     CMNWP;
 			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
 		};
-		typedef gtwp_t<base + 0x00> GTWP_;
-		static GTWP_ GTWP;
+		static inline gtwp_t<base + 0x00> GTWP;
 
 
 		//-----------------------------------------------------------------//
@@ -106,8 +105,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>  CSTRT8;
 			bit_rw_t <io_, bitpos::B9>  CSTRT9;
 		};
-		typedef gtstr_t<base + 0x04> GTSTR_;
-		static GTSTR_ GTSTR;
+		static inline gtstr_t<base + 0x04> GTSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -135,8 +133,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>  CSTOP8;
 			bit_rw_t <io_, bitpos::B9>  CSTOP9;
 		};
-		typedef gtstp_t<base + 0x08> GTSTP_;
-		static GTSTP_ GTSTP;
+		static inline gtstp_t<base + 0x08> GTSTP;
 
 
 		//-----------------------------------------------------------------//
@@ -164,8 +161,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>  CCLR8;
 			bit_rw_t <io_, bitpos::B9>  CCLR9;
 		};
-		typedef gtclr_t<base + 0x0C> GTCLR_;
-		static GTCLR_ GTCLR;
+		static inline gtclr_t<base + 0x0C> GTCLR;
 
 
 		//-----------------------------------------------------------------//
@@ -209,8 +205,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B31> CSTRT;
 		};
-		typedef gtssr_t<base + 0x10> GTSSR_;
-		static GTSSR_ GTSSR;
+		static inline gtssr_t<base + 0x10> GTSSR;
 
 
 		//-----------------------------------------------------------------//
@@ -254,8 +249,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B31> CSTOP;
 		};
-		typedef gtpsr_t<base + 0x14> GTPSR_;
-		static GTPSR_ GTPSR;
+		static inline gtpsr_t<base + 0x14> GTPSR;
 
 
 		//-----------------------------------------------------------------//
@@ -299,8 +293,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B31> CCLR;
 		};
-		typedef gtcsr_t<base + 0x18> GTCSR_;
-		static GTCSR_ GTCSR;
+		static inline gtcsr_t<base + 0x18> GTCSR;
 
 
 		//-----------------------------------------------------------------//
@@ -342,8 +335,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B22> USELCG;
 			bit_rw_t <io_, bitpos::B23> USELCH;
 		};
-		typedef gtupsr_t<base + 0x1C> GTUPSR_;
-		static GTUPSR_ GTUPSR;
+		static inline gtupsr_t<base + 0x1C> GTUPSR;
 
 
 		//-----------------------------------------------------------------//
@@ -385,8 +377,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B22> DSELCG;
 			bit_rw_t <io_, bitpos::B23> DSELCH;
 		};
-		typedef gtdnsr_t<base + 0x20> GTDNSR_;
-		static GTDNSR_ GTDNSR;
+		static inline gtdnsr_t<base + 0x20> GTDNSR;
 
 
 		//-----------------------------------------------------------------//
@@ -428,8 +419,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B22> ASELCG;
 			bit_rw_t <io_, bitpos::B23> ASELCH;
 		};
-		typedef gticasr_t<base + 0x24> GTICASR_;
-		static GTICASR_ GTICASR;
+		static inline gticasr_t<base + 0x24> GTICASR;
 
 
 		//-----------------------------------------------------------------//
@@ -471,8 +461,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B22> BSELCG;
 			bit_rw_t <io_, bitpos::B23> BSELCH;
 		};
-		typedef gticbsr_t<base + 0x28> GTICBSR_;
-		static GTICBSR_ GTICBSR;
+		static inline gticbsr_t<base + 0x28> GTICBSR;
 
 
 		//-----------------------------------------------------------------//
@@ -494,8 +483,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 3>  MD;
 			bits_rw_t<io_, bitpos::B23, 4>  TPCS;
 		};
-		typedef gtcr_t<base + 0x2C> GTCR_;
-		static GTCR_ GTCR;
+		static inline gtcr_t<base + 0x2C> GTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -523,8 +511,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B26>     OBDTYF;
 			bit_rw_t <io_, bitpos::B27>     OBDTYR;
 		};
-		typedef gtuddtyc_t<base + 0x30> GTUDDTYC_;
-		static GTUDDTYC_ GTUDDTYC;
+		static inline gtuddtyc_t<base + 0x30> GTUDDTYC;
 
 
 		//-----------------------------------------------------------------//
@@ -561,8 +548,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B29>     NFBEN;
 			bits_rw_t<io_, bitpos::B30, 2>  NFCSB;
 		};
-		typedef gtior_t<base + 0x34> GTIOR_;
-		static GTIOR_ GTIOR;
+		static inline gtior_t<base + 0x34> GTIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -598,8 +584,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B29>     GRPABH;
 			bit_rw_t <io_, bitpos::B30>     GRPABL;
 		};
-		typedef gtintad_t<base + 0x38> GTINTAD_;
-		static GTINTAD_ GTINTAD;
+		static inline gtintad_t<base + 0x38> GTINTAD;
 
 
 		//-----------------------------------------------------------------//
@@ -631,8 +616,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B29>     OABHF;
 			bit_ro_t <io_, bitpos::B30>     OABLF;
 		};
-		typedef gtst_t<base + 0x3C> GTST_;
-		static GTST_ GTST;
+		static inline gtst_t<base + 0x3C> GTST;
 
 
 		//-----------------------------------------------------------------//
@@ -669,8 +653,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B28, 2>  ADTTB;
 			bit_rw_t <io_, bitpos::B30>     ADTDB;
 		};
-		typedef gtber_t<base + 0x40> GTBER_;
-		static GTBER_ GTBER;
+		static inline gtber_t<base + 0x40> GTBER;
 
 
 		//-----------------------------------------------------------------//
@@ -700,8 +683,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B14>     ADTBL;
 		};
-		typedef gtitc_t<base + 0x44> GTITC_;
-		static GTITC_ GTITC;
+		static inline gtitc_t<base + 0x44> GTITC;
 
 
 		//-----------------------------------------------------------------//
@@ -709,8 +691,7 @@ namespace device {
 			@brief	汎用 PWM タイマカウンタ (GTCNT)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x48>  GTCNT_;
-		static GTCNT_ GTCNT;
+		static inline rw32_t<base + 0x48>  GTCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -719,17 +700,12 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		typedef rw32_t<base + 0x4C>  GTCCRA_;
-		static GTCCRA_ GTCCRA;
-		typedef rw32_t<base + 0x50>  GTCCRB_;
-		static GTCCRB_ GTCCRB;
-		typedef rw32_t<base + 0x54>  GTCCRC_;
-		static GTCCRC_ GTCCRC;
-		typedef rw32_t<base + 0x58>  GTCCRE_;
-		static GTCCRE_ GTCCRE;
-		typedef rw32_t<base + 0x5C>  GTCCRD_;
-		static GTCCRD_ GTCCRD;
-		typedef rw32_t<base + 0x60>  GTCCRF_;
-		static GTCCRF_ GTCCRF;
+		static inline GTCCRA_ GTCCRA;
+		static inline rw32_t<base + 0x50>  GTCCRB;
+		static inline rw32_t<base + 0x54>  GTCCRC;
+		static inline rw32_t<base + 0x58>  GTCCRE;
+		static inline rw32_t<base + 0x5C>  GTCCRD;
+		static inline rw32_t<base + 0x60>  GTCCRF;
 
 
 		//-----------------------------------------------------------------//
@@ -737,8 +713,7 @@ namespace device {
 			@brief	汎用 PWM タイマ周期設定レジスタ (GTPR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x64>  GTPR_;
-		static GTPR_ GTPR;
+		static inline rw32_t<base + 0x64>  GTPR;
 
 
 		//-----------------------------------------------------------------//
@@ -746,8 +721,7 @@ namespace device {
 			@brief	汎用 PWM タイマ周期設定バッファレジスタ (GTPBR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x68>  GTPBR_;
-		static GTPBR_ GTPBR;
+		static inline rw32_t<base + 0x68>  GTPBR;
 
 
 		//-----------------------------------------------------------------//
@@ -755,8 +729,7 @@ namespace device {
 			@brief	汎用 PWM タイマ周期設定ダブルバッファレジスタ (GTPDBR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x6C>  GTPDBR_;
-		static GTPDBR_ GTPDBR;
+		static inline rw32_t<base + 0x6C>  GTPDBR;
 
 
 		//-----------------------------------------------------------------//
@@ -764,10 +737,8 @@ namespace device {
 			@brief	A/D 変換開始要求タイミングレジスタ m (GTADTRm) (m = A, B)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x70>  GTADTRA_;
-		static GTADTRA_ GTADTRA;
-		typedef rw32_t<base + 0x7C>  GTADTRB_;
-		static GTADTRB_ GTADTRB;
+		static inline rw32_t<base + 0x70>  GTADTRA;
+		static inline rw32_t<base + 0x7C>  GTADTRB;
 
 
 		//-----------------------------------------------------------------//
@@ -775,10 +746,8 @@ namespace device {
 			@brief	A/D 変換開始要求タイミングバッファレジスタ m (GTADTBRm) (m = A, B)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x74>  GTADTBRA_;
-		static GTADTBRA_ GTADTBRA;
-		typedef rw32_t<base + 0x80>  GTADTBRB_;
-		static GTADTBRB_ GTADTBRB;
+		static inline rw32_t<base + 0x74>  GTADTBRA;
+		static inline rw32_t<base + 0x80>  GTADTBRB;
 
 
 		//-----------------------------------------------------------------//
@@ -786,10 +755,8 @@ namespace device {
 			@brief	A/D 変換開始要求タイミングダブルバッファレジスタ m (GTADTDBRm)(m = A, B)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x78>  GTADTDBRA_;
-		static GTADTDBRA_ GTADTDBRA;
-		typedef rw32_t<base + 0x84>  GTADTDBRB_;
-		static GTADTDBRB_ GTADTDBRB;
+		static inline rw32_t<base + 0x78>  GTADTDBRA;
+		static inline rw32_t<base + 0x84>  GTADTDBRB;
 
 
 		//-----------------------------------------------------------------//
@@ -813,8 +780,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      TDFER;
 		};
-		typedef gtdtcr_t<base + 0x88> GTDTCR_;
-		static GTDTCR_ GTDTCR;
+		static inline gtdtcr_t<base + 0x88> GTDTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -822,10 +788,8 @@ namespace device {
 			@brief	汎用 PWM タイマデッドタイム値レジスタ m (GTDVm) (m = U, D)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x8C>  GTDVU_;
-		static GTDVU_ GTDVU;
-		typedef rw32_t<base + 0x90>  GTDVD_;
-		static GTDVD_ GTDVD;
+		static inline rw32_t<base + 0x8C>  GTDVU;
+		static inline rw32_t<base + 0x90>  GTDVD;
 
 
 		//-----------------------------------------------------------------//
@@ -833,10 +797,8 @@ namespace device {
 			@brief	汎用 PWM タイマデッドタイムバッファレジスタ m (GTDBm) (m = U, D)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x94>  GTDBU_;
-		static GTDBU_ GTDBU;
-		typedef rw32_t<base + 0x98>  GTDBD_;
-		static GTDBD_ GTDBD;
+		static inline rw32_t<base + 0x94>  GTDBU;
+		static inline rw32_t<base + 0x98>  GTDBD;
 
 
 		//-----------------------------------------------------------------//
@@ -855,8 +817,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>   SOS;
 		};
-		typedef gtsos_t<base + 0x9C> GTSOS_;
-		static GTSOS_ GTSOS;
+		static inline gtsos_t<base + 0x9C> GTSOS;
 
 
 		//-----------------------------------------------------------------//
@@ -875,8 +836,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>   SOTR;
 		};
-		typedef gtsotr_t<base + 0xA0> GTSOTR_;
-		static GTSOTR_ GTSOTR;
+		static inline gtsotr_t<base + 0xA0> GTSOTR;
 
 
 		//-----------------------------------------------------------------//
@@ -901,8 +861,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B24>     ADSMEN1;
 		};
-		typedef gtadsmr_t<base + 0xA4> GTADSMR_;
-		static GTADSMR_ GTADSMR;
+		static inline gtadsmr_t<base + 0xA4> GTADSMR;
 
 
 		//-----------------------------------------------------------------//
@@ -931,8 +890,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 4>  EITCNT2IV;
 			bits_rw_t<io_, bitpos::B28, 4>  EITCNT2;
 		};
-		typedef gteitc_t<base + 0xA8> GTEITC_;
-		static GTEITC_ GTEITC;
+		static inline gteitc_t<base + 0xA8> GTEITC;
 
 
 		//-----------------------------------------------------------------//
@@ -965,8 +923,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B28, 3>  EITLU;
 		};
-		typedef gteitli1_t<base + 0xAC> GTEITLI1_;
-		static GTEITLI1_ GTEITLI1;
+		static inline gteitli1_t<base + 0xAC> GTEITLI1;
 
 
 		//-----------------------------------------------------------------//
@@ -987,8 +944,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 3>   EADTBL;
 		};
-		typedef gteitli2_t<base + 0xB0> GTEITLI2_;
-		static GTEITLI2_ GTEITLI2;
+		static inline gteitli2_t<base + 0xB0> GTEITLI2;
 
 
 		//-----------------------------------------------------------------//
@@ -1019,8 +975,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B28, 3>  EBTLDVD;
 		};
-		typedef gteitlb_t<base + 0xB4> GTEITLB_;
-		static GTEITLB_ GTEITLB;
+		static inline gteitlb_t<base + 0xB4> GTEITLB;
 
 
 		//-----------------------------------------------------------------//
@@ -1048,8 +1003,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>      SECSEL8;
 			bit_rw_t <io_, bitpos::B9>      SECSEL9;
 		};
-		typedef gtsecsr_t<base + 0xD0> GTSECSR_;
-		static GTSECSR_ GTSECSR;
+		static inline gtsecsr_t<base + 0xD0> GTSECSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1076,299 +1030,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B10>     SBDAD;
 			bit_rw_t <io_, bitpos::B11>     SBDDD;
 		};
-		typedef gtsecr_t<base + 0xD4> GTSECR_;
-		static GTSECR_ GTSECR;
+		static inline gtsecr_t<base + 0xD4> GTSECR;
 	};
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTWP_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTWP; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSTR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSTR; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSTP_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSTP; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCLR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCLR; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSSR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSSR; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPSR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPSR; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCSR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCSR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTUPSR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTUPSR; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDNSR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDNSR; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTICASR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTICASR; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTICBSR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTICBSR; 
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTUDDTYC_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTUDDTYC;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTIOR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTIOR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTINTAD_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTINTAD;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTST_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTST;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTBER_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTBER;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTITC_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTITC;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCNT_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCNT;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRA_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRA;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRB_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRB;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRC_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRC;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRD_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRD;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRE_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRE;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRF_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTCCRF;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPBR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPBR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPDBR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTPDBR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTRA_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTRA;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTRB_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTRB;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTBRA_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTBRA;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTBRB_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTBRB;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTDBRA_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTDBRA;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTDBRB_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADTDBRB;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDTCR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDTCR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDVU_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDVU;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDVD_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDVD;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDBU_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDBU;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDBD_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTDBD;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSOS_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSOS;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSOTR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSOTR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADSMR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTADSMR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITC_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITC;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLI1_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLI1;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLI2_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLI2;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLB_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTEITLB;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECSR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECSR;
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
-	typename gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR_
-		gptw_t<base, per, gtcia, gtcib, gtcic, gtcid, gdte, gtcie, gtcif, gtciu, gtciv>::GTSECR;
-
-
 #if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M) 
 	typedef gptw_t<0x000C'2000, peripheral::GPTW0,
 		ICU::SELECTA::GTCIA0, ICU::SELECTA::GTCIB0, ICU::SELECTA::GTCIC0,
