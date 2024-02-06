@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX231/RX24T グループ・RSCAN 定義
+	@brief	RX140/RX231/RX24T グループ・RSCAN 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -37,8 +37,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 10>  BRP;
 		};
-		typedef cfgl_t<base + 0x00>  CFGL_;
-		static CFGL_ CFGL;
+		static inline cfgl_t<base + 0x00>  CFGL;
 
 
 		//-----------------------------------------------------------------//
@@ -60,8 +59,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 2>  SJW;
 		};
-		typedef cfgh_t<base + 0x02>  CFGH_;
-		static CFGH_ CFGH;
+		static inline cfgh_t<base + 0x02>  CFGH;
 
 
 		//-----------------------------------------------------------------//
@@ -91,8 +89,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>		BLIE;
 			bit_rw_t <io_, bitpos::B15>		ALIE;
 		};
-		typedef ctrl_t<base + 0x04>  CTRL_;
-		static CTRL_ CTRL;
+		static inline ctrl_t<base + 0x04>  CTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -116,8 +113,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>		CTME;
 			bits_rw_t<io_, bitpos::B9, 2>	CTMS;
 		};
-		typedef ctrh_t<base + 0x06>  CTRH_;
-		static CTRH_ CTRH;
+		static inline ctrh_t<base + 0x06>  CTRH;
 
 
 		//-----------------------------------------------------------------//
@@ -140,8 +136,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B6>		RECSTS;
 			bit_ro_t <io_, bitpos::B7>		COMSTS;
 		};
-		typedef stsl_t<base + 0x08>  STSL_;
-		static STSL_ STSL;
+		static inline stsl_t<base + 0x08>  STSL;
 
 
 		//-----------------------------------------------------------------//
@@ -158,8 +153,7 @@ namespace device {
 			bits_ro_t<io_, bitpos::B0, 8>	REC;
 			bits_ro_t<io_, bitpos::B8, 8>	TEC;
 		};
-		typedef stsh_t<base + 0x0A>  STSH_;
-		static STSH_ STSH;
+		static inline stsh_t<base + 0x0A>  STSH;
 
 
 		//-----------------------------------------------------------------//
@@ -192,8 +186,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B13>		B0ERR;
 			bit_rw_t <io_, bitpos::B14>		ADERR;
 		};
-		typedef erfll_t<base + 0x0C>  ERFLL_;
-		static ERFLL_ ERFLL;
+		static inline erfll_t<base + 0x0C>  ERFLL;
 
 
 		//-----------------------------------------------------------------//
@@ -212,8 +205,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 15>	CRCREG;
 		};
-		typedef erflh_t<base + 0x0E>  ERFLH_;
-		static ERFLH_ ERFLH;
+		static inline erflh_t<base + 0x0E>  ERFLH;
 
 
 		//-----------------------------------------------------------------//
@@ -239,8 +231,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 4>	TSP;
 			bit_rw_t <io_, bitpos::B12>		TSSS;
 		};
-		typedef gcfgl_t<base + 0x22>  GCFGL_;
-		static GCFGL_ GCFGL;
+		static inline gcfgl_t<base + 0x22>  GCFGL;
 
 
 		//-----------------------------------------------------------------//
@@ -259,8 +250,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>	ITRCP;
 		};
-		typedef gcfgh_t<base + 0x24>  GCFGH_;
-		static GCFGH_ GCFGH;
+		static inline gcfgh_t<base + 0x24>  GCFGH;
 
 
 		//-----------------------------------------------------------------//
@@ -284,8 +274,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B9>		MEIE;
 			bit_rw_t <io_, bitpos::B10>		THLEIE;
 		};
-		typedef gctrl_t<base + 0x26>  GCTRL_;
-		static GCTRL_ GCTRL;
+		static inline gctrl_t<base + 0x26>  GCTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -304,8 +293,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>		TSRST;
 		};
-		typedef gctrh_t<base + 0x28>  GCTRH_;
-		static GCTRH_ GCTRH;
+		static inline gctrh_t<base + 0x28>  GCTRH;
 
 
 		//-----------------------------------------------------------------//
@@ -324,8 +312,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>		GSLPSTS;
 			bit_ro_t <in_, bitpos::B3>		GRAMINT;
 		};
-		typedef gsts_t<base + 0x2A>  GSTS_;
-		static GSTS_ GSTS;
+		static inline gsts_t<base + 0x2A>  GSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -343,8 +330,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B1>		MES;
 			bit_ro_t <io_, bitpos::B2>		THLES;
 		};
-		typedef gerfll_t<base + 0x2C>  GERFLL_;
-		static GERFLL_ GERFLL;
+		static inline gerfll_t<base + 0x2C>  GERFLL;
 
 
 		//-----------------------------------------------------------------//
@@ -363,8 +349,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>		CFTIF0;
 			bit_ro_t <in_, bitpos::B3>		THIF0;
 		};
-		typedef gtintsts_t<base + 0x88>  GTINTSTS_;
-		static GTINTSTS_ GTINTSTS;
+		static inline gtintsts_t<base + 0x88>  GTINTSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -380,8 +365,7 @@ namespace device {
 
 			bits_ro_t <in_, bitpos::B0, 16> TS;
 		};
-		typedef gtsc_t<base + 0x2E>  GTSC_;
-		static GTSC_ GTSC;
+		static inline gtsc_t<base + 0x2E>  GTSC;
 
 
 		//-----------------------------------------------------------------//
@@ -400,8 +384,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>	TSRST;
 		};
-		typedef gaflcfg_t<base + 0x30>  GAFLCFG_;
-		static GAFLCFG_ GAFLCFG;
+		static inline gaflcfg_t<base + 0x30>  GAFLCFG;
 
 
 		//-----------------------------------------------------------------//
@@ -429,8 +412,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef gaflidl_t<base + 0xA0> GAFLIDL_;
-		static GAFLIDL_ GAFLIDL;
+		static inline gaflidl_t<base + 0xA0> GAFLIDL;
 
 
 		//-----------------------------------------------------------------//
@@ -461,8 +443,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef gaflidh_t<base + 0xA2> GAFLIDH_;
-		static GAFLIDH_ GAFLIDH;
+		static inline gaflidh_t<base + 0xA2> GAFLIDH;
 
 
 		//-----------------------------------------------------------------//
@@ -490,8 +471,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef gaflml_t<base + 0xA4> GAFLML_;
-		static GAFLML_ GAFLML;
+		static inline gaflml_t<base + 0xA4> GAFLML;
 
 
 		//-----------------------------------------------------------------//
@@ -522,8 +502,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef gaflmh_t<base + 0xA6> GAFLMH_;
-		static GAFLMH_ GAFLMH;
+		static inline gaflmh_t<base + 0xA6> GAFLMH;
 
 
 		//-----------------------------------------------------------------//
@@ -557,8 +536,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef gaflpl_t<base + 0xA8> GAFLPL_;
-		static GAFLPL_ GAFLPL;
+		static inline gaflpl_t<base + 0xA8> GAFLPL;
 
 
 		//-----------------------------------------------------------------//
@@ -587,8 +565,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef gaflph_t<base + 0xAA> GAFLPH_;
-		static GAFLPH_ GAFLPH;
+		static inline gaflph_t<base + 0xAA> GAFLPH;
 
 
 		//-----------------------------------------------------------------//
@@ -607,8 +584,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>	NRXMB;
 		};
-		typedef rmnb_t<base + 0x32>  RMNB_;
-		static RMNB_ RMNB;
+		static inline rmnb_t<base + 0x32>  RMNB;
 
 
 		//-----------------------------------------------------------------//
@@ -627,8 +603,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>	RMNS;
 		};
-		typedef rmnd0_t<base + 0x34>  RMND0_;
-		static RMND0_ RMND0;
+		static inline rmnd0_t<base + 0x34>  RMND0;
 
 
 		//-----------------------------------------------------------------//
@@ -656,8 +631,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rmidl_t<base + 0xA0> RMIDL_;
-		static RMIDL_ RMIDL;
+		static inline rmidl_t<base + 0xA0> RMIDL;
 
 
 		//-----------------------------------------------------------------//
@@ -688,8 +662,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rmidh_t<base + 0xA2> RMIDH_;
-		static RMIDH_ RMIDH;
+		static inline rmidh_t<base + 0xA2> RMIDH;
 
 
 		//-----------------------------------------------------------------//
@@ -717,8 +690,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rmts_t<base + 0xA4> RMTS_;
-		static RMTS_ RMTS;
+		static inline rmts_t<base + 0xA4> RMTS;
 
 
 		//-----------------------------------------------------------------//
@@ -747,8 +719,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rmptr_t<base + 0xA6> RMPTR_;
-		static RMPTR_ RMPTR;
+		static inline rmptr_t<base + 0xA6> RMPTR;
 
 
 		//-----------------------------------------------------------------//
@@ -777,8 +748,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rmdf0_t<base + 0xA8> RMDF0_;
-		static RMDF0_ RMDF0;
+		static inline rmdf0_t<base + 0xA8> RMDF0;
 
 
 		//-----------------------------------------------------------------//
@@ -807,8 +777,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rmdf1_t<base + 0xAA> RMDF1_;
-		static RMDF1_ RMDF1;
+		static inline rmdf1_t<base + 0xAA> RMDF1;
 
 
 		//-----------------------------------------------------------------//
@@ -837,8 +806,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rmdf2_t<base + 0xAC> RMDF2_;
-		static RMDF2_ RMDF2;
+		static inline rmdf2_t<base + 0xAC> RMDF2;
 
 
 		//-----------------------------------------------------------------//
@@ -867,8 +835,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rmdf3_t<base + 0xAE> RMDF3_;
-		static RMDF3_ RMDF3;
+		static inline rmdf3_t<base + 0xAE> RMDF3;
 
 
 		//-----------------------------------------------------------------//
@@ -902,8 +869,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfcc_t<base + 0x38> RFCC_;
-		static RFCC_ RFCC;
+		static inline rfcc_t<base + 0x38> RFCC;
 
 
 		//-----------------------------------------------------------------//
@@ -936,8 +902,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfsts_t<base + 0x40> RFSTS_;
-		static RFSTS_ RFSTS;
+		static inline rfsts_t<base + 0x40> RFSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -962,8 +927,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfpctr_t<base + 0x48> RFPCTR_;
-		static RFPCTR_ RFPCTR;
+		static inline rfpctr_t<base + 0x48> RFPCTR;
 
 
 		//-----------------------------------------------------------------//
@@ -988,8 +952,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfidl_t<base + 0x2A0> RFIDL_;
-		static RFIDL_ RFIDL;
+		static inline rfidl_t<base + 0x2A0> RFIDL;
 
 
 		//-----------------------------------------------------------------//
@@ -1017,8 +980,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfidh_t<base + 0x2A2> RFIDH_;
-		static RFIDH_ RFIDH;
+		static inline rfidh_t<base + 0x2A2> RFIDH;
 
 
 		//-----------------------------------------------------------------//
@@ -1043,8 +1005,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfts_t<base + 0x2A4> RFTS_;
-		static RFTS_ RFTS;
+		static inline rfts_t<base + 0x2A4> RFTS;
 	
 
 		//-----------------------------------------------------------------//
@@ -1070,8 +1031,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfptr_t<base + 0x2A6> RFPTR_;
-		static RFPTR_ RFPTR;
+		static inline rfptr_t<base + 0x2A6> RFPTR;
 
 
 		//-----------------------------------------------------------------//
@@ -1097,8 +1057,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfdf0_t<base + 0x2A8> RFDF0_;
-		static RFDF0_ RFDF0;
+		static inline rfdf0_t<base + 0x2A8> RFDF0;
 
 
 		//-----------------------------------------------------------------//
@@ -1124,8 +1083,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfdf1_t<base + 0x2AA> RFDF1_;
-		static RFDF1_ RFDF1;
+		static inline rfdf1_t<base + 0x2AA> RFDF1;
 
 
 		//-----------------------------------------------------------------//
@@ -1151,8 +1109,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfdf2_t<base + 0x2AC> RFDF2_;
-		static RFDF2_ RFDF2;
+		static inline rfdf2_t<base + 0x2AC> RFDF2;
 
 
 		//-----------------------------------------------------------------//
@@ -1178,8 +1135,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rfdf3_t<base + 0x2AE> RFDF3_;
-		static RFDF3_ RFDF3;
+		static inline rfdf3_t<base + 0x2AE> RFDF3;
 
 
 		//-----------------------------------------------------------------//
@@ -1205,8 +1161,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B12>		CFIM;
 			bits_rw_t<io_, bitpos::B13, 3>	CFIGCV;
 		};
-		typedef cfccl0_t<base + 0x50>  CFCCL0_;
-		static CFCCL0_ CFCCL0;
+		static inline cfccl0_t<base + 0x50>  CFCCL0;
 
 
 		//-----------------------------------------------------------------//
@@ -1230,8 +1185,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8>	CFITT;
 		};
-		typedef cfcch0_t<base + 0x52>  CFCCH0_;
-		static CFCCH0_ CFCCH0;
+		static inline cfcch0_t<base + 0x52>  CFCCH0;
 
 
 		//-----------------------------------------------------------------//
@@ -1256,8 +1210,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 6>	CFMC;
 		};
-		typedef cfsts0_t<base + 0x58>  CFSTS0_;
-		static CFSTS0_ CFSTS0;
+		static inline cfsts0_t<base + 0x58>  CFSTS0;
 
 
 		//-----------------------------------------------------------------//
@@ -1276,8 +1229,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>	CFPC;
 		};
-		typedef cfpctr0_t<base + 0x5C>  CFPCTR0_;
-		static CFPCTR0_ CFPCTR0;
+		static inline cfpctr0_t<base + 0x5C>  CFPCTR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1296,8 +1248,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>	CFID;
 		};
-		typedef cfidl0_t<base + 0x2E0>  CFIDL0_;
-		static CFIDL0_ CFIDL0;
+		static inline cfidl0_t<base + 0x2E0>  CFIDL0;
 
 
 		//-----------------------------------------------------------------//
@@ -1319,8 +1270,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>		CFRTR;
 			bit_rw_t <io_, bitpos::B15>		CFIDE;
 		};
-		typedef cfidh0_t<base + 0x2E2>  CFIDH0_;
-		static CFIDH0_ CFIDH0;
+		static inline cfidh0_t<base + 0x2E2>  CFIDH0;
 
 
 		//-----------------------------------------------------------------//
@@ -1339,8 +1289,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>	CFTS;
 		};
-		typedef cfts0_t<base + 0x2E4>  CFTS0_;
-		static CFTS0_ CFTS0;
+		static inline cfts0_t<base + 0x2E4>  CFTS0;
 
 
 		//-----------------------------------------------------------------//
@@ -1360,8 +1309,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 12>	CFPTR;
 			bits_rw_t<io_, bitpos::B12, 4>	CFDLC;
 		};
-		typedef cfptr0_t<base + 0x2E6>  CFPTR0_;
-		static CFPTR0_ CFPTR0;
+		static inline cfptr0_t<base + 0x2E6>  CFPTR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1381,8 +1329,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>	CFDB0;
 			bits_rw_t<io_, bitpos::B8, 8>	CFDB1;
 		};
-		typedef cfdf00_t<base + 0x2E8>  CFDF00_;
-		static CFDF00_ CFDF00;
+		static inline cfdf00_t<base + 0x2E8>  CFDF00;
 
 
 		//-----------------------------------------------------------------//
@@ -1402,8 +1349,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>	CFDB2;
 			bits_rw_t<io_, bitpos::B8, 8>	CFDB3;
 		};
-		typedef cfdf10_t<base + 0x2EA>  CFDF10_;
-		static CFDF10_ CFDF10;
+		static inline cfdf10_t<base + 0x2EA>  CFDF10;
 
 
 		//-----------------------------------------------------------------//
@@ -1423,8 +1369,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>	CFDB4;
 			bits_rw_t<io_, bitpos::B8, 8>	CFDB5;
 		};
-		typedef cfdf20_t<base + 0x2EC>  CFDF20_;
-		static CFDF20_ CFDF20;
+		static inline cfdf20_t<base + 0x2EC>  CFDF20;
 
 
 		//-----------------------------------------------------------------//
@@ -1444,8 +1389,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>	CFDB6;
 			bits_rw_t<io_, bitpos::B8, 8>	CFDB7;
 		};
-		typedef cfdf30_t<base + 0x2EE>  CFDF30_;
-		static CFDF30_ CFDF30;
+		static inline cfdf30_t<base + 0x2EE>  CFDF30;
 
 
 		//-----------------------------------------------------------------//
@@ -1462,8 +1406,7 @@ namespace device {
 			bit_rw_t <in_, bitpos::B0>		RF0MLT;
 			bit_rw_t <in_, bitpos::B1>		RF1MLT;
 		};
-		typedef rfmsts_t<base + 0x60>  RFMSTS_;
-		static RFMSTS_ RFMSTS;
+		static inline rfmsts_t<base + 0x60>  RFMSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -1479,8 +1422,7 @@ namespace device {
 
 			bit_rw_t <in_, bitpos::B0>		CF0MLT;
 		};
-		typedef cfmsts_t<base + 0x61>  CFMSTS_;
-		static CFMSTS_ CFMSTS;
+		static inline cfmsts_t<base + 0x61>  CFMSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -1497,8 +1439,7 @@ namespace device {
 			bit_rw_t <in_, bitpos::B0>		RF0IF;
 			bit_rw_t <in_, bitpos::B1>		RF1IF;
 		};
-		typedef rfists_t<base + 0x62>  RFISTS_;
-		static RFISTS_ RFISTS;
+		static inline rfists_t<base + 0x62>  RFISTS;
 
 
 		//-----------------------------------------------------------------//
@@ -1514,8 +1455,7 @@ namespace device {
 
 			bit_rw_t <in_, bitpos::B0>		CF0IF;
 		};
-		typedef cfists_t<base + 0x63>  CFISTS_;
-		static CFISTS_ CFISTS;
+		static inline cfists_t<base + 0x63>  CFISTS;
 
 
 		//-----------------------------------------------------------------//
@@ -1545,8 +1485,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmc_t<base + 0x64> TMC_;
-		static TMC_ TMC;
+		static inline tmc_t<base + 0x64> TMC;
 
 
 		//-----------------------------------------------------------------//
@@ -1577,8 +1516,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmsts_t<base + 0x6C> TMSTS_;
-		static TMSTS_ TMSTS;
+		static inline tmsts_t<base + 0x6C> TMSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -1597,8 +1535,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>		TMTRSTS2;
 			bit_ro_t <in_, bitpos::B3>		TMTRSTS3;
 		};
-		typedef tmtrsts_t<base + 0x74>  TMTRSTS_;
-		static TMTRSTS_ TMTRSTS;
+		static inline tmtrsts_t<base + 0x74>  TMTRSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -1617,8 +1554,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>		TMTCSTS2;
 			bit_ro_t <in_, bitpos::B3>		TMTCSTS3;
 		};
-		typedef tmtcsts_t<base + 0x76>  TMTCSTS_;
-		static TMTCSTS_ TMTCSTS;
+		static inline tmtcsts_t<base + 0x76>  TMTCSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -1637,8 +1573,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>		TMTASTS2;
 			bit_ro_t <in_, bitpos::B3>		TMTASTS3;
 		};
-		typedef tmtasts_t<base + 0x78>  TMTASTS_;
-		static TMTASTS_ TMTASTS;
+		static inline tmtasts_t<base + 0x78>  TMTASTS;
 
 
 		//-----------------------------------------------------------------//
@@ -1660,8 +1595,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>		TMIE2;
 			bit_rw_t <io_, bitpos::B3>		TMIE3;
 		};
-		typedef tmiec_t<base + 0x7A>  TMIEC_;
-		static TMIEC_ TMIEC;
+		static inline tmiec_t<base + 0x7A>  TMIEC;
 
 
 		//-----------------------------------------------------------------//
@@ -1689,8 +1623,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmidl_t<base + 0x300> TMIDL_;
-		static TMIDL_ TMIDL;
+		static inline tmidl_t<base + 0x300> TMIDL;
 
 
 		//-----------------------------------------------------------------//
@@ -1721,8 +1654,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmidh_t<base + 0x302> TMIDH_;
-		static TMIDH_ TMIDH;
+		static inline tmidh_t<base + 0x302> TMIDH;
 
 
 		//-----------------------------------------------------------------//
@@ -1751,8 +1683,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmptr_t<base + 0x306> TMPTR_;
-		static TMPTR_ TMPTR;
+		static inline tmptr_t<base + 0x306> TMPTR;
 
 
 		//-----------------------------------------------------------------//
@@ -1781,8 +1712,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmdf0_t<base + 0x308> TMDF0_;
-		static TMDF0_ TMDF0;
+		static inline tmdf0_t<base + 0x308> TMDF0;
 
 
 		//-----------------------------------------------------------------//
@@ -1811,8 +1741,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmdf1_t<base + 0x30A> TMDF1_;
-		static TMDF1_ TMDF1;
+		static inline tmdf1_t<base + 0x30A> TMDF1;
 
 
 		//-----------------------------------------------------------------//
@@ -1841,8 +1770,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmdf2_t<base + 0x30C> TMDF2_;
-		static TMDF2_ TMDF2;
+		static inline tmdf2_t<base + 0x30C> TMDF2;
 
 
 		//-----------------------------------------------------------------//
@@ -1871,8 +1799,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmdf3_t<base + 0x30E> TMDF3_;
-		static TMDF3_ TMDF3;
+		static inline tmdf3_t<base + 0x30E> TMDF3;
 
 
 		//-----------------------------------------------------------------//
@@ -1895,8 +1822,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B9>		THLIM;
 			bit_rw_t <io_, bitpos::B10>		THLDTE;
 		};
-		typedef thlcc0_t<base + 0x7C>  THLCC0_;
-		static THLCC0_ THLCC0;
+		static inline thlcc0_t<base + 0x7C>  THLCC0;
 
 
 		//-----------------------------------------------------------------//
@@ -1922,8 +1848,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B8, 4>	THLMC;
 		};
-		typedef thlsts0_t<base + 0x80>  THLSTS0_;
-		static THLSTS0_ THLSTS0;
+		static inline thlsts0_t<base + 0x80>  THLSTS0;
 
 
 		//-----------------------------------------------------------------//
@@ -1942,8 +1867,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B8, 8>	TID;
 		};
-		typedef thlacc0_t<base + 0x380>  THLACC0_;
-		static THLACC0_ THLACC0;
+		static inline thlacc0_t<base + 0x380>  THLACC0;
 
 
 		//-----------------------------------------------------------------//
@@ -1959,8 +1883,7 @@ namespace device {
 
 			bits_rw_t<o_, bitpos::B0, 8>	THLPC;
 		};
-		typedef thlpctr0_t<base + 0x384>  THLPCTR0_;
-		static THLPCTR0_ THLPCTR0;
+		static inline thlpctr0_t<base + 0x384>  THLPCTR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1979,8 +1902,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>		RPAGE;
 		};
-		typedef grwcr_t<base + 0x8A>  GRWCR_;
-		static GRWCR_ GRWCR;
+		static inline grwcr_t<base + 0x8A>  GRWCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1999,8 +1921,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 3>	RTMPS;
 		};
-		typedef gtstcfg_t<base + 0x8C>  GTSTCFG_;
-		static GTSTCFG_ GTSTCFG;
+		static inline gtstcfg_t<base + 0x8C>  GTSTCFG;
 
 
 		//-----------------------------------------------------------------//
@@ -2019,8 +1940,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B2>		RTIME;
 		};
-		typedef gtstctrl_t<base + 0x8E>  GTSTCTRL_;
-		static GTSTCTRL_ GTSTCTRL;
+		static inline gtstctrl_t<base + 0x8E>  GTSTCTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -2039,8 +1959,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>	LOCK;
 		};
-		typedef glockk_t<base + 0x94>  GLOCKK_;
-		static GLOCKK_ GLOCKK;
+		static inline glockk_t<base + 0x94>  GLOCKK;
 
 
 		//-----------------------------------------------------------------//
@@ -2068,97 +1987,13 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rpgacc_t<base + 0x280> RPGACC_;
-		static RPGACC_ RPGACC;
+		static inline rpgacc_t<base + 0x280> RPGACC;
 	};
-
-	template <uint32_t base> typename rscan_base_t<base>::CFGL_ rscan_base_t<base>::CFGL;
-	template <uint32_t base> typename rscan_base_t<base>::CFGH_ rscan_base_t<base>::CFGH;
-	template <uint32_t base> typename rscan_base_t<base>::CTRL_ rscan_base_t<base>::CTRL;
-	template <uint32_t base> typename rscan_base_t<base>::CTRH_ rscan_base_t<base>::CTRH;
-	template <uint32_t base> typename rscan_base_t<base>::STSL_ rscan_base_t<base>::STSL;
-	template <uint32_t base> typename rscan_base_t<base>::STSH_ rscan_base_t<base>::STSH;
-	template <uint32_t base> typename rscan_base_t<base>::ERFLL_ rscan_base_t<base>::ERFLL;
-	template <uint32_t base> typename rscan_base_t<base>::ERFLH_ rscan_base_t<base>::ERFLH;
-	template <uint32_t base> typename rscan_base_t<base>::GCFGL_ rscan_base_t<base>::GCFGL;
-	template <uint32_t base> typename rscan_base_t<base>::GCFGH_ rscan_base_t<base>::GCFGH;
-	template <uint32_t base> typename rscan_base_t<base>::GCTRL_ rscan_base_t<base>::GCTRL;
-	template <uint32_t base> typename rscan_base_t<base>::GCTRH_ rscan_base_t<base>::GCTRH;
-	template <uint32_t base> typename rscan_base_t<base>::GSTS_ rscan_base_t<base>::GSTS;
-	template <uint32_t base> typename rscan_base_t<base>::GERFLL_ rscan_base_t<base>::GERFLL;
-	template <uint32_t base> typename rscan_base_t<base>::GTINTSTS_ rscan_base_t<base>::GTINTSTS;
-	template <uint32_t base> typename rscan_base_t<base>::GTSC_ rscan_base_t<base>::GTSC;
-	template <uint32_t base> typename rscan_base_t<base>::GAFLCFG_ rscan_base_t<base>::GAFLCFG;
-	template <uint32_t base> typename rscan_base_t<base>::GAFLIDL_ rscan_base_t<base>::GAFLIDL;
-	template <uint32_t base> typename rscan_base_t<base>::GAFLIDH_ rscan_base_t<base>::GAFLIDH;
-	template <uint32_t base> typename rscan_base_t<base>::GAFLML_ rscan_base_t<base>::GAFLML;
-	template <uint32_t base> typename rscan_base_t<base>::GAFLMH_ rscan_base_t<base>::GAFLMH;
-	template <uint32_t base> typename rscan_base_t<base>::GAFLPL_ rscan_base_t<base>::GAFLPL;
-	template <uint32_t base> typename rscan_base_t<base>::GAFLPH_ rscan_base_t<base>::GAFLPH;
-	template <uint32_t base> typename rscan_base_t<base>::RMNB_ rscan_base_t<base>::RMNB;
-	template <uint32_t base> typename rscan_base_t<base>::RMND0_ rscan_base_t<base>::RMND0;
-	template <uint32_t base> typename rscan_base_t<base>::RMIDL_ rscan_base_t<base>::RMIDL;
-	template <uint32_t base> typename rscan_base_t<base>::RMIDH_ rscan_base_t<base>::RMIDH;
-	template <uint32_t base> typename rscan_base_t<base>::RMTS_ rscan_base_t<base>::RMTS;
-	template <uint32_t base> typename rscan_base_t<base>::RMPTR_ rscan_base_t<base>::RMPTR;
-	template <uint32_t base> typename rscan_base_t<base>::RMDF0_ rscan_base_t<base>::RMDF0;
-	template <uint32_t base> typename rscan_base_t<base>::RMDF1_ rscan_base_t<base>::RMDF1;
-	template <uint32_t base> typename rscan_base_t<base>::RMDF2_ rscan_base_t<base>::RMDF2;
-	template <uint32_t base> typename rscan_base_t<base>::RMDF3_ rscan_base_t<base>::RMDF3;
-	template <uint32_t base> typename rscan_base_t<base>::RFCC_ rscan_base_t<base>::RFCC;
-	template <uint32_t base> typename rscan_base_t<base>::RFSTS_ rscan_base_t<base>::RFSTS;
-	template <uint32_t base> typename rscan_base_t<base>::RFPCTR_ rscan_base_t<base>::RFPCTR;
-	template <uint32_t base> typename rscan_base_t<base>::RFIDL_ rscan_base_t<base>::RFIDL;
-	template <uint32_t base> typename rscan_base_t<base>::RFIDH_ rscan_base_t<base>::RFIDH;
-	template <uint32_t base> typename rscan_base_t<base>::RFTS_ rscan_base_t<base>::RFTS;
-	template <uint32_t base> typename rscan_base_t<base>::RFPTR_ rscan_base_t<base>::RFPTR;
-	template <uint32_t base> typename rscan_base_t<base>::RFDF0_ rscan_base_t<base>::RFDF0;
-	template <uint32_t base> typename rscan_base_t<base>::RFDF1_ rscan_base_t<base>::RFDF1;
-	template <uint32_t base> typename rscan_base_t<base>::RFDF2_ rscan_base_t<base>::RFDF2;
-	template <uint32_t base> typename rscan_base_t<base>::RFDF3_ rscan_base_t<base>::RFDF3;
-	template <uint32_t base> typename rscan_base_t<base>::CFCCL0_ rscan_base_t<base>::CFCCL0;
-	template <uint32_t base> typename rscan_base_t<base>::CFCCH0_ rscan_base_t<base>::CFCCH0;
-	template <uint32_t base> typename rscan_base_t<base>::CFSTS0_ rscan_base_t<base>::CFSTS0;
-	template <uint32_t base> typename rscan_base_t<base>::CFPCTR0_ rscan_base_t<base>::CFPCTR0;
-	template <uint32_t base> typename rscan_base_t<base>::CFIDL0_ rscan_base_t<base>::CFIDL0;
-	template <uint32_t base> typename rscan_base_t<base>::CFIDH0_ rscan_base_t<base>::CFIDH0;
-	template <uint32_t base> typename rscan_base_t<base>::CFTS0_ rscan_base_t<base>::CFTS0;
-	template <uint32_t base> typename rscan_base_t<base>::CFPTR0_ rscan_base_t<base>::CFPTR0;
-	template <uint32_t base> typename rscan_base_t<base>::CFDF00_ rscan_base_t<base>::CFDF00;
-	template <uint32_t base> typename rscan_base_t<base>::CFDF10_ rscan_base_t<base>::CFDF10;
-	template <uint32_t base> typename rscan_base_t<base>::CFDF20_ rscan_base_t<base>::CFDF20;
-	template <uint32_t base> typename rscan_base_t<base>::CFDF30_ rscan_base_t<base>::CFDF30;
-	template <uint32_t base> typename rscan_base_t<base>::RFMSTS_ rscan_base_t<base>::RFMSTS;
-	template <uint32_t base> typename rscan_base_t<base>::CFMSTS_ rscan_base_t<base>::CFMSTS;
-	template <uint32_t base> typename rscan_base_t<base>::RFISTS_ rscan_base_t<base>::RFISTS;
-	template <uint32_t base> typename rscan_base_t<base>::CFISTS_ rscan_base_t<base>::CFISTS;
-	template <uint32_t base> typename rscan_base_t<base>::TMC_ rscan_base_t<base>::TMC;
-	template <uint32_t base> typename rscan_base_t<base>::TMSTS_ rscan_base_t<base>::TMSTS;
-	template <uint32_t base> typename rscan_base_t<base>::TMTRSTS_ rscan_base_t<base>::TMTRSTS;
-	template <uint32_t base> typename rscan_base_t<base>::TMTCSTS_ rscan_base_t<base>::TMTCSTS;
-	template <uint32_t base> typename rscan_base_t<base>::TMTASTS_ rscan_base_t<base>::TMTASTS;
-	template <uint32_t base> typename rscan_base_t<base>::TMIEC_ rscan_base_t<base>::TMIEC;
-	template <uint32_t base> typename rscan_base_t<base>::TMIDL_ rscan_base_t<base>::TMIDL;
-	template <uint32_t base> typename rscan_base_t<base>::TMIDH_ rscan_base_t<base>::TMIDH;
-	template <uint32_t base> typename rscan_base_t<base>::TMPTR_ rscan_base_t<base>::TMPTR;
-	template <uint32_t base> typename rscan_base_t<base>::TMDF0_ rscan_base_t<base>::TMDF0;
-	template <uint32_t base> typename rscan_base_t<base>::TMDF1_ rscan_base_t<base>::TMDF1;
-	template <uint32_t base> typename rscan_base_t<base>::TMDF2_ rscan_base_t<base>::TMDF2;
-	template <uint32_t base> typename rscan_base_t<base>::TMDF3_ rscan_base_t<base>::TMDF3;
-	template <uint32_t base> typename rscan_base_t<base>::THLCC0_ rscan_base_t<base>::THLCC0;
-	template <uint32_t base> typename rscan_base_t<base>::THLSTS0_ rscan_base_t<base>::THLSTS0;
-	template <uint32_t base> typename rscan_base_t<base>::THLACC0_ rscan_base_t<base>::THLACC0;
-	template <uint32_t base> typename rscan_base_t<base>::THLPCTR0_ rscan_base_t<base>::THLPCTR0;
-	template <uint32_t base> typename rscan_base_t<base>::GRWCR_ rscan_base_t<base>::GRWCR;
-	template <uint32_t base> typename rscan_base_t<base>::GTSTCFG_ rscan_base_t<base>::GTSTCFG;
-	template <uint32_t base> typename rscan_base_t<base>::GTSTCTRL_ rscan_base_t<base>::GTSTCTRL;
-	template <uint32_t base> typename rscan_base_t<base>::GLOCKK_ rscan_base_t<base>::GLOCKK;
-	template <uint32_t base> typename rscan_base_t<base>::RPGACC_ rscan_base_t<base>::RPGACC;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	RSCAN モジュール（RX24T/RX231）
+		@brief	RSCAN モジュール（RX140/RX231/RX24T）
 		@param[in]	base	ベースアドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -44,8 +44,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  ROMCEN;
 		};
-		typedef romce_t<0x0008'1000> ROMCE_;
-		static ROMCE_ ROMCE;
+		static inline romce_t<0x0008'1000> ROMCE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -64,8 +63,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  ROMCIV;
 		};
-		typedef romciv_t<0x0008'1004> ROMCIV_;
-		static ROMCIV_ ROMCIV;
+		static inline romciv_t<0x0008'1004> ROMCIV;
 #endif
 
 
@@ -85,8 +83,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> FLWE;
 		};
-		typedef fwepror_t<0x0008'C296> FWEPROR_;
-		static FWEPROR_ FWEPROR;
+		static inline fwepror_t<0x0008'C296> FWEPROR;
 
 
 		//-----------------------------------------------------------------//
@@ -111,8 +108,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  CFAE;
 
 		};
-		typedef fastat_t<0x007F'E010> FASTAT_;
-		static FASTAT_ FASTAT;
+		static inline fastat_t<0x007F'E010> FASTAT;
 
 
 		//-----------------------------------------------------------------//
@@ -138,8 +134,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  CFAEIE;
 
 		};
-		typedef faeint_t<0x007F'E014> FAEINT_;
-		static FAEINT_ FAEINT;
+		static inline faeint_t<0x007F'E014> FAEINT;
 
 
 		//-----------------------------------------------------------------//
@@ -158,8 +153,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  FRDYIE;
 		};
-		typedef frdyie_t<0x007F'E018> FRDYIE_;
-		static FRDYIE_ FRDYIE;
+		static inline frdyie_t<0x007F'E018> FRDYIE;
 
 
 		//-----------------------------------------------------------------//
@@ -167,8 +161,7 @@ namespace device {
 			@brief  FACI コマンド処理開始アドレスレジスタ（FSADDR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x007F'E030> FSADDR_;
-		static FSADDR_ FSADDR;
+		static inline rw32_t<0x007F'E030> FSADDR;
 
 
 		//-----------------------------------------------------------------//
@@ -176,8 +169,7 @@ namespace device {
 			@brief  FACI コマンド処理終了アドレスレジスタ（FEADDR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<0x007F'E034> FEADDR_;
-		static FEADDR_ FEADDR;
+		static inline rw32_t<0x007F'E034> FEADDR;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
@@ -199,8 +191,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>     FRAMTRAN;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fcurame_t<0x007F'E054> FCURAME_;
-		static FCURAME_ FCURAME;
+		static inline fcurame_t<0x007F'E054> FCURAME;
 #endif
 
 
@@ -237,8 +228,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B23>  ILGCOMERR;
 #endif
 		};
-		typedef fstatr_t<0x007F'E080> FSTATR_;
-		static FSTATR_ FSTATR;
+		static inline fstatr_t<0x007F'E080> FSTATR;
 
 
 		//-----------------------------------------------------------------//
@@ -260,8 +250,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>     FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fentryr_t<0x007F'E084> FENTRYR_;
-		static FENTRYR_ FENTRYR;
+		static inline fentryr_t<0x007F'E084> FENTRYR;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T) 
@@ -282,8 +271,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>     FPROTCN;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fprotr_t<0x007F'E088> FPROTR_;
-		static FPROTR_ FPROTR;
+		static inline fprotr_t<0x007F'E088> FPROTR;
 #endif
 
 
@@ -305,8 +293,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fsuinitr_t<0x007F'E08C> FSUINITR_;
-		static FSUINITR_ FSUINITR;
+		static inline fsuinitr_t<0x007F'E08C> FSUINITR;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
@@ -326,8 +313,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  FLOCKST;
 		};
-		typedef flkstat_t<0x007F'E090> FLKSTAT_;
-		static FLKSTAT_ FLKSTAT;
+		static inline flkstat_t<0x007F'E090> FLKSTAT;
 #endif
 
 
@@ -345,8 +331,7 @@ namespace device {
 			bits_ro_t<io_, bitpos::B0, 8>  PCMDR;
 			bits_ro_t<io_, bitpos::B8, 8>  CMDDR;
 		};
-		typedef fcmdr_t<0x007F'E0A0> FCMDR_;
-		static FCMDR_ FCMDR;
+		static inline fcmdr_t<0x007F'E0A0> FCMDR;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
@@ -363,8 +348,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 8>  PEERRST;
 		};
-		typedef fpestat_t<0x007F'E0C0> FPESTAT_;
-		static FPESTAT_ FPESTAT;
+		static inline fpestat_t<0x007F'E0C0> FPESTAT;
 #endif
 
 
@@ -384,8 +368,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  BCDIR;
 		};
-		typedef fbccnt_t<0x007F'E0D0> FBCCNT_;
-		static FBCCNT_ FBCCNT;
+		static inline fbccnt_t<0x007F'E0D0> FBCCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -401,8 +384,7 @@ namespace device {
 
 			bit_ro_t<io_, bitpos::B0>  BCST;
 		};
-		typedef fbcstat_t<0x007F'E0D4> FBCSTAT_;
-		static FBCSTAT_ FBCSTAT;
+		static inline fbcstat_t<0x007F'E0D4> FBCSTAT;
 
 
 		//-----------------------------------------------------------------//
@@ -418,8 +400,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 19>  PSADR;  // RX72N: 17 bits
 		};
-		typedef fpsaddr_t<0x007F'E0D8> FPSADDR_;
-		static FPSADDR_ FPSADDR;
+		static inline fpsaddr_t<0x007F'E0D8> FPSADDR;
 
 
 		//-----------------------------------------------------------------//
@@ -438,8 +419,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  ESUSPMD;
 		};
-		typedef fcpsr_t<0x007F'E0E0> FCPSR_;
-		static FCPSR_ FCPSR;
+		static inline fcpsr_t<0x007F'E0E0> FCPSR;
 
 
 		//-----------------------------------------------------------------//
@@ -459,8 +439,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>  PCKA;
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fpckar_t<0x007F'E0E4> FPCKAR_;
-		static FPCKAR_ FPCKAR;
+		static inline fpckar_t<0x007F'E0E4> FPCKAR;
 
 
 #if defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
@@ -482,8 +461,7 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B31>      BTFLG;
 		};
-		typedef fawmon_t<0x007F'E0DC> FAWMON_;
-		static FAWMON_ FAWMON;
+		static inline fawmon_t<0x007F'E0DC> FAWMON;
 
 
 		//-----------------------------------------------------------------//
@@ -504,8 +482,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
-		typedef fsuacr_t<0x007F'E0E8> FSUACR_;
-		static FSUACR_ FSUACR;
+		static inline fsuacr_t<0x007F'E0E8> FSUACR;
 
 
 		//-----------------------------------------------------------------//
@@ -513,8 +490,7 @@ namespace device {
 			@brief  データフラッシュメモリアクセス周波数設定レジスタ (EEPFCLK)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x007F'C040> EEPFCLK_;
-		static EEPFCLK_ EEPFCLK;
+		static inline rw8_t<0x007F'C040> EEPFCLK;
 #endif
 
 
@@ -523,10 +499,8 @@ namespace device {
 			@brief  FACIコマンド発行領域 007E 0000h 4バイト
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<0x007E'0000> FACI_CMD_AREA_;
-		static FACI_CMD_AREA_ FACI_CMD_AREA;		///< byte 書き込み
-		typedef rw16_t<0x007E'0000> FACI_CMD_AREA16_;
-		static FACI_CMD_AREA16_ FACI_CMD_AREA16;	///< word(16) 書き込み
+		static inline rw8_t<0x007E'0000> FACI_CMD_AREA;  ///< byte 書き込み
+		static inline rw16_t<0x007E'0000> FACI_CMD_AREA16;  ///< word(16) 書き込み
 
 
 		//-----------------------------------------------------------------//
@@ -535,20 +509,16 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
-		typedef ro32_t<0x007F'B174> UIDR0_;
-		typedef ro32_t<0x007F'B1E4> UIDR1_;
-		typedef ro32_t<0x007F'B1E8> UIDR2_;
-		typedef ro32_t<0xFFFF'FFF4> UIDR3_;  ///< in VECTOR 
+		static inline ro32_t<0x007F'B174> UIDR0;
+		static inline ro32_t<0x007F'B1E4> UIDR1;
+		static inline ro32_t<0x007F'B1E8> UIDR2;
+		static inline ro32_t<0xFFFF'FFF4> UIDR3;  ///< in VECTOR 
 #elif defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef ro32_t<0xFE7F'7D90> UIDR0_;
-		typedef ro32_t<0xFE7F'7D94> UIDR1_;
-		typedef ro32_t<0xFE7F7'D98> UIDR2_;
-		typedef ro32_t<0xFE7F7'D9C> UIDR3_;
+		static inline ro32_t<0xFE7F'7D90> UIDR0;
+		static inline ro32_t<0xFE7F'7D94> UIDR1;
+		static inline ro32_t<0xFE7F7'D98> UIDR2;
+		static inline ro32_t<0xFE7F7'D9C> UIDR3;
 #endif
-		static UIDR0_ UIDR0;
-		static UIDR1_ UIDR1;
-		static UIDR2_ UIDR2;
-		static UIDR3_ UIDR3;
 
 
 		//-----------------------------------------------------------------//
@@ -573,50 +543,6 @@ namespace device {
 #endif
 		}
 	};
-#if defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::ROMCE_    flash_t<dsize, idnum>::ROMCE;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::ROMCIV_   flash_t<dsize, idnum>::ROMCIV;
-#endif
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FWEPROR_  flash_t<dsize, idnum>::FWEPROR;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FASTAT_   flash_t<dsize, idnum>::FASTAT;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FAEINT_   flash_t<dsize, idnum>::FAEINT;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FRDYIE_   flash_t<dsize, idnum>::FRDYIE;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSADDR_   flash_t<dsize, idnum>::FSADDR;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FEADDR_   flash_t<dsize, idnum>::FEADDR;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FCURAME_  flash_t<dsize, idnum>::FCURAME;
-#endif
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSTATR_   flash_t<dsize, idnum>::FSTATR;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FENTRYR_  flash_t<dsize, idnum>::FENTRYR;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T) || defined(SIG_RX66T)
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPROTR_   flash_t<dsize, idnum>::FPROTR;
-#endif
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSUINITR_ flash_t<dsize, idnum>::FSUINITR;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FLKSTAT_  flash_t<dsize, idnum>::FLKSTAT;
-#endif
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FCMDR_    flash_t<dsize, idnum>::FCMDR;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPESTAT_  flash_t<dsize, idnum>::FPESTAT;
-#endif
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FBCCNT_   flash_t<dsize, idnum>::FBCCNT;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FBCSTAT_  flash_t<dsize, idnum>::FBCSTAT;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPSADDR_  flash_t<dsize, idnum>::FPSADDR;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FCPSR_    flash_t<dsize, idnum>::FCPSR;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FPCKAR_   flash_t<dsize, idnum>::FPCKAR;
-#if defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FAWMON_   flash_t<dsize, idnum>::FAWMON;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FSUACR_   flash_t<dsize, idnum>::FSUACR;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::EEPFCLK_  flash_t<dsize, idnum>::EEPFCLK;
-#endif
-
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FACI_CMD_AREA_ flash_t<dsize, idnum>::FACI_CMD_AREA;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::FACI_CMD_AREA16_ flash_t<dsize, idnum>::FACI_CMD_AREA16;
-
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR0_  flash_t<dsize, idnum>::UIDR0;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR1_  flash_t<dsize, idnum>::UIDR1;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR2_  flash_t<dsize, idnum>::UIDR2;
-	template <uint32_t dsize, uint32_t idnum> typename flash_t<dsize, idnum>::UIDR3_  flash_t<dsize, idnum>::UIDR3;
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef flash_t<65536, 3> FLASH;

@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX600 グループ　GLCDC 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "graphics/pixel.hpp"
 #include "RX600/glcdc.hpp"
 #include "RX600/glcdc_def.hpp"
@@ -422,7 +422,7 @@ namespace device {
 		};
 
 
-		static glcdc_def::ctrl_t	ctrl_blk_;
+		static inline glcdc_def::ctrl_t	ctrl_blk_;
 
 		void*				layer1_org_;
 		void*				layer2_org_;
@@ -2148,7 +2148,4 @@ namespace device {
 			return true;
 		}
 	};
-
-	template <class GLC, int16_t XSIZE, int16_t YSIZE, graphics::pixel::TYPE PXT_>
-		glcdc_def::ctrl_t glcdc_mgr<GLC, XSIZE, YSIZE, PXT_>::ctrl_blk_;
 }

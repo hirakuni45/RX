@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX631/RX63N IEB 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,12 +17,10 @@ namespace device {
 		@brief  IEB 定義
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
 	struct ieb_t {
 
 		static constexpr auto PERIPHERAL = peripheral::IEB;
 		static constexpr auto IEBINT     = ICU::VECTOR::IEBINT;
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -43,8 +41,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>     DEE;
 			bit_rw_t <io_, bitpos::B6>     IOL;
 		};
-		typedef iectr_t<0x0008'A800> IECTR_;
-		static  IECTR_ IECTR;
+		static inline iectr_t<0x0008'A800> IECTR;
 
 
 		//-----------------------------------------------------------------//
@@ -63,8 +60,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>  CMD;
 		};
-		typedef iecmr_t<0x0008'A801> IECMR_;
-		static  IECMR_ IECMR;
+		static inline iecmr_t<0x0008'A801> IECMR;
 
 
 		//-----------------------------------------------------------------//
@@ -85,8 +81,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3>  RN;
 			bit_rw_t <io_, bitpos::B7>     SS;
 		};
-		typedef iemcr_t<0x0008'A802> IEMCR_;
-		static  IEMCR_ IEMCR;
+		static inline iemcr_t<0x0008'A802> IEMCR;
 
 
 		//-----------------------------------------------------------------//
@@ -108,8 +103,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B2, 2>  IMD;
 			bits_rw_t<io_, bitpos::B4, 4>  IARL;
 		};
-		typedef iear1_t<0x0008'A803> IEAR1_;
-		static  IEAR1_ IEAR1;
+		static inline iear1_t<0x0008'A803> IEAR1;
 
 
 		//-----------------------------------------------------------------//
@@ -128,8 +122,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  IARU8;
 		};
-		typedef iear2_t<0x0008'A804> IEAR2_;
-		static  IEAR2_ IEAR2;
+		static inline iear2_t<0x0008'A804> IEAR2;
 
 
 		//-----------------------------------------------------------------//
@@ -148,8 +141,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 4>  ISAL;
 		};
-		typedef iesa1_t<0x0008'A805> IESA1_;
-		static  IESA1_ IESA1;
+		static inline iesa1_t<0x0008'A805> IESA1;
 
 
 		//-----------------------------------------------------------------//
@@ -168,8 +160,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  ISAU8;
 		};
-		typedef iesa2_t<0x0008'A806> IESA2_;
-		static  IESA2_ IESA2;
+		static inline iesa2_t<0x0008'A806> IESA2;
 
 
 		//-----------------------------------------------------------------//
@@ -188,8 +179,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  IBFL;
 		};
-		typedef ietbfl_t<0x0008'A807> IETBFL_;
-		static  IETBFL_ IETBFL;
+		static inline ietbfl_t<0x0008'A807> IETBFL;
 
 
 		//-----------------------------------------------------------------//
@@ -208,8 +198,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 4>  IMAL4;
 		};
-		typedef iema1_t<0x0008'A809> IEMA1_;
-		static  IEMA1_ IEMA1;
+		static inline iema1_t<0x0008'A809> IEMA1;
 
 
 		//-----------------------------------------------------------------//
@@ -228,8 +217,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  IMAU8;
 		};
-		typedef iema2_t<0x0008'A80A> IEMA2_;
-		static  IEMA2_ IEMA2;
+		static inline iema2_t<0x0008'A80A> IEMA2;
 
 
 		//-----------------------------------------------------------------//
@@ -248,8 +236,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  RCTL;
 		};
-		typedef ierctl_t<0x0008'A80B> IERCTL_;
-		static  IERCTL_ IERCTL;
+		static inline ierctl_t<0x0008'A80B> IERCTL;
 
 
 		//-----------------------------------------------------------------//
@@ -268,8 +255,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  RBFL;
 		};
-		typedef ierbfl_t<0x0008'A80C> IERBFL_;
-		static  IERBFL_ IERBFL;
+		static inline ierbfl_t<0x0008'A80C> IERBFL;
 
 
 		//-----------------------------------------------------------------//
@@ -288,8 +274,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  ILAL8;
 		};
-		typedef iela1_t<0x0008'A80E> IELA1_;
-		static  IELA1_ IELA1;
+		static inline iela1_t<0x0008'A80E> IELA1;
 
 
 		//-----------------------------------------------------------------//
@@ -308,8 +293,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  ILAU4;
 		};
-		typedef iela2_t<0x0008'A80F> IELA2_;
-		static  IELA2_ IELA2;
+		static inline iela2_t<0x0008'A80F> IELA2;
 
 
 		//-----------------------------------------------------------------//
@@ -332,8 +316,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  MRQ;
 			bit_rw_t<io_, bitpos::B7>  CMX;
 		};
-		typedef ieflg_t<0x0008'A810> IEFLG_;
-		static  IEFLG_ IEFLG;
+		static inline ieflg_t<0x0008'A810> IEFLG;
 
 
 		//-----------------------------------------------------------------//
@@ -358,8 +341,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>  TXF;
 			bit_rw_t<io_, bitpos::B6>  TXS;
 		};
-		typedef ietsr_t<0x0008'A811> IETSR_;
-		static  IETSR_ IETSR;
+		static inline ietsr_t<0x0008'A811> IETSR;
 
 
 		//-----------------------------------------------------------------//
@@ -384,8 +366,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>  TXFE;
 			bit_rw_t<io_, bitpos::B6>  TXSE;
 		};
-		typedef ieiet_t<0x0008'A812> IEIET_;
-		static  IEIET_ IEIET;
+		static inline ieiet_t<0x0008'A812> IEIET;
 
 
 		//-----------------------------------------------------------------//
@@ -411,8 +392,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  RXS;
 			bit_rw_t<io_, bitpos::B7>  RXBSY;
 		};
-		typedef iersr_t<0x0008'A814> IERSR_;
-		static  IERSR_ IERSR;
+		static inline iersr_t<0x0008'A814> IERSR;
 
 
 		//-----------------------------------------------------------------//
@@ -438,8 +418,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  RXSE;
 			bit_rw_t<io_, bitpos::B7>  RXBSYE;
 		};
-		typedef ieier_t<0x0008'A815> IEIER_;
-		static  IEIER_ IEIER;
+		static inline ieier_t<0x0008'A815> IEIER;
 
 
 		//-----------------------------------------------------------------//
@@ -462,8 +441,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B5, 2> FCKS;
 			bit_rw_t <io_, bitpos::B7>    FLT;
 		};
-		typedef iecksr_t<0x0008'A818> IECKSR_;
-		static  IECKSR_ IECKSR;
+		static inline iecksr_t<0x0008'A818> IECKSR;
 
 
 		//-----------------------------------------------------------------//
@@ -479,8 +457,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(ofs + idx);
 			}
 		};
-		typedef ietb_t<0x0008'A900> IETB_;
-		static  IETB_ IETB;
+		static inline ietb_t<0x0008'A900> IETB;
 
 
 		//-----------------------------------------------------------------//
@@ -496,29 +473,7 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(ofs + idx);
 			}
 		};
-		typedef ierb_t<0x0008'AA00> IERB_;
-		static  IERB_ IERB;
+		static inline ierb_t<0x0008'AA00> IERB;
 	};
-	template <class _> typename ieb_t<_>::IECTR_ ieb_t<_>::IECTR;
-	template <class _> typename ieb_t<_>::IECMR_ ieb_t<_>::IECMR;
-	template <class _> typename ieb_t<_>::IEMCR_ ieb_t<_>::IEMCR;
-	template <class _> typename ieb_t<_>::IEAR1_ ieb_t<_>::IEAR1;
-	template <class _> typename ieb_t<_>::IEAR2_ ieb_t<_>::IEAR2;
-	template <class _> typename ieb_t<_>::IESA1_ ieb_t<_>::IESA1;
-	template <class _> typename ieb_t<_>::IESA2_ ieb_t<_>::IESA2;
-	template <class _> typename ieb_t<_>::IETBFL_ ieb_t<_>::IETBFL;
-	template <class _> typename ieb_t<_>::IEMA1_ ieb_t<_>::IEMA1;
-	template <class _> typename ieb_t<_>::IEMA2_ ieb_t<_>::IEMA2;
-	template <class _> typename ieb_t<_>::IERCTL_ ieb_t<_>::IERCTL;
-	template <class _> typename ieb_t<_>::IERBFL_ ieb_t<_>::IERBFL;
-	template <class _> typename ieb_t<_>::IELA1_ ieb_t<_>::IELA1;
-	template <class _> typename ieb_t<_>::IELA2_ ieb_t<_>::IELA2;
-	template <class _> typename ieb_t<_>::IEFLG_ ieb_t<_>::IEFLG;
-	template <class _> typename ieb_t<_>::IETSR_ ieb_t<_>::IETSR;
-	template <class _> typename ieb_t<_>::IEIET_ ieb_t<_>::IEIET;
-	template <class _> typename ieb_t<_>::IERSR_ ieb_t<_>::IERSR;
-	template <class _> typename ieb_t<_>::IEIER_ ieb_t<_>::IEIER;
-	template <class _> typename ieb_t<_>::IECKSR_ ieb_t<_>::IECKSR;
-	template <class _> typename ieb_t<_>::IETB_ ieb_t<_>::IETB;
-	template <class _> typename ieb_t<_>::IERB_ ieb_t<_>::IERB;
+	typedef ieb_t IEB;
 }

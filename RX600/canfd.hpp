@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CANFD 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -41,8 +41,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B17, 8>  TSEG;
 			bits_rw_t<io_, bitpos::B25, 7>  TSEG2;
 		};
-		typedef nbcr_t<base + 0x00> NBCR_;
-		static  NBCR_ NBCR;
+		static inline nbcr_t<base + 0x00> NBCR;
 
 
 		//-----------------------------------------------------------------//
@@ -84,8 +83,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>     BFT;
 			bit_rw_t <io_, bitpos::B31>     ROME;
 		};
-		typedef chcr_t<base + 0x04> CHCR_;
-		static  CHCR_ CHCR;
+		static inline chcr_t<base + 0x04> CHCR;
 
 
 		//-----------------------------------------------------------------//
@@ -117,8 +115,7 @@ namespace device {
 			bits_ro_t<in_, bitpos::B16, 8>  REC;
 			bits_ro_t<in_, bitpos::B24, 8>  TEC;
 		};
-		typedef chsr_t<base + 0x08> CHSR_;
-		static  CHSR_ CHSR;
+		static inline chsr_t<base + 0x08> CHSR;
 
 
 		//-----------------------------------------------------------------//
@@ -155,8 +152,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B16, 15> CRC;
 		};
-		typedef chesr_t<base + 0x0C> CHESR_;
-		static  CHESR_ CHESR;
+		static inline chesr_t<base + 0x0C> CHESR;
 
 
 		//-----------------------------------------------------------------//
@@ -178,8 +174,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 4>  TSEG2;
 			bits_rw_t<io_, bitpos::B24, 4>  SJW;
 		};
-		typedef dbcr_t<base + 0x100> DBCR_;
-		static  DBCR_ DBCR;
+		static inline dbcr_t<base + 0x100> DBCR;
 
 
 		//-----------------------------------------------------------------//
@@ -208,8 +203,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B29>     REFE;
 			bit_rw_t <io_, bitpos::B30>     CLOE;
 		};
-		typedef fdcfg_t<base + 0x104> FDCFG_;
-		static  FDCFG_ FDCFG;
+		static inline fdcfg_t<base + 0x104> FDCFG;
 
 
 		//-----------------------------------------------------------------//
@@ -229,8 +223,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>      ECCL;
 			bit_rw_t <io_, bitpos::B1>      SCCL;
 		};
-		typedef fdctr_t<base + 0x108> FDCTR_;
-		static  FDCTR_ FDCTR;
+		static inline fdctr_t<base + 0x108> FDCTR;
 
 
 		//-----------------------------------------------------------------//
@@ -258,8 +251,7 @@ namespace device {
 			bits_ro_t<in_, bitpos::B16, 8>  EC;
 			bits_ro_t<in_, bitpos::B24, 8>  SC;
 		};
-		typedef fdsts_t<base + 0x10C> FDSTS_;
-		static  FDSTS_ FDSTS;
+		static inline fdsts_t<base + 0x10C> FDSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -276,8 +268,7 @@ namespace device {
 			bits_ro_t<in_, bitpos::B0, 21>  CRC21;
 			bits_ro_t<in_, bitpos::B24, 4>  SBC;
 		};
-		typedef fdcrc_t<base + 0x110> FDCRC_;
-		static  FDCRC_ FDCRC;
+		static inline fdcrc_t<base + 0x110> FDCRC;
 
 
 		//-----------------------------------------------------------------//
@@ -306,8 +297,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 16> ITP;
 		};
-		typedef gcfg_t<base + 0x14> GCFG_;
-		static  GCFG_ GCFG;
+		static inline gcfg_t<base + 0x14> GCFG;
 
 
 		//-----------------------------------------------------------------//
@@ -334,8 +324,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B16>     TSCR;
 		};
-		typedef gcr_t<base + 0x18> GCR_;
-		static  GCR_ GCR;
+		static inline gcr_t<base + 0x18> GCR;
 
 
 		//-----------------------------------------------------------------//
@@ -354,8 +343,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>  SLPST;
 			bit_ro_t <in_, bitpos::B3>  RAMST;
 		};
-		typedef gsr_t<base + 0x1C> GSR_;
-		static  GSR_ GSR;
+		static inline gsr_t<base + 0x1C> GSR;
 
 
 		//-----------------------------------------------------------------//
@@ -381,8 +369,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B16>     EEDF0;
 		};
-		typedef gesr_t<base + 0x20> GESR_;
-		static  GESR_ GESR;
+		static inline gesr_t<base + 0x20> GESR;
 
 
 		//-----------------------------------------------------------------//
@@ -402,8 +389,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B3>  CFTIF0;
 			bit_ro_t <in_, bitpos::B4>  THIF0;
 		};
-		typedef tisr_t<base + 0xA4> TISR_;
-		static  TISR_ TISR;
+		static inline tisr_t<base + 0xA4> TISR;
 
 
 		//-----------------------------------------------------------------//
@@ -422,8 +408,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>  VAL;
 		};
-		typedef tscr_t<base + 0x24> TSCR_;
-		static  TSCR_ TSCR;
+		static inline tscr_t<base + 0x24> TSCR;
 
 
 		//-----------------------------------------------------------------//
@@ -444,8 +429,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      AFLWE;
 		};
-		typedef afcr_t<base + 0x28> AFCR_;
-		static  AFCR_ AFCR;
+		static inline afcr_t<base + 0x28> AFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -464,8 +448,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 6>  RN0;
 		};
-		typedef afcfg_t<base + 0x2C> AFCFG_;
-		static  AFCFG_ AFCFG;
+		static inline afcfg_t<base + 0x2C> AFCFG;
 
 
 		//-----------------------------------------------------------------//
@@ -495,8 +478,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef aflidr_t<base + 0x0120> AFLIDR_;
-		static  AFLIDR_ AFLIDR;
+		static inline aflidr_t<base + 0x0120> AFLIDR;
 
 
 		//-----------------------------------------------------------------//
@@ -526,8 +508,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef aflmask_t<base + 0x0124> AFLMASK_;
-		static  AFLMASK_ AFLMASK;
+		static inline aflmask_t<base + 0x0124> AFLMASK;
 
 
 		//-----------------------------------------------------------------//
@@ -560,8 +541,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef aflptr0_t<base + 0x0128> AFLPTR0_;
-		static  AFLPTR0_ AFLPTR0;
+		static inline aflptr0_t<base + 0x0128> AFLPTR0;
 
 
 		//-----------------------------------------------------------------//
@@ -591,8 +571,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef aflptr1_t<base + 0x012C> AFLPTR1_;
-		static  AFLPTR1_ AFLPTR1;
+		static inline aflptr1_t<base + 0x012C> AFLPTR1;
 
 
 		//-----------------------------------------------------------------//
@@ -613,8 +592,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 3>   PLS;
 		};
-		typedef rmcr_t<base + 0x30> RMCR_;
-		static  RMCR_ RMCR;
+		static inline rmcr_t<base + 0x30> RMCR;
 
 
 		//-----------------------------------------------------------------//
@@ -633,8 +611,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 32>  NDF;
 		};
-		typedef rmndr_t<base + 0x34> RMNDR_;
-		static  RMNDR_ RMNDR;
+		static inline rmndr_t<base + 0x34> RMNDR;
 
 
 		//-----------------------------------------------------------------//
@@ -661,10 +638,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B12>     RFIM;
 			bits_rw_t<io_, bitpos::B13, 3>  RFITH;
 		};
-		typedef rfcrn_t<base + 0x3C> RFCR0_;
-		static  RFCR0_ RFCR0;
-		typedef rfcrn_t<base + 0x40> RFCR1_;
-		static  RFCR1_ RFCR1;
+		static inline rfcrn_t<base + 0x3C> RFCR0;
+		static inline rfcrn_t<base + 0x40> RFCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -690,10 +665,8 @@ namespace device {
 
 			bits_rw_t<in_, bitpos::B8, 6>   FLVL;
 		};
-		typedef rfsrn_t<base + 0x44> RFSR0_;
-		static  RFSR0_ RFSR0;
-		typedef rfsrn_t<base + 0x48> RFSR1_;
-		static  RFSR1_ RFSR1;
+		static inline rfsrn_t<base + 0x44> RFSR0;
+		static inline rfsrn_t<base + 0x48> RFSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -712,10 +685,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>   VAL;
 		};
-		typedef rfpcrn_t<base + 0x4C> RFPCR0_;
-		static  RFPCR0_ RFPCR0;
-		typedef rfpcrn_t<base + 0x50> RFPCR1_;
-		static  RFPCR1_ RFPCR1;
+		static inline rfpcrn_t<base + 0x4C> RFPCR0;
+		static inline rfpcrn_t<base + 0x50> RFPCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -749,8 +720,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B21, 3>  FDS;
 			bits_rw_t<io_, bitpos::B24, 8>  TINT;
 		};
-		typedef cfcr0_t<base + 0x54> CFCR0_;
-		static  CFCR0_ CFCR0;
+		static inline cfcr0_t<base + 0x54> CFCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -777,8 +747,7 @@ namespace device {
 
 			bits_rw_t<in_, bitpos::B8, 6>   FLVL;
 		};
-		typedef cfsr0_t<base + 0x58> CFSR0_;
-		static  CFSR0_ CFSR0;
+		static inline cfsr0_t<base + 0x58> CFSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -797,8 +766,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>   VAL;
 		};
-		typedef cfpcr0_t<base + 0x5C> CFPCR0_;
-		static  CFPCR0_ CFPCR0;
+		static inline cfpcr0_t<base + 0x5C> CFPCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -817,8 +785,7 @@ namespace device {
 
 			bit_rw_t <in_, bitpos::B8>      CFEMP0;
 		};
-		typedef fesr_t<base + 0x60> FESR_;
-		static  FESR_ FESR;
+		static inline fesr_t<base + 0x60> FESR;
 
 
 		//-----------------------------------------------------------------//
@@ -837,8 +804,7 @@ namespace device {
 
 			bit_rw_t <in_, bitpos::B8>      CFFUL0;
 		};
-		typedef ffsr_t<base + 0x64> FFSR_;
-		static  FFSR_ FFSR;
+		static inline ffsr_t<base + 0x64> FFSR;
 
 
 		//-----------------------------------------------------------------//
@@ -857,8 +823,7 @@ namespace device {
 
 			bit_rw_t <in_, bitpos::B8>      CFML0;
 		};
-		typedef fmlsr_t<base + 0x68> FMLSR_;
-		static  FMLSR_ FMLSR;
+		static inline fmlsr_t<base + 0x68> FMLSR;
 
 
 		//-----------------------------------------------------------------//
@@ -875,8 +840,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B0>      RFIF0;
 			bit_ro_t <in_, bitpos::B1>      RFIF1;
 		};
-		typedef rfisr_t<base + 0x6C> RFISR_;
-		static  RFISR_ RFISR;
+		static inline rfisr_t<base + 0x6C> RFISR;
 
 
 		//-----------------------------------------------------------------//
@@ -898,8 +862,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      CFDTE0;
 		};
-		typedef dtcr_t<base + 0xC8> DTCR_;
-		static  DTCR_ DTCR;
+		static inline dtcr_t<base + 0xC8> DTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -918,8 +881,7 @@ namespace device {
 
 			bit_ro_t <in_, bitpos::B8>      CFDTS0;
 		};
-		typedef dtsr_t<base + 0xCC> DTSR_;
-		static  DTSR_ DTSR;
+		static inline dtsr_t<base + 0xCC> DTSR;
 
 
 		//-----------------------------------------------------------------//
@@ -947,8 +909,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmcr_t<base + 0x70> TMCR_;
-		static  TMCR_ TMCR;
+		static inline tmcr_t<base + 0x70> TMCR;
 
 
 		//-----------------------------------------------------------------//
@@ -977,8 +938,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef tmsr_t<base + 0x74> TMSR_;
-		static  TMSR_ TMSR;
+		static inline tmsr_t<base + 0x74> TMSR;
 
 
 		//-----------------------------------------------------------------//
@@ -997,8 +957,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>      TXRQS2;
 			bit_ro_t <in_, bitpos::B3>      TXRQS3;
 		};
-		typedef tmtrsr0_t<base + 0x78> TMTRSR0_;
-		static  TMTRSR0_ TMTRSR0;
+		static inline tmtrsr0_t<base + 0x78> TMTRSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1017,8 +976,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>      TARQS2;
 			bit_ro_t <in_, bitpos::B3>      TARQS3;
 		};
-		typedef tmarsr0_t<base + 0x7C> TMARSR0_;
-		static  TMARSR0_ TMARSR0;
+		static inline tmarsr0_t<base + 0x7C> TMARSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1037,8 +995,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>      TXCF2;
 			bit_ro_t <in_, bitpos::B3>      TXCF3;
 		};
-		typedef tmtcsr0_t<base + 0x80> TMTCSR0_;
-		static  TMTCSR0_ TMTCSR0;
+		static inline tmtcsr0_t<base + 0x80> TMTCSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1057,8 +1014,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B2>      TAF2;
 			bit_ro_t <in_, bitpos::B3>      TAF3;
 		};
-		typedef tmtasr0_t<base + 0x84> TMTASR0_;
-		static  TMTASR0_ TMTASR0;
+		static inline tmtasr0_t<base + 0x84> TMTASR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1080,8 +1036,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>      TMIE2;
 			bit_rw_t <io_, bitpos::B3>      TMIE3;
 		};
-		typedef tmier0_t<base + 0x88> TMIER0_;
-		static  TMIER0_ TMIER0;
+		static inline tmier0_t<base + 0x88> TMIER0;
 
 
 		//-----------------------------------------------------------------//
@@ -1106,8 +1061,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 2>   QDS;
 		};
-		typedef tqcr0_t<base + 0x8C> TQCR0_;
-		static  TQCR0_ TQCR0;
+		static inline tqcr0_t<base + 0x8C> TQCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1132,8 +1086,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B8, 3>   FLVL;
 		};
-		typedef tqsr0_t<base + 0x90> TQSR0_;
-		static  TQSR0_ TQSR0;
+		static inline tqsr0_t<base + 0x90> TQSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1152,8 +1105,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>   VAL;
 		};
-		typedef tqpcr0_t<base + 0x94> TQPCR0_;
-		static  TQPCR0_ TQPCR0;
+		static inline tqpcr0_t<base + 0x94> TQPCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1176,8 +1128,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B9>      THIM;
 			bit_rw_t <io_, bitpos::B10>     THRC;
 		};
-		typedef thcr_t<base + 0x98> THCR_;
-		static  THCR_ THCR;
+		static inline thcr_t<base + 0x98> THCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1203,8 +1154,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B8, 4>   FLVL;
 		};
-		typedef thsr_t<base + 0x9C> THSR_;
-		static  THSR_ THSR;
+		static inline thsr_t<base + 0x9C> THSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1223,8 +1173,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B16, 16> TS;
 		};
-		typedef thacr0_t<base + 0x740> THACR0_;
-		static  THACR0_ THACR0;
+		static inline thacr0_t<base + 0x740> THACR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1242,8 +1191,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B16, 2>  IFL;
 		};
-		typedef thacr1_t<base + 0x744> THACR1_;
-		static  THACR1_ THACR1;
+		static inline thacr1_t<base + 0x744> THACR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1262,8 +1210,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>   VAL;
 		};
-		typedef thpcr_t<base + 0xA0> THPCR_;
-		static  THPCR_ THPCR;
+		static inline thpcr_t<base + 0xA0> THPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1284,8 +1231,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8>   KEY;
 		};
-		typedef grcr_t<base + 0xD8> GRCR_;
-		static  GRCR_ GRCR;
+		static inline grcr_t<base + 0xD8> GRCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1304,8 +1250,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 4>  RTPS;
 		};
-		typedef gtmcr_t<base + 0xA8> GTMCR_;
-		static  GTMCR_ GTMCR;
+		static inline gtmcr_t<base + 0xA8> GTMCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1324,8 +1269,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B2>      RTME;
 		};
-		typedef gtmer_t<base + 0xAC> GTMER_;
-		static  GTMER_ GTMER;
+		static inline gtmer_t<base + 0xAC> GTMER;
 
 
 		//-----------------------------------------------------------------//
@@ -1346,8 +1290,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 2>   TSCPS;
 		};
-		typedef gfdcfg_t<base + 0xB0> GFDCFG_;
-		static  GFDCFG_ GFDCFG;
+		static inline gfdcfg_t<base + 0xB0> GFDCFG;
 
 
 		//-----------------------------------------------------------------//
@@ -1366,8 +1309,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>  VAL;
 		};
-		typedef gtmlkr_t<base + 0xB8> GTMLKR_;
-		static  GTMLKR_ GTMLKR;
+		static inline gtmlkr_t<base + 0xB8> GTMLKR;
 
 
 		//-----------------------------------------------------------------//
@@ -1391,8 +1333,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef rtpar_t<base + 0x280> RTPAR_;
-		static  RTPAR_ RTPAR;
+		static inline rtpar_t<base + 0x280> RTPAR;
 
 
 		//-----------------------------------------------------------------//
@@ -1411,8 +1352,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>   IGES;
 		};
-		typedef afigsr_t<base + 0xC0> AFIGSR_;
-		static  AFIGSR_ AFIGSR;
+		static inline afigsr_t<base + 0xC0> AFIGSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1433,8 +1373,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8>   KEY;
 		};
-		typedef afiger_t<base + 0xC4> AFIGER_;
-		static  AFIGER_ AFIGER;
+		static inline afiger_t<base + 0xC4> AFIGER;
 
 
 		//-----------------------------------------------------------------//
@@ -1484,8 +1423,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>     RMIE30;
 			bit_rw_t <io_, bitpos::B31>     RMIE31;
 		};
-		typedef rmier_t<base + 0x38> RMIER_;
-		static  RMIER_ RMIER;
+		static inline rmier_t<base + 0x38> RMIER;
 
 #if 0
 		//-----------------------------------------------------------------//
@@ -1576,68 +1514,6 @@ namespace device {
 #endif
 
 	};
-	template <uint32_t base> typename canfd_base_t<base>::NBCR_    canfd_base_t<base>::NBCR;
-	template <uint32_t base> typename canfd_base_t<base>::CHCR_    canfd_base_t<base>::CHCR;
-	template <uint32_t base> typename canfd_base_t<base>::CHSR_    canfd_base_t<base>::CHSR;
-	template <uint32_t base> typename canfd_base_t<base>::CHESR_   canfd_base_t<base>::CHESR;
-	template <uint32_t base> typename canfd_base_t<base>::DBCR_    canfd_base_t<base>::DBCR;
-	template <uint32_t base> typename canfd_base_t<base>::FDCFG_   canfd_base_t<base>::FDCFG;
-	template <uint32_t base> typename canfd_base_t<base>::FDCTR_   canfd_base_t<base>::FDCTR;
-	template <uint32_t base> typename canfd_base_t<base>::FDSTS_   canfd_base_t<base>::FDSTS;
-	template <uint32_t base> typename canfd_base_t<base>::FDCRC_   canfd_base_t<base>::FDCRC;
-	template <uint32_t base> typename canfd_base_t<base>::GCFG_    canfd_base_t<base>::GCFG;
-	template <uint32_t base> typename canfd_base_t<base>::GCR_     canfd_base_t<base>::GCR;
-	template <uint32_t base> typename canfd_base_t<base>::GSR_     canfd_base_t<base>::GSR;
-	template <uint32_t base> typename canfd_base_t<base>::GESR_    canfd_base_t<base>::GESR;
-	template <uint32_t base> typename canfd_base_t<base>::TISR_    canfd_base_t<base>::TISR;
-	template <uint32_t base> typename canfd_base_t<base>::TSCR_    canfd_base_t<base>::TSCR;
-	template <uint32_t base> typename canfd_base_t<base>::AFCR_    canfd_base_t<base>::AFCR;
-	template <uint32_t base> typename canfd_base_t<base>::AFCFG_   canfd_base_t<base>::AFCFG;
-	template <uint32_t base> typename canfd_base_t<base>::AFLIDR_  canfd_base_t<base>::AFLIDR;
-	template <uint32_t base> typename canfd_base_t<base>::AFLMASK_ canfd_base_t<base>::AFLMASK;
-	template <uint32_t base> typename canfd_base_t<base>::AFLPTR0_ canfd_base_t<base>::AFLPTR0;
-	template <uint32_t base> typename canfd_base_t<base>::AFLPTR1_ canfd_base_t<base>::AFLPTR1;
-	template <uint32_t base> typename canfd_base_t<base>::RMCR_    canfd_base_t<base>::RMCR;
-	template <uint32_t base> typename canfd_base_t<base>::RMNDR_   canfd_base_t<base>::RMNDR;
-	template <uint32_t base> typename canfd_base_t<base>::RFCR0_   canfd_base_t<base>::RFCR0;
-	template <uint32_t base> typename canfd_base_t<base>::RFCR1_   canfd_base_t<base>::RFCR1;
-	template <uint32_t base> typename canfd_base_t<base>::RFSR0_   canfd_base_t<base>::RFSR0;
-	template <uint32_t base> typename canfd_base_t<base>::RFSR1_   canfd_base_t<base>::RFSR1;
-	template <uint32_t base> typename canfd_base_t<base>::RFPCR0_  canfd_base_t<base>::RFPCR0;
-	template <uint32_t base> typename canfd_base_t<base>::RFPCR1_  canfd_base_t<base>::RFPCR1;
-	template <uint32_t base> typename canfd_base_t<base>::CFCR0_   canfd_base_t<base>::CFCR0;
-	template <uint32_t base> typename canfd_base_t<base>::CFSR0_   canfd_base_t<base>::CFSR0;
-	template <uint32_t base> typename canfd_base_t<base>::CFPCR0_  canfd_base_t<base>::CFPCR0;
-	template <uint32_t base> typename canfd_base_t<base>::FESR_    canfd_base_t<base>::FESR;
-	template <uint32_t base> typename canfd_base_t<base>::FFSR_    canfd_base_t<base>::FFSR;
-	template <uint32_t base> typename canfd_base_t<base>::FMLSR_   canfd_base_t<base>::FMLSR;
-	template <uint32_t base> typename canfd_base_t<base>::RFISR_   canfd_base_t<base>::RFISR;
-	template <uint32_t base> typename canfd_base_t<base>::DTCR_    canfd_base_t<base>::DTCR;
-	template <uint32_t base> typename canfd_base_t<base>::DTSR_    canfd_base_t<base>::DTSR;
-	template <uint32_t base> typename canfd_base_t<base>::TMCR_    canfd_base_t<base>::TMCR;
-	template <uint32_t base> typename canfd_base_t<base>::TMSR_    canfd_base_t<base>::TMSR;
-	template <uint32_t base> typename canfd_base_t<base>::TMTRSR0_ canfd_base_t<base>::TMTRSR0;
-	template <uint32_t base> typename canfd_base_t<base>::TMARSR0_ canfd_base_t<base>::TMARSR0;
-	template <uint32_t base> typename canfd_base_t<base>::TMTCSR0_ canfd_base_t<base>::TMTCSR0;
-	template <uint32_t base> typename canfd_base_t<base>::TMTASR0_ canfd_base_t<base>::TMTASR0;
-	template <uint32_t base> typename canfd_base_t<base>::TMIER0_  canfd_base_t<base>::TMIER0;
-	template <uint32_t base> typename canfd_base_t<base>::TQCR0_   canfd_base_t<base>::TQCR0;
-	template <uint32_t base> typename canfd_base_t<base>::TQSR0_   canfd_base_t<base>::TQSR0;
-	template <uint32_t base> typename canfd_base_t<base>::TQPCR0_  canfd_base_t<base>::TQPCR0;
-	template <uint32_t base> typename canfd_base_t<base>::THCR_    canfd_base_t<base>::THCR;
-	template <uint32_t base> typename canfd_base_t<base>::THSR_    canfd_base_t<base>::THSR;
-	template <uint32_t base> typename canfd_base_t<base>::THACR0_  canfd_base_t<base>::THACR0;
-	template <uint32_t base> typename canfd_base_t<base>::THACR1_  canfd_base_t<base>::THACR1;
-	template <uint32_t base> typename canfd_base_t<base>::THPCR_   canfd_base_t<base>::THPCR;
-	template <uint32_t base> typename canfd_base_t<base>::GRCR_    canfd_base_t<base>::GRCR;
-	template <uint32_t base> typename canfd_base_t<base>::GTMCR_   canfd_base_t<base>::GTMCR;
-	template <uint32_t base> typename canfd_base_t<base>::GTMER_   canfd_base_t<base>::GTMER;
-	template <uint32_t base> typename canfd_base_t<base>::GFDCFG_  canfd_base_t<base>::GFDCFG;
-	template <uint32_t base> typename canfd_base_t<base>::GTMLKR_  canfd_base_t<base>::GTMLKR;
-	template <uint32_t base> typename canfd_base_t<base>::RTPAR_   canfd_base_t<base>::RTPAR;
-	template <uint32_t base> typename canfd_base_t<base>::AFIGSR_  canfd_base_t<base>::AFIGSR;
-	template <uint32_t base> typename canfd_base_t<base>::AFIGER_  canfd_base_t<base>::AFIGER;
-	template <uint32_t base> typename canfd_base_t<base>::RMIER_   canfd_base_t<base>::RMIER;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1681,8 +1557,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B16>     EC1EAS;
 			bit_ro_t <in_, bitpos::B17>     EC2EAS;
 		};
-		typedef eccsr_t<base + 0x00> ECCSR_;
-		static  ECCSR_ ECCSR;
+		static inline eccsr_t<base + 0x00> ECCSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1705,8 +1580,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B14, 2>  ECTMWC;
 		};
-		typedef ectmr_t<base + 0x04> ECTMR_;
-		static  ECTMR_ ECTMR;
+		static inline ectmr_t<base + 0x04> ECTMR;
 
 
 		//-----------------------------------------------------------------//
@@ -1714,8 +1588,7 @@ namespace device {
 			@brief  ECC デコーダテストデータレジスタ (ECTDR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x0C> ECTDR_;
-		static  ECTDR_ ECTDR;
+		static inline rw32_t<base + 0x0C> ECTDR;
 
 
 		//-----------------------------------------------------------------//
@@ -1734,13 +1607,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 11>  ADR;
 		};
-		typedef ecear_t<base + 0x10> ECEAR_;
-		static  ECEAR_ ECEAR;
+		static inline ecear_t<base + 0x10> ECEAR;
 	};
-	template <uint32_t base> typename canfd_ecc_t<base>::ECCSR_ canfd_ecc_t<base>::ECCSR;
-	template <uint32_t base> typename canfd_ecc_t<base>::ECTMR_ canfd_ecc_t<base>::ECTMR;
-	template <uint32_t base> typename canfd_ecc_t<base>::ECTDR_ canfd_ecc_t<base>::ECTDR;
-	template <uint32_t base> typename canfd_ecc_t<base>::ECEAR_ canfd_ecc_t<base>::ECEAR;
 
 
 #if defined(SIG_RX26T)

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CAN 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -47,8 +47,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B11, 2>  BOM;
 			bit_rw_t <io_, bitpos::B13>     RBOC;
 		};
-		typedef ctlr_t<base + 0x0640> CTLR_;
-		static  CTLR_ CTLR;
+		static inline ctlr_t<base + 0x0640> CTLR;
 
 
 		//-----------------------------------------------------------------//
@@ -71,8 +70,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 10> BRP;
 			bits_rw_t<io_, bitpos::B28, 4>  TSEG1;
 		};
-		typedef bcr_t<base + 0x0644> BCR_;
-		static  BCR_ BCR;
+		static inline bcr_t<base + 0x0644> BCR;
 
 
 		//-----------------------------------------------------------------//
@@ -100,8 +98,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef mkr_t<base + 0x0200> MKR_;
-		static  MKR_ MKR;
+		static inline mkr_t<base + 0x0200> MKR;
 
 
 		//-----------------------------------------------------------------//
@@ -123,10 +120,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>      RTR;
 			bit_rw_t <io_, bitpos::B31>      IDE;
 		};
-		typedef fidcrx_t<base + 0x0220> FIDCR0_;
-		static  FIDCR0_ FIDCR0;
-		typedef fidcrx_t<base + 0x0224> FIDCR1_;
-		static  FIDCR1_ FIDCR1;
+		static inline fidcrx_t<base + 0x0220> FIDCR0;
+		static inline fidcrx_t<base + 0x0224> FIDCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -187,8 +182,7 @@ namespace device {
 				return (v & (1 << idx)) != 0;
 			}
 		};
-		typedef mbn_t<base + 0x0228> MKIVLR_;
-		static  MKIVLR_ MKIVLR;
+		static inline mbn_t<base + 0x0228> MKIVLR;
 
 
 		//-----------------------------------------------------------------//
@@ -274,8 +268,7 @@ namespace device {
 		private:
 			void operator = (const mb_t& t) { };  // 代入は禁止
 		};
-		typedef mb_t MB_;
-		static  MB_ MB;
+		static inline mb_t MB;
 
 
 		//-----------------------------------------------------------------//
@@ -283,8 +276,7 @@ namespace device {
 			@brief  メールボックス割り込み許可レジスタ（ MIER ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef mbn_t<base + 0x022C> MIER_;
-		static  MIER_ MIER;
+		static inline mbn_t<base + 0x022C> MIER;
 
 
 		//-----------------------------------------------------------------//
@@ -321,8 +313,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef mctl_t<base + 0x0620> MCTL_;
-		static  MCTL_ MCTL;
+		static inline mctl_t<base + 0x0620> MCTL;
 
 
 		//-----------------------------------------------------------------//
@@ -346,8 +337,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B6>      RFWST;
 			bit_ro_t <io_, bitpos::B7>      RFEST;
 		};
-		typedef rfcr_t<base + 0x0648> RFCR_;
-		static  RFCR_ RFCR;
+		static inline rfcr_t<base + 0x0648> RFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -355,8 +345,7 @@ namespace device {
 			@brief  受信 FIFO ポインタ制御レジスタ（ RFPCR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef wo8_t<base + 0x0649>  RFPCR_;
-		static  RFPCR_ RFPCR;
+		static inline wo8_t<base + 0x0649>  RFPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -378,8 +367,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B6>      TFFST;
 			bit_ro_t <io_, bitpos::B7>      TFEST;
 		};
-		typedef tfcr_t<base + 0x064A> TFCR_;
-		static  TFCR_ TFCR;
+		static inline tfcr_t<base + 0x064A> TFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -387,8 +375,7 @@ namespace device {
 			@brief  送信 FIFO ポインタ制御レジスタ（ TFPCR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef wo8_t<base + 0x064B>  TFPCR_;
-		static  TFPCR_ TFPCR;
+		static inline wo8_t<base + 0x064B>  TFPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -418,8 +405,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B13>  TRMST;
 			bit_ro_t <in_, bitpos::B14>  RECST;
 		};
-		typedef str_t<base + 0x0642> STR_;
-		static  STR_ STR;
+		static inline str_t<base + 0x0642> STR;
 
 
 		//-----------------------------------------------------------------//
@@ -438,8 +424,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  MBSM;
 		};
-		typedef msmr_t<base + 0x0654> MSMR_;
-		static  MSMR_ MSMR;
+		static inline msmr_t<base + 0x0654> MSMR;
 
 
 		//-----------------------------------------------------------------//
@@ -459,8 +444,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 5>  MBNST;
 			bit_rw_t <io_, bitpos::B7>     SEST;
 		};
-		typedef mssr_t<base + 0x0652> MSSR_;
-		static  MSSR_ MSSR;
+		static inline mssr_t<base + 0x0652> MSSR;
 
 
 		//-----------------------------------------------------------------//
@@ -468,8 +452,7 @@ namespace device {
 			@brief  チャネルサーチサポートレジスタ（ CSSR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x0651>  CSSR_;
-		static  CSSR_ CSSR;
+		static inline rw8_t<base + 0x0651>  CSSR;
 
 
 		//-----------------------------------------------------------------//
@@ -477,8 +460,7 @@ namespace device {
 			@brief  アクセプタンスフィルタサポートレジスタ（ AFSR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x0656>  AFSR_;
-		static  AFSR_ AFSR;
+		static inline rw16_t<base + 0x0656>  AFSR;
 
 
 		//-----------------------------------------------------------------//
@@ -504,8 +486,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  OLIE;
 			bit_rw_t<io_, bitpos::B7>  BLIE;
 		};
-		typedef eier_t<base + 0x064C> EIER_;
-		static  EIER_ EIER;
+		static inline eier_t<base + 0x064C> EIER;
 
 
 		//-----------------------------------------------------------------//
@@ -531,8 +512,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  OLIF;
 			bit_rw_t<io_, bitpos::B7>  BLIF;
 		};
-		typedef eifr_t<base + 0x064D> EIFR_;
-		static  EIFR_ EIFR;
+		static inline eifr_t<base + 0x064D> EIFR;
 
 
 		//-----------------------------------------------------------------//
@@ -540,8 +520,7 @@ namespace device {
 			@brief  受信エラーカウントレジスタ（ RECR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x064E>  RECR_;
-		static  RECR_ RECR;
+		static inline rw8_t<base + 0x064E>  RECR;
 
 
 		//-----------------------------------------------------------------//
@@ -549,8 +528,7 @@ namespace device {
 			@brief  送信エラーカウントレジスタ（ TECR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x064F>  TECR_;
-		static  TECR_ TECR;
+		static inline rw8_t<base + 0x064F>  TECR;
 
 
 		//-----------------------------------------------------------------//
@@ -576,8 +554,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  ADEF;
 			bit_rw_t<io_, bitpos::B7>  EDPM;
 		};
-		typedef ecsr_t<base + 0x0650> ECSR_;
-		static  ECSR_ ECSR;
+		static inline ecsr_t<base + 0x0650> ECSR;
 
 
 		//-----------------------------------------------------------------//
@@ -585,8 +562,7 @@ namespace device {
 			@brief  タイムスタンプレジスタ（ TSR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x0654>  TSR_;
-		static  TSR_ TSR;
+		static inline rw16_t<base + 0x0654>  TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -606,34 +582,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>     TSTE;
 			bits_rw_t<io_, bitpos::B1, 2>  TSTM;
 		};
-		typedef tcr_t<base + 0x0658> TCR_;
-		static  TCR_ TCR;
+		static inline tcr_t<base + 0x0658> TCR;
 	};
-	template <uint32_t base> typename can_t<base>::CTLR_   can_t<base>::CTLR;
-	template <uint32_t base> typename can_t<base>::BCR_    can_t<base>::BCR;
-	template <uint32_t base> typename can_t<base>::MKR_    can_t<base>::MKR;
-	template <uint32_t base> typename can_t<base>::FIDCR0_ can_t<base>::FIDCR0;
-	template <uint32_t base> typename can_t<base>::FIDCR1_ can_t<base>::FIDCR1;
-	template <uint32_t base> typename can_t<base>::MKIVLR_ can_t<base>::MKIVLR;
-	template <uint32_t base> typename can_t<base>::MB_     can_t<base>::MB;
-	template <uint32_t base> typename can_t<base>::MIER_   can_t<base>::MIER;
-	template <uint32_t base> typename can_t<base>::MCTL_   can_t<base>::MCTL;
-	template <uint32_t base> typename can_t<base>::RFCR_   can_t<base>::RFCR;
-	template <uint32_t base> typename can_t<base>::RFPCR_  can_t<base>::RFPCR;
-	template <uint32_t base> typename can_t<base>::TFCR_   can_t<base>::TFCR;
-	template <uint32_t base> typename can_t<base>::TFPCR_  can_t<base>::TFPCR;
-	template <uint32_t base> typename can_t<base>::STR_    can_t<base>::STR;
-	template <uint32_t base> typename can_t<base>::MSMR_   can_t<base>::MSMR;
-	template <uint32_t base> typename can_t<base>::MSSR_   can_t<base>::MSSR;
-	template <uint32_t base> typename can_t<base>::CSSR_   can_t<base>::CSSR;
-	template <uint32_t base> typename can_t<base>::AFSR_   can_t<base>::AFSR;
-	template <uint32_t base> typename can_t<base>::EIER_   can_t<base>::EIER;
-	template <uint32_t base> typename can_t<base>::EIFR_   can_t<base>::EIFR;
-	template <uint32_t base> typename can_t<base>::RECR_   can_t<base>::RECR;
-	template <uint32_t base> typename can_t<base>::TECR_   can_t<base>::TECR;
-	template <uint32_t base> typename can_t<base>::ECSR_   can_t<base>::ECSR;
-	template <uint32_t base> typename can_t<base>::TSR_    can_t<base>::TSR;
-	template <uint32_t base> typename can_t<base>::TCR_    can_t<base>::TCR;
 
 
 #if defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX63T) || defined(SIG_RX63T_S)

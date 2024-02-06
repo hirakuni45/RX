@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX26T/RX66T/RX72T グループ・HRPWM 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,8 +40,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  DLLEN;
 			bit_rw_t<io_, bitpos::B1>  HRRST;
 		};
-		typedef hrocr_t<0x000C'2A00> HROCR_;
-		static HROCR_ HROCR;
+		static inline hrocr_t<0x000C'2A00> HROCR;
 
 
 		//=================================================================//
@@ -68,8 +67,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B10>  HRDIS2;
 			bit_rw_t<io_, bitpos::B11>  HRDIS3;
 		};
-		typedef hrocr2_t<0x000C'2A02> HROCR2_;
-		static HROCR2_ HROCR2;
+		static inline hrocr2_t<0x000C'2A02> HROCR2;
 
 
 		//=================================================================//
@@ -88,14 +86,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  DLY;
 		};
-		typedef hrrearna_t<0x000C'2A18> HRREAR0A_;
-		static HRREAR0A_ HRREAR0A;
-		typedef hrrearna_t<0x000C'2A1C> HRREAR1A_;
-		static HRREAR1A_ HRREAR1A;
-		typedef hrrearna_t<0x000C'2A20> HRREAR2A_;
-		static HRREAR2A_ HRREAR2A;
-		typedef hrrearna_t<0x000C'2A24> HRREAR3A_;
-		static HRREAR3A_ HRREAR3A;
+		static inline hrrearna_t<0x000C'2A18> HRREAR0A;
+		static inline hrrearna_t<0x000C'2A1C> HRREAR1A;
+		static inline hrrearna_t<0x000C'2A20> HRREAR2A;
+		static inline hrrearna_t<0x000C'2A24> HRREAR3A;
 
 
 		//=================================================================//
@@ -114,14 +108,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  DLY;
 		};
-		typedef hrfearna_t<0x000C'2A28> HRFEAR0A_;
-		static HRFEAR0A_ HRFEAR0A;
-		typedef hrfearna_t<0x000C'2A2C> HRFEAR1A_;
-		static HRFEAR1A_ HRFEAR1A;
-		typedef hrfearna_t<0x000C'2A30> HRFEAR2A_;
-		static HRFEAR2A_ HRFEAR2A;
-		typedef hrfearna_t<0x000C'2A34> HRFEAR3A_;
-		static HRFEAR3A_ HRFEAR3A;
+		static inline hrfearna_t<0x000C'2A28> HRFEAR0A;
+		static inline hrfearna_t<0x000C'2A2C> HRFEAR1A;
+		static inline hrfearna_t<0x000C'2A30> HRFEAR2A;
+		static inline hrfearna_t<0x000C'2A34> HRFEAR3A;
 
 
 		//=================================================================//
@@ -140,14 +130,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  DLY;
 		};
-		typedef hrrearnb_t<0x000C'2A1A> HRREAR0B_;
-		static HRREAR0B_ HRREAR0B;
-		typedef hrrearnb_t<0x000C'2A1E> HRREAR1B_;
-		static HRREAR1B_ HRREAR1B;
-		typedef hrrearnb_t<0x000C'2A22> HRREAR2B_;
-		static HRREAR2B_ HRREAR2B;
-		typedef hrrearnb_t<0x000C'2A26> HRREAR3B_;
-		static HRREAR3B_ HRREAR3B;
+		static inline hrrearnb_t<0x000C'2A1A> HRREAR0B;
+		static inline hrrearnb_t<0x000C'2A1E> HRREAR1B;
+		static inline hrrearnb_t<0x000C'2A22> HRREAR2B;
+		static inline hrrearnb_t<0x000C'2A26> HRREAR3B;
 
 
 		//=================================================================//
@@ -166,14 +152,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  DLY;
 		};
-		typedef hrfearnb_t<0x000C'2A1A> HRFEAR0B_;
-		static HRFEAR0B_ HRFEAR0B;
-		typedef hrfearnb_t<0x000C'2A1E> HRFEAR1B_;
-		static HRFEAR1B_ HRFEAR1B;
-		typedef hrfearnb_t<0x000C'2A22> HRFEAR2B_;
-		static HRFEAR2B_ HRFEAR2B;
-		typedef hrfearnb_t<0x000C'2A26> HRFEAR3B_;
-		static HRFEAR3B_ HRFEAR3B;
+		static inline hrfearnb_t<0x000C'2A1A> HRFEAR0B;
+		static inline hrfearnb_t<0x000C'2A1E> HRFEAR1B;
+		static inline hrfearnb_t<0x000C'2A22> HRFEAR2B;
+		static inline hrfearnb_t<0x000C'2A26> HRFEAR3B;
 
 #if defined(SIG_RX72T)
 		//=================================================================//
@@ -192,8 +174,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  HRCKSEL;
 		};
-		typedef hrcksr_t<0x000C'2A70> HRCKSR_;
-		static HRCKSR_ HRCKSR;
+		static inline hrcksr_t<0x000C'2A70> HRCKSR;
 #endif
 
 
@@ -210,27 +191,5 @@ namespace device {
 #endif
 		}
 	};
-	template <peripheral per> typename hrpwm_t<per>::HROCR_ hrpwm_t<per>::HROCR;
-	template <peripheral per> typename hrpwm_t<per>::HROCR2_ hrpwm_t<per>::HROCR2;
-	template <peripheral per> typename hrpwm_t<per>::HRREAR0A_ hrpwm_t<per>::HRREAR0A;
-	template <peripheral per> typename hrpwm_t<per>::HRREAR1A_ hrpwm_t<per>::HRREAR1A;
-	template <peripheral per> typename hrpwm_t<per>::HRREAR2A_ hrpwm_t<per>::HRREAR2A;
-	template <peripheral per> typename hrpwm_t<per>::HRREAR3A_ hrpwm_t<per>::HRREAR3A;
-	template <peripheral per> typename hrpwm_t<per>::HRFEAR0A_ hrpwm_t<per>::HRFEAR0A;
-	template <peripheral per> typename hrpwm_t<per>::HRFEAR1A_ hrpwm_t<per>::HRFEAR1A;
-	template <peripheral per> typename hrpwm_t<per>::HRFEAR2A_ hrpwm_t<per>::HRFEAR2A;
-	template <peripheral per> typename hrpwm_t<per>::HRFEAR3A_ hrpwm_t<per>::HRFEAR3A;
-	template <peripheral per> typename hrpwm_t<per>::HRREAR0B_ hrpwm_t<per>::HRREAR0B;
-	template <peripheral per> typename hrpwm_t<per>::HRREAR1B_ hrpwm_t<per>::HRREAR1B;
-	template <peripheral per> typename hrpwm_t<per>::HRREAR2B_ hrpwm_t<per>::HRREAR2B;
-	template <peripheral per> typename hrpwm_t<per>::HRREAR3B_ hrpwm_t<per>::HRREAR3B;
-	template <peripheral per> typename hrpwm_t<per>::HRFEAR0B_ hrpwm_t<per>::HRFEAR0B;
-	template <peripheral per> typename hrpwm_t<per>::HRFEAR1B_ hrpwm_t<per>::HRFEAR1B;
-	template <peripheral per> typename hrpwm_t<per>::HRFEAR2B_ hrpwm_t<per>::HRFEAR2B;
-	template <peripheral per> typename hrpwm_t<per>::HRFEAR3B_ hrpwm_t<per>::HRFEAR3B;
-#if defined(SIG_RX72T)
-	template <peripheral per> typename hrpwm_t<per>::HRCKSR_ hrpwm_t<per>::HRCKSR;
-#endif
-
 	typedef hrpwm_t<peripheral::HRPWM> HRPWM;
 }

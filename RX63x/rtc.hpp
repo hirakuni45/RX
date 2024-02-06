@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX631/RX63N グループ RTCa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -50,8 +50,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>	F2HZ;
 			bit_rw_t<io_, bitpos::B6>	F1HZ;
 		};
-		typedef r64cnt_t<0x0008'C400> R64CNT_;
-		static  R64CNT_ R64CNT;
+		static inline r64cnt_t<0x0008'C400> R64CNT;
 
 
 		//-----------------------------------------------------------------//
@@ -71,8 +70,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>  SEC1;
 			bits_rw_t<io_, bitpos::B4, 3>  SEC10;
 		};
-		typedef rseccnt_t<0x0008'C402> RSECCNT_;
-		static  RSECCNT_ RSECCNT;
+		static inline rseccnt_t<0x0008'C402> RSECCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -92,8 +90,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>  MIN1;
 			bits_rw_t<io_, bitpos::B4, 3>  MIN10;
 		};
-		typedef rmincnt_t<0x0008'C404> RMINCNT_;
-		static  RMINCNT_ RMINCNT;
+		static inline rmincnt_t<0x0008'C404> RMINCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -113,8 +110,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>  HR1;
 			bits_rw_t<io_, bitpos::B4, 2>  HR10;
 		};
-		typedef rhrcnt_t<0x0008'C406> RHRCNT_;
-		static  RHRCNT_ RHRCNT;
+		static inline rhrcnt_t<0x0008'C406> RHRCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -133,8 +129,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>  DAYW;
 		};
-		typedef rwkcnt_t<0x0008'C408> RWKCNT_;
-		static  RWKCNT_ RWKCNT;
+		static inline rwkcnt_t<0x0008'C408> RWKCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -154,8 +149,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> DATE1;
 			bits_rw_t<io_, bitpos::B4, 2> DATE10;
 		};
-		typedef rdaycnt_t<0x0008'C40A> RDAYCNT_;
-		static  RDAYCNT_ RDAYCNT;
+		static inline rdaycnt_t<0x0008'C40A> RDAYCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -175,8 +169,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> MON1;
 			bit_rw_t <io_, bitpos::B4>    MON10;
 		};
-		typedef rmoncnt_t<0x0008'C40C> RMONCNT_;
-		static  RMONCNT_ RMONCNT;
+		static inline rmoncnt_t<0x0008'C40C> RMONCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -198,8 +191,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4> YEAR100;
 			bits_rw_t<io_, bitpos::B12, 4> YEAR1000;
 		};
-		typedef ryrcnt_t<0x0008'C40E> RYRCNT_;
-		static  RYRCNT_ RYRCNT;
+		static inline ryrcnt_t<0x0008'C40E> RYRCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -220,8 +212,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3> SEC10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rsecar_t<0x0008'C410> RSECAR_;
-		static  RSECAR_ RSECAR;
+		static inline rsecar_t<0x0008'C410> RSECAR;
 
 
 		//-----------------------------------------------------------------//
@@ -242,8 +233,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3> MIN10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rminar_t<0x0008'C412> RMINAR_;
-		static  RMINAR_ RMINAR;
+		static inline rminar_t<0x0008'C412> RMINAR;
 
 
 		//-----------------------------------------------------------------//
@@ -264,8 +254,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> HR10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rhrar_t<0x0008'C414> RHRAR_;
-		static  RHRAR_ RHRAR;
+		static inline rhrar_t<0x0008'C414> RHRAR;
 
 
 		//-----------------------------------------------------------------//
@@ -286,8 +275,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rwkar_t<0x0008'C416> RWKAR_;
-		static  RWKAR_ RWKAR;
+		static inline rwkar_t<0x0008'C416> RWKAR;
 
 
 		//-----------------------------------------------------------------//
@@ -308,8 +296,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> DATE10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rdayar_t<0x0008'C418> RDAYAR_;
-		static  RDAYAR_ RDAYAR;
+		static inline rdayar_t<0x0008'C418> RDAYAR;
 
 
 		//-----------------------------------------------------------------//
@@ -330,8 +317,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>    MON10;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
-		typedef rmonar_t<0x0008'C41A> RMONAR_;
-		static  RMONAR_ RMONAR;
+		static inline rmonar_t<0x0008'C41A> RMONAR;
 
 
 		//-----------------------------------------------------------------//
@@ -353,8 +339,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4> YEAR100;
 			bits_rw_t<io_, bitpos::B12, 4> YEAR1000;
 		};
-		typedef ryrar_t<0x0008'C41C> RYRAR_;
-		static  RYRAR_ RYRAR;
+		static inline ryrar_t<0x0008'C41C> RYRAR;
 
 
 		//-----------------------------------------------------------------//
@@ -373,8 +358,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  ENB;
 		};
-		typedef ryraren_t<0x0008'C41E> RYRAREN_;
-		static  RYRAREN_ RYRAREN;
+		static inline ryraren_t<0x0008'C41E> RYRAREN;
 
 
 		//-----------------------------------------------------------------//
@@ -397,8 +381,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 3> PES;
 		};
-		typedef rcr1_t<0x0008'C422> RCR1_;
-		static  RCR1_ RCR1;
+		static inline rcr1_t<0x0008'C422> RCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -423,8 +406,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>  AADJP;
 			bit_rw_t<io_, bitpos::B6>  HR24;
 		};
-		typedef rcr2_t<0x0008'C424> RCR2_;
-		static  RCR2_ RCR2;
+		static inline rcr2_t<0x0008'C424> RCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -444,8 +426,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>     RTCEN;
 			bits_rw_t<io_, bitpos::B1, 3>  RTCDV;
 		};
-		typedef rcr3_t<0x0008'C426> RCR3_;
-		static  RCR3_ RCR3;
+		static inline rcr3_t<0x0008'C426> RCR3;
 
 
 		//-----------------------------------------------------------------//
@@ -464,8 +445,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>     RCKSEL;
 		};
-		typedef rcr4_t<0x0008'C428> RCR4_;
-		static  RCR4_ RCR4;
+		static inline rcr4_t<0x0008'C428> RCR4;
 
 
 		//-----------------------------------------------------------------//
@@ -484,8 +464,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>     RFC;
 		};
-		typedef rfrh_t<0x0008'C42A> RFRH_;
-		static RFRH_ RFRH;
+		static inline rfrh_t<0x0008'C42A> RFRH;
 
 
 		//-----------------------------------------------------------------//
@@ -504,8 +483,7 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 16> RFC;
 		};
-		typedef rfrl_t<0x0008'C42C> RFRL_;
-		static RFRL_ RFRL;
+		static inline rfrl_t<0x0008'C42C> RFRL;
 
 
 		//-----------------------------------------------------------------//
@@ -525,8 +503,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 6>  ADJ;
 			bits_rw_t<io_, bitpos::B6, 2>  PMAD;
 		};
-		typedef radj_t<0x0008'C428> RADJ_;
-		static  RADJ_ RADJ;
+		static inline radj_t<0x0008'C428> RADJ;
 
 
 		//-----------------------------------------------------------------//
@@ -550,12 +527,9 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>     TCEN;
 		};
-		typedef rtccr_t<0x0008'C440> RTCCR0_;
-		static  RTCCR0_ RTCCR0;
-		typedef rtccr_t<0x0008'C442> RTCCR1_;
-		static  RTCCR1_ RTCCR1;
-		typedef rtccr_t<0x0008'C444> RTCCR2_;
-		static  RTCCR2_ RTCCR2;
+		static inline rtccr_t<0x0008'C440> RTCCR0;
+		static inline rtccr_t<0x0008'C442> RTCCR1;
+		static inline rtccr_t<0x0008'C444> RTCCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -576,12 +550,9 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 3>  SEC10;
 		};
-		typedef rseccp_t<0x0008'C452> RSECCP0_;
-		static  RSECCP0_ RSECCP0;
-		typedef rseccp_t<0x0008'C462> RSECCP1_;
-		static  RSECCP1_ RSECCP1;
-		typedef rseccp_t<0x0008'C472> RSECCP2_;
-		static  RSECCP2_ RSECCP2;
+		static inline rseccp_t<0x0008'C452> RSECCP0;
+		static inline rseccp_t<0x0008'C462> RSECCP1;
+		static inline rseccp_t<0x0008'C472> RSECCP2;
 
 
 		//-----------------------------------------------------------------//
@@ -602,12 +573,9 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 3>  MIN10;
 		};
-		typedef rmincp_t<0x0008'C454> RMINCP0_;
-		static  RMINCP0_ RMINCP0;
-		typedef rmincp_t<0x0008'C464> RMINCP1_;
-		static  RMINCP1_ RMINCP1;
-		typedef rmincp_t<0x0008'C474> RMINCP2_;
-		static  RMINCP2_ RMINCP2;
+		static inline rmincp_t<0x0008'C454> RMINCP0;
+		static inline rmincp_t<0x0008'C464> RMINCP1;
+		static inline rmincp_t<0x0008'C474> RMINCP2;
 
 
 		//-----------------------------------------------------------------//
@@ -628,12 +596,9 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  HR10;
 			bit_rw_t <io_, bitpos::B6>     PM;
 		};
-		typedef rhrcp_t<0x0008'C456> RHRCP0_;
-		static  RHRCP0_ RHRCP0;
-		typedef rhrcp_t<0x0008'C466> RHRCP1_;
-		static  RHRCP1_ RHRCP1;
-		typedef rhrcp_t<0x0008'C476> RHRCP2_;
-		static  RHRCP2_ RHRCP2;
+		static inline rhrcp_t<0x0008'C456> RHRCP0;
+		static inline rhrcp_t<0x0008'C466> RHRCP1;
+		static inline rhrcp_t<0x0008'C476> RHRCP2;
 
 
 		//-----------------------------------------------------------------//
@@ -653,12 +618,9 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>  DATE1;
 			bits_rw_t<io_, bitpos::B4, 2>  DATE10;
 		};
-		typedef rdaycp_t<0x0008'C45A> RDAYCP0_;
-		static  RDAYCP0_ RDAYCP0;
-		typedef rdaycp_t<0x0008'C46A> RDAYCP1_;
-		static  RDAYCP1_ RDAYCP1;
-		typedef rdaycp_t<0x0008'C47A> RDAYCP2_;
-		static  RDAYCP2_ RDAYCP2;
+		static inline rdaycp_t<0x0008'C45A> RDAYCP0;
+		static inline rdaycp_t<0x0008'C46A> RDAYCP1;
+		static inline rdaycp_t<0x0008'C47A> RDAYCP2;
 
 
 		//-----------------------------------------------------------------//
@@ -678,54 +640,9 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>  MON1;
 			bit_rw_t <io_, bitpos::B4>     MON10;
 		};
-		typedef rmoncp_t<0x0008'C45C> RMONCP0_;
-		static  RMONCP0_ RMONCP0;
-		typedef rmoncp_t<0x0008'C46C> RMONCP1_;
-		static  RMONCP1_ RMONCP1;
-		typedef rmoncp_t<0x0008'C47C> RMONCP2_;
-		static  RMONCP2_ RMONCP2;
+		static inline rmoncp_t<0x0008'C45C> RMONCP0;
+		static inline rmoncp_t<0x0008'C46C> RMONCP1;
+		static inline rmoncp_t<0x0008'C47C> RMONCP2;
 	};
-	template <peripheral per> typename rtc_t<per>::R64CNT_ rtc_t<per>::R64CNT;
-	template <peripheral per> typename rtc_t<per>::RSECCNT_ rtc_t<per>::RSECCNT;
-	template <peripheral per> typename rtc_t<per>::RMINCNT_ rtc_t<per>::RMINCNT;
-	template <peripheral per> typename rtc_t<per>::RHRCNT_ rtc_t<per>::RHRCNT;
-	template <peripheral per> typename rtc_t<per>::RWKCNT_ rtc_t<per>::RWKCNT;
-	template <peripheral per> typename rtc_t<per>::RDAYCNT_ rtc_t<per>::RDAYCNT;
-	template <peripheral per> typename rtc_t<per>::RMONCNT_ rtc_t<per>::RMONCNT;
-	template <peripheral per> typename rtc_t<per>::RYRCNT_ rtc_t<per>::RYRCNT;
-	template <peripheral per> typename rtc_t<per>::RSECAR_ rtc_t<per>::RSECAR;
-	template <peripheral per> typename rtc_t<per>::RMINAR_ rtc_t<per>::RMINAR;
-	template <peripheral per> typename rtc_t<per>::RHRAR_ rtc_t<per>::RHRAR;
-	template <peripheral per> typename rtc_t<per>::RWKAR_ rtc_t<per>::RWKAR;
-	template <peripheral per> typename rtc_t<per>::RDAYAR_ rtc_t<per>::RDAYAR;
-	template <peripheral per> typename rtc_t<per>::RMONAR_ rtc_t<per>::RMONAR;
-	template <peripheral per> typename rtc_t<per>::RYRAR_ rtc_t<per>::RYRAR;
-	template <peripheral per> typename rtc_t<per>::RYRAREN_ rtc_t<per>::RYRAREN;
-	template <peripheral per> typename rtc_t<per>::RCR1_ rtc_t<per>::RCR1;
-	template <peripheral per> typename rtc_t<per>::RCR2_ rtc_t<per>::RCR2;
-	template <peripheral per> typename rtc_t<per>::RCR3_ rtc_t<per>::RCR3;
-	template <peripheral per> typename rtc_t<per>::RCR4_ rtc_t<per>::RCR4;
-	template <peripheral per> typename rtc_t<per>::RFRH_ rtc_t<per>::RFRH;
-	template <peripheral per> typename rtc_t<per>::RFRL_ rtc_t<per>::RFRL;
-	template <peripheral per> typename rtc_t<per>::RADJ_ rtc_t<per>::RADJ;
-	template <peripheral per> typename rtc_t<per>::RTCCR0_ rtc_t<per>::RTCCR0;
-	template <peripheral per> typename rtc_t<per>::RTCCR1_ rtc_t<per>::RTCCR1;
-	template <peripheral per> typename rtc_t<per>::RTCCR2_ rtc_t<per>::RTCCR2;
-	template <peripheral per> typename rtc_t<per>::RSECCP0_ rtc_t<per>::RSECCP0;
-	template <peripheral per> typename rtc_t<per>::RSECCP1_ rtc_t<per>::RSECCP1;
-	template <peripheral per> typename rtc_t<per>::RSECCP2_ rtc_t<per>::RSECCP2;
-	template <peripheral per> typename rtc_t<per>::RMINCP0_ rtc_t<per>::RMINCP0;
-	template <peripheral per> typename rtc_t<per>::RMINCP1_ rtc_t<per>::RMINCP1;
-	template <peripheral per> typename rtc_t<per>::RMINCP2_ rtc_t<per>::RMINCP2;
-	template <peripheral per> typename rtc_t<per>::RHRCP0_ rtc_t<per>::RHRCP0;
-	template <peripheral per> typename rtc_t<per>::RHRCP1_ rtc_t<per>::RHRCP1;
-	template <peripheral per> typename rtc_t<per>::RHRCP2_ rtc_t<per>::RHRCP2;
-	template <peripheral per> typename rtc_t<per>::RDAYCP0_ rtc_t<per>::RDAYCP0;
-	template <peripheral per> typename rtc_t<per>::RDAYCP1_ rtc_t<per>::RDAYCP1;
-	template <peripheral per> typename rtc_t<per>::RDAYCP2_ rtc_t<per>::RDAYCP2;
-	template <peripheral per> typename rtc_t<per>::RMONCP0_ rtc_t<per>::RMONCP0;
-	template <peripheral per> typename rtc_t<per>::RMONCP1_ rtc_t<per>::RMONCP1;
-	template <peripheral per> typename rtc_t<per>::RMONCP2_ rtc_t<per>::RMONCP2;
-
 	typedef rtc_t<peripheral::RTC> RTC;
 }

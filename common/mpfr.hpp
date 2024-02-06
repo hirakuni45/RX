@@ -16,12 +16,26 @@ namespace mpfr {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  value_base クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct value_base {
+		enum class BASE {
+			BIN = 2,
+			DEC = 10,
+			HEX = 16
+		};
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  mpfr オブジェクト
 		@param[in]	num		有効桁数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t num>
-	class value {
+	class value : public value_base {
 
 		mpfr_t		t_;
 		mpfr_rnd_t	rnd_;
@@ -214,11 +228,12 @@ namespace mpfr {
 		/*!
 			@brief	数値文字列の入力
 			@param[in]	str		数値文字列
+			@param[in]	base	基底数
 		*/
 		//-----------------------------------------------------------------//
-		void assign(const char* str) noexcept
+		void assign(const char* str, BASE base = BASE::DEC) noexcept
 		{
-			mpfr_set_str(t_, str, 10, rnd_);
+			mpfr_set_str(t_, str, static_cast<int>(base), rnd_);
 		}
 
 
@@ -327,12 +342,14 @@ namespace mpfr {
 			@param[in]	upn		小数点以下の文字数
 			@param[out]	out		格納文字列ポインター
 			@param[in]	len		格納文字列最大数
+			@param[in]	cnv		変換文字（a, A, b, f, F）
 		*/
 		//-----------------------------------------------------------------//
-		void operator() (int upn, char* out, uint32_t len) noexcept
+		void operator() (int upn, char* out, uint32_t len, char cnv = 'f') noexcept
 		{
 			char form[16];
-			utils::sformat("%%.%dRNf", form, sizeof(form)) % upn;
+			utils::sformat("%%.%dRN%c", form, sizeof(form)) % upn % cnv;
+//			utils::sformat("%%RN%c", form, sizeof(form)) % cnv;
 			mpfr_snprintf(out, len, form, t_);
 //			mpfr_snprintf(out, len, "%.50RNf", t_);
 		}

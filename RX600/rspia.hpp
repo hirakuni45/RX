@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・RSPIA 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,12 +12,12 @@
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  シリアルペリフェラルインタフェースクラスＡ
 		@param[in]	base	ベース・アドレス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base>
 	struct rspia_base_t {
 
@@ -26,8 +26,7 @@ namespace device {
 			@brief  RSPI データレジスタ (SPDR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x00> SPDR_;
-		static  SPDR_ SPDR;
+		static inline rw32_t<base + 0x00> SPDR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -46,8 +45,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>   SCKDL;
 		};
-		typedef spckd_t<base + 0x04> SPCKD_;
-		static  SPCKD_ SPCKD;
+		static inline spckd_t<base + 0x04> SPCKD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -66,8 +64,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>   SLNDL;
 		};
-		typedef sslnd_t<base + 0x05> SSLND_;
-		static  SSLND_ SSLND;
+		static inline sslnd_t<base + 0x05> SSLND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -86,8 +83,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>   SPNDL;
 		};
-		typedef spnd_t<base + 0x06> SPND_;
-		static  SPND_ SPND;
+		static inline spnd_t<base + 0x06> SPND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -129,8 +125,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>     MSTR;
 			bit_rw_t <io_, bitpos::B31>     SYNDIS;
 		};
-		typedef spcr_t<base + 0x08> SPCR_;
-		static  SPCR_ SPCR;
+		static inline spcr_t<base + 0x08> SPCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -152,8 +147,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>      TERM;
 			bit_rw_t <io_, bitpos::B7>      START;
 		};
-		typedef sprmcr_t<base + 0x0C> SPRMCR_;
-		static  SPRMCR_ SPRMCR;
+		static inline sprmcr_t<base + 0x0C> SPRMCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -161,8 +155,7 @@ namespace device {
 			@brief  RSPI 受信データレディ検出条件設定レジスタ (SPDRCSR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<base + 0x0D> SPDRCSR_;
-		static  SPDRCSR_ SPDRCSR;
+		static inline rw8_t<base + 0x0D> SPDRCSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -185,8 +178,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>      MOIFV;
 			bit_rw_t <io_, bitpos::B5>      MOIFE;
 		};
-		typedef sppcr_t<base + 0x0E> SPPCR_;
-		static  SPPCR_ SPPCR;
+		static inline sppcr_t<base + 0x0E> SPPCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -208,8 +200,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>      SSL2P;
 			bit_rw_t <io_, bitpos::B3>      SSL3P;
 		};
-		typedef sslp_t<base + 0x10> SSLP_;
-		static  SSLP_ SSLP;
+		static inline sslp_t<base + 0x10> SSLP;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -217,8 +208,7 @@ namespace device {
 			@brief  RSPI ビットレートレジスタ (SPBR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<base + 0x11> SPBR_;
-		static  SPBR_ SPBR;
+		static inline rw8_t<base + 0x11> SPBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -237,8 +227,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>   SPSLN;
 		};
-		typedef spscr_t<base + 0x13> SPSCR_;
-		static  SPSCR_ SPSCR;
+		static inline spscr_t<base + 0x13> SPSCR;
 
 
 		//-----------------------------------------------------------------//
@@ -276,8 +265,7 @@ namespace device {
 				return *this;
 			}
 		};
-		typedef spcmd_t<base + 0x14> SPCMD_;
-		static  SPCMD_ SPCMD;
+		static inline spcmd_t<base + 0x14> SPCMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -301,8 +289,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 2>   SPFC;
 		};
-		typedef spdcr_t<base + 0x40> SPDCR_;
-		static  SPDCR_ SPDCR;
+		static inline spdcr_t<base + 0x40> SPDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -323,8 +310,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 2>   TTRG;
 		};
-		typedef spfcr_t<base + 0x44> SPFCR_;
-		static  SPFCR_ SPFCR;
+		static inline spfcr_t<base + 0x44> SPFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -342,8 +328,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B4, 3>   SPECM;
 		};
-		typedef spssr_t<base + 0x51> SPSSR_;
-		static  SPSSR_ SPSSR;
+		static inline spssr_t<base + 0x51> SPSSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -367,8 +352,7 @@ namespace device {
 			bit_ro_t <in_, bitpos::B14>     SPCF;
 			bit_ro_t <in_, bitpos::B15>     SPRF;
 		};
-		typedef spsr_t<base + 0x52> SPSR_;
-		static  SPSR_ SPSR;
+		static inline spsr_t<base + 0x52> SPSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -384,8 +368,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B0, 3>   FREE;
 		};
-		typedef sptfsr_t<base + 0x58> SPTFSR_;
-		static  SPTFSR_ SPTFSR;
+		static inline sptfsr_t<base + 0x58> SPTFSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -401,8 +384,7 @@ namespace device {
 
 			bits_ro_t<in_, bitpos::B0, 3>   FILL;
 		};
-		typedef sprfsr_t<base + 0x5C> SPRFSR_;
-		static  SPRFSR_ SPRFSR;
+		static inline sprfsr_t<base + 0x5C> SPRFSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -429,8 +411,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>     SPCFC;
 			bit_rw_t <io_, bitpos::B15>     SPRFC;
 		};
-		typedef spsclr_t<base + 0x6A> SPSCLR_;
-		static  SPSCLR_ SPSCLR;
+		static inline spsclr_t<base + 0x6A> SPSCLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -449,27 +430,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>      FCLR;
 		};
-		typedef spfclr_t<base + 0x6C> SPFCLR_;
-		static  SPFCLR_ SPFCLR;
+		static inline spfclr_t<base + 0x6C> SPFCLR;
 	};
-	template <uint32_t base> typename rspia_base_t<base>::SPDR_    rspia_base_t<base>::SPDR;
-	template <uint32_t base> typename rspia_base_t<base>::SPCKD_   rspia_base_t<base>::SPCKD;
-	template <uint32_t base> typename rspia_base_t<base>::SSLND_   rspia_base_t<base>::SSLND;
-	template <uint32_t base> typename rspia_base_t<base>::SPND_    rspia_base_t<base>::SPND;
-	template <uint32_t base> typename rspia_base_t<base>::SPCR_    rspia_base_t<base>::SPCR;
-	template <uint32_t base> typename rspia_base_t<base>::SPRMCR_  rspia_base_t<base>::SPRMCR;
-	template <uint32_t base> typename rspia_base_t<base>::SPDRCSR_ rspia_base_t<base>::SPDRCSR;
-	template <uint32_t base> typename rspia_base_t<base>::SPPCR_   rspia_base_t<base>::SPPCR;
-	template <uint32_t base> typename rspia_base_t<base>::SSLP_    rspia_base_t<base>::SSLP;
-	template <uint32_t base> typename rspia_base_t<base>::SPBR_    rspia_base_t<base>::SPBR;
-	template <uint32_t base> typename rspia_base_t<base>::SPCMD_   rspia_base_t<base>::SPCMD;
-	template <uint32_t base> typename rspia_base_t<base>::SPDCR_   rspia_base_t<base>::SPDCR;
-	template <uint32_t base> typename rspia_base_t<base>::SPFCR_   rspia_base_t<base>::SPFCR;
-	template <uint32_t base> typename rspia_base_t<base>::SPSSR_   rspia_base_t<base>::SPSSR;
-	template <uint32_t base> typename rspia_base_t<base>::SPSR_    rspia_base_t<base>::SPSR;
-	template <uint32_t base> typename rspia_base_t<base>::SPTFSR_  rspia_base_t<base>::SPTFSR;
-	template <uint32_t base> typename rspia_base_t<base>::SPRFSR_  rspia_base_t<base>::SPRFSR;
-	template <uint32_t base> typename rspia_base_t<base>::SPFCLR_  rspia_base_t<base>::SPFCLR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX700 グループ Δ-Σモジュレータインタフェース定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  DSMIF 定義
+		@brief  DSMIFn 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	ocdi	過電流検出割り込み
@@ -24,7 +24,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
 		ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi>
-	struct dsmif_t {
+	struct dsmifn_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 		static constexpr auto OCD_VEC  = ocdi;	///< 過電流検出割り込み
@@ -60,8 +60,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B28, 4>  OCSH;
 		};
-		typedef dscr_t<base + 0x00> DSCR_;
-		static  DSCR_ DSCR;
+		static inline dscr_t<base + 0x00> DSCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -88,8 +87,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>      SUMERR;
 		};
-		typedef dssr_t<base + 0x04> DSSR_;
-		static  DSSR_ DSSR;
+		static inline dssr_t<base + 0x04> DSSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -97,8 +95,7 @@ namespace device {
 			@brief  過電流検出下基準値レジスタ (OCLTR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x08> OCLTR_;
-		static  OCLTR_ OCLTR;
+		static inline rw32_t<base + 0x08> OCLTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -106,8 +103,7 @@ namespace device {
 			@brief  過電流検出上基準値レジスタ (OCHTR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x0C> OCHTR_;
-		static  OCHTR_ OCHTR;
+		static inline rw32_t<base + 0x0C> OCHTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -115,8 +111,7 @@ namespace device {
 			@brief  短絡検出下基準値レジスタ (SCLTR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x10> SCLTR_;
-		static  SCLTR_ SCLTR;
+		static inline rw32_t<base + 0x10> SCLTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -124,8 +119,7 @@ namespace device {
 			@brief  短絡検出上基準値レジスタ (SCHTR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x14> SCHTR_;
-		static  SCHTR_ SCHTR;
+		static inline rw32_t<base + 0x14> SCHTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -133,8 +127,7 @@ namespace device {
 			@brief  合計電流エラー検出下基準値レジスタ (SUMLTR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x18> SUMLTR_;
-		static  SUMLTR_ SUMLTR;
+		static inline rw32_t<base + 0x18> SUMLTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -142,8 +135,7 @@ namespace device {
 			@brief  合計電流エラー検出上基準値レジスタ (SUMHTR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x18> SUMHTR_;
-		static  SUMHTR_ SUMHTR;
+		static inline rw32_t<base + 0x18> SUMHTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -151,12 +143,9 @@ namespace device {
 			@brief  チャネル x 電流データレジスタ (CDRx) (x = 0 ～ 2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x20> CDR0_;
-		static  CDR0_ CDR0;
-		typedef rw32_t<base + 0x30> CDR1_;
-		static  CDR1_ CDR1;
-		typedef rw32_t<base + 0x40> CDR2_;
-		static  CDR2_ CDR2;
+		static inline rw32_t<base + 0x20> CDR0;
+		static inline rw32_t<base + 0x30> CDR1;
+		static inline rw32_t<base + 0x40> CDR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -164,12 +153,9 @@ namespace device {
 			@brief  チャネル x 山電流データレジスタ (CCDRx) (x = 0 ～ 2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x24> CCDR0_;
-		static  CCDR0_ CCDR0;
-		typedef rw32_t<base + 0x34> CCDR1_;
-		static  CCDR1_ CCDR1;
-		typedef rw32_t<base + 0x44> CCDR2_;
-		static  CCDR2_ CCDR2;
+		static inline rw32_t<base + 0x24> CCDR0;
+		static inline rw32_t<base + 0x34> CCDR1;
+		static inline rw32_t<base + 0x44> CCDR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -177,12 +163,9 @@ namespace device {
 			@brief  チャネル x 谷電流データレジスタ (TCDRx) (x = 0 ～ 2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x28> TCDR0_;
-		static  TCDR0_ TCDR0;
-		typedef rw32_t<base + 0x38> TCDR1_;
-		static  TCDR1_ TCDR1;
-		typedef rw32_t<base + 0x48> TCDR2_;
-		static  TCDR2_ TCDR2;
+		static inline rw32_t<base + 0x28> TCDR0;
+		static inline rw32_t<base + 0x38> TCDR1;
+		static inline rw32_t<base + 0x48> TCDR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -190,38 +173,13 @@ namespace device {
 			@brief  チャネル x 過電流検出用データレジスタ (OCDRx) (x = 0 ～ 2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<base + 0x2C> OCDR0_;
-		static  OCDR0_ OCDR0;
-		typedef rw32_t<base + 0x3C> OCDR1_;
-		static  OCDR1_ OCDR1;
-		typedef rw32_t<base + 0x4C> OCDR2_;
-		static  OCDR2_ OCDR2;
+		static inline rw32_t<base + 0x2C> OCDR0;
+		static inline rw32_t<base + 0x3C> OCDR1;
+		static inline rw32_t<base + 0x4C> OCDR2;
 	};
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::DSCR_ dsmif_t<base, per, ocdi, sumei, scdi>::DSCR;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::DSSR_ dsmif_t<base, per, ocdi, sumei, scdi>::DSSR;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::OCLTR;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::OCHTR;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SCLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SCLTR;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SCHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SCHTR;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SUMLTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SUMLTR;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::SUMHTR_ dsmif_t<base, per, ocdi, sumei, scdi>::SUMHTR;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR0;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR1;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::CDR2;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR0;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR1;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::CCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::CCDR2;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR0;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR1;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::TCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::TCDR2;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR0_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR0;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR1_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR1;
-	template <uint32_t base, peripheral per, ICU::GROUPBL2 ocdi, ICU::GROUPBL2 sumei, ICU::GROUPBL2 scdi> typename dsmif_t<base, per, ocdi, sumei, scdi>::OCDR2_ dsmif_t<base, per, ocdi, sumei, scdi>::OCDR2;
-
-
-	typedef dsmif_t<0x000A'0700, peripheral::DSMIF0,
+	typedef dsmifn_t<0x000A'0700, peripheral::DSMIF0,
 		ICU::GROUPBL2::OCDI0, ICU::GROUPBL2::SUMEI0, ICU::GROUPBL2::SCDI0> DSMIF0;
-	typedef dsmif_t<0x000A'0780, peripheral::DSMIF1,
+	typedef dsmifn_t<0x000A'0780, peripheral::DSMIF1,
 		ICU::GROUPBL2::OCDI1, ICU::GROUPBL2::SUMEI1, ICU::GROUPBL2::SCDI1> DSMIF1;
 
 
@@ -230,8 +188,7 @@ namespace device {
 		@brief  DSMIF 定義
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	struct dsmif_ {
+	struct dsmif_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -254,8 +211,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  EDGE4;
 			bit_rw_t<io_, bitpos::B5>  EDGE5;
 		};
-		typedef dsccr_t<0x000A'07E0> DSCCR_;
-		static  DSCCR_ DSCCR;
+		static inline dsccr_t<0x000A'07E0> DSCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -279,11 +235,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  EDGE4;
 			bit_rw_t<io_, bitpos::B5>  EDGE5;
 		};
-		typedef dschr_t<0x000A'07E4> DSCHR_;
-		static  DSCHR_ DSCHR;
+		static inline dschr_t<0x000A'07E4> DSCHR;
 	};
-	typedef dsmif_<void> DSMIF;
-
-	template <class _> typename dsmif_<_>::DSCCR_ dsmif_<_>::DSCCR;
-	template <class _> typename dsmif_<_>::DSCHR_ dsmif_<_>::DSCHR;
+	typedef dsmif_t DSMIF;
 }

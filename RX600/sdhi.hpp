@@ -43,8 +43,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B13>    TRSTP;
 			bits_rw_t<io_, bitpos::B14, 2> CMD12AT;
 		};
-		typedef sdcmd_t<base + 0x00> SDCMD_;
-		static SDCMD_ SDCMD;
+		static inline sdcmd_t<base + 0x00> SDCMD;
 
 
 		//-----------------------------------------------------------------//
@@ -52,8 +51,7 @@ namespace device {
 			@brief  アーギュメントレジスタ（ SDARG ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x08> SDARG_;
-		static SDARG_ SDARG;
+		static inline rw32_t<base + 0x08> SDARG;
 
 
 		//-----------------------------------------------------------------//
@@ -74,8 +72,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B8>  SDBLKCNTEN;
 		};
-		typedef sdstop_t<base + 0x10> SDSTOP_;
-		static SDSTOP_ SDSTOP;
+		static inline sdstop_t<base + 0x10> SDSTOP;
 
 
 		//-----------------------------------------------------------------//
@@ -83,8 +80,7 @@ namespace device {
 			@brief  ブロックカウントレジスタ（ SDBLKCNT ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x14> SDBLKCNT_;
-		static SDBLKCNT_ SDBLKCNT;
+		static inline rw32_t<base + 0x14> SDBLKCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -92,8 +88,7 @@ namespace device {
 			@brief  レスポンスレジスタ 10 （ SDRSP10 ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x18> SDRSP10_;
-		static SDRSP10_ SDRSP10;
+		static inline ro32_t<base + 0x18> SDRSP10;
 
 
 		//-----------------------------------------------------------------//
@@ -101,8 +96,7 @@ namespace device {
 			@brief  レスポンスレジスタ 32 （ SDRSP32 ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x20> SDRSP32_;
-		static SDRSP32_ SDRSP32;
+		static inline ro32_t<base + 0x20> SDRSP32;
 
 
 		//-----------------------------------------------------------------//
@@ -110,8 +104,7 @@ namespace device {
 			@brief  レスポンスレジスタ 54 （ SDRSP54 ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x28> SDRSP54_;
-		static SDRSP54_ SDRSP54;
+		static inline ro32_t<base + 0x28> SDRSP54;
 
 
 		//-----------------------------------------------------------------//
@@ -119,8 +112,7 @@ namespace device {
 			@brief  レスポンスレジスタ 76 （ SDRSP76 ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef ro32_t<base + 0x30> SDRSP76_;
-		static SDRSP76_ SDRSP76;
+		static inline ro32_t<base + 0x30> SDRSP76;
 
 
 		//-----------------------------------------------------------------//
@@ -149,8 +141,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B9>  SDD3IN;
 			bit_ro_t<io_, bitpos::B10> SDD3MON;
 		};
-		typedef sdsts1_t<base + 0x38> SDSTS1_;
-		static SDSTS1_ SDSTS1;
+		static inline sdsts1_t<base + 0x38> SDSTS1;
 
 
 		//-----------------------------------------------------------------//
@@ -182,8 +173,7 @@ namespace device {
 			bit_ro_t<io_, bitpos::B14> CBSY;
 			bit_rw_t<io_, bitpos::B15> ILA;
 		};
-		typedef sdsts2_t<base + 0x3C> SDSTS2_;
-		static SDSTS2_ SDSTS2;
+		static inline sdsts2_t<base + 0x3C> SDSTS2;
 
 
 		//-----------------------------------------------------------------//
@@ -209,8 +199,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  SDD3RMM;
 			bit_rw_t<io_, bitpos::B9>  SDD3INM;
 		};
-		typedef sdimsk1_t<base + 0x40> SDIMSK1_;
-		static SDIMSK1_ SDIMSK1;
+		static inline sdimsk1_t<base + 0x40> SDIMSK1;
 
 
 		//-----------------------------------------------------------------//
@@ -240,8 +229,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B15> ILAM;
 		};
-		typedef sdimsk2_t<base + 0x44> SDIMSK2_;
-		static SDIMSK2_ SDIMSK2;
+		static inline sdimsk2_t<base + 0x44> SDIMSK2;
 
 
 		//-----------------------------------------------------------------//
@@ -262,8 +250,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>     CLKEN;
 			bit_rw_t <io_, bitpos::B9>     CLKCTRLEN;
 		};
-		typedef sdclkcr_t<base + 0x48> SDCLKCR_;
-		static SDCLKCR_ SDCLKCR;
+		static inline sdclkcr_t<base + 0x48> SDCLKCR;
 
 
 		//-----------------------------------------------------------------//
@@ -282,8 +269,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 10>  LEN;
 		};
-		typedef sdsize_t<base + 0x4C> SDSIZE_;
-		static SDSIZE_ SDSIZE;
+		static inline sdsize_t<base + 0x4C> SDSIZE;
 
 
 		//-----------------------------------------------------------------//
@@ -305,8 +291,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>    WIDTH;
 		};
-		typedef sdopt_t<base + 0x50> SDOPT_;
-		static SDOPT_ SDOPT;
+		static inline sdopt_t<base + 0x50> SDOPT;
 
 
 		//-----------------------------------------------------------------//
@@ -333,8 +318,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B11>     CRCTKE;
 			bits_ro_t<io_, bitpos::B12, 3>  CRCTK;
 		};
-		typedef sdersts1_t<base + 0x58> SDERSTS1_;
-		static SDERSTS1_ SDERSTS1;
+		static inline sdersts1_t<base + 0x58> SDERSTS1;
 
 
 		//-----------------------------------------------------------------//
@@ -356,8 +340,7 @@ namespace device {
 			bit_ro_t<io_, bitpos::B5>  CRCTO;
 			bit_ro_t<io_, bitpos::B6>  CRCBSYTO;
 		};
-		typedef sdersts2_t<base + 0x5C> SDERSTS2_;
-		static SDERSTS2_ SDERSTS2;
+		static inline sdersts2_t<base + 0x5C> SDERSTS2;
 
 
 		//-----------------------------------------------------------------//
@@ -365,8 +348,7 @@ namespace device {
 			@brief  SD バッファレジスタ（ SDBUFR ）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw32_t<base + 0x60> SDBUFR_;
-		static SDBUFR_ SDBUFR;
+		static inline rw32_t<base + 0x60> SDBUFR;
 
 
 		//-----------------------------------------------------------------//
@@ -388,8 +370,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  IOABT;
 			bit_rw_t<io_, bitpos::B9>  C52PUB;
 		};
-		typedef sdiomd_t SDIOMD_;
-		static SDIOMD_ SDIOMD;
+		static inline sdiomd_t SDIOMD;
 
 
 		//-----------------------------------------------------------------//
@@ -409,8 +390,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14> EXPUB52;
 			bit_rw_t<io_, bitpos::B15> EXWT;
 		};
-		typedef sdiosts_t SDIOSTS_;
-		static SDIOSTS_ SDIOSTS;
+		static inline sdiosts_t SDIOSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -430,8 +410,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14> EXPUB52M;
 			bit_rw_t<io_, bitpos::B15> EXWTM;
 		};
-		typedef sdioimsk_t SDIOIMSK_;
-		static SDIOIMSK_ SDIOIMSK;
+		static inline sdioimsk_t SDIOIMSK;
 
 
 		//-----------------------------------------------------------------//
@@ -448,8 +427,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B1>  DMAEN;
 		};
-		typedef sddmaen_t SDDMAEN_;
-		static SDDMAEN_ SDDMAEN;
+		static inline sddmaen_t SDDMAEN;
 
 
 		//-----------------------------------------------------------------//
@@ -466,8 +444,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  SDRST;
 		};
-		typedef sdrst_t SDRST_;
-		static SDRST_ SDRST;
+		static inline sdrst_t SDRST;
 
 
 		//-----------------------------------------------------------------//
@@ -485,8 +462,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B14>    CLKRAT;
 			bit_ro_t <io_, bitpos::B15>    CPRM;
 		};
-		typedef sdver_t SDVER_;
-		static SDVER_ SDVER;
+		static inline sdver_t SDVER;
 
 
 		//-----------------------------------------------------------------//
@@ -504,34 +480,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  BWSWP;
 			bit_rw_t<io_, bitpos::B7>  BRSWP;
 		};
-		typedef sdswap_t SDSWAP_;
-		static SDSWAP_ SDSWAP;
+		static inline sdswap_t SDSWAP;
 	};
-	template <uint32_t base> typename sdhi_base_t<base>::SDCMD_    sdhi_base_t<base>::SDCMD;
-	template <uint32_t base> typename sdhi_base_t<base>::SDARG_    sdhi_base_t<base>::SDARG;
-	template <uint32_t base> typename sdhi_base_t<base>::SDSTOP_   sdhi_base_t<base>::SDSTOP;
-	template <uint32_t base> typename sdhi_base_t<base>::SDBLKCNT_ sdhi_base_t<base>::SDBLKCNT;
-	template <uint32_t base> typename sdhi_base_t<base>::SDRSP10_  sdhi_base_t<base>::SDRSP10;
-	template <uint32_t base> typename sdhi_base_t<base>::SDRSP32_  sdhi_base_t<base>::SDRSP32;
-	template <uint32_t base> typename sdhi_base_t<base>::SDRSP54_  sdhi_base_t<base>::SDRSP54;
-	template <uint32_t base> typename sdhi_base_t<base>::SDRSP76_  sdhi_base_t<base>::SDRSP76;
-	template <uint32_t base> typename sdhi_base_t<base>::SDSTS1_   sdhi_base_t<base>::SDSTS1;
-	template <uint32_t base> typename sdhi_base_t<base>::SDSTS2_   sdhi_base_t<base>::SDSTS2;
-	template <uint32_t base> typename sdhi_base_t<base>::SDIMSK1_  sdhi_base_t<base>::SDIMSK1;
-	template <uint32_t base> typename sdhi_base_t<base>::SDIMSK2_  sdhi_base_t<base>::SDIMSK2;
-	template <uint32_t base> typename sdhi_base_t<base>::SDCLKCR_  sdhi_base_t<base>::SDCLKCR;
-	template <uint32_t base> typename sdhi_base_t<base>::SDSIZE_   sdhi_base_t<base>::SDSIZE;
-	template <uint32_t base> typename sdhi_base_t<base>::SDOPT_    sdhi_base_t<base>::SDOPT;
-	template <uint32_t base> typename sdhi_base_t<base>::SDERSTS1_ sdhi_base_t<base>::SDERSTS1;
-	template <uint32_t base> typename sdhi_base_t<base>::SDERSTS2_ sdhi_base_t<base>::SDERSTS2;
-	template <uint32_t base> typename sdhi_base_t<base>::SDBUFR_   sdhi_base_t<base>::SDBUFR;
-	template <uint32_t base> typename sdhi_base_t<base>::SDIOMD_   sdhi_base_t<base>::SDIOMD;
-	template <uint32_t base> typename sdhi_base_t<base>::SDIOSTS_  sdhi_base_t<base>::SDIOSTS;
-	template <uint32_t base> typename sdhi_base_t<base>::SDIOIMSK_ sdhi_base_t<base>::SDIOIMSK;
-	template <uint32_t base> typename sdhi_base_t<base>::SDDMAEN_  sdhi_base_t<base>::SDDMAEN;
-	template <uint32_t base> typename sdhi_base_t<base>::SDRST_    sdhi_base_t<base>::SDRST;
-	template <uint32_t base> typename sdhi_base_t<base>::SDVER_    sdhi_base_t<base>::SDVER;
-	template <uint32_t base> typename sdhi_base_t<base>::SDSWAP_   sdhi_base_t<base>::SDSWAP;
 
 #if defined(SIG_RX231)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
