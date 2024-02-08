@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX231 グループ・システム定義
+	@brief	RX140 グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -147,8 +147,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  4> PCKD;
 
 			bits_rw_t<io_, bitpos::B8,  4> PCKB;
-			bits_rw_t<io_, bitpos::B12, 4> PCKA;
-			bits_rw_t<io_, bitpos::B16, 4> BCK;
 
 			bit_rw_t <io_, bitpos::B23>    PSTOP1;
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
@@ -312,21 +310,21 @@ namespace device {
 		static inline hococr_t<0x0008'0036> HOCOCR;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief  発振安定フラグレジスタ（OSCOVFSR）
 			@param[in]	base	ベース・アドレス
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct oscovfsr_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t<io_, bitpos::B0> MOOVF;
+			bit_ro_t<in_, bitpos::B0> MOOVF;
 
-			bit_ro_t<io_, bitpos::B2> PLOVF;
-			bit_ro_t<io_, bitpos::B3> HCOVF;
+			bit_ro_t<in_, bitpos::B2> PLOVF;
+			bit_ro_t<in_, bitpos::B3> HCOVF;
 		};
 		static inline oscovfsr_t<0x0008'003C> OSCOVFSR;
 
@@ -390,16 +388,31 @@ namespace device {
 		static inline moscwtcr_t<0x0008'00A2> MOSCWTCR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  低速オンチップオシレータ強制発振コントロールレジスタ (LOFCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct lofcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  LOFXIN;
+		};
+		static inline lofcr_t<0x0008'0043> LOFCR;
 
 
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief  CLKOUT 出力コントロールレジスタ（CKOCR）
 			@param[in]	base	ベース・アドレス
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct ckocr_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -435,29 +448,23 @@ namespace device {
 		static inline mofcr_t<0x0008'C293> MOFCR;
 
 
-
-
-
-
-
-
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	低速オンチップオシレータトリミングレジスタ（LOCOTRR）
+			@brief	低速オンチップオシレータトリミングレジスタ 2（LOCOTRR2）
 			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct locotrr_t : public rw8_t<base> {
+		struct locotrr2_t : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 5>  LOCOTRD;
+			bits_rw_t<io_, bitpos::B0, 8>  LOCOTRD2;
 		};
-		static inline locotrr_t<0x0008'0060> LOCOTRR;
+		static inline locotrr2_t<0x0008'0061> LOCOTRR2;
 
 
 		//-----------------------------------------------------------------//
@@ -481,7 +488,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	高速オンチップオシレータトリミングレジスタ n（HOCOTRRn）（n = 0、3）
+			@brief	高速オンチップオシレータトリミングレジスタ n（HOCOTRRn）（n = 0）
 			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
@@ -496,7 +503,25 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 6>  HOCOTRD;
 		};
 		static inline hocotrr_t<0x0008'0068> HOCOTRR0;
-		static inline hocotrr_t<0x0008'006B> HOCOTRR3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	サブクロック発振器モードコントロールレジスタ (SOMCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct somcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>  SODRV;
+		};
+		static inline somcr_t<0x0008'0083> SOMCR;
 
 
 		//----  消費電力低減機能  -------------------------------------------//
@@ -629,8 +654,6 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B10> MSTPD10;
 
-			bit_rw_t<io_, bitpos::B19> MSTPD19;
-
 			bit_rw_t<io_, bitpos::B29> MSTPD29;
 			bit_rw_t<io_, bitpos::B30> MSTPD30;
 		};
@@ -695,7 +718,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> RSTCKSEL;
 
-			bit_rw_t <io_, bitpos::B4>    RSTCKEN;
+			bit_rw_t <io_, bitpos::B7>    RSTCKEN;
 		};
 		static inline rstckcr_t<0x0008'00A1> RSTCKCR;
 
@@ -772,4 +795,22 @@ namespace device {
 		};
 		static inline prcr_t<0x0008'03FE> PRCR;
 	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  温度センサ (TEMPS)
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct temps_t {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  温度センサ校正データレジスタ (TSCDR)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		ro16_t<0x007F'C228> TSCDR;
+	};
+	static inline temps_t TEMPS;
 }
