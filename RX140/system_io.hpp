@@ -185,7 +185,10 @@ namespace device {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
 			}
 
-			device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
+			if(clock_profile::TURN_SBC) {  // サブクロック発信器制御
+				device::SYSTEM::SOMCR = static_cast<uint8_t>(clock_profile::SOMCR);
+				device::SYSTEM::SOSCCR.SOSTP.b(0);
+			}
 
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 

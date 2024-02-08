@@ -685,7 +685,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> RSTCKSEL;
 
-			bit_rw_t <io_, bitpos::B4>    RSTCKEN;
+			bit_rw_t <io_, bitpos::B7>    RSTCKEN;
 		};
 		static inline rstckcr_t<0x0008'00A1> RSTCKCR;
 

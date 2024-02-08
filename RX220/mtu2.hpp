@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220/RX231/RX631/RX63N グループ・MTU2a 定義
+	@brief	RX140/RX220/RX231/RX631/RX63N グループ・MTU2a 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -1175,7 +1175,7 @@ namespace device {
 		};
 		static inline twcr_t<base + 0x60> TWCR;
 	};
-#if defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef mtu_ab_t<0x0008'8680> MTUA;
 #elif defined(SIG_RX231)
 	typedef mtu_ab_t<0x000D'0A80> MTUA;
@@ -2389,7 +2389,7 @@ namespace device {
 		static inline tgr_uvw_t<TGRU_, TGRV_, TGRW_, CHANNEL> TGR;
 	};
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX140) || defined(SIG_RX220)
 	typedef mtu0_t<0x0008'8700, ICU::VECTOR, ICU::VECTOR> MTU0;
 	typedef mtu1_t<0x0008'8780, ICU::VECTOR, ICU::VECTOR> MTU1;
 	typedef mtu2_t<0x0008'8800, ICU::VECTOR, ICU::VECTOR> MTU2;

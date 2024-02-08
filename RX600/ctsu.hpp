@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	静電容量式タッチセンサ (CTSU) 定義
+	@brief	RX231 静電容量式タッチセンサ (CTSU) 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -20,6 +20,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base>
 	struct ctsu_t {
+
+		static constexpr auto PERIPHERAL = peripheral::CTSU;	///< ペリフェラル型
+		static constexpr auto WRI = ICU::VECTOR::CTSUWR;		///< チャネル毎の設定レジスタ書き込み要求割り込み
+		static constexpr auto RDI = ICU::VECTOR::CTSURD;		///< 測定データ転送要求割り込み
+		static constexpr auto FNI = ICU::VECTOR::CTSUFN;		///< 測定終了割り込み
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -53,11 +58,6 @@ namespace device {
 			TS33 = 33,	///< PC1
 			TS35 = 35,	///< PC0
 		};
-
-		static constexpr auto PERIPHERAL = peripheral::CTSU;	///< ペリフェラル型
-		static constexpr auto WRI = ICU::VECTOR::CTSUWR;		///< チャネル毎の設定レジスタ書き込み要求割り込み
-		static constexpr auto RDI = ICU::VECTOR::CTSURD;		///< 測定データ転送要求割り込み
-		static constexpr auto FNI = ICU::VECTOR::CTSUFN;		///< 測定終了割り込み
 
 
 		//-----------------------------------------------------------------//
@@ -595,5 +595,5 @@ namespace device {
 		};
 		static inline ctsuerrs_t<base + 0x1C> CTSUERRS;
 	};
-	static inline ctsu_t<0x0008'0980> CTSU;
+	static inline ctsu_t<0x000A'0900> CTSU;
 }

@@ -38,9 +38,24 @@ namespace device {
 			HOCO,	///< 内蔵高速オンチップオシレーター（BASE: 24MHz, 32MHz, 48MHz）
 			LOCO,	///< 内蔵低速オンチップオシレーター (125KHz)
 		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発信器ドライブ能力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class SUB_OSC_MODE : uint8_t {
+			DEFAULT,	///< 標準 CL 用ドライブ能力
+			L_HIGH,		///< 低 CL 用ドライブ能力高
+			L_MID,		///< 低 CL 用ドライブ能力中
+			L_LOW,		///< 低 CL 用ドライブ能力低
+		};
+
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 12'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）
 
+		static constexpr auto		SOMCR		= SUB_OSC_MODE::DEFAULT;	///< サブクロック発信器モード選択
 		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
 
 		static constexpr uint32_t   PLL_BASE	= 48'000'000;		///< PLL ベースクロック（最大 24MHz ～ 48MHz）

@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 ポートアウトプットイネーブル POE2a 定義
+	@brief	RX140/RX220 ポートアウトプットイネーブル POE2a 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -90,7 +90,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 2>  POE4M;
+			bits_rw_t<io_, bitpos::B0, 2>  POE8M;
 
 			bit_rw_t <io_, bitpos::B8>     PIE2;
 			bit_rw_t <io_, bitpos::B9>     POE8E;

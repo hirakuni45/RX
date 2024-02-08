@@ -83,8 +83,8 @@ namespace device {
 
 			ELSR8I		= 80,	///< ELC
 
-			LVD1		= 88,   ///< LVD/CMPA
-			LVD2    	= 89,	///< LVD/CMPA
+			LVD1		= 88,   ///< LVD1/CMPA1
+			LVD2    	= 89,	///< LVD2/CMPA2
 
 			USBR0		= 90,	///< USB0
 

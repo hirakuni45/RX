@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140 グループ・RTCB 定義
+	@brief	RX140 グループ RTCB 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,15 +14,17 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RTCB 定義基底クラス
-		@param[in]	per		ペリフェラル型
+		@brief  RTCB 定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per>
-	struct rtc_t {
+	struct rtcb_t {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr bool BINARY = true;	///< バイナリーカウントモード
+		static constexpr auto PERIPHERAL = peripheral::RTC;	///< ペリフェラル型
+		static constexpr auto ALM = ICU::VECTOR::ALM;	///< アラーム割り込みベクタ
+		static constexpr auto PRD = ICU::VECTOR::PRD;	///< 周期割り込みベクタ
+		static constexpr auto CUP = ICU::VECTOR::CUP;	///< 桁上げ割り込みベクタ
+		static constexpr bool BINARY = true;			///< バイナリーカウントモード
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -121,7 +123,6 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  HR1;
 			bits_rw_t<io_, bitpos::B4, 2>  HR10;
-			bit_rw_t <io_, bitpos::B6>     PM;
 		};
 		static inline rhrcnt_t<0x0008'C406> RHRCNT;
 
@@ -148,7 +149,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 2>  DAYW;
+			bits_rw_t<io_, bitpos::B0, 3>  DAYW;
 		};
 		static inline rwkcnt_t<0x0008'C408> RWKCNT;
 
@@ -215,8 +216,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 4> YR1;
-			bits_rw_t<io_, bitpos::B4, 4> YR10;
+			bits_rw_t<io_, bitpos::B0,  4> YEAR;
+			bits_rw_t<io_, bitpos::B4,  4> YEAR10;
+			bits_rw_t<io_, bitpos::B8,  4> YEAR100;
+			bits_rw_t<io_, bitpos::B12, 4> YEAR1000;
 		};
 		static inline ryrcnt_t<0x0008'C40E> RYRCNT;
 
@@ -295,7 +298,6 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4> HR1;
 			bits_rw_t<io_, bitpos::B4, 2> HR10;
-			bit_rw_t <io_, bitpos::B6>    PM;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
 		static inline rhrar_t<0x0008'C414> RHRAR;
@@ -354,7 +356,6 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4> DATE1;
 			bits_rw_t<io_, bitpos::B4, 2> DATE10;
-
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
 		static inline rdayar_t<0x0008'C418> RDAYAR;
@@ -384,7 +385,6 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4> MON1;
 			bit_rw_t <io_, bitpos::B4>    MON10;
-
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
 		static inline rmonar_t<0x0008'C41A> RMONAR;
@@ -412,8 +412,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 4> YR1;
-			bits_rw_t<io_, bitpos::B4, 4> YR10;
+			bits_rw_t<io_, bitpos::B0,  4> YEAR;
+			bits_rw_t<io_, bitpos::B4,  4> YEAR10;
+			bits_rw_t<io_, bitpos::B8,  4> YEAR100;
+			bits_rw_t<io_, bitpos::B12, 4> YEAR1000;
 		};
 		static inline ryrar_t<0x0008'C41C> RYRAR;
 
@@ -492,7 +494,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  START;
 			bit_rw_t<io_, bitpos::B1>  RESET;
-			bit_rw_t<io_, bitpos::B2>  ADJ30;
+			bit_rw_t<io_, bitpos::B2>  ADJ;
 			bit_rw_t<io_, bitpos::B3>  RTCOE;
 			bit_rw_t<io_, bitpos::B4>  AADJE;
 			bit_rw_t<io_, bitpos::B5>  AADJP;
@@ -516,10 +518,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 6> ADJ;
-			bits_rw_t<io_, bitpos::B6, 2> PMADJ;
+			bits_rw_t<io_, bitpos::B0, 6>  ADJ;
+			bits_rw_t<io_, bitpos::B6, 2>  PMAD;
 		};
-		static inline radj_t<0x0008'C42E> RADJ;
+		static inline radj_t<0x0008'C428> RADJ;
 	};
-	typedef rtc_t<peripheral::RTC> RTC;
+	typedef rtcb_t RTC;
 }
