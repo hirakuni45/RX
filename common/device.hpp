@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー @n
 			RX140 @n
@@ -20,7 +20,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 
 #if defined(SIG_RX140)
@@ -31,7 +31,7 @@
 #include "RX140/icu.hpp"
 #include "RX140/icu_mgr.hpp"
 #include "RX140/port_map.hpp"
-// #include "RX140/port_map_mtu.hpp"
+#include "RX140/port_map_mtu.hpp"
 #include "RX140/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
