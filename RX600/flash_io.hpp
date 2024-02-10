@@ -42,9 +42,9 @@ namespace device {
 					RX72N/RX72M: ３２Ｋバイト、６４バイト、５１２ブロック
 		*/
 		//-----------------------------------------------------------------//
-		static constexpr uint32_t DATA_FLASH_SIZE  = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
-		static constexpr uint32_t DATA_FLASH_BLOCK = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
-		static constexpr uint32_t DATA_FLASH_BANK  = FLASH::DATA_SIZE / DATA_FLASH_BLOCK;	///< データ・フラッシュのバンク数
+		static constexpr uint32_t DATA_SIZE  = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
+		static constexpr uint32_t DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
+		static constexpr uint32_t DATA_BLOCK_NUM  = FLASH::DATA_SIZE / DATA_BLOCK_SIZE;	///< データ・フラッシュのバンク数
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -341,7 +341,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint8_t read(uint32_t org) noexcept
 		{
-			if(org >= DATA_FLASH_SIZE) {
+			if(org >= DATA_SIZE) {
 				error_ = error::ADDRESS;
 				return 0;
 			}
@@ -365,12 +365,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool read(uint32_t org, void* dst, uint32_t len) noexcept
 		{
-			if(org >= DATA_FLASH_SIZE) {
+			if(org >= DATA_SIZE) {
 				error_ = error::ADDRESS;
 				return false;
 			}
-			if((org + len) > DATA_FLASH_SIZE) {
-				len = DATA_FLASH_SIZE - org;
+			if((org + len) > DATA_SIZE) {
+				len = DATA_SIZE - org;
 			}
 			if(mode_ != mode::RD) {
 				turn_rd_();
@@ -391,9 +391,9 @@ namespace device {
 			@return 消去されていれば「true」（エラーは「false」）
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_check(uint32_t org, uint32_t len = DATA_FLASH_BLOCK) noexcept
+		bool erase_check(uint32_t org, uint32_t len = DATA_BLOCK_SIZE) noexcept
 		{
-			if(org >= DATA_FLASH_SIZE) {
+			if(org >= DATA_SIZE) {
 				error_ = error::ADDRESS;
 				return false;
 			}
@@ -445,7 +445,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase(uint32_t org) noexcept
 		{
-			if(org >= DATA_FLASH_SIZE) {
+			if(org >= DATA_SIZE) {
 				error_ = error::ADDRESS;
 				return false;
 			}
@@ -499,7 +499,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase_all() noexcept
 		{
-			for(uint32_t pos = 0; pos < DATA_FLASH_SIZE; pos += DATA_FLASH_BLOCK) {
+			for(uint32_t pos = 0; pos < DATA_SIZE; pos += DATA_BLOCK_SIZE) {
 				if(!erase_check(pos)) {
 					auto ret = erase(pos);
 					if(!ret) {
@@ -524,13 +524,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool write(uint32_t org, const void* src, uint32_t len) noexcept
 		{
-			if(org >= DATA_FLASH_SIZE || (org & 0x03) != 0) {
+			if(org >= DATA_SIZE || (org & 0x03) != 0) {
 				error_ = error::ADDRESS;
 				return false;
 			}
 
-			if((org + len) > DATA_FLASH_SIZE) {
-				len = DATA_FLASH_SIZE - org;
+			if((org + len) > DATA_SIZE) {
+				len = DATA_SIZE - org;
 			}
 
 			if(mode_ != mode::PE) {

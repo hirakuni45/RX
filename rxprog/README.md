@@ -19,6 +19,7 @@ Tool to write program to flash memory of RX microcontroller using serial interfa
  - rx_prog.hpp
  - rx_protocol.hpp
  - rx220_protocol.hpp
+ - rx23x_protocol.hpp
  - rx24t_protocol.hpp
  - rx62x_protocol.hpp
  - rx63x_protocol.hpp
@@ -70,6 +71,21 @@ See development environment preparation of 'RX/README.md'
 
 ## Connection terminal list
 
+### RX140:
+
+|Terminal|LFQFP 64|
+|---|---|
+|MD|MD(3)|
+|RXD|P30/RXD1(14)|
+|TXD|P26/TXD1(16)|
+
+|Mode|MD|
+|---|:---:|
+|Serial Boot|0|
+|Single Chip|1|
+
+VCL: 4.7uF
+
 ### RX220:
 |Terminal|LFQFP 64|
 |---|---|
@@ -112,7 +128,7 @@ VCL: 4.7uF
 |TXD|P26/TXD1(31)|
    
 |Mode|MD0|MD1|
-|---|---|---|
+|---|:---:|:---:|
 |Serial Boot|1|0|
 |USB Boot|0|1|
 |Single Chip|1|1|

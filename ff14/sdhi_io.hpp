@@ -347,7 +347,7 @@ namespace fatfs {
 
 			device::power_mgr::turn(SDHI::PERIPHERAL);
 			using port_map = device::port_map;
-			port_map::turn_sdhi(port_map::sdhi_situation::START, PSEL);
+			port_map::turn_sdhi(port_map::SDHI_STATE::START, PSEL);
 
 			intr_lvl_ = lvl;
 			if(intr_lvl_ != device::ICU::LEVEL::NONE) {
@@ -453,7 +453,7 @@ namespace fatfs {
 #endif
 			SDHI::SDRST.SDRST = 0;
 			using port_map = device::port_map;
-			port_map::turn_sdhi(port_map::sdhi_situation::INSERT, PSEL);
+			port_map::turn_sdhi(port_map::SDHI_STATE::INSERT, PSEL);
 			SDHI::SDRST.SDRST = 1;
 
 			if(!set_bus_(true)) {
@@ -660,7 +660,7 @@ namespace fatfs {
 				}
 			}
 
-			port_map::turn_sdhi(port_map::sdhi_situation::BUS, PSEL);
+			port_map::turn_sdhi(port_map::SDHI_STATE::BUS, PSEL);
 
 			card_type_ = ty;
 			stat_ = ty ? 0 : STA_NOINIT;
@@ -952,7 +952,7 @@ namespace fatfs {
 			} else if(!cd && cd_) {
 ///				utils::format("Card Eject\n");
 				f_mount(nullptr, "", DO_MOUNT_INIT);
-				device::port_map::turn_sdhi(device::port_map::sdhi_situation::EJECT, PSEL);
+				device::port_map::turn_sdhi(device::port_map::SDHI_STATE::EJECT, PSEL);
 				POW::P = 0;
 
 				stat_ = STA_NODISK | STA_NOINIT;

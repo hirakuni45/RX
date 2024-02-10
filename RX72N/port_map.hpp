@@ -1,14 +1,14 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX72N グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化して設定 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX72N/peripheral.hpp"
 #include "RX72N/port.hpp"
 #include "RX72N/mpc.hpp"
@@ -22,23 +22,6 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
-	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  SDHI シチュエーション型 @n
-					SDHI ポートの状態に応じたマッピング
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class sdhi_situation : uint8_t {
-			START,		///< 開始時（カード挿入を待っている状態）
- 			INSERT,		///< カード挿入時（カードが挿入された時）
-			BUS,		///< カードのバスを有効にする
-			EJECT,		///< カード排出時（カードが排出された時）
-			DESTROY,	///< カード廃止
-		};
-
-	private:
 
 		static bool sub_1st_(peripheral t, bool enable, ORDER opt)
 		{
@@ -921,23 +904,23 @@ namespace device {
 		}
 
 
-		static bool sdhi_1st_(sdhi_situation sit) noexcept
+		static bool sdhi_1st_(SDHI_STATE state) noexcept
 		{
 			bool ret = true;
 			bool enable = true;
 			uint8_t sel = enable ? 0b011010 : 0;
-			switch(sit) {
-			case sdhi_situation::START:
+			switch(state) {
+			case SDHI_STATE::START:
 				MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
 				PORT8::PMR.B0 = enable;
 				MPC::P81PFS.PSEL = sel;  // SDHI_CD (80)
 				PORT8::PMR.B1 = enable;
 				break;
 
-			case sdhi_situation::EJECT:
+			case SDHI_STATE::EJECT:
 				enable = 0;
 				sel = 0;
-			case sdhi_situation::INSERT:
+			case SDHI_STATE::INSERT:
 				MPC::PC2PFS.PSEL = sel;  // SDHI_D3 (86)
 				PORTC::PMR.B2 = enable;
 				MPC::PC3PFS.PSEL = sel;  // SDHI_D0 (83)
@@ -952,7 +935,7 @@ namespace device {
 				PORT7::PMR.B7 = enable;
 				break;
 
-			case sdhi_situation::DESTROY:
+			case SDHI_STATE::DESTROY:
 				enable = 0;
 				sel = 0;
 				PORT8::PMR.B0 = enable;
@@ -980,13 +963,13 @@ namespace device {
 		}
 
 
-		static bool sdhi_3rd_(sdhi_situation sit) noexcept
+		static bool sdhi_3rd_(SDHI_STATE state) noexcept
 		{
 			bool ret = true;
 			bool enable = true;
 			uint8_t sel = 0b011010;
-			switch(sit) {
-			case sdhi_situation::START:
+			switch(state) {
+			case SDHI_STATE::START:
 ///				PORT2::PMR.B4 = 0;
 ///				MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
 ///				PORT2::PMR.B4 = enable;
@@ -995,7 +978,7 @@ namespace device {
 				PORT2::PMR.B5 = enable;
 				break;
 
-			case sdhi_situation::INSERT:
+			case SDHI_STATE::INSERT:
 				PORT2::PMR.B0 = 0;
 				MPC::P20PFS.PSEL = sel;  // SDHI_CMD-C P20(37)
 				PORT2::PMR.B0 = enable;
@@ -1004,7 +987,7 @@ namespace device {
 				PORT2::PMR.B1 = enable;
 				break;
 
-			case sdhi_situation::BUS:
+			case SDHI_STATE::BUS:
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // SDHI_D0-C  P22(35)
 				PORT2::PMR.B2 = enable;
@@ -1019,14 +1002,14 @@ namespace device {
 				PORT1::PMR.B7 = enable;
 				break;
 
-			case sdhi_situation::DESTROY:
+			case SDHI_STATE::DESTROY:
 				sel = 0;
 ///				PORT2::PMR.B4 = 0;
 ///				MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
 				PORT2::PMR.B5 = 0;
 				MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
 
-			case sdhi_situation::EJECT:
+			case SDHI_STATE::EJECT:
 				sel = 0;
 				PORT2::PMR.B0 = 0;
 				MPC::P20PFS.PSEL = sel;  // SDHI_CMD-C P20(37)
@@ -1177,23 +1160,23 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDHI ポート専用切り替え
-			@param[in]	sit		SHDI シチュエーション
-			@param[in]	opt		ポート・マップ・オプション（ポート候補）
+			@param[in]	state	SHDI 候補
+			@param[in]	order	ポート・マップ候補
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_sdhi(sdhi_situation sit, ORDER opt = ORDER::FIRST) noexcept
+		static bool turn_sdhi(SDHI_STATE state, ORDER order = ORDER::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = 0;
-			switch(opt) {
+			switch(order) {
 			case ORDER::FIRST:
-				ret = sdhi_1st_(sit);
+				ret = sdhi_1st_(state);
 				break;
 			case ORDER::THIRD:
-				ret = sdhi_3rd_(sit);
+				ret = sdhi_3rd_(state);
 				break;
 			default:
 				break;
@@ -1207,14 +1190,14 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDHI クロック・ポートの状態を取得
-			@param[in]	opt		ポート・マップ・オプション（ポート候補）
+			@param[in]	order	ポート・マップ候補
 			@return SDHI クロック・ポートの状態
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool probe_sdhi_clock(ORDER opt) noexcept
+		static bool probe_sdhi_clock(ORDER order) noexcept
 		{
 			bool ret = 0;
-			switch(opt) {
+			switch(order) {
 			case ORDER::FIRST:
 				ret = PORT7::PIDR.B7();
 				break;

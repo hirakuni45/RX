@@ -16,6 +16,7 @@ Development is now possible in multiple environments.
 Currently supported and tested devices:   
 |Series|Core|FPU|TFU|DFPU|Operation check|rx_prog supports|Linker file|
 |---|:-:|:-:|:-:|:-:|:-:|:-:|---|
+|RX140|RXv2|Yes|－|－||△||R5F51403/5/6|
 |RX220|RXv1|－|－|－|〇|〇|〇|R5F52206|
 |RX231|RXv2|Yes|－|－|〇|〇|〇|R5F52316/7/8|
 |RX621|RXv1|Yes|－|－|〇|〇|〇|R5F56218|

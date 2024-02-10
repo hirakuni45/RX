@@ -132,7 +132,7 @@ namespace device {
 
 		TEMPS,		///< 温度センサ（TEMPS）
 
-		DOC,		///< データ演算回路 (DOC)
+		DOC,		///< データ演算回路 (DOCA)
 
 		STBRAM,		///< スタンバイ RAM
 	};

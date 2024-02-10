@@ -4,7 +4,7 @@
 	@brief	RX64M, RX71M グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化して設定 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -27,46 +27,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
-	public:
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  MTUx（マルチ・ファンクション・タイマ） チャネル型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class channel : uint8_t {
-			A,		///< MTUx A (MTIOCxA)
-			B,		///< MTUx B (MTIOCxB)
-			C,		///< MTUx C (MTIOCxC)
-			D,		///< MTUx D (MTIOCxD)
-
-			U,		///< MTU5 U (MTIC5U) P24
-			V,		///< MTU5 V (MTIC5V) P23
-			W,		///< MTU5 W (MTIC5W) P22
-			U2,		///< MTU5 U (MTIC5U) P82
-			V2,		///< MTU5 V (MTIC5V) P81
-			W2,		///< MTU5 W (MTIC5W) P80
-
-			CLK_AB,	///< MTCLKA, MTCLKB 1ST: P33/P32, 2ND: P21/P20 
-			CLK_CD,	///< MTCLKC, MTCLKD 1ST: P31/P30, 2ND: P11/P10, 3RD: PE4/PE3
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  SDHI シチュエーション型 @n
-					SDHI ポートの状態に応じたマッピング
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class sdhi_situation : uint8_t {
-			START,		///< 開始時（カード挿入を待っている状態）
- 			INSERT,		///< カード挿入時（カードが挿入された時）
-			BUS,		///< カードのバスを有効にする
-			EJECT,		///< カード排出時（カードが排出された時）
-			DESTROY,	///< カード廃止
-		};
-
-	private:
 		static bool sub_1st_(peripheral t, bool enable, ORDER opt)
 		{
 			bool ret = true;
@@ -749,13 +710,13 @@ namespace device {
 		}
 
 
-		static bool sdhi_1st_(sdhi_situation sit) noexcept
+		static bool sdhi_1st_(SDHI_STATE state) noexcept
 		{
 			bool ret = true;
 			bool enable = true;
 			uint8_t sel = enable ? 0b011010 : 0;
-			switch(sit) {
-			case sdhi_situation::START:
+			switch(state) {
+			case SDHI_STATE::START:
 				PORT8::PMR.B0 = 0;
 				MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
 				PORT8::PMR.B0 = enable;
@@ -764,10 +725,10 @@ namespace device {
 				PORT8::PMR.B1 = enable;
 				break;
 
-			case sdhi_situation::EJECT:
+			case SDHI_STATE::EJECT:
 				enable = 0;
 				sel = 0;
-			case sdhi_situation::INSERT:
+			case SDHI_STATE::INSERT:
 				PORTC::PMR.B2 = 0;
 				MPC::PC2PFS.PSEL = sel;  // SDHI_D3 (86)
 				PORTC::PMR.B2 = enable;
@@ -788,7 +749,7 @@ namespace device {
 				PORT7::PMR.B7 = enable;
 				break;
 
-			case sdhi_situation::DESTROY:
+			case SDHI_STATE::DESTROY:
 				sel = 0;
 				PORT8::PMR.B0 = 0;
 				MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
@@ -1202,26 +1163,50 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDHI ポート専用切り替え
-			@param[in]	sit		SHDI シチュエーション
-			@param[in]	opt		ポート・マップ・オプション（ポート候補）
+			@param[in]	state	SHDI 状態
+			@param[in]	order	ポート・マップ候補
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_sdhi(sdhi_situation sit, ORDER opt = ORDER::FIRST) noexcept
+		static bool turn_sdhi(SDHI_STATE state, ORDER order = ORDER::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = 0;
-			switch(opt) {
+			switch(order) {
 			case ORDER::FIRST:
-				ret = sdhi_1st_(sit);
+				ret = sdhi_1st_(state);
 				break;
 			default:
 				break;
 			}
 
 			MPC::PWPR = MPC::PWPR.B0WI.b();
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SDHI クロック・ポートの状態を取得
+			@param[in]	order	ポート・マップ候補
+			@return SDHI クロック・ポートの状態
+		*/
+		//-----------------------------------------------------------------//
+		static bool probe_sdhi_clock(ORDER order) noexcept
+		{
+			bool ret = 0;
+			switch(order) {
+			case ORDER::FIRST:
+				ret = PORT7::PIDR.B7();
+				break;
+			case ORDER::THIRD:
+				ret = PORT2::PIDR.B1();
+				break;
+			default:
+				break;
+			}
 			return ret;
 		}
 
@@ -1264,343 +1249,6 @@ namespace device {
 
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
-			return ret;
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  MTU3 関係、チャネル別ポート切り替え
-			@param[in]	per	周辺機器タイプ
-			@param[in]	ch	チャネル
-			@param[in]	ena	無効にする場合場合「false」
-			@param[in]	opt	候補を選択する場合
-			@return 無効な周辺機器の場合「false」
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, channel ch, bool ena = true, ORDER opt = ORDER::FIRST) noexcept
-		{
-			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			bool ret = true;
-			uint8_t sel = 0;
-			switch(per) {
-			case peripheral::MTU0:
-				sel = ena ? 0b00001 : 0;
-				switch(ch) {
-				case channel::A:
-					PORTB::PMR.B3 = 0;
-					MPC::PB3PFS.PSEL = sel;  // MTIOC0A (32/100)
-					PORTB::PMR.B3 = ena;
-					break;
-				case channel::B:
-					PORTB::PMR.B2 = 0;
-					MPC::PB2PFS.PSEL = sel;  // MTIOC0B (33/100)
-					PORTB::PMR.B2 = ena;
-					break;
-				case channel::C:
-					PORTB::PMR.B1 = 0;
-					MPC::PB1PFS.PSEL = sel;  // MTIOC0C (34/100)
-					PORTB::PMR.B1 = ena;
-					break;
-				case channel::D:
-					PORTB::PMR.B0 = 0;
-					MPC::PB0PFS.PSEL = sel;  // MTIOC0D (35/100)
-					PORTB::PMR.B0 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-
-			case peripheral::MTU1:
-				switch(ch) {
-				case channel::A:
-					sel = ena ? 0b00001 : 0;
-					PORTA::PMR.B5 = 0;
-					MPC::PA5PFS.PSEL = sel;  // MTIOC1A (36/100)
-					PORTA::PMR.B5 = ena;
-					break;
-				case channel::B:
-					sel = ena ? 0b00001 : 0;
-					PORTA::PMR.B4 = 0;
-					MPC::PA4PFS.PSEL = sel;  // MTIOC1B (37/100)
-					PORTA::PMR.B4 = ena;
-					break;
-				case channel::CLK_AB:
-					sel = ena ? 0b00010 : 0;
-					if(opt == ORDER::FIRST) {
-						PORT3::PMR.B3 = 0;
-						MPC::P33PFS.PSEL = sel;
-						PORT3::PMR.B3 = ena;
-						PORT3::PMR.B2 = 0;
-						MPC::P32PFS.PSEL = sel;
-						PORT3::PMR.B2 = ena;
-					} else if(opt == ORDER::SECOND) {
-						PORT2::PMR.B1 = 0;
-						MPC::P21PFS.PSEL = sel;
-						PORT2::PMR.B1 = ena;
-						PORT2::PMR.B0 = 0;
-						MPC::P20PFS.PSEL = sel;
-						PORT2::PMR.B0 = ena;
-					} else {
-						ret = false;
-					}
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-
-			case peripheral::MTU2:
-				switch(ch) {
-				case channel::A:
-					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = sel;  // MTIOC2A (38/100)
-					PORTA::PMR.B3 = ena;
-					break;
-				case channel::B:
-					PORTA::PMR.B2 = 0;
-					MPC::PA2PFS.PSEL = sel;  // MTIOC2B (39/100)
-					PORTA::PMR.B2 = ena;
-					break;
-				case channel::CLK_AB:
-					sel = ena ? 0b00010 : 0;
-					if(opt == ORDER::FIRST) {
-						PORT3::PMR.B3 = 0;
-						MPC::P33PFS.PSEL = sel;  // 
-						PORT3::PMR.B3 = ena;
-						PORT3::PMR.B2 = 0;
-						MPC::P32PFS.PSEL = sel;
-						PORT3::PMR.B2 = ena;
-					} else if(opt == ORDER::SECOND) {
-						PORT2::PMR.B1 = 0;
-						MPC::P21PFS.PSEL = sel;
-						PORT2::PMR.B1 = ena;
-						PORT2::PMR.B0 = 0;
-						MPC::P20PFS.PSEL = sel;
-						PORT2::PMR.B0 = ena;
-					} else {
-						ret = false;
-					}
-					break;
-				case channel::CLK_CD:
-					sel = ena ? 0b00010 : 0;
-					if(opt == ORDER::FIRST) {
-						PORT3::PMR.B1 = 0;
-						MPC::P31PFS.PSEL = sel;
-						PORT3::PMR.B1 = ena;
-						PORT3::PMR.B0 = 0;
-						MPC::P30PFS.PSEL = sel;
-						PORT3::PMR.B0 = ena;
-					} else if(opt == ORDER::SECOND) {
-						PORT1::PMR.B1 = 0;
-						MPC::P11PFS.PSEL = sel;
-						PORT1::PMR.B1 = ena;
-						PORT1::PMR.B0 = 0;
-						MPC::P10PFS.PSEL = sel;
-						PORT1::PMR.B0 = ena;
-					} else if(opt == ORDER::THIRD) {
-						PORTE::PMR.B4 = 0;
-						MPC::PE4PFS.PSEL = sel;
-						PORTE::PMR.B4 = ena;
-						PORTE::PMR.B3 = 0;
-						MPC::PE3PFS.PSEL = sel;
-						PORTE::PMR.B3 = ena;
-					} else {
-						ret = false;
-					}
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-
-			case peripheral::MTU3:
-				switch(ch) {
-				case channel::A:
-					PORT3::PMR.B3 = 0;
-					MPC::P33PFS.PSEL = sel;  // MTIOC3A (58/100)
-					PORT3::PMR.B3 = ena;
-					break;
-				case channel::B:
-					PORT7::PMR.B1 = 0;
-					MPC::P71PFS.PSEL = sel;  // MTIOC3B (56/100)
-					PORT7::PMR.B1 = ena;
-					break;
-				case channel::C:
-					PORT3::PMR.B2 = 0;
-					MPC::P32PFS.PSEL = sel;  // MTIOC3C (59/100)
-					PORT3::PMR.B2 = ena;
-					break;
-				case channel::D:
-					PORT7::PMR.B4 = 0;
-					MPC::P74PFS.PSEL = sel;  // MTIOC3D (53/100)
-					PORT7::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-
-			case peripheral::MTU4:
-				switch(ch) {
-				case channel::A:
-					PORT7::PMR.B2 = 0;
-					MPC::P72PFS.PSEL = sel;  // MTIOC4A (55/100)
-					PORT7::PMR.B2 = ena;
-					break;
-				case channel::B:
-					PORT7::PMR.B3 = 0;
-					MPC::P73PFS.PSEL = sel;  // MTIOC4B (54/100)
-					PORT7::PMR.B3 = ena;
-					break;
-				case channel::C:
-					PORT7::PMR.B5 = 0;
-					MPC::P75PFS.PSEL = sel;  // MTIOC4C (52/100)
-					PORT7::PMR.B5 = ena;
-					break;
-				case channel::D:
-					PORT7::PMR.B6 = 0;
-					MPC::P76PFS.PSEL = sel;  // MTIOC4D (51/100)
-					PORT7::PMR.B6 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-
-			case peripheral::MTU5:
-				switch(ch) {
-				case channel::U:
-					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = sel;  // MTIOC5U (64/100)
-					PORT2::PMR.B4 = ena;
-					break;
-				case channel::V:
-					PORT2::PMR.B3 = 0;
-					MPC::P23PFS.PSEL = sel;  // MTIOC5V (65/100)
-					PORT2::PMR.B3 = ena;
-					break;
-				case channel::W:
-					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = sel;  // MTIOC5W (66/100)
-					PORT2::PMR.B2 = ena;
-					break;
-				case channel::U2:
-					PORT8::PMR.B2 = 0;
-					MPC::P82PFS.PSEL = sel;  // MTIOC5U (96/100)
-					PORT8::PMR.B2 = ena;
-					break;
-				case channel::V2:
-					PORT8::PMR.B1 = 0;
-					MPC::P81PFS.PSEL = sel;  // MTIOC5V (97/100)
-					PORT8::PMR.B1 = ena;
-					break;
-				case channel::W2:
-					PORT8::PMR.B0 = 0;
-					MPC::P80PFS.PSEL = sel;  // MTIOC5W (98/100)
-					PORT8::PMR.B0 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-
-			case peripheral::MTU6:
-				switch(ch) {
-				case channel::A:
-					PORTA::PMR.B1 = 0;
-					MPC::PA1PFS.PSEL = sel;  // MTIOC6A (40/100)
-					PORTA::PMR.B1 = ena;
-					break;
-				case channel::B:
-					PORT9::PMR.B5 = 0;
-					MPC::P95PFS.PSEL = sel;  // MTIOC6B (45/100)
-					PORT9::PMR.B5 = ena;
-					break;
-				case channel::C:
-					PORTA::PMR.B0 = 0;
-					MPC::PA0PFS.PSEL = sel;  // MTIOC6C (41/100)
-					PORTA::PMR.B0 = ena;
-					break;
-				case channel::D:
-					PORT9::PMR.B2 = 0;
-					MPC::P92PFS.PSEL = sel;  // MTIOC6D (48/100)
-					PORT9::PMR.B2 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-
-			case peripheral::MTU7:
-				switch(ch) {
-				case channel::A:
-					PORT9::PMR.B4 = 0;
-					MPC::P94PFS.PSEL = sel;  // MTIOC7A (46/100)
-					PORT9::PMR.B4 = ena;
-					break;
-				case channel::B:
-					PORT9::PMR.B3 = 0;
-					MPC::P93PFS.PSEL = sel;  // MTIOC7B (47/100)
-					PORT9::PMR.B3 = ena;
-					break;
-				case channel::C:
-					PORT9::PMR.B1 = 0;
-					MPC::P91PFS.PSEL = sel;  // MTIOC7C (49/100)
-					PORT9::PMR.B1 = ena;
-					break;
-				case channel::D:
-					PORT9::PMR.B0 = 0;
-					MPC::P90PFS.PSEL = sel;  // MTIOC7D (50/100)
-					PORT9::PMR.B0 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-
-			default:
-				ret = false;
-				break;
-			}
-
-			MPC::PWPR = MPC::PWPR.B0WI.b();
-
-			return ret;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  SDHI クロック・ポートの状態を取得
-			@param[in]	opt		ポート・マップ・オプション（ポート候補）
-			@return SDHI クロック・ポートの状態
-		*/
-		//-----------------------------------------------------------------//
-		static bool probe_sdhi_clock(ORDER opt) noexcept
-		{
-			bool ret = 0;
-			switch(opt) {
-			case ORDER::FIRST:
-				ret = PORT7::PIDR.B7();
-				break;
-			case ORDER::THIRD:
-				ret = PORT2::PIDR.B1();
-				break;
-			default:
-				break;
-			}
 			return ret;
 		}
 	};
