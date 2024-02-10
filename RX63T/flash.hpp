@@ -1,15 +1,15 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX63T グループ・フラッシュ 定義 @n
 			R5F563T[ECB]: 32K @n
 			R5F563T[654]:  8K
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/io_utils.hpp"
 
 namespace device {
@@ -19,13 +19,12 @@ namespace device {
 		@brief  フラッシュ・メモリー制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class _>
 	struct flash_t {
 
-		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
-		static constexpr uint32_t DATA_FLASH_SIZE  = 8192;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_FLASH_BLOCK = 256;		///< データ・フラッシュ、ブロックサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 2;			///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
+		static constexpr uint32_t DATA_SIZE  = 8192;		///< データ・フラッシュ、サイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 256;	///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 2;		///< データ・フラッシュ最小書き込みサイズ
 
 		static constexpr auto ID_NUM = 0;						///< 個別識別子数
 
@@ -46,8 +45,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> FLWE;
 		};
-		typedef fwepror_t<0x0008'C296> FWEPROR_;
-		static FWEPROR_ FWEPROR;
+		static inline fwepror_t<0x0008'C296> FWEPROR;
 
 
 		//-----------------------------------------------------------------//
@@ -66,8 +64,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4> FRDMD;
 		};
-		typedef fmodr_t<0x007F'C402> FMODR_;
-		static FMODR_ FMODR;
+		static inline fmodr_t<0x007F'C402> FMODR;
 
 
 		//-----------------------------------------------------------------//
@@ -92,8 +89,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7> ROMAE;
 		};
-		typedef fastat_t<0x007F'C410> FASTAT_;
-		static FASTAT_ FASTAT;
+		static inline fastat_t<0x007F'C410> FASTAT;
 
 
 		//-----------------------------------------------------------------//
@@ -118,8 +114,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7> ROMAEIE;
 		};
-		typedef faeint_t<0x007F'C411> FAEINT_;
-		static FAEINT_ FAEINT;
+		static inline faeint_t<0x007F'C411> FAEINT;
 
 
 		//-----------------------------------------------------------------//
@@ -138,8 +133,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>  FRDYIE;
 		};
-		typedef frdyie_t<0x007F'C412> FRDYIE_;
-		static FRDYIE_ FRDYIE;
+		static inline frdyie_t<0x007F'C412> FRDYIE;
 
 
 		//-----------------------------------------------------------------//
@@ -166,8 +160,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBRE07;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef dflre0_t<0x007F'C440> DFLRE0_;
-		static DFLRE0_ DFLRE0;
+		static inline dflre0_t<0x007F'C440> DFLRE0;
 
 
 		//-----------------------------------------------------------------//
@@ -194,8 +187,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBRE15;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef dflre1_t<0x007F'C442> DFLRE1_;
-		static DFLRE1_ DFLRE1;
+		static inline dflre1_t<0x007F'C442> DFLRE1;
 
 
 		//-----------------------------------------------------------------//
@@ -222,8 +214,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBWE07;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef dflwe0_t<0x007F'C450> DFLWE0_;
-		static DFLWE0_ DFLWE0;
+		static inline dflwe0_t<0x007F'C450> DFLWE0;
 
 
 		//-----------------------------------------------------------------//
@@ -250,8 +241,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBWE15;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef dflwe1_t<0x007F'C452> DFLWE1_;
-		static DFLWE1_ DFLWE1;
+		static inline dflwe1_t<0x007F'C452> DFLWE1;
 
 
 		//-----------------------------------------------------------------//
@@ -274,8 +264,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  ILGERR;
 			bit_rw_t<io_, bitpos::B7>  FRDY;
 		};
-		typedef fstatr0_t<0x007F'FFB0> FSTATR0_;
-		static FSTATR0_ FSTATR0;
+		static inline fstatr0_t<0x007F'FFB0> FSTATR0;
 
 
 		//-----------------------------------------------------------------//
@@ -293,8 +282,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  FCUERR;
 		};
-		typedef fstatr1_t<0x007F'FFB1> FSTATR1_;
-		static FSTATR1_ FSTATR1;
+		static inline fstatr1_t<0x007F'FFB1> FSTATR1;
 
 
 		//-----------------------------------------------------------------//
@@ -316,8 +304,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		typedef fentryr_t<0x007F'FFB2> FENTRYR_;
-		static FENTRYR_ FENTRYR;
+		static inline fentryr_t<0x007F'FFB2> FENTRYR;
 
 
 		//-----------------------------------------------------------------//
@@ -338,8 +325,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> FPKEY;
 		};
-		typedef fprotr_t<0x007F'FFB4> FPROTR_;
-		static FPROTR_ FPROTR;
+		static inline fprotr_t<0x007F'FFB4> FPROTR;
 
 
 		//-----------------------------------------------------------------//
@@ -360,8 +346,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> FRKEY;
 		};
-		typedef fresetr_t<0x007F'FFB6> FRESETR_;
-		static FRESETR_ FRESETR;
+		static inline fresetr_t<0x007F'FFB6> FRESETR;
 
 
 		//-----------------------------------------------------------------//
@@ -379,8 +364,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> CMDR;
 		};
-		typedef fcmdr_t<0x007F'FFBA> FCMDR_;
-		static FCMDR_ FCMDR;
+		static inline fcmdr_t<0x007F'FFBA> FCMDR;
 
 
 		//-----------------------------------------------------------------//
@@ -399,8 +383,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>    ESUSPMD;
 		};
-		typedef fcpsr_t<0x007F'FFC8> FCPSR_;
-		static FCPSR_ FCPSR;
+		static inline fcpsr_t<0x007F'FFC8> FCPSR;
 
 
 		//-----------------------------------------------------------------//
@@ -421,8 +404,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B3, 8> BCADR;
 		};
-		typedef dflbccnt_t<0x007F'FFCA> DFLBCCNT_;
-		static DFLBCCNT_ DFLBCCNT;
+		static inline dflbccnt_t<0x007F'FFCA> DFLBCCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -438,8 +420,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8> PEERRST;
 		};
-		typedef fpestat_t<0x007F'FFCC> FPESTAT_;
-		static FPESTAT_ FPESTAT;
+		static inline fpestat_t<0x007F'FFCC> FPESTAT;
 
 
 		//-----------------------------------------------------------------//
@@ -455,8 +436,7 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B0>    BCST;
 		};
-		typedef dflbcstat_t<0x007F'FFCE> DFLBCSTAT_;
-		static DFLBCSTAT_ DFLBCSTAT;
+		static inline dflbcstat_t<0x007F'FFCE> DFLBCSTAT;
 
 
 		//-----------------------------------------------------------------//
@@ -475,8 +455,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8> PCKA;
 		};
-		typedef pckar_t<0x007F'FFE8> PCKAR_;
-		static PCKAR_ PCKAR;
+		static inline pckar_t<0x007F'FFE8> PCKAR;
 
 
 		//-----------------------------------------------------------------//
@@ -495,30 +474,5 @@ namespace device {
 		static UIDR2_ UIDR2;
 		static UIDR3_ UIDR3;
 	};
-	template<class _> typename flash_t<_>::FWEPROR_ flash_t<_>::FWEPROR;
-	template<class _> typename flash_t<_>::FMODR_ flash_t<_>::FMODR;
-	template<class _> typename flash_t<_>::FASTAT_ flash_t<_>::FASTAT;
-	template<class _> typename flash_t<_>::FAEINT_ flash_t<_>::FAEINT;
-	template<class _> typename flash_t<_>::FRDYIE_ flash_t<_>::FRDYIE;
-	template<class _> typename flash_t<_>::DFLRE0_ flash_t<_>::DFLRE0;
-	template<class _> typename flash_t<_>::DFLRE1_ flash_t<_>::DFLRE1;
-	template<class _> typename flash_t<_>::DFLWE0_ flash_t<_>::DFLWE0;
-	template<class _> typename flash_t<_>::DFLWE1_ flash_t<_>::DFLWE1;
-	template<class _> typename flash_t<_>::FSTATR0_ flash_t<_>::FSTATR0;
-	template<class _> typename flash_t<_>::FSTATR1_ flash_t<_>::FSTATR1;
-	template<class _> typename flash_t<_>::FENTRYR_ flash_t<_>::FENTRYR;
-	template<class _> typename flash_t<_>::FPROTR_ flash_t<_>::FPROTR;
-	template<class _> typename flash_t<_>::FRESETR_ flash_t<_>::FRESETR;
-	template<class _> typename flash_t<_>::FCMDR_ flash_t<_>::FCMDR;
-	template<class _> typename flash_t<_>::FCPSR_ flash_t<_>::FCPSR;
-	template<class _> typename flash_t<_>::DFLBCCNT_ flash_t<_>::DFLBCCNT;
-	template<class _> typename flash_t<_>::FPESTAT_ flash_t<_>::FPESTAT;
-	template<class _> typename flash_t<_>::DFLBCSTAT_ flash_t<_>::DFLBCSTAT;
-	template<class _> typename flash_t<_>::PCKAR_ flash_t<_>::PCKAR;
-	template<class _> typename flash_t<_>::UIDR0_ flash_t<_>::UIDR0;
-	template<class _> typename flash_t<_>::UIDR1_ flash_t<_>::UIDR1;
-	template<class _> typename flash_t<_>::UIDR2_ flash_t<_>::UIDR2;
-	template<class _> typename flash_t<_>::UIDR3_ flash_t<_>::UIDR3;
-
-	typedef flash_t<void> FLASH;
+	typedef flash_t FLASH;
 }

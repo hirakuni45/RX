@@ -31,10 +31,10 @@ namespace device {
 #endif
 
 	public:
-		static constexpr auto DATA_FLASH_SIZE  = FLASH::DATA_FLASH_SIZE;	///< データフラッシュ、サイズ（バイト）
-		static constexpr auto DATA_FLASH_BLOCK = FLASH::DATA_FLASH_BLOCK;	///< データフラッシュ、ブロック数
-		static constexpr auto DATA_FLASH_BANK  = FLASH::DATA_FLASH_SIZE / FLASH::DATA_FLASH_BLOCK;	///< データフラッシュ、バンク数
-		static constexpr auto DATA_WORD_SIZE   = FLASH::DATA_WORD_SIZE;		///< データフラッシュ、ワードサイズ（最小書き込みバイト）
+		static constexpr auto DATA_SIZE  = FLASH::DATA_SIZE;			///< データフラッシュ、サイズ（バイト）
+		static constexpr auto DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データフラッシュ、ブロック数
+		static constexpr auto DATA_BLOCK_NUM  = FLASH::DATA_SIZE / FLASH::DATA_BLOCK_SIZE;	///< データフラッシュ、バンク数
+		static constexpr auto DATA_WORD_SIZE   = FLASH::DATA_WORD_SIZE;	///< データフラッシュ、ワードサイズ（最小書き込みバイト）
 
 	private:
 		enum class MODE : uint8_t {
@@ -245,11 +245,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint8_t read(uint32_t org) noexcept
 		{
-			if(org >= DATA_FLASH_SIZE) return 0;
+			if(org >= DATA_SIZE) return 0;
 	
 			turn_rd_();
 	
-			return rd8_(FLASH::DATA_FLASH_ORG + org);
+			return rd8_(FLASH::DATA_ORG + org);
 		}
 
 
@@ -264,12 +264,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint32_t read(uint32_t org, uint32_t len, void* dst) noexcept
 		{
-			if(org >= DATA_FLASH_SIZE) return 0;
-			if((org + len) > DATA_FLASH_SIZE) {
-				len = DATA_FLASH_SIZE - org;
+			if(org >= DATA_SIZE) return 0;
+			if((org + len) > DATA_SIZE) {
+				len = DATA_SIZE - org;
 			}
 			turn_rd_();
-			const void* src = reinterpret_cast<const void*>(FLASH::DATA_FLASH_ORG + org);
+			const void* src = reinterpret_cast<const void*>(FLASH::DATA_ORG + org);
 			std::memcpy(dst, src, len);
 			return len;
 		}
@@ -284,7 +284,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase_check(uint32_t bank) noexcept
 		{
-			if(bank >= DATA_FLASH_BLOCK) {
+			if(bank >= DATA_BLOCK_NUM) {
 				return false;
 			}
 
@@ -310,7 +310,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase(uint32_t bank) noexcept
 		{
-			if(bank >= DATA_FLASH_BLOCK) {
+			if(bank >= DATA_BLOCK_NUM) {
 				return false;
 			}
 
@@ -338,10 +338,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool write(uint32_t org, const void* src, uint32_t len) noexcept
 		{
-			if(org >= DATA_FLASH_SIZE) return false;
+			if(org >= DATA_SIZE) return false;
 
-			if((org + len) > DATA_FLASH_SIZE) {
-				len = DATA_FLASH_SIZE - org;
+			if((org + len) > DATA_SIZE) {
+				len = DATA_SIZE - org;
 			}
 
 			turn_pe_();

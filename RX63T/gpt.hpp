@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX63T グループ・GPT 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,8 +40,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  CST2;
 			bit_rw_t<io_, bitpos::B3>  CST3;
 		};
-		typedef gtstr_t<base + 0x00> GTSTR_;
-		static  GTSTR_ GTSTR;
+		static inline gtstr_t<base + 0x00> GTSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -67,8 +66,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2>  CPHW2;
 			bits_rw_t<io_, bitpos::B14, 2>  CPHW3;
 		};
-		typedef gthscr_t<base + 0x04> GTHSCR_;
-		static  GTHSCR_ GTHSCR;
+		static inline gthscr_t<base + 0x04> GTHSCR;
 
 
 		//-----------------------------------------------------------------//
@@ -94,8 +92,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B10>    CCSW2;
 			bit_rw_t <io_, bitpos::B11>    CCSW3;
 		};
-		typedef gthccr_t<base + 0x06> GTHCCR_;
-		static  GTHCCR_ GTHCCR;
+		static inline gthccr_t<base + 0x06> GTHCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -117,8 +114,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4>  CSHSL2;
 			bits_rw_t<io_, bitpos::B12, 4>  CSHSL3;
 		};
-		typedef gthssr_t<base + 0x08> GTHSSR_;
-		static  GTHSSR_ GTHSSR;
+		static inline gthssr_t<base + 0x08> GTHSSR;
 
 
 		//-----------------------------------------------------------------//
@@ -140,8 +136,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4>  CSHPL2;
 			bits_rw_t<io_, bitpos::B12, 4>  CSHPL3;
 		};
-		typedef gthpsr_t<base + 0x0A> GTHPSR_;
-		static  GTHPSR_ GTHPSR;
+		static inline gthpsr_t<base + 0x0A> GTHPSR;
 
 
 		//-----------------------------------------------------------------//
@@ -163,8 +158,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>   WP2;
 			bit_rw_t<io_, bitpos::B3>   WP3;
 		};
-		typedef gtwp_t<base + 0x0C> GTWP_;
-		static  GTWP_ GTWP;
+		static inline gtwp_t<base + 0x0C> GTWP;
 
 
 		//-----------------------------------------------------------------//
@@ -186,8 +180,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  2>  SYNC2;
 			bits_rw_t<io_, bitpos::B12, 2>  SYNC3;
 		};
-		typedef gtsync_t<base + 0x0E> GTSYNC_;
-		static  GTSYNC_ GTSYNC;
+		static inline gtsync_t<base + 0x0E> GTSYNC;
 
 
 		//-----------------------------------------------------------------//
@@ -210,8 +203,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B8>      ETIPF;
 			bit_rw_t< io_, bitpos::B9>      ETINF;
 		};
-		typedef gtetint_t<base + 0x10> GTETINT_;
-		static  GTETINT_ GTETINT;
+		static inline gtetint_t<base + 0x10> GTETINT;
 
 
 		//-----------------------------------------------------------------//
@@ -245,8 +237,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14>   BD32;
 			bit_rw_t<io_, bitpos::B15>   BD33;
 		};
-		typedef gtbdr_t<base + 0x14> GTBDR_;
-		static  GTBDR_ GTBDR;
+		static inline gtbdr_t<base + 0x14> GTBDR;
 
 
 		//-----------------------------------------------------------------//
@@ -268,8 +259,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  SWP2;
 			bit_rw_t<io_, bitpos::B3>  SWP3;
 		};
-		typedef gtswp_t<base + 0x18> GTSWP_;
-		static  GTSWP_ GTSWP;
+		static inline gtswp_t<base + 0x18> GTSWP;
 
 
 		//-----------------------------------------------------------------//
@@ -299,8 +289,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> TPSC;
 			bits_rw_t<io_, bitpos::B14, 2> LPSC;
 		};
-		typedef lccr_t<base + 0x80> LCCR_;
-		static LCCR_ LCCR;
+		static inline lccr_t<base + 0x80> LCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -321,8 +310,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  LISD;
 			bit_rw_t<io_, bitpos::B2>  LISO;
 		};
-		typedef lcst_t<base + 0x82> LCST_;
-		static LCST_ LCST;
+		static inline lcst_t<base + 0x82> LCST;
 
 
 		//-----------------------------------------------------------------//
@@ -330,8 +318,7 @@ namespace device {
 			@brief  LOCO カウント値レジスタ（LCNT）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 84> LCNT_;
-		static LCNT_ LCNT;
+		static inline rw16_t<base + 84> LCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -339,8 +326,7 @@ namespace device {
 			@brief  LOCO カウント結果平均レジスタ（LCNTA）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x86> LCNTA_;
-		static LCNTA_ LCNTA;
+		static inline rw16_t<base + 0x86> LCNTA;
 
 
 		//-----------------------------------------------------------------//
@@ -348,38 +334,22 @@ namespace device {
 			@brief  LOCO カウント結果レジスタ n（LCNTn）(n=00 ～ 15) 
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x88> LCNT00_;
-		static LCNT00_ LCNT00;
-		typedef rw16_t<base + 0x8A> LCNT01_;
-		static LCNT01_ LCNT01;
-		typedef rw16_t<base + 0x8C> LCNT02_;
-		static LCNT02_ LCNT02;
-		typedef rw16_t<base + 0x8E> LCNT03_;
-		static LCNT03_ LCNT03;
-		typedef rw16_t<base + 0x90> LCNT04_;
-		static LCNT04_ LCNT04;
-		typedef rw16_t<base + 0x92> LCNT05_;
-		static LCNT05_ LCNT05;
-		typedef rw16_t<base + 0x94> LCNT06_;
-		static LCNT06_ LCNT06;
-		typedef rw16_t<base + 0x96> LCNT07_;
-		static LCNT07_ LCNT07;
-		typedef rw16_t<base + 0x98> LCNT08_;
-		static LCNT08_ LCNT08;
-		typedef rw16_t<base + 0x9A> LCNT09_;
-		static LCNT09_ LCNT09;
-		typedef rw16_t<base + 0x9C> LCNT10_;
-		static LCNT10_ LCNT10;
-		typedef rw16_t<base + 0x9E> LCNT11_;
-		static LCNT11_ LCNT11;
-		typedef rw16_t<base + 0xA0> LCNT12_;
-		static LCNT12_ LCNT12;
-		typedef rw16_t<base + 0xA2> LCNT13_;
-		static LCNT13_ LCNT13;
-		typedef rw16_t<base + 0xA4> LCNT14_;
-		static LCNT14_ LCNT14;
-		typedef rw16_t<base + 0xA6> LCNT15_;
-		static LCNT15_ LCNT15;
+		static inline rw16_t<base + 0x88> LCNT00;
+		static inline rw16_t<base + 0x8A> LCNT01;
+		static inline rw16_t<base + 0x8C> LCNT02;
+		static inline rw16_t<base + 0x8E> LCNT03;
+		static inline rw16_t<base + 0x90> LCNT04;
+		static inline rw16_t<base + 0x92> LCNT05;
+		static inline rw16_t<base + 0x94> LCNT06;
+		static inline rw16_t<base + 0x96> LCNT07;
+		static inline rw16_t<base + 0x98> LCNT08;
+		static inline rw16_t<base + 0x9A> LCNT09;
+		static inline rw16_t<base + 0x9C> LCNT10;
+		static inline rw16_t<base + 0x9E> LCNT11;
+		static inline rw16_t<base + 0xA0> LCNT12;
+		static inline rw16_t<base + 0xA2> LCNT13;
+		static inline rw16_t<base + 0xA4> LCNT14;
+		static inline rw16_t<base + 0xA6> LCNT15;
 
 
 		//-----------------------------------------------------------------//
@@ -387,43 +357,9 @@ namespace device {
 			@brief  LOCO カウント上限／下限許容偏差値レジスタ（LCNTDU、LCNTDL）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0xA8> LCNTDU_;
-		static LCNTDU_ LCNTDU;
-		typedef rw16_t<base + 0xAA> LCNTDL_;
-		static LCNTDL_ LCNTDL;
+		static inline rw16_t<base + 0xA8> LCNTDU;
+		static inline rw16_t<base + 0xAA> LCNTDL;
 	};
-	template <uint32_t base> typename gpt_t<base>::GTSTR_ gpt_t<base>::GTSTR;
-	template <uint32_t base> typename gpt_t<base>::GTHSCR_ gpt_t<base>::GTHSCR;
-	template <uint32_t base> typename gpt_t<base>::GTHCCR_ gpt_t<base>::GTHCCR;
-	template <uint32_t base> typename gpt_t<base>::GTHSSR_ gpt_t<base>::GTHSSR;
-	template <uint32_t base> typename gpt_t<base>::GTHPSR_ gpt_t<base>::GTHPSR;
-	template <uint32_t base> typename gpt_t<base>::GTWP_ gpt_t<base>::GTWP;
-	template <uint32_t base> typename gpt_t<base>::GTSYNC_ gpt_t<base>::GTSYNC;
-	template <uint32_t base> typename gpt_t<base>::GTETINT_ gpt_t<base>::GTETINT;
-	template <uint32_t base> typename gpt_t<base>::GTBDR_ gpt_t<base>::GTBDR;
-	template <uint32_t base> typename gpt_t<base>::GTSWP_ gpt_t<base>::GTSWP;
-	template <uint32_t base> typename gpt_t<base>::LCCR_ gpt_t<base>::LCCR;
-	template <uint32_t base> typename gpt_t<base>::LCNT_ gpt_t<base>::LCNT;
-	template <uint32_t base> typename gpt_t<base>::LCNTA_ gpt_t<base>::LCNTA;
-	template <uint32_t base> typename gpt_t<base>::LCNT00_ gpt_t<base>::LCNT00;
-	template <uint32_t base> typename gpt_t<base>::LCNT01_ gpt_t<base>::LCNT01;
-	template <uint32_t base> typename gpt_t<base>::LCNT02_ gpt_t<base>::LCNT02;
-	template <uint32_t base> typename gpt_t<base>::LCNT03_ gpt_t<base>::LCNT03;
-	template <uint32_t base> typename gpt_t<base>::LCNT04_ gpt_t<base>::LCNT04;
-	template <uint32_t base> typename gpt_t<base>::LCNT05_ gpt_t<base>::LCNT05;
-	template <uint32_t base> typename gpt_t<base>::LCNT06_ gpt_t<base>::LCNT06;
-	template <uint32_t base> typename gpt_t<base>::LCNT07_ gpt_t<base>::LCNT07;
-	template <uint32_t base> typename gpt_t<base>::LCNT08_ gpt_t<base>::LCNT08;
-	template <uint32_t base> typename gpt_t<base>::LCNT09_ gpt_t<base>::LCNT09;
-	template <uint32_t base> typename gpt_t<base>::LCNT10_ gpt_t<base>::LCNT10;
-	template <uint32_t base> typename gpt_t<base>::LCNT11_ gpt_t<base>::LCNT11;
-	template <uint32_t base> typename gpt_t<base>::LCNT12_ gpt_t<base>::LCNT12;
-	template <uint32_t base> typename gpt_t<base>::LCNT13_ gpt_t<base>::LCNT13;
-	template <uint32_t base> typename gpt_t<base>::LCNT14_ gpt_t<base>::LCNT14;
-	template <uint32_t base> typename gpt_t<base>::LCNT15_ gpt_t<base>::LCNT15;
-	template <uint32_t base> typename gpt_t<base>::LCNTDU_ gpt_t<base>::LCNTDU;
-	template <uint32_t base> typename gpt_t<base>::LCNTDL_ gpt_t<base>::LCNTDL;
-
 	typedef gpt_t<0x000C'2000> GPT;
 
 
@@ -455,8 +391,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  CST6;
 			bit_rw_t<io_, bitpos::B3>  CST7;
 		};
-		typedef gtstr_t<base + 0x00> GTSTR_;
-		static  GTSTR_ GTSTR;
+		static inline gtstr_t<base + 0x00> GTSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -482,8 +417,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2>  CPHW6;
 			bits_rw_t<io_, bitpos::B14, 2>  CPHW7;
 		};
-		typedef gthscr_t<base + 0x04> GTHSCR_;
-		static  GTHSCR_ GTHSCR;
+		static inline gthscr_t<base + 0x04> GTHSCR;
 
 
 		//-----------------------------------------------------------------//
@@ -509,8 +443,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B10>    CCSW6;
 			bit_rw_t <io_, bitpos::B11>    CCSW7;
 		};
-		typedef gthccr_t<base + 0x06> GTHCCR_;
-		static  GTHCCR_ GTHCCR;
+		static inline gthccr_t<base + 0x06> GTHCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -532,8 +465,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4>  CSHSL6;
 			bits_rw_t<io_, bitpos::B12, 4>  CSHSL7;
 		};
-		typedef gthssr_t<base + 0x08> GTHSSR_;
-		static  GTHSSR_ GTHSSR;
+		static inline gthssr_t<base + 0x08> GTHSSR;
 
 
 		//-----------------------------------------------------------------//
@@ -555,8 +487,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4>  CSHPL6;
 			bits_rw_t<io_, bitpos::B12, 4>  CSHPL7;
 		};
-		typedef gthpsr_t<base + 0x0A> GTHPSR_;
-		static  GTHPSR_ GTHPSR;
+		static inline gthpsr_t<base + 0x0A> GTHPSR;
 
 
 		//-----------------------------------------------------------------//
@@ -578,8 +509,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>   WP6;
 			bit_rw_t<io_, bitpos::B3>   WP7;
 		};
-		typedef gtwp_t<base + 0x0C> GTWP_;
-		static  GTWP_ GTWP;
+		static inline gtwp_t<base + 0x0C> GTWP;
 
 
 		//-----------------------------------------------------------------//
@@ -601,8 +531,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  2>  SYNC6;
 			bits_rw_t<io_, bitpos::B12, 2>  SYNC7;
 		};
-		typedef gtsync_t<base + 0x0E> GTSYNC_;
-		static  GTSYNC_ GTSYNC;
+		static inline gtsync_t<base + 0x0E> GTSYNC;
 
 
 		//-----------------------------------------------------------------//
@@ -625,8 +554,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B8>      ETIPF;
 			bit_rw_t< io_, bitpos::B9>      ETINF;
 		};
-		typedef gtetint_t<base + 0x10> GTETINT_;
-		static  GTETINT_ GTETINT;
+		static inline gtetint_t<base + 0x10> GTETINT;
 
 
 		//-----------------------------------------------------------------//
@@ -660,8 +588,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14>   BD72;
 			bit_rw_t<io_, bitpos::B15>   BD73;
 		};
-		typedef gtbdr_t<base + 0x14> GTBDR_;
-		static  GTBDR_ GTBDR;
+		static inline gtbdr_t<base + 0x14> GTBDR;
 
 
 		//-----------------------------------------------------------------//
@@ -683,8 +610,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2>  SWP6;
 			bit_rw_t<io_, bitpos::B3>  SWP7;
 		};
-		typedef gtswp_t<base + 0x18> GTSWP_;
-		static  GTSWP_ GTSWP;
+		static inline gtswp_t<base + 0x18> GTSWP;
 
 
 		//-----------------------------------------------------------------//
@@ -714,8 +640,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> TPSC;
 			bits_rw_t<io_, bitpos::B14, 2> LPSC;
 		};
-		typedef lccr_t<base + 0x80> LCCR_;
-		static LCCR_ LCCR;
+		static inline lccr_t<base + 0x80> LCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -736,8 +661,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  LISD;
 			bit_rw_t<io_, bitpos::B2>  LISO;
 		};
-		typedef lcst_t<base + 0x82> LCST_;
-		static LCST_ LCST;
+		static inline lcst_t<base + 0x82> LCST;
 
 
 		//-----------------------------------------------------------------//
@@ -745,8 +669,7 @@ namespace device {
 			@brief  LOCO カウント値レジスタ（LCNT）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 84> LCNT_;
-		static LCNT_ LCNT;
+		static inline rw16_t<base + 84> LCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -754,8 +677,7 @@ namespace device {
 			@brief  LOCO カウント結果平均レジスタ（LCNTA）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x86> LCNTA_;
-		static LCNTA_ LCNTA;
+		static inline rw16_t<base + 0x86> LCNTA;
 
 
 		//-----------------------------------------------------------------//
@@ -763,38 +685,22 @@ namespace device {
 			@brief  LOCO カウント結果レジスタ n（LCNTn）(n=00 ～ 15) 
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x88> LCNT00_;
-		static LCNT00_ LCNT00;
-		typedef rw16_t<base + 0x8A> LCNT01_;
-		static LCNT01_ LCNT01;
-		typedef rw16_t<base + 0x8C> LCNT02_;
-		static LCNT02_ LCNT02;
-		typedef rw16_t<base + 0x8E> LCNT03_;
-		static LCNT03_ LCNT03;
-		typedef rw16_t<base + 0x90> LCNT04_;
-		static LCNT04_ LCNT04;
-		typedef rw16_t<base + 0x92> LCNT05_;
-		static LCNT05_ LCNT05;
-		typedef rw16_t<base + 0x94> LCNT06_;
-		static LCNT06_ LCNT06;
-		typedef rw16_t<base + 0x96> LCNT07_;
-		static LCNT07_ LCNT07;
-		typedef rw16_t<base + 0x98> LCNT08_;
-		static LCNT08_ LCNT08;
-		typedef rw16_t<base + 0x9A> LCNT09_;
-		static LCNT09_ LCNT09;
-		typedef rw16_t<base + 0x9C> LCNT10_;
-		static LCNT10_ LCNT10;
-		typedef rw16_t<base + 0x9E> LCNT11_;
-		static LCNT11_ LCNT11;
-		typedef rw16_t<base + 0xA0> LCNT12_;
-		static LCNT12_ LCNT12;
-		typedef rw16_t<base + 0xA2> LCNT13_;
-		static LCNT13_ LCNT13;
-		typedef rw16_t<base + 0xA4> LCNT14_;
-		static LCNT14_ LCNT14;
-		typedef rw16_t<base + 0xA6> LCNT15_;
-		static LCNT15_ LCNT15;
+		static inline rw16_t<base + 0x88> LCNT00;
+		static inline rw16_t<base + 0x8A> LCNT01;
+		static inline rw16_t<base + 0x8C> LCNT02;
+		static inline rw16_t<base + 0x8E> LCNT03;
+		static inline rw16_t<base + 0x90> LCNT04;
+		static inline rw16_t<base + 0x92> LCNT05;
+		static inline rw16_t<base + 0x94> LCNT06;
+		static inline rw16_t<base + 0x96> LCNT07;
+		static inline rw16_t<base + 0x98> LCNT08;
+		static inline rw16_t<base + 0x9A> LCNT09;
+		static inline rw16_t<base + 0x9C> LCNT10;
+		static inline rw16_t<base + 0x9E> LCNT11;
+		static inline rw16_t<base + 0xA0> LCNT12;
+		static inline rw16_t<base + 0xA2> LCNT13;
+		static inline rw16_t<base + 0xA4> LCNT14;
+		static inline rw16_t<base + 0xA6> LCNT15;
 
 
 		//-----------------------------------------------------------------//
@@ -802,43 +708,9 @@ namespace device {
 			@brief  LOCO カウント上限／下限許容偏差値レジスタ（LCNTDU、LCNTDL）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0xA8> LCNTDU_;
-		static LCNTDU_ LCNTDU;
-		typedef rw16_t<base + 0xAA> LCNTDL_;
-		static LCNTDL_ LCNTDL;
+		static inline rw16_t<base + 0xA8> LCNTDU;
+		static inline rw16_t<base + 0xAA> LCNTDL;
 	};
-	template <uint32_t base> typename gptb_t<base>::GTSTR_ gptb_t<base>::GTSTR;
-	template <uint32_t base> typename gptb_t<base>::GTHSCR_ gptb_t<base>::GTHSCR;
-	template <uint32_t base> typename gptb_t<base>::GTHCCR_ gptb_t<base>::GTHCCR;
-	template <uint32_t base> typename gptb_t<base>::GTHSSR_ gptb_t<base>::GTHSSR;
-	template <uint32_t base> typename gptb_t<base>::GTHPSR_ gptb_t<base>::GTHPSR;
-	template <uint32_t base> typename gptb_t<base>::GTWP_ gptb_t<base>::GTWP;
-	template <uint32_t base> typename gptb_t<base>::GTSYNC_ gptb_t<base>::GTSYNC;
-	template <uint32_t base> typename gptb_t<base>::GTETINT_ gptb_t<base>::GTETINT;
-	template <uint32_t base> typename gptb_t<base>::GTBDR_ gptb_t<base>::GTBDR;
-	template <uint32_t base> typename gptb_t<base>::GTSWP_ gptb_t<base>::GTSWP;
-	template <uint32_t base> typename gptb_t<base>::LCCR_ gptb_t<base>::LCCR;
-	template <uint32_t base> typename gptb_t<base>::LCNT_ gptb_t<base>::LCNT;
-	template <uint32_t base> typename gptb_t<base>::LCNTA_ gptb_t<base>::LCNTA;
-	template <uint32_t base> typename gptb_t<base>::LCNT00_ gptb_t<base>::LCNT00;
-	template <uint32_t base> typename gptb_t<base>::LCNT01_ gptb_t<base>::LCNT01;
-	template <uint32_t base> typename gptb_t<base>::LCNT02_ gptb_t<base>::LCNT02;
-	template <uint32_t base> typename gptb_t<base>::LCNT03_ gptb_t<base>::LCNT03;
-	template <uint32_t base> typename gptb_t<base>::LCNT04_ gptb_t<base>::LCNT04;
-	template <uint32_t base> typename gptb_t<base>::LCNT05_ gptb_t<base>::LCNT05;
-	template <uint32_t base> typename gptb_t<base>::LCNT06_ gptb_t<base>::LCNT06;
-	template <uint32_t base> typename gptb_t<base>::LCNT07_ gptb_t<base>::LCNT07;
-	template <uint32_t base> typename gptb_t<base>::LCNT08_ gptb_t<base>::LCNT08;
-	template <uint32_t base> typename gptb_t<base>::LCNT09_ gptb_t<base>::LCNT09;
-	template <uint32_t base> typename gptb_t<base>::LCNT10_ gptb_t<base>::LCNT10;
-	template <uint32_t base> typename gptb_t<base>::LCNT11_ gptb_t<base>::LCNT11;
-	template <uint32_t base> typename gptb_t<base>::LCNT12_ gptb_t<base>::LCNT12;
-	template <uint32_t base> typename gptb_t<base>::LCNT13_ gptb_t<base>::LCNT13;
-	template <uint32_t base> typename gptb_t<base>::LCNT14_ gptb_t<base>::LCNT14;
-	template <uint32_t base> typename gptb_t<base>::LCNT15_ gptb_t<base>::LCNT15;
-	template <uint32_t base> typename gptb_t<base>::LCNTDU_ gptb_t<base>::LCNTDU;
-	template <uint32_t base> typename gptb_t<base>::LCNTDL_ gptb_t<base>::LCNTDL;
-
 	typedef gptb_t<0x000C'2800> GPTB;
 
 
@@ -872,8 +744,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>   OBDFLT;
 			bit_rw_t <io_, bitpos::B15>   OBHLD;
 		};
-		typedef gtior_t<base + 0x00> GTIOR_;
-		static  GTIOR_ GTIOR;
+		static inline gtior_t<base + 0x00> GTIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -904,8 +775,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B14>   ADTRBUEN;
 			bit_rw_t< io_, bitpos::B15>   ADTRBDEN;
 		};
-		typedef gtintad_t<base + 0x02> GTINTAD_;
-		static  GTINTAD_ GTINTAD;
+		static inline gtintad_t<base + 0x02> GTINTAD;
 
 
 		//-----------------------------------------------------------------//
@@ -926,8 +796,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4>  TPCS;
 			bits_rw_t<io_, bitpos::B12, 2>  CCLR;
 		};
-		typedef gtcr_t<base + 0x04> GTCR_;
-		static  GTCR_ GTCR;
+		static inline gtcr_t<base + 0x04> GTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -954,8 +823,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> ADTTB;
 			bit_rw_t< io_, bitpos::B14>    ADTDB;
 		};
-		typedef gtber_t<base + 0x06> GTBER_;
-		static  GTBER_ GTBER;
+		static inline gtber_t<base + 0x06> GTBER;
 
 
 		//-----------------------------------------------------------------//
@@ -981,8 +849,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B14>    OBDTYF;
 			bit_rw_t< io_, bitpos::B15>    OBDTYR;
 		};
-		typedef gtudc_t<base + 0x08> GTUDC_;
-		static  GTUDC_ GTUDC;
+		static inline gtudc_t<base + 0x08> GTUDC;
 
 
 		//-----------------------------------------------------------------//
@@ -1012,8 +879,7 @@ namespace device {
 
 			bit_rw_t< io_, bitpos::B14>    ADTBL;
 		};
-		typedef gtitc_t<base + 0x0A> GTITC_;
-		static  GTITC_ GTITC;
+		static inline gtitc_t<base + 0x0A> GTITC;
 
 
 		//-----------------------------------------------------------------//
@@ -1043,8 +909,7 @@ namespace device {
 
 			bit_rw_t< io_, bitpos::B15>   TUCF;
 		};
-		typedef gtst_t<base + 0x0C> GTST_;
-		static  GTST_ GTST;
+		static inline gtst_t<base + 0x0C> GTST;
 
 
 		//-----------------------------------------------------------------//
@@ -1052,8 +917,7 @@ namespace device {
 			@brief  汎用 PWM タイマカウンタ (GTCNT)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x0E> GTCNT_;
-		static  GTCNT_ GTCNT;
+		static inline rw16_t<base + 0x0E> GTCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -1061,18 +925,12 @@ namespace device {
 			@brief	汎用 PWM タイマコンペアキャプチャレジスタ m（GTCCRm）（m = A ～ F）
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x10> GTCCRA_;
-		static  GTCCRA_ GTCCRA;
-		typedef rw16_t<base + 0x12> GTCCRB_;
-		static  GTCCRB_ GTCCRB;
-		typedef rw16_t<base + 0x14> GTCCRC_;
-		static  GTCCRC_ GTCCRC;
-		typedef rw16_t<base + 0x16> GTCCRD_;
-		static  GTCCRD_ GTCCRD;
-		typedef rw16_t<base + 0x18> GTCCRE_;
-		static  GTCCRE_ GTCCRE;
-		typedef rw16_t<base + 0x1A> GTCCRF_;
-		static  GTCCRF_ GTCCRF;
+		static inline rw16_t<base + 0x10> GTCCRA;
+		static inline rw16_t<base + 0x12> GTCCRB;
+		static inline rw16_t<base + 0x14> GTCCRC;
+		static inline rw16_t<base + 0x16> GTCCRD;
+		static inline rw16_t<base + 0x18> GTCCRE;
+		static inline rw16_t<base + 0x1A> GTCCRF;
 
 
 		//-----------------------------------------------------------------//
@@ -1080,8 +938,7 @@ namespace device {
 			@brief  汎用 PWM タイマ周期設定レジスタ (GTPR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x1C> GTPR_;
-		static  GTPR_ GTPR;
+		static inline rw16_t<base + 0x1C> GTPR;
 
 
 		//-----------------------------------------------------------------//
@@ -1089,8 +946,7 @@ namespace device {
 			@brief  汎用 PWM タイマ周期設定バッファレジスタ (GTPBR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x1E> GTPBR_;
-		static  GTPBR_ GTPBR;
+		static inline rw16_t<base + 0x1E> GTPBR;
 
 
 		//-----------------------------------------------------------------//
@@ -1098,8 +954,7 @@ namespace device {
 			@brief  汎用 PWM タイマ周期設定ダブルバッファレジスタ (GTPDBR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x20> GTPDBR_;
-		static  GTPDBR_ GTPDBR;
+		static inline rw16_t<base + 0x20> GTPDBR;
 
 
 		//-----------------------------------------------------------------//
@@ -1107,10 +962,8 @@ namespace device {
 			@brief  A/D 変換開始要求タイミングレジスタｍ (GTADTRm)(m=A, B)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x24> GTADTRA_;
-		static  GTADTRA_ GTADTRA;
-		typedef rw16_t<base + 0x2C> GTADTRB_;
-		static  GTADTRB_ GTADTRB;
+		static inline rw16_t<base + 0x24> GTADTRA;
+		static inline rw16_t<base + 0x2C> GTADTRB;
 
 
 		//-----------------------------------------------------------------//
@@ -1118,10 +971,8 @@ namespace device {
 			@brief  A/D 変換開始要求タイミングバッファレジスタｍ (GTADTBRm)(m=A, B)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x26> GTADTBRA_;
-		static  GTADTBRA_ GTADTBRA;
-		typedef rw16_t<base + 0x2E> GTADTBRB_;
-		static  GTADTBRB_ GTADTBRB;
+		static inline rw16_t<base + 0x26> GTADTBRA;
+		static inline rw16_t<base + 0x2E> GTADTBRB;
 
 
 		//-----------------------------------------------------------------//
@@ -1129,10 +980,8 @@ namespace device {
 			@brief  A/D 変換開始要求タイミングダブルバッファレジスタｍ (GTADTDBRm)(m=A, B)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x28> GTADTDBRA_;
-		static  GTADTDBRA_ GTADTDBRA;
-		typedef rw16_t<base + 0x30> GTADTDBRB_;
-		static  GTADTDBRB_ GTADTDBRB;
+		static inline rw16_t<base + 0x28> GTADTDBRA;
+		static inline rw16_t<base + 0x30> GTADTDBRB;
 
 
 		//-----------------------------------------------------------------//
@@ -1161,8 +1010,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B14>   OAE;
 			bit_rw_t< io_, bitpos::B15>   OBE;
 		};
-		typedef gtoncr_t<base + 0x34> GTONCR_;
-		static  GTONCR_ GTONCR;
+		static inline gtoncr_t<base + 0x34> GTONCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1184,8 +1032,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B5>  TDBDE;
 			bit_rw_t< io_, bitpos::B8>  TDFER;
 		};
-		typedef gtdtcr_t<base + 0x36> GTDTCR_;
-		static  GTDTCR_ GTDTCR;
+		static inline gtdtcr_t<base + 0x36> GTDTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1193,10 +1040,8 @@ namespace device {
 			@brief  汎用 PWM タイマデッドタイム値レジスタｍ (GTDVm)(m=U, D)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x38> GTDVU_;
-		static  GTDVU_ GTDVU;
-		typedef rw16_t<base + 0x3A> GTDVD_;
-		static  GTDVD_ GTDVD;
+		static inline rw16_t<base + 0x38> GTDVU;
+		static inline rw16_t<base + 0x3A> GTDVD;
 
 
 		//-----------------------------------------------------------------//
@@ -1204,10 +1049,8 @@ namespace device {
 			@brief  汎用 PWM タイマデッドタイムバッファレジスタｍ (GTDBm)(m=U, D)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw16_t<base + 0x3C> GTDBU_;
-		static  GTDBU_ GTDBU;
-		typedef rw16_t<base + 0x3E> GTDBD_;
-		static  GTDBD_ GTDBD;
+		static inline rw16_t<base + 0x3C> GTDBU;
+		static inline rw16_t<base + 0x3E> GTDBD;
 
 
 		//-----------------------------------------------------------------//
@@ -1226,8 +1069,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  SOS;
 		};
-		typedef gtsos_t<base + 0x40> GTSOS_;
-		static  GTSOS_ GTSOS;
+		static inline gtsos_t<base + 0x40> GTSOS;
 
 
 		//-----------------------------------------------------------------//
@@ -1246,40 +1088,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  SOTR;
 		};
-		typedef gtsos_t<base + 0x42> GTSOTR_;
-		static  GTSOTR_ GTSOTR;
+		static inline gtsos_t<base + 0x42> GTSOTR;
 	};
-	template <uint32_t base> typename gptn_t<base>::GTIOR_ gptn_t<base>::GTIOR;
-	template <uint32_t base> typename gptn_t<base>::GTINTAD_ gptn_t<base>::GTINTAD;
-	template <uint32_t base> typename gptn_t<base>::GTCR_ gptn_t<base>::GTCR;
-	template <uint32_t base> typename gptn_t<base>::GTBER_ gptn_t<base>::GTBER;
-	template <uint32_t base> typename gptn_t<base>::GTUDC_ gptn_t<base>::GTUDC;
-	template <uint32_t base> typename gptn_t<base>::GTITC_ gptn_t<base>::GTITC;
-	template <uint32_t base> typename gptn_t<base>::GTST_ gptn_t<base>::GTST;
-	template <uint32_t base> typename gptn_t<base>::GTCNT_ gptn_t<base>::GTCNT;
-	template <uint32_t base> typename gptn_t<base>::GTCCRA_ gptn_t<base>::GTCCRA;
-	template <uint32_t base> typename gptn_t<base>::GTCCRB_ gptn_t<base>::GTCCRB;
-	template <uint32_t base> typename gptn_t<base>::GTCCRC_ gptn_t<base>::GTCCRC;
-	template <uint32_t base> typename gptn_t<base>::GTCCRD_ gptn_t<base>::GTCCRD;
-	template <uint32_t base> typename gptn_t<base>::GTCCRE_ gptn_t<base>::GTCCRE;
-	template <uint32_t base> typename gptn_t<base>::GTCCRF_ gptn_t<base>::GTCCRF;
-	template <uint32_t base> typename gptn_t<base>::GTPR_ gptn_t<base>::GTPR;
-	template <uint32_t base> typename gptn_t<base>::GTPBR_ gptn_t<base>::GTPBR;
-	template <uint32_t base> typename gptn_t<base>::GTPDBR_ gptn_t<base>::GTPDBR;
-	template <uint32_t base> typename gptn_t<base>::GTADTRA_ gptn_t<base>::GTADTRA;
-	template <uint32_t base> typename gptn_t<base>::GTADTRB_ gptn_t<base>::GTADTRB;
-	template <uint32_t base> typename gptn_t<base>::GTADTBRA_ gptn_t<base>::GTADTBRA;
-	template <uint32_t base> typename gptn_t<base>::GTADTBRB_ gptn_t<base>::GTADTBRB;
-	template <uint32_t base> typename gptn_t<base>::GTADTDBRA_ gptn_t<base>::GTADTDBRA;
-	template <uint32_t base> typename gptn_t<base>::GTADTDBRB_ gptn_t<base>::GTADTDBRB;
-	template <uint32_t base> typename gptn_t<base>::GTONCR_ gptn_t<base>::GTONCR;
-	template <uint32_t base> typename gptn_t<base>::GTDTCR_ gptn_t<base>::GTDTCR;
-	template <uint32_t base> typename gptn_t<base>::GTDVU_ gptn_t<base>::GTDVU;
-	template <uint32_t base> typename gptn_t<base>::GTDVD_ gptn_t<base>::GTDVD;
-	template <uint32_t base> typename gptn_t<base>::GTDBU_ gptn_t<base>::GTDBU;
-	template <uint32_t base> typename gptn_t<base>::GTDBD_ gptn_t<base>::GTDBD;
-	template <uint32_t base> typename gptn_t<base>::GTSOS_ gptn_t<base>::GTSOS;
-	template <uint32_t base> typename gptn_t<base>::GTSOTR_ gptn_t<base>::GTSOTR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1307,8 +1117,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  SOTR;
 		};
-		typedef gtdlycr_t<0x000C'2300 + (chno * 2)> GTDLYCR_;
-		static GTDLYCR_ GTDLYCR;
+		static inline gtdlycr_t<0x000C'2300 + (chno * 2)> GTDLYCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1327,8 +1136,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>  DLY;
 		};
-		typedef gtdlyrx_t<0x000C'2318 + (chno * 2)> GTDLYRA_;
-		static GTDLYRA_ GTDLYRA;
+		static inline gtdlyrx_t<0x000C'2318 + (chno * 2)> GTDLYRA;
 
 
 		//-----------------------------------------------------------------//
@@ -1337,8 +1145,7 @@ namespace device {
 			@param[in]	ofs		オフセット・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef gtdlyrx_t<0x000C'2328 + (chno * 2)> GTDLYFA_;
-		static GTDLYFA_ GTDLYFA;
+		static inline gtdlyrx_t<0x000C'2328 + (chno * 2)> GTDLYFA;
 
 
 		//-----------------------------------------------------------------//
@@ -1347,8 +1154,7 @@ namespace device {
 			@param[in]	ofs		オフセット・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef gtdlyrx_t<0x000C'231A + (chno * 2)> GTDLYRB_;
-		static GTDLYRB_ GTDLYRB;
+		static inline gtdlyrx_t<0x000C'231A + (chno * 2)> GTDLYRB;
 
 
 		//-----------------------------------------------------------------//
@@ -1357,14 +1163,8 @@ namespace device {
 			@param[in]	ofs		オフセット・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		typedef gtdlyrx_t<0x000C'232A + (chno * 2)> GTDLYFB_;
-		static GTDLYFB_ GTDLYFB;
+		static inline gtdlyrx_t<0x000C'232A + (chno * 2)> GTDLYFB;
 	};
-	template <uint32_t chno> typename gptm_t<chno>::GTDLYCR_ gptm_t<chno>::GTDLYCR;
-	template <uint32_t chno> typename gptm_t<chno>::GTDLYRA_ gptm_t<chno>::GTDLYRA;
-	template <uint32_t chno> typename gptm_t<chno>::GTDLYFA_ gptm_t<chno>::GTDLYFA;
-	template <uint32_t chno> typename gptm_t<chno>::GTDLYRB_ gptm_t<chno>::GTDLYRB;
-	template <uint32_t chno> typename gptm_t<chno>::GTDLYFB_ gptm_t<chno>::GTDLYFB;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
