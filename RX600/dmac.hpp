@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	DMA コントローラ（DMACa）
+		@brief	DMA コントローラ（DMACAa/DMACAb）
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	ivec	割り込みベクター
@@ -206,7 +206,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4>   DTIF;
 
-			bit_rw_t<io_, bitpos::B7>   ACT;
+			bit_ro_t<io_, bitpos::B7>   ACT;
 		};
 		static inline dmsts_t<base + 0x1E> DMSTS;
 

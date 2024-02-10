@@ -236,6 +236,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B1,  3>  UHACI;
+
 			bits_rw_t<io_, bitpos::B16, 8>  HITI;
 		};
 		static inline mhiti_t<0x0008'6528> MHIHI;
@@ -256,6 +257,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B1,  3>  UHACD;
+
 			bits_rw_t<io_, bitpos::B16, 8>  HITD;
 		};
 		static inline mhitd_t<0x0008'6528> MHITD;

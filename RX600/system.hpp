@@ -198,6 +198,186 @@ namespace device {
 		};
 		static inline syscr1_t<0x0008'0008> SYSCR1;
 
+#if defined(SIG_RX671)
+		//----  バッテリバックアップ機能  ----------------------------------------//
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バックアップ領域電源ステータスレジスタ (BKPSR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct bkpsr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     PDDF;
+		};
+		static inline bkpsr_t<0x0008'CC46> BKPSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパステータスレジスタ (TAMPSR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampsr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     TAMP0F;
+			bit_rw_t <io_, bitpos::B1>     TAMP1F;
+			bit_rw_t <io_, bitpos::B2>     TAMP2F;
+		};
+		static inline tampsr_t<0x0008'CC48> TAMPSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパ制御レジスタ (TAMPCR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     TAMP0IE;
+			bit_rw_t <io_, bitpos::B1>     TAMP1IE;
+			bit_rw_t <io_, bitpos::B2>     TAMP2IE;
+
+			bit_rw_t <io_, bitpos::B4>     TAMP0EE;
+			bit_rw_t <io_, bitpos::B5>     TAMP1EE;
+			bit_rw_t <io_, bitpos::B6>     TAMP2EE;
+		};
+		static inline tampcr_t<0x0008'CC49> TAMPCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  時間キャプチャイベント制御レジスタ (TCECR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tcecr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     TCE0S;
+			bit_rw_t <io_, bitpos::B1>     TCE1S;
+			bit_rw_t <io_, bitpos::B2>     TCE2S;
+		};
+		static inline tcecr_t<0x0008'CC4A> TCECR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパ /RTCIC 入力制御レジスタ 1 (TAMPICR1)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampicr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     CH0EN;
+			bit_rw_t <io_, bitpos::B1>     CH1EN;
+			bit_rw_t <io_, bitpos::B2>     CH2EN;
+		};
+		static inline tampicr1_t<0x0008'CC4C> TAMPICR1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパ /RTCIC 入力制御レジスタ 2 (TAMPICR2)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampicr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     CH0NFE;
+			bit_rw_t <io_, bitpos::B1>     CH1NFE;
+			bit_rw_t <io_, bitpos::B2>     CH2NFE;
+
+			bit_rw_t <io_, bitpos::B4>     CH0TRG;
+			bit_rw_t <io_, bitpos::B5>     CH1TRG;
+			bit_rw_t <io_, bitpos::B6>     CH2TRG;
+		};
+		static inline tampicr2_t<0x0008'CC4D> TAMPICR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパ /RTCIC 入力モニタレジスタ (TAMPIMR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampimr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     CH0LVL;
+			bit_rw_t <io_, bitpos::B1>     CH1LVL;
+			bit_rw_t <io_, bitpos::B2>     CH2LVL;
+		};
+		static inline tampimr_t<0x0008'CC4E> TAMPIMR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バックアップレジスタ n (BKR[n]) (n = 0 ～ 127)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct bkr_t : public rw8_index_t<ofs> {
+			typedef rw8_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j <= 127) { io_::index = j; } }
+
+			bkr_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		static inline bkr_t<0x0008'CE00> BKR;
+#endif
+
 		//----  クロック発生回路  -----------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

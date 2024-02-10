@@ -1,7 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・DOCA 定義
+	@brief	RX600 グループ・DOCA 定義 @n
+			RX26T @n
+			RX671
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -119,5 +121,5 @@ namespace device {
 		static constexpr auto INTRV = vec;			///< 割り込みベクター
 
 	};
-	typedef doca_bl0_t<0x000A'0580, peripheral::DOCA, ICU::GROUPBL0::DOPCI> DOC;
+	typedef doca_bl0_t<0x000A'0580, peripheral::DOC, ICU::GROUPBL0::DOPCI> DOC;
 }

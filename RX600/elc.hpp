@@ -46,7 +46,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  イベントリンク設定レジスタ n（ELSRn） @n
-					（n = 0、3、4、7、10 ～ 13、15、16、18 ～ 28、33、35 ～ 38、41 ～ 45）
+					（n = 0、3、4、7、10 ～ 15、16、18 ～ 28、33、35 ～ 38、41 ～ 45）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<base + 0x01>  ELSR0;
@@ -58,7 +58,7 @@ namespace device {
 		static inline rw8_t<base + 0x0C>  ELSR11;
 		static inline rw8_t<base + 0x0D>  ELSR12;
 		static inline rw8_t<base + 0x0E>  ELSR13;
-
+		static inline rw8_t<base + 0x0F>  ELSR14;
 		static inline rw8_t<base + 0x10>  ELSR15;
 		static inline rw8_t<base + 0x11>  ELSR16;
 
@@ -406,5 +406,5 @@ namespace device {
 		};
 		static inline elsegr_t<base + 0x2D> ELSEGR;
 	};
-	static inline elc_t<0x0008'B100, peripheral::ELC> ELC;
+	typedef elc_t<0x0008'B100, peripheral::ELC> ELC;
 }

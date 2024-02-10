@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ　DTCa 定義
+	@brief	RX600 グループ　DTCa, DTCb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,10 +14,12 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  データトランスファコントローラ・クラス
+		@brief  DTCa データトランスファコントローラ・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct dtc_base_t {
+	struct dtca_t {
+
+		static constexpr auto PERIPHERAL = peripheral::DTC;	///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -102,15 +104,13 @@ namespace device {
 		static inline dtcsts_t<0x0008'240E> DTCSTS;
 	};
 
-#if defined(SIG_RX140)
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  データトランスファコントローラ・クラス
+		@brief  DTCb データトランスファコントローラ・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct dtc_t : public dtc_base_t {
-
-		static constexpr auto PERIPHERAL = peripheral::DTC;	///< ペリフェラル型
+	struct dtcb_t : public dtca_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -168,18 +168,9 @@ namespace device {
 		static inline rw32_t<0x0008'2418> DTCDISP;
 	};
 
+#if defined(SIG_RX140) || defined(SIG_RX671)
+	typedef dtcb_t DTC;
 #else
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  データトランスファコントローラ・クラス
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct dtc_t : public dtc_base_t {
-
-		static constexpr auto PERIPHERAL = peripheral::DTC;	///< ペリフェラル型
-
-	};
+	typedef dtca_t DTC;
 #endif
-
-	typedef dtc_t DTC;
 }
