@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX231 グループ・ポート・マッピング
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -280,6 +280,166 @@ namespace device {
 			return true;
 		}
 
+
+		static bool sdhi_1st_(SDHI_STATE state, bool wp) noexcept
+		{
+			// CLK: PB1
+			// CMD: PB0
+			// D0:  PC3
+			// D1:  PB6
+			// D2:  PB7
+			// D3:  PC2
+			// CD:  PB5
+			// WP:  PB3
+			bool ret = true;
+			bool enable = true;
+			uint8_t sel = enable ? 0b01'1010 : 0;
+			switch(state) {
+			case SDHI_STATE::START:
+				if(wp) {
+					PORTB::PMR.B3 = 0;
+					MPC::PB3PFS.PSEL = sel;  // SDHI_WP
+					PORTB::PMR.B3 = enable;
+				}
+				PORTB::PMR.B5 = 0;
+				MPC::PB5PFS.PSEL = sel;  // SDHI_CD
+				PORTB::PMR.B5 = enable;
+				break;
+
+			case SDHI_STATE::INSERT:
+				PORTB::PMR.B1 = 0;
+				MPC::PB1PFS.PSEL = sel;  // SDHI_CLK
+				PORTB::PMR.B1 = enable;
+				PORTB::PMR.B0 = 0;
+				MPC::PB0PFS.PSEL = sel;  // SDHI_CMD
+				PORTB::PMR.B0 = enable;
+				break;
+			case SDHI_STATE::BUS:
+				PORTC::PMR.B3 = 0;
+				MPC::PC3PFS.PSEL = sel;  // SDHI_D0
+				PORTC::PMR.B3 = enable;
+				PORTB::PMR.B6 = 0;
+				MPC::PB6PFS.PSEL = sel;  // SDHI_D1
+				PORTB::PMR.B6 = enable;
+				PORTB::PMR.B7 = 0;
+				MPC::PB7PFS.PSEL = sel;  // SDHI_D2
+				PORTB::PMR.B7 = enable;
+				PORTC::PMR.B2 = 0;
+				MPC::PC2PFS.PSEL = sel;  // SDHI_D3
+				PORTC::PMR.B2 = enable;
+				break;
+
+			case SDHI_STATE::DESTROY:
+				sel = 0;
+				enable = 0;
+				if(wp) {
+					MPC::PB3PFS.PSEL = sel;  // SDHI_WP
+					PORTB::PMR.B3 = enable;
+				}
+				MPC::PB5PFS.PSEL = sel;  // SDHI_CD
+				PORTB::PMR.B5 = enable;
+			case SDHI_STATE::EJECT:
+				sel = 0;
+				enable = 0;
+				MPC::PB1PFS.PSEL = sel;  // SDHI_CLK
+				PORTB::PMR.B1 = enable;
+				MPC::PB0PFS.PSEL = sel;  // SDHI_CMD
+				PORTB::PMR.B0 = enable;
+				MPC::PC3PFS.PSEL = sel;  // SDHI_D0
+				PORTB::PMR.B6 = enable;
+				MPC::PB6PFS.PSEL = sel;  // SDHI_D1
+				PORTB::PMR.B6 = enable;
+				MPC::PB7PFS.PSEL = sel;  // SDHI_D2
+				PORTB::PMR.B7 = enable;
+				MPC::PC2PFS.PSEL = sel;  // SDHI_D3
+				PORTC::PMR.B2 = enable;
+				break;
+			default:
+				ret = false;
+			}
+			return ret;
+		}
+
+
+		static bool sdhi_2nd_(SDHI_STATE state, bool wp) noexcept
+		{
+			// CLK: PB1
+			// CMD: PB0
+			// D0:  PC3
+			// D1:  PC4
+			// D2:  PB7
+			// D3:  PC2
+			// CD:  PB5
+			// WP:  PB3
+			bool ret = true;
+			bool enable = true;
+			uint8_t sel = enable ? 0b01'1010 : 0;
+			switch(state) {
+			case SDHI_STATE::START:
+				if(wp) {
+					PORTB::PMR.B3 = 0;
+					MPC::PB3PFS.PSEL = sel;  // SDHI_WP
+					PORTB::PMR.B3 = enable;
+				}
+				PORTB::PMR.B5 = 0;
+				MPC::PB5PFS.PSEL = sel;  // SDHI_CD
+				PORTB::PMR.B5 = enable;
+				break;
+
+			case SDHI_STATE::INSERT:
+				PORTB::PMR.B1 = 0;
+				MPC::PB1PFS.PSEL = sel;  // SDHI_CLK
+				PORTB::PMR.B1 = enable;
+				PORTB::PMR.B0 = 0;
+				MPC::PB0PFS.PSEL = sel;  // SDHI_CMD
+				PORTB::PMR.B0 = enable;
+				break;
+			case SDHI_STATE::BUS:
+				PORTC::PMR.B3 = 0;
+				MPC::PC3PFS.PSEL = sel;  // SDHI_D0
+				PORTC::PMR.B3 = enable;
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = sel;  // SDHI_D1
+				PORTC::PMR.B4 = enable;
+				PORTB::PMR.B7 = 0;
+				MPC::PB7PFS.PSEL = sel;  // SDHI_D2
+				PORTB::PMR.B7 = enable;
+				PORTC::PMR.B2 = 0;
+				MPC::PC2PFS.PSEL = sel;  // SDHI_D3
+				PORTC::PMR.B2 = enable;
+				break;
+
+			case SDHI_STATE::DESTROY:
+				sel = 0;
+				enable = 0;
+				if(wp) {
+					MPC::PB3PFS.PSEL = sel;  // SDHI_WP
+					PORTB::PMR.B3 = enable;
+				}
+				MPC::PB5PFS.PSEL = sel;  // SDHI_CD
+				PORTB::PMR.B5 = enable;
+			case SDHI_STATE::EJECT:
+				sel = 0;
+				enable = 0;
+				MPC::PB1PFS.PSEL = sel;  // SDHI_CLK
+				PORTB::PMR.B1 = enable;
+				MPC::PB0PFS.PSEL = sel;  // SDHI_CMD
+				PORTB::PMR.B0 = enable;
+				MPC::PC3PFS.PSEL = sel;  // SDHI_D0
+				PORTC::PMR.B3 = enable;
+				MPC::PC4PFS.PSEL = sel;  // SDHI_D1
+				PORTC::PMR.B4 = enable;
+				MPC::PB7PFS.PSEL = sel;  // SDHI_D2
+				PORTB::PMR.B7 = enable;
+				MPC::PC2PFS.PSEL = sel;  // SDHI_D3
+				PORTC::PMR.B2 = enable;
+				break;
+
+			default:
+				ret = false;
+			}
+			return ret;
+		}
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -315,6 +475,58 @@ namespace device {
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SDHI ポート専用切り替え
+			@param[in]	state	SHDI シチュエーション
+			@param[in]	odr		ポート・マップ・オーダー
+			@param[in]	wp		WP 端子を利用する場合「true」
+			@return 無効な周辺機器の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn_sdhi(SDHI_STATE state, ORDER odr = ORDER::FIRST, bool wp = false) noexcept
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				ret = sdhi_1st_(state, wp);
+				break;
+			case ORDER::SECOND:
+				ret = sdhi_2nd_(state, wp);
+				break;
+			default:
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SDHI クロック・ポートの状態を取得
+			@param[in]	odr		ポート・マップ・オーダー
+			@return SDHI クロック・ポートの状態
+		*/
+		//-----------------------------------------------------------------//
+		static bool probe_sdhi_clock(ORDER odr) noexcept
+		{
+			bool ret = 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				ret = PORTB::PIDR.B1();
+				break;
+			default:
+				break;
+			}
 			return ret;
 		}
 	};

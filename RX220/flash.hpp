@@ -181,8 +181,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fentryr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
+		struct fentryr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;

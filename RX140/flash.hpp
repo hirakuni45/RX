@@ -21,7 +21,7 @@ namespace device {
 
 		static constexpr auto DATA_SIZE = 4096;
 //		static constexpr auto DATA_SIZE = 8192;
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 1024;
 		static constexpr uint32_t DATA_WORD_SIZE = 1;
 		static constexpr auto ID_NUM = 4;
 
