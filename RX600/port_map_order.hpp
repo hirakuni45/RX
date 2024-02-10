@@ -18,8 +18,8 @@ namespace device {
 		@brief  ポート・マッピング・オーダー型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map_order {
-    public:
+	struct port_map_order {
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ポート・マッピング・オーダー型
@@ -57,25 +57,6 @@ namespace device {
 
 			LOCAL0,			///< 独自の特殊な設定０
 			LOCAL1,			///< 独自の特殊な設定１
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  SCI ポート・マッピング・グループ @n
-					CTS/RTS はどちらか片方しか利用出来ない
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct sci_port_t {
-			ORDER		cts_;	///< CTSx 端子の選択権
-			ORDER		rts_;	///< RTSx 端子の選択権
-			ORDER		rxd_;	///< RXDx 端子の選択権
-			ORDER		sck_;	///< SCKx 端子の選択権
-			ORDER		txd_;	///< TXDx 端子の選択権
-			constexpr sci_port_t(ORDER rxd = ORDER::BYPASS, ORDER txd = ORDER::BYPASS) noexcept :
-				cts_(ORDER::BYPASS), rts_(ORDER::BYPASS),
-				rxd_(rxd),  sck_(ORDER::BYPASS),  txd_(txd)
-			{ }
 		};
 
 
@@ -163,6 +144,41 @@ namespace device {
 			WOL,			///< WOL output
 			MDC,			///< MDC output
 			MDIO,			///< MDIO input/output
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  SDHI ステート型 @n
+					SDHI ポートの状態に応じたグループ・マッピング
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class SDHI_STATE : uint8_t {
+			START,		///< 開始時（カード挿入を待っている状態）
+ 			INSERT,		///< カード挿入時（カードが挿入された時）
+			BUS,		///< カードのバスを有効にする
+			EJECT,		///< カード排出時（カードが排出された時）
+			DESTROY,	///< カード廃止
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  SCI ポート・マッピング・グループ @n
+					CTS/RTS はどちらか片方しか利用出来ない
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct sci_port_t {
+			ORDER		cts_;	///< CTSx 端子の選択権
+			ORDER		rts_;	///< RTSx 端子の選択権
+			ORDER		sck_;	///< SCKx 端子の選択権
+			ORDER		rxd_;	///< RXDx 端子の選択権
+			ORDER		txd_;	///< TXDx 端子の選択権
+			constexpr sci_port_t(ORDER rxd = ORDER::BYPASS, ORDER txd = ORDER::BYPASS) noexcept :
+				cts_(ORDER::BYPASS), rts_(ORDER::BYPASS),
+				sck_(ORDER::BYPASS),
+				rxd_(rxd), txd_(txd)
+			{ }
 		};
 
 

@@ -1,7 +1,11 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX631/RX63N/RX64M/RX71M/RX65N グループ PPG 定義
+	@brief	RX600 グループ PPG 定義 @n
+			RX631/RX63N @n
+			RX64M/RX71M @n
+			RX651/RX65N @n
+			RX671 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

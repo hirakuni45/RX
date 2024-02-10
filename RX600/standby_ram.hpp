@@ -19,11 +19,12 @@ namespace device {
 		@brief  スタンバイＲＡＭアクセス・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t size>
 	class standby_ram {
 	public:
 
 		static constexpr uint32_t TOP  = 0x000A'4000;  ///< RAM 開始アドレス
-		static constexpr uint32_t SIZE = 8192;  	   ///< RAM サイズ
+		static constexpr uint32_t SIZE = size;  	   ///< RAM サイズ
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -183,4 +184,9 @@ namespace device {
 			return len;
 		}
 	};
+#if defined(SIG_RX671)
+	typedef standby_ram<4096> STANDBY_RAM;
+#else
+	typedef standby_ram<8192> STANDBY_RAM;
+	#endif
 }

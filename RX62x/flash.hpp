@@ -19,10 +19,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t {
 
-		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
-		static constexpr uint32_t DATA_FLASH_SIZE = 32768;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_FLASH_BLOCK = 2048;		///< データ・フラッシュ、ブロックサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 2;			///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
+		static constexpr uint32_t DATA_SIZE = 32768;		///< データ・フラッシュ、サイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 2;		///< データ・フラッシュ最小書き込みサイズ
 
 		static constexpr auto ID_NUM = 0;						///< 個別識別子数
 
@@ -481,8 +481,8 @@ namespace device {
 			@brief  FCU E2 データフラッシュコマンドレジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw8_t<DATA_FLASH_ORG> FCU_DATA_CMD8;
-		static inline rw16_t<DATA_FLASH_ORG> FCU_DATA_CMD16;
+		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
+		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
 
 
 		//-----------------------------------------------------------------//

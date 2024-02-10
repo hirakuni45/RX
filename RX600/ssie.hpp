@@ -32,7 +32,6 @@ namespace device {
 		static constexpr auto RX_VEC = rxi;		///< 受信データフル割り込みベクタ
 		static constexpr auto SS_VEC = ssie;	///< ステータス割り込みベクタ
 
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  制御レジスタ（ SSICR ）
@@ -213,8 +212,10 @@ namespace device {
 		static inline ssiscr_t<base + 0x24> SSISCR;
 	};
 
-
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX671) 
+	typedef ssie_t<0x0008'A500, peripheral::SSIE0,
+		ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::GROUPBL1::SSIF0> SSIE0;
+#elif defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef ssie_t<0x0008'A500, peripheral::SSIE0,
 		ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::GROUPBL1::SSIF0> SSIE0;
 	typedef ssie_t<0x0008'A540, peripheral::SSIE1,

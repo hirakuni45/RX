@@ -27,7 +27,7 @@ namespace {
 
 	utils::command<64> command_;
 
-	typedef utils::log_man<device::standby_ram> LOG_MAN;
+	typedef utils::log_man<device::STANDBY_RAM> LOG_MAN;
 	LOG_MAN		log_man_;
 }
 

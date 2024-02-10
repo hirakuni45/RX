@@ -383,8 +383,6 @@ namespace device {
 			S12GBADI1	= 69,	///< S12AD1 (グループ B A/D変換終了割り込み)
 			S12GCADI1	= 70,	///< S12AD1 (グループ C A/D変換終了割り込み)
 
-			RNGEND = 76,	///< RNG (完了割り込み)
-
 			ELSR18I = 79,	///< ELC (ELC割り込み)
 			ELSR19I,		///< ELC (ELC割り込み)
 
@@ -399,6 +397,10 @@ namespace device {
 			RDRDY1,			///< TSIP (リードレディ 1)
 			INTEGRATE_WRRDY,	///< TSIP (インテグレートライトレディ )
 			INTEGRATE_RDRDY,	///< TSIP (インテグレートリードレディ )
+
+			CTSUWR = 96,	///< CTSU (チャネルごとの設定レジスタ書き込み要求)
+			CTSURD,			///< CTSU (測定データ転送要求)
+			CTSUFN,			///< CTSU (測定終了)
 		};
 
 
@@ -462,8 +464,23 @@ namespace device {
 			TGID8,		///< MTU8（TGRDのインプットキャプチャ /コンペアマッチ）
 			TCIV8,		///< MTU8（TCNTのオーバフロー）
 
-			AESRDY = 88,	///< AES (暗号/復号準備完了)
-			AESEND,			///< AES (暗号/復号準備完了)
+			SPCI = 90,	///< RSPIA0 (通信完了)
+			SPCI0,		///< RSPI0 (通信完了)
+			SPCI1,		///< RSPI1 (通信完了)
+			SPCI2,		///< RSPI2 (通信完了)
+			AED10,		///< RSCI10 (有効エッジ検出)
+			AED11,		///< RSCI11 (有効エッジ検出)
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPIE0・ベクター型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class GROUPIE0 : uint8_t {
+			DPFPUEX,	///< DPFPU (倍精度浮動小数点例外)
+			NUM_ = 1
 		};
 
 

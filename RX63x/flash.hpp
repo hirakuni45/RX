@@ -4,7 +4,7 @@
 	@brief	RX631/RX63N グループ・フラッシュ 定義 @n
 			G バージョン時「G_VERSION」を有効にする。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -20,10 +20,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t {
 
-		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
-		static constexpr uint32_t DATA_FLASH_SIZE = 32768;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_FLASH_BLOCK = 2048;		///< データ・フラッシュ、ブロックサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 2;			///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
+		static constexpr uint32_t DATA_SIZE = 32768;		///< データ・フラッシュ、サイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 2;		///< データ・フラッシュ最小書き込みサイズ
 
 #ifdef G_VERSION
 		static constexpr auto ID_NUM = 4;						///< 個別識別子数（Gバージョン）
@@ -486,8 +486,8 @@ namespace device {
 			@brief  FCU E2 データフラッシュコマンドレジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw8_t<DATA_FLASH_ORG> FCU_DATA_CMD8;
-		static inline rw16_t<DATA_FLASH_ORG> FCU_DATA_CMD16;
+		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
+		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
 
 
 		//-----------------------------------------------------------------//

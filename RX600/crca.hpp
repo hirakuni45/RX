@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・CRCA 定義
+	@brief	RX600 グループ・CRCA 定義 @n
+			RX671
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -39,8 +40,8 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 3>  GPS;
-			bit_rw_t <io_, bitpos::B6>     LMS;
 
+			bit_rw_t <io_, bitpos::B6>     LMS;
 			bit_rw_t <io_, bitpos::B7>     DORCLR;
 		};
 		static inline crccr_t<base + 0x00> CRCCR;

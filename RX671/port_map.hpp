@@ -1,17 +1,17 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72N グループ・ポート・マッピング @n
+	@brief	RX671 グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化して設定 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX72N/peripheral.hpp"
-#include "RX72N/port.hpp"
-#include "RX72N/mpc.hpp"
+#include "RX671/peripheral.hpp"
+#include "RX671/port.hpp"
+#include "RX671/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -22,7 +22,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
-
+#if 0
 		static bool sub_1st_(peripheral t, bool enable, ORDER opt)
 		{
 			bool ret = true;
@@ -902,7 +902,7 @@ namespace device {
 			}
 			return ret;
 		}
-
+#endif
 
 		static bool sdhi_1st_(SDHI_STATE state) noexcept
 		{
@@ -954,6 +954,72 @@ namespace device {
 				MPC::P76PFS.PSEL = sel;  // SDHI_CMD (85)
 				PORT7::PMR.B7 = enable;
 				MPC::P77PFS.PSEL = sel;  // SDHI_CLK (84)
+				break;
+
+			default:
+				ret = false;
+			}
+			return ret;
+		}
+
+
+		static bool sdhi_2nd_(SDHI_STATE state) noexcept
+		{
+			bool ret = true;
+			bool enable = true;
+			uint8_t sel = 0b011010;
+			switch(state) {
+			case SDHI_STATE::START:
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
+				PORT2::PMR.B5 = enable;
+				break;
+
+			case SDHI_STATE::INSERT:
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = sel;  // SDHI_CMD-C P20(37)
+				PORT2::PMR.B0 = enable;
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = sel;  // SDHI_CLK-C P21(36)
+				PORT2::PMR.B1 = enable;
+				break;
+
+			case SDHI_STATE::BUS:
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // SDHI_D0-C  P22(35)
+				PORT2::PMR.B2 = enable;
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;  // SDHI_D1-C  P23(34)
+				PORT2::PMR.B3 = enable;
+				PORT8::PMR.B7 = 0;
+				MPC::P87PFS.PSEL = sel;  // SDHI_D2-C  P87(39)
+				PORT8::PMR.B7 = enable;
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = sel;  // SDHI_D3-C  P17(38)
+				PORT1::PMR.B7 = enable;
+				break;
+
+			case SDHI_STATE::DESTROY:
+				sel = 0;
+///				PORT2::PMR.B4 = 0;
+///				MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
+
+			case SDHI_STATE::EJECT:
+				sel = 0;
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = sel;  // SDHI_CMD-C P20(37)
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = sel;  // SDHI_CLK-C P21(36)
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // SDHI_D0-C  P22(35)
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;  // SDHI_D1-C  P23(34)
+				PORT8::PMR.B7 = 0;
+				MPC::P87PFS.PSEL = sel;  // SDHI_D2-C  P87(39)
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = sel;  // SDHI_D3-C  P17(38)
 				break;
 
 			default:
@@ -1032,6 +1098,7 @@ namespace device {
 		}
 
 	public:
+#if 0
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  USB ポート専用切り替え
@@ -1155,25 +1222,70 @@ namespace device {
 
 			return ret;
 		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+#endif
+		//-----------------------------------------------------------------//
 		/*!
-			@brief  SDHI ポート専用切り替え
-			@param[in]	state	SHDI 候補
-			@param[in]	order	ポート・マップ候補
+			@brief  周辺機器に切り替える
+			@param[in]	per	周辺機器タイプ
+			@param[in]	ena	無効にする場合「false」
+			@param[in]	odr	ポート・マップ・オーダー
 			@return 無効な周辺機器の場合「false」
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_sdhi(SDHI_STATE state, ORDER order = ORDER::FIRST) noexcept
+		//-----------------------------------------------------------------//
+		static bool turn(peripheral per, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
+		{
+			if(odr == ORDER::BYPASS) return false;
+
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = false;
+			switch(odr) {
+			case ORDER::FIRST:
+			case ORDER::FIRST_I2C:
+			case ORDER::FIRST_SPI:
+//				ret = sub_1st_(per, ena, odr);
+				break;
+			case ORDER::SECOND:
+			case ORDER::SECOND_I2C:
+			case ORDER::SECOND_SPI:
+//				ret = sub_2nd_(per, ena, odr);
+				break;
+			case ORDER::THIRD:
+			case ORDER::THIRD_I2C:
+			case ORDER::THIRD_SPI:
+//				ret = sub_3rd_(per, ena, odr);
+				break;
+			default:
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SDHI ポート専用切り替え
+			@param[in]	sit		SHDI 候補
+			@param[in]	odr		ポート・マップ候補
+			@return 無効な周辺機器の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn_sdhi(SDHI_STATE state, ORDER odr = ORDER::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = 0;
-			switch(order) {
+			switch(odr) {
 			case ORDER::FIRST:
 				ret = sdhi_1st_(state);
+				break;
+			case ORDER::SECOND:
+				ret = sdhi_2nd_(state);
 				break;
 			case ORDER::THIRD:
 				ret = sdhi_3rd_(state);
@@ -1187,91 +1299,30 @@ namespace device {
 		}
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief  SDHI クロック・ポートの状態を取得
-			@param[in]	order	ポート・マップ候補
+			@param[in]	odr		ポート・マップ候補
 			@return SDHI クロック・ポートの状態
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool probe_sdhi_clock(ORDER order) noexcept
+		//-----------------------------------------------------------------//
+		static bool probe_sdhi_clock(ORDER odr) noexcept
 		{
 			bool ret = 0;
-			switch(order) {
+			switch(odr) {
 			case ORDER::FIRST:
+				ret = PORT2::PIDR.B1();
+				break;
+			case ORDER::SECOND:
 				ret = PORT7::PIDR.B7();
 				break;
 			case ORDER::THIRD:
-				ret = PORT2::PIDR.B1();
+				ret = PORTD::PIDR.B5();
 				break;
 			default:
 				break;
 			}
 			return ret;
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  周辺機器に切り替える
-			@param[in]	per	周辺機器タイプ
-			@param[in]	ena	無効にする場合「false」
-			@param[in]	odr	ポート・マップ・オーダー
-			@return 無効な周辺機器の場合「false」
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
-		{
-			if(odr == ORDER::BYPASS) return false;
-
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			bool ret = false;
-			switch(odr) {
-			case ORDER::FIRST:
-			case ORDER::FIRST_I2C:
-			case ORDER::FIRST_SPI:
-				ret = sub_1st_(per, ena, odr);
-				break;
-			case ORDER::SECOND:
-			case ORDER::SECOND_I2C:
-			case ORDER::SECOND_SPI:
-				ret = sub_2nd_(per, ena, odr);
-				break;
-			case ORDER::THIRD:
-			case ORDER::THIRD_I2C:
-			case ORDER::THIRD_SPI:
-				ret = sub_3rd_(per, ena, odr);
-				break;
-			default:
-				break;
-			}
-
-			MPC::PWPR = MPC::PWPR.B0WI.b();
-
-			return ret;
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  CLKOUT25M 出力を許可する
-			@param[in]	ena	不許可にする場合「false」
-			@return 無効な周辺機器の場合「false」
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static void turn_CLKOUT25M(bool ena = true) noexcept
-		{
-			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			PORT5::PMR.B6 = 0;
-			uint8_t sel = ena ? 0b101010 : 0;			
-			MPC::P56PFS.PSEL = sel;
-			PORT5::PMR.B6 = ena;
-
-			MPC::PWPR = MPC::PWPR.B0WI.b();
 		}
 	};
 }

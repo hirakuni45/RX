@@ -7,7 +7,7 @@
 			144/120/112/100 ピン版： S12ADB0(4 CH), S12ADB1(4 CH) @n
 			64/48 ピン版： S12ADB(8 CH)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -32,7 +32,7 @@ namespace device {
 		typedef channels_t<ANALOG> CHANNELS;
 
 	private:
-		static TASK		task_;
+		static inline TASK	task_;
 
 		CHANNELS	channels_;
 

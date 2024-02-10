@@ -436,25 +436,31 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  シリアルペリフェラルインタフェースクラスＡ
+		@brief  シリアルペリフェラルインタフェースＡ クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	rxv		受信割り込みベクター
-		@param[in]	txv		送信割り込みベクター
+		@param[in]	spri	受信割り込みベクター
+		@param[in]	spti	送信割り込みベクター
+		@param[in]	spii	アイドル割り込み
+		@param[in]	spei	エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base, peripheral per, ICU::VECTOR spri, ICU::VECTOR spti, ICU::GROUPAL0 spii, ICU::GROUPAL0 spei>
 	struct rspia_t : public rspia_base_t<base> {
 
-		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
-		static constexpr auto SPTV = ICU::VECTOR::SPTI;		///< 受信割り込みベクター
-		static constexpr auto SPRV = ICU::VECTOR::SPRI;		///< 送信割り込みベクター
-		static constexpr auto SPIV = ICU::GROUPAL0::SPII;	///< RSPIA0 / SPII
-		static constexpr auto SPEV = ICU::GROUPAL0::SPEI;	///< RSPIA0 / SPEI
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto SPRI = spri;		///< 受信割り込みベクター
+		static constexpr auto SPTI = spti;		///< 送信割り込みベクター
+		static constexpr auto SPII = spii;		///< アイドル割り込み
+		static constexpr auto SPEI = spei;		///< エラー割り込み
 		static constexpr auto PCLK = clock_profile::PCLKA;	///< PCLK 周波数
 	};
 
 #if defined(SIG_RX26T)
-	typedef rspia_t<0x000E'2800, peripheral::RSPIA0> RSPIA0;
+	typedef rspia_t<0x000E'2800, peripheral::RSPIA0,
+		ICU::VECTOR::SPRI, ICU::VECTOR::SPTI, ICU::GROUPAL0::SPII, ICU::GROUPAL0::SPEI> RSPIA0;
+#elif defined(SIG_RX671)
+	typedef rspia_t<0x000E'2800, peripheral::RSPIA0,
+		ICU::VECTOR::SPARI0, ICU::VECTOR::SPATI0, ICU::GROUPAL0::SPII, ICU::GROUPAL0::SPEI> RSPIA0;
 #endif
 }

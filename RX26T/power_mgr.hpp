@@ -150,7 +150,7 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB4 = f;		// SCI12 のストップ状態解除
 				break;
 
-			case peripheral::DOCA:
+			case peripheral::DOC:
 				SYSTEM::MSTPCRB.MSTPB6 = f;		// DOC のストップ状態解除
 				break;
 

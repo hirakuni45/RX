@@ -1,7 +1,13 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX64M, RX71M, RX65[1N], RX66N, RX72[NM] EXDMAC 定義 (EXDMACa)
+	@brief	EXDMAC 定義 (EXDMACa) @n
+			RX621/RX62N @n
+			RX64M/RX71M @n
+			RX651/RX65N @n
+			RX671 @n
+			RX66N @n
+			RX72N/RX72M 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

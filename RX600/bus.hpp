@@ -33,17 +33,20 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>     EXENB;
-			bits_rw_t<io_, bitpos::B4, 2>  BSIZE;
+
+			bits_rw_t<io_, bitpos::B4, 2>  BSIZE;  // CS0CR の初期値が異なる
+
 			bit_rw_t <io_, bitpos::B8>     EMODE;
+
 			bit_rw_t <io_, bitpos::B12>    MPXEN;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csncr_t<0x0008'3802> CS0CR;
 		static inline csncr_t<0x0008'3812> CS1CR;
 		static inline csncr_t<0x0008'3822> CS2CR;
 		static inline csncr_t<0x0008'3832> CS3CR;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csncr_t<0x0008'3842> CS4CR;
 		static inline csncr_t<0x0008'3852> CS5CR;
 		static inline csncr_t<0x0008'3862> CS6CR;
@@ -65,15 +68,16 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 4> PRCV;
+
 			bits_rw_t<io_, bitpos::B8, 4> WRCV;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csncr_t<0x0008'380A> CS0REC;
 		static inline csncr_t<0x0008'381A> CS1REC;
 		static inline csncr_t<0x0008'382A> CS2REC;
 		static inline csncr_t<0x0008'383A> CS3REC;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csncr_t<0x0008'384A> CS4REC;
 		static inline csncr_t<0x0008'385A> CS5REC;
 		static inline csncr_t<0x0008'386A> CS6REC;
@@ -94,15 +98,14 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0> RCVEN0;
-			bit_rw_t<io_, bitpos::B1> RCVEN1;
-			bit_rw_t<io_, bitpos::B2> RCVEN2;
-			bit_rw_t<io_, bitpos::B3> RCVEN3;
-			bit_rw_t<io_, bitpos::B4> RCVEN4;
-			bit_rw_t<io_, bitpos::B5> RCVEN5;
-			bit_rw_t<io_, bitpos::B6> RCVEN6;
-			bit_rw_t<io_, bitpos::B7> RCVEN7;
-
+			bit_rw_t<io_, bitpos::B0>  RCVEN0;
+			bit_rw_t<io_, bitpos::B1>  RCVEN1;
+			bit_rw_t<io_, bitpos::B2>  RCVEN2;
+			bit_rw_t<io_, bitpos::B3>  RCVEN3;
+			bit_rw_t<io_, bitpos::B4>  RCVEN4;
+			bit_rw_t<io_, bitpos::B5>  RCVEN5;
+			bit_rw_t<io_, bitpos::B6>  RCVEN6;
+			bit_rw_t<io_, bitpos::B7>  RCVEN7;
 			bit_rw_t<io_, bitpos::B8>  RCVENM0;
 			bit_rw_t<io_, bitpos::B9>  RCVENM1;
 			bit_rw_t<io_, bitpos::B10> RCVENM2;
@@ -129,18 +132,21 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  WRMOD;
+
 			bit_rw_t<io_, bitpos::B3>  EWENB;
+
 			bit_rw_t<io_, bitpos::B8>  PRENB;
 			bit_rw_t<io_, bitpos::B9>  PWENB;
+
 			bit_rw_t<io_, bitpos::B15> PRMOD;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnmod_t<0x0008'3002> CS0MOD;
 		static inline csnmod_t<0x0008'3012> CS1MOD;
 		static inline csnmod_t<0x0008'3022> CS2MOD;
 		static inline csnmod_t<0x0008'3032> CS3MOD;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnmod_t<0x0008'3042> CS4MOD;
 		static inline csnmod_t<0x0008'3052> CS5MOD;
 		static inline csnmod_t<0x0008'3062> CS6MOD;
@@ -162,17 +168,20 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 3>  CSPWWAIT;
+
 			bits_rw_t<io_, bitpos::B8, 3>  CSPRWAIT;
+
 			bits_rw_t<io_, bitpos::B16, 5> CSWWAIT;
+
 			bits_rw_t<io_, bitpos::B24, 5> CSRWWAIT;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnwcr1_t<0x0008'3004> CS0WCR1;
 		static inline csnwcr1_t<0x0008'3014> CS1WCR1;
 		static inline csnwcr1_t<0x0008'3024> CS2WCR1;
 		static inline csnwcr1_t<0x0008'3034> CS3WCR1;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnwcr1_t<0x0008'3044> CS4WCR1;
 		static inline csnwcr1_t<0x0008'3054> CS5WCR1;
 		static inline csnwcr1_t<0x0008'3064> CS6WCR1;
@@ -194,21 +203,28 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0,  3> CSROFF;
+
 			bits_rw_t<io_, bitpos::B4,  3> CSWOFF;
+
 			bits_rw_t<io_, bitpos::B8,  3> WDOFF;
+
 			bits_rw_t<io_, bitpos::B12, 2> AWAIT;
+
 			bits_rw_t<io_, bitpos::B16, 3> RDON;
+
 			bits_rw_t<io_, bitpos::B20, 3> WRON;
+
 			bits_rw_t<io_, bitpos::B24, 3> WDON;
+
 			bits_rw_t<io_, bitpos::B28, 3> CSON;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnwcr2_t<0x0008'3008> CS0WCR2;
 		static inline csnwcr2_t<0x0008'3018> CS1WCR2;
 		static inline csnwcr2_t<0x0008'3028> CS2WCR2;
 		static inline csnwcr2_t<0x0008'3038> CS3WCR2;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnwcr2_t<0x0008'3048> CS4WCR2;
 		static inline csnwcr2_t<0x0008'3058> CS5WCR2;
 		static inline csnwcr2_t<0x0008'3068> CS6WCR2;
@@ -300,14 +316,14 @@ namespace device {
 			static inline csnwcr1_t<base + 0x0008> CSWCR2;
 		};
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline cs_t<0x0008'3000, 0xFF00'0000, 0xFFFF'FFFF> CS0;
 		static inline cs_t<0x0008'3010, 0x0700'0000, 0x07FF'FFFF> CS1;
 		static inline cs_t<0x0008'3020, 0x0600'0000, 0x06FF'FFFF> CS2;
 		static inline cs_t<0x0008'3030, 0x0500'0000, 0x05FF'FFFF> CS3;
 #endif
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline cs_t<0x0008'3040, 0x0400'0000, 0x04FF'FFFF> CS4;
 		static inline cs_t<0x0008'3050, 0x0300'0000, 0x03FF'FFFF> CS5;
 		static inline cs_t<0x0008'3060, 0x0200'0000, 0x02FF'FFFF> CS6;
@@ -315,7 +331,7 @@ namespace device {
 #endif
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDC 制御レジスタ（SDCCR）
@@ -330,6 +346,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>    EXENB;
+
 			bits_rw_t<io_, bitpos::B4, 2> BSIZE;
 		};
 		static inline sdccr_t<0x0008'3C00> SDCCR;
@@ -496,9 +513,11 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0,  3> CL;
+
 			bit_rw_t <io_, bitpos::B8>     WR;
 			bits_rw_t<io_, bitpos::B9,  3> RP;
 			bits_rw_t<io_, bitpos::B12, 2> RCD;
+
 			bits_rw_t<io_, bitpos::B16, 3> RAS;
 		};
 		static inline sdtr_t<0x0008'3C44> SDTR;
@@ -517,7 +536,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 14> MR;
+			bits_rw_t<io_, bitpos::B0, 15> MR;
 		};
 		static inline sdmod_t<0x0008'3C48> SDMOD;
 
@@ -536,6 +555,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> MRSST;
+
 			bit_rw_t<io_, bitpos::B3> INIST;
 			bit_rw_t<io_, bitpos::B4> SRFST;
 		};
