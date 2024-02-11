@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ルネサス RX ペリフェラル／デバイス選択
+	@brief	ルネサス RX マイコンシリーズ・ペリフェラル定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -361,16 +361,16 @@
 #include "RX600/sci_i.hpp"
 #include "RX600/sci_h.hpp"
 #include "RX600/rsci.hpp"
-// #include "RX600/riichs.hpp"
+#include "RX600/riichs.hpp"
 #include "RX600/can.hpp"
 #include "RX600/rspia.hpp"
 #include "RX600/qspix.hpp"
 #include "RX600/crca.hpp"
 #include "RX600/sdhi.hpp"
 #include "RX600/ssie.hpp"
-// #include "RX600/remc.hpp"
+#include "RX600/remc.hpp"
 #include "RX600/ctsu.hpp"
-// #include "RX600/s12adf.hpp"
+#include "RX600/s12adf.hpp"
 // #include "RX600/temps.hpp"
 #include "RX600/doca.hpp"
 #include "RX600/standby_ram.hpp"
@@ -381,7 +381,7 @@
 #include "RX600/rtc_io.hpp"
 #include "ff14/sdhi_io.hpp"
 #include "RX600/ssie_io.hpp"
-// #include "RX600/adc_in.hpp"
+#include "RX600/adc_in.hpp"
 #include "RX600/flash_io.hpp"
 #include "RX600/ether_io.hpp"
 

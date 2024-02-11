@@ -118,6 +118,8 @@ namespace device {
 			ALM         = 92,		///< RTC
 			PRD         = 93,
 
+			REMCI0		= 94,		///< REMC0
+
 			IWUNI       = 95,		///< IWDT
 
 			WUNI        = 96,		///< WDT
