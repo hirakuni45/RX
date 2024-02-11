@@ -1,7 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX651/RX65N/RX72N/RX72M グループ・S12ADFa 定義
+	@brief	RX600 グループ・S12ADFa 定義 @n
+			RX651/RX65N @n
+			RX671 (S12ADFa) @n
+			RX72N/RX72M 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -1964,6 +1967,670 @@ namespace device {
 		static inline adcmpser_t<base + 0xA4>  ADCMPSER;
 	};
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  S12ADa1 定義
+		@param[in]	base	ベース・アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct s12adfa1_t : public s12adf_base_t<base> {
+
+		typedef s12adf_base_t<base> BASE;
+
+		static constexpr auto PERIPHERAL = peripheral::S12AD1;		///< ペリフェラル型
+		static constexpr auto ADI		 = ICU::SELECTB::S12ADI1;	///< 変換終了割り込みベクター
+		static constexpr auto GBADI		 = ICU::SELECTB::S12GBADI1;	///< グループＢ変換終了割り込みベクター
+		static constexpr auto GCADI		 = ICU::SELECTB::S12GCADI1;	///< グループＣ変換終了割り込みベクター
+		static constexpr auto CMPAI		 = ICU::GROUPBL1::S12CMPAI1;	///< コンペアＡ割り込みベクター
+		static constexpr auto CMPBI		 = ICU::VECTOR::NONE;		///< コンペアＢ割り込みベクター
+
+		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
+		static constexpr uint32_t CONV_TIME_NS = 480;				///< A/D 入力 0.48uS、単位「ns」
+
+		static constexpr uint32_t ANALOG_NUM = 12;	///< アナログ入力数
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ANALOG : uint8_t {
+			AN100,
+			AN101,
+			AN102,
+			AN103,
+			AN104,
+			AN105,
+			AN106,
+			AN107,
+			AN108,
+			AN109,
+			AN110,
+			AN111,
+			TEMP,		///< 温度センサ
+			REF,		///< 内部基準電圧
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	ena	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(ANALOG an, bool ena = true) noexcept
+		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			switch(an) {
+			case ANALOG::AN100:
+				if(ena) {
+					PORTD::PDR.B7 = 0;
+					PORTD::PMR.B7 = 0;
+				}
+				MPC::PD7PFS.ASEL = ena;
+				break;
+			case ANALOG::AN101:
+				if(ena) {
+					PORTD::PDR.B6 = 0;
+					PORTD::PMR.B6 = 0;
+				}
+				MPC::PD6PFS.ASEL = ena;
+				break;
+			case ANALOG::AN102:
+				if(ena) {
+					PORTD::PDR.B5 = 0;
+					PORTD::PMR.B5 = 0;
+				}
+				MPC::PD5PFS.ASEL = ena;
+				break;
+			case ANALOG::AN103:
+				if(ena) {
+					PORTD::PDR.B4 = 0;
+					PORTD::PMR.B4 = 0;
+				}
+				MPC::PD4PFS.ASEL = ena;
+				break;
+			case ANALOG::AN104:
+				if(ena) {
+					PORTD::PDR.B3 = 0;
+					PORTD::PMR.B3 = 0;
+				}
+				MPC::PD3PFS.ASEL = ena;
+				break;
+			case ANALOG::AN105:
+				if(ena) {
+					PORTD::PDR.B2 = 0;
+					PORTD::PMR.B2 = 0;
+				}
+				MPC::PD2PFS.ASEL = ena;
+				break;
+			case ANALOG::AN106:
+				if(ena) {
+					PORTD::PDR.B1 = 0;
+					PORTD::PMR.B1 = 0;
+				}
+				MPC::PD1PFS.ASEL = ena;
+				break;
+			case ANALOG::AN107:
+				if(ena) {
+					PORTD::PDR.B0 = 0;
+					PORTD::PMR.B0 = 0;
+				}
+				MPC::PD0PFS.ASEL = ena;
+				break;
+			case ANALOG::AN108:
+				if(ena) {
+					PORT9::PDR.B0 = 0;
+					PORT9::PMR.B0 = 0;
+				}
+				MPC::P90PFS.ASEL = ena;
+				break;
+			case ANALOG::AN109:
+				if(ena) {
+					PORT0::PDR.B2 = 0;
+					PORT0::PMR.B2 = 0;
+				}
+				MPC::P02PFS.ASEL = ena;
+				break;
+			case ANALOG::AN110:
+				if(ena) {
+					PORT0::PDR.B1 = 0;
+					PORT0::PMR.B1 = 0;
+				}
+				MPC::P01PFS.ASEL = ena;
+				break;
+			case ANALOG::AN111:
+				if(ena) {
+					PORT0::PDR.B0 = 0;
+					PORT0::PMR.B0 = 0;
+				}
+				MPC::P00PFS.ASEL = ena;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 8（ADDR8）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro16_t<base + 0x30> ADDR8;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 9（ADDR9）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro16_t<base + 0x32> ADDR9;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 10（ADDR10）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro16_t<base + 0x34> ADDR10;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 11（ADDR11）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro16_t<base + 0x36> ADDR11;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D 温度センサデータレジスタ（ ADTSDR ）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x1A> ADTSDR_;
+		static inline ADTSDR_ ADTSDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief   A/D 内部基準電圧データレジスタ（ ADOCDR ）
+		*/
+		//-----------------------------------------------------------------//
+		typedef ro16_t<base + 0x1C> ADOCDR_;
+		static inline ADOCDR_ ADOCDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ（ADDR）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::addr_tr_t<ANALOG, BASE::ADDR0_::address,
+			ANALOG::TEMP, ADTSDR_::address, ANALOG::REF, ADOCDR_::address> ADDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ A0（ADANSA0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adansa0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   ANSA000;	///< AN100
+			bit_rw_t<io_, bitpos::B1>   ANSA001;	///< AN101
+			bit_rw_t<io_, bitpos::B2>   ANSA002;	///< AN102
+			bit_rw_t<io_, bitpos::B3>   ANSA003;	///< AN103
+			bit_rw_t<io_, bitpos::B4>   ANSA004;	///< AN104
+			bit_rw_t<io_, bitpos::B5>   ANSA005;	///< AN105
+			bit_rw_t<io_, bitpos::B6>   ANSA006;	///< AN106
+			bit_rw_t<io_, bitpos::B7>   ANSA007;	///< AN107
+			bit_rw_t<io_, bitpos::B8>   ANSA008;	///< AN108
+			bit_rw_t<io_, bitpos::B9>   ANSA009;	///< AN109
+			bit_rw_t<io_, bitpos::B10>  ANSA010;	///< AN110
+			bit_rw_t<io_, bitpos::B11>  ANSA011;	///< AN111
+		};
+		typedef adansa0_t<base + 0x04>   ADANSA0_;
+		static inline ADANSA0_ ADANSA0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ B0（ADANSB0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adansb0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   ANSB000;	///< AN100
+			bit_rw_t<io_, bitpos::B1>   ANSB001;	///< AN101
+			bit_rw_t<io_, bitpos::B2>   ANSB002;	///< AN102
+			bit_rw_t<io_, bitpos::B3>   ANSB003;	///< AN103
+			bit_rw_t<io_, bitpos::B4>   ANSB004;	///< AN104
+			bit_rw_t<io_, bitpos::B5>   ANSB005;	///< AN105
+			bit_rw_t<io_, bitpos::B6>   ANSB006;	///< AN106
+			bit_rw_t<io_, bitpos::B7>   ANSB007;	///< AN107
+			bit_rw_t<io_, bitpos::B8>   ANSB008;	///< AN108
+			bit_rw_t<io_, bitpos::B9>   ANSB009;	///< AN109
+			bit_rw_t<io_, bitpos::B10>  ANSB010;	///< AN110
+			bit_rw_t<io_, bitpos::B11>  ANSB011;	///< AN111
+		};
+		typedef adansb0_t<base + 0x14>   ADANSB0_;
+		static inline ADANSB0_ ADANSB0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ C0（ADANSC0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adansc0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   ANSC000;	///< AN100
+			bit_rw_t<io_, bitpos::B1>   ANSC001;	///< AN101
+			bit_rw_t<io_, bitpos::B2>   ANSC002;	///< AN102
+			bit_rw_t<io_, bitpos::B3>   ANSC003;	///< AN103
+			bit_rw_t<io_, bitpos::B4>   ANSC004;	///< AN104
+			bit_rw_t<io_, bitpos::B5>   ANSC005;	///< AN105
+			bit_rw_t<io_, bitpos::B6>   ANSC006;	///< AN106
+			bit_rw_t<io_, bitpos::B7>   ANSC007;	///< AN107
+			bit_rw_t<io_, bitpos::B8>   ANSC008;	///< AN108
+			bit_rw_t<io_, bitpos::B9>   ANSC009;	///< AN109
+			bit_rw_t<io_, bitpos::B10>  ANSC010;	///< AN110
+			bit_rw_t<io_, bitpos::B11>  ANSC011;	///< AN111
+		};
+		typedef adansc0_t<base + 0xD4>   ADANSC0_;
+		static inline ADANSC0_ ADANSC0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ A（ADANSA）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adans1_t<ANALOG, ADANSA0_::address> ADANSA;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ設定 B（ADANSB）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adans1_t<ANALOG, ADANSB0_::address> ADANSB;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ設定 C（ADANSC）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adans1_t<ANALOG, ADANSC0_::address> ADANSC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D 変換値加算 / 平均機能チャネル選択レジスタ 0（ADADS0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adads0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   ADS000;		///< AN100
+			bit_rw_t<io_, bitpos::B1>   ADS001;		///< AN101
+			bit_rw_t<io_, bitpos::B2>   ADS002;		///< AN102
+			bit_rw_t<io_, bitpos::B3>   ADS003;		///< AN103
+			bit_rw_t<io_, bitpos::B4>   ADS004;		///< AN104
+			bit_rw_t<io_, bitpos::B5>   ADS005;		///< AN105
+			bit_rw_t<io_, bitpos::B6>   ADS006;		///< AN106
+			bit_rw_t<io_, bitpos::B7>   ADS007;		///< AN107
+			bit_rw_t<io_, bitpos::B8>   ADS008;		///< AN108
+			bit_rw_t<io_, bitpos::B9>   ADS009;		///< AN109
+			bit_rw_t<io_, bitpos::B10>  ADS010;		///< AN110
+			bit_rw_t<io_, bitpos::B11>  ADS011;		///< AN111
+		};
+		typedef adads0_t<base + 0x08>   ADADS0_;
+		static inline ADADS0_ ADADS0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D 変換値加算 / 平均モード選択レジスタ（ADADS）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adans1_t<ANALOG, ADADS0_::address> ADADS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D 変換拡張入力コントロールレジスタ（ ADEXICR ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adexicr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      TSSAD;
+			bit_rw_t <io_, bitpos::B1>      OCSAD;
+
+			bit_rw_t <io_, bitpos::B8>      TSSA;
+			bit_rw_t <io_, bitpos::B9>      OCSA;
+			bit_rw_t <io_, bitpos::B10>     TSSB;
+			bit_rw_t <io_, bitpos::B11>     OCSB;
+
+			bits_rw_t<io_, bitpos::B13, 2>  EXSEL;
+			bit_rw_t <io_, bitpos::B15>     EXOEN;
+		};
+		static inline adexicr_t<base + 0x12>   ADEXICR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D グループ C 拡張入力コントロールレジスタ（ ADGCEXCR ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adgcexcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      TSSC;
+			bit_rw_t <io_, bitpos::B1>      OCSC;
+		};
+		static inline adgcexcr_t<base + 0xD8>   ADGCEXCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ L（ADSSTRL）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<base + 0xDD> ADSSTRL_;
+		static inline ADSSTRL_ ADSSTRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ T（ADSSTRT）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<base + 0xDE> ADSSTRT_;
+		static inline ADSSTRT_ ADSSTRT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ O（ADSSTRO）
+		*/
+		//-----------------------------------------------------------------//
+		typedef rw8_t<base + 0xDF> ADSSTRO_;
+		static inline ADSSTRO_ ADSSTRO;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 8 （ ADSSTR8 ）
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw8_t<base + 0xE8> ADSSTR8;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 9 （ ADSSTR9 ）
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw8_t<base + 0xE9> ADSSTR9;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 10 （ ADSSTR10 ）
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw8_t<base + 0xEA> ADSSTR10;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 11 （ ADSSTR11 ）
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw8_t<base + 0xEB> ADSSTR11;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ（ADSSTR）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adsstr1l_tr_t<ANALOG, BASE::ADSSTR0_::address, ADSSTRL_::address,
+			ANALOG::TEMP, ADSSTRT_::address, ANALOG::REF, ADSSTRO_::address> ADSSTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	A/D コンペアチャネル選択レジスタ 0（ADCMPANSR0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpansr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   CMPCHA000;		///< AN100
+			bit_rw_t<io_, bitpos::B1>   CMPCHA001;		///< AN101
+			bit_rw_t<io_, bitpos::B2>   CMPCHA002;		///< AN102
+			bit_rw_t<io_, bitpos::B3>   CMPCHA003;		///< AN103
+			bit_rw_t<io_, bitpos::B4>   CMPCHA004;		///< AN104
+			bit_rw_t<io_, bitpos::B5>   CMPCHA005;		///< AN105
+			bit_rw_t<io_, bitpos::B6>   CMPCHA006;		///< AN106
+			bit_rw_t<io_, bitpos::B7>   CMPCHA007;		///< AN107
+			bit_rw_t<io_, bitpos::B8>   CMPCHA008;		///< AN108
+			bit_rw_t<io_, bitpos::B9>   CMPCHA009;		///< AN109
+			bit_rw_t<io_, bitpos::B10>  CMPCHA010;		///< AN110
+			bit_rw_t<io_, bitpos::B11>  CMPCHA011;		///< AN111
+		};
+		typedef adcmpansr0_t<base + 0x94>  ADCMPANSR0_;
+		static inline ADCMPANSR0_ ADCMPANSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	A/D コンペアチャネル選択レジスタ（ADCMPANSR）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adans1_t<ANALOG, ADCMPANSR0_::address> ADCMPANSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	A/D コンペアチャネル選択拡張レジスタ（ADCMPANSER）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpanser_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  CMPSTS;
+			bit_rw_t <io_, bitpos::B1>  CMPSOC;
+		};
+		static inline adcmpanser_t<base + 0x92>  ADCMPANSER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアレベルレジスタ 0（ADCMPLR0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmplr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   CMPLCHA000;		///< AN100
+			bit_rw_t<io_, bitpos::B1>   CMPLCHA001;		///< AN101
+			bit_rw_t<io_, bitpos::B2>   CMPLCHA002;		///< AN102
+			bit_rw_t<io_, bitpos::B3>   CMPLCHA003;		///< AN103
+			bit_rw_t<io_, bitpos::B4>   CMPLCHA004;		///< AN104
+			bit_rw_t<io_, bitpos::B5>   CMPLCHA005;		///< AN105
+			bit_rw_t<io_, bitpos::B6>   CMPLCHA006;		///< AN106
+			bit_rw_t<io_, bitpos::B7>   CMPLCHA007;		///< AN107
+			bit_rw_t<io_, bitpos::B8>   CMPLCHA008;		///< AN108
+			bit_rw_t<io_, bitpos::B9>   CMPLCHA009;		///< AN109
+			bit_rw_t<io_, bitpos::B10>  CMPLCHA010;		///< AN110
+			bit_rw_t<io_, bitpos::B11>  CMPLCHA011;		///< AN111
+		};
+		typedef adcmplr0_t<base + 0x98>  ADCMPLR0_;
+		static inline ADCMPLR0_ ADCMPLR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアレベルレジスタ（ADCMPLR）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adans1_t<ANALOG, ADCMPLR0_::address> ADCMPLR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアレベル拡張レジスタ（ADCMPLER）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpler_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  CMPLTS;
+			bit_rw_t<io_, bitpos::B1>  CMPLOC;
+		};
+		static inline adcmpler_t<base + 0x93>  ADCMPLER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアステータスレジスタ 0（ADCMPSR0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpsr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   CMPSTCHA000;	///< AN100
+			bit_rw_t<io_, bitpos::B1>   CMPSTCHA001;	///< AN101
+			bit_rw_t<io_, bitpos::B2>   CMPSTCHA002;	///< AN102
+			bit_rw_t<io_, bitpos::B3>   CMPSTCHA003;	///< AN103
+			bit_rw_t<io_, bitpos::B4>   CMPSTCHA004;	///< AN104
+			bit_rw_t<io_, bitpos::B5>   CMPSTCHA005;	///< AN105
+			bit_rw_t<io_, bitpos::B6>   CMPSTCHA006;	///< AN106
+			bit_rw_t<io_, bitpos::B7>   CMPSTCHA007;	///< AN107
+			bit_rw_t<io_, bitpos::B8>   CMPSTCHA008;	///< AN108
+			bit_rw_t<io_, bitpos::B9>   CMPSTCHA009;	///< AN109
+			bit_rw_t<io_, bitpos::B10>  CMPSTCHA010;	///< AN110
+			bit_rw_t<io_, bitpos::B11>  CMPSTCHA011;	///< AN111
+		};
+		typedef adcmpsr0_t<base + 0xA0>  ADCMPSR0_;
+		static inline ADCMPSR0_ ADCMPSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアステータスレジスタ（ADCMPSR）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adans1_t<ANALOG, ADCMPSR0_::address> ADCMPSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアステータス拡張レジスタ（ADCMPSER）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpser_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  CMPFTS;
+			bit_rw_t<io_, bitpos::B1>  CMPFOC;
+		};
+		static inline adcmpser_t<base + 0xA4>  ADCMPSER;
+	};
+
+#if defined(SIG_RX671)
+	typedef s12adf0_t<0x0008'9000> S12AD;
+	typedef s12adfa1_t<0x0008'9100> S12AD1;
+#else
 	typedef s12adf0_t<0x0008'9000> S12AD;
 	typedef s12adf1_t<0x0008'9100> S12AD1;
+#endif
 }
