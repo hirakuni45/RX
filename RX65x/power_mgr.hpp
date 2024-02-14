@@ -252,6 +252,10 @@ namespace device {
 				SYSTEM::MSTPCRC.MSTPC17 = f;	// RIIC2 のストップ状態解除
 				break;
 
+			case peripheral::RSPI2:
+				SYSTEM::MSTPCRC.MSTPC22 = f;	// RSPI2 のストップ状態解除
+				break;
+
 			case peripheral::QSPI:
 				SYSTEM::MSTPCRC.MSTPC23 = f;
 				break;
