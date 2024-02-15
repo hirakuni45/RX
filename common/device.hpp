@@ -220,15 +220,15 @@
 
 #elif defined(SIG_RX66T)
 #include "RX66T/clock_profile.hpp"
-#include "RX66T/peripheral.hpp"
+#include "RX72T/peripheral.hpp"
 #include "RX600/system.hpp"
-#include "RX66T/power_mgr.hpp"
-#include "RX66T/icu.hpp"
-#include "RX66T/icu_mgr.hpp"
-#include "RX66T/port_map.hpp"
-#include "RX66T/port_map_mtu.hpp"
-#include "RX66T/port_map_gptw.hpp"
-#include "RX66T/port_map_irq.hpp"
+#include "RX72T/power_mgr.hpp"
+#include "RX72T/icu.hpp"
+#include "RX72T/icu_mgr.hpp"
+#include "RX72T/port_map.hpp"
+#include "RX72T/port_map_mtu.hpp"
+#include "RX72T/port_map_gptw.hpp"
+#include "RX72T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72T)
@@ -242,7 +242,7 @@
 #include "RX72T/port_map_sci.hpp"
 #include "RX72T/port_map_mtu.hpp"
 #include "RX72T/port_map_gptw.hpp"
-#include "RX66T/port_map_irq.hpp"
+#include "RX72T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #else
