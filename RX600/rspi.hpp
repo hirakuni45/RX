@@ -122,9 +122,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> IDLNF;
 			bit_rw_t<io_, bitpos::B2> MODF;
 			bit_rw_t<io_, bitpos::B3> PERF;
-
+			bit_rw_t<io_, bitpos::B4> UDRF;
 			bit_rw_t<io_, bitpos::B5> SPTEF;
-
+			bit_rw_t<io_, bitpos::B6> SPCF;		///< d version only
 			bit_rw_t<io_, bitpos::B7> SPRF;
 		};
 		static inline spsr_t<base + 0x03> SPSR;
@@ -341,6 +341,83 @@ namespace device {
 //		static inline spcmd_t<base + 0x1A> SPCMD5;
 //		static inline spcmd_t<base + 0x1C> SPCMD6;
 //		static inline spcmd_t<base + 0x1E> SPCMD7;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RSPI データコントロールレジスタ 2 (SPDCR2)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct spdcr2_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  BYSW;
+			bit_rw_t<io_, bitpos::B1>  DINV;
+		};
+		static inline spdcr2_t<base + 0x20> SPDCR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RSPI 制御レジスタ 3 (SPCR3)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct spcr3_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  RXMD;
+			bit_rw_t<io_, bitpos::B1>  SCKDDIS;
+
+			bit_rw_t<io_, bitpos::B4>  SPCIE;
+		};
+		static inline spcr3_t<base + 0x21> SPCR3;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  シリアルペリフェラルインタフェースクラス (RSPI)
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	pclk	PCLK 周波数
+		@param[in]	EIT		エラー割り込み型
+		@param[in]	spri	受信バッファフル割り込みベクター
+		@param[in]	spti	送信バッファエンプティ割り込みベクター
+		@param[in]	spei	エラー割り込みベクター
+		@param[in]	spii	アイドル割り込みベクター
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, uint32_t pclk, typename EIT,
+		ICU::VECTOR spri, ICU::VECTOR spti, EIT spei, ICU::VECTOR spii>
+	struct rspi_t : public rspi_base_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr uint32_t PCLK = pclk;		///< PCLK 周波数
+		static constexpr auto SPRI = spri;			///< 受信バッファフル割り込みベクター
+		static constexpr auto SPTI = spti;			///< 送信バッファエンプティ割り込みベクター
+		static constexpr auto SPEI = spei;			///< エラー割り込みベクター
+		static constexpr auto SPII = spii;			///< アイドル割り込みベクター
+
+		static constexpr bool BYTE_ACCESS = false;	///< バイトアクセス機能
+		static constexpr bool SPSR_UDRF   = false;	///< SPSR.UDRF 機能
+		static constexpr bool SPSR_SPTEF  = false;	///< SPSR.SPTEF 機能
+		static constexpr bool SPSR_SPCF   = false;	///< SPSR.SPCF 機能
+		static constexpr bool SPSR_SPRF   = false;	///< SPSR.SPRF 機能
+		static constexpr bool SPDCR2_BYSW = false;	///< SPDCR2.BYSW 機能
+		static constexpr bool SPDCR2_DINV = false;	///< SPDCR2.DINV 機能
+		static constexpr bool SPCR3_reg   = false;	///< SPCR3 機能
 	};
 
 
@@ -349,19 +426,34 @@ namespace device {
 		@brief  シリアルペリフェラルインタフェースクラス (RSPIa)
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	rxv		受信割り込みベクター
-		@param[in]	txv		送信割り込みベクター
 		@param[in]	pclk	PCLK 周波数
+		@param[in]	EIT		エラー割り込み型
+		@param[in]	IIT		アイドル割り込み型
+		@param[in]	spri	受信バッファフル割り込みベクター
+		@param[in]	spti	送信バッファエンプティ割り込みベクター
+		@param[in]	spei	エラー割り込みベクター
+		@param[in]	spii	アイドル割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+	template <uint32_t base, peripheral per, uint32_t pclk, typename EIT, typename IIT,
+		ICU::VECTOR spri, ICU::VECTOR spti, EIT spei, IIT spii>
 	struct rspi_a_t : public rspi_base_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr uint32_t PCLK = pclk;		///< PCLK 周波数
+		static constexpr auto SPRI = spri;			///< 受信バッファフル割り込みベクター
+		static constexpr auto SPTI = spti;			///< 送信バッファエンプティ割り込みベクター
+		static constexpr auto SPEI = spei;			///< エラー割り込みベクター
+		static constexpr auto SPII = spii;			///< アイドル割り込みベクター
+
 		static constexpr bool BYTE_ACCESS = false;	///< バイトアクセス機能
+		static constexpr bool SPSR_UDRF   = false;	///< SPSR.UDRF 機能
+		static constexpr bool SPSR_SPTEF  = true;	///< SPSR.SPTEF 機能
+		static constexpr bool SPSR_SPCF   = false;	///< SPSR.SPCF 機能
+		static constexpr bool SPSR_SPRF   = true;	///< SPSR.SPRF 機能
+		static constexpr bool SPDCR2_BYSW = false;	///< SPDCR2.BYSW 機能
+		static constexpr bool SPDCR2_DINV = false;	///< SPDCR2.DINV 機能
+		static constexpr bool SPCR3_reg   = false;	///< SPCR3 機能
 	};
 
 
@@ -370,19 +462,31 @@ namespace device {
 		@brief  シリアルペリフェラルインタフェースクラス (RSPIb)
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	rxv		受信割り込みベクター
-		@param[in]	txv		送信割り込みベクター
 		@param[in]	pclk	PCLK 周波数
+		@param[in]	spri	受信バッファフル割り込みベクター
+		@param[in]	spti	送信バッファエンプティ割り込みベクター
+		@param[in]	spei	エラー割り込みベクター
+		@param[in]	spii	アイドル割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+	template <uint32_t base, peripheral per, uint32_t pclk,
+		ICU::VECTOR spri, ICU::VECTOR spti, ICU::VECTOR spei, ICU::VECTOR spii>
 	struct rspi_b_t : public rspi_base_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr uint32_t PCLK = pclk;		///< PCLK 周波数
+		static constexpr auto SPRI = spri;			///< 受信バッファフル割り込みベクター
+		static constexpr auto SPTI = spti;			///< 送信バッファエンプティ割り込みベクター
+		static constexpr auto SPEI = spei;			///< エラー割り込みベクター
+		static constexpr auto SPII = spii;			///< アイドル割り込みベクター
+
 		static constexpr bool BYTE_ACCESS = false;	///< バイトアクセス機能
+		static constexpr bool SPSR_UDRF   = true;	///< SPSR.UDRF 機能
+		static constexpr bool SPSR_SPTEF  = true;	///< SPSR.SPTEF 機能
+		static constexpr bool SPSR_SPCF   = false;	///< SPSR.SPCF 機能
+		static constexpr bool SPSR_SPRF   = true;	///< SPSR.SPRF 機能
+		static constexpr bool SPDCR2_BYSW = false;	///< SPDCR2.BYSW 機能
+		static constexpr bool SPCR3_reg   = false;	///< SPCR3 機能
 	};
 
 
@@ -391,38 +495,34 @@ namespace device {
 		@brief  シリアルペリフェラルインタフェースクラス (RSPIc)
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	rxv		受信割り込みベクター
-		@param[in]	txv		送信割り込みベクター
 		@param[in]	pclk	PCLK 周波数
+		@param[in]	EIT		エラー割り込み型
+		@param[in]	IIT		アイドル割り込み型
+		@param[in]	spri	受信バッファフル割り込みベクター
+		@param[in]	spti	送信バッファエンプティ割り込みベクター
+		@param[in]	spei	エラー割り込みベクター
+		@param[in]	spii	アイドル割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+	template <uint32_t base, peripheral per, uint32_t pclk, typename EIT, typename IIT,
+		ICU::VECTOR spri, ICU::VECTOR spti, EIT spei, IIT spii>
 	struct rspi_c_t : public rspi_base_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr uint32_t PCLK = pclk;		///< PCLK 周波数
+		static constexpr auto SPRI = spri;			///< 受信バッファフル割り込みベクター
+		static constexpr auto SPTI = spti;			///< 送信バッファエンプティ割り込みベクター
+		static constexpr auto SPEI = spei;			///< エラー割り込みベクター
+		static constexpr auto SPII = spii;			///< アイドル割り込みベクター
+
 		static constexpr bool BYTE_ACCESS = true;	///< バイトアクセス機能
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  RSPI データコントロールレジスタ 2 (SPDCR2)
-			@param[in]	ofs	オフセット
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t ofs>
-		struct spdcr2_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  BYSW;
-		};
-		static inline spdcr2_t<base + 0x20> SPDCR2;
+		static constexpr bool SPSR_UDRF   = true;	///< SPSR.UDRF 機能
+		static constexpr bool SPSR_SPTEF  = true;	///< SPSR.SPTEF 機能
+		static constexpr bool SPSR_SPCF   = false;	///< SPSR.SPCF 機能
+		static constexpr bool SPSR_SPRF   = true;	///< SPSR.SPRF 機能
+		static constexpr bool SPDCR2_BYSW = true;	///< SPDCR2.BYSW 機能
+		static constexpr bool SPDCR2_DINV = false;	///< SPDCR2.DINV 機能
+		static constexpr bool SPCR3_reg   = false;	///< SPCR3 機能
 	};
 
 
@@ -431,84 +531,89 @@ namespace device {
 		@brief  シリアルペリフェラルインタフェースクラス (RSPId)
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	rxv		受信割り込みベクター
-		@param[in]	txv		送信割り込みベクター
 		@param[in]	pclk	PCLK 周波数
+		@param[in]	EIT		エラー割り込み型
+		@param[in]	IIT		アイドル割り込み型
+		@param[in]	spri	受信バッファフル割り込みベクター
+		@param[in]	spti	送信バッファエンプティ割り込みベクター
+		@param[in]	spei	エラー割り込みベクター
+		@param[in]	spii	アイドル割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+	template <uint32_t base, peripheral per, uint32_t pclk, typename EIT, typename IIT,
+		ICU::VECTOR spri, ICU::VECTOR spti, EIT spei, IIT spii>
 	struct rspi_d_t : public rspi_base_t<base> {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;		///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;		///< 送信割り込みベクター
-		static constexpr uint32_t PCLK = pclk;	///< PCLK 周波数
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr uint32_t PCLK = pclk;		///< PCLK 周波数
+		static constexpr auto SPRI = spri;			///< 受信バッファフル割り込みベクター
+		static constexpr auto SPTI = spti;			///< 送信バッファエンプティ割り込みベクター
+		static constexpr auto SPEI = spei;			///< エラー割り込みベクター
+		static constexpr auto SPII = spii;			///< アイドル割り込みベクター
+
 		static constexpr bool BYTE_ACCESS = true;	///< バイトアクセス機能
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  RSPI データコントロールレジスタ 2 (SPDCR2)
-			@param[in]	ofs	オフセット
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t ofs>
-		struct spdcr2_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  BYSW;
-		};
-		static inline spdcr2_t<base + 0x20> SPDCR2;
+		static constexpr bool SPSR_UDRF   = true;	///< SPSR.UDRF 機能
+		static constexpr bool SPSR_SPTEF  = true;	///< SPSR.SPTEF 機能
+		static constexpr bool SPSR_SPCF   = true;	///< SPSR.SPCF 機能
+		static constexpr bool SPSR_SPRF   = true;	///< SPSR.SPRF 機能
+		static constexpr bool SPDCR2_BYSW = true;	///< SPDCR2.BYSW 機能
+		static constexpr bool SPDCR2_DINV = true;	///< SPDCR2.DINV 機能
+		static constexpr bool SPCR3_reg   = true;	///< SPCR3 機能
 	};
 
-#if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX24T)
-	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKB>  RSPI0;
+#if defined(SIG_RX140)
+	typedef rspi_c_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR, ICU::VECTOR,
+		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
+#elif defined(SIG_RX220)
+	typedef rspi_t  <0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR,
+		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
+#elif defined(SIG_RX231)
+	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR, ICU::VECTOR,
+		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
+#elif defined(SIG_RX24T)
+	typedef rspi_b_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB,
+		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
-	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLK>  RSPI0;
-	typedef rspi_a_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
-		clock_profile::PCLK>  RSPI1;
+	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLK, ICU::VECTOR, ICU::VECTOR,
+		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
+	typedef rspi_a_t<0x0008'83A0, peripheral::RSPI1, clock_profile::PCLK, ICU::VECTOR, ICU::VECTOR,
+		ICU::VECTOR::SPRI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPEI1, ICU::VECTOR::SPII1> RSPI1;
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
-	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKB>  RSPI0;
-	typedef rspi_a_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
-		clock_profile::PCLKB>  RSPI1;
+	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::GROUP12, ICU::VECTOR,
+		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::GROUP12::SPEI0, ICU::VECTOR::SPII0> RSPI0;
+	typedef rspi_a_t<0x0008'83A0, peripheral::RSPI1, clock_profile::PCLKB, ICU::GROUP12, ICU::VECTOR,
+		ICU::VECTOR::SPRI1, ICU::VECTOR::SPTI1, ICU::GROUP12::SPEI1, ICU::VECTOR::SPII1> RSPI1;
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
-	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKB>  RSPI0;
-	typedef rspi_a_t<0x0008'83A0, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
-		clock_profile::PCLKB>  RSPI1;
-	typedef rspi_a_t<0x0008'83C0, peripheral::RSPI2, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
-		clock_profile::PCLKB>  RSPI2;
+	typedef rspi_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::GROUP12,
+		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUP12::SPEI0, ICU::VECTOR::SPII0> RSPI0;
+	typedef rspi_t<0x0008'83A0, peripheral::RSPI1, clock_profile::PCLKB, ICU::GROUP12,
+		ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1, ICU::GROUP12::SPEI1, ICU::VECTOR::SPII1> RSPI1;
+	typedef rspi_t<0x0008'83C0, peripheral::RSPI2, clock_profile::PCLKB, ICU::GROUP12,
+		ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2, ICU::GROUP12::SPEI2, ICU::VECTOR::SPII2> RSPI2;
 #elif defined(SIG_RX64M)
-	typedef rspi_a_t<0x000D'0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKA>  RSPI;
+	typedef rspi_a_t<0x000D'0100, peripheral::RSPI0, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUPAL0::SPEI0, ICU::GROUPAL0::SPII0> RSPI0;
 #elif defined(SIG_RX71M)
-	typedef rspi_a_t<0x000D'0100, peripheral::RSPI,  ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKA>  RSPI;
-	typedef rspi_a_t<0x000D'0120, peripheral::RSPI2, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKA>  RSPI2;
-#elif defined(SIG_RX65N) || defined(SIG_RX671)
-	typedef rspi_a_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKA>  RSPI0;
-	typedef rspi_a_t<0x000D'0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
-		clock_profile::PCLKA>  RSPI1;
-	typedef rspi_a_t<0x000D'0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
-		clock_profile::PCLKA>  RSPI2;
+	typedef rspi_a_t<0x000D'0100, peripheral::RSPI0, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUPAL0::SPEI0, ICU::GROUPAL0::SPII0> RSPI0;
+	typedef rspi_a_t<0x000D'0120, peripheral::RSPI1, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1, ICU::GROUPAL0::SPEI1, ICU::GROUPAL0::SPII1> RSPI1;
+#elif defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M) || defined(SIG_RX66N)
+	typedef rspi_c_t<0x000D'0100, peripheral::RSPI0, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUPAL0::SPEI0, ICU::GROUPAL0::SPII0> RSPI0;
+	typedef rspi_c_t<0x000D'0140, peripheral::RSPI1, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1, ICU::GROUPAL0::SPEI1, ICU::GROUPAL0::SPII1> RSPI1;
+	typedef rspi_c_t<0x000D'0300, peripheral::RSPI2, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2, ICU::GROUPAL0::SPEI2, ICU::GROUPAL0::SPII2> RSPI2;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef rspi_c_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKA>  RSPI0;
-#elif defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
-	typedef rspi_a_t<0x000D'0100, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0,
-		clock_profile::PCLKA>  RSPI0;
-	typedef rspi_a_t<0x000D'0140, peripheral::RSPI1, ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1,
-		clock_profile::PCLKA>  RSPI1;
-	typedef rspi_a_t<0x000D'0300, peripheral::RSPI1, ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2,
-		clock_profile::PCLKA>  RSPI2;
+	typedef rspi_c_t<0x000D'0100, peripheral::RSPI0, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUPAL0::SPEI0, ICU::GROUPAL0::SPII0> RSPI0;
+#elif defined(SIG_RX671)
+	typedef rspi_d_t<0x000D'0100, peripheral::RSPI0, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUPAL0::SPEI0, ICU::GROUPAL0::SPII0> RSPI0;
+	typedef rspi_d_t<0x000D'0140, peripheral::RSPI1, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI1, ICU::VECTOR::SPRI1, ICU::GROUPAL0::SPEI1, ICU::GROUPAL0::SPII1> RSPI1;
+	typedef rspi_d_t<0x000D'0300, peripheral::RSPI2, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI2, ICU::VECTOR::SPRI2, ICU::GROUPAL0::SPEI2, ICU::GROUPAL0::SPII2> RSPI2;
 #endif
 }
