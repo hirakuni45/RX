@@ -52,7 +52,8 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp \
 				usb/hcd_usb0.cpp \
-				usb/dcd_usb0.cpp
+				usb/dcd_usb0.cpp \
+				common/stdapi.cpp
 
 USER_LIBS	=	supc++
 

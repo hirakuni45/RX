@@ -44,6 +44,11 @@ else
   endif
 endif
 
+# Add default C++ source
+ifeq ($(findstring common/stdapi.cpp,$(PSOURCES)),)
+  PSOURCES += common/stdapi.cpp
+endif
+
 LIB_ROOT    =   ../../rxlib/lib
 
 INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)

@@ -146,7 +146,7 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 	typedef utils::fixed_fifo<uint8_t, 64> RB64;
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
-	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::SECOND> FT5206_I2C;
 	FT5206_I2C	ft5206_i2c_;
 	typedef chip::FT5206<FT5206_I2C> TOUCH;
 	TOUCH	touch_(ft5206_i2c_);
