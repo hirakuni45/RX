@@ -3,14 +3,14 @@
 /*!	@file
 	@brief	RX72T グループ・ポート・マッピング (SCIx) 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "RX72T/peripheral.hpp"
-#include "RX66T/port.hpp"
-#include "RX66T/mpc.hpp"
+#include "RX72T/port.hpp"
+#include "RX72T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
