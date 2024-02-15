@@ -570,6 +570,8 @@ namespace device {
 
 			SPII0 = 16,		///< RSPI0 / SPII0
 			SPEI0,			///< RSPI0 / SPEI0
+			SPII1,			///< RSPI1 / SPII1
+			SPEI1,			///< RSPI1 / SPEI1
 			SPII2,			///< RSPI2 / SPII2
 			SPEI2,			///< RSPI2 / SPEI2
 			NUM_ = 8
