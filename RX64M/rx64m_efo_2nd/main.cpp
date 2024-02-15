@@ -99,7 +99,7 @@ namespace {
 	typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::LTC> SPI_IO;
 #else
 	// RSPI ハード（ポートの割り当ては、port_map クラスを参照）
-	typedef device::rspi_io<device::RSPI, device::port_map::ORDER::SECOND> SPI_IO;
+	typedef device::rspi_io<device::RSPI0, device::port_map::ORDER::SECOND> SPI_IO;
 #endif
 	// LTC2348_16a: EFO 専用、サンプリング方法によるドライバー
 	typedef chip::LTC2348_16a<LTC_CSN, LTC_CNV, LTC_BUSY, SPI_IO> EADC;

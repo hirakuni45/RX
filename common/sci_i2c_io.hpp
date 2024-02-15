@@ -57,14 +57,14 @@ namespace device {
 		@param[in]	SCI		SCI 型
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
-		@param[in]	PSEL	ポート選択
+		@param[in]	PSEL	ポート選択（xxx_I2C を使う）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class sci_i2c_io : public i2c_base {
-	public:
 
-	private:
+		static_assert(SCI::I2C_SUB, "Not support simple I2C mode.");
+
 		static RBF	recv_;
 		static SBF	send_;
 
@@ -296,11 +296,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(MODE mode, SPEED spd, ICU::LEVEL level = ICU::LEVEL::NONE) noexcept
 		{
-			// I2C オプションが無い場合エラー
-			if(PSEL == port_map::ORDER::FIRST_I2C || PSEL == port_map::ORDER::SECOND_I2C || PSEL == port_map::ORDER::THIRD_I2C) {
-			} else {
-				return false;
-			}
 // 割り込み動作に不具合があるので、強制的にポーリングとする。
 level = ICU::LEVEL::NONE;
 			uint32_t clk = static_cast<uint32_t>(spd);
@@ -324,7 +319,7 @@ level = ICU::LEVEL::NONE;
 			power_mgr::turn(SCI::PERIPHERAL);
 
 			SCI::SCR = 0x00;		// TE, RE disable. CKE = 0
-			port_map::turn(SCI::PERIPHERAL, true, PSEL);
+			port_map::turn(SCI::PERIPHERAL, true, PSEL, port_map::OPTIONAL::SCI_I2C);
 
 			SCI::SIMR3 = SCI::SIMR3.IICSDAS.b(0b11) | SCI::SIMR3.IICSCLS.b(0b11);
 			SCI::SMR   = 0x00;
