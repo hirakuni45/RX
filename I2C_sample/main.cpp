@@ -127,7 +127,7 @@ namespace {
 	// タッチセンサー「RESET」制御ポート
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 	// タッチセンサー I2C ポート設定
-	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::THIRD_I2C> FT5206_I2C;
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::SECOND> FT5206_I2C;
 	#define TOUCH_I2C
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T DIY" };

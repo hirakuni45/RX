@@ -82,7 +82,7 @@ namespace {
 	static const char* system_str_ = { "RX63T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T DIY" };
 	static constexpr bool LED_ACTIVE = 0;
