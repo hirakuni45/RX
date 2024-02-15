@@ -1,13 +1,16 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX621/RX62N グループ・ポート・マッピング
+	@brief	RX621/RX62N グループ・ポート・マッピング @n
+			このマイコンは、初期のデザインな為、ポートをアサインする仕組みにおいて @n
+			かなり制限された機能しかありません、その為、他のシリーズと異なる挙動と @n
+			なる場合があるので、注意を要します。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX62x/peripheral.hpp"
 #include "RX62x/port.hpp"
 #include "RX62x/mpc.hpp"
@@ -17,7 +20,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ポート・マッピング・クラス @n
+		@brief  RX621/RX62N ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
@@ -168,29 +171,48 @@ namespace device {
 			return true;
 		}
 
+		static inline USER_FUNC_TYPE	user_func_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ユーザー設定関数設定
+			@param[in]	func	ユーザー設定関数
+		*/
+		//-----------------------------------------------------------------//
+		static void set_user_func(USER_FUNC_TYPE func) noexcept { user_func_ = func; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  周辺機器別ポート切り替え
-			@param[in]	t	周辺機器タイプ
-			@param[in]	f	無効にする場合「false」
-			@param[in]	odr	候補を選択する場合
+			@param[in]	per		周辺機器タイプ
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	odr		候補を選択する場合
+			@param[in]	opt		オプショナル設定を行う場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, bool f = true, ORDER odr = ORDER::FIRST) noexcept
+		static bool turn(peripheral per, bool ena = true, ORDER odr = ORDER::FIRST, OPTIONAL opt = OPTIONAL::NONE) noexcept
 		{
 			if(odr == ORDER::BYPASS) return false;
 
 			bool ret = false;
-			if(odr == ORDER::FIRST) {
-				ret = sub_1st_(t, f);
-			} else if(odr == ORDER::SECOND) {
-				ret = sub_2nd_(t, f);
+			switch(odr) {
+			case ORDER::FIRST:
+				ret = sub_1st_(per, ena);
+				break;
+			case ORDER::SECOND:
+				ret = sub_2nd_(per, ena);
+				break;
+			case ORDER::USER:
+				ret = user_func_(per, ena);
+				break;
+			default:
+				break;
 			}
 
 			return ret;
 		}
-
 	};
 }

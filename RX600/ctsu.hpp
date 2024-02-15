@@ -148,103 +148,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  CTSU チャネル有効制御レジスタ n (CTSUCHAC[n]) (n = 0 ～ 4) @n
-					※冗長なので、[]オペレーターで対応
-			@param[in]	ofs		オフセット
-			@param[in]	PORT	ポート型
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs, typename PORT>
-		struct ctsuchac_t : public rw8_index_t<ofs> {
-			typedef rw8_index_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			void set_index(uint32_t j) noexcept { if(j <= 4) { io_::index = j; } }
-
-			void enable(PORT port, bool ena = true) noexcept
-			{
-				if(port != PORT::TSCAP) {
-					auto n = static_cast<uint8_t>(port);
-					set_index(n >> 3);
-					auto tmp = io_::read();
-					if(ena) {
-						tmp |= 1 << (n & 7);
-					} else {
-						tmp &= ~(1 << (n & 7));
-					}
-					io_::write(tmp);
-				}
-			}
-
-			bit_rw_t <io_, bitpos::B0>     CTSUCHAC0;
-			bit_rw_t <io_, bitpos::B1>     CTSUCHAC1;
-			bit_rw_t <io_, bitpos::B2>     CTSUCHAC2;
-			bit_rw_t <io_, bitpos::B3>     CTSUCHAC3;
-			bit_rw_t <io_, bitpos::B4>     CTSUCHAC4;
-			bit_rw_t <io_, bitpos::B5>     CTSUCHAC5;
-			bit_rw_t <io_, bitpos::B6>     CTSUCHAC6;
-			bit_rw_t <io_, bitpos::B7>     CTSUCHAC7;
-
-			auto& operator [] (uint32_t idx) {
-				set_index(idx);
-				return *this;
-			}
-		};
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  CTSU チャネル送受信制御レジスタ n (CTSUCHTRC[n]) (n = 0 ～ 4) @n
-					※冗長なので、[]オペレーターで対応
-			@param[in]	ofs	オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs, typename PORT>
-		struct ctsuchtrc_t : public rw8_index_t<ofs> {
-			typedef rw8_index_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			void set_index(uint32_t j) noexcept { if(j <= 4) { io_::index = j; } }
-
-			void enable(PORT port, bool ena = true) noexcept
-			{
-				if(port != PORT::TSCAP) {
-					auto n = static_cast<uint8_t>(port);
-					set_index(n >> 3);
-					auto tmp = io_::read();
-					if(ena) {
-						tmp |= 1 << (n & 7);
-					} else {
-						tmp &= ~(1 << (n & 7));
-					}
-					io_::write(tmp);
-				}
-			}
-
-			bit_rw_t <io_, bitpos::B0>     CTSUCHTRC0;
-			bit_rw_t <io_, bitpos::B1>     CTSUCHTRC1;
-			bit_rw_t <io_, bitpos::B2>     CTSUCHTRC2;
-			bit_rw_t <io_, bitpos::B3>     CTSUCHTRC3;
-			bit_rw_t <io_, bitpos::B4>     CTSUCHTRC4;
-			bit_rw_t <io_, bitpos::B5>     CTSUCHTRC5;
-			bit_rw_t <io_, bitpos::B6>     CTSUCHTRC6;
-			bit_rw_t <io_, bitpos::B7>     CTSUCHTRC7;
-
-			auto& operator [] (uint32_t idx) {
-				set_index(idx);
-				return *this;
-			}
-		};
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  CTSU 高域ノイズ低減制御レジスタ (CTSUDCLKC)
 			@param[in]	ofs	オフセット
 		*/
@@ -409,6 +312,102 @@ namespace device {
 			bit_rw_t <io_, bitpos::B15>    CTSUICOMP;
 		};
 		static inline ctsuerrs_t<base + 0x1C> CTSUERRS;
+	};
+
+
+	struct ctsu_utils {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル有効制御レジスタ n (CTSUCHACn) (n = 0 ～ 4)
+			@param[in]	ofs		オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct ctsuchacn_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     CTSUCHAC0;
+			bit_rw_t <io_, bitpos::B1>     CTSUCHAC1;
+			bit_rw_t <io_, bitpos::B2>     CTSUCHAC2;
+			bit_rw_t <io_, bitpos::B3>     CTSUCHAC3;
+			bit_rw_t <io_, bitpos::B4>     CTSUCHAC4;
+			bit_rw_t <io_, bitpos::B5>     CTSUCHAC5;
+			bit_rw_t <io_, bitpos::B6>     CTSUCHAC6;
+			bit_rw_t <io_, bitpos::B7>     CTSUCHAC7;
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル送受信制御レジスタ n (CTSUCHTRCn) (n = 0 ～ 4)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct ctsuchtrcn_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     CTSUCHTRC0;
+			bit_rw_t <io_, bitpos::B1>     CTSUCHTRC1;
+			bit_rw_t <io_, bitpos::B2>     CTSUCHTRC2;
+			bit_rw_t <io_, bitpos::B3>     CTSUCHTRC3;
+			bit_rw_t <io_, bitpos::B4>     CTSUCHTRC4;
+			bit_rw_t <io_, bitpos::B5>     CTSUCHTRC5;
+			bit_rw_t <io_, bitpos::B6>     CTSUCHTRC6;
+			bit_rw_t <io_, bitpos::B7>     CTSUCHTRC7;
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル制御クラス
+			@param[in]	base	ベース・アドレス
+			@param[in]	PORT	ポート型
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base, typename PORT>
+		struct ctsuchctrl_t {
+
+			bool get(PORT port) noexcept
+			{
+				if(port != PORT::TSCAP) {
+					auto n = static_cast<uint8_t>(port);
+					auto adr = base + (n >> 3);
+					auto tmp = rd8_(adr);
+					return tmp & (1 << (n & 7));
+				} else {
+					return 0;
+				}
+			}
+
+			void set(PORT port, bool val = true) noexcept
+			{
+				if(port != PORT::TSCAP) {
+					auto n = static_cast<uint8_t>(port);
+					auto adr = base + (n >> 3);
+					auto tmp = rd8_(adr);
+					if(val) {
+						tmp |= 1 << (n & 7);
+					} else {
+						tmp &= ~(1 << (n & 7));
+					}
+					wr8_(adr, tmp);
+				}
+			}
+
+			bool operator () (PORT port) {
+				return get(port);
+			}
+		};
 	};
 
 
@@ -605,8 +604,33 @@ namespace device {
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 
-//		static inline ctsuchac_t<base + 0x06, PORT> CTSUCHAC;
-//		static inline ctsuchtrc_t<base + 0x0B, PORT> CTSUCHTRC;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル有効制御レジスタ n (CTSUCHACn) (n = 0 ～ 4)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ctsu_utils::ctsuchacn_t<base + 0x06> CTSUCHAC0_;
+		static inline CTSUCHAC0_ CTSUCHAC0;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x07> CTSUCHAC1;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x08> CTSUCHAC2;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x09> CTSUCHAC3;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x0A> CTSUCHAC4;
+		static inline ctsu_utils::ctsuchctrl_t<base + 0x06, PORT> CTSUCHAC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル送受信制御レジスタ n (CTSUCHTRCn) (n = 0 ～ 4)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0B> CTSUCHTRC0_;
+		static inline CTSUCHTRC0_ CTSUCHTRC0;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0C> CTSUCHTRC1;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0D> CTSUCHTRC2;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0E> CTSUCHTRC3;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0F> CTSUCHTRC4;
+		static inline ctsu_utils::ctsuchctrl_t<base + 0x08, PORT> CTSUCHTRC;
 	};
 
 #elif defined(SIG_RX671)
@@ -633,7 +657,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PORT : uint8_t {
-			TSCAP = 36,	///< PC4
+			TSCAP = 17,	///< PC4
 			TS0 = 0,	///< P34
 			TS1,		///< P33
 			TS2,		///< P27
@@ -763,10 +787,29 @@ namespace device {
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
 
-//		typedef BASE::ctsuchac_t<base + 0x06, PORT> CTSUCHAC_;
-//		static inline CTSUCHAC_ CTSUCHAC;
 
-//		static inline typename BASE::ctsuchtrc_t<base + 0x0B, PORT> CTSUCHTRC;
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル有効制御レジスタ n (CTSUCHACn) (n = 0 ～ 2)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ctsu_utils::ctsuchacn_t<base + 0x06> CTSUCHAC0_;
+		static inline CTSUCHAC0_ CTSUCHAC0;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x07> CTSUCHAC1;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x08> CTSUCHAC2;
+		static inline ctsu_utils::ctsuchctrl_t<base + 0x06, PORT> CTSUCHAC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル送受信制御レジスタ n (CTSUCHTRCn) (n = 0 ～ 2)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0B> CTSUCHTRC0_;
+		static inline CTSUCHTRC0_ CTSUCHTRC0;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0C> CTSUCHTRC1;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0D> CTSUCHTRC2;
+		static inline ctsu_utils::ctsuchctrl_t<base + 0x08, PORT> CTSUCHTRC;
 	};
 #endif
 	typedef ctsu_t<0x000A'0900> CTSU;

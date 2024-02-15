@@ -122,7 +122,7 @@ namespace {
 	typedef utils::fixed_fifo<uint8_t, 64> RECV6_BUFF;
 	typedef utils::fixed_fifo<uint8_t, 64> SEND6_BUFF;
 	typedef device::sci_i2c_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
-			device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
+			device::port_map::ORDER::FIRST> FT5206_I2C;
 #endif
 	FT5206_I2C	ft5206_i2c_;
 	typedef chip::FT5206<FT5206_I2C> FT5206;

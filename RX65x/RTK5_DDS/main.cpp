@@ -101,7 +101,7 @@ namespace {
 	typedef utils::fixed_fifo<uint8_t, 64> RB6;
 	typedef utils::fixed_fifo<uint8_t, 64> SB6;
 	typedef device::sci_i2c_io<device::SCI6, RB6, SB6,
-		device::port_map::ORDER::FIRST_I2C> FT5206_I2C;
+		device::port_map::ORDER::FIRST> FT5206_I2C;
 
 	FT5206_I2C	ft5206_i2c_;
 	typedef chip::FT5206<FT5206_I2C> FT5206;

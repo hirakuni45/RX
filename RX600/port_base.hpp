@@ -222,6 +222,29 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
 		static inline odr1_t<base + 0x01> ODR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オープンドレイン制御レジスタ（ODR）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct odr_t {
+			typedef rw8_t<ofs + 0>  io0_;
+			typedef rw8_t<ofs + 1>  io1_;
+
+			bits_rw_t<io0_, bitpos::B0, 2> B0;
+			bits_rw_t<io0_, bitpos::B2, 2> B1;
+			bits_rw_t<io0_, bitpos::B4, 2> B2;
+			bits_rw_t<io0_, bitpos::B6, 2> B3;
+			bits_rw_t<io1_, bitpos::B0, 2> B4;
+			bits_rw_t<io1_, bitpos::B2, 2> B5;
+			bits_rw_t<io1_, bitpos::B4, 2> B6;
+			bits_rw_t<io1_, bitpos::B6, 2> B7;
+		};
+		static inline odr_t<base> ODR;
 	};
 
 
@@ -242,7 +265,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct odr0_t : public rw8_t<ofs> {
-
 			typedef rw8_t<ofs>  io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -254,7 +276,25 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		static inline odr0_t<base> ODR0;
+		static inline odr0_t<base + 0> ODR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オープンドレイン制御レジスタ（ODR）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct odr_t {
+			typedef rw8_t<ofs + 0>  io0_;
+
+			bits_rw_t<io0_, bitpos::B0, 2> B0;
+			bits_rw_t<io0_, bitpos::B2, 2> B1;
+			bits_rw_t<io0_, bitpos::B4, 2> B2;
+			bits_rw_t<io0_, bitpos::B6, 2> B3;
+		};
+		static inline odr_t<base> ODR;
 	};
 
 
@@ -275,7 +315,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct odr1_t : public rw8_t<ofs> {
-
 			typedef rw8_t<ofs>  io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -287,7 +326,25 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		static inline odr1_t<base> ODR1;
+		static inline odr1_t<base + 1> ODR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オープンドレイン制御レジスタ（ODR）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct odr_t {
+			typedef rw8_t<ofs + 1>  io1_;
+
+			bits_rw_t<io1_, bitpos::B0, 2> B4;
+			bits_rw_t<io1_, bitpos::B2, 2> B5;
+			bits_rw_t<io1_, bitpos::B4, 2> B6;
+			bits_rw_t<io1_, bitpos::B6, 2> B7;
+		};
+		static inline odr_t<base> ODR;
 	};
 
 

@@ -4,7 +4,7 @@
 	@brief	RX72M/RX72N/RX66N SSIE I/O 制御 @n
 			SSIE 内 FIFO では容量が足りないので、バッファリングを行う。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -49,10 +49,11 @@ namespace device {
 		@param[in]	SSIE		ハードウェアー・コンテキスト
 		@param[in]	DMAC		DMAC デバイス・コンテキスト(DMAC0 - DMAC7)
 		@param[in]	SOUND_OUT	サウンド出力オブジェクト型
+		@param[in]	PSEL		ポート候補
 		@param[in]	MASTER		スレーブの場合「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SSIE, class DMAC, class SOUND_OUT, bool MASTER = true>
+	template <class SSIE, class DMAC, class SOUND_OUT, port_map::ORDER PSEL = port_map::ORDER::FIRST, bool MASTER = true>
 	class ssie_io : public ssie_io_base {
 	public:
 
@@ -82,7 +83,7 @@ namespace device {
 		};
 		sound_task_t	sound_task_t_;
 
-		static void* sound_task_ptr_;
+		static inline void* sound_task_ptr_;
 
 		static INTERRUPT_FUNC void send_task_()
 		{
@@ -121,18 +122,18 @@ namespace device {
 		/*!
 			@brief  開始 @n
 					※送信動作、受信動作、ミュート、初期状態を維持
-			@param[in]	aclk	オーディオ入力周波数
+			@param[in]	mclk	マスター・クロック周波数
 			@param[in]	lrclk	LR クロック周波数（サンプルレート）
 			@param[in]	bform	ビット列フォーマット
 			@param[in]	intl	割り込みレベル
 			@return 初期化出来ない場合「false」（パラメータの異常など）
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t aclk, uint32_t lrclk, BFORM bform, ICU::LEVEL intl) noexcept
+		bool start(uint32_t mclk, uint32_t lrclk, BFORM bform, ICU::LEVEL intl) noexcept
 		{
 			power_mgr::turn(SSIE::PERIPHERAL);
 
-			if(!port_map::turn(SSIE::PERIPHERAL, true)) {
+			if(!port_map::turn(SSIE::PERIPHERAL, true, PSEL)) {
 				return false;
 			}
 
@@ -237,7 +238,7 @@ namespace device {
 				return false;
 			}
 
-			auto adiv = aclk / lrclk / bits;
+			auto adiv = mclk / lrclk / bits;
 			uint8_t ckdv = 0;
 			switch(adiv) {
 			case 1:   ckdv = 0b0000; break;
@@ -437,8 +438,4 @@ namespace device {
 		//-----------------------------------------------------------------//
 		auto recv() const noexcept { return SSIE::SSIFRDR32(); }
 	};
-
-	// テンプレート関数内、実態の定義
-	template <class SSIE, class DMAC, class SOUND_OUT, bool MASTER>
-		void* ssie_io<SSIE, DMAC, SOUND_OUT, MASTER>::sound_task_ptr_;
 }

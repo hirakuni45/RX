@@ -219,9 +219,13 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB14 = f;	// ETHER1, EDMAC1 のストップ状態解除
 				BUS::BEREN.TOEN = 1;
 				break;
-
-			case peripheral::RSPI:
-				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
+#if defined(SIG_RX71M)
+			case peripheral::RSPI1:
+				SYSTEM::MSTPCRB.MSTPB16 = f;	// RSPI1 のストップ状態解除
+				break;
+#endif
+			case peripheral::RSPI0:
+				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI0 のストップ状態解除
 				break;
 
 			case peripheral::USB0:

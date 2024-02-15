@@ -6,18 +6,14 @@
 			  通常割り込み入力としても使え、通常「ORDER::FIRST」で選択する。 @n
 			  詳しくは、MPC の解説を参照する事。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#if defined(SIG_RX66T)
-#include "RX66T/peripheral.hpp"
-#elif defined(SIG_RX72T)
 #include "RX72T/peripheral.hpp"
-#endif
-#include "RX66T/port.hpp"
-#include "RX66T/mpc.hpp"
+#include "RX72T/port.hpp"
+#include "RX72T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

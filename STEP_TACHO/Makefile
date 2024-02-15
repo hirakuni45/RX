@@ -21,7 +21,8 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				common/stdapi.cpp
 
 USER_LIBS	=
 

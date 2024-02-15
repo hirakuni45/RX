@@ -120,9 +120,10 @@ namespace device {
 		CAN1,		///< CAN インタフェース（CAN1）
 		CAN2,		///< CAN インタフェース（CAN2）
 
-		RSPI,		///< シリアルペリフェラルインタフェース（RSPIa）
-		RSPI2,		///< シリアルペリフェラルインタフェース（RSPIb）
-
+		RSPI0,		///< シリアルペリフェラルインタフェース（RSPIa）
+#if defined(SIG_RX71M)
+		RSPI1,		///< シリアルペリフェラルインタフェース（RSPIb）
+#endif
 		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
 
 		CRC,		///< CRC 演算器（CRCA）

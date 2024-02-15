@@ -29,7 +29,7 @@ namespace device {
 
 	private:
 
-		static TASK task_;
+		static inline TASK task_;
 
 		static INTERRUPT_FUNC void adi_task_()
 		{
@@ -133,6 +133,4 @@ namespace device {
 			return ADCU::ADDR(an);
 		}
 	};
-
-	template <class ADCU, class TASK> TASK adc_in<ADCU, TASK>::task_;
 }

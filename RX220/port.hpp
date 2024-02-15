@@ -14,7 +14,7 @@ namespace device {
 
 	typedef portx_t<0x0008'C000, odr_xx_t<0x0008'C080> > PORT0;
 	typedef portx_t<0x0008'C001, odr_oo_t<0x0008'C082> > PORT1;
-	typedef portx_t<0x0008'C002, odr_xx_t<0x0008'C084> > PORT2;
+	typedef portx_t<0x0008'C002, odr_xo_t<0x0008'C084> > PORT2;
 	typedef portx_t<0x0008'C003, odr_oo_t<0x0008'C086> > PORT3;
 	typedef portx_t<0x0008'C004, odr_xx_t<0x0008'C088> > PORT4;
 	typedef portx_t<0x0008'C005, odr_xx_t<0x0008'C08A> > PORT5;

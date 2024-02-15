@@ -66,7 +66,7 @@ namespace device {
 		@param[in]	SCI		SCI 型
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
-		@param[in]	PSEL	通常ポート候補
+		@param[in]	PSEL	ポート候補
 		@param[in]	FLCT	フロー制御型
 		@param[in]	RTS		制御ポート（RTS/RS-485_DE）
 	*/
