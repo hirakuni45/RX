@@ -1,12 +1,13 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	システム定義（クロック発生回路、） @n
-			・RX64M/RX71M @n
-			・RX651/RX65N @n
-			・RX66T/RX72T @n
+	@brief	システム定義関連 @n
+			・RX64M @n
+			・RX65N/RX651 @n
 			・RX671 @n
-			・RX72M/RX72N
+			・RX71M @n
+			・RX72N/RX72M @n
+			・RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -22,7 +23,7 @@ namespace device {
 		@brief  システム定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	namespace SYSTEM {
+	struct system_base_t {
 
 		//----  オプション設定メモリ  -------------------------------------------//
 
@@ -104,17 +105,6 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 3> MDE;
 		};
-#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		static inline spcc_t<0xFE7F'5D40> SPCC;
-		static inline ofs0_t<0xFE7F'5D04> OFS0;
-		static inline ofs1_t<0xFE7F'5D08> OFS1;
-		static inline mde_t <0xFE7F'5D00> MDE;
-#else
-		static inline spcc_t<0x0012'0040> SPCC;
-		static inline ofs0_t<0x0012'0068> OFS0;
-		static inline ofs1_t<0x0012'006C> OFS1;
-		static inline mde_t <0x0012'0064> MDE;
-#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -198,186 +188,6 @@ namespace device {
 		};
 		static inline syscr1_t<0x0008'0008> SYSCR1;
 
-#if defined(SIG_RX671)
-		//----  バッテリバックアップ機能  ----------------------------------------//
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  バックアップ領域電源ステータスレジスタ (BKPSR)
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct bkpsr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     PDDF;
-		};
-		static inline bkpsr_t<0x0008'CC46> BKPSR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タンパステータスレジスタ (TAMPSR)
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct tampsr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     TAMP0F;
-			bit_rw_t <io_, bitpos::B1>     TAMP1F;
-			bit_rw_t <io_, bitpos::B2>     TAMP2F;
-		};
-		static inline tampsr_t<0x0008'CC48> TAMPSR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タンパ制御レジスタ (TAMPCR)
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct tampcr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     TAMP0IE;
-			bit_rw_t <io_, bitpos::B1>     TAMP1IE;
-			bit_rw_t <io_, bitpos::B2>     TAMP2IE;
-
-			bit_rw_t <io_, bitpos::B4>     TAMP0EE;
-			bit_rw_t <io_, bitpos::B5>     TAMP1EE;
-			bit_rw_t <io_, bitpos::B6>     TAMP2EE;
-		};
-		static inline tampcr_t<0x0008'CC49> TAMPCR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  時間キャプチャイベント制御レジスタ (TCECR)
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct tcecr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     TCE0S;
-			bit_rw_t <io_, bitpos::B1>     TCE1S;
-			bit_rw_t <io_, bitpos::B2>     TCE2S;
-		};
-		static inline tcecr_t<0x0008'CC4A> TCECR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タンパ /RTCIC 入力制御レジスタ 1 (TAMPICR1)
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct tampicr1_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     CH0EN;
-			bit_rw_t <io_, bitpos::B1>     CH1EN;
-			bit_rw_t <io_, bitpos::B2>     CH2EN;
-		};
-		static inline tampicr1_t<0x0008'CC4C> TAMPICR1;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タンパ /RTCIC 入力制御レジスタ 2 (TAMPICR2)
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct tampicr2_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     CH0NFE;
-			bit_rw_t <io_, bitpos::B1>     CH1NFE;
-			bit_rw_t <io_, bitpos::B2>     CH2NFE;
-
-			bit_rw_t <io_, bitpos::B4>     CH0TRG;
-			bit_rw_t <io_, bitpos::B5>     CH1TRG;
-			bit_rw_t <io_, bitpos::B6>     CH2TRG;
-		};
-		static inline tampicr2_t<0x0008'CC4D> TAMPICR2;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  タンパ /RTCIC 入力モニタレジスタ (TAMPIMR)
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct tampimr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     CH0LVL;
-			bit_rw_t <io_, bitpos::B1>     CH1LVL;
-			bit_rw_t <io_, bitpos::B2>     CH2LVL;
-		};
-		static inline tampimr_t<0x0008'CC4E> TAMPIMR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バックアップレジスタ n (BKR[n]) (n = 0 ～ 127)
-			@param[in]	ofs	オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct bkr_t : public rw8_index_t<ofs> {
-			typedef rw8_index_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			void set_index(uint32_t j) { if(j <= 127) { io_::index = j; } }
-
-			bkr_t& operator [] (uint32_t idx) {
-				set_index(idx);
-				return *this;
-			}
-		};
-		static inline bkr_t<0x0008'CE00> BKR;
-#endif
-
 		//----  クロック発生回路  -----------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -412,13 +222,30 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT_null) ダミー
 			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-#if defined(SIG_RX71M)
 		template<uint32_t base>
-		struct memwait_t : public rw32_t<base> {
+		struct romwt_null_t : public rw8_null_t<base> {
+			typedef rw8_null_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> ROMWT;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ 32（MEMWAIT）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct memwait32_t : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -427,11 +254,16 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
 		};
-		static inline memwait_t<0x0008'6610> MEMWAIT;
 
-#elif defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ 8（MEMWAIT8）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
-		struct memwait_t : public rw8_t<base> {
+		struct memwait8_t : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -440,12 +272,27 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
 		};
-		static inline memwait_t<0x0008'101C> MEMWAIT;
-#endif
 
 
-#if defined(SIG_RX65N) || defined(SIG_RX671)
-  		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT_null）ダミー
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct memwait_null_t : public rw8_null_t<base> {
+			typedef rw8_null_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> MEMWAIT;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT)
 			@param[in]	base	ベース・アドレス
@@ -461,8 +308,6 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> ROMWT;
 		};
-		static inline romwt_t<0x0008'101C> ROMWT;
-#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -583,7 +428,6 @@ namespace device {
 		static inline mosccr_t<0x0008'0032> MOSCCR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
@@ -600,8 +444,24 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SOSTP;
 		};
-		static inline sosccr_t<0x0008'0033> SOSCCR;
-#endif
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR_null）ダミー
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct sosccr_null_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> SOSTP;
+		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -791,6 +651,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  メインクロック発振器ウェイトコントロールレジスタ（MOSCWTCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -806,10 +667,10 @@ namespace device {
 		static inline moscwtcr_t<0x0008'00A2> MOSCWTCR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -822,8 +683,24 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8> SSTS;
 		};
-		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
-#endif
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR_null）ダミー
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct soscwtcr_null_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8> SSTS;
+		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -869,7 +746,7 @@ namespace device {
 		static inline hocopcr_t<0x0008'C294> HOCOPCR;
 
 
-#if defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CLKOUT 出力コントロールレジスタ (CKOCR)
@@ -892,7 +769,7 @@ namespace device {
 		static inline ckocr_t<0x0008'003E> CKOCR;
 #endif
 
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  特定用途向けクロック制御レジスタ (PACKCR)
@@ -1417,7 +1294,6 @@ namespace device {
 		static inline rw16_t<0x0008'00C2> SWRR;
 
 
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	ノンキャッシャブル領域 n アドレスレジスタ (NCRGn) (n = 0, 1)
@@ -1449,6 +1325,508 @@ namespace device {
 		};
 		static inline ncrcn_t<0x0008'1044> NCRC0;
 		static inline ncrcn_t<0x0008'104C> NCRC1;
-#endif
 	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  バッテリバックアップ機能 RX671
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_batt_backup_t {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バックアップ領域電源ステータスレジスタ (BKPSR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct bkpsr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     PDDF;
+		};
+		static inline bkpsr_t<0x0008'CC46> BKPSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパステータスレジスタ (TAMPSR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampsr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     TAMP0F;
+			bit_rw_t <io_, bitpos::B1>     TAMP1F;
+			bit_rw_t <io_, bitpos::B2>     TAMP2F;
+		};
+		static inline tampsr_t<0x0008'CC48> TAMPSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパ制御レジスタ (TAMPCR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     TAMP0IE;
+			bit_rw_t <io_, bitpos::B1>     TAMP1IE;
+			bit_rw_t <io_, bitpos::B2>     TAMP2IE;
+
+			bit_rw_t <io_, bitpos::B4>     TAMP0EE;
+			bit_rw_t <io_, bitpos::B5>     TAMP1EE;
+			bit_rw_t <io_, bitpos::B6>     TAMP2EE;
+		};
+		static inline tampcr_t<0x0008'CC49> TAMPCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  時間キャプチャイベント制御レジスタ (TCECR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tcecr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     TCE0S;
+			bit_rw_t <io_, bitpos::B1>     TCE1S;
+			bit_rw_t <io_, bitpos::B2>     TCE2S;
+		};
+		static inline tcecr_t<0x0008'CC4A> TCECR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパ /RTCIC 入力制御レジスタ 1 (TAMPICR1)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampicr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     CH0EN;
+			bit_rw_t <io_, bitpos::B1>     CH1EN;
+			bit_rw_t <io_, bitpos::B2>     CH2EN;
+		};
+		static inline tampicr1_t<0x0008'CC4C> TAMPICR1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパ /RTCIC 入力制御レジスタ 2 (TAMPICR2)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampicr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     CH0NFE;
+			bit_rw_t <io_, bitpos::B1>     CH1NFE;
+			bit_rw_t <io_, bitpos::B2>     CH2NFE;
+
+			bit_rw_t <io_, bitpos::B4>     CH0TRG;
+			bit_rw_t <io_, bitpos::B5>     CH1TRG;
+			bit_rw_t <io_, bitpos::B6>     CH2TRG;
+		};
+		static inline tampicr2_t<0x0008'CC4D> TAMPICR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タンパ /RTCIC 入力モニタレジスタ (TAMPIMR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct tampimr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     CH0LVL;
+			bit_rw_t <io_, bitpos::B1>     CH1LVL;
+			bit_rw_t <io_, bitpos::B2>     CH2LVL;
+		};
+		static inline tampimr_t<0x0008'CC4E> TAMPIMR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バックアップレジスタ n (BKR[n]) (n = 0 ～ 127)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct bkr_t : public rw8_index_t<ofs> {
+			typedef rw8_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j <= 127) { io_::index = j; } }
+
+			bkr_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		static inline bkr_t<0x0008'CE00> BKR;
+	};
+
+
+//-----------------------------------------------------------------------------//
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  システム定義クラス RX64M
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_64m_t : public system_base_t {
+
+		static constexpr bool NCRGx_reg    = false;
+		static constexpr bool NCRCx_reg    = false;
+
+		// オプション設定メモリ
+		static inline spcc_t<0x0012'0040> SPCC;
+		static inline ofs0_t<0x0012'0068> OFS0;
+		static inline ofs1_t<0x0012'006C> OFS1;
+		static inline mde_t <0x0012'0064> MDE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT_null）ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline memwait_null_t<0x0000'0000> MEMWAIT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT_null) ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline romwt_null_t<0x0000'0000> ROMWT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline sosccr_t<0x0008'0033> SOSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  システム定義クラス RX65N/RX651
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_65x_t : public system_base_t {
+
+		static constexpr bool NCRGx_reg    = false;
+		static constexpr bool NCRCx_reg    = false;
+
+		// オプション設定メモリ
+		static inline spcc_t<0xFE7F'5D40> SPCC;
+		static inline ofs0_t<0xFE7F'5D04> OFS0;
+		static inline ofs1_t<0xFE7F'5D08> OFS1;
+		static inline mde_t <0xFE7F'5D00> MDE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT_null）ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline memwait_null_t<0x0000'0000> MEMWAIT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline romwt_t<0x0008'101C> ROMWT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline sosccr_t<0x0008'0033> SOSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  システム定義クラス RX671
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_671_t : public system_base_t, system_batt_backup_t {
+
+		static constexpr bool NCRGx_reg    = false;
+		static constexpr bool NCRCx_reg    = false;
+
+		// オプション設定メモリ
+		static inline spcc_t<0x0012'0040> SPCC;
+		static inline ofs0_t<0x0012'0068> OFS0;
+		static inline ofs1_t<0x0012'006C> OFS1;
+		static inline mde_t <0x0012'0064> MDE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT_null）ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline memwait_null_t<0x0000'0000> MEMWAIT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline romwt_t<0x0008'101C> ROMWT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline sosccr_t<0x0008'0033> SOSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  システム定義クラス RX71M
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_71m_t : public system_base_t {
+
+		static constexpr bool NCRGx_reg    = false;
+		static constexpr bool NCRCx_reg    = false;
+
+		// オプション設定メモリ
+		static inline spcc_t<0x0012'0040> SPCC;
+		static inline ofs0_t<0x0012'0068> OFS0;
+		static inline ofs1_t<0x0012'006C> OFS1;
+		static inline mde_t <0x0012'0064> MDE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ 32（MEMWAIT） @n
+					※スーパーバイザモードでのみアクセス可能
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline memwait32_t<0x0008'6610> MEMWAIT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT_null) ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline romwt_null_t<0x0000'0000> ROMWT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline sosccr_t<0x0008'0033> SOSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  システム定義クラス RX72N/RX72M
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_72n_72m_t : public system_base_t {
+
+		static constexpr bool NCRGx_reg    = true;
+		static constexpr bool NCRCx_reg    = true;
+
+		// オプション設定メモリ
+		static inline spcc_t<0xFE7F'5D40> SPCC;
+		static inline ofs0_t<0xFE7F'5D04> OFS0;
+		static inline ofs1_t<0xFE7F'5D08> OFS1;
+		static inline mde_t <0xFE7F'5D00> MDE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ 8（MEMWAIT）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline memwait8_t<0x0008'101C> MEMWAIT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT_null) ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline romwt_null_t<0x0000'0000> ROMWT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline sosccr_t<0x0008'0033> SOSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  システム定義クラス RX66T/RX72T
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_66t_72t_t : public system_base_t {
+
+		static constexpr bool NCRGx_reg    = false;
+		static constexpr bool NCRCx_reg    = false;
+
+		// オプション設定メモリ
+		static inline spcc_t<0x0012'0040> SPCC;
+		static inline ofs0_t<0x0012'0068> OFS0;
+		static inline ofs1_t<0x0012'006C> OFS1;
+		static inline mde_t <0x0012'0064> MDE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ 8（MEMWAIT）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline memwait8_t<0x0008'101C> MEMWAIT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT_null) ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline romwt_null_t<0x0000'0000> ROMWT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline sosccr_null_t<0x0000'0000> SOSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline soscwtcr_null_t<0x0000'0000> SOSCWTCR;
+	};
+
+#if defined(SIG_RX64M)
+	typedef system_64m_t SYSTEM;
+#elif defined(SIG_RX65N) || defined(SIG_RX651)
+	typedef system_65x_t SYSTEM;
+#elif defined(SIG_RX671)
+	typedef system_671_t SYSTEM;
+#elif defined(SIG_RX71M)
+	typedef system_71m_t SYSTEM;
+#elif defined(SIG_RX72N) || defined(SIG_RX72M)
+	typedef system_72n_72m_t SYSTEM;
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+	typedef system_66t_72t_t SYSTEM;
+#endif
 }
