@@ -2,7 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	R12DA 定義 @n
-			RX231/RX64M/RX71M/RX65x/RX72N/RX72M @n
+			RX231/RX64M/RX71M/RX65N/RX651/RX72N/RX72M @n
 			RX26T/RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
@@ -102,7 +102,7 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M) 
+#if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M) 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	12 ビット D/A コンバータ（R12DA）

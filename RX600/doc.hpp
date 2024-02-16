@@ -77,7 +77,7 @@ namespace device {
 		static constexpr auto INTRV = vec;		///< 割り込みベクター
 	};
 	typedef doc_norm_t<0x0008'B080, peripheral::DOC, ICU::VECTOR::DOPCF> DOC;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データ演算回路（DOC）

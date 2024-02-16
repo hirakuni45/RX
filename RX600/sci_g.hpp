@@ -94,7 +94,7 @@ namespace device {
 		ICU::GROUPBL0, ICU::GROUPBL0::TEI6, ICU::GROUPBL0::ERI6> SCI6;
 	typedef scig_t<0x0008'A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7,
 		ICU::GROUPBL0, ICU::GROUPBL0::TEI7, ICU::GROUPBL0::ERI7> SCI7;
-#elif defined(SIG_RX651) || defined(SIG_RX65N) || defined(SIG_RX671)
+#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671)
 	typedef scig_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
 		ICU::GROUPBL0, ICU::GROUPBL0::TEI0, ICU::GROUPBL0::ERI0> SCI0;
 	typedef scig_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,

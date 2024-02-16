@@ -11,7 +11,7 @@
 #include "common/device.hpp"
 
 /// CMPC モジュールが無いデバイスでエラーとする
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) 
 #  error "cmpc.hpp: This module does not exist"
 #endif
 

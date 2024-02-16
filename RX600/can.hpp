@@ -684,7 +684,7 @@ namespace device {
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
 		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::GROUPBE0::ERS0> CAN0;
 
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	CAN モジュール（CAN 選択割り込み型 + グループ割り込み BE0）
