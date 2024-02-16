@@ -67,6 +67,7 @@
 #include "RX231/lvda.hpp"
 #include "RX600/cac.hpp"
 #include "RX231/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
 #include "RX231/elc.hpp"
 #include "RX231/port.hpp"
@@ -102,6 +103,7 @@
 #include "RX24T/lvda.hpp"
 #include "RX600/cac.hpp"
 #include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX24T/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX24T/poe3.hpp"
@@ -125,6 +127,7 @@
 #include "RX24T/lvda.hpp"
 #include "RX600/cac.hpp"
 #include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/elc.hpp"
 #include "RX26T/port.hpp"
@@ -155,9 +158,10 @@
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/dac_out.hpp"
 
-#elif defined(SIG_RX621) || defined(SIG_RX62N)
+#elif defined(SIG_RX62N) || defined(SIG_RX621)
 #include "RX62x/lvd.hpp"
 #include "RX62x/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/exdmac.hpp"
 #include "RX62x/port.hpp"
@@ -168,8 +172,10 @@
 #include "RX600/sci_a.hpp"
 #include "RX62x/rtc.hpp"
 #include "RX62x/wdt.hpp"
+#if defined(SIG_RX62N)
 #include "RX600/etherc.hpp"
 #include "RX600/edmac.hpp"
+#endif
 #include "RX62x/usb.hpp"
 #include "RX600/crc.hpp"
 #include "RX600/can.hpp"
@@ -183,9 +189,11 @@
 #include "RX600/dmac_mgr.hpp"
 #include "RX24T/dac_out.hpp"
 
-#elif defined(SIG_RX631) || defined(SIG_RX63N)
+#elif defined(SIG_RX63N) || defined(SIG_RX631)
 #include "RX63T/lvda.hpp"
 #include "RX63x/mck.hpp"
+#include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/exdmac.hpp"
 #include "RX63x/port.hpp"
@@ -196,8 +204,10 @@
 #include "RX600/tmr.hpp"
 #include "RX63x/rtc.hpp"
 #include "RX600/wdta.hpp"
+#if defined(SIG_RX63N)
 #include "RX600/etherc.hpp"
 #include "RX600/edmac.hpp"
+#endif
 #include "RX62x/usb.hpp"
 #include "RX600/sci_c.hpp"
 #include "RX600/sci_d.hpp"
@@ -218,6 +228,7 @@
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
 #include "RX63T/lvda.hpp"
 #include "RX63T/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
 #include "RX63T/port.hpp"
 #include "RX600/mtu3.hpp"
@@ -243,6 +254,7 @@
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/cac.hpp"
 #include "RX64M/port.hpp"
 #include "RX600/mtu3.hpp"
@@ -271,7 +283,7 @@
 #include "RX600/rtc.hpp"
 #include "RX600/rtc_io.hpp"
 #include "RX600/wdta.hpp"
-#include "RX64M/flash.hpp"
+#include "RX600/flash.hpp"
 #include "RX600/ssi.hpp"
 #include "RX600/src.hpp"
 #include "RX600/sdhi.hpp"
@@ -290,9 +302,10 @@
 #include "ff14/sdhi_io.hpp"
 #include "RX600/ssi_io.hpp"
 
-#elif defined(SIG_RX651) || defined(SIG_RX65N)
+#elif defined(SIG_RX65N) || defined(SIG_RX651)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/cac.hpp"
 #include "RX64M/port.hpp"
 #include "RX600/mtu3.hpp"
@@ -345,6 +358,7 @@
 #include "RX600/lvda.hpp"
 #include "RX600/cac.hpp"
 #include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/exdmac.hpp"
 #include "RX600/elc.hpp"
@@ -388,6 +402,7 @@
 #elif defined(SIG_RX72N) || defined(SIG_RX72M)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/cac.hpp"
 #include "RX72N/port.hpp"
 #include "RX600/mtu3.hpp"
@@ -445,6 +460,7 @@
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/cac.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX72T/poe3.hpp"
@@ -482,7 +498,3 @@
 #include "RX600/iwdt.hpp"
 #include "RX600/riic.hpp"
 #include "RX600/rspi.hpp"
-#if defined(SIG_RX140)
-#else
-#include "RX600/mpu.hpp"
-#endif
