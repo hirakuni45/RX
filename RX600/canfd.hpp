@@ -1,7 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・CANFD 定義
+	@brief	RX700 グループ・CANFD 定義 @n
+			※新型 CAN コントローラー @n
+			・RX26T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

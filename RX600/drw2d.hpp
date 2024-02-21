@@ -1,7 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ DRW2D 定義
+	@brief	RX700 グループ DRW2D 定義 @n
+			・RX65N/RX651 @n
+			・RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -24,7 +26,6 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = per;					///< ペリフェラル型
 		static constexpr auto IVEC = ICU::GROUPAL1::DRW_IRQ;	///< 割り込みベクター
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

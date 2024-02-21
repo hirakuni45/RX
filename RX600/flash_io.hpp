@@ -1,12 +1,13 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65[1N]/RX66T/RX72T/RX72M/RX72N グループ FLASH 制御 @n
+	@brief	RX600/RX700 グループ FLASH 制御 @n
+			RX64M/RX71M/RX65[1N]/RX66T/RX72T/RX72M/RX72N @n
 			・データフラッシュ消去サイズ（６４バイト単位） @n
 			・データフラッシュ書き込みサイズ（４バイト単位） @n
 			このファイルは、「renesas.hpp」にインクルードされる前提なので、個別にインクルードしない。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -176,7 +177,7 @@ namespace device {
 		{
 			if(trans_farm_) return true;
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651)
 			/// RX64M, RX71M, RX65x では、ファームを転送する必要がある。
 			/// FCUファームウェア格納領域 FEFF F000h～FEFF FFFFh 4Kバイト
 			/// FCURAM領域 007F 8000h～007F 8FFFh 4Kバイト
@@ -454,7 +455,7 @@ namespace device {
 				turn_pe_();
 			}
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
 			device::FLASH::FPROTR = 0x5501;  // ロックビットプロテクト無効
 #endif
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先

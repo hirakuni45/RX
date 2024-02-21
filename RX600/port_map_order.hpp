@@ -4,7 +4,7 @@
 	@brief	ポート・マッピング・オーダー型 @n
             ポートの機能設定において、どのピンを利用するかを、選択する「型」
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -62,8 +62,10 @@ namespace device {
 			NONE,		///< 無し
 			SCI_I2C,	///< SCI 簡易 I2C 通信
 			SCI_SPI,	///< SCI 簡易 SPI 通信
-			SSI_IN,		///< SSI[E] 通信、入力のみ
-			SSI_OUT,	///< SSI[E] 通信、出力のみ
+			RSPI_SSL0,	///< RSPI SSL0 制御
+			RSPI_SSL1,	///< RSPI SSL1 制御
+			RSPI_SSL2,	///< RSPI SSL2 制御
+			RSPI_SSL3,	///< RSPI SSL3 制御
 		};
 
 		/// ポート・マッピング・ユーザー設定関数型

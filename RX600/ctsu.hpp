@@ -1,7 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX231, RX671 静電容量式タッチセンサ (CTSU/CTSUa) 定義
+	@brief	RX マイコン 静電容量式タッチセンサ (CTSU/CTSUa) 定義 @n
+			・RX231 @n
+			・RX671
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

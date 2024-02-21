@@ -54,7 +54,7 @@ namespace device {
 
 	typedef scih_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
 		ICU::VECTOR::TEI12, ICU::VECTOR::ERI12> SCI12;
-#elif defined(SIG_RX26T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX651) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX26T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCIh 定義クラス（通常ベクター、グループベクター版）

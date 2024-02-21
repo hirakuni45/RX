@@ -371,8 +371,8 @@ namespace device {
 			@brief  PHn 端子機能制御レジスタ（PHnPFS）（n = 1, 2）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static inline pfs_p_t<0x0008'C1C9> PH1PFS;
-		static inline pfs_p_t<0x0008'C1CA> PH2PFS;
+		static inline pfs_pi_t<0x0008'C1C9> PH1PFS;
+		static inline pfs_pi_t<0x0008'C1CA> PH2PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -380,8 +380,8 @@ namespace device {
 			@brief  PJn 端子機能制御レジスタ（PJnPFS）（n = 3, 5）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static inline pfs_p_t<0x0008'C1D3> PJ3PFS;
-		static inline pfs_p_t<0x0008'C1D5> PJ5PFS;
+		static inline pfs_pi_t<0x0008'C1D3> PJ3PFS;
+		static inline pfs_pi_t<0x0008'C1D5> PJ5PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

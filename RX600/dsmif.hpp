@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX700 グループ Δ-Σモジュレータインタフェース定義
+	@brief	RX700 グループ Δ-Σモジュレータインタフェース定義 @n
+			・RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

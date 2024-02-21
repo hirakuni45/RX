@@ -31,8 +31,8 @@ namespace device {
 	template <class SCI, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class sci_spi_io {
 
-		static RBF	recv_;
-		static SBF	send_;
+		static inline RBF	recv_;
+		static inline SBF	send_;
 
 		uint8_t		level_;
 
@@ -63,7 +63,7 @@ namespace device {
 
 		static INTERRUPT_FUNC void send_task_()
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651)
 			if(send_.length() > 0) {
 				SCI::TDR = send_.get();
 			}
@@ -93,7 +93,7 @@ namespace device {
 
 		void set_intr_() noexcept
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651)
 			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
 #else
 			set_vector_(SCI::get_rx_vec(), SCI::get_te_vec());
@@ -230,10 +230,4 @@ namespace device {
 			}
 		}
 	};
-
-	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
-		RBF sci_spi_io<SCI, RBF, SBF, PSEL>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
-		SBF sci_spi_io<SCI, RBF, SBF, PSEL>::send_;
 }

@@ -1,29 +1,39 @@
 #pragma once
-//=========================================================================//
+//=============================================================================//
 /*!	@file
-	@brief	RX24T/RX26T/RX600/RX700 バス定義
+	@brief	RX600 グループ・バス定義 @n
+			RX24T (CSx レジスタ 0 ～ 3, SDRAM 制御無し) @n
+			RX26T (CSx レジスタ 0 ～ 3, SDRAM 制御無し) @n
+			RX62N/RX621 @n
+			RX63N/RX631 @n
+			RX64M/RX71M @n
+			RX65N/RX651 @n
+			RX671 @n
+			RX72M/RX72N @n
+			RX66T/RX72T (CSx レジスタ 0 ～ 3, SDRAM 制御無し)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=========================================================================//
+//=============================================================================//
 #include "common/io_utils.hpp"
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  バス定義基底クラス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct bus_t {
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct bus_base_t {
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CSn 制御レジスタ（CSnCR）（n = 0 ～ 7）
+			@brief  CSn 制御レジスタ（CSnCR）（n = 0 ～ 3）
+			@param[in]	base	ベース・アドレス
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
 		struct csncr_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -40,25 +50,18 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B12>    MPXEN;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csncr_t<0x0008'3802> CS0CR;
 		static inline csncr_t<0x0008'3812> CS1CR;
 		static inline csncr_t<0x0008'3822> CS2CR;
 		static inline csncr_t<0x0008'3832> CS3CR;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		static inline csncr_t<0x0008'3842> CS4CR;
-		static inline csncr_t<0x0008'3852> CS5CR;
-		static inline csncr_t<0x0008'3862> CS6CR;
-		static inline csncr_t<0x0008'3872> CS7CR;
-#endif
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CSn リカバリサイクル設定レジスタ（CSnREC）（n = 0 ～ 7）
+			@param[in]	base	ベース・アドレス
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
 		struct csnrec_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -71,23 +74,16 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 4> WRCV;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csncr_t<0x0008'380A> CS0REC;
 		static inline csncr_t<0x0008'381A> CS1REC;
 		static inline csncr_t<0x0008'382A> CS2REC;
 		static inline csncr_t<0x0008'383A> CS3REC;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		static inline csncr_t<0x0008'384A> CS4REC;
-		static inline csncr_t<0x0008'385A> CS5REC;
-		static inline csncr_t<0x0008'386A> CS6REC;
-		static inline csncr_t<0x0008'387A> CS7REC;
-#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CS リカバリサイクル挿入許可レジスタ（CSRECEN）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -118,11 +114,12 @@ namespace device {
 		static inline csrecen_t<0x0008'3880> CSRECEN;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CSn モードレジスタ（CSnMOD）（n = 0 ～ 7）
+			@brief  CSn モードレジスタ（CSnMOD）（n = 0 ～ 3）
+			@param[in]	base	ベース・アドレス
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
 		struct csnmod_t : public rw16_t<base> {
 			typedef rw16_t<base> io_;
@@ -140,25 +137,18 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B15> PRMOD;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnmod_t<0x0008'3002> CS0MOD;
 		static inline csnmod_t<0x0008'3012> CS1MOD;
 		static inline csnmod_t<0x0008'3022> CS2MOD;
 		static inline csnmod_t<0x0008'3032> CS3MOD;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		static inline csnmod_t<0x0008'3042> CS4MOD;
-		static inline csnmod_t<0x0008'3052> CS5MOD;
-		static inline csnmod_t<0x0008'3062> CS6MOD;
-		static inline csnmod_t<0x0008'3072> CS7MOD;
-#endif
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CSn ウェイト制御レジスタ 1（CSnWCR1）（n = 0 ～ 7）
+			@brief  CSn ウェイト制御レジスタ 1（CSnWCR1）（n = 0 ～ 3）
+			@param[in]	base	ベース・アドレス
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
 		struct csnwcr1_t : public rw32_t<base> {
 			typedef rw32_t<base> io_;
@@ -175,25 +165,18 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B24, 5> CSRWWAIT;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnwcr1_t<0x0008'3004> CS0WCR1;
 		static inline csnwcr1_t<0x0008'3014> CS1WCR1;
 		static inline csnwcr1_t<0x0008'3024> CS2WCR1;
 		static inline csnwcr1_t<0x0008'3034> CS3WCR1;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		static inline csnwcr1_t<0x0008'3044> CS4WCR1;
-		static inline csnwcr1_t<0x0008'3054> CS5WCR1;
-		static inline csnwcr1_t<0x0008'3064> CS6WCR1;
-		static inline csnwcr1_t<0x0008'3074> CS7WCR1;
-#endif
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CSn ウェイト制御レジスタ 2（CSnWCR2）（n = 0 ～ 7）
+			@brief  CSn ウェイト制御レジスタ 2（CSnWCR2）（n = 0 ～ 3）
+			@param[in]	base	ベース・アドレス
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
 		struct csnwcr2_t : public rw32_t<base> {
 			typedef rw32_t<base> io_;
@@ -218,30 +201,23 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B28, 3> CSON;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline csnwcr2_t<0x0008'3008> CS0WCR2;
 		static inline csnwcr2_t<0x0008'3018> CS1WCR2;
 		static inline csnwcr2_t<0x0008'3028> CS2WCR2;
 		static inline csnwcr2_t<0x0008'3038> CS3WCR2;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		static inline csnwcr2_t<0x0008'3048> CS4WCR2;
-		static inline csnwcr2_t<0x0008'3058> CS5WCR2;
-		static inline csnwcr2_t<0x0008'3068> CS6WCR2;
-		static inline csnwcr2_t<0x0008'3078> CS7WCR2;
-#endif
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CS 空間クラス
+			@brief  CS 空間クラス（CSn）（n = 0 ～ 3）
 			@param[in]	base	レジスタ・ベース・アドレス
 			@param[in]	org		CS 空間開始アドレス
 			@param[in]	end		CS 空間終了アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base, uint32_t org, uint32_t end>
-		class cs_t {
-		public:
+		struct cs_t {
+
 			static constexpr auto ORG = org;			///< CS 空間開始アドレス
 			static constexpr auto END = end;			///< CS 空間終了アドレス
 			static constexpr auto LEN = end - org + 1;	///< CS 空間長さ
@@ -315,26 +291,129 @@ namespace device {
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 			static inline csnwcr1_t<base + 0x0008> CSWCR2;
 		};
-
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static inline cs_t<0x0008'3000, 0xFF00'0000, 0xFFFF'FFFF> CS0;
 		static inline cs_t<0x0008'3010, 0x0700'0000, 0x07FF'FFFF> CS1;
 		static inline cs_t<0x0008'3020, 0x0600'0000, 0x06FF'FFFF> CS2;
 		static inline cs_t<0x0008'3030, 0x0500'0000, 0x05FF'FFFF> CS3;
-#endif
-
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		static inline cs_t<0x0008'3040, 0x0400'0000, 0x04FF'FFFF> CS4;
-		static inline cs_t<0x0008'3050, 0x0300'0000, 0x03FF'FFFF> CS5;
-		static inline cs_t<0x0008'3060, 0x0200'0000, 0x02FF'FFFF> CS6;
-		static inline cs_t<0x0008'3070, 0x0100'0000, 0x01FF'FFFF> CS7;
-#endif
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスエラーステータスクリアレジスタ（BERCLR）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct berclr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> STSCLR;
+		};
+		static inline berclr_t<0x0008'1300> BERCLR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスエラー監視許可レジスタ（BEREN）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct beren_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> IGAEN;
+			bit_rw_t<io_, bitpos::B1> TOEN;
+		};
+		static inline beren_t<0x0008'1304> BEREN;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスエラーステータスレジスタ 1（BERSR1）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct bersr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>    IA;
+			bit_rw_t <io_, bitpos::B1>    TO;
+
+			bits_rw_t<io_, bitpos::B4, 3> MST;
+		};
+		static inline bersr1_t<0x0008'1308> BERSR1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスエラーステータスレジスタ 2（BERSR2）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct bersr2_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B3, 13> ADDR;
+		};
+		static inline bersr2_t<0x0008'130A> BERSR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスプライオリティ制御レジスタ（BUSPRI）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct buspri_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2> BPRA;
+			bits_rw_t<io_, bitpos::B2,  2> BPRO;
+			bits_rw_t<io_, bitpos::B4,  2> BPIB;
+			bits_rw_t<io_, bitpos::B6,  2> BPGB;
+			bits_rw_t<io_, bitpos::B8,  2> BPHB;
+			bits_rw_t<io_, bitpos::B10, 2> BPFB;
+			bits_rw_t<io_, bitpos::B12, 2> BPEB;
+		};
+		static inline buspri_t<0x0008'1310> BUSPRI;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  バス定義 SDRAM クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct bus_sdram_t {
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDC 制御レジスタ（SDCCR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -355,6 +434,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDC モードレジスタ（SDCMOD）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -373,6 +453,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM アクセスモードレジスタ（SDAMOD）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -391,6 +472,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM セルフリフレッシュ制御レジスタ（SDSELF）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -409,6 +491,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM リフレッシュ制御レジスタ（SDRFCR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -428,6 +511,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM オートリフレッシュ制御レジスタ（SDRFEN）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -446,6 +530,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM 初期化シーケンス制御レジスタ（SDICR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -464,6 +549,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM 初期化レジスタ（SDIR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -484,6 +570,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM アドレスレジスタ（SDADR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -502,6 +589,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM タイミングレジスタ（SDTR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -526,6 +614,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM モードレジスタ（SDMOD）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -544,6 +633,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDRAM ステータスレジスタ（SDSR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -560,113 +650,97 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> SRFST;
 		};
 		static inline sdsr_t<0x0008'3C50> SDSR;
-#endif
+	};
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  バス定義クラス（ALL）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct bus_all_t : public bus_base_t, bus_sdram_t {
+
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  バス定義クラス（ALL+Ex）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct bus_allex_t : public bus_base_t, bus_sdram_t {
+
+		//---------------------------------------------------------------------//
 		/*!
-			@brief  バスエラーステータスクリアレジスタ（BERCLR）
+			@brief  CSn 制御レジスタ（CSnCR）（n = 4 ～ 7）
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct berclr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> STSCLR;
-		};
-		static inline berclr_t<0x0008'1300> BERCLR;
+		//---------------------------------------------------------------------//
+		static inline csncr_t<0x0008'3842> CS4CR;
+		static inline csncr_t<0x0008'3852> CS5CR;
+		static inline csncr_t<0x0008'3862> CS6CR;
+		static inline csncr_t<0x0008'3872> CS7CR;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//---------------------------------------------------------------------//
 		/*!
-			@brief  バスエラー監視許可レジスタ（BEREN）
+			@brief  CSn リカバリサイクル設定レジスタ（CSnREC）（n = 4 ～ 7）
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct beren_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> IGAEN;
-			bit_rw_t<io_, bitpos::B1> TOEN;
-		};
-		static inline beren_t<0x0008'1304> BEREN;
+		//---------------------------------------------------------------------//
+		static inline csncr_t<0x0008'384A> CS4REC;
+		static inline csncr_t<0x0008'385A> CS5REC;
+		static inline csncr_t<0x0008'386A> CS6REC;
+		static inline csncr_t<0x0008'387A> CS7REC;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//---------------------------------------------------------------------//
 		/*!
-			@brief  バスエラーステータスレジスタ 1（BERSR1）
+			@brief  CSn モードレジスタ（CSnMOD）（n = 4 ～ 7）
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct bersr1_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>    IA;
-			bit_rw_t <io_, bitpos::B1>    TO;
-
-			bits_rw_t<io_, bitpos::B4, 3> MST;
-		};
-		static inline bersr1_t<0x0008'1308> BERSR1;
+		//---------------------------------------------------------------------//
+		static inline csnmod_t<0x0008'3042> CS4MOD;
+		static inline csnmod_t<0x0008'3052> CS5MOD;
+		static inline csnmod_t<0x0008'3062> CS6MOD;
+		static inline csnmod_t<0x0008'3072> CS7MOD;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//---------------------------------------------------------------------//
 		/*!
-			@brief  バスエラーステータスレジスタ 2（BERSR2）
+			@brief  CSn ウェイト制御レジスタ 1（CSnWCR1）（n = 4 ～ 7）
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct bersr2_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B3, 13> ADDR;
-		};
-		static inline bersr2_t<0x0008'130A> BERSR2;
+		//---------------------------------------------------------------------//
+		static inline csnwcr1_t<0x0008'3044> CS4WCR1;
+		static inline csnwcr1_t<0x0008'3054> CS5WCR1;
+		static inline csnwcr1_t<0x0008'3064> CS6WCR1;
+		static inline csnwcr1_t<0x0008'3074> CS7WCR1;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//---------------------------------------------------------------------//
 		/*!
-			@brief  バスプライオリティ制御レジスタ（BUSPRI）
+			@brief  CSn ウェイト制御レジスタ 2（CSnWCR2）（n = 4 ～ 7）
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct buspri_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0,  2> BPRA;
-			bits_rw_t<io_, bitpos::B2,  2> BPRO;
-			bits_rw_t<io_, bitpos::B4,  2> BPIB;
-			bits_rw_t<io_, bitpos::B6,  2> BPGB;
-			bits_rw_t<io_, bitpos::B8,  2> BPHB;
-			bits_rw_t<io_, bitpos::B10, 2> BPFB;
-			bits_rw_t<io_, bitpos::B12, 2> BPEB;
-		};
-		static inline buspri_t<0x0008'1310> BUSPRI;
+		//---------------------------------------------------------------------//
+		static inline csnwcr2_t<0x0008'3048> CS4WCR2;
+		static inline csnwcr2_t<0x0008'3058> CS5WCR2;
+		static inline csnwcr2_t<0x0008'3068> CS6WCR2;
+		static inline csnwcr2_t<0x0008'3078> CS7WCR2;
 
 
-#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
+		//---------------------------------------------------------------------//
+		/*!
+			@brief  CS 空間クラス（CSn）（n = 4 ～ 7）
+		*/
+		//---------------------------------------------------------------------//
+		static inline cs_t<0x0008'3040, 0x0400'0000, 0x04FF'FFFF> CS4;
+		static inline cs_t<0x0008'3050, 0x0300'0000, 0x03FF'FFFF> CS5;
+		static inline cs_t<0x0008'3060, 0x0200'0000, 0x02FF'FFFF> CS6;
+		static inline cs_t<0x0008'3070, 0x0100'0000, 0x01FF'FFFF> CS7;
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  拡張バスマスタ優先度制御レジスタ (EBMAPCR)
+			@brief  拡張バスマスタ優先度制御レジスタ (EBMAPCR) @n
+					※ GLCDC 関係に関連したレジスタ
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -692,7 +766,13 @@ namespace device {
 			bit_rw_t <io_, bitpos::B31>     PRERR;
 		};
 		static inline ebmapcr_t<0x000C'5800> EBMAPCR;
-#endif
 	};
-	typedef bus_t BUS;
+
+#if defined(SIG_RX62N) || defined(SIG_RX621) || defined(SIG_RX63N) || defined(SIG_RX631) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX671)
+	typedef bus_all_t BUS;
+#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+	typedef bus_allex_t BUS;
+#elif defined(SIG_RX24T) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+	typedef bus_base_t BUS;
+#endif
 }

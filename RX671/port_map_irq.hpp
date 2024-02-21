@@ -1,17 +1,12 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	ポート・マッピング (IRQ) @n
-			RX63N/RX631 @n
-			RX64M/RX71M @n
-			RX65N/RX651 @n
-			RX72N @n
-			RX72M
+	@brief	RX671 ポート・マッピング (IRQ) @n
 			IRQx-DS 端子は、ディープスタンバイからの復帰が有効な端子 @n
 			  通常割り込み入力としても使え、通常「ORDER::FIRST」で選択する。 @n
 			  詳しくは、MPC の解説を参照する事。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -31,22 +26,52 @@ namespace device {
 		{
 			switch(odr) {
 			// P30 (DS)
-			// P10
+			// P50
+			// P60
+			// P70
+			// P90
+			// PA0
 			// PD0
+			// PH1
 			case ORDER::FIRST:
 				PORT3::PMR.B0 = 0;
 				MPC::P30PFS.PSEL = 0;
 				MPC::P30PFS.ISEL = ena;
 				break;
 			case ORDER::SECOND:
-				PORT1::PMR.B0 = 0;
-				MPC::P10PFS.PSEL = 0;
-				MPC::P10PFS.ISEL = ena;
+				PORT5::PMR.B0 = 0;
+				MPC::P50PFS.PSEL = 0;
+				MPC::P50PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT6::PMR.B0 = 0;
+				MPC::P60PFS.PSEL = 0;
+				MPC::P60PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORT7::PMR.B0 = 0;
+				MPC::P70PFS.PSEL = 0;
+				MPC::P70PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORT9::PMR.B0 = 0;
+				MPC::P90PFS.PSEL = 0;
+				MPC::P90PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTA::PMR.B0 = 0;
+				MPC::PA0PFS.PSEL = 0;
+				MPC::PA0PFS.ISEL = ena;
+				break;
+			case ORDER::SEVENTH:
 				PORTD::PMR.B0 = 0;
 				MPC::PD0PFS.PSEL = 0;
 				MPC::PD0PFS.ISEL = ena;
+				break;
+			case ORDER::EIGHTH:
+				PORTH::PMR.B1 = 0;
+				MPC::PH1PFS.PSEL = 0;
+				MPC::PH1PFS.ISEL = ena;
 				break;
 			default:
 				return false;
@@ -58,22 +83,40 @@ namespace device {
 		{
 			switch(odr) {
 			// P31 (DS)
-			// P11
+			// P51
+			// P61
+			// P71
 			// PD1
+			// PH2
 			case ORDER::FIRST:
 				PORT3::PMR.B1 = 0;
 				MPC::P31PFS.PSEL = 0;
 				MPC::P31PFS.ISEL = ena;
 				break;
 			case ORDER::SECOND:
-				PORT1::PMR.B1 = 0;
-				MPC::P11PFS.PSEL = 0;
-				MPC::P11PFS.ISEL = ena;
+				PORT5::PMR.B1 = 0;
+				MPC::P51PFS.PSEL = 0;
+				MPC::P51PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT6::PMR.B1 = 0;
+				MPC::P61PFS.PSEL = 0;
+				MPC::P61PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORT7::PMR.B1 = 0;
+				MPC::P71PFS.PSEL = 0;
+				MPC::P71PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
 				PORTD::PMR.B1 = 0;
 				MPC::PD1PFS.PSEL = 0;
 				MPC::PD1PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTH::PMR.B2 = 0;
+				MPC::PH2PFS.PSEL = 0;
+				MPC::PH2PFS.ISEL = ena;
 				break;
 			default:
 				return false;
@@ -86,6 +129,10 @@ namespace device {
 			switch(odr) {
 			// P32 (DS)
 			// P12
+			// P52
+			// P62
+			// P82
+			// PB2
 			// PD2
 			case ORDER::FIRST:
 				PORT3::PMR.B2 = 0;
@@ -98,6 +145,26 @@ namespace device {
 				MPC::P12PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT5::PMR.B2 = 0;
+				MPC::P52PFS.PSEL = 0;
+				MPC::P52PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORT6::PMR.B2 = 0;
+				MPC::P62PFS.PSEL = 0;
+				MPC::P62PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORT8::PMR.B2 = 0;
+				MPC::P82PFS.PSEL = 0;
+				MPC::P82PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTB::PMR.B2 = 0;
+				MPC::PB2PFS.PSEL = 0;
+				MPC::PB2PFS.ISEL = ena;
+				break;
+			case ORDER::SEVENTH:
 				PORTD::PMR.B2 = 0;
 				MPC::PD2PFS.PSEL = 0;
 				MPC::PD2PFS.ISEL = ena;
@@ -113,6 +180,11 @@ namespace device {
 			switch(odr) {
 			// P33 (DS)
 			// P13
+			// P23
+			// P53
+			// P63
+			// P83
+			// PB3
 			// PD3
 			case ORDER::FIRST:
 				PORT3::PMR.B3 = 0;
@@ -125,6 +197,31 @@ namespace device {
 				MPC::P13PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = 0;
+				MPC::P23PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORT5::PMR.B3 = 0;
+				MPC::P53PFS.PSEL = 0;
+				MPC::P53PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORT6::PMR.B3 = 0;
+				MPC::P63PFS.PSEL = 0;
+				MPC::P63PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORT8::PMR.B3 = 0;
+				MPC::P83PFS.PSEL = 0;
+				MPC::P83PFS.ISEL = ena;
+				break;
+			case ORDER::SEVENTH:
+				PORTB::PMR.B3 = 0;
+				MPC::PB3PFS.PSEL = 0;
+				MPC::PB3PFS.ISEL = ena;
+				break;
+			case ORDER::EIGHTH:
 				PORTD::PMR.B3 = 0;
 				MPC::PD3PFS.PSEL = 0;
 				MPC::PD3PFS.ISEL = ena;
@@ -141,6 +238,9 @@ namespace device {
 			// PB1 (DS)
 			// P14
 			// P34
+			// P54
+			// P64
+			// PB4
 			// PD4
 			// PF5
 			case ORDER::FIRST:
@@ -159,11 +259,26 @@ namespace device {
 				MPC::P34PFS.ISEL = ena;
 				break;
 			case ORDER::FOURTH:
+				PORT5::PMR.B4 = 0;
+				MPC::P54PFS.PSEL = 0;
+				MPC::P54PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORT6::PMR.B4 = 0;
+				MPC::P64PFS.PSEL = 0;
+				MPC::P64PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTB::PMR.B4 = 0;
+				MPC::PB4PFS.PSEL = 0;
+				MPC::PB4PFS.ISEL = ena;
+				break;
+			case ORDER::SEVENTH:
 				PORTD::PMR.B4 = 0;
 				MPC::PD4PFS.PSEL = 0;
 				MPC::PD4PFS.ISEL = ena;
 				break;
-			case ORDER::FIFTH:
+			case ORDER::EIGHTH:
 				PORTF::PMR.B5 = 0;
 				MPC::PF5PFS.PSEL = 0;
 				MPC::PF5PFS.ISEL = ena;
@@ -179,6 +294,9 @@ namespace device {
 			switch(odr) {
 			// PA4 (DS)
 			// P15
+			// P25
+			// PA5
+			// PC5
 			// PD5
 			// PE5
 			case ORDER::FIRST:
@@ -192,11 +310,26 @@ namespace device {
 				MPC::P15PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = 0;
+				MPC::P25PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTA::PMR.B5 = 0;
+				MPC::PA5PFS.PSEL = 0;
+				MPC::PA5PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTC::PMR.B5 = 0;
+				MPC::PC5PFS.PSEL = 0;
+				MPC::PC5PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
 				PORTD::PMR.B5 = 0;
 				MPC::PD5PFS.PSEL = 0;
 				MPC::PD5PFS.ISEL = ena;
 				break;
-			case ORDER::FOURTH:
+			case ORDER::SEVENTH:
 				PORTE::PMR.B5 = 0;
 				MPC::PE5PFS.PSEL = 0;
 				MPC::PE5PFS.ISEL = ena;
@@ -212,6 +345,9 @@ namespace device {
 			switch(odr) {
 			// PA3 (DS)
 			// P16
+			// P26
+			// P56
+			// PB6
 			// PD6
 			// PE6
 			case ORDER::FIRST:
@@ -225,11 +361,26 @@ namespace device {
 				MPC::P16PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT2::PMR.B6 = 0;
+				MPC::P26PFS.PSEL = 0;
+				MPC::P26PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORT5::PMR.B6 = 0;
+				MPC::P56PFS.PSEL = 0;
+				MPC::P56PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTB::PMR.B6 = 0;
+				MPC::PB6PFS.PSEL = 0;
+				MPC::PB6PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
 				PORTD::PMR.B6 = 0;
 				MPC::PD6PFS.PSEL = 0;
 				MPC::PD6PFS.ISEL = ena;
 				break;
-			case ORDER::FOURTH:
+			case ORDER::SEVENTH:
 				PORTE::PMR.B6 = 0;
 				MPC::PE6PFS.PSEL = 0;
 				MPC::PE6PFS.ISEL = ena;
@@ -245,6 +396,9 @@ namespace device {
 			switch(odr) {
 			// PE2 (DS)
 			// P17
+			// P27
+			// P77
+			// PA7
 			// PD7
 			// PE7
 			case ORDER::FIRST:
@@ -258,11 +412,26 @@ namespace device {
 				MPC::P17PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT2::PMR.B7 = 0;
+				MPC::P27PFS.PSEL = 0;
+				MPC::P27PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORT7::PMR.B7 = 0;
+				MPC::P77PFS.PSEL = 0;
+				MPC::P77PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTA::PMR.B7 = 0;
+				MPC::PA7PFS.PSEL = 0;
+				MPC::PA7PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
 				PORTD::PMR.B7 = 0;
 				MPC::PD7PFS.PSEL = 0;
 				MPC::PD7PFS.ISEL = ena;
 				break;
-			case ORDER::FOURTH:
+			case ORDER::SEVENTH:
 				PORTE::PMR.B7 = 0;
 				MPC::PE7PFS.PSEL = 0;
 				MPC::PE7PFS.ISEL = ena;
@@ -279,6 +448,9 @@ namespace device {
 			// P40 (DS)
 			// P00
 			// P20
+			// P73
+			// P80
+			// PE0
 			case ORDER::FIRST:
 				MPC::P40PFS.ISEL = ena;
 				break;
@@ -292,6 +464,21 @@ namespace device {
 				MPC::P20PFS.PSEL = 0;
 				MPC::P20PFS.ISEL = ena;
 				break;
+			case ORDER::FOURTH:
+				PORT7::PMR.B3 = 0;
+				MPC::P73PFS.PSEL = 0;
+				MPC::P73PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORT8::PMR.B0 = 0;
+				MPC::P80PFS.PSEL = 0;
+				MPC::P80PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTE::PMR.B0 = 0;
+				MPC::PE0PFS.PSEL = 0;
+				MPC::PE0PFS.ISEL = ena;
+				break;
 			default:
 				return false;
 			}
@@ -304,6 +491,9 @@ namespace device {
 			// P41 (DS)
 			// P01
 			// P21
+			// P81
+			// P91
+			// PE1
 			case ORDER::FIRST:
 				MPC::P41PFS.ISEL = ena;
 				break;
@@ -317,6 +507,21 @@ namespace device {
 				MPC::P21PFS.PSEL = 0;
 				MPC::P21PFS.ISEL = ena;
 				break;
+			case ORDER::FOURTH:
+				PORT8::PMR.B1 = 0;
+				MPC::P81PFS.PSEL = 0;
+				MPC::P81PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORT9::PMR.B1 = 0;
+				MPC::P91PFS.PSEL = 0;
+				MPC::P91PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTE::PMR.B1 = 0;
+				MPC::PE1PFS.PSEL = 0;
+				MPC::PE1PFS.ISEL = ena;
+				break;
 			default:
 				return false;
 			}
@@ -329,6 +534,10 @@ namespace device {
 			// P42 (DS)
 			// P02
 			// P55
+			// P72
+			// P92
+			// PA2
+			// PC2
 			case ORDER::FIRST:
 				MPC::P42PFS.ISEL = ena;
 				break;
@@ -342,6 +551,26 @@ namespace device {
 				MPC::P55PFS.PSEL = 0;
 				MPC::P55PFS.ISEL = ena;
 				break;
+			case ORDER::FOURTH:
+				PORT7::PMR.B2 = 0;
+				MPC::P72PFS.PSEL = 0;
+				MPC::P72PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORT9::PMR.B2 = 0;
+				MPC::P92PFS.PSEL = 0;
+				MPC::P92PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTA::PMR.B2 = 0;
+				MPC::PA2PFS.PSEL = 0;
+				MPC::PA2PFS.ISEL = ena;
+				break;
+			case ORDER::SEVENTH:
+				PORTC::PMR.B2 = 0;
+				MPC::PC2PFS.PSEL = 0;
+				MPC::PC2PFS.ISEL = ena;
+				break;
 			default:
 				return false;
 			}
@@ -353,7 +582,11 @@ namespace device {
 			switch(odr) {
 			// P43 (DS)
 			// P03
+			// P93
 			// PA1
+			// PC3
+			// PE3
+			// PJ3
 			case ORDER::FIRST:
 				MPC::P43PFS.ISEL = ena;
 				break;
@@ -363,9 +596,29 @@ namespace device {
 				MPC::P03PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT9::PMR.B3 = 0;
+				MPC::P93PFS.PSEL = 0;
+				MPC::P93PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
 				PORTA::PMR.B1 = 0;
 				MPC::PA1PFS.PSEL = 0;
 				MPC::PA1PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTC::PMR.B3 = 0;
+				MPC::PC3PFS.PSEL = 0;
+				MPC::PC3PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTE::PMR.B3 = 0;
+				MPC::PE3PFS.PSEL = 0;
+				MPC::PE3PFS.ISEL = ena;
+				break;
+			case ORDER::SEVENTH:
+				PORTJ::PMR.B3 = 0;
+				MPC::PJ3PFS.PSEL = 0;
+				MPC::PJ3PFS.ISEL = ena;
 				break;
 			default:
 				return false;
@@ -377,20 +630,44 @@ namespace device {
 		{
 			switch(odr) {
 			// P44 (DS)
+			// P24
+			// P74
 			// PB0
 			// PC1
+			// PC4
+			// PE4
 			case ORDER::FIRST:
 				MPC::P44PFS.ISEL = ena;
 				break;
 			case ORDER::SECOND:
+				PORT2::PMR.B4 = 0;
+				MPC::P24PFS.PSEL = 0;
+				MPC::P24PFS.ISEL = ena;
+				break;
+			case ORDER::THIRD:
+				PORT7::PMR.B4 = 0;
+				MPC::P74PFS.PSEL = 0;
+				MPC::P74PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = 0;
 				MPC::PB0PFS.ISEL = ena;
 				break;
-			case ORDER::THIRD:
+			case ORDER::FIFTH:
 				PORTC::PMR.B1 = 0;
 				MPC::PC1PFS.PSEL = 0;
 				MPC::PC1PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = 0;
+				MPC::PC4PFS.ISEL = ena;
+				break;
+			case ORDER::SEVENTH:
+				PORTE::PMR.B4 = 0;
+				MPC::PE4PFS.PSEL = 0;
+				MPC::PE4PFS.ISEL = ena;
 				break;
 			default:
 				return false;
@@ -403,7 +680,11 @@ namespace device {
 			switch(odr) {
 			// P45 (DS)
 			// P05
+			// P65
+			// P75
+			// PB5
 			// PC6
+			// PJ5
 			case ORDER::FIRST:
 				MPC::P45PFS.ISEL = ena;
 				break;
@@ -413,9 +694,29 @@ namespace device {
 				MPC::P05PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT6::PMR.B5 = 0;
+				MPC::P65PFS.PSEL = 0;
+				MPC::P65PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORT7::PMR.B5 = 0;
+				MPC::P75PFS.PSEL = 0;
+				MPC::P75PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTB::PMR.B5 = 0;
+				MPC::PB5PFS.PSEL = 0;
+				MPC::PB5PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
 				PORTC::PMR.B6 = 0;
 				MPC::PC6PFS.PSEL = 0;
 				MPC::PC6PFS.ISEL = ena;
+				break;
+			case ORDER::SEVENTH:
+				PORTJ::PMR.B5 = 0;
+				MPC::PJ5PFS.PSEL = 0;
+				MPC::PJ5PFS.ISEL = ena;
 				break;
 			default:
 				return false;
@@ -427,17 +728,41 @@ namespace device {
 		{
 			switch(odr) {
 			// P46 (DS)
+			// P66
+			// P76
+			// P86
+			// PA6
 			// PC0
 			// PC7
 			case ORDER::FIRST:
 				MPC::P46PFS.ISEL = ena;
 				break;
 			case ORDER::SECOND:
+				PORT6::PMR.B6 = 0;
+				MPC::P66PFS.PSEL = 0;
+				MPC::P66PFS.ISEL = ena;
+				break;
+			case ORDER::THIRD:
+				PORT7::PMR.B6 = 0;
+				MPC::P76PFS.PSEL = 0;
+				MPC::P76PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORT8::PMR.B6 = 0;
+				MPC::P86PFS.PSEL = 0;
+				MPC::P86PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTA::PMR.B6 = 0;
+				MPC::PA6PFS.PSEL = 0;
+				MPC::PA6PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
 				PORTC::PMR.B0 = 0;
 				MPC::PC0PFS.PSEL = 0;
 				MPC::PC0PFS.ISEL = ena;
 				break;
-			case ORDER::THIRD:
+			case ORDER::SEVENTH:
 				PORTC::PMR.B7 = 0;
 				MPC::PC7PFS.PSEL = 0;
 				MPC::PC7PFS.ISEL = ena;
@@ -453,7 +778,10 @@ namespace device {
 			switch(odr) {
 			// P47 (DS)
 			// P07
+			// P22
 			// P67
+			// P87
+			// PB7
 			case ORDER::FIRST:
 				MPC::P47PFS.ISEL = ena;
 				break;
@@ -463,9 +791,24 @@ namespace device {
 				MPC::P07PFS.ISEL = ena;
 				break;
 			case ORDER::THIRD:
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = 0;
+				MPC::P22PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
 				PORT6::PMR.B7 = 0;
 				MPC::P67PFS.PSEL = 0;
 				MPC::P67PFS.ISEL = ena;
+				break;
+			case ORDER::FIFTH:
+				PORT8::PMR.B7 = 0;
+				MPC::P87PFS.PSEL = 0;
+				MPC::P87PFS.ISEL = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTB::PMR.B7 = 0;
+				MPC::PB7PFS.PSEL = 0;
+				MPC::PB7PFS.ISEL = ena;
 				break;
 			default:
 				return false;

@@ -1,7 +1,12 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65N/RX671/RX66T/RX72T/RX72N/RX72M グループ・フラッシュ 定義
+	@brief	RX600/RX700 グループ・フラッシュ 定義 @n
+			・RX64M/RX71M @n
+			・RX65N/RX651 @n
+			・RX671 @n
+			・RX72N/RX72M @n
+			・RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -27,7 +32,7 @@ namespace device {
 		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
 		static constexpr auto ID_NUM = idnum;			///< ユニーク ID 数
 
-#if defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）
@@ -64,6 +69,43 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>  ROMCIV;
 		};
 		static inline romciv_t<0x0008'1004> ROMCIV;
+#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）ダミー
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct romce_null_t : public rw16_null_t<base> {
+			typedef rw16_null_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  ROMCEN;
+		};
+		static inline romce_null_t<0x0000'0000> ROMCE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM キャッシュ無効化レジスタ（ ROMCIV ）ダミー
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct romciv_null_t : public rw16_null_t<base> {
+			typedef rw16_null_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  ROMCIV;
+		};
+		static inline romciv_null_t<0x0000'0000> ROMCIV;
 #endif
 
 
@@ -172,7 +214,7 @@ namespace device {
 		static inline rw32_t<0x007F'E034> FEADDR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  FCURAM イネーブルレジスタ（FCURAME）
@@ -442,7 +484,7 @@ namespace device {
 		static inline fpckar_t<0x007F'E0E4> FPCKAR;
 
 
-#if defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュアクセスウィンドウモニタレジスタ (FAWMON)
@@ -513,7 +555,7 @@ namespace device {
 		static inline ro32_t<0x007F'B1E4> UIDR1;
 		static inline ro32_t<0x007F'B1E8> UIDR2;
 		static inline ro32_t<0xFFFF'FFF4> UIDR3;  ///< in VECTOR 
-#elif defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		static inline ro32_t<0xFE7F'7D90> UIDR0;
 		static inline ro32_t<0xFE7F'7D94> UIDR1;
 		static inline ro32_t<0xFE7F7'D98> UIDR2;
@@ -524,7 +566,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  EEPFCLK レジスタの設定 @n
-					RX72N, RX72M にあるレジスタで、クロックジェネレーターの @n
+					RX671, RX72N, RX72M にあるレジスタで、クロックジェネレーターの @n
 					FCLK を変更する前に設定する必要がある。 @n
 					この API は、system_io クラス、boost_master_clock から呼び出される。
 			@param[in]	fclk	FCLK 周波数
@@ -532,7 +574,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void set_eepfclk(uint32_t fclk)
 		{
-#if defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 			// Set for DataFlash memory access clocks
 			uint32_t clk = ((fclk / 500'000) + 1) >> 1;
 			if(clk > 60) {
@@ -548,7 +590,7 @@ namespace device {
 	typedef flash_t<65536, 3> FLASH;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef flash_t<32768, 3> FLASH;
-#elif defined(SIG_RX65N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef flash_t<32768, 4> FLASH;
 #elif defined(SIG_RX671)
 	typedef flash_t<8192, 4> FLASH;

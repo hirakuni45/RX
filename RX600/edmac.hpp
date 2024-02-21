@@ -1,8 +1,12 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	イーサネットコントローラ用 DMA コントローラ (EDMACa, PTPEDMAC) @n
-			RX64M/RX71M/RX65[1N]/RX72[NM]/RX66[1N]
+	@brief	RX600/RX700 グループ・イーサネットコントローラ用 DMA コントローラ (EDMACa, PTPEDMAC) @n
+			・RX62N @n
+			・RX63N @n
+			・RX64M/RX71M @n
+			・RX65N/RX651 @n
+			・RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -17,13 +21,10 @@ namespace device {
 	/*!
 		@brief  edmac core 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base>
 	struct edmac_core_t {
-
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -320,13 +321,14 @@ namespace device {
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	IT		割り込み型
-		@param[in]	eint	割り込み番号
+		@param[in]	eint	割り込みベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, typename IT, IT eint>
-	struct edmac_t : public edmac_core_t<base, per> {
+	struct edmac_t : public edmac_core_t<base> {
 
-		static constexpr auto EINT = eint;
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto EINT = eint;			///< 割り込みベクタ
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -463,7 +465,9 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per>
-	struct ptpedmac_t : public edmac_core_t<base, per> {
+	struct ptpedmac_t : public edmac_core_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

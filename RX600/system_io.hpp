@@ -1,7 +1,13 @@
 #pragma once
-//=========================================================================//
+//=============================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX651/RX65N/RX66T/RX72T/RX72N/RX72M グループ・システム制御 @n
+	@brief	RX600/RX700 グループ・システム制御 @n
+			・RX64M @n
+			・RX65N/RX651 @n
+			・RX671 @n
+			・RX71M @n
+			・RX72N/RX72M @n
+			・RX66T/RX72T
 			※ USB を使う場合：96MHz, 144MHz, 192MHz, 240MHz のいづれか @n
 			RX72x 系では、内部 PLL2 回路が追加され、Ethernet などに必要な 25MHz を得る為 @n
 			16MHz を使います。 @n
@@ -9,16 +15,16 @@
 			現状の実装では、PLL2 を USB のクロック源として利用する事は出来ません。 @n
 			clock_profile::TURN_USB = true; の場合、48MHz を作る事が出来ない場合、コンパイルエラーとなります。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=========================================================================//
+//=============================================================================//
 #include "RX600/system.hpp"
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス @n
 				RX71M はスーパーバイザモードでの変更が必要なので、 @n
@@ -26,7 +32,7 @@ namespace device {
 				RX71M の場合、アセンブラにオプション「--defsym MEMWAIT=1」を渡す。
 		@param[in]	OSCT	発信器種別型
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <clock_profile::OSC_TYPE OSCT>
 	class system_io
 	{
@@ -109,12 +115,12 @@ namespace device {
 		}
 
 	public:
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		/*!
 			@brief  マスター・クロックのブースト @n
 					インストラクション・クロックを最大速度にブーストする。
 		*/
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		static void boost_master_clock() noexcept
 		{
 			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC0.b() | device::SYSTEM::PRCR.PRC1.b();
@@ -160,7 +166,7 @@ namespace device {
 				return;
 			}
 
-#if defined(SIG_RX65N) || defined(SIG_RX671)
+			// このレジスタは、RX65N/RX651/RX671 にのみある、それ以外はダミーアクセス
 			if(clock_profile::ICLK >= 120'000'000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::ROMWT = 0b10;
 			} else if(clock_profile::ICLK >= 100'000'000) {
@@ -168,15 +174,18 @@ namespace device {
 			} else if(clock_profile::ICLK >= 50'000'000) {
 				device::SYSTEM::ROMWT = 0b00;
 			}
-#endif
+
+			// このレジスタは、120MHz 以上で動作が可能なマイコンにのみある、それ以外はダミーアクセス
 			// RX71M はスーパーバイザモードでの変更が必要なので、「start.s」内で行う。
 			// RX71M の場合、アセンブラにオプション「--defsym MEMWAIT=1」を渡す。
-#if defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 			if(clock_profile::ICLK > 120'000'000) {  // 120MHz 以上の場合設定
+#if defined(SIG_RX71M)
+#else
 				device::SYSTEM::MEMWAIT = 1;
 				volatile auto tmp = device::SYSTEM::MEMWAIT();  // 読み出しを行う
-			}
 #endif
+			}
+
 			// 1/64 以上、分周出来ない設定は不可
 			// ※RX72N, RX72M などは BCLK: 1/3 を選択する事が出来る。
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
@@ -214,7 +223,7 @@ namespace device {
 			// 1/2:0b0001, 1/3:0b0010, 1/4:0b0011, 1/5:0b0100
 			device::SYSTEM::SCKCR2.UCK = usb_div_() - 1;
 
-			// マイクロコントローラによっては、ICLK をブーストする前に FCLK 周期を設定する必要がある。
+			// 機種によっては、ICLK をブーストする前に FCLK 周期を設定する必要がある。
 			device::FLASH::set_eepfclk(clock_profile::FCLK);
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;  // PLL 選択
@@ -230,17 +239,21 @@ namespace device {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
 			}
 
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
-#else
-			device::SYSTEM::SOSCWTCR = 0b01010;
+			// サブクロック発信器制御
+			// サブクロックが RX66T/RX72T では、ダミーアクセスとなる。
+			device::SYSTEM::SOSCWTCR = 0b0'1010;
 			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
-#endif
+
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 
-#if defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
-			// ROM キャッシュを有効（標準）
+			// ROM キャッシュを有効（標準設定）
+			// RX64M/RX71M は機能が無いので、ダミーアクセス
+			// RX65N/RX651
+			// RX671
+			// RX72N/RX72M
+			// RX66T/RX72T
 			device::FLASH::ROMCE = 1;
-#endif
+
 #if defined(__TFU)
 			__init_tfu();
 #endif
@@ -248,12 +261,12 @@ namespace device {
 
 
 #if defined(SIG_RX72N) || defined(SIG_RX72M)
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		/*!
 			@brief  PPLL 制御を使って PHY 向け 25MHz を出力する。
 			@return 成功なら「true」
 		*/
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		static bool setup_phy25() noexcept
 		{
 			if(clock_profile::BASE != 16'000'000) {  // ベースクロックが 16MHz 以外は、生成不可とする。 
@@ -289,11 +302,11 @@ namespace device {
 	};
 
 
-	//---------------------------------------------------------------------//
+	//-------------------------------------------------------------------------//
 	/*!
 		@brief  ソフト・リセットの起動
 	*/
-	//---------------------------------------------------------------------//
+	//-------------------------------------------------------------------------//
 	inline void assert_soft_reset()
 	{
 		device::SYSTEM::PRCR = 0xA502;

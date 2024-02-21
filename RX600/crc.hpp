@@ -1,7 +1,19 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・CRC 定義
+	@brief	RX600/RX700 グループ・CRC 定義 @n
+			・RX220 @n
+			・RX231 @n
+			・RX24T @n
+			・RX26T @n
+			・RX62N/RX621 @n
+			・RX63N/RX631 @n
+			・RX63T @n
+			・RX64M/RX71M @n
+			・RX65N/RX651 @n
+			・RX66T/RX72T @n
+			・RX671 @n
+			・RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,13 +28,12 @@ namespace device {
 	/*!
 		@brief  CRC 演算器クラス
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base>
 	struct crc_t {
 
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto PERIPHERAL = peripheral::CRC;	///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -61,5 +72,5 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static inline rw16_t<base + 0x02> CRCDOR;
 	};
-	typedef crc_t<0x0008'8280, peripheral::CRC> CRC;
+	typedef crc_t<0x0008'8280> CRC;
 }

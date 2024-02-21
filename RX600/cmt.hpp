@@ -1,19 +1,20 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ CMT 定義 @n
-			RX140 @n
-			RX220 / RX231 @n
-			RX621 / RX62N @n
-			RX631 / RX63N @n
-			RX63T @n
+	@brief	RX600/RX700 グループ CMT 定義 @n
+			RX140 (CMT0/CMT1 のみ) @n
+			RX220 @n
+			RX231 @n
 			RX24T @n
 			RX26T @n
+			RX62N/RX621 @n
+			RX63N/RX631 @n
+			RX63T @n
 			RX64M/RX71M @n
-			RX651/RX65N @n
+			RX65N/RX651 @n
 			RX671 @n
 			RX66T/RX72T @n
-			RX72N
+			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -189,7 +190,7 @@ namespace device {
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
 	typedef cmt_nom_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR::CMI2, clock_profile::PCLKB> CMT2;
 	typedef cmt_nom_t<0x0008'8018, peripheral::CMT3, ICU::VECTOR::CMI3, clock_profile::PCLKB> CMT3;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef cmt_nom_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
 	typedef cmt_sel_t<0x0008'8012, peripheral::CMT2, ICU::SELECTB, ICU::SELECTB::CMI2, clock_profile::PCLKB> CMT2;

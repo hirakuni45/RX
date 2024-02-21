@@ -1,10 +1,10 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	CMTW 定義 @n
+	@brief	RX600/RX700 グループ CMTW 定義 @n
 			RX26T @n
 			RX64M/RX71M @n
-			RX651/RX65N @n
+			RX65N/RX651 @n
 			RX671 @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
