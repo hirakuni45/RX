@@ -1,19 +1,20 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ CMT 定義 @n
-			RX140 @n
-			RX220 / RX231 @n
-			RX62N / RX621 @n
-			RX63N / RX631 @n
-			RX63T @n
+	@brief	RX600/RX700 グループ CMT 定義 @n
+			RX140 (CMT0/CMT1 のみ) @n
+			RX220 @n
+			RX231 @n
 			RX24T @n
 			RX26T @n
+			RX62N/RX621 @n
+			RX63N/RX631 @n
+			RX63T @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
 			RX671 @n
 			RX66T/RX72T @n
-			RX72N
+			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

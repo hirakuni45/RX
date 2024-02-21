@@ -15,13 +15,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief   高分解能 PWM 波形生成回路 クラス
-		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral per>
 	struct hrpwm_t {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = peripheral::HRPWM;	///< ペリフェラル型
 
 		//=================================================================//
 		/*!
@@ -176,20 +174,6 @@ namespace device {
 		};
 		static inline hrcksr_t<0x000C'2A70> HRCKSR;
 #endif
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  HRPWM 動作クロック選択レジスタ (HRCKSR)
-			@param[in]	base	ベースアドレス
-		*/
-		//-----------------------------------------------------------------//
-		static void set_base_clock()
-		{
-#if defined(SIG_RX72T)
-			HRCKSR.HRCKSEL = (clock_profile::PCLKC < 160'000'000) ? 0b00 : 0b01;
-#endif
-		}
 	};
-	typedef hrpwm_t<peripheral::HRPWM> HRPWM;
+	typedef hrpwm_t HRPWM;
 }

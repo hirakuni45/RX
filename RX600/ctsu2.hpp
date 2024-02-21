@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140 静電容量式タッチセンサ (CTSU2SL/CTSU2L) 定義
+	@brief	RX マイコン静電容量式タッチセンサ (CTSU2SL/CTSU2L) 定義 @n
+			・RX140
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

@@ -1,7 +1,17 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	CAC 定義
+	@brief	RX600/RX700 グループ CAC 定義 @n
+			・RX140 @n
+			・RX220 @n
+			・RX231 @n
+			・RX24T @n
+			・RX26T @n
+			・RX64M/RX71M @n
+			・RX65N/RX651 @n
+			・RX671 @n
+			・RX66T/RX72T @n
+			・RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,20 +25,19 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  クロック周波数精度測定回路（CAC）クラス
-		@param[in]	per		ペリフェラル型
 		@param[in]	INT		割り込みベクタ型
 		@param[in]	ferr	周波数エラー割り込みベクタ
 		@param[in]	mend	測定終了割り込みベクタ
 		@param[in]	ovff	オーバフロー割り込みベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff>
+	template<typename INT, INT ferr, INT mend, INT ovff>
 	struct cac_t {
 
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto FERR_VEC = ferr;		///< 周波数エラー割り込みベクター
-		static constexpr auto MEND_VEC = mend;		///< 測定終了割り込みベクター
-		static constexpr auto OVFF_VEC = ovff;		///< オーバーフロー割り込みベクター
+		static constexpr auto PERIPHERAL = peripheral::CAC;	///< ペリフェラル型
+		static constexpr auto FERR = ferr;					///< 周波数エラー割り込みベクター
+		static constexpr auto MEND = mend;					///< 測定終了割り込みベクター
+		static constexpr auto OVFF = ovff;					///< オーバーフロー割り込みベクター
 
 
 		//-----------------------------------------------------------------//
@@ -162,10 +171,8 @@ namespace device {
 	};
 
 #if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX24T)
-	typedef cac_t<peripheral::CAC,
-		ICU::VECTOR, ICU::VECTOR::FERRF, ICU::VECTOR::MENDF, ICU::VECTOR::OVFF> CAC;
+	typedef cac_t<ICU::VECTOR, ICU::VECTOR::FERRF, ICU::VECTOR::MENDF, ICU::VECTOR::OVFF> CAC;
 #elif defined(SIG_RX26T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
-	typedef cac_t<peripheral::CAC,
-		ICU::GROUPBL0, ICU::GROUPBL0::FERRI, ICU::GROUPBL0::MENDI, ICU::GROUPBL0::OVFI> CAC;
+	typedef cac_t<ICU::GROUPBL0, ICU::GROUPBL0::FERRI, ICU::GROUPBL0::MENDI, ICU::GROUPBL0::OVFI> CAC;
 #endif
 }

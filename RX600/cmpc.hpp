@@ -1,7 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T/RX26T/RX66T/RX72T グループ・CMPCa 定義
+	@brief	RX600/RX700 グループ・CMPCa 定義 @n
+			・RX24T @n
+			・RX26T @n
+			・RX66T/RX72T 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,11 +12,6 @@
 */
 //=========================================================================//
 #include "common/device.hpp"
-
-/// CMPC モジュールが無いデバイスでエラーとする
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) 
-#  error "cmpc.hpp: This module does not exist"
-#endif
 
 namespace device {
 

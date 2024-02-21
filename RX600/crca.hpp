@@ -1,8 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・CRCA 定義 @n
-			RX671
+	@brief	RX600/RX700 グループ・CRCA 定義 @n
+			・RX671
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

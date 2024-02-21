@@ -1,7 +1,15 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・CAN 定義
+	@brief	RX600/RX700 グループ CAN 定義 @n
+			・RX62N/RX621 (CAN0) @n
+			・RX63N/RX631 (CAN0) @n
+			・RX63T (CAN0) @n
+			・RX64M/RX71M (CAN0/CAN1/CAN2) @n
+			・RX65N/RX651 (CAN0/CAN1) @n
+			・RX66T/RX72T (CAN0) @n
+			・RX671 (CAN0/CAN1) @n
+			・RX72N/RX72M (CAN0/CAN1/CAN2)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -586,7 +594,7 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX63T) || defined(SIG_RX63T_S)
+#if defined(SIG_RX63N) || defined(SIG_RX631) || defined(SIG_RX63T) || defined(SIG_RX63T_S)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	CAN モジュール（CAN 通常割り込み、GROUP0 型）
@@ -624,7 +632,7 @@ namespace device {
 		ICU::VECTOR::RXM2, ICU::VECTOR::TXM2, ICU::GROUP0::ERS2> CAN2;
 #endif
 
-#elif defined(SIG_RX621) || defined(SIG_RX62N)
+#elif defined(SIG_RX62N) || defined(SIG_RX621)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	CAN モジュール（CAN 通常割り込み型）
@@ -711,10 +719,11 @@ namespace device {
 		static constexpr auto ERS = ers;	///< ERS 割り込みベクター
 	};
 
+// note: RX65x CAN0, CAN1
 	typedef can_seli_t<0x0009'0200, peripheral::CAN0,
 		ICU::SELECTB::RXF0, ICU::SELECTB::TXF0,
 		ICU::SELECTB::RXM0, ICU::SELECTB::TXM0, ICU::GROUPBE0::ERS0> CAN0;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef can_seli_t<0x0009'1200, peripheral::CAN1,
 		ICU::SELECTB::RXF1, ICU::SELECTB::TXF1,
 		ICU::SELECTB::RXM1, ICU::SELECTB::TXM1, ICU::GROUPBE0::ERS1> CAN1;
@@ -725,5 +734,4 @@ namespace device {
 		ICU::SELECTB::RXM2, ICU::SELECTB::TXM2, ICU::GROUPBE0::ERS2> CAN2;
 #endif
 #endif
-// note: RX65x/RX72x CAN0, CAN1
 }

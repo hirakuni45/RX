@@ -216,8 +216,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base, uint32_t org, uint32_t end>
-		class cs_t {
-		public:
+		struct cs_t {
+
 			static constexpr auto ORG = org;			///< CS 空間開始アドレス
 			static constexpr auto END = end;			///< CS 空間終了アドレス
 			static constexpr auto LEN = end - org + 1;	///< CS 空間長さ
@@ -659,6 +659,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct bus_all_t : public bus_base_t, bus_sdram_t {
+
 	};
 
 

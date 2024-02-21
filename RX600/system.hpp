@@ -182,7 +182,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  RAME;
 			bit_rw_t<io_, bitpos::B6>  ECCRAME;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B7>  SBYRAME;
 #endif
 		};
@@ -218,6 +218,24 @@ namespace device {
 			bits_rw_t<io_, bitpos::B28, 4> FCK;
 		};
 		static inline sckcr_t<0x0008'0020> SCKCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct romwt_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> ROMWT;
+		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -289,24 +307,6 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT)
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct romwt_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 2> ROMWT;
 		};
 
 
@@ -1214,10 +1214,19 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B4>	TSOE;
+
 			bit_rw_t<io_, bitpos::B7>	TSEN;
 		};
 		static inline tscr_t<0x0008'C500> TSCR;
 
+#if defined(SIG_RX671)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  温度センサ校正データレジスタ (TSCDR)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline ro32_t<0xFE7F'7D7C> TSCDR;
+#endif
 
 		//----  リセット  ------------------------------------------------------//
 

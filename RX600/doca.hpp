@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・DOCA 定義 @n
+	@brief	RX600/RX700 グループ・DOCA 定義 @n
 			RX26T @n
 			RX671
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -110,16 +110,15 @@ namespace device {
 	/*!
 		@brief  データ演算回路（DOCA）
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	vec		割り込みベクター
+		@param[in]	dopci	データ演算回路割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::GROUPBL0 vec>
+	template <uint32_t base, ICU::GROUPBL0 dopci>
 	struct doca_bl0_t : public doca_t<base> {
 
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto INTRV = vec;			///< 割り込みベクター
+		static constexpr auto PERIPHERAL = peripheral::DOC;	///< ペリフェラル型
+		static constexpr auto DOPCI = dopci;				///< データ演算回路割り込みベクター
 
 	};
-	typedef doca_bl0_t<0x000A'0580, peripheral::DOC, ICU::GROUPBL0::DOPCI> DOC;
+	typedef doca_bl0_t<0x000A'0580, ICU::GROUPBL0::DOPCI> DOC;
 }

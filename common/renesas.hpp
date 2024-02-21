@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	ルネサス RX マイコンシリーズ・ペリフェラル定義
+	@brief	ルネサス RX マイコンシリーズ・ペリフェラル・セレクタ
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/byte_order.h"
 #include "common/vect.h"
 #include "common/delay.hpp"
@@ -385,7 +385,6 @@
 #include "RX600/remc.hpp"
 #include "RX600/ctsu.hpp"
 #include "RX600/s12adf.hpp"
-// #include "RX600/temps.hpp"
 #include "RX600/doca.hpp"
 #include "RX600/standby_ram.hpp"
 #include "RX600/flash.hpp"
