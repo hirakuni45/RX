@@ -5,13 +5,13 @@
 			RX140 @n
 			RX220 @n
 			RX231 @n
-			RX621/RX62N @n
-			RX631/RX63N @n
+			RX62N/RX621 @n
+			RX63N/RX631 @n
 			RX63T @n
 			RX24T @n
 			RX26T @n
 			RX64M/RX71M @n
-			RX651/RX65N @n
+			RX65N/RX651 @n
 			RX671 @n
 			RX72N @n
 			RX72M @n
@@ -181,8 +181,8 @@
 #include "RX671/icu_mgr.hpp"
 #include "RX671/port_map.hpp"
 #include "RX671/port_map_mtu.hpp"
-// #include "RX671/port_map_tpu.hpp"
-// #include "RX671/port_map_irq.hpp"
+#include "RX671/port_map_tpu.hpp"
+#include "RX671/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX72N)
