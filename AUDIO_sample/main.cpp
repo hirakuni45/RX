@@ -49,6 +49,7 @@ namespace {
 	static const char* system_str_ = { "RX64M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
 
 	// SDCARD 制御リソース
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
@@ -74,6 +75,7 @@ namespace {
 	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
 
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
@@ -87,6 +89,7 @@ namespace {
 	static const char* system_str_ = { "RX65N" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
 
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
     typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
@@ -108,6 +111,7 @@ namespace {
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 	typedef device::SCI2 SCI_CH;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
 
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
@@ -127,6 +131,7 @@ namespace {
 	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
 	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
 
 	// RSPI 定義、FIRST: P20:RSPCK, P21:MOSI, P22:MISO
 	typedef device::rspi_io<device::RSPI0> SDC_SPI;
@@ -149,7 +154,7 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 2048> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
+	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF, SCI_ORDER> SCI;
 	SCI			sci_;
 
 	SemaphoreHandle_t	putch_sync_;

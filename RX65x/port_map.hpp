@@ -220,7 +220,7 @@ namespace device {
 					}
 				}
 				break;
-			case peripheral::SCI9:
+			case peripheral::SCI9:  // RX65N Envision Kit Pmod_9(TXD9), Pmod_10(RXD9)
 				{
 					// RXD9: PB6
 					// TXD9: PB7

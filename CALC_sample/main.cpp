@@ -58,12 +58,12 @@ namespace {
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;

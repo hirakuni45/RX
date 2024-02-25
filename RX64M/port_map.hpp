@@ -183,7 +183,7 @@ namespace device {
 					}
 				}
 				break;
-			case peripheral::SCI7:
+			case peripheral::SCI7:  // GR-KAEDE J14 UART Lines
 				{
 					// RXD7: P92
 					// TXD7: P90
@@ -492,7 +492,7 @@ namespace device {
 					}
 				}
 				break;
-			case peripheral::SCI1:
+			case peripheral::SCI1:  // Serial Boot Mode (145/144/100 pin)
 				{
 					// RXD1: P30
 					// TXD1: P26

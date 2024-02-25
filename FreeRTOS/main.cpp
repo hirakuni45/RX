@@ -41,6 +41,14 @@ namespace {
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+#elif defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+#elif defined(SIG_RX26T)
+	static const char* system_str_ = { "RX26T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX62N)
   #if defined(CQ_FRK)
     // FRK-RX62N(CQ 出版社)
@@ -62,14 +70,6 @@ namespace {
 	static constexpr bool LED_ACTIVE = 1;
 	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
 	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX72M)
-	static const char* system_str_ = { "RX72M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX64M)
 #ifdef GR_KAEDE
 	static const char* system_str_ = { "GR-KAEDE" };
@@ -79,28 +79,28 @@ namespace {
 #else
 	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 #endif
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX26T)
-	static const char* system_str_ = { "RX26T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
+#elif defined(SIG_RX72M)
+	static const char* system_str_ = { "RX72M DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
+#elif defined(SIG_RX66T)
+	static const char* system_str_ = { "RX66T DIY" };
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 #elif defined(SIG_RX72T)
 	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;

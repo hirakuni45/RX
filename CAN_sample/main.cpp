@@ -68,7 +68,7 @@ namespace {
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::THIRD;
 	typedef device::CAN0 CAN0_CH;
 	typedef device::CAN1 CAN1_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
@@ -78,7 +78,7 @@ namespace {
 	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static constexpr auto SCI_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto SCI_PORT = device::port_map::ORDER::THIRD;
 	typedef device::CAN0 CAN0_CH;
 	typedef device::CAN1 CAN1_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
