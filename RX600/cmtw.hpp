@@ -22,14 +22,25 @@ namespace device {
 		@brief  コンペアマッチタイマ W クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
-		@param[in]	ivec	割り込みベクター
+		@param[in]	cmwi	コンペア・マッチ割り込みベクタ
+		@param[in]	CIVT	キャプチャ系・割り込み型
+		@param[in]	ic0i	インプット・キャプチャ 0 割り込みベクタ
+		@param[in]	ic1i	インプット・キャプチャ 1 割り込みベクタ
+		@param[in]	oc0i	アウトプット・キャプチャ 0 割り込みベクタ
+		@param[in]	oc1i	アウトプット・キャプチャ 1 割り込みベクタ
+
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+	template <uint32_t base, peripheral per, ICU::VECTOR cmwi, typename CIVT,
+		CIVT ic0i, CIVT ic1i, CIVT oc0i, CIVT oc1i>
 	struct cmtw_t {
 
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto IVEC = ivec;			///< 割り込みベクター
+		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
+		static constexpr auto CMWI = cmwi;					///< コンペア・マッチ割り込みベクタ
+		static constexpr auto IC0I = ic0i;					///< インプット・キャプチャ 0 割り込みベクタ
+		static constexpr auto IC1I = ic1i;					///< インプット・キャプチャ 1 割り込みベクタ
+		static constexpr auto OC0I = oc0i;					///< アウトプット・キャプチャ 0 割り込みベクタ
+		static constexpr auto OC1I = oc1i;					///< アウトプット・キャプチャ 1 割り込みベクタ
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -96,13 +107,11 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>   IC0;
 			bits_rw_t<io_, bitpos::B2, 2>   IC1;
-
 			bit_rw_t <io_, bitpos::B4>      IC0E;
 			bit_rw_t <io_, bitpos::B5>      IC1E;
 
 			bits_rw_t<io_, bitpos::B8,  2>  OC0;
 			bits_rw_t<io_, bitpos::B10, 2>  OC1;
-
 			bit_rw_t <io_, bitpos::B12>     OC0E;
 			bit_rw_t <io_, bitpos::B13>     OC1E;
 
@@ -158,6 +167,15 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline rw32_t<base + 0x24> CMWOCR1;
 	};
-	typedef cmtw_t<0x0009'4200, peripheral::CMTW0, ICU::VECTOR::CMWI0> CMTW0;
-	typedef cmtw_t<0x0009'4280, peripheral::CMTW1, ICU::VECTOR::CMWI1> CMTW1;
+#if defined (SIG_RX26T)
+	typedef cmtw_t<0x0009'4200, peripheral::CMTW0, ICU::VECTOR::CMWI0, ICU::VECTOR,
+		ICU::VECTOR::IC0I0, ICU::VECTOR::IC1I0, ICU::VECTOR::OC0I0, ICU::VECTOR::OC1I0> CMTW0;
+	typedef cmtw_t<0x0009'4280, peripheral::CMTW1, ICU::VECTOR::CMWI1, ICU::VECTOR,
+		ICU::VECTOR::IC0I1, ICU::VECTOR::IC1I1, ICU::VECTOR::OC0I1, ICU::VECTOR::OC1I1> CMTW1;
+#else
+	typedef cmtw_t<0x0009'4200, peripheral::CMTW0, ICU::VECTOR::CMWI0, ICU::SELECTB,
+		ICU::SELECTB::IC0I0, ICU::SELECTB::IC1I0, ICU::SELECTB::OC0I0, ICU::SELECTB::OC1I0> CMTW0;
+	typedef cmtw_t<0x0009'4280, peripheral::CMTW1, ICU::VECTOR::CMWI1, ICU::SELECTB,
+		ICU::SELECTB::IC0I1, ICU::SELECTB::IC1I1, ICU::SELECTB::OC0I1, ICU::SELECTB::OC1I1> CMTW1;
+#endif
 }

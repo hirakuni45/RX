@@ -1,7 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・D/A 定義
+	@brief	RX24T グループ・D/A 定義 @n
+			A バージョン、１チャネル @n
+			B バージョン、２チャネル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,16 +17,12 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  D/A コンバータ（DA, DAa）@n
-				※チップバージョンＡとＢでチャネル数が異なる
-		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
+		@brief  D/A コンバータ（DA, DAa）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
 	struct da_t {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = peripheral::DA;	///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -69,7 +67,7 @@ namespace device {
 			@brief  D/A データレジスタ 0（DADR0）
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<0x000880C0> DADR0;
+		static inline rw16_t<0x0008'80C0> DADR0;
 
 
 		//-----------------------------------------------------------------//
@@ -77,7 +75,7 @@ namespace device {
 			@brief  D/A データレジスタ 1（DADR1）
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<0x000880C2> DADR1;
+		static inline rw16_t<0x0008'80C2> DADR1;
 
 
 		//-----------------------------------------------------------------//
@@ -97,7 +95,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DAOE0;
 			bit_rw_t<io_, bitpos::B7> DAOE1;
 		};
-		static inline dacr_t<0x000880C4> DACR;
+		static inline dacr_t<0x0008'80C4> DACR;
 
 
 		//-----------------------------------------------------------------//
@@ -116,7 +114,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DPSEL;
 		};
-		static inline dadpr_t<0x000880C5> DADPR;
+		static inline dadpr_t<0x0008'80C5> DADPR;
 	};
-	typedef da_t<0x0008'80C0, peripheral::DA> DA;
+	typedef da_t DA;
 }

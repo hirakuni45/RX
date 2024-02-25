@@ -35,7 +35,7 @@ namespace device {
 			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
 			uint8_t sel = enable ? 0b00'1010 : 0;
 			switch(odr) {
-			case ORDER::FIRST:
+			case ORDER::FIRST:  // Serial BOOT
 			// RXD1: PD5
 				PORTD::PMR.B3 = 0;
 				PORTD::ODR.B3 = i2c;

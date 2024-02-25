@@ -1,13 +1,14 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・CMTW 管理
+	@brief	RX600/RX700 グループ・CMTW マネージャー @n
+			※仕様として、1Hz 以下の周波数を設定出来ない。（改善の余地）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
@@ -19,11 +20,35 @@ namespace device {
 		@brief  CMTW ベースクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class cmtw_base {
-	public:
+	struct cmtw_base {
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CMTW ベースクラス
+			@brief  レジスタ直接型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class DIRECT : uint32_t {
+			MIN = 1,			///< 設定可能な最小値
+			MAX = 0xffff'ffff,	///< 設定可能な最大値
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  分周器型（逆数）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class DIVIDE : uint8_t {
+			I8,		///< 1/8
+			I32,	///< 1/32
+			I128,	///< 1/128
+			I512,	///< 1/512
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CMTW モード型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class MODE : uint8_t {
@@ -46,13 +71,14 @@ namespace device {
 		typedef CMTW value_type;	///< チャネル・クラス型
 
 	private:
-		uint8_t		level_;
+		uint32_t		rate_;
+		ICU::LEVEL		level_;
 
 		void sleep_() const { asm("nop"); }
 
-		static FUNC	func_;
+		static inline FUNC	func_;
 
-		static volatile uint32_t counter_;
+		static inline volatile uint32_t counter_;
 
 		static INTERRUPT_FUNC void i_task_()
 		{
@@ -60,16 +86,15 @@ namespace device {
 			func_();
 		}
 
-		static constexpr bool calc_freq_(uint32_t freq, uint8_t& cks, uint32_t& cmcor)
+		static constexpr bool calc_freq_(uint32_t freq, uint8_t& cks, uint64_t& cmcor)
 		{
 			if(freq == 0) return false;
 
-			cmcor = CMTW::PCLK / freq / 4;
+			cmcor = static_cast<uint64_t>(CMTW::PCLK) / freq / 4;
 			++cmcor;
 			cmcor >>= 1;
-
 			cks = 0;
-			while(cmcor > 65536) {
+			while(cmcor > 0x1'0000'0000) {
 				cmcor >>= 2;
 				++cks;
 			}
@@ -80,7 +105,7 @@ namespace device {
 			return true;
 		}
 
-		static constexpr uint32_t get_real_freq_(uint8_t cks, uint32_t cmcor)
+		static constexpr uint32_t get_real_freq_(uint8_t cks, uint64_t cmcor)
 		{
 			uint32_t rate = CMTW::PCLK / cmcor;
 			rate /= 8 << (cks * 2);
@@ -93,7 +118,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmtw_mgr() : level_(0) { }
+		cmtw_mgr() : rate_(0), level_(ICU::LEVEL::NONE) { }
 
 
 		//-----------------------------------------------------------------//
@@ -108,7 +133,7 @@ namespace device {
 		static constexpr bool probe_freq(uint32_t freq, uint32_t thper = 10) noexcept
 		{
 			uint8_t cks = 0;
-			uint32_t cmcor = 0;
+			uint64_t cmcor = 0;
 			if(!calc_freq_(freq, cks, cmcor)) {
 				return false;
 			}
@@ -125,19 +150,16 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  開始
-			@param[in]	freq	タイマー周波数
+			@brief  レジスタ直、開始
+			@param[in]	direct	レジスタ直接設定値
+			@param[in]	cks		分周器設定型
 			@param[in]	level	割り込みレベル（０ならポーリング）
-			@return レンジオーバーなら「false」を返す
+			@return タイマー周波数が範囲を超えた場合「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level = 0) noexcept
+		bool start(DIRECT direct, DIVIDE cks, ICU::LEVEL level = ICU::LEVEL::NONE) noexcept
 		{
-			uint8_t cks;
-			uint32_t cmcor;
-			if(!calc_freq_(freq, cks, cmcor)) {
-				return false;
-			}
+			rate_ = 0;
 
 			level_ = level;
 
@@ -146,17 +168,19 @@ namespace device {
 			CMTW::CMWSTR = 0;
 
 			CMTW::CMWCNT = 0;
-		    CMTW::CMWCOR = cmcor - 1;
+		    CMTW::CMWCOR = static_cast<uint32_t>(direct) - 1;
 
 			counter_ = 0;
 
-			auto vec = CMTW::IVEC;
-			if(level_ > 0) {
+			CMTW::CMWIOR.CMWE = 1;
+
+			auto vec = CMTW::CMWI;
+			if(level_ != ICU::LEVEL::NONE) {
 				icu_mgr::set_interrupt(vec, i_task_, level_);
-			    CMTW::CMCR = CMTW::CMCR.CKS.b(cks) | CMTW::CMCR.CMIE.b();
+			    CMTW::CMWCR = CMTW::CMWCR.CKS.b(static_cast<uint8_t>(cks)) | CMTW::CMWCR.CMWIE.b();
 			} else {
-				icu_mgr::set_interrupt(vec, nullptr, 0);
-			    CMTW::CMCR = CMTW::CMCR.CKS.b(cks);
+				icu_mgr::set_interrupt(vec, nullptr, ICU::LEVEL::NONE);
+			    CMTW::CMWCR = CMTW::CMWCR.CKS.b(static_cast<uint8_t>(cks));
 			}
 			CMTW::CMWSTR = 1;
 
@@ -166,13 +190,39 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  廃棄（割り込みを停止して、ユニットを停止）
+			@brief  インターバル・タイマー開始
+			@param[in]	freq	タイマー周波数
+			@param[in]	level	割り込みレベル（NONE ならポーリング）
+			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		void destroy() noexcept
+		bool start(uint32_t freq, ICU::LEVEL level = ICU::LEVEL::NONE) noexcept
 		{
-		    CMTW::CMCR.CMIE = 0;
-			CMTW::enable(false);
+			uint8_t cks;
+			uint64_t cmwcor;
+			if(!calc_freq_(freq, cks, cmwcor)) {
+				return false;
+			}
+
+			auto ret = start(static_cast<DIRECT>(cmwcor - 1), static_cast<DIVIDE>(cks), level);
+
+			rate_ = freq;
+
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  廃棄（割り込みを停止して、ユニットを停止）
+			@param[in]	power	消費電力を低減しない場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		void destroy(bool power) noexcept
+		{
+		    CMTW::CMWCR.CMWIE = 0;
+			CMTW::CMSTR = 0;
+			power_mgr::turn(CMTW::PERIPHERAL, power);
 		}
 
 
@@ -183,13 +233,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync() const noexcept
 		{
-			if(level_ > 0) {
+			if(level_ != ICU::LEVEL::NONE) {
 				volatile uint32_t cnt = counter_;
 				while(cnt == counter_) sleep_();
 			} else {
 				auto ref = CMTW::CMWCNT();
 				while(ref <= CMTW::CMWCNT()) sleep_();
-				task_();
+				func_();
 				++counter_;
 			}
 		}
@@ -211,6 +261,23 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static uint32_t get_counter() noexcept { return counter_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	周期を取得
+			@param[in]	real	「true」にした場合、設定されている実際の値
+			@return 周期
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_rate(bool real = false) const noexcept
+		{
+			if(real) {
+				return get_real_freq_(CMTW::CMWCR.CKS(), CMTW::CMWCOR() + 1);
+			} else {
+				return rate_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -239,7 +306,4 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static FUNC& at_func() noexcept { return func_; }
 	};
-
-	template <class CMTW, class FUNC> volatile uint32_t cmtw_mgr<CMTW, FUNC>::counter_ = 0;
-	template <class CMTW, class FUNC> FUNC cmtw_mgr<CMTW, FUNC>::func_;
 }
