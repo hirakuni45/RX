@@ -82,10 +82,10 @@ namespace device {
 			bool f = !ena;
 			switch(per) {
 
-			case peripheral::CMTW0:
+			case peripheral::CMTW1:
 				SYSTEM::MSTPCRA.MSTPA0 = f;
 				break;
-			case peripheral::CMTW1:
+			case peripheral::CMTW0:
 				SYSTEM::MSTPCRA.MSTPA1 = f;
 				break;
 
