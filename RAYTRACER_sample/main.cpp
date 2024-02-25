@@ -122,7 +122,7 @@ namespace {
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
 	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
@@ -141,7 +141,7 @@ namespace {
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
 	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;

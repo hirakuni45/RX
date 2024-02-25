@@ -94,14 +94,14 @@ namespace {
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB> SCI_IO;
+	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB, device::port_map::ORDER::THIRD> SCI_IO;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB> SCI_IO;
+	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB, device::port_map::ORDER::THIRD> SCI_IO;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 

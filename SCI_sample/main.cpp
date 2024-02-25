@@ -16,6 +16,7 @@
 #include "common/scif_io.hpp"
 #include "common/rsci_io.hpp"
 #include "common/cmt_mgr.hpp"
+#include "common/cmtw_mgr.hpp"
 #include "common/command.hpp"
 
 #include "common/format.hpp"
@@ -95,18 +96,18 @@ namespace {
 	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 // RSCI を使う場合：
 //	typedef device::rsci_io<device::RSCI8, RXB, TXB> SCI;
-#elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-// SCIF を使う場合：
-//	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M DIY" };
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
+// SCIF を使う場合：
+//	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M DIY" };
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 // SCIF を使う場合：
 //	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
 #elif defined(SIG_RX65N)
@@ -138,6 +139,8 @@ namespace {
 
 	SCI		sci_;
 
+//  CMTW を持っている CPU の場合
+//	typedef device::cmtw_mgr<device::CMTW0> CMT;
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
 

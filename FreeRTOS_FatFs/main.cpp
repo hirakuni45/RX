@@ -41,83 +41,13 @@
 
 namespace {
 
-#if defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
 
-	static constexpr uint32_t sdc_spi_speed_ = 30000000;
-
-#elif defined(SIG_RX72M)
-
-	static const char* system_str_ = { "RX72M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	static constexpr uint32_t sdc_spi_speed_ = 30000000;
-
-#elif defined(SIG_RX64M)
-	typedef utils::rtc_io RTC;
-
-#ifdef GR_KAEDE
-	static const char* system_str_ = { "GR-KAEDE" };
-	typedef device::PORT<device::PORTC, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORTC, device::bitpos::B1> LED2;
-	typedef device::SCI7 SCI_CH;
-
-#if SOFT_SPI
-	// Soft SDC 用　SPI 定義（SPI）
-	typedef device::PORT<device::PORTC, device::bitpos::B7> MISO;
-	typedef device::PORT<device::PORTC, device::bitpos::B6> MOSI;
-	typedef device::PORT<device::PORTC, device::bitpos::B5> SPCK;
-	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
-#else
-	///< Hard SPI 定義
-	typedef device::rspi_io<device::RSPI> SDC_SPI;
-#endif
-
-	///< SDC インターフェースの定義
-	typedef device::PORT<device::PORTC, device::bitpos::B4> SDC_SELECT;	///< SD カード選択信号
-	typedef device::NULL_PORT  SDC_POWER;	///< SD カード電源制御（制御なし、常にＯＮ）
-	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< SD カード検出
-
-	static const uint32_t sdc_spi_speed_ = 30000000;
-#else
-	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-
-	///< Soft SDC 用　SPI 定義（SPI）
-	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
-	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
-	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
-	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
-
-	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
-	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;  ///< カード選択信号
-	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
-
-	static constexpr uint32_t sdc_spi_speed_ = 30000000;
-#endif
-
-#elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
-
-	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
-	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
-	typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
-	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
-	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
-	typedef device::NULL_PORT  SDC_POWER;	///< SD カード電源制御（制御なし、常にＯＮ）
-	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD カード検出
-
-	static constexpr uint32_t sdc_spi_speed_ = 30000000;
-
-#elif defined(SIG_RX24T)
+#if defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 
 #ifdef SOFT_SPI
 	// Soft SDC 用　SPI 定義（SPI）
@@ -129,17 +59,78 @@ namespace {
 	// RSPI SDC 用　SPI 定義（RSPI0）
 	typedef device::rspi_io<device::RSPI0> SDC_SPI;
 #endif
-
 	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
 
-	static constexpr uint32_t sdc_spi_speed_ = 20000000;
+	static constexpr uint32_t sdc_spi_speed_ = 20'000'000;
+#elif defined(SIG_RX64M)
+	typedef utils::rtc_io RTC;
 
+#ifdef GR_KAEDE
+	static const char* system_str_ = { "GR-KAEDE" };
+	typedef device::PORT<device::PORTC, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORTC, device::bitpos::B1> LED2;
+	typedef device::sci_io<device::SCI7, RXB, TXB> SCI;
+
+#if SOFT_SPI
+	// Soft SDC 用　SPI 定義（SPI）
+	typedef device::PORT<device::PORTC, device::bitpos::B7> MISO;
+	typedef device::PORT<device::PORTC, device::bitpos::B6> MOSI;
+	typedef device::PORT<device::PORTC, device::bitpos::B5> SPCK;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
+#else
+	///< Hard SPI 定義
+	typedef device::rspi_io<device::RSPI> SDC_SPI;
+#endif
+	///< SDC インターフェースの定義
+	typedef device::PORT<device::PORTC, device::bitpos::B4> SDC_SELECT;	///< SD カード選択信号
+	typedef device::NULL_PORT  SDC_POWER;	///< SD カード電源制御（制御なし、常にＯＮ）
+	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< SD カード検出
+
+	static const uint32_t sdc_spi_speed_ = 30'000'000;
+#else
+	static const char* system_str_ = { "RX64M" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
+
+	///< Soft SDC 用　SPI 定義（SPI）
+	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
+	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
+	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
+
+	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;  ///< カード選択信号
+	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
+
+	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
+#endif
+
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
+
+	static constexpr uint32_t sdc_spi_speed_ = 30000000;
+#elif defined(SIG_RX65N)
+	static const char* system_str_ = { "RX65N Envision Kit" };
+	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
+
+	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
+	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
+	typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
+	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
+	typedef device::NULL_PORT  SDC_POWER;	///< SD カード電源制御（制御なし、常にＯＮ）
+	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD カード検出
+
+	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
+	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
 
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
@@ -147,32 +138,31 @@ namespace {
     typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
     SDC			sdc_;
 
-	static constexpr uint32_t sdc_spi_speed_ = 30000000;
+	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
+#elif defined(SIG_RX72M)
+	static const char* system_str_ = { "RX72M" };
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 
+	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
+	static const char* system_str_ = { "RX72T DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 
 	// RSPI 定義、FIRST: P20:RSPCK, P21:MOSI, P22:MISO
 	typedef device::rspi_io<device::RSPI0> SDC_SPI;
 
-	typedef device::PORT<device::PORT3, device::bitpos::B0> SDC_SELECT;			///< カード選択信号
-	typedef device::PORT<device::PORTA, device::bitpos::B2> SDC_POWER;			///< カード電源制御 MIC2076-1YM (ACTIVE-HIGH)
-	typedef device::PORT<device::PORTB, device::bitpos::B4, 0> SDC_DETECT;		///< カード検出（ACTIVE-LOW）
-	typedef device::NULL_PORT SDC_WPRT;											///< カード書き込み禁止ポート設定（無効）
+	typedef device::PORT<device::PORT3, device::bitpos::B0> SDC_SELECT;		///< カード選択信号
+	typedef device::PORT<device::PORTA, device::bitpos::B2> SDC_POWER;		///< カード電源制御 MIC2076-1YM (ACTIVE-HIGH)
+	typedef device::PORT<device::PORTB, device::bitpos::B4, 0> SDC_DETECT;	///< カード検出（ACTIVE-LOW）
+	typedef device::NULL_PORT SDC_WPRT;										///< カード書き込み禁止ポート設定（無効）
 
-	static constexpr uint32_t sdc_spi_speed_ = 30000000;
-
+	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
 #endif
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;
-
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
-
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI			sci_;
 
 	SemaphoreHandle_t	putch_sync_;

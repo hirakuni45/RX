@@ -52,10 +52,13 @@
 
 namespace {
 
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+
 #if defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 	// SDCARD 制御リソース
 #if 1
 	// RSPI0 定義
@@ -89,7 +92,7 @@ namespace {
 //	typedef device::PORT<device::PORT0, device::bitpos::B2> LED1;
 //	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
 //	typedef device::PORT<device::PORTC, device::bitpos::B1> LED3;
-	typedef device::SCI7 SCI_CH;
+	typedef device::sci_io<device::SCI7, RXB, TXB> SCI;
 
     typedef device::rspi_io<device::RSPI> SDC_SPI;
     typedef device::PORT<device::PORTC, device::bitpos::B4> SDC_SELECT; ///< カード選択信号
@@ -100,7 +103,7 @@ namespace {
 	#else
 	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 
 	// SDCARD 制御リソース（ソフト SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
@@ -128,13 +131,14 @@ namespace {
 
 	static const char* system_str_ = { "RX71M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<DEVICE::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 
 #elif defined(SIG_RX65N)
 
 	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
+	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
+
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< 「０」でＯＮ
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
@@ -157,7 +161,8 @@ namespace {
 
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
+	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
+
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
@@ -180,7 +185,7 @@ namespace {
 	// RSPI I/F
 	static const char* system_str_ = { "RX72T" };
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	typedef device::SCI1 SCI_CH;
+	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
 
 #if 0
 	// SDCARD 制御リソース（ソフト SPI）
@@ -208,10 +213,6 @@ namespace {
 	typedef chip::DS3231<I2C> RTC;
 #endif
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
-
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI		sci_;
 
 	static const uint32_t CMT_FREQ = 1000;  ///< 計測用タイマー分解能
