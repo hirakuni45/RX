@@ -24,47 +24,33 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class TMR, class FUNC = utils::null_task>
 	class tmr_mgr {
+	public:
 
-		static inline FUNC	func_;
+		typedef TMR tmr_type;	///< TMR チャネル・クラス型
+	
+	private:
 
-		ICU::VECTOR		intr_vec_;
+		static inline uint32_t counter_;
+		static inline FUNC func_;
+
 		uint32_t		freq_;
 		uint8_t			shift_;
 
+
+		void sleep_() const { asm("nop"); }
+
+
 		static INTERRUPT_FUNC void match_task_()
 		{
+			++counter_;
 			func_();
 		}
 
-	public:
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  コンストラクター
-		*/
-		//-----------------------------------------------------------------//
-		tmr_mgr() noexcept :
-			intr_vec_(ICU::VECTOR::NONE), freq_(0), shift_(0) 
-		{ }
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  開始（１６ビットインターバルタイマー）
-			@param[in]	freq	タイマー周波数
-			@param[in]	level	割り込みレベル（０ならポーリング）
-			@return タイマー周波数が範囲を超えた場合「false」を返す
-		*/
-		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level = 0) noexcept
+		static constexpr bool calc_freq_(uint32_t freq, uint8_t& shift, uint32_t& match) noexcept
 		{
-			// 16 bits バインドモードでは、TMR0、TMR2 以外はエラー
-			static_assert(((TMR::PERIPHERAL == device::peripheral::TMR0) || (TMR::PERIPHERAL == device::peripheral::TMR2)),
-				"The TMR peripheral specifies TMR0 or TMR2.");
-
-			freq_ = freq;
-
-			auto match = TMR::PCLK / freq;
-			uint8_t shift = 0;
+			match = TMR::PCLK / freq;
+			shift = 0;
 			while(match > 65536) {
 				match /= 2;
 				++shift;
@@ -77,25 +63,95 @@ namespace device {
 				++shift;
 			}
 			if(match <= 1) return false;
-			shift_ = shift;
+
+			return true;
+		}
+
+
+		static constexpr uint32_t get_real_freq_(uint8_t shift, uint32_t match)
+		{
+			uint32_t rate = (TMR::PCLK >> shift) / match;
+			return rate;
+		}
+
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		tmr_mgr() noexcept : freq_(0), shift_(0) 
+		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	設定周波数の誤差を検証
+			@param[in]	freq	周波数
+			@param[in]	thper	許容誤差（通常 1.0%） @n
+								百分率を 10 倍した値を設定
+			@return 誤差範囲なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		static constexpr bool probe_freq(uint32_t freq, uint32_t thper = 10) noexcept
+		{
+			uint8_t shift = 0;
+			uint32_t match = 0;
+			if(!calc_freq_(freq, shift, match)) {
+				return false;
+			}
+
+			auto rate = get_real_freq_(shift, match);
+			auto d = freq * thper;
+			if((rate * 1000) < (freq * 1000 - d) || (freq * 1000 + d) < (rate * 1000)) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  開始（１６ビットインターバルタイマー）
+			@param[in]	freq	タイマー周波数
+			@param[in]	level	割り込みレベル（NONE ならポーリング）
+			@return タイマー周波数が範囲を超えた場合「false」を返す
+		*/
+		//-----------------------------------------------------------------//
+		bool start(uint32_t freq, ICU::LEVEL level = ICU::LEVEL::NONE) noexcept
+		{
+			// 16 bits バインドモードでは、TMR0、TMR2 以外はエラー
+			static_assert(TMR::BIND16, "The TMR peripheral specifies TMR0 or TMR2.");
+
+			uint32_t match = 0;
+			uint8_t shift = 0;
+			if(!calc_freq_(freq, shift, match)) {
+				return false;
+			}
 
 			if(!device::power_mgr::turn(TMR::PERIPHERAL)) {
 				return false;
 			}
 
+			shift_ = shift;
+			freq_ = freq;
+
 			TMR::TCCR = 0;
-			if(TMR::PERIPHERAL == device::peripheral::TMR0) {
+			if(TMR::BIND16) {
 				device::TMR1::TCCR = 0;
 			} else {
 				device::TMR3::TCCR = 0;
 			}
 
+			counter_ = 0;
 			TMR::TCR.CCLR = 0b01;  // CMP Match-A
 			TMR::TCNT16 = 0;
 			TMR::TCORA16 = match - 1;
 
-			if(level > 0) {
-				intr_vec_ = icu_mgr::set_interrupt(TMR::CMIA_VEC, match_task_, level);
+			if(level != ICU::LEVEL::NONE) {
+				icu_mgr::set_interrupt(TMR::CMIA, match_task_, level);
 				TMR::TCR.CMIEA = 1;
 			}
 
@@ -119,19 +175,38 @@ namespace device {
 				0b110,  // shift:13, PCLK/8192
 			};
 			// 16 ビットカウンタモード（カウント開始）
-			if(TMR::PERIPHERAL == device::peripheral::TMR0) {
+			if(TMR::BIND16) {
 				device::TMR1::TCCR.CKS = cks[shift];
 			} else {
 				device::TMR3::TCCR.CKS = cks[shift];
 			}
 			TMR::TCCR.CSS = 0b11;
-			if(TMR::PERIPHERAL == device::peripheral::TMR0) {
+			if(TMR::BIND16) {
 				device::TMR1::TCCR.CSS = 0b01;
 			} else {
 				device::TMR3::TCCR.CSS = 0b01;
 			}
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みと同期
+		*/
+		//-----------------------------------------------------------------//
+		void sync() const noexcept
+		{
+			if(icu_mgr::get_level(TMR::CMIA) != ICU::LEVEL::NONE) {
+				volatile uint32_t cnt = counter_;
+				while(cnt == counter_) sleep_();
+			} else {
+				auto ref = TMR::TCNT16();
+				while(ref <= TMR::TCNT16()) sleep_();
+				func_();
+				++counter_;
+			}
 		}
 
 
@@ -159,7 +234,7 @@ namespace device {
 			@return 割り込みベクター
 		*/
 		//-----------------------------------------------------------------//
-		auto get_intr_vec() const noexcept { return intr_vec_; }
+		auto get_intr_vec() const noexcept { return TMR::CMIA; }
 
 
 		//-----------------------------------------------------------------//
