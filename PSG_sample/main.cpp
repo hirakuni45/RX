@@ -23,15 +23,7 @@
 
 namespace {
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
-
 #if defined(SIG_RX231)
-	static const char* system_str_ = { "RX231 DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
@@ -40,20 +32,6 @@ namespace {
 	typedef device::R12DA DAC;
 
 #elif defined(SIG_RX62N)
-  #if defined(CQ_FRK)
-    // FRK-RX62N(CQ 出版社)
-	static const char* system_str_ = { "RX62N FRK-RX62N" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-  #else
-    // BlueBoard-RX62N_100pin
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-  #endif
-
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
@@ -63,12 +41,6 @@ namespace {
 
 #elif defined(SIG_RX631)
 	// RX631 GR-CITRUS board
-	static const char* system_str_ = { "RX631 GR-CITRUS" };
-	// GR-CITRUS
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
@@ -77,10 +49,6 @@ namespace {
 	typedef device::DA DAC;
 
 #elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
-
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
@@ -89,10 +57,6 @@ namespace {
 	typedef device::R12DA DAC;
 
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
-
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
@@ -101,10 +65,7 @@ namespace {
 	typedef device::R12DA DAC;
 
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N DIY" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5, false> SW2;
-	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
@@ -114,16 +75,7 @@ namespace {
 	typedef device::R12DA DAC;
 	#define USE_SW2
 
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-
 #elif defined(SIG_RX26T)
-	static const char* system_str_ = { "RX26T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
@@ -132,10 +84,6 @@ namespace {
 	typedef device::R12DA DAC;
 
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
@@ -144,10 +92,7 @@ namespace {
 	typedef device::R12DA DAC;
 
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N DIY" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
-	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
 
 	// SSIE の FIFO サイズの２倍以上（1024）
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
@@ -157,10 +102,6 @@ namespace {
 	#define USE_SW2
 
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-
 	// D/A 出力では、無音出力は、中間電圧とする。
 	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
@@ -170,9 +111,12 @@ namespace {
 
 #endif
 
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
+	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI;
 	SCI		sci_;
 
-	typedef device::cmt_mgr<device::CMT0> CMT;
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT		cmt_;
 
 	typedef utils::command<256> CMD;
@@ -1224,6 +1168,8 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	{
 		auto intr = device::ICU::LEVEL::_4;

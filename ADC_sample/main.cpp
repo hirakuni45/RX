@@ -8,49 +8,22 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/cmt_mgr.hpp"
 #include "common/sci_io.hpp"
-#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "RX600/adc_in.hpp"
 
 namespace {
 
-#if defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
-#elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	typedef device::SCI1 SCI_CH;
-#endif
-
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-	SCI		sci_;
+	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
+	SCI_IO	sci_io_;
+
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT_MGR;
+	CMT_MGR	cmt_mgr_;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
@@ -75,25 +48,24 @@ extern "C" {
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
 	void sci_putch(char ch)
 	{
-		sci_.putch(ch);
+		sci_io_.putch(ch);
 	}
 
 	void sci_puts(const char* str)
 	{
-		sci_.puts(str);
+		sci_io_.puts(str);
 	}
 
 	// syscalls.c から呼ばれる、標準入力（stdin）
 	char sci_getch(void)
 	{
-		return sci_.getch();
+		return sci_io_.getch();
 	}
 
 	uint16_t sci_length()
 	{
-		return sci_.recv_length();
+		return sci_io_.recv_length();
 	}
-
 }
 
 int main(int argc, char** argv);
@@ -102,16 +74,22 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
-	// タイマー設定（１００Ｈｚ）
-	{
-		auto intr = device::ICU::LEVEL::_1;
-		cmt_.start(100, intr);
+	using namespace board_profile;
+
+	{  // タイマー設定（100Hz）
+		constexpr uint32_t freq = 100;
+		static_assert(CMT_MGR::probe_freq(freq), "Failed CMT rate accuracy test");
+		cmt_mgr_.start(freq, device::ICU::LEVEL::_4);
 	}
 
-	// SCI 設定
-	{
-		auto intr = device::ICU::LEVEL::_3;
-		sci_.start(115200, intr);
+	{  // SCI の開始
+		constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
+		static_assert(SCI_IO::probe_baud(baud), "Failed baud rate accuracy test");  // 許容誤差（3%）を超える場合、コンパイルエラー
+		auto intr = device::ICU::LEVEL::_2;		// 割り込みレベル（NONE を指定すると、ポーリング動作になる）
+		sci_io_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
+// 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
+// sci_io.hpp PROTOCOL enum class のタイプを参照
+//		sci_.start(baud, intr, SCI::PROTOCOL::B8_E_1S);
 	}
 
 	// A/D 変換設定

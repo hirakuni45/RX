@@ -41,22 +41,12 @@ namespace {
 
 	static constexpr int VERSION = 50;
 
-	typedef utils::fixed_fifo<char, 512> SCI_RXB;  // SCI RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> SCI_TXB;  // SCI TX (SEND) バッファの定義
-
 #if defined(SIG_RX220)
 	// 秋月 RX220 ボード
-	static const char* system_str_ = { "AE-RX220" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB, device::port_map::ORDER::SECOND> SCI_IO;
+
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX62N)
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	typedef device::PORT<device::PORT0, device::bitpos::B5, false> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB> SCI_IO;
-
 // #define SOFT_I2C
 #ifdef SOFT_I2C
 	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
@@ -66,17 +56,10 @@ namespace {
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 #endif
 #elif defined(SIG_RX631)
-	// RX631 GR-CITRUS board
-	static const char* system_str_ = { "RX631 GR-CITRUS" };
-	// GR-CITRUS
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB, device::port_map::ORDER::SECOND> SCI_IO;
+
 	typedef device::iica_io<device::RIIC0> I2C_IO;
+
 #elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB> SCI_IO;
 #ifdef SOFT_I2C
 	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
 	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
@@ -85,37 +68,22 @@ namespace {
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 #endif
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB> SCI_IO;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB, device::port_map::ORDER::THIRD> SCI_IO;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::sci_io<device::SCI1, SCI_RXB, SCI_TXB, device::port_map::ORDER::THIRD> SCI_IO;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
-	typedef device::sci_io<device::SCI9, SCI_RXB, SCI_TXB> SCI_IO;
 
 	typedef device::iica_io<device::RIIC0> I2C_IO;
 
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
-	typedef device::sci_io<device::SCI2, SCI_RXB, SCI_TXB> SCI_IO;
 
 	typedef device::SCI4 I2C_CH;
 	typedef utils::fixed_fifo<char, 512> RBF;
@@ -130,9 +98,6 @@ namespace {
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::SECOND> FT5206_I2C;
 	#define TOUCH_I2C
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
-	typedef device::sci_io<device::SCI9, SCI_RXB, SCI_TXB> SCI_IO;
 
 //	#define SOFT_I2C
 
@@ -145,6 +110,9 @@ namespace {
 #endif
 #endif
 
+	typedef utils::fixed_fifo<char, 512> SCI_RXB;  // SCI RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> SCI_TXB;  // SCI TX (SEND) バッファの定義
+	typedef device::sci_io<board_profile::SCI_CH, SCI_RXB, SCI_TXB, board_profile::SCI_ORDER> SCI_IO;
 	SCI_IO		sci_io_;
 
 #ifdef TOUCH_I2C
@@ -153,7 +121,7 @@ namespace {
 	TOUCH		touch_(ft5206_i2c_);
 #endif
 
-	typedef device::cmt_mgr<device::CMT0> CMT;
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT			cmt_;
 
 	I2C_IO		i2c_io_;
@@ -473,6 +441,8 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	{  // タイマー設定（100Hz）
 		auto intr = device::ICU::LEVEL::_1;

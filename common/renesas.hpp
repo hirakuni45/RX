@@ -13,6 +13,12 @@
 #include "common/delay.hpp"
 #include "common/device.hpp"
 
+#include "RX600/dtc.hpp"
+#include "RX600/cmt.hpp"
+#include "RX600/iwdt.hpp"
+#include "RX600/riic.hpp"
+#include "RX600/rspi.hpp"
+
 #if defined(SIG_RX140)
 #include "RX231/lvda.hpp"
 #include "RX600/cac.hpp"
@@ -39,6 +45,8 @@
 #include "RX140/system_io.hpp"
 #include "RX24T/flash_io.hpp"
 
+#include "RX140/board_profile.hpp"
+
 #elif defined(SIG_RX220)
 #include "RX220/lvda.hpp"
 #include "RX600/cac.hpp"
@@ -62,6 +70,8 @@
 #include "RX220/system_io.hpp"
 // #include "RX24T/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+
+#include "RX220/board_profile.hpp"
 
 #elif defined(SIG_RX231)
 #include "RX231/lvda.hpp"
@@ -99,6 +109,8 @@
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/dac_out.hpp"
 
+#include "RX231/board_profile.hpp"
+
 #elif defined(SIG_RX24T)
 #include "RX24T/lvda.hpp"
 #include "RX600/cac.hpp"
@@ -122,6 +134,8 @@
 #include "RX24T/flash_io.hpp"
 #include "RX24T/adc_in.hpp"
 #include "RX24T/dac_out.hpp"
+
+#include "RX24T/board_profile.hpp"
 
 #elif defined(SIG_RX26T)
 #include "RX24T/lvda.hpp"
@@ -158,6 +172,8 @@
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/dac_out.hpp"
 
+#include "RX26T/board_profile.hpp"
+
 #elif defined(SIG_RX62N) || defined(SIG_RX621)
 #include "RX62x/lvd.hpp"
 #include "RX62x/bus.hpp"
@@ -188,6 +204,8 @@
 #include "RX62x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX24T/dac_out.hpp"
+
+#include "RX62x/board_profile.hpp"
 
 #elif defined(SIG_RX63N) || defined(SIG_RX631)
 #include "RX63T/lvda.hpp"
@@ -225,6 +243,8 @@
 #include "RX600/dmac_mgr.hpp"
 #include "RX24T/dac_out.hpp"
 
+#include "RX63x/board_profile.hpp"
+
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
 #include "RX63T/lvda.hpp"
 #include "RX63T/bus.hpp"
@@ -250,6 +270,8 @@
 // #include "RX63T/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 // #include "RX63T/dac_out.hpp"
+
+#include "RX63T/board_profile.hpp"
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/lvda.hpp"
@@ -301,6 +323,8 @@
 #include "RX600/flash_io.hpp"
 #include "ff14/sdhi_io.hpp"
 #include "RX600/ssi_io.hpp"
+
+#include "RX64M/board_profile.hpp"
 
 #elif defined(SIG_RX65N) || defined(SIG_RX651)
 #include "RX600/lvda.hpp"
@@ -354,6 +378,8 @@
 #include "RX600/dac_out.hpp"
 #include "RX600/flash_io.hpp"
 
+#include "RX65x/board_profile.hpp"
+
 #elif defined(SIG_RX671)
 #include "RX600/lvda.hpp"
 #include "RX600/cac.hpp"
@@ -397,6 +423,8 @@
 #include "RX600/adc_in.hpp"
 #include "RX600/flash_io.hpp"
 #include "RX600/ether_io.hpp"
+
+#include "RX671/board_profile.hpp"
 
 #elif defined(SIG_RX72N) || defined(SIG_RX72M)
 #include "RX600/lvda.hpp"
@@ -456,6 +484,12 @@
 #include "RX600/flash_io.hpp"
 #include "RX600/ether_io.hpp"
 
+#if defined(SIG_RX72M)
+#include "RX72M/board_profile.hpp"
+#else
+#include "RX72N/board_profile.hpp"
+#endif
+
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
@@ -487,13 +521,12 @@
 #include "RX600/dac_out.hpp"
 #include "RX600/flash_io.hpp"
 
+#if defined(SIG_RX66T)
+#include "RX66T/board_profile.hpp"
+#else
+#include "RX72T/board_profile.hpp"
+#endif
+
 #else
 #  error "renesas.hpp: Requires SIG_RXxxx to be defined"
 #endif
-
-// RX マイコン共通ペリフェラル
-#include "RX600/dtc.hpp"
-#include "RX600/cmt.hpp"
-#include "RX600/iwdt.hpp"
-#include "RX600/riic.hpp"
-#include "RX600/rspi.hpp"

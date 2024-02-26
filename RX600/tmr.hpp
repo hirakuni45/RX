@@ -105,10 +105,11 @@ namespace device {
 	struct tmra0246_t : public tmr_base_t<base> {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto CMIA_VEC = cmia;	///< CMIA 割り込みベクタ
-		static constexpr auto CMIB_VEC = cmib;	///< CMIB 割り込みベクタ
-		static constexpr auto OVI_VEC  = ovi;	///< OVI 割り込みベクタ
+		static constexpr auto CMIA = cmia;		///< CMIA 割り込みベクタ
+		static constexpr auto CMIB = cmib;		///< CMIB 割り込みベクタ
+		static constexpr auto OVI  = ovi;		///< OVI 割り込みベクタ
 		static constexpr auto PCLK = clk;		///< PCLK 周波数
+		static constexpr bool BIND16 = true;	///< 16 ビットバインド有効
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -190,10 +191,11 @@ namespace device {
 	struct tmr0246_t : public tmr_base_t<base> {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto CMIA_VEC = cmia;	///< CMIA 割り込みベクタ
-		static constexpr auto CMIB_VEC = cmib;	///< CMIB 割り込みベクタ
-		static constexpr auto OVI_VEC  = ovi;	///< OVI 割り込みベクタ
+		static constexpr auto CMIA = cmia;		///< CMIA 割り込みベクタ
+		static constexpr auto CMIB = cmib;		///< CMIB 割り込みベクタ
+		static constexpr auto OVI  = ovi;		///< OVI 割り込みベクタ
 		static constexpr auto PCLK = clk;		///< PCLK 周波数
+		static constexpr bool BIND16 = true;	///< 16 ビットバインド有効
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -261,6 +263,7 @@ namespace device {
 		static constexpr auto CMIB_VEC = cmib;	///< CMIB 割り込みベクタ
 		static constexpr auto OVI_VEC  = ovi;	///< OVI 割り込みベクタ
 		static constexpr auto PCLK = clk;		///< PCLK 周波数
+		static constexpr bool BIND16 = false;	///< 16 ビットバインド不可
 	};
 
 #if defined(SIG_RX140)

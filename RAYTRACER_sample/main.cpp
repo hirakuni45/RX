@@ -26,7 +26,7 @@
 
 namespace {
 
-	typedef device::cmt_mgr<device::CMT0> CMT;
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT			cmt_;
 
 	typedef graphics::font8x16 AFONT;
@@ -38,11 +38,6 @@ namespace {
 
 #if defined(SIG_RX140)
 	// RX140 DIY ボード
-	static const char* system_str_ = { "RX140 DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTJ, device::bitpos::B1, LED_ACTIVE> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::SECOND;
-	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORTE, device::bitpos::B4> RD;
@@ -56,11 +51,6 @@ namespace {
 	TFT         tft_;
 #elif defined(SIG_RX231)
 	// RX231 DIY ボード
-	static const char* system_str_ = { "RX231 DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::SECOND;
-	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORTE, device::bitpos::B4> RD;
@@ -73,21 +63,6 @@ namespace {
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
 #elif defined(SIG_RX62N)
-  #if defined(CQ_FRK)
-    // FRK-RX62N(CQ 出版社)
-	static const char* system_str_ = { "RX62N FRK-RX62N" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-	typedef device::SCI1 SCI_CH;
-  #else
-    // BlueBoard-RX62N_100pin
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-    typedef device::SCI1 SCI_CH;
-  #endif
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORTE, device::bitpos::B4> RD;
@@ -100,14 +75,6 @@ namespace {
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
 #elif defined(SIG_RX631)
-	// RX631 GR-CITRUS board
-	static const char* system_str_ = { "RX631 GR-CITRUS" };
-	// GR-CITRUS
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::SECOND;
-    typedef device::SCI1 SCI_CH;
-
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORTB, device::bitpos::B4> RD;
@@ -120,13 +87,8 @@ namespace {
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;	
 #elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
-	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
-
 	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
 	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
 	typedef device::PORT<device::PORT5, device::bitpos::B0> WR;
@@ -137,15 +99,9 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
-
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
-	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
-
 	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
 	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
 	typedef device::PORT<device::PORT5, device::bitpos::B0> WR;
@@ -156,14 +112,9 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
-
 #elif defined(SIG_RX65N)
 	/// for RX65N Envision Kit
-	static const char* system_str_ = { "RX65N" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-	typedef device::SCI9 SCI_CH;
+	typedef device::PORT<device::PORT0, device::bitpos::B5, false> SW2;
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	/// フレームバッファ開始アドレスは null_ptr の関係で０から開始出来ない
@@ -179,10 +130,6 @@ namespace {
 	#define USE_GLCDC
 
 #elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
@@ -194,12 +141,7 @@ namespace {
 	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
-
 #elif defined(SIG_RX26T)
-	static const char* system_str_ = { "RX26T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
@@ -211,12 +153,7 @@ namespace {
 	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
-
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
@@ -228,14 +165,9 @@ namespace {
 	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
-
 #elif defined(SIG_RX72N)
 	/// for RX72N Envision Kit
-	static const char* system_str_ = { "RX72N" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-	typedef device::SCI2 SCI_CH;
+	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x0080'0000);
@@ -249,10 +181,6 @@ namespace {
 	#define USE_GLCDC
 
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-	typedef device::SCI1 SCI_CH;
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
@@ -264,7 +192,6 @@ namespace {
 	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
-
 #endif
 
 #ifndef USE_GLCDC
@@ -292,7 +219,7 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF, SCI_ORDER> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RECV_BUFF, SEND_BUFF, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
 	bool		run_ = false;
@@ -427,6 +354,8 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	{  // SCI 設定
 		auto intr_lvl = device::ICU::LEVEL::_2;

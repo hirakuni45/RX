@@ -21,77 +21,40 @@
 namespace {
 
 #if defined(SIG_RX62N)
-  #if defined(CQ_FRK)
-    // FRK-RX62N(CQ 出版社)
-	static const char* system_str_ = { "RX62N FRK-RX62N" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
-  #else
-    // BlueBoard-RX62N_100pin
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI1 SCI_CH;
-  #endif
 	// See 'RX62x/port_map_mtu.hpp' J6_6
 	typedef device::MTU0 MTU_CH;
 	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
 	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
 	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
 	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
-	typedef device::SCI9 SCI_CH;
 	// CN13 (1): PD1_AN109_IRQ1 (MTIOC4B)
 	typedef device::MTU4 MTU_CH;
 	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIFTH;
 #elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
 	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
-	typedef device::SCI2 SCI_CH;
 	// Pmod2 (8): PD1_RESET (MTIOC4B)
 	typedef device::MTU4 MTU_CH;
 	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIFTH;
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
-	typedef device::SCI1 SCI_CH;
 	typedef device::MTU0 MTU_CH;
 	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
-
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI;
 	SCI		sci_;
 
-	typedef device::cmt_mgr<device::CMT0> CMT;
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT		cmt_;
 
 	typedef device::mtu_io<MTU_CH, utils::null_task, utils::null_task, MTU_ORDER> MTU;
@@ -211,6 +174,8 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	LED::DIR = 1;
 	LED::P = 0;

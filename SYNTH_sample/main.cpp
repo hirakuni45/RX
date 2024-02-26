@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX65N/RX72N Envision Kit SYNTH sample
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -36,18 +36,12 @@
 
 namespace {
 
-	static const char* SOUND_COLOR_FILE = { "DX7_0628.SYX" };
+	static constexpr char SOUND_COLOR_FILE[] = "DX7_0628.SYX";
 
 	typedef utils::fixed_fifo<uint8_t, 64> RB64;
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
 
 #if defined(SIG_RX65N)
-
-	static const char* sys_msg_ = { "RX65N Envision Kit" };
-
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
-
 	static constexpr uint32_t AUDIO_SAMPLE_RATE = 48'000;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
@@ -78,12 +72,6 @@ namespace {
 	SDHI		sdh_;
 
 #elif defined(SIG_RX72N)
-
-	static const char* sys_msg_ = { "RX72N Envision Kit" };
-
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
-
 //	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
 
 	static constexpr uint32_t AUDIO_SAMPLE_RATE = 48'000;
@@ -116,10 +104,6 @@ namespace {
 
 #elif defined(SIG_RX72T)
 	// RSPI I/F
-	static const char* system_str_ = { "RX72T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	typedef device::SCI1 SCI_CH;
-
 #if 0
 	// SDCARD 制御リソース（ソフト SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
@@ -158,7 +142,7 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 256> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 512> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RECV_BUFF, SEND_BUFF, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
 #ifdef USE_GRAPHICS
@@ -1423,6 +1407,8 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
+	using namespace board_profile;
+
 	{  // SCI 設定
 		auto sci_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, sci_level);
@@ -1451,7 +1437,7 @@ int main(int argc, char** argv)
 		set_sample_rate(AUDIO_SAMPLE_RATE);
 	}
 
-	utils::format("\r%s Start for SYNTH sample\n") % sys_msg_;
+	utils::format("\r%s Start for SYNTH sample\n") % system_str_;
 	cmd_.set_prompt("# ");
 
 	{  // GLCDC 初期化

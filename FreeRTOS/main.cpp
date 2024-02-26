@@ -20,96 +20,14 @@
 #include "semphr.h"
 #include "task.h"
 
-#ifdef SIG_RX64M
-// RX64Mで、GR-KAEDE の場合有効にする
-// #define GR_KAEDE
-#endif
-
 namespace {
+
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
+	CMT			cmt_;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
-
-#if defined(SIG_RX220)
-	// 秋月 RX220 ボード
-	static const char* system_str_ = { "AE-RX220" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX231)
-	static const char* system_str_ = { "RX231 DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX26T)
-	static const char* system_str_ = { "RX26T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX62N)
-  #if defined(CQ_FRK)
-    // FRK-RX62N(CQ 出版社)
-	static const char* system_str_ = { "RX62N FRK-RX62N" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-  #else
-    // BlueBoard-RX62N_100pin
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-  #endif
-#elif defined(SIG_RX631)
-	// RX631 GR-CITRUS board
-	static const char* system_str_ = { "RX631 GR-CITRUS" };
-	// GR-CITRUS
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX64M)
-#ifdef GR_KAEDE
-	static const char* system_str_ = { "GR-KAEDE" };
-	typedef device::PORT<device::PORTC, device::bitpos::B1> LED;
-	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
-	typedef device::sci_io<device::SCI7, RXB, TXB> SCI;
-#else
-	static const char* system_str_ = { "RX64M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
-#endif
-#elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
-#elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
-#elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
-#elif defined(SIG_RX72M)
-	static const char* system_str_ = { "RX72M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#endif
-
-	typedef device::cmt_mgr<device::CMT0> CMT;
-	CMT			cmt_;
-
+	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
 //  StaticSemaphore を使う場合、「configSUPPORT_STATIC_ALLOCATION」を「1」にする必要がある。
@@ -239,6 +157,8 @@ namespace {
 
 	void vTask1(void *pvParameters)
 	{
+		using namespace board_profile;
+
 		uint32_t loop = 0;
 		uint32_t cnt = 0;
 		while(1) {
@@ -258,6 +178,8 @@ namespace {
 
 	void vTask2(void *pvParameters)
 	{
+		using namespace board_profile;
+
 		uint32_t loop = 0;
 		uint32_t cnt = 0;
 		while(1) {
@@ -296,6 +218,8 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 	LED::P = 1;		// Off

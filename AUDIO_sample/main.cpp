@@ -7,7 +7,7 @@
 			※ SSIE を使う場合「#define USE_SSIE」(RX72N) @n
 			※ GLCDC を使う場合「#define USE_GLCDC」(RX65N/RX72N)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,15 +42,7 @@
 
 namespace {
 
-	typedef device::cmt_mgr<device::CMT0> CMT;
-	CMT			cmt_;
-
 #if defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
-
 	// SDCARD 制御リソース
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
 	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
@@ -72,11 +64,6 @@ namespace {
 	#define USE_DAC
 
 #elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
-
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
@@ -86,11 +73,6 @@ namespace {
 
 #elif defined(SIG_RX65N)
 	/// RX65N Envision Kit
-	static const char* system_str_ = { "RX65N" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
     typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
     // RX65N Envision Kit の SDHI ポートは、候補３で指定できる
@@ -107,11 +89,7 @@ namespace {
 
 #elif defined(SIG_RX72N)
 	/// RX72N Envision Kit
-	static const char* system_str_ = { "RX72N" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
-	typedef device::SCI2 SCI_CH;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
 
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
@@ -128,11 +106,6 @@ namespace {
 	#define USE_GLCDC
 
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
-	typedef device::SCI1 SCI_CH;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
-
 	// RSPI 定義、FIRST: P20:RSPCK, P21:MOSI, P22:MISO
 	typedef device::rspi_io<device::RSPI0> SDC_SPI;
 
@@ -154,8 +127,11 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 2048> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF, SCI_ORDER> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RECV_BUFF, SEND_BUFF, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
+
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
+	CMT			cmt_;
 
 	SemaphoreHandle_t	putch_sync_;
 	SemaphoreHandle_t	puts_sync_;
@@ -185,6 +161,8 @@ namespace {
 
 	void update_led_()
 	{
+		using namespace board_profile;
+
 		static uint8_t n = 0;
 		++n;
 		if(n >= 30) {
@@ -499,7 +477,7 @@ extern "C" {
 	{
 		cmd_.set_prompt("# ");
 
-		LED::DIR = 1;
+		board_profile::LED::DIR = 1;
 #ifdef USE_GLCDC
 		gui_.start();
 		gui_.setup_touch_panel();
@@ -551,7 +529,7 @@ int main(int argc, char** argv)
 		sdc_.start();
 	}
 
-	utils::format("\r%s Start for Audio Sample\n") % system_str_;
+	utils::format("\r%s Start for Audio Sample\n") % board_profile::system_str_;
 
     {
         uint32_t stack_size = 4096;
