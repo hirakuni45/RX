@@ -34,21 +34,9 @@
 #include "sound/mp3_in.hpp"
 #endif
 
-#ifdef SIG_RX64M
-// RX64Mで、GR-KAEDE の場合有効にする
-// #define GR_KAEDE
-#endif
-
 namespace {
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
-
 #if defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-
 #ifdef SOFT_SPI
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
@@ -68,11 +56,6 @@ namespace {
 	typedef utils::rtc_io RTC;
 
 #ifdef GR_KAEDE
-	static const char* system_str_ = { "GR-KAEDE" };
-	typedef device::PORT<device::PORTC, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORTC, device::bitpos::B1> LED2;
-	typedef device::sci_io<device::SCI7, RXB, TXB> SCI;
-
 #if SOFT_SPI
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B7> MISO;
@@ -90,10 +73,6 @@ namespace {
 
 	static const uint32_t sdc_spi_speed_ = 30'000'000;
 #else
-	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
-
 	///< Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
 	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
@@ -108,16 +87,9 @@ namespace {
 #endif
 
 #elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
 
 	static constexpr uint32_t sdc_spi_speed_ = 30000000;
 #elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
-
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
 	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
 	typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
@@ -128,10 +100,6 @@ namespace {
 
 	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
-
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
     // RX72N Envision Kit の SDHI ポートは、候補３で指定できる
@@ -140,16 +108,8 @@ namespace {
 
 	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
 #elif defined(SIG_RX72M)
-	static const char* system_str_ = { "RX72M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::THIRD> SCI;
-
 	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-
 	// RSPI 定義、FIRST: P20:RSPCK, P21:MOSI, P22:MISO
 	typedef device::rspi_io<device::RSPI0> SDC_SPI;
 
@@ -161,8 +121,12 @@ namespace {
 	static constexpr uint32_t sdc_spi_speed_ = 30'000'000;
 #endif
 
-	typedef device::cmt_mgr<device::CMT0> CMT;
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT			cmt_;
+
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
 	SemaphoreHandle_t	putch_sync_;
@@ -237,6 +201,8 @@ namespace {
 
 	void update_led_()
 	{
+		using namespace board_profile;
+
 		static uint8_t n = 0;
 		++n;
 		if(n >= 30) {
@@ -606,6 +572,8 @@ namespace {
 
 	void led_task_(void *pvParameters)
 	{
+		using namespace board_profile;
+
 		while(1) {
 			vTaskEnterCritical();
 			LED::P = !LED::P();
@@ -672,6 +640,8 @@ int main(int argc, char** argv)
 #endif
 
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 	LED::P = 0;		// Off

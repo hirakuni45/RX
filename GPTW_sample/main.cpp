@@ -46,41 +46,16 @@
 
 namespace {
 
-#if defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
+#if defined(SIG_RX66T)
 	typedef device::GPTW0 GPTW_CH;
 	const auto ORDER_A = device::port_map_gptw::ORDER::FIRST;
 	const auto ORDER_B = device::port_map_gptw::ORDER::FIRST;
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
 	/// PMOD Connector: PD0(CN6-7), PD1(CN6-8)
 	typedef device::GPTW1 GPTW_CH;
 	const auto ORDER_A = device::port_map_gptw::ORDER::FOURTH;
 	const auto ORDER_B = device::port_map_gptw::ORDER::FOURTH;
 #elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
-	typedef device::SCI1 SCI_CH;
 	typedef device::GPTW0 GPTW_CH;
 	const auto ORDER_A = device::port_map_gptw::ORDER::FIRST;
 	const auto ORDER_B = device::port_map_gptw::ORDER::FIRST;
@@ -93,11 +68,10 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
-
-	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI;
 	SCI		sci_;
 
-	typedef device::cmt_mgr<device::CMT0> CMT;
+	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT		cmt_;
 
 	typedef utils::command<256> CMD;
@@ -151,6 +125,8 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	{  // タイマー設定（100Hz）
 		auto intr = device::ICU::LEVEL::_4;

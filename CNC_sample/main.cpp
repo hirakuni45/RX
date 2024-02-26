@@ -2,7 +2,7 @@
 /*! @file
     @brief  CNC プロジェクト
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,7 +23,6 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B1, 0> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::SCI11 RS485_CH;
-
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 512> TXB;  // TX (送信) バッファの定義

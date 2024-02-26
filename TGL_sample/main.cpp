@@ -4,7 +4,7 @@
 			OpenGL の縮小セット風３Ｄグラフィックスサンプル @n
 			ダブルバッファを使うので、RX72N 専用
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -36,10 +36,6 @@ namespace {
 
 #if defined(SIG_RX72N)
 /// for RX72N Envision Kit
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
-	typedef device::SCI2 SCI_CH;
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	uint16_t* fb_ = reinterpret_cast<uint16_t*>(0x0080'0000);
@@ -82,7 +78,7 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RECV_BUFF, SEND_BUFF, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 }
 
@@ -118,6 +114,8 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	{  // SCI 設定
 		auto intr_lvl = device::ICU::LEVEL::_2;
