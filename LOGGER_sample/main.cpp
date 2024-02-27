@@ -1,12 +1,12 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  RX65N/RX72N Envision kit ロガーメイン
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 // 漢字フォントをキャッシュする場合
 #define CASH_KFONT
 
@@ -23,21 +23,15 @@
 
 namespace {
 
-    typedef device::cmt_mgr<device::CMT0> CMT;
+    typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
     CMT         cmt_;
 
 #if defined(SIG_RX65N)
-	static const char* SYSTEM_STR = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< '0'でＯＮ
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	// RX65N Envision Kit の SDHI ポートは、候補３で指定できる。
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::ORDER::THIRD> SDC;
 #elif defined(SIG_RX72N)
-	static const char* SYSTEM_STR = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;  ///< '1'でＯＮ
 	typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
 	// RX72N Envision Kit の SDHI ポートは、候補３で指定できる
@@ -46,7 +40,7 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 512>  REB;
 	typedef utils::fixed_fifo<char, 1024> SEB;
-	typedef device::sci_io<SCI_CH, REB, SEB> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, REB, SEB, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
 	SDC			sdc_;
@@ -243,6 +237,7 @@ extern "C" {
 
 	void main_task_(void* param)
 	{
+		using namespace board_profile;
 
 		cmd_.set_prompt("# ");
 
@@ -281,6 +276,8 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
+	using namespace board_profile;
+
 	{  // SCI 設定
 		putch_sync_ = xSemaphoreCreateBinary();	// putch 排他制御のリソースを作成
 		puts_sync_  = xSemaphoreCreateBinary();	// puts  排他制御のリソースを作成
@@ -293,7 +290,7 @@ int main(int argc, char** argv)
 		sdc_.start();
 	}
 
-	utils::format("\rStart '%s' Data Logger\n") % SYSTEM_STR;
+	utils::format("\rStart '%s' Data Logger\n") % system_str_;
 
     {
         uint32_t stack_size = 8192;

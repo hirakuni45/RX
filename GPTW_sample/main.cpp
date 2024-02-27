@@ -1,4 +1,4 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  GPTW サンプル @n
 			RX64M, RX71M: @n
@@ -26,11 +26,11 @@
 					P01 ピンにLEDを接続する @n
 					SCI1 を使用する @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 
 #include "common/fixed_fifo.hpp"

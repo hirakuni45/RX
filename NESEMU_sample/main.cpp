@@ -1,4 +1,4 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  RX65N/RX72N Envision Kit NES Emulator @n
 			・NES Emulator のソース、ライセンスは GPL @n
@@ -6,11 +6,11 @@
 			・(RX65N) オーディオとして、DA0、DA1 出力を繋ぐ必要がある。@n
 			・ファミコン互換パッドを繋ぐ必要がある。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -33,11 +33,6 @@
 namespace {
 
 #if defined(SIG_RX65N)
-
-	static const char* sys_msg_ = { "RX65N Envision Kit" };
-
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
 
 	static const uint32_t AUDIO_SAMPLE_RATE = 22'050;
 
@@ -69,11 +64,6 @@ namespace {
 	#define USE_DAC
 
 #elif defined(SIG_RX72N)
-
-	static const char* sys_msg_ = { "RX72N Envision Kit" };
-
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
 
 	static const uint32_t AUDIO_SAMPLE_RATE = 48'000;
 
@@ -109,7 +99,7 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 256> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 512> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RECV_BUFF, SEND_BUFF, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
 	static const uint16_t LCD_X = 480;
@@ -396,6 +386,8 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
+	using namespace board_profile;
+
 	{  // SCI 設定
 		auto sci_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, sci_level);
@@ -418,7 +410,7 @@ int main(int argc, char** argv)
 
 	start_audio_();
 
-	utils::format("\r%s Start for NES Emulator\n") % sys_msg_;
+	utils::format("\r%s Start for NES Emulator\n") % system_str_;
 	cmd_.set_prompt("# ");
 
 	{  // GLCDC 初期化

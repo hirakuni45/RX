@@ -42,11 +42,7 @@ namespace {
 
 #if defined(SIG_RX65N)
 
-	static const char* sys_msg_ = { "RX65N Envision Kit" };
-
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
-
+	// GLCDC の制御関係
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	// フレームバッファ開始アドレスは、100 番地から開始とする。
@@ -64,11 +60,6 @@ namespace {
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST> FT5206_I2C;
 
 #elif defined(SIG_RX72N)
-
-	static const char* sys_msg_ = { "RX72N Envision Kit" };
-
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
 
 	// GLCDC の制御関係
 	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
@@ -92,7 +83,7 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RECV_BUFF, SEND_BUFF, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
 	// RX65N/RX72N Envision Kit の SDHI は、候補３になっている
@@ -143,6 +134,8 @@ namespace {
 
 	void update_led_()
 	{
+		using namespace board_profile;
+
 		static uint8_t n = 0;
 		++n;
 		if(n >= 15) {
@@ -273,6 +266,8 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
+	using namespace board_profile;
+
 	{  // SCI 設定
 		auto sci_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, sci_level);
@@ -282,7 +277,7 @@ int main(int argc, char** argv)
 		sdh_.start();
 	}
 
-	utils::format("\r%s Start for Digital Storage Oscilloscope\n") % sys_msg_;
+	utils::format("\r%s Start for Digital Storage Oscilloscope\n") % system_str_;
 
 	{  // GLCDC の初期化
 		LCD_DISP::DIR  = 1;
