@@ -1,12 +1,12 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  RX65N/RX72N Space InvaDers Emulator
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -28,11 +28,6 @@
 namespace {
 
 #if defined(SIG_RX65N)
-
-	const char* sys_msg_ = { "RX65N Envision kit" };
-
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
 
 	// Famicon PAD (CMOS 4021B Shift Register)
 	// 電源は、微小なので、接続を簡単に行う為、ポートを使う
@@ -70,11 +65,6 @@ namespace {
 
 #elif defined(SIG_RX72N)
 
-	const char* sys_msg_ = { "RX72N Envision kit" };
-
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
-
 	// Famicon PAD (CMOS 4021B Shift Register)
 	// PMOD1                                                PAD_3V3:     Pmod1-6
 	// PMOD1                                                PAD_GND:     Pmod1-5 
@@ -110,7 +100,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RECV_BUFF, SEND_BUFF, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
 	static const auto PIX = graphics::pixel::TYPE::RGB565;
@@ -287,12 +277,14 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
 
+	using namespace board_profile;
+
 	{  // SCI 設定
 		auto sci_level = device::ICU::LEVEL::_2;
 		sci_.start(115200, sci_level);
 	}
 
-	utils::format("\r%s Start Space Invaders Emulator\n") % sys_msg_;
+	utils::format("\r%s Start Space Invaders Emulator\n") % system_str_;
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();

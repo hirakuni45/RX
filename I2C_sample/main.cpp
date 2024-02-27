@@ -1,4 +1,4 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  I2C サンプル @n
 			対話形式で接続された I2C デバイスを操作する。 @n
@@ -7,11 +7,11 @@
 					・DS3231 (RTC) @n
 					・BMP280 (温度、圧力センサ)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 
 #include "common/fixed_fifo.hpp"
@@ -41,54 +41,9 @@ namespace {
 
 	static constexpr int VERSION = 50;
 
-#if defined(SIG_RX220)
-	// 秋月 RX220 ボード
-
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-
-#elif defined(SIG_RX62N)
-// #define SOFT_I2C
-#ifdef SOFT_I2C
-	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
-	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
-	typedef device::si2c_io<SDA, SCL> I2C_IO;
-#else
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-#endif
-#elif defined(SIG_RX631)
-
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-
-#elif defined(SIG_RX24T)
-#ifdef SOFT_I2C
-	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
-	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
-	typedef device::si2c_io<SDA, SCL> I2C_IO;
-#else
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-#endif
-#elif defined(SIG_RX66T)
-
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-
-#elif defined(SIG_RX64M)
-
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-
-#elif defined(SIG_RX71M)
-
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-
-#elif defined(SIG_RX65N)
-
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-
-#elif defined(SIG_RX72N)
-
+#if defined(SIG_RX72N)
+	#define SCI_I2C
 	typedef device::SCI4 I2C_CH;
-	typedef utils::fixed_fifo<char, 512> RBF;
-	typedef utils::fixed_fifo<char, 512> SBF;
-	typedef device::sci_i2c_io<I2C_CH, RBF, SBF> I2C_IO;
 
 	typedef utils::fixed_fifo<uint8_t, 64> RB64;
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
@@ -97,17 +52,6 @@ namespace {
 	// タッチセンサー I2C ポート設定
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::SECOND> FT5206_I2C;
 	#define TOUCH_I2C
-#elif defined(SIG_RX72T)
-
-//	#define SOFT_I2C
-
-#ifdef SOFT_I2C
-	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
-	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
-	typedef device::si2c_io<SDA, SCL> I2C_IO;
-#else
-	typedef device::iica_io<device::RIIC0> I2C_IO;
-#endif
 #endif
 
 	typedef utils::fixed_fifo<char, 512> SCI_RXB;  // SCI RX (RECV) バッファの定義
@@ -124,6 +68,17 @@ namespace {
 	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT			cmt_;
 
+// SOFT I2C を使うには、SDA, SCL のポートが定義されている必要がある。
+//	#define SOFT_I2C
+#if defined(SOFT_I2C)
+	typedef device::si2c_io<board_profile::SDA, board_profile::SCL> I2C_IO;
+#elif defined(SCI_I2C)
+	typedef utils::fixed_fifo<char, 512> RBF;
+	typedef utils::fixed_fifo<char, 512> SBF;
+	typedef device::sci_i2c_io<I2C_CH, RBF, SBF> I2C_IO;
+#else
+	typedef device::iica_io<board_profile::RIIC_CH> I2C_IO;
+#endif
 	I2C_IO		i2c_io_;
 
 	typedef utils::command<256> CMD;

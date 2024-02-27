@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX グループ・IICA 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstring>
 #include "common/vect.h"
 #include "common/renesas.hpp"
@@ -112,7 +112,7 @@ namespace device {
 				src_(nullptr), dst_(nullptr), len_(0),
 				send_id_(0), send_id_back_(0), recv_id_(0), recv_id_back_(0) { }
 		};
-		static intr_t	intr_;
+		static inline intr_t	intr_;
 
 		static void event_ntask_()
 		{
@@ -636,6 +636,4 @@ namespace device {
 			return ret;
 		}
 	};
-
-	template<class IICA, uint32_t TPSZ> typename iica_io<IICA, TPSZ>::intr_t iica_io<IICA, TPSZ>::intr_;
 }

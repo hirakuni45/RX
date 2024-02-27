@@ -1,12 +1,12 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  RX65N/RX72N GUI サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -41,11 +41,6 @@ namespace {
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
 
 #if defined(SIG_RX65N)
-	/// RX65N Envision Kit
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::SCI9 SCI_CH;
-
 	// SDHI 関係定義（RX65N Envision Kit の SDHI ポートは、候補３で指定できる）
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
     typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
@@ -59,11 +54,6 @@ namespace {
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST> FT5206_I2C;
 
 #elif defined(SIG_RX72N)
-	/// RX72N Envision Kit
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
-	typedef device::SCI2 SCI_CH;
-
 	// SDHI 関係定義（RX72N Envision Kit の SDHI ポートは、候補３で指定できる）
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
@@ -80,7 +70,7 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 2048> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
+	typedef device::sci_io<board_profile::SCI_CH, RECV_BUFF, SEND_BUFF, board_profile::SCI_ORDER> SCI;
 	SCI			sci_;
 
     SDC			sdc_;
@@ -524,6 +514,8 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::boost_master_clock();
+
+	using namespace board_profile;
 
 	{  // SCI 設定
 		auto sci_level = device::ICU::LEVEL::_2;

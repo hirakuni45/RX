@@ -1,4 +1,4 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  RX DSP サンプル @n
 			RX64M, RX71M: @n
@@ -22,11 +22,11 @@
 					P40 ピンにLEDを接続する @n
 					SCI2 を使用する @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 
 #include "common/fixed_fifo.hpp"
