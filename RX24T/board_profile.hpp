@@ -36,4 +36,10 @@ namespace board_profile {
 
 	// インターバル・タイマーの定義
 	typedef device::CMT0 CMT_CH;
+
+	// RIIC ポートの定義
+	typedef device::RIIC0 RIIC_CH;
+	// ソフト制御 I2C ポートの定義
+	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
+	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
 }
