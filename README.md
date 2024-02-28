@@ -27,6 +27,8 @@ Currently supported and tested devices:
 |RX71M|RXv2|Yes|－|－|〇|〇|〇|R5F571MF/G/J/L|
 |RX651|RXv2|Yes|－|－|〇|〇|〇|R5F5651E|
 |RX65N|RXv2|Yes|－|－|〇|〇|〇|R5F565NE|
+|RX66N|RXv3|Yes|V1|－|||〇|R5F566ND/N|
+|RX671|RXv3|Yes|－|－|||〇|R5F5671C/E|
 |RX72N|RXv3|Yes|V1|Yes|〇|〇|〇|R5F572ND/N|
 |RX72M|RXv3|Yes|V1|Yes|△|△|△|R5F572MD/N|
 |RX24T|RXv2|Yes|－|－|〇|〇|〇|R5F524T8/A|
