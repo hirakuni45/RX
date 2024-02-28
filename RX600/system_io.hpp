@@ -4,6 +4,7 @@
 	@brief	RX600/RX700 グループ・システム制御 @n
 			・RX64M @n
 			・RX65N/RX651 @n
+			・RX66N @n
 			・RX671 @n
 			・RX71M @n
 			・RX72N/RX72M @n
@@ -77,7 +78,7 @@ namespace device {
 
 		static constexpr uint8_t clock_div_bus_(uint32_t clk) noexcept
 		{
-#if defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 			if((clock_profile::PLL_BASE - (clk * 3)) < 3) {  // 1/3 設定の検出
 				return 0b1001;
 			}

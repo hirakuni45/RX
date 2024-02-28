@@ -1,20 +1,29 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72N グループ・ポート・マッピング (MTU3a) @n
+	@brief	RX66N/RX72N/RX72M グループ・ポート・マッピング (MTU3a) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8 @n
-			RX651/RX65N とほぼ同じだが、オーダーが一部異なるので注意！ @n
 			オーダーの順番は、ハードウェアーマニュアルに準拠してある。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
+#if defined(SIG_RX66N)
+#include "RX66N/peripheral.hpp"
+#include "RX66N/port.hpp"
+#include "RX66N/mpc.hpp"
+#elif defined(SIG_RX72N)
 #include "RX72N/peripheral.hpp"
 #include "RX72N/port.hpp"
 #include "RX72N/mpc.hpp"
+#elif defined(SIG_RX72M)
+#include "RX72M/peripheral.hpp"
+#include "RX72N/port.hpp"
+#include "RX72M/mpc.hpp"
+#endif
 #include "RX600/port_map_order.hpp"
 
 namespace device {

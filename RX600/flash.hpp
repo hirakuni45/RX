@@ -4,6 +4,7 @@
 	@brief	RX600/RX700 グループ・フラッシュ 定義 @n
 			・RX64M/RX71M @n
 			・RX65N/RX651 @n
+			・RX66N @n
 			・RX671 @n
 			・RX72N/RX72M @n
 			・RX66T/RX72T
@@ -32,7 +33,7 @@ namespace device {
 		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
 		static constexpr auto ID_NUM = idnum;			///< ユニーク ID 数
 
-#if defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）
@@ -484,7 +485,7 @@ namespace device {
 		static inline fpckar_t<0x007F'E0E4> FPCKAR;
 
 
-#if defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュアクセスウィンドウモニタレジスタ (FAWMON)
@@ -555,7 +556,7 @@ namespace device {
 		static inline ro32_t<0x007F'B1E4> UIDR1;
 		static inline ro32_t<0x007F'B1E8> UIDR2;
 		static inline ro32_t<0xFFFF'FFF4> UIDR3;  ///< in VECTOR 
-#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		static inline ro32_t<0xFE7F'7D90> UIDR0;
 		static inline ro32_t<0xFE7F'7D94> UIDR1;
 		static inline ro32_t<0xFE7F7'D98> UIDR2;
@@ -574,7 +575,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void set_eepfclk(uint32_t fclk)
 		{
-#if defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 			// Set for DataFlash memory access clocks
 			uint32_t clk = ((fclk / 500'000) + 1) >> 1;
 			if(clk > 60) {
@@ -590,7 +591,7 @@ namespace device {
 	typedef flash_t<65536, 3> FLASH;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef flash_t<32768, 3> FLASH;
-#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef flash_t<32768, 4> FLASH;
 #elif defined(SIG_RX671)
 	typedef flash_t<8192, 4> FLASH;

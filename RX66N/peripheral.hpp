@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72N グループ・ペリフェラル
+	@brief	RX66N グループ・ペリフェラル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -81,10 +81,6 @@ namespace device {
 		IWDT,		///< 独立ウォッチドッグタイマ
 
 		ETHERC0,	///< イーサネットコントローラ 0
-		ETHERC1,	///< イーサネットコントローラ 1
-		EPTPC,		///< イーサネットコントローラ用 PTP コントローラ
-		EPTPC0,		///< イーサネットコントローラ用 PTP コントローラ 0
-		EPTPC1,		///< イーサネットコントローラ用 PTP コントローラ 1
 
 		ETHERCA,	///< Ethernet 0 (PHY RMII)カスタムポート接続
 
@@ -93,7 +89,6 @@ namespace device {
 		PTPEDMAC,	///< PTP Ethernet DMA
 
 		PMGI0,		///< PHY マネジメントインタフェース 0
-		PMGI1,		///< PHY マネジメントインタフェース 1
 
 		USB0,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
 

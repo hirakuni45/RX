@@ -1,7 +1,17 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・MTU3x 定義
+	@brief	RX600 グループ・MTU3x 定義 @n
+			RX24T @n
+			RX26T @n
+			RX63T @n
+			RX64M/RX71M @n
+			RX65N/RX651 @n
+			RX66N @n
+			RX671 @n
+			RX66T/RX72T @n
+			RX72N @n
+			RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -27,7 +37,7 @@ namespace device {
 		enum class TYPE : uint8_t {
 			MTU2,	///< MTU2:  RX621 / RX62N
 			MTU3,	///< MTU3:  RX63T
-			MTU3a,	///< MTU3a: RX64M / RX71M / RX651 / RX65N / RX671 / RX72N / RX72M
+			MTU3a,	///< MTU3a: RX64M / RX71M / RX65N / RX651 / RX66N / RX671 / RX72N / RX72M
 			MTU3d,	///< MTU3d: RX24T / RX26T / RX66T / RX72T
 		};
 
@@ -4281,7 +4291,6 @@ namespace device {
 	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR, clock_profile::PCLKA> MTU5;
 	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR, clock_profile::PCLKA> MTU6;
 	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR, clock_profile::PCLKA> MTU7;
-
 #elif defined(SIG_RX24T)  // MTU3d
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR, clock_profile::PCLKA> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR, clock_profile::PCLKA> MTU1;
@@ -4302,7 +4311,7 @@ namespace device {
 	typedef mtu6_t<peripheral::MTU6, ICU::SELECTA, clock_profile::PCLKC> MTU6;
 	typedef mtu7_t<peripheral::MTU7, ICU::SELECTA, clock_profile::PCLKC> MTU7;
 	typedef mtu9_t<peripheral::MTU9, ICU::SELECTA, clock_profile::PCLKC> MTU9;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)  // MTU3a
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)  // MTU3a
 	typedef mtu0_t<peripheral::MTU0, ICU::SELECTA, clock_profile::PCLKA> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::SELECTA, clock_profile::PCLKA> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::SELECTA, clock_profile::PCLKA> MTU2;
