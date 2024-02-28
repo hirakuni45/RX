@@ -85,14 +85,16 @@ namespace device {
 			U,		///< MTICyU(MTUx)
 			V,		///< MTICyV(MTUx)
 			W,		///< MTICyW(MTUx)
-			CLK_A,	///< MTCLKA(MTUx), TCLKA(TPUx)
-			CLK_B,	///< MTCLKB(MTUx), TCLKB(TPUx)
-			CLK_C,	///< MTCLKC(MTUx), TCLKC(TPUx)
-			CLK_D,	///< MTCLKD(MTUx), TCLKD(TPUx)
+			CLK_A,	///< MTCLKA(MTUx), TCLKA(TPUx), GPTWx (GTETRGA)
+			CLK_B,	///< MTCLKB(MTUx), TCLKB(TPUx), GPTWx (GTETRGB)
+			CLK_C,	///< MTCLKC(MTUx), TCLKC(TPUx), GPTWx (GTETRGC)
+			CLK_D,	///< MTCLKD(MTUx), TCLKD(TPUx), GPTWx (GTETRGD)
 			CLK_E,	///< MTCLKE (MTU2, TPU 系)
 			CLK_F,	///< MTCLKF (MTU2, TPU 系)
 			CLK_G,	///< MTCLKG (MTU2, TPU 系)
 			CLK_H,	///< MTCLKH (MTU2, TPU 系)
+			OUT_0,	///< GPTWx (GTADSM0)
+			OUT_1,	///< GPTWx (GTADSM1)
 			NONE,	///< 無効なチャネル
 		};
 

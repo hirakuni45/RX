@@ -1658,8 +1658,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static inline rw32_t<0x000C'49D4 + ofs> RSTOUTR;
 	};
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef eptpc_t<peripheral::EPTPC> EPTPC;
 	typedef eptpcx_t<0x000, peripheral::EPTPC0> EPTPC0;
 	typedef eptpcx_t<0x400, peripheral::EPTPC1> EPTPC1;
+#endif
 }

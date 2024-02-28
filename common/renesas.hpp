@@ -426,7 +426,7 @@
 
 #include "RX671/board_profile.hpp"
 
-#elif defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 #include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/mpu.hpp"
@@ -486,8 +486,10 @@
 
 #if defined(SIG_RX72M)
 #include "RX72M/board_profile.hpp"
-#else
+#elif defined(SIG_RX72N)
 #include "RX72N/board_profile.hpp"
+#else
+#include "RX66N/board_profile.hpp"
 #endif
 
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)

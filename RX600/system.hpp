@@ -4,6 +4,7 @@
 	@brief	システム定義関連 @n
 			・RX64M @n
 			・RX65N/RX651 @n
+			・RX66N @n
 			・RX671 @n
 			・RX71M @n
 			・RX72N/RX72M @n
@@ -210,7 +211,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 4> PCKA;
 			bits_rw_t<io_, bitpos::B16, 4> BCK;
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t <io_, bitpos::B22>    PSTOP0;
 #endif
 			bit_rw_t <io_, bitpos::B23>    PSTOP1;
@@ -595,13 +596,13 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> MOOVF;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX671) || defined(SIG_RX72N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B1> SOOVF;
 #endif
 			bit_rw_t<io_, bitpos::B2> PLOVF;
 			bit_rw_t<io_, bitpos::B3> HCOVF;
 			bit_rw_t<io_, bitpos::B4> ILCOVF;
-#if defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+#if defined(SIG_RX66N) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B5> PPLOVF;
 #endif
 		};
@@ -746,7 +747,7 @@ namespace device {
 		static inline hocopcr_t<0x0008'C294> HOCOPCR;
 
 
-#if defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CLKOUT 出力コントロールレジスタ (CKOCR)
@@ -769,7 +770,7 @@ namespace device {
 		static inline ckocr_t<0x0008'003E> CKOCR;
 #endif
 
-#if defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  特定用途向けクロック制御レジスタ (PACKCR)
@@ -1627,6 +1628,56 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  システム定義クラス RX66N
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_66n_t : public system_base_t {
+
+		static constexpr bool NCRGx_reg    = true;
+		static constexpr bool NCRCx_reg    = true;
+
+		// オプション設定メモリ
+		static inline spcc_t<0xFE7F'5D40> SPCC;
+		static inline ofs0_t<0xFE7F'5D04> OFS0;
+		static inline ofs1_t<0xFE7F'5D08> OFS1;
+		static inline mde_t <0xFE7F'5D00> MDE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT_null）ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline memwait_null_t<0x0000'0000> MEMWAIT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT_null) ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline romwt_null_t<0x0000'0000> ROMWT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline sosccr_t<0x0008'0033> SOSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  システム定義クラス RX671
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1829,6 +1880,8 @@ namespace device {
 	typedef system_64m_t SYSTEM;
 #elif defined(SIG_RX65N) || defined(SIG_RX651)
 	typedef system_65x_t SYSTEM;
+#elif defined(SIG_RX66N)
+	typedef system_66n_t SYSTEM;
 #elif defined(SIG_RX671)
 	typedef system_671_t SYSTEM;
 #elif defined(SIG_RX71M)
