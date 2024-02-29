@@ -1,7 +1,13 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX631/RX63N/RX64M/RX71M グループ・PDC 定義
+	@brief	RX600/RX700 グループ・PDC 定義 @n
+			RX631/RX63N @n
+			RX64M/RX71M @n
+			RX65N/RX65N @n
+			RX66N @n
+			RX72N @n
+			RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -168,7 +174,7 @@ namespace device {
 		static inline hcr_t<0x000A'0518>  HCR;
 	};
 
-#if defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX63N) || defined(SIG_RX631)
 	typedef pdc_t<peripheral::PDC, ICU::VECTOR> PDC;
 #else
 	typedef pdc_t<peripheral::PDC, ICU::GROUPBL0> PDC;

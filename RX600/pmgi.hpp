@@ -2,9 +2,9 @@
 //=============================================================================//
 /*!	@file
 	@brief	RX700 グループ　PMGI 定義 @n
-			・RX66N (1 channel) @n
-			・RX72N @n
-			・RX72M
+			RX66N (1 channel) @n
+			RX72N @n
+			RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

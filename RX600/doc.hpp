@@ -2,14 +2,16 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600/RX700 グループ・DOC 定義 @n
-			・RX140 @n
-			・RX220 @n
-			・RX231 @n
-			・RX24T @n
-			・RX63T @n
-			・RX64M/RX71M @n
-			・RX65N/RX651 @n
-			・RX66T/RX72T
+			RX140 @n
+			RX220 @n
+			RX231 @n
+			RX24T @n
+			RX63T @n
+			RX64M/RX71M @n
+			RX65N/RX651 @n
+			RX66N @n
+			RX66T/RX72T @n
+			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -84,7 +86,7 @@ namespace device {
 		static constexpr auto DOPCI = dopci;				///< データ演算回路割り込みベクター
 	};
 	typedef doc_norm_t<0x0008'B080, ICU::VECTOR::DOPCF> DOC;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX72N) || defined(SIG_RX72M) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データ演算回路（DOC）

@@ -5,6 +5,7 @@
 			RX631/RX63N @n
 			RX64M/RX71M @n
 			RX651/RX65N @n
+			RX66N @n
 			RX671 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n

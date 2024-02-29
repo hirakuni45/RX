@@ -5,6 +5,7 @@
 			RX26T @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
+			RX66N @n
 			RX671 @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)

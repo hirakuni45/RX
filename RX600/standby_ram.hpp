@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//========================================================================//
 /*!	@file
-	@brief	RX600 グループ Standby RAM 制御
+	@brief	RX600/RX700 グループ Standby RAM 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/device.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
@@ -188,5 +188,5 @@ namespace device {
 	typedef standby_ram<4096> STANDBY_RAM;
 #else
 	typedef standby_ram<8192> STANDBY_RAM;
-	#endif
+#endif
 }
