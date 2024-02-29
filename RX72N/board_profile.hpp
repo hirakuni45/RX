@@ -40,4 +40,7 @@ namespace board_profile {
 
 	// RIIC ポートの定義
 	typedef device::RIIC0 RIIC_CH;
+
+	// QSPI ポートの定義
+	static constexpr auto QSPI_PORT = device::port_map_order::RX72N_ENVISION_KIT::QSPI;
 }

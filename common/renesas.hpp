@@ -439,7 +439,6 @@
 #include "RX600/elc.hpp"
 #include "RX600/exdmac.hpp"
 #include "RX600/tpu.hpp"
-#include "RX600/ppg.hpp"
 #include "RX600/gptw.hpp"
 #include "RX600/ppg.hpp"
 #include "RX600/cmtw.hpp"
@@ -488,7 +487,7 @@
 #include "RX72M/board_profile.hpp"
 #elif defined(SIG_RX72N)
 #include "RX72N/board_profile.hpp"
-#else
+#elif defined(SIG_RX66N)
 #include "RX66N/board_profile.hpp"
 #endif
 

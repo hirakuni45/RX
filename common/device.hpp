@@ -169,6 +169,7 @@
 #include "RX65x/port_map.hpp"
 #include "RX65x/port_map_mtu.hpp"
 #include "RX65x/port_map_tpu.hpp"
+#include "RX65x/port_map_qspi.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -184,6 +185,7 @@
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
+#include "RX72N/port_map_qspi.hpp"
 
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
@@ -198,6 +200,7 @@
 #include "RX671/port_map.hpp"
 #include "RX671/port_map_mtu.hpp"
 #include "RX671/port_map_tpu.hpp"
+#include "RX671/port_map_qspix.hpp"
 #include "RX671/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 

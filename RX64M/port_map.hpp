@@ -413,36 +413,6 @@ namespace device {
 				}
 				break;
 #endif
-			case peripheral::QSPI:
-				{
-					// QSPCLK:   P77
-					// QSSL:     P76
-					// QMO/QIO0: PC3  (100ピンは未対応)
-					// QMI/QIO1: PC4  (100ピンは未対応)
-					// QIO2:     P80
-					// QIO3:     P81
-					uint8_t sel = enable ? 0b01'1011 : 0;  // ok
-					PORT7::PMR.B7 = 0;
-					MPC::P77PFS.PSEL = sel;  // QSPCLK-A (P77 LQFP176: 84)
-					PORT7::PMR.B7 = enable;
-					PORT7::PMR.B6 = 0;
-					MPC::P76PFS.PSEL = sel;  // QSPSSL-A (P76 LQFP176: 85)
-					PORT7::PMR.B6 = enable;
-					PORTC::PMR.B3 = 0;
-					MPC::PC3PFS.PSEL = sel;  // QIO0-A   (PC3 LQFP176: 83)
-					PORTC::PMR.B3 = enable;
-					PORTC::PMR.B4 = 0;
-					MPC::PC4PFS.PSEL = sel;  // QIO1-A   (PC4 LQFP176: 82)
-					PORTC::PMR.B4 = enable;
-					PORT8::PMR.B0 = 0;
-					MPC::P80PFS.PSEL = sel;  // QIO2-A   (P80 LQFP176: 81)
-					PORT8::PMR.B0 = enable;
-					PORT8::PMR.B1 = 0;
-					MPC::P81PFS.PSEL = sel;  // QIO3-A   (P81 LQFP176: 80)
-					PORT8::PMR.B1 = enable;
-				}
-				break;
-
 			case peripheral::USB0:  // USB0 Host: VBUSEN, OVRCURB
 				{
 					uint8_t sel = enable ? 0b010011 : 0;
@@ -682,36 +652,6 @@ namespace device {
 				}
 				break;
 #endif
-			case peripheral::QSPI:  // QSPI-B
-				{
-					// QSPCLK:   PD5
-					// QSSL:     PD4
-					// QMO/QIO0: PD6
-					// QMI/QIO1: PD7
-					// QIO2:     PD2
-					// QIO3:     PD3
-					uint8_t sel = enable ? 0b01'1011 : 0;  // ok
-					PORTD::PMR.B5 = 0;
-					MPC::PD5PFS.PSEL = sel;  // QSPCLK-B (PD5 LQFP176: 147)
-					PORTD::PMR.B5 = enable;
-					PORTD::PMR.B4 = 0;
-					MPC::PD4PFS.PSEL = sel;  // QSSL-B   (PD4 LQFP176: 142)
-					PORTD::PMR.B4 = enable;
-					PORTD::PMR.B6 = 0;
-					MPC::PD6PFS.PSEL = sel;  // QIO0-B   (PD6 LQFP176: 145)
-					PORTD::PMR.B6 = enable;
-					PORTD::PMR.B7 = 0;
-					MPC::PD7PFS.PSEL = sel;  // QIO1-B   (PD7 LQFP176: 143)
-					PORTD::PMR.B7 = enable;
-					PORTD::PMR.B2 = 0;
-					MPC::PD2PFS.PSEL = sel;  // QIO2-B   (PD2 LQFP176: 154)
-					PORTD::PMR.B2 = enable;
-					PORTD::PMR.B3 = 0;
-					MPC::PD3PFS.PSEL = sel;  // QIO3-B   (PD3 LQFP176: 150)
-					PORTD::PMR.B3 = enable;
-				}
-				break;
-
 			default:
 				ret = false;
 				break;
