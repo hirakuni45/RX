@@ -15,6 +15,11 @@
 
 #include "common/format.hpp"
 #include "common/input.hpp"
+#include "common/command.hpp"
+
+// #include <functional>
+
+#include "calc_cmd.hpp"
 
 #if defined(SIG_RX65N) | defined(SIG_RX72N)
 	#define USE_GUI
@@ -24,7 +29,7 @@
 #include "calc_gui.hpp"
 #include "calc_graph.hpp"
 #else
-#include "calc_cmd.hpp"
+
 #endif
 
 namespace {
@@ -32,17 +37,8 @@ namespace {
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
 
-#if defined(SIG_RX65N)
-    typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
-    typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
-    // RX65N Envision Kit の SDHI ポートは、候補３で指定できる
-    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
-    SDC		sdc_;
-#elif defined(SIG_RX72N)
-    typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
-    typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
-    // RX72N Envision Kit の SDHI ポートは、候補３で指定できる
-    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDC;
+#if defined(SIG_RX65N) || defined(SIG_RX72N)
+    typedef fatfs::sdhi_io<device::SDHI, board_profile::SDC_POWER, board_profile::SDC_WP, board_profile::SDHI_ORDER> SDC;
     SDC		sdc_;
 #endif
 
@@ -52,16 +48,18 @@ namespace {
 	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT		cmt_;
 
+	typedef utils::command<256> CMD;
+	CMD		cmd_;
+	typedef app::calc_cmd CALC;
+	CALC	calc_;
+
 #ifdef USE_GUI
-	typedef app::calc_gui GUI;
-	GUI		gui_;
+	typedef app::calc_gui<CALC> GUI;
+	GUI		gui_(calc_);
 	typedef app::calc_graph GRAPH;
 	GRAPH	graph_;
-
-#else
-	typedef app::calc_cmd CMD;
-	CMD		cmd_;
 #endif
+
 }
 
 
@@ -165,21 +163,30 @@ int main(int argc, char** argv)
 	uint8_t cnt = 0;
 
 	LED::DIR = 1;
+
+	cmd_.set_prompt("# ");
+
 #ifdef USE_GUI
 	gui_.start();
 	gui_.setup_touch_panel();
 	gui_.setup();
 	graph_.start();
-#else
-	cmd_.start();
 #endif
 	while(1) {
 #ifdef USE_GUI
 		gui_.update();
 #else
 		cmt_.sync();
-		cmd_.update();
 #endif
+		auto ret = cmd_.service();
+		if(ret) {
+			const auto* cmd =  cmd_.get_command();
+			if(cmd[0] != 0) {
+				calc_.set_out(sci_puts);
+				calc_(cmd);
+			}
+		}
+
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;

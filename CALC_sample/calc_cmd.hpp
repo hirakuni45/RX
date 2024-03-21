@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*! @file
-    @brief  四則演算コマンドライン
+    @brief  演算コマンドライン
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -10,14 +10,14 @@
 //=====================================================================//
 #include <cmath>
 #include <cstring>
-#include "common/command.hpp"
+#include <string>
 
-#include "common/format.hpp"
-#include "common/fixed_string.hpp"
+#include <boost/unordered_map.hpp>
 
 #include "common/basic_arith.hpp"
-
 #include "common/mpfr.hpp"
+#include "common/fixed_string.hpp"
+#include "common/fixed_map.hpp"
 
 #include "calc_func.hpp"
 #include "calc_symbol.hpp"
@@ -29,28 +29,153 @@ namespace app {
         @brief  calc cmd クラス
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-    class calc_cmd {
+    struct calc_cmd {
 
-		static constexpr uint32_t CALC_NUM = 250;  ///< 250 桁
-
-		static constexpr uint32_t ANS_NUM = 60;
-
-		typedef utils::command<256> CMD;
-		CMD		cmd_;
+		static constexpr uint32_t ANS_NUM = 20;  			///< 表示桁
+		// 内部演算を大きくしないと、最下位の表示が曖昧になる・・
+		static constexpr uint32_t CALC_NUM = ANS_NUM * 4;	///< 内部演算
 
 		// 数値クラス
 		typedef mpfr::value<CALC_NUM> NVAL;
 
-		typedef utils::calc_symbol<NVAL> SYMBOL;
-		SYMBOL	symbol_;
-
-		typedef utils::calc_func<NVAL> FUNC;
-		FUNC	func_;
-
+//		typedef boost::unordered_map<utils::STR8, uint8_t> MAP;
+		typedef utils::fixed_map<utils::STR8, uint8_t, 64> MAP;
+		typedef utils::calc_symbol<NVAL, MAP> SYMBOL;
+		typedef utils::calc_func<NVAL, MAP> FUNC;
 		typedef utils::basic_arith<NVAL, SYMBOL, FUNC> ARITH;
+
+	private:
+		MAP		map_;
+		SYMBOL	symbol_;
+		FUNC	func_;
 		ARITH	arith_;
 
-		typedef utils::fixed_string<256> STR;
+		void (*out_func_)(const char* str);
+
+		int		shift_;
+		bool	disp_separate_;
+
+		void zerosup_(char* org, char ech) noexcept
+		{
+			// 指数表示の場合スルー
+			if(strrchr(org, ech) != nullptr) return;
+
+			// 小数点が無い場合スルー
+			if(strrchr(org, '.') == nullptr) return;
+
+			auto l = strlen(org);
+			while(l > 0) {
+				--l;
+				if(org[l] != '0') break;
+				else {
+					org[l] = 0;
+				}
+			}
+			if(l > 0) {
+				if(org[l] == '.') {
+					org[l] = 0;
+				}
+			}
+		}
+
+		void sep_(const char* src, int len, int mod, int spn) noexcept
+		{
+			char sub[8];
+
+			if(mod == 0) mod = spn;
+			while(len > 0) {
+				strncpy(sub, src, mod);
+				if(len > spn) {
+					sub[mod] = '\'';
+					sub[mod + 1] = 0;
+				} else {
+					sub[mod] = 0;
+				}
+				out_func_(sub);
+				len -= mod;
+				src += mod;
+				mod = spn;
+			}
+		}
+
+		void disp_(NVAL& ans) noexcept
+		{
+			char cnv = 'f';
+			char ech = 'e';
+			uint32_t spn = 3;
+			if(func_.get_vtype() == FUNC::VTYPE::Hex) {
+				cnv = 'A';
+				ech = 'P';
+				spn = 4;
+			} else if(func_.get_vtype() == FUNC::VTYPE::Bin) {
+				cnv = 'b';
+				ech = 'p';
+				spn = 4;
+			}
+
+			if(shift_ != 0) {
+				auto exp = NVAL::exp10(NVAL(shift_));
+				ans *= exp;
+			}
+
+			char tmp[ANS_NUM * 4 + 8];  // 2 進表示用に 4 倍を確保 + α
+			ans(ANS_NUM, tmp, sizeof(tmp), cnv);
+			zerosup_(tmp, ech);
+
+			if(disp_separate_) {
+				const char* s = tmp;
+				if(*s == '-') {
+					out_func_("-");
+					++s;
+				} else if(*s == '+') {
+					out_func_("+");
+					++s;
+				}
+				if(cnv == 'A') {
+					if(s[0] == '0' && s[1] == 'X') {
+						s += 2;
+						out_func_("0x");
+					}
+				} else if(cnv == 'b') {
+					out_func_("0b");
+				}
+
+				const char* p = strchr(s, '.');
+				int l;
+				if(p != nullptr) {
+					l = p - s;
+				} else {
+					l = strlen(s);
+				}
+				auto m = l % spn;
+				sep_(s, l, m, spn);
+				if(p != nullptr) {
+					out_func_(".");
+					++p;
+					int l = strlen(p);
+					sep_(p, l, 0, spn);
+				}
+			} else {
+				out_func_(tmp);
+			}
+			out_func_("\n");
+		}
+
+		void list_sym_() noexcept
+		{
+			for(auto id = SYMBOL::NAME::V0; id < SYMBOL::NAME::V9; SYMBOL::next(id)) {
+				out_func_(symbol_.get_name(id));
+				out_func_(": ");
+				NVAL val;
+				symbol_(id, val);
+				disp_(val);
+			}
+		}
+
+		bool def_func_(const char* org, uint32_t n)
+		{
+			return true;
+		}
 
 	public:
 		//-------------------------------------------------------------//
@@ -58,58 +183,56 @@ namespace app {
 			@brief  コンストラクタ
 		*/
 		//-------------------------------------------------------------//
-		calc_cmd() noexcept : cmd_(),
-			symbol_(), func_(), arith_(symbol_, func_)
+		calc_cmd() noexcept :
+			map_(), symbol_(map_), func_(map_), arith_(symbol_, func_),
+			out_func_(nullptr),
+			shift_(0), disp_separate_(true)
 		{ }
 
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief  初期化
+			@brief  出力先を設定
+			@param[in]	func	文字列出力関数
 		*/
 		//-------------------------------------------------------------//
-		void start() noexcept
+		void set_out(void (*func)(const char* str)) noexcept
 		{
-			cmd_.set_prompt("# ");
+			out_func_ = func;
 		}
 
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief  アップデート
+			@brief  ファンクタ
+			@param[in] cmd		コマンドライン文字列
 		*/
 		//-------------------------------------------------------------//
-		void update() noexcept
+		void operator () (const char* cmd) noexcept
 		{
-			auto ret = cmd_.service();
-			if(!ret) return;
-
-			const auto* cmd =  cmd_.get_command();
-			if(cmd[0] == 0) return;
+			if(out_func_ == nullptr) return;
 
 			if(strcmp(cmd, "help") == 0 || strcmp(cmd, "?") == 0) {
-				utils::format("  PI         constant\n");
-				utils::format("  LOG2       constant\n");
-				utils::format("  EULER      constant\n");
-				utils::format("  ANS        constant\n");
-				utils::format("  V[0-9]     Memory symbol 0..9\n");
-				utils::format("  Min[0-9]   Memory In 0..9\n");
-				utils::format("  Rad        0 to 2*PI\n");
-				utils::format("  Grad       0 to 400\n");
-				utils::format("  Deg        0 to 360\n");
-				utils::format("  Dec        Decimal mode\n");
-				utils::format("  Hex        Hexadecimal mode\n");
-				utils::format("  Bin        Binary mode\n");
-				utils::format("  sin(x)\n");
-				utils::format("  cos(x)\n");
-				utils::format("  tan(x)\n");
-				utils::format("  asin(x)\n");
-				utils::format("  acos(x)\n");
-				utils::format("  atan(x)\n");
-				utils::format("  sqrt(x)\n");
-				utils::format("  log(x)\n");
-				utils::format("  ln(x)\n");
-				utils::format("  exp10(x)\n");
+				out_func_("  PI        constant\n");
+				out_func_("  LOG2      constant\n");
+				out_func_("  EULER     constant\n");
+				out_func_("  ANS       constant\n");
+				out_func_("  V[0-9]    Memory symbol 0..9\n");
+				out_func_("  Min[0-9]  Memory In 0..9\n");
+				out_func_("  ListSym   List symbol\n");
+				out_func_("  Rad       0 to 2*PI\n");
+				out_func_("  Grad      0 to 400\n");
+				out_func_("  Deg       0 to 360\n");
+				out_func_("  Dec       Decimal mode\n");
+				out_func_("  Hex       Hexadecimal mode\n");
+				out_func_("  Bin       Binary mode\n");
+				out_func_("  Sep       Separate mode\n");
+
+				for(auto id = FUNC::NAME::org; id != FUNC::NAME::last; FUNC::next(id)) {
+					out_func_("  ");
+					out_func_(func_.get_name(static_cast<FUNC::NAME>(id)));
+					out_func_("(x)\n");
+				}
 				return;
 			} else if(strncmp(cmd, "Min", 3) == 0) {
 				if(cmd[3] >= '0' && cmd[3] <= '9') {
@@ -119,8 +242,11 @@ namespace app {
 					vi = static_cast<SYMBOL::NAME>(static_cast<uint8_t>(vi) + (cmd[3] - '0'));
 					symbol_.set_value(vi, val);
 				} else {
-					utils::format("Min number fail.\n");
+					out_func_("Min number fail.\n");
 				}
+				return;
+			} else if(strcmp(cmd, "ListSym") == 0) {
+				list_sym_();
 				return;
 			} else if(strcmp(cmd, "Rad") == 0) {
 				func_.set_atype(FUNC::ATYPE::Rad);
@@ -140,39 +266,29 @@ namespace app {
 			} else if(strcmp(cmd, "Bin") == 0) {
 				func_.set_vtype(FUNC::VTYPE::Bin);
 				return;
+			} else if(strcmp(cmd, "Sep") == 0) {
+				disp_separate_ = !disp_separate_;
+				out_func_(disp_separate_ ? "Separate: ON" : "Separate: OFF");
+				out_func_("\n");
+				return;
 			}
 
-			if(arith_.analize(cmd)) {
-
+			const auto p = strchr(cmd, ':');
+			if(p != nullptr) {  // 関数定義
+				def_func_(cmd, p - cmd);
+			} else if(arith_.analize(cmd)) {
 				auto ans = arith_();
-				symbol_.set_value(SYMBOL::NAME::ANS, ans);
-
-				char cnv = 'f';
-				if(func_.get_vtype() == FUNC::VTYPE::Dec) {
-					cnv = 'f';
-				} else if(func_.get_vtype() == FUNC::VTYPE::Hex) {
-					cnv = 'a';
-				} else if(func_.get_vtype() == FUNC::VTYPE::Bin) {
-					cnv = 'b';
-				}
-				char tmp[ANS_NUM+1];
-				ans(ANS_NUM, tmp, sizeof(tmp), cnv);
-				// zero supless
-				auto l = strlen(tmp);
-				while(l > 0) {
-					--l;
-					if(tmp[l] != '0') break;
-					else {
-						tmp[l] = 0;
-					}
-				}
-				if(l > 0) { if(tmp[l] == '.') tmp[l] = 0; }
-
-				utils::format(" %s\n") % tmp;
-
+				if(shift_ == 0) symbol_.set_value(SYMBOL::NAME::ANS, ans);
+				disp_(ans);
 			} else {
-				utils::format("Fail: %s\n") % cmd;
+				char tmp[ANS_NUM + 16];
+				utils::sformat("Fail: %s\n", tmp, sizeof(tmp)) % cmd;
+				out_func_(tmp);
 			}
 		}
+
+		auto& at_symbol() { return symbol_; }
+
+		auto& at_func() { return func_; }
 	};
 }
