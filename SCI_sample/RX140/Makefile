@@ -2,7 +2,7 @@
 #=======================================================================
 #	RX140 Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -51,7 +51,7 @@ endif
 ifeq ($(BUILD),release)
     CC_OPT += -DNDEBUG
     CP_OPT += -DNDEBUG
-	OPTIMIZE = -O3
+	OPTIMIZE = -O2
 endif
 
 -include ../../common/makefile

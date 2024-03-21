@@ -40,7 +40,6 @@ namespace {
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
-
 	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
 // SCIF を使う場合：
 //	typedef device::scif_io<device::SCIF8, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
@@ -61,6 +60,19 @@ namespace {
 	typedef utils::command<256> CMD;
 	CMD 	cmd_;
 #endif
+
+	void halt_()
+	{
+		using namespace board_profile;
+
+		LED::DIR = 1;
+		while(1) {
+			LED::P = 0;
+			utils::delay::milli_second(100);
+			LED::P = 1;
+			utils::delay::milli_second(100);
+		}
+	}
 }
 
 extern "C" {
@@ -88,7 +100,6 @@ extern "C" {
 	}
 }
 
-
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
@@ -97,24 +108,31 @@ int main(int argc, char** argv)
 
 	using namespace board_profile;
 
-	{  // タイマー設定（100Hz）
-		constexpr uint32_t freq = 100;
-		static_assert(CMT_MGR::probe_freq(freq), "Failed CMT rate accuracy test");
-		cmt_mgr_.start(freq, device::ICU::LEVEL::_4);
-	}
-
 	{  // SCI の開始
 		constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
 		static_assert(SCI_IO::probe_baud(baud), "Failed baud rate accuracy test");  // 許容誤差（3%）を超える場合、コンパイルエラー
 		auto intr = device::ICU::LEVEL::_2;		// 割り込みレベル（NONE を指定すると、ポーリング動作になる）
-		sci_io_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
+		if(!sci_io_.start(baud, intr)) {  // 標準では、８ビット、１ストップビットを自動選択
+			halt_();
+		}
 // 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
 // sci_io.hpp PROTOCOL enum class のタイプを参照
 //		sci_.start(baud, intr, SCI::PROTOCOL::B8_E_1S);
 	}
 
-	auto clk = device::clock_profile::ICLK / 1'000'000;
-	utils::format("\nStart SCI (UART) sample for '%s' %d[MHz]\n") % system_str_ % clk;
+	{  // タイマー設定（100Hz）
+		constexpr uint32_t freq = 100;
+		static_assert(CMT_MGR::probe_freq(freq), "Failed CMT rate accuracy test");
+		if(!cmt_mgr_.start(freq, device::ICU::LEVEL::_4)) {
+			utils::format("CMT not start!\n");
+		}
+	}
+
+	{
+		auto clk = device::clock_profile::ICLK / 1'000'000;
+		utils::format("\nStart SCI (UART) sample for '%s' %d[MHz]\n") % system_str_ % clk;
+	}
+
 	{  // SCI/CMT の設定レポート表示
 		utils::format("SCI PCLK: %u [Hz]\n") % SCI_IO::sci_type::PCLK;
 		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_io_.get_baud_rate();
@@ -146,10 +164,11 @@ int main(int argc, char** argv)
 	LED::P = 0;
 
 #if 0
-	sci_ = 'A';
-	sci_ = "ABC\n";
-	auto ch = sci_();
-	sci_ = ch;
+	// sci_io クラスは、オペレーターをオーバーロードしているので、以下のように文字を直接入出力する事も出来る。
+	sci_io_ = 'A';
+	sci_io_ = "ABC\n";
+	auto ch = sci_io_();
+	sci_io_ = ch;
 #endif
 
 	uint8_t cnt = 0;

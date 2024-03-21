@@ -68,107 +68,15 @@ RX マイコンを使った SCI/SCIF/RSCI (UART) のサンプルプログラム
 
 - 各プラットホームディレクトリーに移動、make する。
 - sci_sample.mot ファイルを書き込む。
+- 各マイコンディレクトリには「board_profile.hpp」があり、基板固有の設定を行う事が出来る。
 - FRK-RX62N は、R5F562N7(FlashRom: 384KB) の為、Makefile のデバイスを変更する。
 - CQ_FRK 変数（コンパイル時定数）を有効にする事で、基板依存の切り替えを行う。
 
 ```C++
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
-
-#if defined(SIG_RX140)
-	// RX140 DIY ボード
-	static const char* system_str_ = { "RX140 DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTJ, device::bitpos::B1, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX220)
-	// 秋月 RX220 ボード
-	static const char* system_str_ = { "AE-RX220" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX231)
-	// RX231 DIY ボード
-	static const char* system_str_ = { "RX231 DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX62N)
-  #if defined(CQ_FRK)
-    // FRK-RX62N(CQ 出版社)
-	static const char* system_str_ = { "RX62N FRK-RX62N" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-  #else
-    // BlueBoard-RX62N_100pin
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-  #endif
-#elif defined(SIG_RX631)
-	// RX631 GR-CITRUS board
-	static const char* system_str_ = { "RX631 GR-CITRUS" };
-	// GR-CITRUS
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI;
-#elif defined(SIG_RX63T)
-	// DIY RX63T board
-	static const char* system_str_ = { "RX63T DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX26T)
-	static const char* system_str_ = { "RX26T DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-// RSCI を使う場合：
-//	typedef device::rsci_io<device::RSCI8, RXB, TXB> SCI;
-#elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-// SCIF を使う場合：
-//	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
-#elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-// SCIF を使う場合：
-//	typedef device::scif_io<device::SCIF8, RXB, TXB> SCI;
-#elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI9, RXB, TXB> SCI;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI1, RXB, TXB> SCI;
-#elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-	typedef device::sci_io<device::SCI2, RXB, TXB> SCI;
-#endif
-
-	SCI		sci_;
+	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
+	SCI_IO	sci_io_;
 ```
 
 ---
@@ -352,23 +260,23 @@ extern "C" {
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
 	void sci_putch(char ch)
 	{
-		sci_.putch(ch);
+		sci_io_.putch(ch);
 	}
 
 	void sci_puts(const char* str)
 	{
-		sci_.puts(str);
+		sci_io_.puts(str);
 	}
 
 	// syscalls.c から呼ばれる、標準入力（stdin）
 	char sci_getch(void)
 	{
-		return sci_.getch();
+		return sci_io_.getch();
 	}
 
 	uint16_t sci_length()
 	{
-		return sci_.recv_length();
+		return sci_io_.recv_length();
 	}
 }
 ```
@@ -418,7 +326,7 @@ extern "C" {
 	constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
 	auto intr = device::ICU::LEVEL::_2;      // 割り込みレベル（NONE を指定すると、ポーリング動作になる）
 	auto protocol = SCI::PROTOCOL::B8_E_2S;  // 8 ビット、Even(偶数)、2 Stop Bits
-	sci_.start(baud, intr, protocol);
+	sci_io_.start(baud, intr, protocol);
 ```
 
 ---
@@ -454,7 +362,7 @@ extern "C" {
 ```C++
 	auto intr = device::ICU:LEVEL::_2;       // 割り込みレベル（NONE を指定すると、ポーリング動作になる）
 	auto protocol = SCI::PROTOCOL::B8_E_2S;  // 8 ビット、Even(偶数)、2 Stop Bits
-	sci_.start(SCI::BAUDRATE::B115200, intr, protocol);  // 115200 B.P.S.
+	sci_io_.start(SCI::BAUDRATE::B115200, intr, protocol);  // 115200 B.P.S.
 ```
 
 ---
