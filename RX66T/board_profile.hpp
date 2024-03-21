@@ -32,7 +32,7 @@ namespace board_profile {
 
 	// SCI ポートの定義
 	typedef device::SCI1 SCI_CH;
-	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::THIRD;
 
 	// インターバル・タイマーの定義
 	typedef device::CMT0 CMT_CH;

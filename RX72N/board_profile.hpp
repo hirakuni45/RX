@@ -43,4 +43,18 @@ namespace board_profile {
 
 	// QSPI ポートの定義
 	static constexpr auto QSPI_PORT = device::port_map_order::RX72N_ENVISION_KIT::QSPI;
+
+	// SDHI 定義
+	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
+	typedef device::NULL_PORT SDC_WP;	///< カード書き込み禁止ポート設定
+    // RX72N Envision Kit の SDHI ポートは、候補３で指定できる
+	static constexpr auto SDHI_ORDER = device::port_map::ORDER::THIRD;
+
+	// GLCDC, touch panel 定義
+	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
+	static constexpr uint32_t LCD_ORG = 0x0080'0000;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+	typedef device::SCI6 FT5206_SCI_CH;
+	static constexpr auto FT5206_SCI_ORDER = device::port_map::ORDER::SECOND;
 }
