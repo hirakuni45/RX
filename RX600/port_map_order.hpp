@@ -101,6 +101,41 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  RX65N_ENVISION_KIT 型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class RX65N_ENVISION_KIT : uint8_t {
+			QSPI,
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RX72N_ENVISION_KIT 型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class RX72N_ENVISION_KIT : uint8_t {
+			QSPI,
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  QSPI ポート・チャネル型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class QSPI_PORT : uint8_t {
+			CLK,		///< QSPCLK
+			SSL,		///< QSSL
+			IO0,		///< QMO/QIO0
+			IO1,		///< GMI/QIO1
+			IO2,		///< QIO2
+			IO3,		///< QIO3
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  USB ポート型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -120,14 +155,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ETHER_RMII : uint8_t {
-			REF50CK,		///< REF50CK input
-			CRS_DV,			///< CRS_DV input
-			TXD0,			///< TXD0 output
-			TXD1,			///< TXD1 output
-			RXD0,			///< RXD0 input
-			RXD1,			///< RXD1 input
-			TXD_EN,			///< TXD_EN output
-			RX_ER,			///< RX_ER input
+			REF50CK,	///< REF50CK input
+			CRS_DV,		///< CRS_DV input
+			TXD0,		///< TXD0 output
+			TXD1,		///< TXD1 output
+			RXD0,		///< RXD0 input
+			RXD1,		///< RXD1 input
+			TXD_EN,		///< TXD_EN output
+			RX_ER,		///< RX_ER input
 		};
 
 
@@ -137,27 +172,27 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ETHER_MII : uint8_t {
-			CRS,			///< REF50CK input
-			RX_DV,			///< CRS_DV input
-			EX_OUT,			///< EX_OUT output
-			LINKSTA,		///< LINKSTA input
-			ETXD0,			///< ETXD0 output
-			ETXD1,			///< ETXD1 output
-			ETXD2,			///< ETXD2 output
-			ETXD3,			///< ETXD3 output
-			ERXD0,			///< ERXD0 input
-			ERXD1,			///< ERXD1 input
-			ERXD2,			///< ERXD2 input
-			ERXD3,			///< ERXD3 input
-			TX_EN,			///< TX_EN output
-			TX_ER,			///< TX_ER input
-			RX_ER,			///< RX_ER input
-			TX_CLK,			///< TX_CLK input
-			RX_CLK,			///< RX_CLK input
-			COL,			///< COL input
-			WOL,			///< WOL output
-			MDC,			///< MDC output
-			MDIO,			///< MDIO input/output
+			CRS,		///< REF50CK input
+			RX_DV,		///< CRS_DV input
+			EX_OUT,		///< EX_OUT output
+			LINKSTA,	///< LINKSTA input
+			ETXD0,		///< ETXD0 output
+			ETXD1,		///< ETXD1 output
+			ETXD2,		///< ETXD2 output
+			ETXD3,		///< ETXD3 output
+			ERXD0,		///< ERXD0 input
+			ERXD1,		///< ERXD1 input
+			ERXD2,		///< ERXD2 input
+			ERXD3,		///< ERXD3 input
+			TX_EN,		///< TX_EN output
+			TX_ER,		///< TX_ER input
+			RX_ER,		///< RX_ER input
+			TX_CLK,		///< TX_CLK input
+			RX_CLK,		///< RX_CLK input
+			COL,		///< COL input
+			WOL,		///< WOL output
+			MDC,		///< MDC output
+			MDIO,		///< MDIO input/output
 		};
 
 
@@ -183,15 +218,57 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct sci_port_t {
-			ORDER		cts_;	///< CTSx 端子の選択権
-			ORDER		rts_;	///< RTSx 端子の選択権
-			ORDER		sck_;	///< SCKx 端子の選択権
-			ORDER		rxd_;	///< RXDx 端子の選択権
-			ORDER		txd_;	///< TXDx 端子の選択権
+			ORDER	cts_;	///< CTSx 端子の選択権
+			ORDER	rts_;	///< RTSx 端子の選択権
+			ORDER	sck_;	///< SCKx 端子の選択権
+			ORDER	rxd_;	///< RXDx 端子の選択権
+			ORDER	txd_;	///< TXDx 端子の選択権
 			constexpr sci_port_t(ORDER rxd = ORDER::BYPASS, ORDER txd = ORDER::BYPASS) noexcept :
 				cts_(ORDER::BYPASS), rts_(ORDER::BYPASS),
 				sck_(ORDER::BYPASS),
 				rxd_(rxd), txd_(txd)
+			{ }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  QSPI ポート・マッピング・グループ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct qspi_port_t {
+			ORDER	clk;
+			ORDER	ssl;
+			ORDER	io0;
+			ORDER	io1;
+			ORDER	io2;
+			ORDER	io3;
+
+			constexpr qspi_port_t() noexcept :
+				clk(ORDER::BYPASS),
+				ssl(ORDER::BYPASS),
+				io0(ORDER::BYPASS),
+				io1(ORDER::BYPASS),
+				io2(ORDER::BYPASS),
+				io3(ORDER::BYPASS)
+			{ }
+
+			constexpr qspi_port_t(RX65N_ENVISION_KIT qspi) noexcept :
+				clk(ORDER::SECOND),	///< PD5
+				ssl(ORDER::SECOND),	///< PD4
+				io0(ORDER::SECOND),	///< PD6
+				io1(ORDER::SECOND),	///< PD7
+				io2(ORDER::SECOND),	///< PD2
+				io3(ORDER::SECOND)	///< PD3
+			{ }
+
+			constexpr qspi_port_t(RX72N_ENVISION_KIT qspi) noexcept :
+				clk(ORDER::SECOND),	///< PD5
+				ssl(ORDER::SECOND),	///< PD4
+				io0(ORDER::SECOND),	///< PD6
+				io1(ORDER::SECOND),	///< PD7
+				io2(ORDER::THIRD),	///< PD2
+				io3(ORDER::THIRD)	///< PD3
 			{ }
 		};
 
@@ -279,17 +356,6 @@ namespace device {
 				mdc_(ORDER::BYPASS),
 				mdio_(ORDER::BYPASS)
 			{ }
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ポート・マッピング・ルネサス型 @n
-					ルネサス社が提供するボードに対する型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class RENESAS : uint8_t {
-			RX72N_ENVISION_KIT,			///< RX72N Envision Kit に対する設定
 		};
     };
 }

@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	マルチメディアカードインタフェース（MMCIF）定義
+	@brief	RX600/RX700 グループ・マルチメディアカードインタフェース（MMCIF）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

@@ -2,11 +2,12 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600/RX700 グループ・イーサネットコントローラ用 DMA コントローラ (EDMACa, PTPEDMAC) @n
-			・RX62N @n
-			・RX63N @n
-			・RX64M/RX71M @n
-			・RX65N/RX651 @n
-			・RX72N/RX72M
+			RX62N @n
+			RX63N @n
+			RX64M/RX71M @n
+			RX65N/RX651 @n
+			RX66N @n
+			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -548,7 +549,7 @@ namespace device {
 #else
 	typedef edmac_t<0x000C'0000, peripheral::EDMAC0, ICU::GROUPAL1, ICU::GROUPAL1::EINT0> EDMAC0;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef edmac_t<0x000C'0200, peripheral::EDMAC1, ICU::GROUPAL1, ICU::GROUPAL1::EINT1> EDMAC1;
 	typedef ptpedmac_t<0x000C'0400, peripheral::PTPEDMAC> PTPEDMAC;
 #endif

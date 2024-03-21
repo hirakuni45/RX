@@ -1,28 +1,28 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ・ポート・マッピング (QSPI)
+	@brief	RX671 グループ・ポート・マッピング (QSPIX)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX64M/peripheral.hpp"
-#include "RX64M/port.hpp"
-#include "RX64M/mpc.hpp"
+#include "RX671/peripheral.hpp"
+#include "RX671/port.hpp"
+#include "RX671/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  QSPI ポート・マッピング・ユーティリティー
+		@brief  QSPIX ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class port_map_qspi : public port_map_order {
+	class port_map_qspix : public port_map_order {
 
-		static bool qspi_clk_(bool ena, ORDER odr) noexcept
+		static bool qspix_clk_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
@@ -48,7 +48,7 @@ namespace device {
 		}
 
 
-		static bool qspi_ssl_(bool ena, ORDER odr) noexcept
+		static bool qspix_ssl_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
@@ -74,7 +74,7 @@ namespace device {
 		}
 
 
-		static bool qspi_io0_(bool ena, ORDER odr) noexcept
+		static bool qspix_io0_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
@@ -82,6 +82,7 @@ namespace device {
 			/// QIO0:
 			///   PC3
 			///   PD6
+			///   PE6
 			case ORDER::FIRST:
 				PORTC::PMR.B3 = 0;
 				MPC::PC3PFS.PSEL = sel;
@@ -92,6 +93,11 @@ namespace device {
 				MPC::PD6PFS.PSEL = sel;
 				PORTD::PMR.B6 = ena;
 				break;
+			case ORDER::THIRD:
+				PORTE::PMR.B6 = 0;
+				MPC::PE6PFS.PSEL = sel;
+				PORTE::PMR.B6 = ena;
+				break;
 			default:
 				ret = false;
 				break;
@@ -100,7 +106,7 @@ namespace device {
 		}
 
 
-		static bool qspi_io1_(bool ena, ORDER odr) noexcept
+		static bool qspix_io1_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
@@ -108,6 +114,7 @@ namespace device {
 			/// QIO1:
 			///   PC4
 			///   PD7
+			///   PE7
 			case ORDER::FIRST:
 				PORTC::PMR.B4 = 0;
 				MPC::PC4PFS.PSEL = sel;
@@ -118,6 +125,11 @@ namespace device {
 				MPC::PD7PFS.PSEL = sel;
 				PORTD::PMR.B7 = ena;
 				break;
+			case ORDER::THIRD:
+				PORTE::PMR.B7 = 0;
+				MPC::PE7PFS.PSEL = sel;
+				PORTE::PMR.B7 = ena;
+				break;
 			default:
 				ret = false;
 				break;
@@ -126,7 +138,7 @@ namespace device {
 		}
 
 
-		static bool qspi_io2_(bool ena, ORDER odr) noexcept
+		static bool qspix_io2_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
@@ -152,7 +164,7 @@ namespace device {
 		}
 
 
-		static bool qspi_io3_(bool ena, ORDER odr) noexcept
+		static bool qspix_io3_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
@@ -180,8 +192,8 @@ namespace device {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  QSPI、チャネル別ポート切り替え
-			@param[in]	port	QSPI チャネル型
+			@brief  QSPIX、チャネル別ポート切り替え
+			@param[in]	port	QSPIX チャネル型
 			@param[in]	ena		無効にする場合場合「false」
 			@param[in]	odr		候補を選択する場合
 			@return 無効な周辺機器の場合「false」
@@ -197,22 +209,22 @@ namespace device {
 			bool ret = true;
 			switch(port) {
 			case QSPI_PORT::CLK:
-				ret = qspi_clk_(ena, odr);
+				ret = qspix_clk_(ena, odr);
 				break;
 			case QSPI_PORT::SSL:
-				ret = qspi_ssl_(ena, odr);
+				ret = qspix_ssl_(ena, odr);
 				break;
 			case QSPI_PORT::IO0:
-				ret = qspi_io0_(ena, odr);
+				ret = qspix_io0_(ena, odr);
 				break;
 			case QSPI_PORT::IO1:
-				ret = qspi_io1_(ena, odr);
+				ret = qspix_io1_(ena, odr);
 				break;
 			case QSPI_PORT::IO2:
-				ret = qspi_io2_(ena, odr);
+				ret = qspix_io2_(ena, odr);
 				break;
 			case QSPI_PORT::IO3:
-				ret = qspi_io3_(ena, odr);
+				ret = qspix_io3_(ena, odr);
 				break;
 			default:
 				ret = false;

@@ -39,4 +39,21 @@ namespace board_profile {
 
 	// RIIC ポートの定義
 	typedef device::RIIC0 RIIC_CH;
+
+	// QSPI ポートの定義
+	static constexpr auto QSPI_PORT = device::port_map_order::RX65N_ENVISION_KIT::QSPI;
+
+	// SDHI 定義
+    typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
+    typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
+    // RX65N Envision Kit の SDHI ポートは、候補３で指定できる
+    static constexpr auto SDHI_ORDER = device::port_map::ORDER::THIRD;
+
+	// GLCDC, touch panel 定義
+	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+	static constexpr auto LCD_ORG = reinterpret_cast<uint16_t*>(0x0000'0100);
+	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+	typedef device::SCI6 FT5206_SCI_CH;
+	static constexpr auto FT5206_SCI_ORDER = device::port_map::ORDER::FIRST;
 }

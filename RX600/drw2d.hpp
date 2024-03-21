@@ -1,9 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX700 グループ DRW2D 定義 @n
-			・RX65N/RX651 @n
-			・RX72N/RX72M
+	@brief	RX600/RX700 グループ DRW2D 定義 @n
+			RX65N/RX651 @n
+			RX66N @n
+			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

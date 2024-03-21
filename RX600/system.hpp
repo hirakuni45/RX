@@ -454,8 +454,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct sosccr_null_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
+		struct sosccr_null_t : public rw8_null_t<base> {
+			typedef rw8_null_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -693,8 +693,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct soscwtcr_null_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
+		struct soscwtcr_null_t : public rw8_null_t<base> {
+			typedef rw8_null_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;

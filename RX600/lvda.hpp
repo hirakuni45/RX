@@ -4,6 +4,7 @@
 	@brief	LVDA 定義 @n
 			RX64M/RX71M @n
 			RX651/RX65N @n
+			RX66N @n
 			RX66T/RX72T @n
 			RX671 @n
 			RX72N/RX72M

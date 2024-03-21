@@ -1,17 +1,16 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	固定サイズ文字列クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <algorithm>
 #include <cstring>
 #include <iterator>
-#include "common/string_utils.hpp"
 
 namespace utils {
 
@@ -23,22 +22,44 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t SIZE>
 	class fixed_string {
-		uint32_t	pos_;
+
 		char		str_[SIZE + 1];
+		uint32_t	pos_;
+
+		static char* strncpy_(char* dst, const char* src, uint32_t n) noexcept
+		{
+			if(n == 0) return dst;
+
+			auto tmp = dst;
+			do {
+				auto ch = *src++;
+				*tmp++ = ch;
+				if(ch == 0) {
+					return dst;
+				}
+			} while(tmp < (dst + n)) ;
+			*tmp = 0;
+			return dst;
+		}
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクタ
-			@param[in]	str	初期設定文字列
+			@param[in]	s	文字列
+			@param[in]	n	コピー最大数
 		*/
 		//-----------------------------------------------------------------//
-		fixed_string(const char* str = nullptr) noexcept : pos_(0) {
-			if(str != nullptr) {
-				utils::str::strncpy_(str_, str, SIZE);
+		constexpr fixed_string(const char* s = nullptr, uint32_t n = SIZE) noexcept : str_{ 0, }, pos_(0)
+		{
+			if(s != nullptr) {
+				strncpy_(str_, s, n);
+				str_[n] = 0;
 				pos_ = std::strlen(str_);
+			} else {
+				str_[0] = 0;
+				pos_ = 0;
 			}
-			str_[pos_] = 0;
 			str_[SIZE] = 0;
 		}
 
@@ -205,7 +226,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		fixed_string& operator = (const char* src) noexcept {
-			utils::str::strncpy_(str_, src, SIZE);
+			strncpy_(str_, src, SIZE);
 			pos_ = std::strlen(str_);
 			return *this;
 		}
@@ -219,7 +240,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		fixed_string& operator = (const fixed_string& src) noexcept {
-			utils::str::strncpy_(str_, src.c_str(), SIZE);
+			strncpy_(str_, src.c_str(), SIZE);
 			pos_ = src.pos_;
 			return *this;
 		}
@@ -260,7 +281,7 @@ namespace utils {
 				pos_ += l;
 			} else {  // バッファが許す範囲でコピー
 				l = SIZE - pos_;
-				utils::str::strncpy_(&str_[pos_], str, l);
+				strncpy_(&str_[pos_], str, l);
 				pos_ = SIZE;
 			}
 			str_[pos_] = 0; 
@@ -384,11 +405,31 @@ namespace utils {
 		bool operator <= (const fixed_string& th) const noexcept {
 			return std::strcmp(c_str(), th.c_str()) <= 0;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ハッシュ値の計算
+			@return ハッシュ値
+		*/
+		//-----------------------------------------------------------------//
+		size_t hash() const noexcept
+		{
+			size_t h = 0;
+			for(uint32_t i = 0; i < pos_; ++i) {
+ 				boost::hash_combine(h, str_[i]);
+			}
+			return h;
+		}
 	};
 
+	typedef fixed_string<8> STR8;
 	typedef fixed_string<16> STR16;
 	typedef fixed_string<32> STR32;
 	typedef fixed_string<64> STR64;
 	typedef fixed_string<128> STR128;
 	typedef fixed_string<256> STR256;
+
+	template <class T>
+	inline size_t hash_value(const T& t) { return t.hash(); }
 }

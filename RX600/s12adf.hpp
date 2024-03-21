@@ -3,6 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・S12ADFa 定義 @n
 			RX651/RX65N @n
+			RX66N @n
 			RX671 (S12ADFa) @n
 			RX72N/RX72M 
     @author 平松邦仁 (hira@rvf-rc45.net)

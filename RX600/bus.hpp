@@ -8,6 +8,7 @@
 			RX63N/RX631 @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
+			RX66N @n
 			RX671 @n
 			RX72M/RX72N @n
 			RX66T/RX72T (CSx レジスタ 0 ～ 3, SDRAM 制御無し)

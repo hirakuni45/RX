@@ -472,37 +472,6 @@ namespace device {
 					PORTA::PMR.B7 = enable;
 				}
 				break;
-
-			case peripheral::QSPIX:
-				{
-					// QSPCLK: P77
-					// QSSL:   P76
-					// QIO0:   PC3
-					// QIO1:   PC4
-					// QIO2:   P80
-					// QIO3:   P81
-					uint8_t sel = enable ? 0b01'1011 : 0;  // ok
-					PORT7::PMR.B7 = 0;
-					MPC::P77PFS.PSEL = sel;
-					PORT7::PMR.B7 = enable;
-					PORT7::PMR.B6 = 0;
-					MPC::P76PFS.PSEL = sel;
-					PORT7::PMR.B6 = enable;
-					PORTC::PMR.B3 = 0;
-					MPC::PC3PFS.PSEL = sel;
-					PORTC::PMR.B3 = enable;
-					PORTC::PMR.B4 = 0;
-					MPC::PC4PFS.PSEL = sel;
-					PORTC::PMR.B4 = enable;
-					PORT8::PMR.B0 = 0;
-					MPC::P80PFS.PSEL = sel;
-					PORT8::PMR.B0 = enable;
-					PORT8::PMR.B1 = 0;
-					MPC::P81PFS.PSEL = sel;
-					PORT8::PMR.B1 = enable;
-				}
-				break;
-
 			default:
 				ret = false;
 				break;
@@ -856,37 +825,6 @@ namespace device {
 					PORTC::PMR.B7 = enable;
 				}
 				break;
-
-			case peripheral::QSPIX:
-				{
-					// QSPCLK: PD5
-					// QSSL:   PD4
-					// QIO0:   PD6
-					// QIO1:   PD7
-					// QIO2:   PD2
-					// QIO3:   PD3
-					uint8_t sel = enable ? 0b01'1011 : 0;
-					PORTD::PMR.B5 = 0;
-					MPC::PD5PFS.PSEL = sel;
-					PORTD::PMR.B5 = enable;
-					PORTD::PMR.B4 = 0;
-					MPC::PD4PFS.PSEL = sel;
-					PORTD::PMR.B4 = enable;
-					PORTD::PMR.B6 = 0;
-					MPC::PD6PFS.PSEL = sel;
-					PORTD::PMR.B6 = enable;
-					PORTD::PMR.B7 = 0;
-					MPC::PD7PFS.PSEL = sel;
-					PORTD::PMR.B7 = enable;
-					PORTD::PMR.B2 = 0;
-					MPC::PD2PFS.PSEL = sel;
-					PORTD::PMR.B2 = enable;
-					PORTD::PMR.B3 = 0;
-					MPC::PD3PFS.PSEL = sel;
-					PORTD::PMR.B3 = enable;
-				}
-				break;
-
 			default:
 				ret = false;
 				break;

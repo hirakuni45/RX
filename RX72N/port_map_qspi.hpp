@@ -31,75 +31,17 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_qspi : public port_map_order {
-	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  QSPI ポート・チャネル型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CHANNEL : uint8_t {
-			CLK,		///< QSPCLK
-			SSL,		///< QSSL
-			IO0,		///< QMO/QIO0
-			IO1,		///< GMI/QIO1
-			IO2,		///< QIO2
-			IO3,		///< QIO3
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  QSPI ポート・オーダー構造体
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct group_t {
-
-			ORDER	clk;
-			ORDER	ssl;
-			ORDER	io0;
-			ORDER	io1;
-			ORDER	io2;
-			ORDER	io3;
-
-			group_t() noexcept :
-				clk(ORDER::BYPASS),
-				ssl(ORDER::BYPASS),
-				io0(ORDER::BYPASS),
-				io1(ORDER::BYPASS),
-				io2(ORDER::BYPASS),
-				io3(ORDER::BYPASS)
-			{ }
-
-
-			group_t(port_map_order::RENESAS renesas) noexcept
-			{
-				switch(renesas) {
-				case port_map_order::RENESAS::RX72N_ENVISION_KIT:
-					clk = ORDER::SECOND;	///< PD5
-					ssl = ORDER::SECOND;	///< PD4
-					io0 = ORDER::SECOND;	///< PD6
-					io1 = ORDER::SECOND;	///< PD7
-					io2 = ORDER::THIRD;		///< PD2
-					io3 = ORDER::THIRD;		///< PD3
-					break;
-				default:
-					break;
-				}
-			}
-		};
-
-	private:
 
 		static bool qspi_clk_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b011011 : 0;
+			uint8_t sel = ena ? 0b01'1011 : 0;
 			switch(odr) {
-			/// P77
-			/// PD5
-			/// PM0
-			/// PN4
+			/// QSPCLK:
+			///   P77
+			///   PD5
+			///   PM0
+			///   PN4
 			case ORDER::FIRST:
 				PORT7::PMR.B7 = 0;
 				MPC::P77PFS.PSEL = sel;
@@ -131,12 +73,13 @@ namespace device {
 		static bool qspi_ssl_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b011011 : 0;
+			uint8_t sel = ena ? 0b01'1011 : 0;
 			switch(odr) {
-			/// P76
-			/// PD4
-			/// PM1
-			/// PN5
+			/// QSSL:
+			///   P76
+			///   PD4
+			///   PM1
+			///   PN5
 			case ORDER::FIRST:
 				PORT7::PMR.B6 = 0;
 				MPC::P76PFS.PSEL = sel;
@@ -168,12 +111,13 @@ namespace device {
 		static bool qspi_io0_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b011011 : 0;
+			uint8_t sel = ena ? 0b01'1011 : 0;
 			switch(odr) {
-			/// PC3
-			/// PD6
-			/// PJ3
-			/// PM2
+			/// QIO0:
+			///   PC3
+			///   PD6
+			///   PJ3
+			///   PM2
 			case ORDER::FIRST:
 				PORTC::PMR.B3 = 0;
 				MPC::PC3PFS.PSEL = sel;
@@ -205,12 +149,13 @@ namespace device {
 		static bool qspi_io1_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b011011 : 0;
+			uint8_t sel = ena ? 0b01'1011 : 0;
 			switch(odr) {
-			/// PC4
-			/// PD7
-			/// PJ5
-			/// PM3
+			/// QIO1:
+			///   PC4
+			///   PD7
+			///   PJ5
+			///   PM3
 			case ORDER::FIRST:
 				PORTC::PMR.B4 = 0;
 				MPC::PC4PFS.PSEL = sel;
@@ -242,12 +187,13 @@ namespace device {
 		static bool qspi_io2_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b011011 : 0;
+			uint8_t sel = ena ? 0b01'1011 : 0;
 			switch(odr) {
-			/// P00
-			/// P80
-			/// PD2
-			/// PM4
+			/// QIO2:
+			///   P00
+			///   P80
+			///   PD2
+			///   PM4
 			case ORDER::FIRST:
 				PORT0::PMR.B0 = 0;
 				MPC::P00PFS.PSEL = sel;
@@ -279,12 +225,13 @@ namespace device {
 		static bool qspi_io3_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b011011 : 0;
+			uint8_t sel = ena ? 0b01'1011 : 0;
 			switch(odr) {
-			/// P01
-			/// P81
-			/// PD3
-			/// PM5
+			/// QIO3:
+			///   P01
+			///   P81
+			///   PD3
+			///   PM5
 			case ORDER::FIRST:
 				PORT0::PMR.B1 = 0;
 				MPC::P01PFS.PSEL = sel;
@@ -316,42 +263,37 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  QSPI、チャネル別ポート切り替え
-			@param[in]	per		周辺機器タイプ
-			@param[in]	ch		QSPI チャネル型
+			@param[in]	port	QSPI チャネル型
 			@param[in]	ena		無効にする場合場合「false」
 			@param[in]	odr		候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
+		static bool turn(QSPI_PORT port, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
 			if(odr == ORDER::BYPASS) return true;
-
-			if(per != peripheral::QSPI) {
-				return false;
-			}
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = true;
-			switch(ch) {
-			case CHANNEL::CLK:
+			switch(port) {
+			case QSPI_PORT::CLK:
 				ret = qspi_clk_(ena, odr);
 				break;
-			case CHANNEL::SSL:
+			case QSPI_PORT::SSL:
 				ret = qspi_ssl_(ena, odr);
 				break;
-			case CHANNEL::IO0:
+			case QSPI_PORT::IO0:
 				ret = qspi_io0_(ena, odr);
 				break;
-			case CHANNEL::IO1:
+			case QSPI_PORT::IO1:
 				ret = qspi_io1_(ena, odr);
 				break;
-			case CHANNEL::IO2:
+			case QSPI_PORT::IO2:
 				ret = qspi_io2_(ena, odr);
 				break;
-			case CHANNEL::IO3:
+			case QSPI_PORT::IO3:
 				ret = qspi_io3_(ena, odr);
 				break;
 			default:
@@ -367,33 +309,22 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  QSPI、チャネル別ポート切り替え
-			@param[in]	group	チャネルオーダー
+			@brief  QSPI、チャネル・グループ切り替え
+			@param[in]	group	チャネル・グループ
 			@param[in]	ena		無効にする場合場合「false」
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(const group_t& group, bool ena) noexcept
+		static bool turn(const qspi_port_t& group, bool ena = true) noexcept
 		{
-			if(!turn(peripheral::QSPI, CHANNEL::CLK, ena, group.clk)) {
-				return false;
-			}
-			if(!turn(peripheral::QSPI, CHANNEL::SSL, ena, group.ssl)) {
-				return false;
-			}
-			if(!turn(peripheral::QSPI, CHANNEL::IO0, ena, group.io0)) {
-				return false;
-			}
-			if(!turn(peripheral::QSPI, CHANNEL::IO1, ena, group.io1)) {
-				return false;
-			}
-			if(!turn(peripheral::QSPI, CHANNEL::IO2, ena, group.io2)) {
-				return false;
-			}
-			if(!turn(peripheral::QSPI, CHANNEL::IO3, ena, group.io3)) {
-				return false;
-			}
-			return false;
+			uint32_t erc = 0;
+			erc += turn(QSPI_PORT::CLK, ena, group.clk);
+			erc += turn(QSPI_PORT::SSL, ena, group.ssl);
+			erc += turn(QSPI_PORT::IO0, ena, group.io0);
+			erc += turn(QSPI_PORT::IO1, ena, group.io1);
+			erc += turn(QSPI_PORT::IO2, ena, group.io2);
+			erc += turn(QSPI_PORT::IO3, ena, group.io3);
+			return erc == 6;
 		}
 	};
 }

@@ -1,16 +1,16 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ・ポート・マッピング (QSPI)
+	@brief	RX65N/RX651 グループ・ポート・マッピング (QSPI)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX64M/peripheral.hpp"
+#include "RX65x/peripheral.hpp"
 #include "RX64M/port.hpp"
-#include "RX64M/mpc.hpp"
+#include "RX65x/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {

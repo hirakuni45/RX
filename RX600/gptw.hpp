@@ -1,10 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72N/RX72M/RX66T/RX72T/RX26T 汎用 PWM タイマ（GPTW）定義 @n
-			RX26T:       GPTW0 - GPTW7 @n
-			RX72N/RX72M: GPTW0 - GPTW3 @n
-			RX66T/RX72T: GPTW0 - GPTW9
+	@brief	RX600/RX700 グループ・汎用 PWM タイマ（GPTW）定義 @n
+			RX26T:  GPTW0 - GPTW7 @n
+			RX66N/RX72N/RX72M:  GPTW0 - GPTW3 @n
+			RX66T/RX72T:  GPTW0 - GPTW9
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -51,7 +51,7 @@ namespace device {
 
 #if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 		static constexpr uint32_t PCLK = clock_profile::PCLKC;	///< カウント基準クロック
-#elif defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		static constexpr uint32_t PCLK = clock_profile::PCLKA;	///< カウント基準クロック
 #endif
 

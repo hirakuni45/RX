@@ -802,8 +802,8 @@ namespace graphics {
 				}
 			}
 
-			vtx::ipos ps = tmp[1] - tmp[0];
-			vtx::ipos ns = tmp[2] - tmp[0];
+//			vtx::ipos ps = tmp[1] - tmp[0];
+//			vtx::ipos ns = tmp[2] - tmp[0];
 			for(auto i = tmp[0].y; i < tmp[2].y; ++i) {
 				
 				auto w = 0;

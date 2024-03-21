@@ -6,7 +6,7 @@
 			RX72N Envision Kit @n
 			calc_gui
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -30,11 +30,6 @@
 #include "common/format.hpp"
 #include "common/fixed_string.hpp"
 
-#include "common/basic_arith.hpp"
-#include "common/mpfr.hpp"
-#include "calc_func.hpp"
-#include "calc_symbol.hpp"
-
 #include "resource.hpp"
 
 namespace app {
@@ -42,12 +37,15 @@ namespace app {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     /*!
         @brief  CALC GUI クラス
+		@param[in]	CALC_CMD	calc_cmd クラス型
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-    class calc_gui {
-	public:
-		static constexpr uint32_t CALC_NUM = 250;  ///< 計算精度桁数 (250)
-		static constexpr uint32_t ANS_NUM = 60;  ///< 結果表示桁数
+	template <class CALC_CMD>
+    struct calc_gui {
+
+		typedef typename CALC_CMD::NVAL NVAL;
+		typedef typename CALC_CMD::SYMBOL SYMBOL;
+		typedef typename CALC_CMD::FUNC FUNC;
 
 		static constexpr int16_t  DISP_OFS_X = 4;
 		static constexpr int16_t  DISP_OFS_Y = 6;
@@ -56,25 +54,12 @@ namespace app {
 		static constexpr int16_t LCD_Y = 272;
 		static constexpr auto PIX = graphics::pixel::TYPE::RGB565;
 
-#ifndef EMU
+		CALC_CMD&	calc_cmd_;
+
+#if defined(SIG_RX65N) || defined(SIG_RX72N)
 		typedef utils::fixed_fifo<uint8_t, 64> RB64;
 		typedef utils::fixed_fifo<uint8_t, 64> SB64;
-#endif
-
-#if defined(SIG_RX65N)
-		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-		static constexpr uint32_t LCD_ORG = 0x0000'0100;
-		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
-		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST> FT5206_I2C;
-		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
-
-#elif defined(SIG_RX72N)
-		typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
-		typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
-		static constexpr uint32_t LCD_ORG = 0x0080'0000;
-		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
-		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::SECOND> FT5206_I2C;
+		typedef device::sci_i2c_io<board_profile::FT5206_SCI_CH, RB64, SB64, board_profile::FT5206_SCI_ORDER> FT5206_I2C;
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
 #endif
 
@@ -232,18 +217,6 @@ namespace app {
 		BUTTON	sym_in_;
 		BUTTON	sym_out_;
 
-		// 数値クラス
-		typedef mpfr::value<CALC_NUM> NVAL;
-
-		typedef utils::calc_symbol<NVAL> SYMBOL;
-		SYMBOL	symbol_;
-
-		typedef utils::calc_func<NVAL> FUNC;
-		FUNC	func_;
-
-		typedef utils::basic_arith<NVAL, SYMBOL, FUNC> ARITH;
-		ARITH	arith_;
-
 		typedef utils::fixed_string<256> STR;
 		STR			cbackup_;
 		STR			cbuff_;
@@ -271,10 +244,10 @@ namespace app {
 			render_.set_fore_color(DEF_COLOR::Darkgray);
 			render_.round_box(vtx::srect(0, 0, 480, 16 * 5 + 6), 8);
 			nest_ = 0;
-			symbol_.set_value(SYMBOL::NAME::ANS, NVAL(0));
-			for(uint8_t i = static_cast<uint8_t>(SYMBOL::NAME::V0); i <= static_cast<uint8_t>(SYMBOL::NAME::V9); i++) {
-				symbol_.set_value(static_cast<SYMBOL::NAME>(i), NVAL(0));
-			}
+//			symbol_.set_value(SYMBOL::NAME::ANS, NVAL(0));
+//			for(uint8_t i = static_cast<uint8_t>(SYMBOL::NAME::V0); i <= static_cast<uint8_t>(SYMBOL::NAME::V9); i++) {
+//				symbol_.set_value(static_cast<SYMBOL::NAME>(i), NVAL(0));
+//			}
 			symbol_idx_ = 0;
 			shift_ = 0;
 		}
@@ -286,10 +259,10 @@ namespace app {
 		{
 			auto code = static_cast<uint8_t>(ch);
 			if(code >= 0x80 && code < 0xc0) {
-				out += symbol_.get_name(static_cast<SYMBOL::NAME>(code));
+				out += calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code));
 				return;
 			} else if(code >= 0xc0) {
-				out += func_.get_name(static_cast<FUNC::NAME>(code));
+				out += calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code));
 				return;
 			}
 			switch(code) {
@@ -303,6 +276,12 @@ namespace app {
 			case '7': out += "７"; break;
 			case '8': out += "８"; break;
 			case '9': out += "９"; break;
+			case 'A': out += "Ａ"; break;
+			case 'B': out += "Ｂ"; break;
+			case 'C': out += "Ｃ"; break;
+			case 'D': out += "Ｄ"; break;
+			case 'E': out += "Ｅ"; break;
+			case 'F': out += "Ｆ"; break;
 			case '+': out += "＋"; break;
 			case '-': out += "－"; break;
 			case '/': out += "÷"; break;
@@ -322,10 +301,10 @@ namespace app {
 			auto code = static_cast<uint8_t>(ch);
 			uint32_t l = 8;
 			if(code >= 0x80 && code < 0xc0) {
-				// symbol_.get_name(static_cast<SYMBOL::NAME>(code));
+				calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code));
 				l = 16;
 			} else if(code >= 0xc0) {
-				l = strlen(func_.get_name(static_cast<FUNC::NAME>(code)));
+				l = strlen(calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code)));
 				l *= 8;
 			} else if(ch >= '0' && ch <= '9') {
 				l = 16;
@@ -386,6 +365,7 @@ namespace app {
 
 
 		// 答え表示
+#if 0
 		void draw_ans_(const NVAL& in, bool ok)
 		{
 			char tmp[ANS_NUM+1];
@@ -425,7 +405,7 @@ namespace app {
 				render_.draw_text(vtx::spos(480 - DISP_OFS_X - 24, DISP_OFS_Y + 20 * 3 + 1), tmp);
 			}
 		}
-
+#endif
 
 		// 答え表示
 		void update_equ_()
@@ -439,10 +419,12 @@ namespace app {
 			while(nest_ > 0) { cbuff_ += ')'; nest_--; }
 			update_calc_();
 
-			auto ok = arith_.analize(cbuff_.c_str());
-			auto ans = arith_();
-			symbol_.set_value(SYMBOL::NAME::ANS, ans);
-			draw_ans_(ans, ok);
+			calc_cmd_(cbuff_.c_str());
+
+//			auto ok = arith_.analize(cbuff_.c_str());
+//			auto ans = arith_();
+//			symbol_.set_value(SYMBOL::NAME::ANS, ans);
+//			draw_ans_(ans, ok);
 
 			OUTSTR cmd;
 			parse_cbuff_(cmd);
@@ -468,12 +450,12 @@ namespace app {
 				sin_.set_title("asin");
 				cos_.set_title("acos");
 				tan_.set_title("atan");
-//				pai_.set_title("е");
+				pai_.set_title("е");
 			} else {
 				sin_.set_title("sin");
 				cos_.set_title("cos");
 				tan_.set_title("tan");
-//				pai_.set_title("π");
+				pai_.set_title("π");
 			}
 		}
 
@@ -481,11 +463,13 @@ namespace app {
 		//-------------------------------------------------------------//
 		/*!
 			@brief  GUI コンストラクタ
+			@param[in]	calc_cmd	calc_cmd クラスの参照
 		*/
 		//-------------------------------------------------------------//
-		calc_gui() noexcept :
+		calc_gui(CALC_CMD& calc_cmd) noexcept :
+			calc_cmd_(calc_cmd),
 #ifndef EMU
-			glcdc_(nullptr, reinterpret_cast<void*>(LCD_ORG)),
+			glcdc_(nullptr, reinterpret_cast<uint16_t*>(board_profile::LCD_ORG)),
 #else
 			glcdc_(),
 #endif
@@ -545,7 +529,6 @@ namespace app {
 			sym_in_  (vtx::srect(LOC_X(1), LOC_Y(1), BTN_W, BTN_H), "Min"),
 			sym_out_ (vtx::srect(LOC_X(1), LOC_Y(2), BTN_W, BTN_H), "Rcl"),
 
-			symbol_(), func_(), arith_(symbol_, func_),
 			cbackup_(), cbuff_(), cbuff_pos_(0), del_len_(0), cur_pos_(0),
 			fc_mode_(false), nest_(0), symbol_idx_(0), shift_(0)
 		{ }
@@ -610,6 +593,7 @@ namespace app {
 		void start() noexcept
 		{
 #ifndef EMU
+			using namespace board_profile;
 			{  // GLCDC の初期化
 				LCD_DISP::DIR  = 1;
 				LCD_LIGHT::DIR = 1;
@@ -719,7 +703,10 @@ namespace app {
 					if(!cbuff_.empty()) {					
 						auto code = static_cast<uint8_t>(cbuff_.back());
 						if(code >= 0xc0) {
-							del_len_ += func_.get_name_size(static_cast<FUNC::NAME>(code));
+							auto p = calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code));
+							if(p != nullptr) {
+								del_len_ += strlen(p);
+							}
 							cbuff_.pop_back();
 						}
 					}
@@ -733,9 +720,15 @@ namespace app {
 				} else if(code == '+' || code == '-' || code == '*' || code == '/') {
 					del_len_ = 16;
 				} else if(code >= 0x80 && code < 0xc0) {
-					del_len_ = symbol_.get_name_size(static_cast<SYMBOL::NAME>(code));
+					auto p = calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code));
+					if(p != nullptr) {
+						del_len_ = strlen(p);
+					}
 				} else if(code >= 0xc0) {
-					del_len_ = func_.get_name_size(static_cast<FUNC::NAME>(code));
+					auto p = calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code));
+					if(p != nullptr) {
+						del_len_ = strlen(p);
+					}
 				}
 			};
 			ac_.set_layer(WIDGET::LAYER::_0);
@@ -758,15 +751,15 @@ namespace app {
 			left_.at_select_func()  = [=](uint32_t id) {
 				shift_++;
 				NVAL ans;
-				symbol_(SYMBOL::NAME::ANS, ans);
-				draw_ans_(ans, true);
+				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
+//				draw_ans_(ans, true);
 			};
 			right_.set_layer(WIDGET::LAYER::_0);
 			right_.at_select_func() = [=](uint32_t id) {
 				shift_--;
 				NVAL ans;
-				symbol_(SYMBOL::NAME::ANS, ans);
-				draw_ans_(ans, true);
+				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
+//				draw_ans_(ans, true);
 			};
 			pin_.set_layer(WIDGET::LAYER::_0);
 			pin_.at_select_func() = [=](uint32_t id) { cbuff_ += '('; nest_++; };
@@ -782,11 +775,11 @@ namespace app {
 			};
 			ans_.set_layer(WIDGET::LAYER::_0);
 			ans_.at_select_func() = [=](uint32_t id) {
-				NVAL tmp;
-				symbol_(SYMBOL::NAME::ANS, tmp);
-				if(tmp != 0) {
-					cbuff_ += static_cast<char>(SYMBOL::NAME::ANS);
-				}
+//				NVAL tmp;
+//				symbol_(SYMBOL::NAME::ANS, tmp);
+//				if(tmp != 0) {
+//					cbuff_ += static_cast<char>(SYMBOL::NAME::ANS);
+//				}
 			};
 
 			equ_.set_layer(WIDGET::LAYER::_0);
@@ -825,11 +818,11 @@ namespace app {
 			pai_.set_layer(WIDGET::LAYER::_0);
 			pai_.set_base_color(graphics::def_color::LightPink);
 			pai_.at_select_func() = [=](uint32_t id) {
-//				if(fc_mode_) {
-//					cbuff_ += static_cast<char>(SYMBOL::NAME::LOG2);
-//				} else {
+				if(fc_mode_) {
+					cbuff_ += static_cast<char>(SYMBOL::NAME::LOG2);
+				} else {
 					cbuff_ += static_cast<char>(SYMBOL::NAME::PI);
-//				}
+				}
 			};
 
 			sqr_.set_layer(WIDGET::LAYER::_0);
@@ -878,17 +871,17 @@ namespace app {
 			angt_.set_layer(WIDGET::LAYER::_0);  // 角度タイプ
 			angt_.set_base_color(graphics::def_color::SafeColor);
 			angt_.at_select_func() = [=](uint32_t id) {
-				switch(func_.get_atype()) {
+				switch(calc_cmd_.at_func().get_atype()) {
 				case FUNC::ATYPE::Deg:
-					func_.set_atype(FUNC::ATYPE::Rad);
+					calc_cmd_.at_func().set_atype(FUNC::ATYPE::Rad);
 					angt_.set_title("Rad");
 					break;
 				case FUNC::ATYPE::Rad:
-					func_.set_atype(FUNC::ATYPE::Grad);
+					calc_cmd_.at_func().set_atype(FUNC::ATYPE::Grad);
 					angt_.set_title("Grad");
 					break;
 				case FUNC::ATYPE::Grad:
-					func_.set_atype(FUNC::ATYPE::Deg);
+					calc_cmd_.at_func().set_atype(FUNC::ATYPE::Deg);
 					angt_.set_title("Deg");
 					break;
 				}
@@ -903,17 +896,17 @@ namespace app {
 			sym_.at_select_func() = [=](uint32_t id) {
 				symbol_idx_++;
 				symbol_idx_ %= 10;
-				auto name = static_cast<SYMBOL::NAME>(static_cast<uint32_t>(SYMBOL::NAME::V0) + symbol_idx_);
-				sym_.set_title(symbol_.get_name(name));
+				auto i = static_cast<typename SYMBOL::NAME>(static_cast<uint32_t>(SYMBOL::NAME::V0) + symbol_idx_);
+				sym_.set_title(calc_cmd_.at_symbol().get_name(i));
 			};
 			sym_in_.set_layer(WIDGET::LAYER::_0);  // シンボル(in)
 			sym_in_.set_base_color(graphics::def_color::SafeColor);
 			sym_in_.at_select_func() = [=](uint32_t id) {
 				NVAL tmp;
-				symbol_(SYMBOL::NAME::ANS, tmp);
-				auto name = static_cast<SYMBOL::NAME>(
+				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, tmp);
+				auto name = static_cast<typename SYMBOL::NAME>(
 					static_cast<uint32_t>(SYMBOL::NAME::V0) + symbol_idx_);
-				symbol_.set_value(name, tmp);
+				calc_cmd_.at_symbol().set_value(name, tmp);
 			};
 			sym_out_.set_layer(WIDGET::LAYER::_0);  // シンボル(out)
 			sym_out_.set_base_color(graphics::def_color::SafeColor);

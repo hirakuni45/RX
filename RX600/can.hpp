@@ -2,14 +2,15 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600/RX700 グループ CAN 定義 @n
-			・RX62N/RX621 (CAN0) @n
-			・RX63N/RX631 (CAN0) @n
-			・RX63T (CAN0) @n
-			・RX64M/RX71M (CAN0/CAN1/CAN2) @n
-			・RX65N/RX651 (CAN0/CAN1) @n
-			・RX66T/RX72T (CAN0) @n
-			・RX671 (CAN0/CAN1) @n
-			・RX72N/RX72M (CAN0/CAN1/CAN2)
+			RX62N/RX621 (CAN0) @n
+			RX63N/RX631 (CAN0) @n
+			RX63T (CAN0) @n
+			RX64M/RX71M (CAN0/CAN1/CAN2) @n
+			RX65N/RX651 (CAN0/CAN1) @n
+			RX66N (CAN0/CAN1/CAN2) @n
+			RX66T/RX72T (CAN0) @n
+			RX671 (CAN0/CAN1) @n
+			RX72N/RX72M (CAN0/CAN1/CAN2)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -723,12 +724,12 @@ namespace device {
 	typedef can_seli_t<0x0009'0200, peripheral::CAN0,
 		ICU::SELECTB::RXF0, ICU::SELECTB::TXF0,
 		ICU::SELECTB::RXM0, ICU::SELECTB::TXM0, ICU::GROUPBE0::ERS0> CAN0;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef can_seli_t<0x0009'1200, peripheral::CAN1,
 		ICU::SELECTB::RXF1, ICU::SELECTB::TXF1,
 		ICU::SELECTB::RXM1, ICU::SELECTB::TXM1, ICU::GROUPBE0::ERS1> CAN1;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef can_seli_t<0x0009'2200, peripheral::CAN2,
 		ICU::SELECTB::RXF2, ICU::SELECTB::TXF2,
 		ICU::SELECTB::RXM2, ICU::SELECTB::TXM2, ICU::GROUPBE0::ERS2> CAN2;

@@ -49,7 +49,7 @@
 			Ex: 許容誤差を 2% にする場合。(百分率を 10 倍にした整数を設定) @n
 			    static_assert(SCI::probe_baud(baud, 20), "Failed baud rate accuracy test");
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -75,8 +75,8 @@ namespace device {
 		typename sci_io_base::FLOW_CTRL FLCT = sci_io_base::FLOW_CTRL::NONE, class RTS = NULL_PORT>
 	class sci_io : public sci_io_base {
 
-		static_assert(RBF::size() > 8, "Receive buffer is too small.");
-		static_assert(SBF::size() > 8, "Transmission buffer is too small.");
+		static_assert(RBF::size() > 15, "Receive buffer is too small.");
+		static_assert(SBF::size() > 15, "Transmission buffer is too small.");
 
 	public:
 		typedef SCI sci_type;
@@ -670,7 +670,7 @@ namespace device {
 			}
 		}
 	
-
+		// オペレーターのオーバーロード
 		char operator () () noexcept { return getch(); }
 		void operator = (char ch) noexcept { putch(ch); }
 		void operator = (const char* str) noexcept { puts(str); }

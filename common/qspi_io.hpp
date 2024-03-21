@@ -1,13 +1,16 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
-	@brief	RX グループ・QSPI I/O 制御
+	@brief	RX グループ・QSPI I/O 制御 @n
+			RX64M/RX71M @n
+			RX65N/RX651 @n
+			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
@@ -22,13 +25,13 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  通信幅
+			@brief  通信幅型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class WIDTH : uint8_t {
-			SINGLE,		///< シングル
-			DUAL,		///< デュアル
-			QUAD,		///< クアッド
+			SINGLE,		///< シングル (全二重: IO0, IO1)
+			DUAL,		///< デュアル (半二重: IO0, IO1)
+			QUAD,		///< クアッド (半二重: IO0 ～ IO3)
 		};
 
 
@@ -62,14 +65,15 @@ namespace device {
 	/*!
 		@brief  QSPI 制御クラス
 		@param[in]	QSPI	QSPI 定義クラス
+		@param[in]	BUSW	バス幅の指定（省略すると「QUAD」）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class QSPI>
+	template <class QSPI, qspi_base::WIDTH BUSW = qspi_base::WIDTH::QUAD>
 	class qspi_io : public qspi_base {
 
-		const device::port_map_qspi::group_t&		group_;
+		const device::port_map_order::qspi_port_t&	group_;
 
-		uint8_t	level_;
+		ICU::LEVEL	level_;
 
 		DLEN	dlen_;
 
@@ -79,7 +83,6 @@ namespace device {
 
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) noexcept
 		{
-///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(QSPI::PCLK);
 			auto br = static_cast<uint32_t>(QSPI::PCLK) / speed;
 			uint8_t dv = 0;
 			while(br > 512) {
@@ -110,8 +113,8 @@ namespace device {
 			@param[in] group	ポート・グループ
 		*/
 		//-----------------------------------------------------------------//
-		qspi_io(const device::port_map_qspi::group_t& group) noexcept :
-			group_(group), level_(0), dlen_(DLEN::W8)
+		explicit qspi_io(const device::port_map_order::qspi_port_t& group) noexcept :
+			group_(group), level_(ICU::LEVEL::NONE), dlen_(DLEN::W8)
 		{ }
 
 
@@ -121,11 +124,11 @@ namespace device {
 			@param[in]	speed	通信速度
 			@param[in]	phase	クロック位相タイプ
 			@param[in]	dlen	データ長設定
-			@param[in]	level	割り込みレベル、０の場合はポーリング
+			@param[in]	level	割り込みレベル、NONE の場合はポーリング
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, PHASE phase, DLEN dlen, uint8_t level = 0) noexcept
+		bool start(uint32_t speed, PHASE phase, DLEN dlen, ICU::LEVEL level = ICU::LEVEL::NONE) noexcept
 		{
 			uint8_t brdv;
 			uint8_t spbr;
@@ -172,7 +175,7 @@ namespace device {
 			@param[in]	ena		SSL の値
 		*/
 		//----------------------------------------------------------------//
-		void enable_ssl(bool ena) noexcept
+		void enable_ssl(bool ena = true) noexcept
 		{
 //			QSPI::SPCMD[0].
 		}
@@ -180,15 +183,14 @@ namespace device {
 
 		//----------------------------------------------------------------//
 		/*!
-			@brief	リード・ライト
-			@param[in]	data	書き込みデータ
-			@param[in]	width	通信幅（指定しないと１ビット）
-			@return 読み出しデータ
+			@brief	送信
+			@param[in]	data	送信データ
 		*/
 		//----------------------------------------------------------------//
-		uint32_t xchg(uint32_t data = 0, WIDTH width = WIDTH::SINGLE) noexcept
+		void send(uint32_t data) noexcept
 		{
-			QSPI::SPCMD[0].SPB = static_cast<uint8_t>(width);
+			while(QSPI::SPSR.SPTEF() != 0) sleep_();
+
 			switch(dlen_) {
 			case DLEN::W8:
 				QSPI::SPDR8 = data;
@@ -200,9 +202,19 @@ namespace device {
 				QSPI::SPDR32 = data;
 				break;
 			}
-	
-			while(QSPI::SPSR.SPRF() == 0) sleep_();
-	
+		}
+
+
+		//----------------------------------------------------------------//
+		/*!
+			@brief	受信
+			@return 受信データ
+		*/
+		//----------------------------------------------------------------//
+		uint32_t recv() noexcept
+		{
+			while(QSPI::SPSR.SPRFF() != 0) sleep_();
+
 			switch(dlen_) {
 			case DLEN::W8:
 				return QSPI::SPDR8();
@@ -216,20 +228,19 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  シリアル送信
+			@brief  連続送信
 			@param[in]	src	送信ソース
 			@param[in]	cnt	送信サイズ（バイト）
-			@param[in]	width	通信幅（指定しないと１ビット）
 			@return 転送サイズを返す（バイト）
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t send(const void* src, uint32_t size, WIDTH width = WIDTH::SINGLE) noexcept
+		uint32_t send(const void* src, uint32_t size) noexcept
 		{
-			auto org = static_cast<const uint8_t*>(src);
-			auto end = org + size;
-			while(org < end) {
-				xchg(*org, width);
-				++org;
+			auto ptr = static_cast<const uint8_t*>(src);
+			auto end = ptr + size;
+			while(ptr < end) {
+				uint32_t d = *ptr++;
+				send(d);
 			}
 			return size;
 		}
@@ -237,17 +248,17 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  シリアル受信
+			@brief  連続受信
 			@param[out]	dst	受信先
 			@param[in]	cnt	受信サイズ
 		*/
 		//-----------------------------------------------------------------//
-		void recv(uint8_t* dst, uint16_t size) noexcept
+		void recv(void* dst, uint32_t size) noexcept
 		{
-			auto end = dst + size;
-			while(dst < end) {
-				*dst = xchg();
-				++dst;
+			auto ptr = static_cast<uint8_t*>(dst);
+			auto end = ptr + size;
+			while(ptr < end) {
+				*ptr++ = recv();
 			}
 		}
 

@@ -6,7 +6,8 @@
 			RX631/RX63N @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
-			RX671
+			RX66N @n
+			RX671 @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
@@ -481,7 +482,7 @@ namespace device {
 		ICU::VECTOR, ICU::VECTOR::TGI11A, ICU::VECTOR::TGI11B, ICU::VECTOR::NONE, ICU::VECTOR::NONE,
 		ICU::GROUP5, ICU::GROUP5::TCI11V, ICU::GROUP5::TCI11U> TPU11;
 
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
 		ICU::SELECTB, ICU::SELECTB::TGI0A, ICU::SELECTB::TGI0B, ICU::SELECTB::TGI0C, ICU::SELECTB::TGI0D,
 		ICU::SELECTB, ICU::SELECTB::TGI0V, ICU::SELECTB::NONE>  TPU0;
