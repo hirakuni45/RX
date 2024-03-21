@@ -16,19 +16,18 @@ namespace device {
 	/*!
 		@brief  QSPI 定義基底クラス
 		@param[in]	per		ペリフェラル型
-		@param[in]	txv		送信バッファ・エンプティ割り込みベクター
-		@param[in]	rxv		受信バッファ・フル割り込みベクター
-		@param[in]	sslv	QSSL ネゲート割り込みベクター
+		@param[in]	spri	受信バッファフル・割り込みベクター
+		@param[in]	spti	送信バッファエンプティ・割り込みベクター
+		@param[in]	ssli	QSSL ネゲート・割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
-		ICU::GROUPBL0 sslv>
+	template <uint32_t base, peripheral per, ICU::VECTOR spri, ICU::VECTOR spti, ICU::GROUPBL0 ssli>
 	struct qspi_t {
 
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto TX_VEC = txv;			///< 受信割り込みベクター
-		static constexpr auto RX_VEC = rxv;			///< 送信割り込みベクター
-		static constexpr auto SSL_VEC = sslv;		///< 送信終了割り込みベクター
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto SPRI = spri;		///< 受信バッファフル・割り込みベクター
+		static constexpr auto SPTI = spti;		///< 送信バッファエンプティ・割り込みベクター
+		static constexpr auto SSLI = ssli;		///< QSSL ネゲート・割り込みベクター
 		static constexpr uint32_t PCLK = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -368,6 +367,6 @@ namespace device {
 		};
 		static inline spbmul_t<0x1C> SPBMUL;
 	};
-	typedef qspi_t<0x0008'9E00, peripheral::QSPI, ICU::VECTOR::SPTI, ICU::VECTOR::SPRI,
+	typedef qspi_t<0x0008'9E00, peripheral::QSPI, ICU::VECTOR::SPRI, ICU::VECTOR::SPTI,
 		ICU::GROUPBL0::QSPSSLI>  QSPI;
 }
