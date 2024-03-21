@@ -32,14 +32,15 @@
 namespace {
 
 	// LCD 定義
-	static const int16_t LCD_X = 480;
-	static const int16_t LCD_Y = 272;
-	static const auto PIX = graphics::pixel::TYPE::RGB565;
+	static constexpr int16_t LCD_X = 480;
+	static constexpr int16_t LCD_Y = 272;
+	static constexpr auto PIX = graphics::pixel::TYPE::RGB565;
 
 	// SCI_I2C バッファ定義
 	typedef utils::fixed_fifo<uint8_t, 64> RB64;
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
 
+#if 0
 #if defined(SIG_RX65N)
 	// SDHI 関係定義（RX65N Envision Kit の SDHI ポートは、候補３で指定できる）
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
@@ -49,7 +50,7 @@ namespace {
 	// GLCDC 関係定義
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	static const uint32_t LCD_ORG = 0x0000'0100;
+	static constexpr uint32_t LCD_ORG = 0x0000'0100;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::FIRST> FT5206_I2C;
 
@@ -62,10 +63,14 @@ namespace {
 	// GLCDC 関係定義
 	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
-	static const uint32_t LCD_ORG = 0x0080'0000;
+	static constexpr uint32_t LCD_ORG = 0x0080'0000;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::ORDER::SECOND> FT5206_I2C;
 
+#endif
+#else
+    typedef fatfs::sdhi_io<device::SDHI, board_profile::SDC_POWER, board_profile::SDC_WP, board_profile::SDHI_ORDER> SDC;
+	typedef device::sci_i2c_io<board_profile::FT5206_SCI_CH, RB64, SB64, board_profile::FT5206_SCI_ORDER> FT5206_I2C;
 #endif
 
 	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;
@@ -100,7 +105,7 @@ namespace {
 	// 標準カラーインスタンス
 	typedef graphics::def_color DEF_COLOR;
 
-	GLCDC		glcdc_(nullptr, reinterpret_cast<void*>(LCD_ORG));
+	GLCDC		glcdc_(nullptr, reinterpret_cast<void*>(board_profile::LCD_ORG));
 	AFONT		afont_;
 	KFONT		kfont_;
 	FONT		font_(afont_, kfont_);
@@ -489,6 +494,8 @@ extern "C" {
 
 	void setup_touch_panel_()
 	{
+		dialog_.ready_to_touch();
+#if 0
 		render_.sync_frame();
 		dialog_.modal(vtx::spos(400, 60),
 			"Touch panel device wait...\nPlease touch it with some screen.");
@@ -505,6 +512,7 @@ extern "C" {
 			}
 		}
 		render_.clear(DEF_COLOR::Black);
+#endif
 	}
 }
 
