@@ -10,7 +10,7 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include "common/bitset.hpp"
+#include "bitset.hpp"
 
 namespace utils {
 
@@ -116,20 +116,19 @@ namespace utils {
 			} else if(ch_ <= 0x7f) {  // 通常の文字列の場合
 				typename SYMBOL::NAME sc;
 				auto tmp = symbol_.get_code(tx_ - 1, sc);
-				if(symbol_(sc, nval)) {
-					tx_ = tmp;
-					ch_ = *tx_++;
-					if(minus) { nval = -nval; }
-					return nval;
-				} else {
-					typename FUNC::NAME fc;
-					auto tmp = func_.get_code(tx_ - 1, fc);
-					if(fc != FUNC::NAME::NONE) {
+				if(sc == SYMBOL::NAME::NONE) ;
+				else if(SYMBOL::probe(sc)) {
+					if(symbol_(sc, nval)) {
 						tx_ = tmp;
-						func_sub_(fc, nval);
+						ch_ = *tx_++;
 						if(minus) { nval = -nval; }
 						return nval;
 					}
+				} else {
+					tx_ = tmp;
+					func_sub_(static_cast<typename FUNC::NAME>(sc), nval);
+					if(minus) { nval = -nval; }
+					return nval;
 				}
 				error_.set(error::symbol_fatal);
 				return nval;
