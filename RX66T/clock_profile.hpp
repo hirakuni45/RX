@@ -44,7 +44,7 @@ namespace device {
 
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
 
-		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
+		static constexpr bool		TURN_SBC	= false;			///< RX66T はサブクロックは無いので常に「false」
 	#if defined(USE_USB)
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
@@ -86,7 +86,8 @@ namespace device {
 #endif
 #endif
 
-		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+//		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr uint32_t	DELAY_MS	= ICLK / 2'077'922;	///< ソフトウェアー遅延における定数（1マイクロ秒）
     };
 }
 

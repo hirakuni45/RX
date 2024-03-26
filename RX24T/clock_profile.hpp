@@ -6,7 +6,7 @@
             クロックジェネレータで発生させる周波数の定義 @n
 			※簡単な実験では、120MHz は、普通に動作する、それ以上は、怪しい・・
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,8 +24,8 @@ namespace device {
 				・詳細はハードウェアーマニュアル参照の事
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class clock_profile {
-	public:
+	struct clock_profile {
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発信器タイプ @n
@@ -46,8 +46,6 @@ namespace device {
 		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		=  8'000'000;		///< HOCO 指定の固定値
 #endif
-
-#if 1
 		static constexpr uint32_t   PLL_BASE	=  80'000'000;		///< PLL ベースクロック（最大80MHz）
 
 		static constexpr uint32_t   ICLK		=  80'000'000;		///< ICLK 周波数（最大80MHz）
@@ -65,7 +63,8 @@ namespace device {
 		static constexpr uint32_t   PCLKD		=  60'000'000;		///< PCLKD 周波数（最大40MHz）
 		static constexpr uint32_t   FCLK		=  30'000'000;		///< FCLK 周波数（最大32MHz）
 #endif
-		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+//		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr uint32_t	DELAY_MS	= ICLK / 3'200'000;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 	};
 }
 

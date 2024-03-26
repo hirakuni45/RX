@@ -36,9 +36,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  4> PCKD;
 
 			bits_rw_t<io_, bitpos::B8,  4> PCKB;
-
 			bits_rw_t<io_, bitpos::B12, 4> PCKA;
-
+			bits_rw_t<io_, bitpos::B16, 4> PCKB_;
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 			bits_rw_t<io_, bitpos::B28, 4> FCK;
 		};

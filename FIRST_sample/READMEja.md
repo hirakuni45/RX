@@ -33,81 +33,10 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 
 ## ハードウェアーの準備（全般）
  - 各マイコンの、クリスタル周波数、各モジュールの周波数は、RXxxx/clock_profile.hpp を参照して下さい。
+ - 各マイコンの、LED 接続ポートは、RXxxx/board_profile.hpp を参照して下さい。
  - インジケーター LED を指定のポートに接続する。
  - LED の接続は標準では、LOW レベル出力で点灯するように接続します。
  - LED の typedef を変更する事で、HIGH レベルで点灯するようにする事も出来ます。
-   
-```C++
-/// LED 接続ポートの定義
-/// LED を「吸い込み：出力０で点灯させる場合」LED_ACTIVE = 0
-/// LED を「吐き出し：出力１で点灯させる場合」LED_ACTIVE = 1
-// Memo:
-//    ポート出力は、電流を引いた（吸い込み）場合と、電流を掃き出した（吐き出し）場合で、能力が異なります。
-//    一般的に、「吸い込み」の方が電流を多く流せる場合が多く、その慣例に従って、「吸い込み」で接続する場合が通例です。
-#if defined(SIG_RX220)
-	// 秋月 AE-RX220 ボード
-	// P03 に LED を吸い込みで接続する事を想定している。
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-#elif defined(SIG_RX231)
-	// DIY RX231 board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX62N)
-	// BlueBoard-RX62N_100pin
-	static constexpr bool LED_ACTIVE = 0;
-  #if defined(CQ_FRK)
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-  #else
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-  #endif
-#elif defined(SIG_RX631)
-	// RX631 GR-CITRUS
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX63T)
-	// DIY RX63T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
-#elif defined(SIG_RX24T)
-	// DIY RX24T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX26T)
-	// DIY RX26T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX71M)
-	// DIY RX72M board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-#elif defined(SIG_RX72M)
-	// 工事中
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-#elif defined(SIG_RX72N)
-	// RX72N Envision Kit
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX64M)
-	// DIY RX64M board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-#elif defined(SIG_RX65N)
-	// RX65N Envision Kit
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX66T)
-	// DIY RX66T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX72T)
-	// DIY RX72T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
-#endif
-```
-
  - BlueBoard-RX62N_100pin の場合、ボード上の D2 LED を利用する。（赤色） 
  - FRK-RX62N の場合、ボード上の LED1 を利用する。（黄色） 
  - GR-CITRUS の場合、ボード上 LED1 を利用する。（赤色）
@@ -129,6 +58,8 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 ## LED 接続ポートを「出力」に設定
 
 ```C++
+	using namespace board_profile;
+
 	LED::OUTPUT();  // LED ポートを出力に設定
 ```
 

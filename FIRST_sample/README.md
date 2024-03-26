@@ -32,81 +32,11 @@ Sample program of LED blinking using RX microcontroller
 ---
 
 ## Hardware Preparation (General)
- - Refer to RXxxx/clock_profile.hpp for the crystal frequency of each microcontroller and each module.
- - Connect the indicator LEDs to the specified ports.
- - The LEDs are connected so that they light up at the LOW level output by default.
- - By changing the typedef of the LED, it can be made to turn on at the HIGH level.
-   
-```C++
-/// LED connection port definition
-/// LED_ACTIVE = 0 when the LED is to be turned on with "Inhale: Output 0
-/// LED_ACTIVE = 1 if the LED is to be turned on at output 1
-/// Memo:
-// Port outputs have different capabilities when current is drawn (suction) and when current is swept (discharge).
-// In general, "sucking in" often allows more current to flow, and it is customary to follow that convention and connect with "sucking in".
-#if defined(SIG_RX220)
-	// Akizuki-Denshi（秋月電子通商）AE-RX220 ボード
-	// P03 に LED を吸い込みで接続する事を想定している。
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B3, LED_ACTIVE> LED;
-#elif defined(SIG_RX231)
-	// DIY RX231 board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX62N)
-	// BlueBoard-RX62N_100pin
-	static constexpr bool LED_ACTIVE = 0;
-  #if defined(CQ_FRK)
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-  #else
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-  #endif
-#elif defined(SIG_RX631)
-	// RX631 GR-CITRUS
-	static constexpr bool LED_ACTIVE = 1;
-	typedef device::PORT<device::PORTA, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX63T)
-	// DIY RX63T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORTB, device::bitpos::B7, LED_ACTIVE> LED;
-#elif defined(SIG_RX24T)
-	// DIY RX24T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX26T)
-	// DIY RX26T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX71M)
-	// DIY RX72M board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-#elif defined(SIG_RX72M)
-	// 工事中
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-#elif defined(SIG_RX72N)
-	// RX72N Envision Kit
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT4, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX64M)
-	// DIY RX64M board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B7, LED_ACTIVE> LED;
-#elif defined(SIG_RX65N)
-	// RX65N Envision Kit
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT7, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX66T)
-	// DIY RX66T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
-#elif defined(SIG_RX72T)
-	// DIY RX72T board
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B1, LED_ACTIVE> LED;
-#endif
-```
+- Refer to RXxxx/clock_profile.hpp for the crystal frequency of each microcontroller and each module.
+- Refer to RXxxx/board_profile.hpp for the LED connection port of each microcontroller.
+- Connect the indicator LEDs to the specified ports.
+- The LEDs are connected so that they light up at the LOW level output by default.
+- By changing the typedef of the LED, it can be made to turn on at the HIGH level.
 - For BlueBoard-RX62N_100pin,  use the red LED (D2) on the board.
 - For FRK-RX62N, use LED1 on the board. (yellow) 
 - For GR-CITRUS, use the red LED1 on the board.  (red) 
@@ -128,6 +58,8 @@ Sample program of LED blinking using RX microcontroller
 ## Set LED connection port to "output".
 
 ```C++
+	using namespace board_profile;
+
 	LED::OUTPUT(); // set LED port to output
 ```
 
