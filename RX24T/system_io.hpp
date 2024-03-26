@@ -124,7 +124,8 @@ namespace device {
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
 								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
-								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
+								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD))
+								  | device::SYSTEM::SCKCR.PCKB_.b(clock_div_(clock_profile::PCLKB));
 
 			device::SYSTEM::PLLCR2.PLLEN = 0;	// PLL 動作
 			{
