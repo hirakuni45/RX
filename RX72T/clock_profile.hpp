@@ -89,7 +89,8 @@ namespace device {
 		static constexpr uint32_t	BCLK		=  60'000'000;		///< BCLK 周波数（最大60MHz）
 #endif
 
-		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+//		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr uint32_t	DELAY_MS	= ICLK / 2'077'922;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 	};
 }
 
