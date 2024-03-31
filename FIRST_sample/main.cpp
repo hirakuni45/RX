@@ -1,8 +1,8 @@
 //=============================================================================//
 /*! @file
     @brief  ファースト・サンプル（LED 点滅） @n
-			※動作周波数は、RXxxx/clock_profile.hpp を参照 @n
-			LED 接続ポートの定義： RXxxx/board_profile.hpp を参照 @n
+			・動作周波数は、RXxxx/clock_profile.hpp を参照 @n
+			・LED 接続ポートは、 RXxxx/board_profile.hpp を参照 @n
 			  LED を「吸い込み：出力０で点灯させる場合」LED_ACTIVE = 0 @n
 			  K（カソード）をポート側、A（アノード）を＋電源側に接続（制限抵抗を入れる） @n
 			  LED を「吐き出し：出力１で点灯させる場合」LED_ACTIVE = 1 @n
