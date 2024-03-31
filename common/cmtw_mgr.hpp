@@ -182,7 +182,7 @@ namespace device {
 				icu_mgr::set_interrupt(vec, nullptr, ICU::LEVEL::NONE);
 			    CMTW::CMWCR = CMTW::CMWCR.CKS.b(static_cast<uint8_t>(cks));
 			}
-			CMTW::CMWSTR = 1;
+			CMTW::CMWSTR.STR = 1;
 
 			return true;
 		}
@@ -209,6 +209,20 @@ namespace device {
 			rate_ = freq;
 
 			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  許可／不許可（再開／停止）
+			@param[in] ena	停止の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(bool ena = true) noexcept
+		{
+			if(CMTW::CMSTR.STR() != ena) {
+				CMTW::CMSTR.STR = ena;
+			} 
 		}
 
 
