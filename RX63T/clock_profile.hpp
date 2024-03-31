@@ -5,7 +5,7 @@
 	@brief	RX63T グループ・クロック。プロファイル @n
             クロックジェネレータで発生させる周波数の定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -67,7 +67,7 @@ namespace device {
 		static constexpr uint32_t   FCLK		=  48'000'000;		///< FCLK 周波数（最大50MHz）
 		static constexpr uint32_t	BCLK		=  48'000'000;		///< BCLK 周波数（最大50MHz）
 
-		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr uint32_t	DELAY_MS	= (ICLK / 1'000'000 / 4) - 1;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 	};
 }
 

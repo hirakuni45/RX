@@ -5,7 +5,7 @@
 	@brief	RX621/RX62N グループ・クロック。プロファイル @n
             クロックジェネレータで発生させる周波数の定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -45,9 +45,7 @@ namespace device {
 
 		static constexpr uint32_t	FCLK        = PCLK;				///< FCLK 周波数（互換性の為設定）
 
-		// RXv1 コア（最大 100MHz）
-		// ※96MHz 動作、10uS で調整
-		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr uint32_t	DELAY_MS	= (ICLK / 1'000'000 / 4) - 1;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 	};
 }
 
