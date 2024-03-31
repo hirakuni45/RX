@@ -9,7 +9,7 @@
 			  ・0.5% にする場合 @n
 			  static_assert(CMT_MGR::probe_freq(freq, 5), "Failed rate accuracy test");
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -197,6 +197,20 @@ namespace device {
 			rate_ = freq;
 
 			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  許可／不許可（再開／停止）
+			@param[in] ena	停止の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(bool ena = true) noexcept
+		{
+			if(CMT::get_state() != ena) {
+				CMT::enable(ena);
+			} 
 		}
 
 

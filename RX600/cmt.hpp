@@ -135,7 +135,31 @@ namespace device {
 				CMSTR1.STR3 = ena;
 				break;
 #endif
-			} 			
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  状態を取得
+			@return 動作「true」、停止「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool get_state() noexcept
+		{
+			switch(per) {
+			case peripheral::CMT0:
+				return CMSTR0.STR0();
+			case peripheral::CMT1:
+				return CMSTR0.STR1();
+#ifndef SIG_RX140
+			case peripheral::CMT2:
+				return CMSTR1.STR2();
+			case peripheral::CMT3:
+				return CMSTR1.STR3();
+#endif
+			}
+			return false;
 		}
 	};
 

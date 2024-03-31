@@ -40,6 +40,8 @@ namespace {
 	typedef utils::fixed_fifo<uint8_t, 64> RB64;
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
 
+	#define USE_DRW2D
+
 #if 0
 #if defined(SIG_RX65N)
 	// SDHI 関係定義（RX65N Envision Kit の SDHI ポートは、候補３で指定できる）
@@ -98,10 +100,13 @@ namespace {
 	typedef graphics::kfont<16, 16> KFONT;
 	typedef graphics::font<AFONT, KFONT> FONT;
 
+#ifdef USE_DRW2D
 	// DRW2D レンダラー
 	typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
+#else
 	// ソフトウェアーレンダラー
-//	typedef graphics::render<GLCDC, FONT> RENDER;
+	typedef graphics::render<GLCDC, FONT> RENDER;
+#endif
 	// 標準カラーインスタンス
 	typedef graphics::def_color DEF_COLOR;
 
@@ -564,6 +569,17 @@ int main(int argc, char** argv)
 		}
 	}
 
+#ifdef USE_DRW2D
+	{  // DRW2D 初期化
+		if(render_.start(device::ICU::LEVEL::_2)) {
+			utils::format("DRW2D Start\n");
+			render_.list_info();
+		} else {
+			utils::format("DRW2D Fail...\n");
+		}
+	}
+#endif
+
 	setup_touch_panel_();
 
 	setup_gui_();
@@ -571,6 +587,11 @@ int main(int argc, char** argv)
 	cmd_.set_prompt("# ");
 
 	LED::OUTPUT();  // LED ポートを出力に設定
+
+	render_.clear(DEF_COLOR::Black);
+	render_.sync_frame();
+	render_.clear(DEF_COLOR::Black);
+	render_.sync_frame();
 
 	uint8_t cnt = 0;
 	while(1) {
