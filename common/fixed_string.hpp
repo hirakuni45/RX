@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstring>
 #include <iterator>
+#include <boost/functional/hash.hpp>
 
 namespace utils {
 
