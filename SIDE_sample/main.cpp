@@ -39,13 +39,8 @@ namespace {
 	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
 	FAMIPAD		famipad_;
 
-	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
-	// LCD のフレームメモリーの開始アドレスは、nullptr と区別する為 0x00000000 から始められない
-	// 0x000100 から 255K バイト (480x272x2)
-	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  // Low Active
@@ -74,11 +69,8 @@ namespace {
 	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT, 40> FAMIPAD;
 	FAMIPAD		famipad_;
 
-	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
-	static void* LCD_ORG = reinterpret_cast<void*>(0x0080'0000);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
@@ -105,7 +97,7 @@ namespace {
 
 	static const auto PIX = graphics::pixel::TYPE::RGB565;
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
-	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
+	GLCDC_MGR	glcdc_mgr_(nullptr, reinterpret_cast<void*>(board_profile::LCD_ORG));
 
 	typedef graphics::font8x16 AFONT;
 	AFONT		afont_;

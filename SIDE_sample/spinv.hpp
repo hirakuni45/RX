@@ -150,13 +150,13 @@ namespace emu {
 			@param[in]	h		高さ
 		*/
 		//-----------------------------------------------------------------//
-		void service(void* org, int w, int h)
+		void service(uint32_t org, int w, int h)
 		{
 			uint8_t pad = get_fami_pad();
 
 			const uint8_t* video = im_.getVideo();
 			if(video != nullptr) {
-				uint16_t* fb = static_cast<uint16_t*>(org);
+				uint16_t* fb = reinterpret_cast<uint16_t*>(org);
 				uint32_t yo = (h - InvadersMachine::ScreenHeight) / 2;
 				uint32_t xo = (w - InvadersMachine::ScreenWidth) / 2;
 				for(uint32_t y = 0; y < InvadersMachine::ScreenHeight; ++y) {
