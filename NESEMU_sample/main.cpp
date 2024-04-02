@@ -45,12 +45,6 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B3> PAD_OUT;
 	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
 
-	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	// フレームバッファ開始アドレスは、100 番地から開始とする。
-	// ※０～ＦＦは未使用領域
-	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
-
 	// カード電源制御を使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 	// 書き込み禁止は使わない
@@ -75,11 +69,6 @@ namespace {
 	typedef device::PORT<device::PORT5, device::bitpos::B2> PAD_CLK;  // Pmod1-3
 	typedef device::PORT<device::PORT5, device::bitpos::B0> PAD_OUT;  // Pmod1-2
 	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT, 40> FAMIPAD;
-
-	// GLCDC の制御関係
-	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
-	static void* LCD_ORG = reinterpret_cast<void*>(0x0080'0000);
 
 	// SD-CARD の制御関係
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
@@ -106,7 +95,7 @@ namespace {
 	static const uint16_t LCD_Y = 272;
 	static const graphics::pixel::TYPE PIX = graphics::pixel::TYPE::RGB565;
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
-	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
+	GLCDC_MGR	glcdc_mgr_(nullptr, reinterpret_cast<void*>(board_profile::LCD_ORG));
 
 	// RX65N/RX72N Envision Kit の SDHI は、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::ORDER::THIRD> SDHI;

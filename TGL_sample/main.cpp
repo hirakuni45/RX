@@ -38,9 +38,7 @@ namespace {
 /// for RX72N Envision Kit
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
-	uint16_t* fb_ = reinterpret_cast<uint16_t*>(0x0080'0000);
-	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
+	uint16_t* fb_ = reinterpret_cast<uint16_t*>(board_profile::LCD_ORG);
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_MGR;
 	typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
 

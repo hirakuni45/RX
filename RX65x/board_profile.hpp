@@ -52,7 +52,7 @@ namespace board_profile {
 	// GLCDC, touch panel 定義
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	static constexpr auto LCD_ORG = reinterpret_cast<uint16_t*>(0x0000'0100);
+	static constexpr uint32_t LCD_ORG = 0x0000'0100;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 	typedef device::SCI6 FT5206_SCI_CH;
 	static constexpr auto FT5206_SCI_ORDER = device::port_map::ORDER::FIRST;

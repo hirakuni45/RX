@@ -46,6 +46,8 @@ namespace device {
 		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		=  8'000'000;		///< HOCO 指定の固定値
 #endif
+
+#if 1
 		static constexpr uint32_t   PLL_BASE	=  80'000'000;		///< PLL ベースクロック（最大80MHz）
 
 		static constexpr uint32_t   ICLK		=  80'000'000;		///< ICLK 周波数（最大80MHz）
