@@ -2,7 +2,7 @@
 //=============================================================================//
 /*!	@file
 	@brief	RX600 グループ・バス定義 @n
-			RX24T (CSx レジスタ 0 ～ 3, SDRAM 制御無し) @n
+			RX24T/RX24U (CSx レジスタ 0 ～ 3, SDRAM 制御無し) @n
 			RX26T (CSx レジスタ 0 ～ 3, SDRAM 制御無し) @n
 			RX62N/RX621 @n
 			RX63N/RX631 @n
@@ -773,7 +773,7 @@ namespace device {
 	typedef bus_all_t BUS;
 #elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef bus_allex_t BUS;
-#elif defined(SIG_RX24T) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef bus_base_t BUS;
 #endif
 }

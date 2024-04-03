@@ -61,6 +61,45 @@
 #include "RX231/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX24T)
+#include "RX24T/clock_profile.hpp"
+#include "RX24T/peripheral.hpp"
+#include "RX24T/system.hpp"
+#include "RX24T/power_mgr.hpp"
+#include "RX24T/icu.hpp"
+#include "RX24T/icu_mgr.hpp"
+#include "RX24T/port_map.hpp"
+#include "RX24T/port_map_mtu.hpp"
+#include "RX24T/port_map_gpt.hpp"
+#include "RX24T/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX24U)
+#include "RX24U/clock_profile.hpp"
+#include "RX24U/peripheral.hpp"
+#include "RX24T/system.hpp"
+#include "RX24U/power_mgr.hpp"
+#include "RX24U/icu.hpp"
+#include "RX24T/icu_mgr.hpp"
+#include "RX24T/port_map.hpp"
+#include "RX24T/port_map_mtu.hpp"
+#include "RX24T/port_map_gpt.hpp"
+#include "RX24T/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX26T)
+#include "RX26T/clock_profile.hpp"
+#include "RX26T/peripheral.hpp"
+#include "RX26T/system.hpp"
+#include "RX26T/power_mgr.hpp"
+#include "RX26T/icu.hpp"
+#include "RX26T/icu_mgr.hpp"
+#include "RX26T/port_map.hpp"
+#include "RX26T/port_map_mtu.hpp"
+#include "RX26T/port_map_gptw.hpp"
+#include "RX26T/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/clock_profile.hpp"
 #include "RX62x/peripheral.hpp"
@@ -97,32 +136,6 @@
 #include "RX63T/port_map_mtu.hpp"
 #include "RX63T/port_map_gpt.hpp"
 #include "RX63T/port_map_irq.hpp"
-#include "RX600/rx_dsp_inst.h"
-
-#elif defined(SIG_RX24T)
-#include "RX24T/clock_profile.hpp"
-#include "RX24T/peripheral.hpp"
-#include "RX24T/system.hpp"
-#include "RX24T/power_mgr.hpp"
-#include "RX24T/icu.hpp"
-#include "RX24T/icu_mgr.hpp"
-#include "RX24T/port_map.hpp"
-#include "RX24T/port_map_mtu.hpp"
-#include "RX24T/port_map_gpt.hpp"
-#include "RX24T/port_map_irq.hpp"
-#include "RX600/rx_dsp_inst.h"
-
-#elif defined(SIG_RX26T)
-#include "RX26T/clock_profile.hpp"
-#include "RX26T/peripheral.hpp"
-#include "RX26T/system.hpp"
-#include "RX26T/power_mgr.hpp"
-#include "RX26T/icu.hpp"
-#include "RX26T/icu_mgr.hpp"
-#include "RX26T/port_map.hpp"
-#include "RX26T/port_map_mtu.hpp"
-#include "RX26T/port_map_gptw.hpp"
-#include "RX26T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX64M)

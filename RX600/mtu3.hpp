@@ -2,7 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・MTU3x 定義 @n
-			RX24T @n
+			RX24T/RX24U @n
 			RX26T @n
 			RX63T @n
 			RX64M/RX71M @n
@@ -4291,7 +4291,7 @@ namespace device {
 	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR, clock_profile::PCLKA> MTU5;
 	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR, clock_profile::PCLKA> MTU6;
 	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR, clock_profile::PCLKA> MTU7;
-#elif defined(SIG_RX24T)  // MTU3d
+#elif defined(SIG_RX24T) || defined(SIG_RX24U) // MTU3d
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR, clock_profile::PCLKA> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR, clock_profile::PCLKA> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR, clock_profile::PCLKA> MTU2;

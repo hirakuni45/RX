@@ -122,7 +122,7 @@ namespace device {
 
 #if defined(SIG_RX220) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef iwdt_t<0x0008'8030, peripheral::IWDT, ICU::VECTOR::NONE, 125'000> IWDT;
-#elif defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX24T)
+#elif defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX24T) || defined(SIG_RX24U)
 	// interrupt vector: for NMI vector
 	typedef iwdt_t<0x0008'8030, peripheral::IWDT, ICU::VECTOR::NONE,  15'000> IWDT;
 #else

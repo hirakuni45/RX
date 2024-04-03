@@ -4,7 +4,7 @@
 	@brief	RX600/RX700 グループ・CRC 定義 @n
 			・RX220 @n
 			・RX231 @n
-			・RX24T @n
+			・RX24T/RX24U @n
 			・RX26T @n
 			・RX62N/RX621 @n
 			・RX63N/RX631 @n
