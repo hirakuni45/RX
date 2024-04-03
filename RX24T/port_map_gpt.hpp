@@ -1,14 +1,18 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・ポート・マッピング (GPTB)
+	@brief	RX24T/RX24U グループ・ポート・マッピング (GPTB)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
+#if defined(SIG_RX24T)
 #include "RX24T/peripheral.hpp"
+#elif defined(SIG_RX24U)
+#include "RX24U/peripheral.hpp"
+#endif
 #include "RX24T/port.hpp"
 #include "RX24T/mpc.hpp"
 #include "RX600/port_map_order.hpp"

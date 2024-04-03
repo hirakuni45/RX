@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・ポート・マッピング (IRQ)
+	@brief	RX24T/RX24U グループ・ポート・マッピング (IRQ)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -10,7 +10,11 @@
 //=========================================================================//
 #include "RX24T/port.hpp"
 #include "RX24T/mpc.hpp"
+#if defined(SIG_RX24T)
 #include "RX24T/icu.hpp"
+#elif defined(SIG_RX24U)
+#include "RX24U/icu.hpp"
+#endif
 #include "RX600/port_map_order.hpp"
 
 namespace device {

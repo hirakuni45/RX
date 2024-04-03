@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T システム制御
+	@brief	RX24T/RX24U システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -10,7 +10,11 @@
 //=========================================================================//
 #include "RX24T/system.hpp"
 #include "RX24T/flash.hpp"
+#if defined(SIG_RX24T)
 #include "RX24T/clock_profile.hpp"
+#elif defined(SIG_RX24U)
+#include "RX24U/clock_profile.hpp"
+#endif
 
 namespace device {
 

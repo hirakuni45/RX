@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・システム定義
+	@brief	RX24T/RX24U グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -429,6 +429,11 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  MSTPC0;
 
 			bit_rw_t<io_, bitpos::B19> MSTPC19;
+
+			bit_rw_t<io_, bitpos::B24> MSTPC24;
+
+			bit_rw_t<io_, bitpos::B26> MSTPC26;
+			bit_rw_t<io_, bitpos::B27> MSTPC27;
 
 			bit_rw_t<io_, bitpos::B31> DSLPE;
 		};

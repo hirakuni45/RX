@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・ポート・マッピング @n
+	@brief	RX24T/RX24U グループ・ポート・マッピング @n
 			コメントのピン番号は、LQFP100 パッケージの場合
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
@@ -9,7 +9,11 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
+#if defined(SIG_RX24T)
 #include "RX24T/peripheral.hpp"
+#elif defined(SIG_RX24U)
+#include "RX24U/peripheral.hpp"
+#endif
 #include "RX24T/port.hpp"
 #include "RX24T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
