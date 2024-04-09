@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・ICUb 定義
+	@brief	RX13T グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,7 +18,7 @@ namespace device {
 		@brief  RX24T 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct icu_t : public ICU_BASE, ICU_IRQ8 {
+	struct icu_t : public ICU_BASE, ICU_IRQ6 {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -50,8 +50,6 @@ namespace device {
 			IRQ3    = 67,
 			IRQ4    = 68,
 			IRQ5    = 69,
-			IRQ6    = 70,
-			IRQ7    = 71,
 
 			LVD1    = 88,   ///< LVD
 			LVD2    = 89,   ///< LVD

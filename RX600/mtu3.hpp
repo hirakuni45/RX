@@ -2,6 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・MTU3x 定義 @n
+			RX13T @n
 			RX24T/RX24U @n
 			RX26T @n
 			RX63T @n
@@ -38,6 +39,7 @@ namespace device {
 			MTU2,	///< MTU2:  RX621 / RX62N
 			MTU3,	///< MTU3:  RX63T
 			MTU3a,	///< MTU3a: RX64M / RX71M / RX65N / RX651 / RX66N / RX671 / RX72N / RX72M
+			MTU3c,	///< MTU3c: RX13T
 			MTU3d,	///< MTU3d: RX24T / RX26T / RX66T / RX72T
 		};
 
@@ -451,6 +453,8 @@ namespace device {
 					OE4C = 0;
 					OE4D = 0;
 					break;
+#if defined(SIG_RX13T)
+#else
 				case peripheral::MTU6:
 					OE6B = 0;
 					OE6D = 0;
@@ -461,6 +465,7 @@ namespace device {
 					OE7C = 0;
 					OE7D = 0;
 					break;
+#endif
 				default:
 					break;
 				}
@@ -482,9 +487,12 @@ namespace device {
 					case peripheral::MTU4:
 						OE4A = val != 0;
 						break;
+#if defined(SIG_RX13T)
+#else
 					case peripheral::MTU7:
 						OE7A = val != 0;
 						break;
+#endif
 					default:
 						break;
 					}
@@ -498,12 +506,15 @@ namespace device {
 					case peripheral::MTU4:
 						OE4B = val != 0;
 						break;
+#if defined(SIG_RX13T)
+#else
 					case peripheral::MTU6:
 						OE6B = val != 0;
 						break;
 					case peripheral::MTU7:
 						OE7B = val != 0;
 						break;
+#endif
 					default:
 						break;
 					}
@@ -514,9 +525,12 @@ namespace device {
 					case peripheral::MTU4:
 						OE4C = val != 0;
 						break;
+#if defined(SIG_RX13T)
+#else
 					case peripheral::MTU7:
 						OE7C = val != 0;
 						break;
+#endif
 					default:
 						break;
 					}
@@ -530,12 +544,15 @@ namespace device {
 					case peripheral::MTU4:
 						OE4D = val != 0;
 						break;
+#if defined(SIG_RX13T)
+#else
 					case peripheral::MTU6:
 						OE6D = val != 0;
 						break;
 					case peripheral::MTU7:
 						OE7D = val != 0;
 						break;
+#endif
 					default:
 						break;
 					}
@@ -4282,7 +4299,14 @@ namespace device {
 		static inline nfcr_t<0x000C'1296> NFCR;
 	};
 
-#if defined(SIG_RX63T) || defined(SIG_RX63T_S)  // MTU3
+#if defined(SIG_RX13T)  // MTU3c
+	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR, clock_profile::PCLKB> MTU0;
+	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR, clock_profile::PCLKB> MTU1;
+	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR, clock_profile::PCLKB> MTU2;
+	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR, clock_profile::PCLKB> MTU3;
+	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR, clock_profile::PCLKB> MTU4;
+	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR, clock_profile::PCLKB> MTU5;
+#elif defined(SIG_RX63T) || defined(SIG_RX63T_S)  // MTU3
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR, clock_profile::PCLKA> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR, clock_profile::PCLKA> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR, clock_profile::PCLKA> MTU2;

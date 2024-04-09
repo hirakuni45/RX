@@ -310,6 +310,87 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  RX グループ割り込みコントローラ、IRQ6 クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct icu_irq6_t {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	IRQ コントロールレジスタ i (IRQCRi) (i = 0 ～ 5)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct irqcrn_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B2, 2>  IRQMD;
+		};
+		static inline irqcrn_t<0x0008'7500> IRQCR0;
+		static inline irqcrn_t<0x0008'7501> IRQCR1;
+		static inline irqcrn_t<0x0008'7502> IRQCR2;
+		static inline irqcrn_t<0x0008'7503> IRQCR3;
+		static inline irqcrn_t<0x0008'7504> IRQCR4;
+		static inline irqcrn_t<0x0008'7505> IRQCR5;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  IRQ 端子デジタルフィルタ許可レジスタ 0（IRQFLTE0）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct irqflte0_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> FLTEN0;
+			bit_rw_t<io_, bitpos::B1> FLTEN1;
+			bit_rw_t<io_, bitpos::B2> FLTEN2;
+			bit_rw_t<io_, bitpos::B3> FLTEN3;
+			bit_rw_t<io_, bitpos::B4> FLTEN4;
+			bit_rw_t<io_, bitpos::B5> FLTEN5;
+		};
+		static inline irqflte0_t<0x0008'7510> IRQFLTE0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	IRQ 端子デジタルフィルタ設定レジスタ 0（IRQFLTC0）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct irqfltc0_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2> FCLKSEL0;
+			bits_rw_t<io_, bitpos::B2,  2> FCLKSEL1;
+			bits_rw_t<io_, bitpos::B4,  2> FCLKSEL2;
+			bits_rw_t<io_, bitpos::B6,  2> FCLKSEL3;
+			bits_rw_t<io_, bitpos::B8,  2> FCLKSEL4;
+			bits_rw_t<io_, bitpos::B10, 2> FCLKSEL5;
+		};
+		static inline irqfltc0_t<0x0008'7514> IRQFLTC0;
+	};
+	typedef icu_irq6_t ICU_IRQ6;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  RX グループ割り込みコントローラ、IRQ8 クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -317,7 +398,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	IRQ コントロールレジスタ i (IRQCRi) (i = 0 ～ 15)
+			@brief	IRQ コントロールレジスタ i (IRQCRi) (i = 0 ～ 7)
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

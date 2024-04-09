@@ -74,33 +74,33 @@ namespace device {
 					}
 				}
 				break;
-#if 0
+
 			case peripheral::SCI12:
 				{
-					// RXD6: P80
-					// TXD6: P81
-					// SCK6: P82
-					uint8_t sel = enable ? 0b0'1010 : 0;  // ok
-					PORT8::PMR.B0 = 0;
-					PORT8::ODR.B0 = i2c;
-					MPC::P80PFS.PSEL = sel;
-					PORT8::PMR.B0 = enable;
-					PORT8::PMR.B1 = 0;
-					PORT8::ODR.B1 = i2c;
-					MPC::P81PFS.PSEL = sel;
-					PORT8::PMR.B1 = enable;
+					// RXD12: P94
+					// TXD12: PB0
+					// SCK12: PB3
+					uint8_t sel = enable ? 0b0'1100 : 0;
+					PORT9::PMR.B4 = 0;
+					PORT9::ODR.B4 = i2c;
+					MPC::P94PFS.PSEL = sel;
+					PORT9::PMR.B4 = enable;
+					PORTB::PMR.B0 = 0;
+					PORTB::ODR.B0 = i2c;
+					MPC::PB0PFS.PSEL = sel;
+					PORTB::PMR.B0 = enable;
 					if(spi) {
-						PORT8::PMR.B2 = 0;
-						MPC::P82PFS.PSEL = sel;
-						PORT8::PMR.B2 = enable;
+						PORTB::PMR.B3 = 0;
+						MPC::PB3PFS.PSEL = sel;
+						PORTB::PMR.B3 = enable;
 					}
 				}
 				break;
-#endif
+
 			case peripheral::RIIC0:
 				{
-					// SCL0: PB1 (34/100)
-					// SDA0: PB2 (33/100)
+					// SCL0: PB1
+					// SDA0: PB2
 					uint8_t sel = enable ? 0b0'1111 : 0;  // ok
 					PORTB::PMR.B1 = 0;
 					MPC::PB1PFS.PSEL = sel;  
@@ -131,7 +131,7 @@ namespace device {
 					// RXD1: PB7
 					// TXD1: PB6
 					// SCK1: PD4
-					uint8_t sel = enable ? 0b0'1010 : 0;  // ok
+					uint8_t sel = enable ? 0b0'1011 : 0;  // ok
 					PORTB::PMR.B7 = 0;
 					PORTB::ODR.B7 = i2c;
 					MPC::PB7PFS.PSEL = sel;
@@ -142,55 +142,33 @@ namespace device {
 					PORTB::PMR.B6 = enable;
 					if(spi) {
 						PORTD::PMR.B4 = 0;
-						MPC::PD4PFS.PSEL = sel;
+						MPC::PD4PFS.PSEL = enable ? 0b0'1010 : 0;  // ok
 						PORTD::PMR.B4 = enable;
 					}
 				}
 				break;
-#if 0
-			case peripheral::SCI5:  // Only B Version
+			case peripheral::SCI12:
 				{
-					// RXD5: PE0
-					// TXD5: PD7
-					// SCK5: PD2
-					uint8_t sel = enable ? 0b0'1010 : 0;  // ok
-					PORTE::PMR.B0 = 0;
-					PORTE::ODR.B0 = i2c;
-					MPC::PE0PFS.PSEL = sel;
-					PORTE::PMR.B0 = enable;
-					PORTD::PMR.B7 = 0;
-					PORTD::ODR.B7 = i2c;
-					MPC::PD7PFS.PSEL = sel;
-					PORTD::PMR.B7 = enable;
-					if(spi) {
-						PORTD::PMR.B2 = 0;
-						MPC::PD2PFS.PSEL = sel;
-						PORTD::PMR.B2 = enable;
-					}
-				}
-				break;
-			case peripheral::SCI6:
-				{
-					// RXD6: PA5
-					// TXD6: PB0
-					// SCK6: PA4
-					uint8_t sel = enable ? 0b0'1010 : 0;  // ok
-					PORTA::PMR.B5 = 0;
-					PORTA::ODR.B5 = i2c;
-					MPC::PA5PFS.PSEL = sel;
-					PORTA::PMR.B5 = enable;
+					// RXD12: P94
+					// TXD12: PB0
+					// SCK12: P93
+					uint8_t sel = enable ? 0b0'1100 : 0;  // ok
+					PORT9::PMR.B4 = 0;
+					PORT9::ODR.B4 = i2c;
+					MPC::P94PFS.PSEL = sel;
+					PORT9::PMR.B4 = enable;
 					PORTB::PMR.B0 = 0;
 					PORTB::ODR.B0 = i2c;
 					MPC::PB0PFS.PSEL = sel;
 					PORTB::PMR.B0 = enable;
 					if(spi) {
-						PORTA::PMR.B4 = 0;
-						MPC::PA4PFS.PSEL = sel;
-						PORTA::PMR.B4 = enable;
+						PORT9::PMR.B3 = 0;
+						MPC::P93PFS.PSEL = sel;
+						PORT9::PMR.B3 = enable;
 					}
 				}
 				break;
-#endif
+
 			default:
 				return false;
 				break;

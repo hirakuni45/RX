@@ -247,9 +247,6 @@ namespace device {
 			case peripheral::MTU3:
 			case peripheral::MTU4:
 			case peripheral::MTU5:
-			case peripheral::MTU6:
-			case peripheral::MTU7:
-			case peripheral::MTU9:
 				switch(ch) {
 				case port_map_order::CHANNEL::A:
 				case port_map_order::CHANNEL::B:

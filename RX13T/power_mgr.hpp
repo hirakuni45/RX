@@ -105,9 +105,6 @@ namespace device {
 			case peripheral::MTU3:
 			case peripheral::MTU4:
 			case peripheral::MTU5:
-			case peripheral::MTU6:
-			case peripheral::MTU7:
-			case peripheral::MTU9:
 				sr_(ena, pad_.mtu_, peripheral::MTU0, per);
 				SYSTEM::MSTPCRA.MSTPA9 = (pad_.mtu_ == 0);
 				break;
@@ -125,15 +122,12 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA15 = ((pad_.cmt_ & 0b0011) == 0);
 				break;
 
-			case peripheral::S12AD1:
-				SYSTEM::MSTPCRA.MSTPA16 = f;
-				break;
 			case peripheral::S12AD:
 				SYSTEM::MSTPCRA.MSTPA17 = f;
 				break;
 
-			case peripheral::S12AD2:
-				SYSTEM::MSTPCRA.MSTPA23 = f;
+			case peripheral::DA:
+				SYSTEM::MSTPCRA.MSTPA19 = f;
 				break;
 
 			case peripheral::DTC:

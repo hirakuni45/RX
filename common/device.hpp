@@ -2,13 +2,14 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー @n
+			RX13T @n
 			RX140 @n
 			RX220 @n
 			RX231 @n
 			RX62N/RX621 @n
 			RX63N/RX631 @n
 			RX63T @n
-			RX24T @n
+			RX24T/RX24U @n
 			RX26T @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
@@ -24,7 +25,19 @@
 //=========================================================================//
 #include "common/io_utils.hpp"
 
-#if defined(SIG_RX140)
+#if defined(SIG_RX13T)
+#include "RX13T/clock_profile.hpp"
+#include "RX13T/peripheral.hpp"
+#include "RX24T/system.hpp"
+#include "RX13T/power_mgr.hpp"
+#include "RX13T/icu.hpp"
+#include "RX24T/icu_mgr.hpp"
+#include "RX13T/port_map.hpp"
+#include "RX13T/port_map_mtu.hpp"
+#include "RX13T/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX140)
 #include "RX140/clock_profile.hpp"
 #include "RX140/peripheral.hpp"
 #include "RX140/system.hpp"
