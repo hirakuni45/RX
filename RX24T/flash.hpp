@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・フラッシュ 定義
+	@brief	RX13T/RX24T/RX24U グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,11 +15,13 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  フラッシュ・メモリー制御クラス
+		@param[in]	DSZ		データサイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t DSZ>
 	struct flash_t {
 
-		static constexpr auto DATA_SIZE = 8192;
+		static constexpr auto DATA_SIZE = DSZ;
 		static constexpr auto DATA_BLOCK_SIZE = 1024;
 		static constexpr uint32_t DATA_WORD_SIZE = 1;
 		static constexpr auto ID_NUM = 4;
@@ -396,5 +398,10 @@ namespace device {
 		};
 		static inline romciv_t<0x00081004> ROMCIV;
 	};
-	typedef flash_t FLASH;
+
+#if defined(SIG_RX13T)
+	typedef flash_t<4096> FLASH;
+#elif defined(SIG_RX24T) || defined(SIG_RX24U)
+	typedef flash_t<8192> FLASH;
+#endif
 }

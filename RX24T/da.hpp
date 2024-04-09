@@ -1,9 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・D/A 定義 @n
+	@brief	RX24T/RX24U グループ・D/A 定義 @n
 			A バージョン、１チャネル @n
-			B バージョン、２チャネル
+			B バージョン、２チャネル @n
+			RX24U、２チャネル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -17,7 +18,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  D/A コンバータ（DA, DAa）
+		@brief  8 ビット D/A コンバータ（DA, DAa）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct da_t {

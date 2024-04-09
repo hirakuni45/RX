@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140/RX231/RX24T グループ FLASH データ 制御
+	@brief	RX13T/RX140/RX231/RX24T/RX24U グループ FLASH データ 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

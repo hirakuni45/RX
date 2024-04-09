@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T/RX24U システム制御
+	@brief	RX13T/RX24T/RX24U システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -10,7 +10,9 @@
 //=========================================================================//
 #include "RX24T/system.hpp"
 #include "RX24T/flash.hpp"
-#if defined(SIG_RX24T)
+#if defined(SIG_RX13T)
+#include "RX13T/clock_profile.hpp"
+#elif defined(SIG_RX24T)
 #include "RX24T/clock_profile.hpp"
 #elif defined(SIG_RX24U)
 #include "RX24U/clock_profile.hpp"
@@ -120,23 +122,32 @@ namespace device {
 			// 1/64 以上、分周出来ない設定は不可
 			static_assert(check_clock_div_(clock_profile::FCLK), "FCLK can't divided.");
 			static_assert(check_clock_div_(clock_profile::ICLK), "ICLK can't divided.");
+#if defined(SIG_RX24T) || defined(SIG_RX24U)
 			static_assert(check_clock_div_(clock_profile::PCLKA), "PCLKA can't divided.");
+#endif
 			static_assert(check_clock_div_(clock_profile::PCLKB), "PCLKB can't divided.");
 			static_assert(check_clock_div_(clock_profile::PCLKD), "PCLKD can't divided.");
 
+#if defined(SIG_RX13T)
+			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
+								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
+								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
+								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
+#else
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
 								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(clock_profile::PCLKA))
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD))
 								  | device::SYSTEM::SCKCR.PCKB_.b(clock_div_(clock_profile::PCLKB));
-
+#endif
 			device::SYSTEM::PLLCR2.PLLEN = 0;	// PLL 動作
 			{
 				volatile auto tmp = device::SYSTEM::PLLCR2();
 			}
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
+#if defined(SIG_RX24T) || defined(SIG_RX24U)
 			// メモリーの WAIT 設定
 			if(clock_profile::ICLK > 64'000'000) {
 				device::SYSTEM::MEMWAIT = 0b10; // 64MHz 以上 wait 設定
@@ -145,7 +156,7 @@ namespace device {
 			} else {
 				device::SYSTEM::MEMWAIT = 0b00; // wait 無し
 			}
-
+#endif
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択
 			{  // dummy read register
 				volatile auto tmp = device::SYSTEM::SCKCR3();
@@ -160,10 +171,10 @@ namespace device {
 
 			// クロック関係書き込み不許可
 			device::SYSTEM::PRCR = 0xA500;
-
+#if defined(SIG_RX24T) || defined(SIG_RX24U)
 			// ROM キャッシュを有効（標準）
 			device::FLASH::ROMCE = 1;
-
+#endif
 			return true;
 		}
 	};

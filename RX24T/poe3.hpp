@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T ポートアウトプットイネーブル 3（POE3[bA]）定義
+	@brief	RX24T/RX24U ポートアウトプットイネーブル 3（POE3[bA]）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
