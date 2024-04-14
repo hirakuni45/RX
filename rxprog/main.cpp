@@ -16,8 +16,8 @@
 
 namespace {
 
-	static const std::string version_ = "1.78";
-	static const std::string conf_file_ = "rx_prog.conf";
+	static constexpr char version_[] = "1.88";
+	static constexpr char conf_file_[] = "rx_prog.conf";
 	static constexpr uint32_t cpr_last_year_ = 2024;
 	static constexpr uint32_t progress_num_ = 50;
 	static constexpr char progress_cha_ = '#';
@@ -212,7 +212,7 @@ namespace {
 ///		cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
 ///		cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
 ///		cout << "    --erase-data\t\tPerform data flash erase" << endl;
-///		cout << "    --id=ID[:,]ID[;,] ...      Specify protect ID (16bytes)" << endl;
+		cout << "    --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)" << endl;
 		cout << "    -r, --read                 Perform data read" << endl;
 ///		cout << "    --area=ORG[:,]END          Specify read area" << endl;
 		cout << "    -v, --verify               Perform data verify" << endl;
@@ -315,8 +315,8 @@ int main(int argc, char* argv[])
 				opts.read = true;
 //			} else if(p == "-i") {
 //				opts.id = true;
-//			} else if(p.find("--id=") == 0) {
-//				opts.id_val = &p[std::strlen("--id=")];
+			} else if(p.find("--id=") == 0) {
+				opts.id_val = &p[std::strlen("--id=")];
 			} else if(p == "-w" || p == "--write") {
 				opts.write = true;
 			} else if(p == "-v" || p == "--verify") {
@@ -349,6 +349,19 @@ int main(int argc, char* argv[])
 		if(opterr) {
 			std::cerr << "Option error: '" << p << "'" << std::endl;
 			opts.help = true;
+		}
+	}
+
+	// ID 変換
+	{
+		auto ss = utils::split_text(opts.id_val, ":,");
+		if(ss.size() != 16) {
+			std::cerr << "The number of IDs must be 16: '" << opts.id_val << "'" << std::endl;
+			opts.help = true;
+		} else {
+			for(auto s : ss) {
+				
+			}
 		}
 	}
 
@@ -390,6 +403,7 @@ int main(int argc, char* argv[])
 		}
 		return 0;
 	}
+
 	// HELP 表示
 	if(opts.help || opts.com_path.empty() || opts.com_speed.empty() || opts.device.empty()) {
 ///			&& opts.sequrity_set.empty() && !opts.sequrity_get && !opts.sequrity_release)
@@ -404,7 +418,6 @@ int main(int argc, char* argv[])
 	}
 
 	// 入力ファイルの読み込み
-	uint32_t pageall = 0;
 	if(!opts.inp_file.empty()) {
 		if(opts.verbose) {
 			std::cout << "# Input file path: '" << opts.inp_file << '\'' << std::endl;
@@ -413,7 +426,6 @@ int main(int argc, char* argv[])
 			std::cerr << "Can't open input file: '" << opts.inp_file << "'" << std::endl;
 			return -1;
 		}
-		pageall = motsx_.get_total_page();
 		if(opts.verbose) {
 			motsx_.list_area_map("# ");
 		}
@@ -514,6 +526,7 @@ int main(int argc, char* argv[])
 		}
 		uint32_t pageall = 1;
 		page_t page;
+//		auto page_size = prog_.get_page_size();
 		for(const auto& a : areas) {
 			uint8_t tmp[256];
 			if(!prog_.read_page(a.org_, tmp)) {
@@ -540,21 +553,22 @@ int main(int argc, char* argv[])
 	}
 
 	//================================ 消去
+	auto page_size = prog_.get_page_size();
+	auto page_all = motsx_.get_total_page(page_size);
 	if(opts.erase) {  // erase
 		auto areas = motsx_.create_area_map();
 
 		page_t page;
-		auto page_size = prog_.get_page_size();
 		for(const auto& a : areas) {
 			uint32_t adr = a.min_ & ~(page_size - 1);
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
-					progress_("Erase:  ", pageall, page);
+					progress_("Erase:  ", page_all, page);
 				} else if(opts.verbose) {
 					std::cout << boost::format("Erase: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
 				}
-				if(!prog_.erase_page(adr)) {  // 256 バイト単位で消去要求を送る
+				if(!prog_.erase_page(adr)) {  // 256/128 バイト単位で消去要求を送る
 					prog_.end();
 					return -1;
 				}
@@ -570,7 +584,7 @@ int main(int argc, char* argv[])
 	}
 
 	//=============================== 書き込み
-	if(opts.write && pageall > 0) {  // write
+	if(opts.write && page_all > 0) {  // write
 		auto areas = motsx_.create_area_map();
 		if(!areas.empty()) {
 			if(!prog_.start_write(true)) {
@@ -580,18 +594,18 @@ int main(int argc, char* argv[])
 		}
 		
 		page_t page;
-		auto page_size = prog_.get_page_size();
 		for(const auto& a : areas) {
 			uint32_t adr = a.min_ & ~(page_size - 1);
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
-					progress_("Write:  ", pageall, page);
+					progress_("Write:  ", page_all, page);
 				} else if(opts.verbose) {
 					std::cout << boost::format("Write: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
 				}
 				auto mem = motsx_.get_memory(adr);
-				if(!prog_.write(adr, &mem[0])) {
+				auto ofs = adr & 0xff;
+				if(!prog_.write(adr, &mem[ofs])) {
 					prog_.end();
 					return -1;
 				}
@@ -614,18 +628,18 @@ int main(int argc, char* argv[])
 	if(opts.verify) {  // verify
 		auto areas = motsx_.create_area_map();
 		page_t page;
-		auto page_size = prog_.get_page_size();
 		for(const auto& a : areas) {
 			uint32_t adr = a.min_ & ~(page_size - 1);
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
-					progress_("Verify: ", pageall, page);
+					progress_("Verify: ", page_all, page);
 				} else if(opts.verbose) {
 					std::cout << boost::format("Verify: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
 				}
 				auto mem = motsx_.get_memory(adr);
-				if(!prog_.verify_page(adr, &mem[0])) {
+				auto ofs = adr & 0xff;
+				if(!prog_.verify_page(adr, &mem[ofs])) {
 					prog_.end();
 					return -1;
 				}

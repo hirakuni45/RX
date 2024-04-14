@@ -7,6 +7,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include <cstdint>
 #include "string_utils.hpp"
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>

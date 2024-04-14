@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX26T プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "rs232c_io.hpp"
 #include "rx_protocol.hpp"
 #include <vector>
@@ -50,7 +50,8 @@ namespace rx26t {
 
 //		uint8_t				last_error_ = 0;
 
-		static uint32_t get16_big_(const uint8_t* p) {
+		static uint32_t get16_big_(const uint8_t* p)
+		{
 			uint32_t v;
 			v = p[1];
 			v |= static_cast<uint32_t>(p[0]) << 8;
@@ -58,13 +59,15 @@ namespace rx26t {
 		}
 
 
-		static void put16_big_(uint8_t* p, uint32_t val) {
+		static void put16_big_(uint8_t* p, uint32_t val)
+		{
 			p[0] = (val >> 8) & 0xff;
 			p[1] = val & 0xff;
 		}
 
 
-		static uint32_t get32_big_(const uint8_t* p) {
+		static uint32_t get32_big_(const uint8_t* p)
+		{
 			uint32_t v;
 			v = p[3];
 			v |= static_cast<uint32_t>(p[2]) << 8;
@@ -74,7 +77,8 @@ namespace rx26t {
 		}
 
 
-		static void put32_big_(uint8_t* p, uint32_t val) {
+		static void put32_big_(uint8_t* p, uint32_t val)
+		{
 			p[0] = (val >> 24) & 0xff;
 			p[1] = (val >> 16) & 0xff;
 			p[2] = (val >> 8) & 0xff;
@@ -82,7 +86,8 @@ namespace rx26t {
 		}
 
 
-		static uint8_t sum_(const uint8_t* buff, uint32_t len) {
+		static uint8_t sum_(const uint8_t* buff, uint32_t len)
+		{
 			uint16_t sum = 0;
 			for(uint32_t i = 0; i < len; ++i) {
 				sum += *buff++;
@@ -91,12 +96,14 @@ namespace rx26t {
 		}
 
 
-		bool read_(void* buff, uint32_t len, const timeval& tv) {
+		bool read_(void* buff, uint32_t len, const timeval& tv)
+		{
 			return rs232c_.recv(buff, len, tv) == len;
 		}
 
 
-		bool read_(void* buff, uint32_t len) {
+		bool read_(void* buff, uint32_t len)
+		{
 			timeval tv;
 			tv.tv_sec  = 5;
 			tv.tv_usec = 0;
@@ -104,14 +111,16 @@ namespace rx26t {
 		}
 
 
-		bool write_(const void* buff, uint32_t len) {
+		bool write_(const void* buff, uint32_t len)
+		{
 			uint32_t wr = rs232c_.send(buff, len);
 			rs232c_.sync_send();
 			return wr == len;
 		}
 
 
-		bool com_(uint8_t soh, uint8_t cmd, uint8_t ext, const uint8_t* src = nullptr, uint32_t len = 0) {
+		bool com_(uint8_t soh, uint8_t cmd, uint8_t ext, const uint8_t* src = nullptr, uint32_t len = 0)
+		{
 			uint8_t tmp[1 + 2 + 1 + len + 1 + 1];
 			tmp[0] = soh;
 			put16_big_(&tmp[1], 1 + len);
@@ -127,12 +136,14 @@ namespace rx26t {
 		}
 
 
-		bool command_(uint8_t cmd, const uint8_t* src = nullptr, uint32_t len = 0) {
+		bool command_(uint8_t cmd, const uint8_t* src = nullptr, uint32_t len = 0)
+		{
 			return com_(0x01, cmd, 0x03, src, len);
 		}
 
 
-		bool status_sub_(uint8_t* dst) {
+		bool status_sub_(uint8_t* dst)
+		{
 			if(!read_(dst, 4)) {
 				return false;
 			}
@@ -159,7 +170,8 @@ namespace rx26t {
 		}
 
 
-		void dump_status_() {
+		void dump_status_()
+		{
 			uint8_t tmp[4 + 1024 + 2];
 			if(!read_(tmp, 4)) {
 				return;
@@ -183,7 +195,8 @@ namespace rx26t {
 		}
 
 
-		bool status_(uint8_t res) {
+		bool status_(uint8_t res)
+		{
 			uint8_t tmp[4 + 1 + 1 + 1];
 
 			if(!status_sub_(tmp)) {
@@ -194,7 +207,8 @@ namespace rx26t {
 		}
 
 
-		bool response_(uint8_t& res, uint8_t& err) {
+		bool response_(uint8_t& res, uint8_t& err)
+		{
 			uint8_t tmp[4 + 1 + 1 + 1];
 
 			if(!status_sub_(tmp)) {
@@ -206,7 +220,8 @@ namespace rx26t {
 		}
 
 
-		bool status_back_(uint8_t res) {
+		bool status_back_(uint8_t res)
+		{
 			uint8_t tmp[4 + 1 + 1 + 1];
 
 			if(!status_sub_(tmp)) {
@@ -224,7 +239,8 @@ namespace rx26t {
 		}
 
 
-		bool status_data_(uint8_t res, uint8_t* dst, uint32_t len) {
+		bool status_data_(uint8_t res, uint8_t* dst, uint32_t len)
+		{
 			uint8_t tmp[4 + len + 2];
 			if(!read_(tmp, 4)) {
 				return false;
@@ -253,7 +269,8 @@ namespace rx26t {
 		}
 
 
-		std::string out_section_(uint32_t n, uint32_t num) const {
+		std::string out_section_(uint32_t n, uint32_t num) const
+		{
 			return (boost::format("#%02d/%02d: ") % n % num).str();
 		}
 
@@ -372,7 +389,8 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(const std::string& path) {
+		bool start(const std::string& path)
+		{
 			if(!rs232c_.open(path, B9600)) {
 				return false;
 			}
@@ -392,7 +410,8 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool connection() {
+		bool connection()
+		{
 			bool ok = false;
 			for(int i = 0; i < 30; ++i) {
 				if(!rs232c_.send(0x00)) {
@@ -432,7 +451,8 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_device_type() {
+		bool inquiry_device_type()
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x38)) {
@@ -514,8 +534,8 @@ namespace rx26t {
 			if(!connection_) return false;
 
 			uint8_t tmp[8];
-			put32_big_(&tmp[0],  16000000);
-			put32_big_(&tmp[4], 120000000);
+			put32_big_(&tmp[0],  16'000'000);
+			put32_big_(&tmp[4], 120'000'000);
 			if(!command_(0x32, tmp, sizeof(tmp))) {
 				return false;
 			}
@@ -749,7 +769,8 @@ namespace rx26t {
 				return false;
 			}
 
-			if(!com_(0x81, 0x13, 0x03, src, PAGE_SIZE)) {
+			uint8_t etx = 0x03;
+			if(!com_(0x81, 0x13, etx, src, PAGE_SIZE)) {
 				return false;
 			}
 
@@ -762,8 +783,8 @@ namespace rx26t {
 				return true;
 			} else if(res == 0x93) { // write error
 				std::cerr << std::endl;
-				std::cerr << boost::format("Write error (%08X), status: %02X")
-					% address % static_cast<uint32_t>(err) << std::endl;
+				std::cerr << boost::format("Write error (0x%08X to 0x%08X), status: 0x%02X")
+					% address % (address + PAGE_SIZE - 1) % static_cast<uint32_t>(err) << std::endl;
 			}
 			return false;
 		}
@@ -818,5 +839,4 @@ namespace rx26t {
 			return rs232c_.close();
 		}
 	};
-
 }

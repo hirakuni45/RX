@@ -169,11 +169,13 @@ namespace rx {
 		struct rx_t {
 			bool	verbose_ = false;
 
-			std::string	cpu_type_;		///< CPU タイプ
+			std::string	cpu_type_;			///< CPU タイプ
 
 			uint32_t	master_ = 1200;		///< マスター・クロック（MHz 単位で、小数第２位、１００倍）
 			uint32_t	iclk_multi_ = 8;	///< インストラクション・マルチプライヤー設定
 			uint32_t	pclk_multi_ = 4;	///< 周辺機器・マルチプライヤー設定
+
+			uint8_t		id_[16] = { 0xff };	///< ID 
 		};
 	};
 }
