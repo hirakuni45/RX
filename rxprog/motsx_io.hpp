@@ -397,12 +397,27 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	総ページ数の取得
+			@param[in]	unit	ページ単位（128/256）
 			@return 総ページ数
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_total_page() const noexcept
+		uint32_t get_total_page(uint32_t unit) const noexcept
 		{
-			return memory_map_.size();
+			uint32_t pgn = 0;
+			for(const auto& m : memory_map_) {
+				auto l = m.second.area_.min_ & 0xff;
+				auto h = m.second.area_.max_ & 0xff;
+				if(unit != 128) {
+					pgn++;
+				} else {
+					if(l < 128 && h >= 128) {
+						pgn += 2;
+					} else {
+						pgn++;
+					}
+				}
+			}
+			return pgn;
 		}
 
 
