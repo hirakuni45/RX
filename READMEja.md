@@ -25,6 +25,9 @@ Renesas RX Microcontroller
 |RX140|RXv2|Yes|－|－||△||R5F51403/5/6|
 |RX220|RXv1|－|－|－|〇|〇|〇|R5F52206|
 |RX231|RXv2|Yes|－|－|〇|〇|〇|R5F52316/7/8|
+|RX24T|RXv2|Yes|－|－|〇|〇|〇|R5F524T8/A|
+|RX24U|RXv2|Yes|－|－||〇|△|R5F524UB/E|
+|RX26T|RXv3|Yes|V2|ー|〇|△|ー|R5F526TF|
 |RX621|RXv1|Yes|－|－|〇|〇|〇|R5F56218|
 |RX62N|RXv1|Yes|－|－|〇|〇|〇|R5F562N7/8|
 |RX631|RXv1|Yes|－|－|〇|〇|〇|R5F5631F|
@@ -33,12 +36,10 @@ Renesas RX Microcontroller
 |RX71M|RXv2|Yes|－|－|〇|〇|〇|R5F571MF/G/J/L|
 |RX651|RXv2|Yes|－|－|〇|〇|〇|R5F5651E|
 |RX65N|RXv2|Yes|－|－|〇|〇|〇|R5F565NE|
-|RX66N|RXv3|Yes|V1|－|||〇|R5F566ND/N|
-|RX671|RXv3|Yes|－|－|||〇|R5F5671C/E|
+|RX66N|RXv3|Yes|V1|－||△|〇|R5F566ND/N|
+|RX671|RXv3|Yes|－|－||△|〇|R5F5671C/E|
 |RX72N|RXv3|Yes|V1|Yes|〇|〇|〇|R5F572ND/N|
 |RX72M|RXv3|Yes|V1|Yes|△|△|△|R5F572MD/N|
-|RX24T|RXv2|Yes|－|－|〇|〇|〇|R5F524T8/A|
-|RX26T|RXv3|Yes|V2|ー|〇|△|ー|R5F526TF|
 |RX63T|RXv1|Yes|－|－|〇|〇|〇|R5F563T6|
 |RX66T|RXv3|Yes|－|－|〇|〇|〇|R5F566TA/E/F/K|
 |RX72T|RXv3|Yes|V1|－|〇|〇|〇|R5F572TF/K|
@@ -122,15 +123,18 @@ int main(int argc, char** argv)
 |[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr ライブラリ|
 |[/RX600](./RX600)|RX マイコン共通デバイス定義クラス|
 |[/RX220](./RX220)|RX220 デバイス定義クラス、リンカースクリプト|
+|[/RX24T](./RX24T)|RX24T デバイス定義クラス、リンカースクリプト|
+|[/RX24U](./RX24U)|RX24U デバイス定義クラス、リンカースクリプト|
+|[/RX26T](./RX26T)|RX26T デバイス定義クラス、リンカースクリプト|
 |[/RX62x](./RX62x)|RX621/RX62N デバイス定義クラス、リンカースクリプト|
 |[/RX63x](./RX63x)|RX631/RX63N デバイス定義クラス、リンカースクリプト|
 |[/RX64M](./RX64M)|RX64M デバイス定義クラス、リンカースクリプト|
 |[/RX71M](./RX71M)|RX71M デバイス定義クラス、リンカースクリプト|
 |[/RX65x](./RX65x)|RX651/RX65N デバイス定義クラス、リンカースクリプト|
+|[/RX66N](./RX66N)|RX66N デバイス定義クラス、リンカースクリプト|
+|[/RX671](./RX672)|RX671 デバイス定義クラス、リンカースクリプト|
 |[/RX72N](./RX72N)|RX72N デバイス定義クラス、リンカースクリプト|
 |[/RX72M](./RX72M)|RX72M デバイス定義クラス、リンカースクリプト|
-|[/RX24T](./RX24T)|RX24T デバイス定義クラス、リンカースクリプト|
-|[/RX26T](./RX26T)|RX26T デバイス定義クラス、リンカースクリプト|
 |[/RX63T](./RX63T)|RX63T デバイス定義クラス、リンカースクリプト|
 |[/RX66T](./RX66T)|RX66T デバイス定義クラス、リンカースクリプト|
 |[/RX72T](./RX72T)|RX72T デバイス定義クラス、リンカースクリプト|
