@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・システム定義
+	@brief	RX13T/RX24T/RX24U グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -313,14 +313,16 @@ namespace device {
 		};
 		static inline mofcr_t<0x0008'C293> MOFCR;
 
-
+#if defined(SIG_RX24T) || defined(SIG_RX24U)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'0031> MEMWAIT;
+#endif
 
+		//------------------------ 消費電力削減機能 ------------------------//
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -329,8 +331,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct sbycr_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
+		struct sbycr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -394,6 +396,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  MSTPB0;
 
+			bit_rw_t<io_, bitpos::B4>  MSTPB4;
+
 			bit_rw_t<io_, bitpos::B6>  MSTPB6;
 
 			bit_rw_t<io_, bitpos::B10> MSTPB10;
@@ -430,6 +434,11 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B19> MSTPC19;
 
+			bit_rw_t<io_, bitpos::B24> MSTPC24;
+
+			bit_rw_t<io_, bitpos::B26> MSTPC26;
+			bit_rw_t<io_, bitpos::B27> MSTPC27;
+
 			bit_rw_t<io_, bitpos::B31> DSLPE;
 		};
 		static inline mstpcrc_t<0x0008'0018> MSTPCRC;
@@ -456,6 +465,8 @@ namespace device {
 		static inline opccr_t<0x0008'00A0> OPCCR;
 
 
+		//----------------- レジスタライトプロテクション機能 -----------------//
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  プロテクトレジスタ（PRCR）
@@ -473,6 +484,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>    PRC0;
 			bit_rw_t <io_, bitpos::B1>    PRC1;
 			bit_rw_t <io_, bitpos::B3>    PRC3;
+
 			bits_rw_t<io_, bitpos::B8, 8> PRKEY;
 		};
 		static inline prcr_t<0x0008'03FE> PRCR;

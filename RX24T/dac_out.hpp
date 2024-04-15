@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX62[1N]/RX63[1N]/RX24T(Version B) 10 bits D/A 制御
+	@brief	RX62[1N]/RX63[1N]/RX24T(Version B)/RX24U 10 bits D/A 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

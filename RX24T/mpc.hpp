@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ MPC 定義
+	@brief	RX24T/RX24U グループ MPC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,7 +9,11 @@
 */
 //=========================================================================//
 #include "common/io_utils.hpp"
+#if defined(SIG_RX24T)
 #include "RX24T/peripheral.hpp"
+#elif defined(SIG_RX24U)
+#include "RX24U/peripheral.hpp"
+#endif
 #include "RX600/port_map_order.hpp"
 
 namespace device {

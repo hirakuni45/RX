@@ -18,13 +18,13 @@ namespace utils {
 	typedef std::string::iterator						string_it;
 	typedef std::string::const_iterator					string_cit;
 
-	typedef std::basic_string<uint16_t>					wstring;
-	typedef std::basic_string<uint16_t>::iterator		wstring_it;
-	typedef std::basic_string<uint16_t>::const_iterator	wstring_cit;
+	typedef std::basic_string<char16_t>					wstring;
+	typedef std::basic_string<char16_t>::iterator		wstring_it;
+	typedef std::basic_string<char16_t>::const_iterator	wstring_cit;
 
-	typedef std::basic_string<uint32_t>					lstring;
-	typedef std::basic_string<uint32_t>::iterator		lstring_it;
-	typedef std::basic_string<uint32_t>::const_iterator	lstring_cit;
+	typedef std::basic_string<char32_t>					lstring;
+	typedef std::basic_string<char32_t>::iterator		lstring_it;
+	typedef std::basic_string<char32_t>::const_iterator	lstring_cit;
 
 	typedef std::vector<std::string>					strings;
 	typedef std::vector<std::string>::iterator			strings_it;
@@ -75,9 +75,9 @@ namespace utils {
 		if(idx == T::npos) return nullptr;
 		else return &src[idx];
 	}
-	inline const char* string_strchr(const string& src, char ch) { return string_strchrT(src, ch); }
-	inline const uint16_t* string_strchr(const wstring& src, uint16_t ch) { return string_strchrT(src, ch); }
-	inline const uint32_t* string_strchr(const lstring& src, uint32_t ch) { return string_strchrT(src, ch); }
+	inline const auto* string_strchr(const string& src, char ch) { return string_strchrT(src, ch); }
+	inline const auto* string_strchr(const wstring& src, char16_t ch) { return string_strchrT(src, ch); }
+	inline const auto* string_strchr(const lstring& src, char32_t ch) { return string_strchrT(src, ch); }
 
 
 	//-----------------------------------------------------------------//
@@ -94,9 +94,9 @@ namespace utils {
 		if(idx == T::npos) return 0;
 		else return &src[idx];
 	}
-	inline const char* string_strrchr(const std::string& src, char ch) { return string_strrchrT(src, ch); }
-	inline const uint16_t* string_strrchr(const wstring& src, uint16_t ch) { return string_strrchrT(src, ch); }
-	inline const uint32_t* string_strrchr(const lstring& src, uint32_t ch) { return string_strrchrT(src, ch); }
+	inline const auto* string_strrchr(const std::string& src, char ch) { return string_strrchrT(src, ch); }
+	inline const auto* string_strrchr(const wstring& src, char16_t ch) { return string_strrchrT(src, ch); }
+	inline const auto* string_strrchr(const lstring& src, char32_t ch) { return string_strrchrT(src, ch); }
 
 
 	//-----------------------------------------------------------------//
