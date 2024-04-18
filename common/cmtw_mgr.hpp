@@ -118,7 +118,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmtw_mgr() : rate_(0), level_(ICU::LEVEL::NONE) { }
+		cmtw_mgr() noexcept : rate_(0), level_(ICU::LEVEL::NONE) { }
 
 
 		//-----------------------------------------------------------------//
@@ -232,7 +232,7 @@ namespace device {
 			@param[in]	power	消費電力を低減しない場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void destroy(bool power) noexcept
+		void destroy(bool power = false) noexcept
 		{
 		    CMTW::CMWCR.CMWIE = 0;
 			CMTW::CMSTR = 0;

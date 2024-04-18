@@ -29,7 +29,6 @@ namespace device {
 		@param[in]	ic1i	インプット・キャプチャ 1 割り込みベクタ
 		@param[in]	oc0i	アウトプット・キャプチャ 0 割り込みベクタ
 		@param[in]	oc1i	アウトプット・キャプチャ 1 割り込みベクタ
-
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR cmwi, typename CIVT,
@@ -43,6 +42,7 @@ namespace device {
 		static constexpr auto OC0I = oc0i;					///< アウトプット・キャプチャ 0 割り込みベクタ
 		static constexpr auto OC1I = oc1i;					///< アウトプット・キャプチャ 1 割り込みベクタ
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< PCLK 周波数
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
