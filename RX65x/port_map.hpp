@@ -553,6 +553,58 @@ namespace device {
 				}
 				break;
 #endif
+
+			case peripheral::CMTW0:
+				if(opt == OPTIONAL::CMTW_TOC0) {
+					// PC7
+					PORTC::PMR.B7 = 0;
+					MPC::PC7PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTC::PMR.B7 = enable;
+				} else if(opt == OPTIONAL::CMTW_TIC0) {
+					// PC6
+					PORTC::PMR.B6 = 0;
+					MPC::PC6PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTC::PMR.B6 = enable;
+				} else if(opt == OPTIONAL::CMTW_TOC1) {
+					// PE7
+					PORTE::PMR.B7 = 0;
+					MPC::PE7PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTE::PMR.B7 = enable;
+				} else if(opt == OPTIONAL::CMTW_TIC1) {
+					// PE6
+					PORTE::PMR.B6 = 0;
+					MPC::PE6PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTE::PMR.B6 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case peripheral::CMTW1:
+				if(opt == OPTIONAL::CMTW_TOC0) {
+					// PD3
+					PORTD::PMR.B3 = 0;
+					MPC::PD3PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTD::PMR.B3 = enable;
+				} else if(opt == OPTIONAL::CMTW_TIC0) {
+					// PD2
+					PORTD::PMR.B2 = 0;
+					MPC::PD2PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTD::PMR.B2 = enable;
+				} else if(opt == OPTIONAL::CMTW_TOC1) {
+					// PE3
+					PORTE::PMR.B3 = 0;
+					MPC::PE3PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTE::PMR.B3 = enable;
+				} else if(opt == OPTIONAL::CMTW_TIC1) {
+					// PE2
+					PORTE::PMR.B2 = 0;
+					MPC::PE2PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTE::PMR.B2 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+
 			case peripheral::GLCDC:
 				{
 					uint8_t sel = enable ? 0b100101 : 0;

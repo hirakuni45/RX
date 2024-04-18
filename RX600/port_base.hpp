@@ -9,7 +9,7 @@
 */
 //=========================================================================//
 #include "common/io_utils.hpp"
-#include <tuple>
+// #include <tuple>
 
 namespace device {
 
@@ -611,7 +611,7 @@ namespace device {
 	};
 	typedef null_port_t NULL_PORT;
 
-
+#if 0
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  複数ポート定義テンプレート（最大８ビット）
@@ -621,7 +621,7 @@ namespace device {
 	template <class... Args>
 	class PORTS {
 		static constexpr std::size_t pack_size = sizeof...(Args);
-		static std::tuple<Args...> pack_; 
+		static inline std::tuple<Args...> pack_; 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -706,4 +706,5 @@ namespace device {
 			}
 		}
 	};
+#endif
 }
