@@ -66,6 +66,10 @@ namespace device {
 			RSPI_SSL1,	///< RSPI SSL1 制御
 			RSPI_SSL2,	///< RSPI SSL2 制御
 			RSPI_SSL3,	///< RSPI SSL3 制御
+			CMTW_TOC0,	///< CMTW TOC0
+			CMTW_TOC1,	///< CMTW TOC1
+			CMTW_TIC0,	///< CMTW TIC0
+			CMTW_TIC1,	///< CMTW TIC1
 		};
 
 		/// ポート・マッピング・ユーザー設定関数型

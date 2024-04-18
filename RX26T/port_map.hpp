@@ -572,6 +572,87 @@ namespace device {
 			return true;
 		}
 
+
+		static bool cmtw0_(ORDER odr, bool enable, OPTIONAL opt)
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+				if(opt == OPTIONAL::CMTW_TOC0) {
+					// PB6
+					PORTB::PMR.B6 = 0;
+					MPC::PB6PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTB::PMR.B6 = enable;
+				} else if(opt == OPTIONAL::CMTW_TIC0) {
+					// PB5
+					PORTB::PMR.B5 = 0;
+					MPC::PB5PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTB::PMR.B5 = enable;
+				} else if(opt == OPTIONAL::CMTW_TOC1) {
+					// PB3
+					PORTB::PMR.B3 = 0;
+					MPC::PB3PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTB::PMR.B3 = enable;
+				} else if(opt == OPTIONAL::CMTW_TIC1) {
+					// PB2
+					PORTB::PMR.B2 = 0;
+					MPC::PB2PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTB::PMR.B2 = enable;
+				} else {
+					return false;
+				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+
+		static bool cmtw1_(ORDER odr, bool enable, OPTIONAL opt)
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+				if(opt == OPTIONAL::CMTW_TOC0) {
+					// PB1
+					PORTB::PMR.B1 = 0;
+					MPC::PB1PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTB::PMR.B1 = enable;
+				} else if(opt == OPTIONAL::CMTW_TIC0) {
+					// PB0
+					PORTB::PMR.B0 = 0;
+					MPC::PB0PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORTB::PMR.B0 = enable;
+				} else if(opt == OPTIONAL::CMTW_TOC1) {
+					// P11
+					PORT1::PMR.B1 = 0;
+					MPC::P11PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORT1::PMR.B1 = enable;
+				} else if(opt == OPTIONAL::CMTW_TIC1) {
+					// P00
+					PORT0::PMR.B0 = 0;
+					MPC::P00PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORT0::PMR.B0 = enable;
+				} else {
+					return false;
+				}
+				break;
+			case ORDER::SECOND:
+				if(opt == OPTIONAL::CMTW_TIC1) {
+					// P10
+					PORT1::PMR.B0 = 0;
+					MPC::P10PFS.PSEL = enable ? 0b01'1101 : 0;
+					PORT1::PMR.B0 = enable;
+				} else {
+					return false;
+				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+
 		static inline USER_FUNC_TYPE	user_func_;
 
 	public:
@@ -641,6 +722,12 @@ namespace device {
 					break;
 				case peripheral::CANFD:
 					ret = canfd0_(odr, ena);
+					break;
+				case peripheral::CMTW0:
+					ret = cmtw0_(odr, ena, opt);
+					break;
+				case peripheral::CMTW1:
+					ret = cmtw1_(odr, ena, opt);
 					break;
 				default:
 					break;
