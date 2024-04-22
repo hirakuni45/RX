@@ -99,6 +99,9 @@ namespace device {
 			CLK_H,	///< MTCLKH (MTU2, TPU 系)
 			OUT_0,	///< GPTWx (GTADSM0)
 			OUT_1,	///< GPTWx (GTADSM1)
+			TMO,	///< TMOx  (TMR)
+			TMCI,	///< TMCIx (TMR)
+			TMRI,	///< TMRIx (TMR)
 			NONE,	///< 無効なチャネル
 		};
 
