@@ -46,6 +46,7 @@
 #include "RX140/icu_mgr.hpp"
 #include "RX140/port_map.hpp"
 #include "RX140/port_map_mtu.hpp"
+#include "RX140/port_map_tmr.hpp"
 #include "RX140/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -58,6 +59,7 @@
 #include "RX220/icu_mgr.hpp"
 #include "RX220/port_map.hpp"
 #include "RX220/port_map_mtu.hpp"
+#include "RX220/port_map_tmr.hpp"
 #include "RX220/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -71,6 +73,7 @@
 #include "RX231/port_map.hpp"
 #include "RX231/port_map_mtu.hpp"
 #include "RX231/port_map_tpu.hpp"
+#include "RX220/port_map_tmr.hpp"
 #include "RX231/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -84,6 +87,7 @@
 #include "RX24T/port_map.hpp"
 #include "RX24T/port_map_mtu.hpp"
 #include "RX24T/port_map_gpt.hpp"
+#include "RX24T/port_map_tmr.hpp"
 #include "RX24T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -97,6 +101,7 @@
 #include "RX24T/port_map.hpp"
 #include "RX24T/port_map_mtu.hpp"
 #include "RX24T/port_map_gpt.hpp"
+#include "RX24T/port_map_tmr.hpp"
 #include "RX24T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -110,6 +115,7 @@
 #include "RX26T/port_map.hpp"
 #include "RX26T/port_map_mtu.hpp"
 #include "RX26T/port_map_gptw.hpp"
+#include "RX26T/port_map_tmr.hpp"
 #include "RX26T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -135,6 +141,7 @@
 #include "RX63x/port_map.hpp"
 #include "RX63x/port_map_mtu.hpp"
 #include "RX63x/port_map_tpu.hpp"
+#include "RX63x/port_map_tmr.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -163,6 +170,7 @@
 #include "RX64M/port_map_mtu.hpp"
 #include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
+#include "RX63x/port_map_tmr.hpp"
 #include "RX64M/port_map_qspi.hpp"
 #include "RX64M/port_map_ether.hpp"
 #include "RX600/port_map_irq.hpp"
@@ -180,6 +188,7 @@
 #include "RX64M/port_map_mtu.hpp"
 #include "RX64M/port_map_gpt.hpp"
 #include "RX64M/port_map_tpu.hpp"
+#include "RX63x/port_map_tmr.hpp"
 #include "RX64M/port_map_qspi.hpp"
 #include "RX64M/port_map_ether.hpp"
 #include "RX600/port_map_irq.hpp"
@@ -195,6 +204,7 @@
 #include "RX65x/port_map.hpp"
 #include "RX65x/port_map_mtu.hpp"
 #include "RX65x/port_map_tpu.hpp"
+#include "RX63x/port_map_tmr.hpp"
 #include "RX65x/port_map_qspi.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
@@ -211,6 +221,7 @@
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
+#include "RX63x/port_map_tmr.hpp"
 #include "RX72N/port_map_qspi.hpp"
 
 #include "RX600/port_map_irq.hpp"
@@ -226,6 +237,7 @@
 #include "RX671/port_map.hpp"
 #include "RX671/port_map_mtu.hpp"
 #include "RX671/port_map_tpu.hpp"
+#include "RX671/port_map_tmr.hpp"
 #include "RX671/port_map_qspix.hpp"
 #include "RX671/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
@@ -242,6 +254,7 @@
 #include "RX72N/port_map_mtu.hpp"
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
+#include "RX63x/port_map_tmr.hpp"
 #include "RX72N/port_map_qspi.hpp"
 #include "RX72N/port_map_ether.hpp"
 #include "RX600/port_map_irq.hpp"
@@ -259,6 +272,7 @@
 #include "RX72N/port_map_mtu.hpp"
 #include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
+#include "RX63x/port_map_tmr.hpp"
 #include "RX72N/port_map_qspi.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
@@ -273,6 +287,7 @@
 #include "RX72T/port_map.hpp"
 #include "RX72T/port_map_mtu.hpp"
 #include "RX72T/port_map_gptw.hpp"
+#include "RX72T/port_map_tmr.hpp"
 #include "RX72T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -287,6 +302,7 @@
 #include "RX72T/port_map_sci.hpp"
 #include "RX72T/port_map_mtu.hpp"
 #include "RX72T/port_map_gptw.hpp"
+#include "RX72T/port_map_tmr.hpp"
 #include "RX72T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
