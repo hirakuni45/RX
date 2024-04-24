@@ -17,7 +17,7 @@ namespace device {
 		@brief  ペリフェラル種別
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class peripheral : uint16_t {
+	enum class peripheral : uint8_t {
 
 		LVDA,		///< 電圧検出回路
 
