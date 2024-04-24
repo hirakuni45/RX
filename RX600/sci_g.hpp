@@ -50,7 +50,7 @@ namespace device {
 		static constexpr bool SPI_SUB   = true;		///< 簡易 SPI が利用可能な場合「true」
 	};
 
-#if defined(SIG_RX13T)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
 	typedef scig_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR, ICU::VECTOR::TEI1, ICU::VECTOR::ERI1> SCI1;
 	typedef scig_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
