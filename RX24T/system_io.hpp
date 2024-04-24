@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX24T/RX24U システム制御
+	@brief	RX13T/RX23T/RX24T/RX24U システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -12,6 +12,8 @@
 #include "RX24T/flash.hpp"
 #if defined(SIG_RX13T)
 #include "RX13T/clock_profile.hpp"
+#elif defined(SIG_RX23T)
+#include "RX23T/clock_profile.hpp"
 #elif defined(SIG_RX24T)
 #include "RX24T/clock_profile.hpp"
 #elif defined(SIG_RX24U)
@@ -128,7 +130,7 @@ namespace device {
 			static_assert(check_clock_div_(clock_profile::PCLKB), "PCLKB can't divided.");
 			static_assert(check_clock_div_(clock_profile::PCLKD), "PCLKD can't divided.");
 
-#if defined(SIG_RX13T)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
