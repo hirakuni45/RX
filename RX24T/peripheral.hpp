@@ -17,7 +17,7 @@ namespace device {
 		@brief  ペリフェラル種別
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class peripheral : uint16_t {
+	enum class peripheral : uint8_t {
 
 		CAC,	///< クロック周波数精度測定回路
 

@@ -266,6 +266,11 @@ namespace device {
 					idx = static_cast<uint32_t>(VECTOR::TGIU5);
 					break;
 
+				case VECTOR::OEI3:
+				case VECTOR::OEI4:
+					idx = static_cast<uint32_t>(VECTOR::OEI3);
+					break;
+
 				case VECTOR::ERI1:
 				case VECTOR::RXI1:
 				case VECTOR::TXI1:

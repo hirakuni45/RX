@@ -23,24 +23,14 @@ namespace device {
 		struct pad_t {
 
 			uint8_t		tmr_;
-			uint16_t	mtu_;
-
+			uint8_t		mtu_;
 			uint8_t		cmt_;
-			uint8_t		tpu_;
-
-			uint16_t	dmac_;
-			uint8_t		exdmac_;
 			uint8_t		cmpc_;
 
 			pad_t() :
 				tmr_(0),
 				mtu_(0),
-
 				cmt_(0),
-				tpu_(0),
-
-				dmac_(0),
-				exdmac_(0),
 				cmpc_(0)
 			{ }
 		};

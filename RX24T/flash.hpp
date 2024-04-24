@@ -361,6 +361,7 @@ namespace device {
 		static inline ro32_t<0x007F'C35C> UIDR3;
 
 
+#if defined (SIG_RX24T) || defined(SIG_RX24U)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ (ROMCE)
@@ -377,7 +378,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  ROMCEN;
 		};
-		static inline romce_t<0x00081000> ROMCE;
+		static inline romce_t<0x0008'1000> ROMCE;
 
 
 		//-----------------------------------------------------------------//
@@ -396,7 +397,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  ROMCIV;
 		};
-		static inline romciv_t<0x00081004> ROMCIV;
+		static inline romciv_t<0x0008'1004> ROMCIV;
+#endif
 	};
 
 #if defined(SIG_RX13T)
