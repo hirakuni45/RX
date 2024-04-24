@@ -135,6 +135,30 @@
 
 #include "RX231/board_profile.hpp"
 
+#elif defined(SIG_RX23T)
+
+// #include "RX24T/lvda.hpp"
+// #include "RX600/cac.hpp"
+// #include "RX600/bus.hpp"
+// #include "RX600/mpu.hpp"
+// #include "RX600/mtu3.hpp"
+// #include "RX23T/poe3.hpp"
+#include "RX600/tmr.hpp"
+#include "RX600/sci_g.hpp"
+// #include "RX13T/s12ad.hpp"
+// #include "RX13T/da.hpp"
+// #include "RX600/cmpc.hpp"
+// #include "RX24T/flash.hpp"
+// #include "RX600/crc.hpp"
+// #include "RX600/doc.hpp"
+
+#include "RX24T/system_io.hpp"
+// #include "RX24T/flash_io.hpp"
+// #include "RX24T/adc_in.hpp"
+// #include "RX24T/dac_out.hpp"
+
+#include "RX23T/board_profile.hpp"
+
 #elif defined(SIG_RX24T)
 #include "RX24T/lvda.hpp"
 #include "RX600/cac.hpp"

@@ -128,6 +128,13 @@ ifeq ($(RX_DEF),SIG_RX63N)
   LDSCRIPT	= ../../RX63x/$(DEVICE).ld
 endif
 
+ifeq ($(RX_DEF),SIG_RX23T)
+  RX_CPU = RX23T
+  RX_CHOOSE = -misa=v2
+  LDSCRIPT	= ../../RX23T/$(DEVICE).ld
+  PROG_VERIFY =
+endif
+
 ifeq ($(RX_DEF),SIG_RX24T)
   RX_CPU = RX24T
   RX_CHOOSE = -misa=v2

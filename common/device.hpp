@@ -77,6 +77,20 @@
 #include "RX231/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX23T)
+#include "RX23T/clock_profile.hpp"
+#include "RX23T/peripheral.hpp"
+#include "RX24T/system.hpp"
+#include "RX23T/power_mgr.hpp"
+#include "RX23T/icu.hpp"
+#include "RX24T/icu_mgr.hpp"
+#include "RX23T/port_map.hpp"
+// #include "RX24T/port_map_mtu.hpp"
+// #include "RX24T/port_map_gpt.hpp"
+// #include "RX24T/port_map_tmr.hpp"
+#include "RX23T/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX24T)
 #include "RX24T/clock_profile.hpp"
 #include "RX24T/peripheral.hpp"
