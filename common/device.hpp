@@ -85,9 +85,8 @@
 #include "RX23T/icu.hpp"
 #include "RX24T/icu_mgr.hpp"
 #include "RX23T/port_map.hpp"
-// #include "RX24T/port_map_mtu.hpp"
-// #include "RX24T/port_map_gpt.hpp"
-// #include "RX24T/port_map_tmr.hpp"
+#include "RX23T/port_map_mtu.hpp"
+#include "RX23T/port_map_tmr.hpp"
 #include "RX23T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
