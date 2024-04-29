@@ -17,7 +17,7 @@ namespace device {
 		@brief  ペリフェラル種別
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class peripheral : uint16_t {
+	enum class peripheral : uint8_t {
 
 		CMT0,	///< コンペアマッチタイマー０
 		CMT1,	///< コンペアマッチタイマー１

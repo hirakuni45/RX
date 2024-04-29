@@ -4,6 +4,7 @@
 	@brief	RX600 グループ・RSPI[abcd] 制御 @n
 			RX220 @n
 			RX231 @n
+			RX23T @n
 			RX24T/RX24U @n
 			RX621/RX62N @n
 			RX63T @n
@@ -567,7 +568,7 @@ namespace device {
 #elif defined(SIG_RX220)
 	typedef rspi_t  <0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR,
 		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX231) || defined(SIG_RX23T)
 	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR, ICU::VECTOR,
 		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
 #elif defined(SIG_RX24T) || defined(SIG_RX24U)

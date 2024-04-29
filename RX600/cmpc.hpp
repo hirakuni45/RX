@@ -2,6 +2,8 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600/RX700 グループ・CMPCa 定義 @n
+			・RX13T @n
+			・RX23T @n
 			・RX24T/RX24U @n
 			・RX26T @n
 			・RX66T/RX72T 
@@ -180,7 +182,11 @@ namespace device {
 		static inline cmpctl2_t<base + 0x18> CMPCTL2;
 	};
 
-#if defined(SIG_RX24T) || defined(SIG_RX24U)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
+	typedef cmpc_t<0x000A'0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
+	typedef cmpc_t<0x000A'0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
+	typedef cmpc_t<0x000A'0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
+#elif defined(SIG_RX24T) || defined(SIG_RX24U)
 	typedef cmpc_t<0x000A'0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
 	typedef cmpc_t<0x000A'0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
 	typedef cmpc_t<0x000A'0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;

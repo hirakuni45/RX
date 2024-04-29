@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T グループ・電力制御 @n
+	@brief	RX23T グループ・電力制御 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,7 +9,7 @@
 */
 //=========================================================================//
 #include "RX24T/system.hpp"
-#include "RX13T/peripheral.hpp"
+#include "RX23T/peripheral.hpp"
 
 namespace device {
 
@@ -68,16 +68,6 @@ namespace device {
 			bool ret = true;
 			bool f = !ena;
 			switch(per) {
-			case peripheral::TMR6:
-			case peripheral::TMR7:
-				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
-				SYSTEM::MSTPCRA.MSTPA2 = ((pad_.tmr_ & 0b11'00'00'00) == 0);
-				break;
-			case peripheral::TMR4:
-			case peripheral::TMR5:
-				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
-				SYSTEM::MSTPCRA.MSTPA3 = ((pad_.tmr_ & 0b00'11'00'00) == 0);
-				break;
 			case peripheral::TMR3:
 			case peripheral::TMR2:
 				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
@@ -135,17 +125,18 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB10 = (pad_.cmpc_ == 0);
 				break;
 
+			case peripheral::RSPI0:
+				SYSTEM::MSTPCRB.MSTPB17 = f;
+				break;
+
 			case peripheral::RIIC0:
 				SYSTEM::MSTPCRB.MSTPB21 = f;
 				break;
 
 			case peripheral::CRC:
-				SYSTEM::MSTPCRB.MSTPB23 = f;	// CRC のストップ状態解除
+				SYSTEM::MSTPCRB.MSTPB23 = f;
 				break;
 
-			case peripheral::SCI12:
-				SYSTEM::MSTPCRB.MSTPB4 = f;
-				break;
 			case peripheral::SCI5:
 				SYSTEM::MSTPCRB.MSTPB26 = f;
 				break;

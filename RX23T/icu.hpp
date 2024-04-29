@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T グループ・ICUb 定義
+	@brief	RX23T グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX24T 割り込みコントローラ・テンプレート・クラス（ICUb）
+		@brief  RX23T 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icu_t : public ICU_BASE, ICU_IRQ6 {
@@ -42,6 +42,11 @@ namespace device {
 			MENDF   = 33,	///< CAC
 			OVFF    = 34,	///< CAC
 
+			SPEI0	= 44,	///< RSPI0
+			SPRI0	= 45,	///< RSPI0
+			SPTI0	= 46,	///< RSPI0
+			SPII0	= 47,	///< RSPI0
+
 			DOPCF   = 57,	///< DOC
 
 			IRQ0    = 64,	///< ICU
@@ -56,7 +61,6 @@ namespace device {
 
 			S12ADI  = 102,  ///< S12AD
 			GBADI   = 103,
-			GCADI   = 104,
 
 			CMPC0   = 108,  ///< CMPC0
 			CMPC1   = 109,  ///< CMPC1
@@ -101,6 +105,19 @@ namespace device {
 			OEI3	= 170,	///< POE
 			OEI4	= 171,	///< POE
 
+			CMIA0   = 174,	///< TMR0: CMIA0
+			CMIB0   = 175,	///< TMR0: CMIB0
+			OVI0    = 176,	///< TMR0: OVI0
+			CMIA1   = 177,	///< TMR1: CMIA1
+			CMIB1   = 178,	///< TMR1: CMIB1
+			OVI1    = 179,	///< TMR1: OVI1
+			CMIA2   = 180,	///< TMR2: CMIA2
+			CMIB2   = 181,	///< TMR2: CMIB2
+			OVI2    = 182,	///< TMR2: OVI2
+			CMIA3   = 183,	///< TMR3: CMIA3
+			CMIB3   = 184,	///< TMR3: CMIB3
+			OVI3    = 185,	///< TMR3: OVI3
+
 			ERI1    = 218,  ///< SCI1
 			RXI1    = 219,  ///< SCI1
 			TXI1    = 220,  ///< SCI1
@@ -110,14 +127,6 @@ namespace device {
 			TXI5    = 224,  ///< SCI5
 			TEI5    = 225,  ///< SCI5
 
-			ERI12   = 238,  ///< SCI12
-			RXI12   = 239,  ///< SCI12
-			TXI12   = 240,  ///< SCI12
-			TEI12   = 241,  ///< SCI12
-			SCIX0   = 242, 	///< SCI12
-			SCIX1   = 243, 	///< SCI12
-			SCIX2   = 244, 	///< SCI12
-			SCIX3   = 245, 	///< SCI12
 			ICEEI0  = 246,  ///< RIIC0
 			ICRXI0  = 247,  ///< RIIC0
 			ICTXI0  = 248,  ///< RIIC0
@@ -271,6 +280,27 @@ namespace device {
 					idx = static_cast<uint32_t>(VECTOR::OEI3);
 					break;
 
+				case VECTOR::CMIA0:
+				case VECTOR::CMIB0:
+				case VECTOR::OVI0:
+					idx = static_cast<uint32_t>(VECTOR::CMIA0);
+					break;
+				case VECTOR::CMIA1:
+				case VECTOR::CMIB1:
+				case VECTOR::OVI1:
+					idx = static_cast<uint32_t>(VECTOR::CMIA1);
+					break;
+				case VECTOR::CMIA2:
+				case VECTOR::CMIB2:
+				case VECTOR::OVI2:
+					idx = static_cast<uint32_t>(VECTOR::CMIA2);
+					break;
+				case VECTOR::CMIA3:
+				case VECTOR::CMIB3:
+				case VECTOR::OVI3:
+					idx = static_cast<uint32_t>(VECTOR::CMIA3);
+					break;
+
 				case VECTOR::ERI1:
 				case VECTOR::RXI1:
 				case VECTOR::TXI1:
@@ -283,12 +313,7 @@ namespace device {
 				case VECTOR::TEI5:
 					idx = static_cast<uint32_t>(VECTOR::ERI5);
 					break;
-				case VECTOR::ERI12:
-				case VECTOR::RXI12:
-				case VECTOR::TXI12:
-				case VECTOR::TEI12:
-					idx = static_cast<uint32_t>(VECTOR::ERI12);
-					break;
+
 				default: idx = static_cast<uint32_t>(vec); break;
 				}
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);

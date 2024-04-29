@@ -1,23 +1,23 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T グループ・ポート・マッピング (IRQ)
+	@brief	RX23T グループ・ポート・マッピング (IRQ)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX13T/port.hpp"
-#include "RX13T/mpc.hpp"
-#include "RX13T/icu.hpp"
+#include "RX23T/port.hpp"
+#include "RX23T/mpc.hpp"
+#include "RX23T/icu.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX13T IRQ ポート・マッピング・ユーティリティー
+		@brief  RX23T IRQ ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_irq : public port_map_order {
@@ -27,7 +27,6 @@ namespace device {
 			switch(odr) {
 			// P10
 			// P93
-			// PE2
 			case ORDER::FIRST:
 				PORT1::PMR.B0 = 0;
 				MPC::P10PFS.PSEL = 0;
@@ -37,11 +36,6 @@ namespace device {
 				PORT9::PMR.B3 = 0;
 				MPC::P93PFS.PSEL = 0;
 				MPC::P93PFS.ISEL = ena;
-				break;
-			case ORDER::THIRD:
-				PORTE::PMR.B2 = 0;
-				MPC::PE2PFS.PSEL = 0;
-				MPC::PE2PFS.ISEL = ena;
 				break;
 			default:
 				return false;
@@ -73,20 +67,26 @@ namespace device {
 		static bool irq2_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
+			// P00
 			// P22
 			// PB1
 			// PD4
 			case ORDER::FIRST:
+				PORT0::PMR.B0 = 0;
+				MPC::P00PFS.PSEL = 0;
+				MPC::P00PFS.ISEL = ena;
+				break;
+			case ORDER::SECOND:
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = 0;
 				MPC::P22PFS.ISEL = ena;
 				break;
-			case ORDER::SECOND:
+			case ORDER::THIRD:
 				PORTB::PMR.B1 = 0;
 				MPC::PB1PFS.PSEL = 0;
 				MPC::PB1PFS.ISEL = ena;
 				break;
-			case ORDER::THIRD:
+			case ORDER::FOURTH:
 				PORTD::PMR.B4 = 0;
 				MPC::PD4PFS.PSEL = 0;
 				MPC::PD4PFS.ISEL = ena;
@@ -127,14 +127,20 @@ namespace device {
 		static bool irq4_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
+			// P01
 			// P23
 			// PA2
 			case ORDER::FIRST:
+				PORT0::PMR.B1 = 0;
+				MPC::P01PFS.PSEL = 0;
+				MPC::P01PFS.ISEL = ena;
+				break;
+			case ORDER::SECOND:
 				PORT2::PMR.B3 = 0;
 				MPC::P23PFS.PSEL = 0;
 				MPC::P23PFS.ISEL = ena;
 				break;
-			case ORDER::SECOND:
+			case ORDER::THIRD:
 				PORTA::PMR.B2 = 0;
 				MPC::PA2PFS.PSEL = 0;
 				MPC::PA2PFS.ISEL = ena;
@@ -148,20 +154,26 @@ namespace device {
 		static bool irq5_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
+			// P02
 			// P70
-			// PB7
+			// PB6
 			// PD6
 			case ORDER::FIRST:
+				PORT0::PMR.B2 = 0;
+				MPC::P02PFS.PSEL = 0;
+				MPC::P02PFS.ISEL = ena;
+				break;
+			case ORDER::SECOND:
 				PORT7::PMR.B0 = 0;
 				MPC::P70PFS.PSEL = 0;
 				MPC::P70PFS.ISEL = ena;
 				break;
-			case ORDER::SECOND:
-				PORTB::PMR.B7 = 0;
-				MPC::PB7PFS.PSEL = 0;
-				MPC::PB7PFS.ISEL = ena;
-				break;
 			case ORDER::THIRD:
+				PORTB::PMR.B6 = 0;
+				MPC::PB6PFS.PSEL = 0;
+				MPC::PB6PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
 				PORTD::PMR.B6 = 0;
 				MPC::PD6PFS.PSEL = 0;
 				MPC::PD6PFS.ISEL = ena;
