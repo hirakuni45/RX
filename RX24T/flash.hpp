@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX24T/RX24U グループ・フラッシュ 定義
+	@brief	RX13T/RX23T/RX24T/RX24U グループ・フラッシュ 定義 @n
+			RX23T はデータフラッシュが無
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -26,6 +27,8 @@ namespace device {
 		static constexpr uint32_t DATA_WORD_SIZE = 1;
 		static constexpr auto ID_NUM = 4;
 
+#if defined(SIG_RX23T)
+#else
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
@@ -43,7 +46,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> DFLEN;
 		};
 		static inline dflctl_t<0x007F'C090> DFLCTL;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -403,6 +406,8 @@ namespace device {
 
 #if defined(SIG_RX13T)
 	typedef flash_t<4096> FLASH;
+#elif defined(SIG_RX23T)
+	typedef flash_t<0> FLASH;
 #elif defined(SIG_RX24T) || defined(SIG_RX24U)
 	typedef flash_t<8192> FLASH;
 #endif

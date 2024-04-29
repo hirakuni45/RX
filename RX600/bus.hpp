@@ -24,10 +24,123 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  バス定義基底クラス
+		@brief  バス定義基底０クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct bus_base_t {
+	struct bus_base0_t {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスエラーステータスクリアレジスタ（BERCLR）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct berclr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> STSCLR;
+		};
+		static inline berclr_t<0x0008'1300> BERCLR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスエラー監視許可レジスタ（BEREN）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct beren_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> IGAEN;
+			bit_rw_t<io_, bitpos::B1> TOEN;
+		};
+		static inline beren_t<0x0008'1304> BEREN;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスエラーステータスレジスタ 1（BERSR1）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct bersr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>    IA;
+			bit_rw_t <io_, bitpos::B1>    TO;
+
+			bits_rw_t<io_, bitpos::B4, 3> MST;
+		};
+		static inline bersr1_t<0x0008'1308> BERSR1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスエラーステータスレジスタ 2（BERSR2）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct bersr2_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B3, 13> ADDR;
+		};
+		static inline bersr2_t<0x0008'130A> BERSR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  バスプライオリティ制御レジスタ（BUSPRI）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct buspri_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2> BPRA;
+			bits_rw_t<io_, bitpos::B2,  2> BPRO;
+			bits_rw_t<io_, bitpos::B4,  2> BPIB;
+			bits_rw_t<io_, bitpos::B6,  2> BPGB;
+			bits_rw_t<io_, bitpos::B8,  2> BPHB;
+			bits_rw_t<io_, bitpos::B10, 2> BPFB;
+			bits_rw_t<io_, bitpos::B12, 2> BPEB;
+		};
+		static inline buspri_t<0x0008'1310> BUSPRI;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  バス定義基底１クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct bus_base1_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -296,111 +409,6 @@ namespace device {
 		static inline cs_t<0x0008'3010, 0x0700'0000, 0x07FF'FFFF> CS1;
 		static inline cs_t<0x0008'3020, 0x0600'0000, 0x06FF'FFFF> CS2;
 		static inline cs_t<0x0008'3030, 0x0500'0000, 0x05FF'FFFF> CS3;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  バスエラーステータスクリアレジスタ（BERCLR）
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct berclr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> STSCLR;
-		};
-		static inline berclr_t<0x0008'1300> BERCLR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  バスエラー監視許可レジスタ（BEREN）
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct beren_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> IGAEN;
-			bit_rw_t<io_, bitpos::B1> TOEN;
-		};
-		static inline beren_t<0x0008'1304> BEREN;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  バスエラーステータスレジスタ 1（BERSR1）
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct bersr1_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>    IA;
-			bit_rw_t <io_, bitpos::B1>    TO;
-
-			bits_rw_t<io_, bitpos::B4, 3> MST;
-		};
-		static inline bersr1_t<0x0008'1308> BERSR1;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  バスエラーステータスレジスタ 2（BERSR2）
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct bersr2_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B3, 13> ADDR;
-		};
-		static inline bersr2_t<0x0008'130A> BERSR2;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  バスプライオリティ制御レジスタ（BUSPRI）
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct buspri_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0,  2> BPRA;
-			bits_rw_t<io_, bitpos::B2,  2> BPRO;
-			bits_rw_t<io_, bitpos::B4,  2> BPIB;
-			bits_rw_t<io_, bitpos::B6,  2> BPGB;
-			bits_rw_t<io_, bitpos::B8,  2> BPHB;
-			bits_rw_t<io_, bitpos::B10, 2> BPFB;
-			bits_rw_t<io_, bitpos::B12, 2> BPEB;
-		};
-		static inline buspri_t<0x0008'1310> BUSPRI;
 	};
 
 
@@ -656,11 +664,19 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  バス定義クラス（標準）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct bus_def_t : public bus_base0_t, bus_base1_t {
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  バス定義クラス（ALL）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct bus_all_t : public bus_base_t, bus_sdram_t {
-
+	struct bus_all_t : public bus_base0_t, bus_base1_t, bus_sdram_t {
 	};
 
 
@@ -669,7 +685,7 @@ namespace device {
 		@brief  バス定義クラス（ALL+Ex）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct bus_allex_t : public bus_base_t, bus_sdram_t {
+	struct bus_allex_t : public bus_base0_t, bus_base1_t, bus_sdram_t {
 
 		//---------------------------------------------------------------------//
 		/*!
@@ -769,11 +785,13 @@ namespace device {
 		static inline ebmapcr_t<0x000C'5800> EBMAPCR;
 	};
 
-#if defined(SIG_RX62N) || defined(SIG_RX621) || defined(SIG_RX63N) || defined(SIG_RX631) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX671)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
+	typedef bus_base0_t BUS;
+#elif defined(SIG_RX62N) || defined(SIG_RX621) || defined(SIG_RX63N) || defined(SIG_RX631) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX671)
 	typedef bus_all_t BUS;
 #elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef bus_allex_t BUS;
 #elif defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef bus_base_t BUS;
+	typedef bus_def_t BUS;
 #endif
 }

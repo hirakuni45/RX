@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T ポートアウトプットイネーブル 3（POE3C）定義
+	@brief	RX13T/RX23T ポートアウトプットイネーブル 3（POE3C/POE3b）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

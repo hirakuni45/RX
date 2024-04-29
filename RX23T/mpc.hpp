@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX23T グループ MPC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -144,8 +144,8 @@ namespace device {
 			@brief  P1n 端子機能制御レジスタ（P1nPFS）（n = 0, 1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static inline pfs_ip_t<0x0008'C148> P10PFS;
-		static inline pfs_ip_t<0x0008'C149> P11PFS;
+		static inline pfs_aip_t<0x0008'C148> P10PFS;
+		static inline pfs_aip_t<0x0008'C149> P11PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -160,13 +160,15 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P3n 端子機能制御レジスタ（P3nPFS）（n = 2 ～ 3）
+			@brief  P3n 端子機能制御レジスタ（P3nPFS）（n = 0 ～ 3, 6, 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_aip_t<0x0008'C158> P30PFS;
 		static inline pfs_aip_t<0x0008'C159> P31PFS;
 		static inline pfs_aip_t<0x0008'C15A> P32PFS;
 		static inline pfs_aip_t<0x0008'C15B> P33PFS;
+		static inline pfs_aip_t<0x0008'C15E> P36PFS;
+		static inline pfs_aip_t<0x0008'C15F> P37PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -200,9 +202,11 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P9n 端子機能制御レジスタ（P9nPFS）（n = 3, 4）
+			@brief  P9n 端子機能制御レジスタ（P9nPFS）（n = 1 ～ 4）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline pfs_ip_t<0x0008'C189> P91PFS;
+		static inline pfs_ip_t<0x0008'C18A> P92PFS;
 		static inline pfs_ip_t<0x0008'C18B> P93PFS;
 		static inline pfs_ip_t<0x0008'C18C> P94PFS;
 
@@ -235,13 +239,14 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  PDn 端子機能制御レジスタ（PDnPFS）（n = 3 ～ 6）
+			@brief  PDn 端子機能制御レジスタ（PDnPFS）（n = 3 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_ip_t<0x0008'C1AB> PD3PFS;
 		static inline pfs_ip_t<0x0008'C1AC> PD4PFS;
 		static inline pfs_ip_t<0x0008'C1AD> PD5PFS;
 		static inline pfs_ip_t<0x0008'C1AE> PD6PFS;
+		static inline pfs_ip_t<0x0008'C1AF> PD7PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

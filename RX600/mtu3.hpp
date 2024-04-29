@@ -3,6 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・MTU3x 定義 @n
 			RX13T @n
+			RX23T @n
 			RX24T/RX24U @n
 			RX26T @n
 			RX63T @n
@@ -453,7 +454,7 @@ namespace device {
 					OE4C = 0;
 					OE4D = 0;
 					break;
-#if defined(SIG_RX13T)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
 #else
 				case peripheral::MTU6:
 					OE6B = 0;
@@ -487,7 +488,7 @@ namespace device {
 					case peripheral::MTU4:
 						OE4A = val != 0;
 						break;
-#if defined(SIG_RX13T)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
 #else
 					case peripheral::MTU7:
 						OE7A = val != 0;
@@ -506,7 +507,7 @@ namespace device {
 					case peripheral::MTU4:
 						OE4B = val != 0;
 						break;
-#if defined(SIG_RX13T)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
 #else
 					case peripheral::MTU6:
 						OE6B = val != 0;
@@ -525,7 +526,7 @@ namespace device {
 					case peripheral::MTU4:
 						OE4C = val != 0;
 						break;
-#if defined(SIG_RX13T)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
 #else
 					case peripheral::MTU7:
 						OE7C = val != 0;
@@ -544,7 +545,7 @@ namespace device {
 					case peripheral::MTU4:
 						OE4D = val != 0;
 						break;
-#if defined(SIG_RX13T)
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
 #else
 					case peripheral::MTU6:
 						OE6D = val != 0;
@@ -4298,7 +4299,7 @@ namespace device {
 		static inline nfcr_t<0x000C'1296> NFCR;
 	};
 
-#if defined(SIG_RX13T)  // MTU3c
+#if defined(SIG_RX13T) || defined(SIG_RX23T) // MTU3c
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR, clock_profile::PCLKB> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR, clock_profile::PCLKB> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR, clock_profile::PCLKB> MTU2;

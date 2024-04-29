@@ -231,7 +231,7 @@ namespace device {
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B6 = 0;
-					MPC::PB6PFS.PSEL = ena ? 0b0'0011 : 0;
+					MPC::PB6PFS.PSEL = ena ? 0b0'0011 : 0;  // ok
 					PORTB::PMR.B6 = ena;
 					break;
 				default:
@@ -367,7 +367,7 @@ namespace device {
 					break;
 				case ORDER::SECOND:
 					PORT9::PMR.B4 = 0;
-					MPC::P94PFS.PSEL = ena ? 0b0'0011 : 0;
+					MPC::P94PFS.PSEL = ena ? 0b0'0011 : 0;  // ok
 					PORT9::PMR.B4 = ena;
 					break;
 				default:
@@ -386,7 +386,7 @@ namespace device {
 					break;
 				case ORDER::SECOND:
 					PORT9::PMR.B3 = 0;
-					MPC::P93PFS.PSEL = ena ? 0b0'0001 : 0;
+					MPC::P93PFS.PSEL = ena ? 0b0'0001 : 0;  // ok
 					PORT9::PMR.B3 = ena;
 					break;
 				default:
@@ -405,7 +405,7 @@ namespace device {
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B1 = 0;
-					MPC::PB1PFS.PSEL = ena ? 0b0'0001 : 0;
+					MPC::PB1PFS.PSEL = ena ? 0b0'0001 : 0;  // ok
 					PORTB::PMR.B1 = ena;
 					break;
 				default:
@@ -421,12 +421,12 @@ namespace device {
 		}
 
 
-		static bool clk_a_(ORDER odr, bool ena, bool neg) noexcept
+		static bool clk_a_(ORDER odr, bool ena) noexcept
 		{
 			// P11
 			// P94
 			// PB1
-			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			uint8_t sel = ena ? 0b00'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT1::PMR.B1 = 0;
@@ -451,11 +451,11 @@ namespace device {
 		}
 
 
-		static bool clk_b_(ORDER odr, bool ena, bool neg) noexcept
+		static bool clk_b_(ORDER odr, bool ena) noexcept
 		{
 			// P10
 			// PB0
-			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			uint8_t sel = ena ? 0b00'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT1::PMR.B0 = 0;
@@ -475,10 +475,10 @@ namespace device {
 		}
 
 
-		static bool clk_c_(ORDER odr, bool ena, bool neg) noexcept
+		static bool clk_c_(ORDER odr, bool ena) noexcept
 		{
 			// PB2
-			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			uint8_t sel = ena ? 0b00'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORTB::PMR.B2 = 0;
@@ -493,10 +493,10 @@ namespace device {
 		}
 
 
-		static bool clk_d_(ORDER odr, bool ena, bool neg) noexcept
+		static bool clk_d_(ORDER odr, bool ena) noexcept
 		{
 			// PB7
-			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			uint8_t sel = ena ? 0b00'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORTB::PMR.B7 = 0;
@@ -580,21 +580,23 @@ namespace device {
 
 			if(odr == ORDER::BYPASS) return true;
 
+			if(neg) return false;
+
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			switch(ch) {
 			case CHANNEL::CLK_A:
-				ret = clk_a_(odr, ena, neg);
+				ret = clk_a_(odr, ena);
 				break;
 			case CHANNEL::CLK_B:
-				ret = clk_b_(odr, ena, neg);
+				ret = clk_b_(odr, ena);
 				break;
 			case CHANNEL::CLK_C:
-				ret = clk_c_(odr, ena, neg);
+				ret = clk_c_(odr, ena);
 				break;
 			case CHANNEL::CLK_D:
-				ret = clk_d_(odr, ena, neg);
+				ret = clk_d_(odr, ena);
 				break;
 			default:
 				ret = false;
