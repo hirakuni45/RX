@@ -57,13 +57,21 @@ namespace device {
 
 		static constexpr auto		SOMCR		= SUB_OSC_MODE::DEFAULT;	///< サブクロック発信器モード選択
 		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
-
+#if 1
 		static constexpr uint32_t   PLL_BASE	= 48'000'000;		///< PLL ベースクロック（最大 24MHz ～ 48MHz）
 
 		static constexpr uint32_t   ICLK		= 48'000'000;		///< ICLK 周波数（最大 48MHz）
 		static constexpr uint32_t   PCLKB		= 24'000'000;		///< PCLKB 周波数（最大 32MHz）
 		static constexpr uint32_t   PCLKD		= 48'000'000;		///< PCLKD 周波数（最大 1MHz ～ 48MHz）
 		static constexpr uint32_t   FCLK		= 24'000'000;		///< FCLK 周波数（最大 1 ～ 32MHz）
+#else
+		static constexpr uint32_t   PLL_BASE	= 54'000'000;		///< PLL ベースクロック（最大 24MHz ～ 48MHz）
+
+		static constexpr uint32_t   ICLK		= 54'000'000;		///< ICLK 周波数（最大 48MHz）
+		static constexpr uint32_t   PCLKB		= 27'000'000;		///< PCLKB 周波数（最大 32MHz）
+		static constexpr uint32_t   PCLKD		= 54'000'000;		///< PCLKD 周波数（最大 1MHz ～ 48MHz）
+		static constexpr uint32_t   FCLK		= 27'000'000;		///< FCLK 周波数（最大 1 ～ 32MHz）
+#endif
 
 		// 32MHz より高い周波数で動作させる場合、MEMWAIT を設けるので、ソフト遅延を微調整する。
 		static constexpr uint32_t	DELAY_MS	=  ICLK / ((ICLK > 32'000'000) ? 787'402 : 1'000'000) / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）

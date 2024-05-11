@@ -186,6 +186,7 @@ namespace device {
 			}
 
 			if(clock_profile::TURN_SBC) {  // サブクロック発信器制御
+				device::SYSTEM::SOMCR.SODRV = 0b00;  // ドライブ能力指定
 				device::SYSTEM::SOMCR = static_cast<uint8_t>(clock_profile::SOMCR);
 				device::SYSTEM::SOSCCR.SOSTP.b(0);
 			}

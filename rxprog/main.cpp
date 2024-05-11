@@ -316,6 +316,7 @@ int main(int argc, char* argv[])
 //			} else if(p == "-i") {
 //				opts.id = true;
 			} else if(p.find("--id=") == 0) {
+				opts.id = true;
 				opts.id_val = &p[std::strlen("--id=")];
 			} else if(p == "-w" || p == "--write") {
 				opts.write = true;
@@ -353,7 +354,7 @@ int main(int argc, char* argv[])
 	}
 
 	// ID 変換
-	{
+	if(opts.id) {
 		auto ss = utils::split_text(opts.id_val, ":,");
 		if(ss.size() != 16) {
 			std::cerr << "The number of IDs must be 16: '" << opts.id_val << "'" << std::endl;
