@@ -53,7 +53,6 @@
 #include "RX600/tmr.hpp"
 #include "RX140/rtc.hpp"
 #include "RX600/lpt.hpp"
-#include "RX140/rtc.hpp"
 #include "RX600/sci_k.hpp"
 #include "RX600/sci_g.hpp"
 #include "RX600/sci_h.hpp"
