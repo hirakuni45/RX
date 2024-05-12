@@ -334,6 +334,10 @@
     [
       "adcde844-2b78-4ac5-a378-4f3ee5119fb2",
       "Interface"
+    ],
+    [
+      "f8ddbd88-db59-428c-85a3-c7b178ec34c2",
+      "CH340 Serial USB"
     ]
   ],
   "text_variables": {}
