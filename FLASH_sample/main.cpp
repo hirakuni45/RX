@@ -126,9 +126,14 @@ namespace {
 				}
 			}
 			uint32_t len = device::FLASH::DATA_WORD_SIZE;
-			if(n >= 3) {
+			if(f && n >= 3) {
 				if(command_.get_word(2, buff, sizeof(buff))) {
-					if((utils::input("%x", buff) % len).status()) {
+					uint32_t end;
+					if((utils::input("%x", buff) % end).status()) {
+						if(end > org) {
+							len = end - org + 1;
+							len &= ~(device::FLASH::DATA_WORD_SIZE - 1);
+						}
 						f = true;
 					}
 				}
@@ -180,8 +185,8 @@ namespace {
 		} else if(command_.cmp_word(0, "?") || command_.cmp_word(0, "help")) {
 			utils::format("Data Flash Size: %d, Block Num: %d, Block Size: %d, Word: %d\n")
 				% FLASH_IO::DATA_SIZE % FLASH_IO::DATA_BLOCK_NUM % FLASH_IO::DATA_BLOCK_SIZE % device::FLASH::DATA_WORD_SIZE;
-			utils::format("erase [bank] (erase 0 to %d)\n") % FLASH_IO::DATA_BLOCK_NUM;
-			utils::format("check [bank] (erase check 0 to %d)\n") % FLASH_IO::DATA_BLOCK_NUM;
+			utils::format("erase [bank] (erase 0 to %d)\n") % (FLASH_IO::DATA_BLOCK_NUM - 1);
+			utils::format("check [bank] (erase check 0 to %d)\n") % (FLASH_IO::DATA_BLOCK_NUM - 1);
 			utils::format("r[ead] org [end] (read)\n");
 			utils::format("write org data... (write)\n");
 			utils::format("uid (unique ID list)\n");

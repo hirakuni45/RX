@@ -22,6 +22,53 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
 
+		static void rspi_ssl_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			uint8_t sel = enable ? 0b0'1101 : 0;  // ok
+			switch(opt) {
+			case OPTIONAL::RSPI_SSL0:
+				// SSLA0: PA4
+				// SSLA0: PC4
+				if(odr == ORDER::FIRST) {
+					PORTA::PMR.B4 = 0;
+					MPC::PA4PFS.PSEL = sel;
+					PORTA::PMR.B4 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = sel;
+					PORTC::PMR.B4 = enable;
+				}
+				break;
+			case OPTIONAL::RSPI_SSL1:
+				// PA0
+				PORTA::PMR.B0 = 0;
+				MPC::PA0PFS.PSEL = sel;
+				PORTA::PMR.B0 = enable;
+				break;
+			case OPTIONAL::RSPI_SSL2:
+				// PA1
+				PORTA::PMR.B1 = 0;
+				MPC::PA1PFS.PSEL = sel;
+				PORTA::PMR.B1 = enable;
+				break;
+			case OPTIONAL::RSPI_SSL3:
+				// PA2
+				// PC2
+				if(odr == ORDER::FIRST) {
+					PORTA::PMR.B2 = 0;
+					MPC::PA2PFS.PSEL = sel;
+					PORTA::PMR.B2 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORTC::PMR.B2 = 0;
+					MPC::PC2PFS.PSEL = sel;
+					PORTC::PMR.B2 = enable;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+
 		static bool sub_1st_(peripheral per, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
@@ -57,6 +104,7 @@ namespace device {
 					PORT1::PMR.B7 = 0;
 					MPC::P17PFS.PSEL = sel;
 					PORT1::PMR.B7 = enable;
+					rspi_ssl_(ORDER::FIRST, enable, opt);
 				}
 				break;
 			case peripheral::RSCAN:
@@ -198,7 +246,14 @@ namespace device {
 					}
 				}
 				break;
-
+			case peripheral::LPT:
+				{
+					// LPTO:: P26
+					PORT2::PMR.B6 = 0;
+					MPC::P26PFS.PSEL = enable ? 0b1'1011 : 0;  // ok
+					PORT2::PMR.B6 = enable;
+				}
+				break;
 			default:
 				return false;
 				break;
@@ -242,6 +297,7 @@ namespace device {
 					PORT1::PMR.B7 = 0;					
 					MPC::P17PFS.PSEL = sel;
 					PORT1::PMR.B7 = enable;
+					rspi_ssl_(ORDER::SECOND, enable, opt);
 				}
 				break;
 			case peripheral::RSCAN:
@@ -320,6 +376,14 @@ namespace device {
 					}
 				}
 				break;
+			case peripheral::LPT:
+				{
+					// LPTO:: PB3
+					PORTB::PMR.B3 = 0;
+					MPC::PB3PFS.PSEL = enable ? 0b1'1011 : 0;  // ok
+					PORTB::PMR.B3 = enable;
+				}
+				break;
 			default:
 				return false;
 				break;
@@ -350,6 +414,7 @@ namespace device {
 					PORTC::PMR.B7 = 0;
 					MPC::PC7PFS.PSEL = sel;
 					PORTC::PMR.B7 = enable;
+					rspi_ssl_(ORDER::SECOND, enable, opt);
 				}
 				break;
 			case peripheral::SCI5:
@@ -371,6 +436,14 @@ namespace device {
 						MPC::PC4PFS.PSEL = sel;
 						PORTC::PMR.B4 = enable;
 					}
+				}
+				break;
+			case peripheral::LPT:
+				{
+					// LPTO:: PC7
+					PORTC::PMR.B7 = 0;
+					MPC::PC7PFS.PSEL = enable ? 0b1'1011 : 0;  // ok
+					PORTC::PMR.B7 = enable;
 				}
 				break;
 			default:

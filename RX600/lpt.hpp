@@ -100,11 +100,14 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ローパワータイマ（LPTa）
+		@param[in]	cmi1	割り込み要因
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <ICU::VECTOR cmi1>
 	struct lpta_t : public lpt_core_t {
 
 		static constexpr auto PERIPHERAL = peripheral::LPT;	///< ペリフェラル型
+		static constexpr auto CMI1 = cmi1;		///< 割り込み要因
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -157,11 +160,14 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ローパワータイマ（LPT）
+		@param[in]	cmi1	割り込み要因
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <ICU::VECTOR cmi1>
 	struct lpt_t : public lpt_core_t {
 
 		static constexpr auto PERIPHERAL = peripheral::LPT;	///< ペリフェラル型
+		static constexpr auto CMI1 = cmi1;		///< 割り込み要因
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -206,8 +212,8 @@ namespace device {
 	};
 
 #if defined(SIG_RX140)
-	typedef lpta_t LPT;
+	typedef lpta_t<ICU::VECTOR::LPTCMI1> LPT;
 #elif defined(SIG_RX231)
-	typedef lpt_t LPT;
+	typedef lpt_t<ICU::VECTOR::NONE> LPT;
 #endif
 }
