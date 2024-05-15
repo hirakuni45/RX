@@ -67,6 +67,7 @@
 
 #include "RX140/system_io.hpp"
 #include "RX24T/flash_io.hpp"
+#include "RX600/dac_out.hpp"
 
 #include "RX140/board_profile.hpp"
 

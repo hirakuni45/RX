@@ -1,6 +1,7 @@
 //=====================================================================//
 /*! @file
     @brief  PSG サンプル @n
+			PSG 音源エミュレートによる音楽演奏
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -21,11 +22,25 @@
 #include "sound/dac_stream.hpp"
 #include "sound/psg_mng.hpp"
 
+#include "score.hpp"
+
 namespace {
 
-#if defined(SIG_RX231)
+	// サンプリング周波数が 48KHz で 1/100 毎にサービスするので、
+	// 1 ターンは 480 サンプルなので、その倍以上を必要とする。
+	static constexpr uint32_t FIFO_NUM = 1024;
+
+#if defined(SIG_RX140)
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 4> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
+
+	// 割り込み毎に D/A 出力
+	typedef device::DA DAC;
+
+#elif defined(SIG_RX231)
+	// D/A 出力では、無音出力は、中間電圧とする。
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -33,7 +48,7 @@ namespace {
 
 #elif defined(SIG_RX62N)
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -42,7 +57,7 @@ namespace {
 #elif defined(SIG_RX631)
 	// RX631 GR-CITRUS board
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -50,7 +65,7 @@ namespace {
 
 #elif defined(SIG_RX71M)
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -58,7 +73,7 @@ namespace {
 
 #elif defined(SIG_RX64M)
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -68,7 +83,7 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B5, false> SW2;
 
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -77,7 +92,7 @@ namespace {
 
 #elif defined(SIG_RX26T)
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -85,7 +100,7 @@ namespace {
 
 #elif defined(SIG_RX66T)
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -95,7 +110,7 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B7, false> SW2;
 
 	// SSIE の FIFO サイズの２倍以上（1024）
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x0000;
 
 	#define USE_SSIE
@@ -103,7 +118,7 @@ namespace {
 
 #elif defined(SIG_RX72T)
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, 4096, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, FIFO_NUM, 1024> SOUND_OUT;
 	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
@@ -128,16 +143,15 @@ namespace {
 	static constexpr uint16_t SAMPLE = 48'000;  // サンプリング周期
 	static constexpr uint16_t TICK = 100;	// サンプルの楽曲では、１００を前提にしている。
 	static constexpr uint16_t CNUM = 3;		// 同時発音数（大きくすると処理負荷が増えるので注意）
-	typedef utils::psg_base PSG;
 	typedef utils::psg_mng<SAMPLE, TICK, CNUM> PSG_MNG;
 	PSG_MNG		psg_mng_;
 
-
-#ifdef USE_DAC
+#if defined(USE_DAC)
+	/// DMA 転送先、DMA 起動を行うタイマー(MTU0)、DMA チャネルなどを指定
 	typedef sound::dac_stream<DAC, device::MTU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
 	DAC_STREAM	dac_stream_(sound_out_);
 
-	void start_audio_()
+	void start_audio_() noexcept
 	{
 		auto dmac_intl = device::ICU::LEVEL::_4;
 		auto timer_intl  = device::ICU::LEVEL::_5;
@@ -148,13 +162,11 @@ namespace {
 			utils::format("D/A Stream not start...\n");
 		}
 	}
-#endif
-
-#ifdef USE_SSIE
+#elif defined(USE_SSIE)
 	typedef device::ssie_io<device::SSIE1, device::DMAC1, SOUND_OUT> SSIE_IO;
 	SSIE_IO		ssie_io_(sound_out_);
 
-	void start_audio_()
+	void start_audio_() noexcept
 	{
 		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/16 ビットフォーマット固定
 			auto intr = device::ICU::LEVEL::_5;
@@ -170,960 +182,14 @@ namespace {
 			}
 		}
 	}
+#else
+	// タイマー割り込みを使って転送
+
+	void start_audio_() noexcept
+	{
+
+	}
 #endif
-
-	// ドラゴンクエスト１・ラダトーム城（Dragon Quest 1 Chateau Ladutorm）
-	constexpr PSG::SCORE score0_[] = {
-		PSG::CTRL::VOLUME, 128,
-		PSG::CTRL::SQ50,
-		PSG::CTRL::TEMPO, 80,
-		PSG::CTRL::ATTACK, 175,
-		// 1
-		PSG::KEY::Q,   8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::E_5, 8,
-		// 2
-		PSG::KEY::A_4, 8*3,
-		PSG::KEY::Q,   8*5,
-		// 3
-		PSG::KEY::Q,   8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::F_5, 8,
-		// 4
-		PSG::KEY::B_4, 8*3,
-		PSG::KEY::Q,   8*5,
-		// 5
-		PSG::KEY::Q,   8,
-		PSG::KEY::G_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::G_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::G_5, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::G_5, 8,
-		// 6
-		PSG::KEY::F_5, 16,
-		PSG::KEY::G_5, 16,
-		PSG::KEY::A_5, 16,
-		PSG::KEY::G_5, 8,
-		PSG::KEY::F_5, 8,
-		// 7
-		PSG::KEY::E_5, 16,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::D_5, 16,
-		PSG::KEY::Eb5, 16,
-		// 8
-		PSG::KEY::E_5, 8*8,
-		// 9
-		PSG::KEY::Q,   8,
-		PSG::KEY::A_5, 4,
-		PSG::KEY::Gs5, 4,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::E_5, 4,
-		PSG::KEY::Eb5, 4,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::C_5, 4,
-		PSG::KEY::B_4, 4,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::A_4, 8,
-		// 10
-		PSG::KEY::Q,   8,
-		PSG::KEY::A_5, 4,
-		PSG::KEY::Gs5, 4,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::E_5, 4,
-		PSG::KEY::Eb5, 4,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::C_5, 4,
-		PSG::KEY::B_4, 4,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::A_4, 8,
-		// 11
-		PSG::KEY::B_4, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::A_4, 8,
-		// 12
-		PSG::KEY::E_5, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::E_5, 8,
-		// 13
-		PSG::KEY::Q,   8,
-		PSG::KEY::A_5, 4,
-		PSG::KEY::Gs5, 4,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::F_5, 4,
-		PSG::KEY::E_5, 4,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 4,
-		PSG::KEY::Cs5, 4,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::A_4, 8,
-		// 14
-		PSG::KEY::Q,   8,
-		PSG::KEY::A_5, 4,
-		PSG::KEY::Gs5, 4,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::F_5, 4,
-		PSG::KEY::E_5, 4,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 4,
-		PSG::KEY::Cs5, 4,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::A_4, 8,
-		// 15
-		PSG::KEY::B_4, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::F_5, 8,
-		// 16
-		PSG::KEY::E_5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::B_3, 8,
-		// 17
-		PSG::KEY::Q,   8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::E_5, 8,
-		// 18
-		PSG::KEY::A_4, 8*3,
-		PSG::KEY::Q,   8*5,
-		// 19
-		PSG::KEY::Q,   8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::F_5, 8,
-		// 20
-		PSG::KEY::B_4, 8*3,
-		PSG::KEY::Q,   8*5,
-		// 21
-		PSG::KEY::Q,   8,
-		PSG::KEY::G_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::G_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::G_5, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::G_5, 8,
-		// 22
-		PSG::KEY::F_5, 16,
-		PSG::KEY::G_5, 16,
-		PSG::KEY::A_5, 16,
-		PSG::KEY::G_5, 8,
-		PSG::KEY::F_5, 8,
-		// 23
-		PSG::KEY::E_5, 16,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::D_5, 16,
-		PSG::KEY::Eb5, 16,
-		// 24
-		PSG::KEY::E_5, 8*8,
-		// 25
-		PSG::KEY::Q   ,8,
-		PSG::KEY::A_5, 4,
-		PSG::KEY::Gs5, 4,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::E_5, 4,
-		PSG::KEY::Eb5, 4,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::C_5, 4,
-		PSG::KEY::B_4, 4,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::A_4, 8,
-		// 26
-		PSG::KEY::Q   ,8,
-		PSG::KEY::A_5, 4,
-		PSG::KEY::Gs5, 4,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::E_5, 4,
-		PSG::KEY::Eb5, 4,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::C_5, 4,
-		PSG::KEY::B_4, 4,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::A_4, 8,
-		// 27
-		PSG::KEY::B_4, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::A_4, 8,
-		// 28
-		PSG::KEY::E_5, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::E_5, 8,
-		// 29
-		PSG::KEY::Q,   8,
-		PSG::KEY::A_5, 4,
-		PSG::KEY::Gs5, 4,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::F_5, 4,
-		PSG::KEY::E_5, 4,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 4,
-		PSG::KEY::Cs5, 4,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::A_4, 8,
-		// 30
-		PSG::KEY::Q,   8,
-		PSG::KEY::A_5, 4,
-		PSG::KEY::Gs5, 4,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::F_5, 4,
-		PSG::KEY::E_5, 4,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 4,
-		PSG::KEY::Cs5, 4,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::A_4, 8,
-		// 31
-		PSG::KEY::B_4, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::F_5, 8,
-		// 32
-		PSG::KEY::E_5, 8,
-		PSG::KEY::A_4, 8,  // F_4, 8
-		PSG::KEY::Gs4, 8,  // E_4, 8
-		PSG::KEY::F_4, 8,  // D_4, 8
-		PSG::KEY::E_4, 8,  // C_4, 8
-		PSG::KEY::D_4, 8,  // B_3, 8
-		PSG::KEY::C_4, 8,  // A_3, 8
-		PSG::KEY::B_3, 8,  // G_3, 8
-		// 33
-		PSG::KEY::Q,   8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::E_5, 8,
-		// 34
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::Cs5, 8,
-		// 35
-		PSG::KEY::D_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::E_5, 8,  // Cs5, 8 
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::A_5, 8,  // C_5, 8
-		PSG::KEY::F_5, 8,
-		// 36
-		PSG::KEY::Gs5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Gs5, 8,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::B_5, 8,
-		PSG::KEY::Gs5, 8,
-		// 37
-		PSG::KEY::Bb5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Cs5, 8,
-		// 38
-		PSG::KEY::Gs5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::D_5, 8,
-		// 39
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::Bb4, 8,
-		// 40
-		PSG::KEY::E_5, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Fs4, 8,
-		// 41
-		PSG::KEY::B_4, 16,
-		PSG::KEY::Bb4, 16,
-		PSG::KEY::B_4, 16,
-		PSG::KEY::Fs5, 16,  // PSG::KEY::Fs4, 16,
-		// 42
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::Cs4, 8,
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Fs4, 8,
-		// 43
-		PSG::KEY::Q,   8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::Fs4, 8,
-		// 44
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::Gs4, 8,
-		// 45
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::A_4, 8,
-		// 46
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::A_4, 8,
-		// 47
-		PSG::KEY::E_5, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::B_4, 8,
-		// 48
-		PSG::KEY::E_5, 8,
-		PSG::KEY::E_6, 8,  // PSG::KEY::Gs5, 8,
-		PSG::KEY::D_6, 8,  // PSG::KEY::F_5, 8,
-		PSG::KEY::C_6, 8,  // PSG::KEY::E_5, 8,
-		PSG::KEY::B_5, 8,  // PSG::KEY::D_5, 8,
-		PSG::KEY::A_5, 8,  // PSG::KEY::C_5, 8,
-		PSG::KEY::Gs5, 8,  // PSG::KEY::B_4, 8,
-		PSG::KEY::E_5, 8,  // PSG::KEY::Gs4, 8,
-		// 49
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::G_4, 8,
-		PSG::KEY::Bb4, 8,
-		// 50
-		PSG::KEY::D_5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::A_4, 8,
-		// 51
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::A_4, 8,
-		// 52
-		PSG::KEY::E_5, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::B_4, 8,
-		// 53
-		PSG::KEY::F_5, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::F_5, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::Cs5, 8,
-		// 54
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Cs5, 8,
-		// 55
-		PSG::KEY::G_5, 8,  // KEY::Bb4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::G_5, 8,  // KEY::Bb4, 8,
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Cs5, 8,
-		// 56
-		PSG::KEY::Gs5, 8,  // KEY::C_5, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::Cs4, 8,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::Gs3, 8,
-		// 57
-		PSG::KEY::Q,   8,
-		PSG::KEY::Gs5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Gs5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::Gs5, 8,
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::Gs5, 8,
-		// 58
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Bb5, 8,
-		PSG::KEY::Gs5, 8,
-		PSG::KEY::Bb5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Bb5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::Bb5, 8,
-		// 59
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::B_5, 8,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::B_5, 8,
-		PSG::KEY::Gb5, 8,
-		PSG::KEY::B_5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::B_5, 8,
-		// 60
-		PSG::KEY::E_5, 8,
-		PSG::KEY::Eb5, 8,
-		PSG::KEY::E_5, 8,
-		PSG::KEY::Fs5, 8,
-		PSG::KEY::Gs5, 8,
-		PSG::KEY::A_5, 8,
-		PSG::KEY::B_5, 8,
-		PSG::KEY::Gs5, 8,
-
-
-
-
-
-
-		PSG::CTRL::END
-	};
-
-	constexpr PSG::SCORE score1_[] = {
-		PSG::CTRL::VOLUME, 128,
-		PSG::CTRL::SQ50,
-		PSG::CTRL::TEMPO, 80,
-		PSG::CTRL::ATTACK, 175,
-		// 1
-		PSG::KEY::A_2, 8,
-		PSG::KEY::Q,   8*7,
-		// 2
-		PSG::KEY::Q,   8,
-		PSG::KEY::A_2, 8,
-		PSG::KEY::C_3, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::G_3, 8,
-		PSG::KEY::F_3, 8,
-		PSG::KEY::E_3, 8,
-		// 3
-		PSG::KEY::D_3, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::D_4, 8,
-		// 4
-		PSG::KEY::Gs3, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Gs3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Fs3, 8,
-		PSG::KEY::Gs3, 8,
-		// 5
-		PSG::KEY::A_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Cs4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::E_4, 8,
-		// 6
-		PSG::KEY::D_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::D_4, 8,
-		// 7
-		PSG::KEY::C_4, 8,
-		PSG::KEY::G_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::G_3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::Fs4, 8,
-		// 8
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Gs3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::B_3, 8,
-		// 9
-		PSG::KEY::A_3, 8,
-		PSG::KEY::C_4, 4,
-		PSG::KEY::B_3, 4,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::C_4, 4,
-		PSG::KEY::B_3, 4,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::Eb4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::C_4, 8,
-		// 10
-		PSG::KEY::G_3, 8,
-		PSG::KEY::C_4, 4,
-		PSG::KEY::B_3, 4,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::C_4, 4,
-		PSG::KEY::B_3, 4,
-		PSG::KEY::E_4, 8, // PSG::KEY::Fs3, 8,
-		PSG::KEY::Eb4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::C_4, 8,
-		// 11
-		PSG::KEY::F_3, 16,
-		PSG::KEY::E_3, 16,
-		PSG::KEY::D_3, 16,
-		PSG::KEY::Eb3, 16,
-		// 12
-		PSG::KEY::E_3, 16*2,
-		PSG::KEY::A_3, 16*2,
-		// 13
-		PSG::KEY::D_3, 8,
-		PSG::KEY::F_4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_4, 4,
-		PSG::KEY::Cs4, 4,
-		PSG::KEY::Ds4, 8,
-		PSG::KEY::F_4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_4, 8,
-		// 14
-		PSG::KEY::C_4, 8,
-		PSG::KEY::F_4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_4, 4,
-		PSG::KEY::Cs4, 4,
-		PSG::KEY::D_4, 8,  // B_3, 8
-		PSG::KEY::F_4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_4, 8,
-		// 15
-		PSG::KEY::F_3, 16,
-		PSG::KEY::E_3, 16,
-		PSG::KEY::D_3, 32,
-		// 16
-		PSG::KEY::E_3, 16,
-		PSG::KEY::Q,   8*6,
-		// 17
-		PSG::KEY::A_2, 16,
-		PSG::KEY::Q,   8*6,
-		// 18
-		PSG::KEY::Q,   8,
-		PSG::KEY::A_2, 8,
-		PSG::KEY::C_3, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::G_3, 8,
-		PSG::KEY::F_3, 8,
-		PSG::KEY::E_3, 8,
-		// 19
-		PSG::KEY::D_3, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::D_4, 8,
-		// 20
-		PSG::KEY::Gs3, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Gs3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Fs3, 8,
-		PSG::KEY::Gs3, 8,
-		// 21
-		PSG::KEY::A_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::Cs4, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::E_4, 8,
-		// 22
-		PSG::KEY::D_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::D_4, 8,
-		// 23
-		PSG::KEY::C_4, 8,
-		PSG::KEY::G_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::G_3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::Fs4, 8,
-		// 24
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Gs3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::B_3, 8,
-		// 25
-		PSG::KEY::A_3, 8,
-		PSG::KEY::C_4, 4,
-		PSG::KEY::B_3, 4,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::C_4, 4,
-		PSG::KEY::B_3, 4,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::Eb4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::C_3, 8,
-		// 26
-		PSG::KEY::A_3, 8,
-		PSG::KEY::C_4, 4,
-		PSG::KEY::B_3, 4,
-		PSG::KEY::C_4, 8,
-		PSG::KEY::C_4, 4,
-		PSG::KEY::B_3, 4,
-		PSG::KEY::C_4, 8,  // Fs3, 8
-		PSG::KEY::Eb4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::E_4, 8,
-		PSG::KEY::C_3, 8,
-		// 27
-		PSG::KEY::F_3, 16,
-		PSG::KEY::E_3, 16,
-		PSG::KEY::D_3, 16,
-		PSG::KEY::Eb3, 16,
-		// 28
-		PSG::KEY::E_3, 32,
-		PSG::KEY::A_3, 32,
-		// 29
-		PSG::KEY::D_3, 8,
-		PSG::KEY::F_4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_4, 4,
-		PSG::KEY::Cs4, 4,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::F_4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_4, 8,
-		// 30
-		PSG::KEY::C_4, 8,
-		PSG::KEY::F_4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_4, 4,
-		PSG::KEY::Cs4, 4,
-		PSG::KEY::D_4, 8,  // B_3, 8
-		PSG::KEY::F_4, 4,
-		PSG::KEY::E_4, 4,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_4, 8,
-		// 31
-		PSG::KEY::F_3, 16,
-		PSG::KEY::E_3, 16,
-		PSG::KEY::D_3, 32,
-		// 32
-		PSG::KEY::E_3, 16,
-		PSG::KEY::Q,   16*3,
-		// 33
-		PSG::KEY::A_3, 16,
-		PSG::KEY::Q,   16*3,
-		// 34
-		PSG::KEY::Q,   8*8,
-		// 35
-		PSG::KEY::Q,   8*8,
-		// 36
-		PSG::KEY::B_4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::Gs4, 8,
-		PSG::KEY::A_4, 8,
-		PSG::KEY::B_4, 8,
-		PSG::KEY::C_5, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::B_4, 8,
-		// 37
-		PSG::KEY::Cs5, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Cs4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb4, 8,
-		// 38
-		PSG::KEY::F_4, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::F_4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::D_5, 8,
-		PSG::KEY::Bb4, 8,
-		// 39
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Eb4, 8,
-		PSG::KEY::Bb4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb4, 8,
-		// 40
-		PSG::KEY::Cs4, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb3, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Cs4, 8,
-		PSG::KEY::Bb3, 8,
-		PSG::KEY::Fs4, 8,
-		PSG::KEY::Bb3, 8,
-		// 41
-		PSG::KEY::B_3, 8,
-		PSG::KEY::Fs3, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Fs3, 8,
-		PSG::KEY::Eb3, 8,
-		PSG::KEY::Fs3, 8,
-		PSG::KEY::Cs3, 8,
-		PSG::KEY::Fs3, 8,
-		// 42
-		PSG::KEY::B_2, 8,
-		PSG::KEY::Bb2, 8,
-		PSG::KEY::B_2, 8,
-		PSG::KEY::C_3, 8,
-		PSG::KEY::Eb3, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Fs3, 8,
-		PSG::KEY::E_3, 8,
-		// 43
-		PSG::KEY::E_3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::Gs3, 8,  // PSG::KEY::E_3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::Fs3, 8,  // PSG::KEY::B_2, 8,
-		PSG::KEY::B_3, 8,
-		// 44
-		PSG::KEY::Gs3, 8,  // PSG::KEY::E_3, 8,
-		PSG::KEY::Fs3, 8,
-		PSG::KEY::Gs3, 8,
-		PSG::KEY::A_3, 8,
-		PSG::KEY::B_3, 8,
-		PSG::KEY::Cs4, 8,
-		PSG::KEY::D_4, 8,
-		PSG::KEY::B_3, 8,
-		// 45
-		PSG::KEY::A_3, 16,
-		PSG::KEY::A_2, 16,
-		PSG::KEY::A_3, 16,
-		PSG::KEY::A_2, 16,
-		// 46
-		PSG::KEY::Fs3, 16,
-		PSG::KEY::Fs2, 16,
-		PSG::KEY::B_2, 16,
-		PSG::KEY::B_2, 16,
-		// 47
-		PSG::KEY::E_3, 16,
-		PSG::KEY::E_2, 16,
-		PSG::KEY::E_3, 16,
-		PSG::KEY::E_2, 16,
-		// 48
-		PSG::KEY::E_3, 16,
-		PSG::KEY::Q,   16*3,
-		// 49
-		PSG::KEY::E_4, 16,
-		PSG::KEY::E_4, 16,
-		PSG::KEY::E_4, 16,
-		PSG::KEY::E_4, 16,
-		// 50
-		PSG::KEY::D_4, 16,
-		PSG::KEY::D_4, 16,
-		PSG::KEY::D_4, 16,
-		PSG::KEY::D_4, 16,
-		// 51
-		PSG::KEY::C_4, 16,
-		PSG::KEY::C_4, 16,
-		PSG::KEY::C_4, 16,
-		PSG::KEY::C_4, 16,
-		// 52
-		PSG::KEY::B_3, 16,
-		PSG::KEY::B_3, 16,
-		PSG::KEY::B_3, 16,
-		PSG::KEY::B_3, 16,
-		// 53
-		PSG::KEY::B_3, 16,
-		PSG::KEY::B_3, 16,
-		PSG::KEY::B_3, 16,
-		PSG::KEY::B_3, 16,
-		// 54
-		PSG::KEY::A_3, 16,
-		PSG::KEY::A_3, 16,
-		PSG::KEY::A_3, 16,
-		PSG::KEY::A_3, 16,
-		// 55
-		PSG::KEY::Eb3, 16,
-		PSG::KEY::Eb3, 16,  //  PSG::KEY::Eb2, 16, 
-		PSG::KEY::Eb3, 16,
-		PSG::KEY::Eb3, 16,  //  PSG::KEY::Eb2, 16, 
-		// 56
-		PSG::KEY::Gs2, 8,
-		PSG::KEY::Gs3, 8,
-		PSG::KEY::Fs3, 8,
-		PSG::KEY::E_3, 8,
-		PSG::KEY::Eb3, 8,
-		PSG::KEY::Cs3, 8,
-		PSG::KEY::C_3, 8,
-		PSG::KEY::Gs2, 8,
-		// 57
-		PSG::KEY::Cs3, 16,
-		PSG::KEY::Q,   16*3,
-		// 58
-		PSG::KEY::Q,   16*4,
-		// 59
-		PSG::KEY::Q,   16*4,
-		// 60
-		PSG::KEY::Q,   16*4,
-
-
-
-		PSG::CTRL::END
-	};
 }
 
 
@@ -1131,11 +197,12 @@ extern "C" {
 
 	void set_sample_rate(uint32_t freq)
 	{
-#ifdef USE_DAC
+#if defined(USE_DAC)
 		dac_stream_.set_sample_rate(freq);
-#endif
-#ifdef USE_SSIE
+#elif defined(USE_SSIE)
 		sound_out_.set_output_rate(freq);
+#else
+
 #endif
 	}
 
@@ -1208,8 +275,8 @@ int main(int argc, char** argv)
 		set_sample_rate(SAMPLE);
 	}
 
-	psg_mng_.set_score(0, score0_);
-	psg_mng_.set_score(1, score1_);
+	psg_mng_.set_score(0, score::_0);
+	psg_mng_.set_score(1, score::_1);
 
 #ifdef USE_SW2
 	SW2::INPUT();
@@ -1263,8 +330,8 @@ int main(int argc, char** argv)
 			auto tmp = SW2::P();
 			if(!lvl && tmp) {
 				utils::format("Music restart\n");
-				psg_mng_.set_score(0, score0_);
-				psg_mng_.set_score(1, score1_);
+				psg_mng_.set_score(0, score::_0);
+				psg_mng_.set_score(1, score::_1);
 				delay = 100;
 			}
 			lvl = tmp;

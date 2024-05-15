@@ -14,6 +14,7 @@
 //=====================================================================//
 #include "sound/sound_out.hpp"
 #include "common/mtu_io.hpp"
+#include "RX600/dmac_mgr.hpp"
 
 namespace sound {
 
@@ -122,9 +123,10 @@ namespace sound {
 
 			{  // DMAC マネージャー開始
 				bool cpu_intr = true;
-				auto ret = dmac_mgr_.start(itv_mgr_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-					reinterpret_cast<uint32_t>(sound_out_.get_sample()), DAC::DADR0.address,
-					sound_out_.get_sample_size(), dmac_intl, cpu_intr);
+				auto siz = sound_out_.get_sample_size();
+				auto ret = dmac_mgr_.start(DMAC_MGR::TRANS_MODE::REPEAT, DMAC_MGR::TRANS_TYPE::SP_DN_32, itv_mgr_.get_intr_vec(),
+					reinterpret_cast<uint32_t>(sound_out_.get_sample()), DAC::DADR0.address, 1024, siz,
+					dmac_intl, cpu_intr);
 				if(!ret) {
 //					utils::format("DMAC Not start...\n");
 					return false;

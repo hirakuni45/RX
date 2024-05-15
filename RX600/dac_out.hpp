@@ -71,7 +71,7 @@ namespace device {
 		{
 			if(otype == output::NONE) {
 				power_mgr::turn(DAC::PERIPHERAL);
-				DAC::DACR = DAC::DACR.RESERVE.b(0b11111);
+				DAC::DACR = DAC::DACR.RESERVE.b(0b1'1111);
 				power_mgr::turn(DAC::PERIPHERAL, false);
 				return true;
 			}

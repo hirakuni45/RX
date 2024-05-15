@@ -196,9 +196,9 @@ int main(int argc, char** argv)
 	{  // DMAC マネージャー開始
 		auto intr_level = device::ICU::LEVEL::_4;
 		bool cpu_intr = false;
-		auto ret = dmac_mgr_.start(mtu_io_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address,
-			DMAC_MGR::BLOCK_SIZE_MAX, intr_level, cpu_intr);
+		auto ret = dmac_mgr_.start(DMAC_MGR::TRANS_MODE::REPEAT, DMAC_MGR::TRANS_TYPE::SP_DN_32, mtu_io_.get_intr_vec(),
+			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address, 1024, DMAC_MGR::BLOCK_SIZE_MAX,
+			intr_level, cpu_intr);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}

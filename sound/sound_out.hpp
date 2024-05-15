@@ -46,9 +46,11 @@ namespace sound {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	サウンド出力クラス
-		@param[in]	T		基本型
-		@param[in]	BFS		fifo バッファのサイズ
-		@param[in]	OUTS	出力バッファのサイズ（外部ハードウェアの仕様による）
+		@param[in]	T		波形基本型
+		@param[in]	BFS		fifo バッファのサイズ @n
+							サンプルレートをサービス間隔で割った値の倍以上を設定
+		@param[in]	OUTS	出力バッファのサイズ（外部ハードウェアの仕様による） @n
+							2^n 倍の指定
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<typename T, uint32_t BFS, uint32_t OUTS>
@@ -58,7 +60,8 @@ namespace sound {
 		typedef wave_t<T> WAVE;
 		typedef utils::fixed_fifo<WAVE, BFS> FIFO;
 
-		static constexpr uint16_t PEAK_LEVEL_FRAME = 400;	///< 400 sample (48KHz : 0.5sec)
+		/// ピークレベルを超える閾値(400 sample: 48KHz : 0.5sec)
+		static constexpr uint16_t PEAK_LEVEL_FRAME = 400;
 
 	private:
 
