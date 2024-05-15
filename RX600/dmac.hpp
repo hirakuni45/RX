@@ -14,17 +14,12 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	DMA コントローラ（DMACAa/DMACAb）
+		@brief	DMA コントローラ・ベース・クラス（DMACAa/DMACAb）
 		@param[in]	base	ベース・アドレス
-		@param[in]	per		ペリフェラル型
-		@param[in]	ivec	割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-	struct dmac_t {
-
-		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
-		static constexpr auto IVEC = ivec;			///< 割り込みベクター
+	template <uint32_t base>
+	struct dmac_base_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -231,42 +226,58 @@ namespace device {
 	};
 
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  DMAC モジュール起動レジスタ (DMAST)
-		@param[in]	ofs	オフセット
+		@brief	DMA コントローラ（DMACAa/DMACAb）
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	ivec	割り込みベクター
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t ofs>
-	struct dmast_t : public rw8_t<ofs> {
-		typedef rw8_t<ofs> io_;
-		using io_::operator =;
-		using io_::operator ();
-		using io_::operator |=;
-		using io_::operator &=;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+	struct dmac_t : public dmac_base_t<base> {
 
-		bit_rw_t<io_, bitpos::B0>   DMST;
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto IVEC = ivec;		///< 割り込みベクター
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  DMAC モジュール起動レジスタ (DMAST)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct dmast_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   DMST;
+		};
+		static inline dmast_t<0x0008'2200> DMAST;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  DMAC74 割り込みステータスモニタレジスタ (DMIST)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct dmist_t : public ro8_t<ofs> {
+			typedef ro8_t<ofs> in_;
+			using in_::operator ();
+
+			bit_ro_t<in_, bitpos::B4>   DMIS4;
+			bit_ro_t<in_, bitpos::B5>   DMIS5;
+			bit_ro_t<in_, bitpos::B6>   DMIS6;
+			bit_ro_t<in_, bitpos::B7>   DMIS7;
+		};
+		static inline dmist_t<0x0008'2204> DMIST;
+
 	};
-	static inline dmast_t<0x0008'2200> DMAST;
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  DMAC74 割り込みステータスモニタレジスタ (DMIST)
-		@param[in]	ofs	オフセット
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t ofs>
-	struct dmist_t : public ro8_t<ofs> {
-		typedef ro8_t<ofs> in_;
-		using in_::operator ();
-
-		bit_ro_t<in_, bitpos::B4>   DMIS4;
-		bit_ro_t<in_, bitpos::B5>   DMIS5;
-		bit_ro_t<in_, bitpos::B6>   DMIS6;
-		bit_ro_t<in_, bitpos::B7>   DMIS7;
-	};
-	static inline dmist_t<0x0008'2204> DMIST;
 
 #if defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef dmac_t<0x0008'2000, peripheral::DMAC0, ICU::VECTOR::DMACI0>   DMAC0;

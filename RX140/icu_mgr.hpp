@@ -77,6 +77,20 @@ namespace device {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DMAC 要因の設定（互換性ダミー）
+			@param[in]	dma_per	DMAC ペリフェラル
+			@param[in]	target	DMA 要因のベクター番号
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool set_dmac(peripheral dma_per, ICU::VECTOR target) noexcept
+		{
+			return false;
+		}
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  グループ割り込みに対するベクタを返すダミー

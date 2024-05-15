@@ -16,24 +16,17 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  DMAC マネージャー・クラス
-		@param[in]	DMAC	DMAC コントローラー
-		@param[in]	TASK	DMA 終了割り込みファンクタ
+		@brief  DMAC マネージャー、定数クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class DMAC, class TASK = utils::null_task>
-	class dmac_mgr {
-	public:
-		typedef DMAC value_type;
-
-		static constexpr uint32_t BLOCK_SIZE_MAX = 1024;	///< データ転送最大ブロック数
+	struct dmac_mgr_def {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  転送タイプ
+			@brief  転送タイプ型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class trans_type : uint8_t {
+		enum class TRANS_TYPE : uint8_t {
 			SN_DP_8,		///< ソース固定、ディストネーション＋（8 bits）
 			SP_DN_8,		///< ソース＋、ディストネーション固定（8 bits）
 			SN_DP_16,		///< ソース固定、ディストネーション＋（16 bits）
@@ -41,6 +34,34 @@ namespace device {
 			SN_DP_32,		///< ソース固定、ディストネーション＋（32 bits）
 			SP_DN_32,		///< ソース＋、ディストネーション固定（32 bits）
 		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  転送モード型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class TRANS_MODE : uint8_t {
+			NORMAL = 0b00, 	///< ノーマル転送モード（回数：１～６５５３５）
+			REPEAT = 0b01,	///< リピート転送モード（回数：１～１０２４）
+			BLOCK  = 0b10	///< ブロック転送モード（回数：１～１０２４）
+		};
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  DMAC マネージャー・クラス
+		@param[in]	DMAC	DMAC コントローラー
+		@param[in]	TASK	DMA 終了割り込みファンクタ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class DMAC, class TASK = utils::null_task>
+	class dmac_mgr : public dmac_mgr_def {
+	public:
+		typedef DMAC value_type;	///< DMAC チャネルの型
+
+		static constexpr uint32_t BLOCK_SIZE_MAX = 1024;	///< データ転送最大ブロック数
 
 	private:
 		static inline TASK	task_;
@@ -129,8 +150,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始（メモリー操作関係）
-			@param[in]	lvl		転送完了割り込みレベル（０以上）@n
-								※無指定（０）なら割り込みを起動しない。
+			@param[in]	lvl		転送完了割り込みレベル
 		 */
 		//-----------------------------------------------------------------//
 		void start(ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
@@ -140,63 +160,74 @@ namespace device {
 			level_ = lvl;
 			set_vector_(DMAC::IVEC);
 
-			DMAST.DMST = 1;
+			DMAC::DMAST.DMST = 1;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	割り込み要因による開始
+			@brief	割り込み要因による転送開始
+			@param[in]	trm		転送モード型
+			@param[in]	trt		転送タイプ型
 			@param[in]	trg		転送開始要因
-			@param[in]	tft		転送タイプ
-			@param[in]	src		元アドレス
-			@param[in]	dst		先アドレス
-			@param[in]	lim		転送リミット（※カウント数なので注意）
-			@param[in]	ilvl	転送完了割り込みレベル（０以上）@n
+			@param[in]	src		転送元アドレス
+			@param[in]	dst		転送先アドレス
+			@param[in]	siz		MODE_REPEAT:リンピート・サイズ、 @n
+								MODE_BLOCK:ブロック・サイズ
+			@param[in]	cnt		転送カウント
+			@param[in]	ilvl	転送完了割り込みレベル（０以上） @n
 								※無指定（０）なら割り込みを起動しない。
 			@param[in]	isel	CPU にも割り込みをかける場合は「true」にする。
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(ICU::VECTOR trg, trans_type tft, uint32_t src, uint32_t dst, uint32_t lim,
-			ICU::LEVEL ilvl, bool isel) noexcept
+		bool start(TRANS_MODE trm, TRANS_TYPE trt, ICU::VECTOR trg,
+			uint32_t src, uint32_t dst, uint16_t siz, uint16_t cnt,
+			ICU::LEVEL ilvl, bool isel = false) noexcept
 		{
-			if(lim > 1024) return false;
+			if(trm == TRANS_MODE::REPEAT || trm == TRANS_MODE::BLOCK) {
+				if(siz > 1024 || cnt > 1024) {
+					return false;
+				}
+				siz &= 0x3ff;
+				cnt &= 0x3ff;
+			}
 
 			power_mgr::turn(DMAC::PERIPHERAL);
 
 			DMAC::DMCNT.DTE = 0;  // 念のため停止させる。
 
-			uint8_t dm = 0;
+			auto md = static_cast<uint8_t>(trm);
 			uint8_t sm = 0;
+			uint8_t dm = 0;
 			uint8_t sz = 0;
-			switch(tft) {
-			case trans_type::SN_DP_8:
+			switch(trt) {
+			case TRANS_TYPE::SN_DP_8:
 				sm = 0b00;  // n
 				dm = 0b10;  // ++
 				sz = 0;
 				break;
-			case trans_type::SP_DN_8:
+			case TRANS_TYPE::SP_DN_8:
 				sm = 0b10;  // ++
 				dm = 0b00;  // n
 				sz = 0;
 				break;
-			case trans_type::SN_DP_16:
+			case TRANS_TYPE::SN_DP_16:
 				sm = 0b00;  // n
 				dm = 0b10;  // ++
 				sz = 1;
 				break;
-			case trans_type::SP_DN_16:
+			case TRANS_TYPE::SP_DN_16:
 				sm = 0b10;  // ++
 				dm = 0b00;  // n
 				sz = 1;
 				break;
-			case trans_type::SN_DP_32:
+			case TRANS_TYPE::SN_DP_32:
 				sm = 0b00;  // n
 				dm = 0b10;  // ++
 				sz = 2;
 				break;
-			case trans_type::SP_DN_32:
+			case TRANS_TYPE::SP_DN_32:
 				sm = 0b10;  // ++
 				dm = 0b00;  // n
 				sz = 2;
@@ -206,13 +237,12 @@ namespace device {
 			}
 
 			DMAC::DMAMD = DMAC::DMAMD.DM.b(dm) | DMAC::DMAMD.SM.b(sm);
-			// リピート転送
 			DMAC::DMTMD = DMAC::DMTMD.DCTG.b(0b01) | DMAC::DMTMD.SZ.b(sz) |
-						  DMAC::DMTMD.DTS.b(0b01)  | DMAC::DMTMD.MD.b(0b01);
+						  DMAC::DMTMD.DTS.b(0b01)  | DMAC::DMTMD.MD.b(md);
 			DMAC::DMSAR = src;
 			DMAC::DMDAR = dst;
 
-			DMAC::DMCRA = ((lim & 0x3FF) << 16) | (lim & 0x3FF);
+			DMAC::DMCRA = (siz << 16) | cnt;
 			DMAC::DMCRB = 1;
 
 			level_ = ilvl;
@@ -228,7 +258,7 @@ namespace device {
 
 			DMAC::DMCNT.DTE = 1;
 
-			DMAST.DMST = 1;
+			DMAC::DMAST.DMST = 1;
 
 			return true;
 		}
