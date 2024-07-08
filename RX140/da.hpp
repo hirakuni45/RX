@@ -25,6 +25,8 @@ namespace device {
 		static constexpr uint32_t RESOLUTION = 8;	///< D/A 変換分解能
 		static constexpr uint32_t CHANNEL = 2;		///< チャネル数
 
+		static constexpr bool DACR_DAE = false;		///< DAE フラグの有無
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  アナログ入出力型
@@ -97,8 +99,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B6> DAOE0;
-			bit_rw_t<io_, bitpos::B7> DAOE1;
+			bits_rw_t<io_, bitpos::B0, 5> RESERVE;
+			bit_rw_t <io_, bitpos::B5>    DAE;			///< ダミー
+			bit_rw_t <io_, bitpos::B6>    DAOE0;
+			bit_rw_t <io_, bitpos::B7>    DAOE1;
 		};
 		static inline dacr_t<0x0008'80C4> DACR;
 
