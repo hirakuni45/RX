@@ -34,9 +34,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.762,
-          "height": 1.524,
-          "width": 1.524
+          "drill": 0.0,
+          "height": 0.95,
+          "width": 1.075
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
@@ -173,10 +173,9 @@
       ],
       "track_widths": [
         0.0,
-        0.0,
         0.4,
-        0.5,
-        2.0
+        0.9,
+        1.6
       ],
       "via_dimensions": [
         {
@@ -409,7 +408,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "RX140_board.kicad_pro",
+    "filename": "StepDriver.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -444,7 +443,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "specctra_dsn": "RX140_board.dsn",
+      "specctra_dsn": "StepDriver.dsn",
       "step": "",
       "vrml": ""
     },
@@ -486,20 +485,8 @@
   },
   "sheets": [
     [
-      "1ba7daaa-0b3e-4d88-b450-d41f3b2cc6e9",
+      "fe6068e1-55db-4f20-8000-579213a216a3",
       ""
-    ],
-    [
-      "a97e6d7b-e1e9-416e-bfc6-a992ab699499",
-      "Power"
-    ],
-    [
-      "adcde844-2b78-4ac5-a378-4f3ee5119fb2",
-      "Interface"
-    ],
-    [
-      "f8ddbd88-db59-428c-85a3-c7b178ec34c2",
-      "CH340 Serial USB"
     ]
   ],
   "text_variables": {}
