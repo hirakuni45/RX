@@ -4,7 +4,7 @@
 	@brief	RX600/RX700 グループ・CRCA 定義 @n
 			RX65N/RX651 @n
 			RX66N @n
-			RX671 @n
+			RX660/RX671 @n
 			RX66T/RX72T @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)

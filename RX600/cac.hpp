@@ -11,7 +11,7 @@
 			・RX64M/RX71M @n
 			・RX65N/RX651 @n
 			・RX66N @n
-			・RX671 @n
+			・RX660/RX671 @n
 			・RX66T/RX72T @n
 			・RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -174,7 +174,7 @@ namespace device {
 
 #if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U)
 	typedef cac_t<ICU::VECTOR, ICU::VECTOR::FERRF, ICU::VECTOR::MENDF, ICU::VECTOR::OVFF> CAC;
-#elif defined(SIG_RX26T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX26T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX660) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef cac_t<ICU::GROUPBL0, ICU::GROUPBL0::FERRI, ICU::GROUPBL0::MENDI, ICU::GROUPBL0::OVFI> CAC;
 #endif
 }

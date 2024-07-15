@@ -13,7 +13,7 @@
 			RX64M/RX71M @n
 			RX65N/RX651 @n
 			RX66N @n
-			RX671 @n
+			RX660/RX671 @n
 			RX66T/RX72T @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -215,7 +215,7 @@ namespace device {
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
 	typedef cmt_nom_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR::CMI2, clock_profile::PCLKB> CMT2;
 	typedef cmt_nom_t<0x0008'8018, peripheral::CMT3, ICU::VECTOR::CMI3, clock_profile::PCLKB> CMT3;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX660) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef cmt_nom_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
 	typedef cmt_sel_t<0x0008'8012, peripheral::CMT2, ICU::SELECTB, ICU::SELECTB::CMI2, clock_profile::PCLKB> CMT2;

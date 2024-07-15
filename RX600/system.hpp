@@ -5,7 +5,7 @@
 			・RX64M @n
 			・RX65N/RX651 @n
 			・RX66N @n
-			・RX671 @n
+			・RX660/RX671 @n
 			・RX71M @n
 			・RX72N/RX72M @n
 			・RX66T/RX72T
@@ -541,7 +541,7 @@ namespace device {
 		static inline hococr2_t<0x0008'0037> HOCOCR2;
 
 
-#if defined(SIG_RX671)
+#if defined(SIG_RX660) || defined(SIG_RX671)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	FLL コントロールレジスタ 1 (FLLCR1)
@@ -747,7 +747,7 @@ namespace device {
 		static inline hocopcr_t<0x0008'C294> HOCOPCR;
 
 
-#if defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#if defined(SIG_RX66N) || defined(SIG_RX660) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CLKOUT 出力コントロールレジスタ (CKOCR)
@@ -853,7 +853,7 @@ namespace device {
 		static inline ppllcr3_t<0x0008'004B> PPLLCR3;
 #endif
 
-#if defined(SIG_RX671)
+#if defined(SIG_RX660) || defined(SIG_RX671)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器コントロールレジスタ 2 (SOSCCR2)
@@ -1220,7 +1220,14 @@ namespace device {
 		};
 		static inline tscr_t<0x0008'C500> TSCR;
 
-#if defined(SIG_RX671)
+#if defined(SIG_RX660)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  温度センサ校正データレジスタ (TSCDR)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline ro32_t<0x007F'B17C> TSCDR;
+#elif defined(SIG_RX671)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  温度センサ校正データレジスタ (TSCDR)
@@ -1678,6 +1685,56 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  システム定義クラス RX660
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct system_660_t : public system_base_t, system_batt_backup_t {
+
+		static constexpr bool NCRGx_reg    = false;
+		static constexpr bool NCRCx_reg    = false;
+
+		// オプション設定メモリ
+		static inline spcc_t<0x0012'0040> SPCC;
+		static inline ofs0_t<0x0012'0068> OFS0;
+		static inline ofs1_t<0x0012'006C> OFS1;
+		static inline mde_t <0x0012'0064> MDE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT_null）ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline memwait_null_t<0x0000'0000> MEMWAIT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT_null) ダミー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline romwt_null_t<0x0000'0000> ROMWT;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline sosccr_t<0x0008'0033> SOSCCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline soscwtcr_t<0x0008'00A3> SOSCWTCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  システム定義クラス RX671
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1882,6 +1939,8 @@ namespace device {
 	typedef system_65x_t SYSTEM;
 #elif defined(SIG_RX66N)
 	typedef system_66n_t SYSTEM;
+#elif defined(SIG_RX660)
+	typedef system_660_t SYSTEM;
 #elif defined(SIG_RX671)
 	typedef system_671_t SYSTEM;
 #elif defined(SIG_RX71M)

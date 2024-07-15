@@ -893,7 +893,7 @@ namespace device {
 		ICU::GROUPBL1::TEI9, ICU::GROUPBL1::ERI9>  RSCI9;
 	typedef rscib_t<0x000E'2080, peripheral::RSCI11,  ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
 		ICU::GROUPAL0::TEI11, ICU::GROUPAL0::ERI11>  RSCI11;
-#elif defined(SIG_RX671)
+#elif defined(SIG_RX660) || defined(SIG_RX671)
 	typedef rscib_t<0x000E'2000, peripheral::RSCI10,  ICU::VECTOR::RTXI10, ICU::VECTOR::RRXI10,
 		ICU::GROUPAL0::RTEI10, ICU::GROUPAL0::RERI10>  RSCI10;
 	typedef rscib_t<0x000E'2080, peripheral::RSCI11,  ICU::VECTOR::RTXI11, ICU::VECTOR::RRXI11,

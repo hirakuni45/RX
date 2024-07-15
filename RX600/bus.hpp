@@ -9,6 +9,7 @@
 			RX64M/RX71M @n
 			RX65N/RX651 @n
 			RX66N @n
+			RX660 @n
 			RX671 @n
 			RX72M/RX72N @n
 			RX66T/RX72T (CSx レジスタ 0 ～ 3, SDRAM 制御無し)
@@ -791,7 +792,7 @@ namespace device {
 	typedef bus_all_t BUS;
 #elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef bus_allex_t BUS;
-#elif defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX660)
 	typedef bus_def_t BUS;
 #endif
 }

@@ -452,6 +452,39 @@
 
 #include "RX65x/board_profile.hpp"
 
+#elif defined(SIG_RX660)
+#include "RX600/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
+#include "RX600/dmac.hpp"
+#include "RX600/elc.hpp"
+#include "RX600/mtu3.hpp"
+#include "RX72N/poe3.hpp"
+#include "RX600/cmtw.hpp"
+#include "RX600/rtc.hpp"
+#include "RX600/wdta.hpp"
+#include "RX600/sci_g.hpp"
+#include "RX600/sci_i.hpp"
+#include "RX600/sci_h.hpp"
+#include "RX600/rsci.hpp"
+#include "RX600/canfd.hpp"
+#include "RX600/crca.hpp"
+#include "RX600/remc.hpp"
+#include "RX660/s12adh.hpp"
+#include "RX600/r12da.hpp"
+#include "RX600/cmpc.hpp"
+#include "RX600/doca.hpp"
+#include "RX600/flash.hpp"
+
+#include "RX600/system_io.hpp"
+#include "RX600/dmac_mgr.hpp"
+#include "RX600/flash_io.hpp"
+#include "RX600/adc_in.hpp"
+#include "RX600/dac_out.hpp"
+
+#include "RX660/board_profile.hpp"
+
 #elif defined(SIG_RX671)
 #include "RX600/lvda.hpp"
 #include "RX600/cac.hpp"
@@ -460,7 +493,6 @@
 #include "RX600/dmac.hpp"
 #include "RX600/exdmac.hpp"
 #include "RX600/elc.hpp"
-#include "RX671/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX72N/poe3.hpp"
 #include "RX600/tpu.hpp"
@@ -494,7 +526,6 @@
 #include "RX600/ssie_io.hpp"
 #include "RX600/adc_in.hpp"
 #include "RX600/flash_io.hpp"
-#include "RX600/ether_io.hpp"
 
 #include "RX671/board_profile.hpp"
 

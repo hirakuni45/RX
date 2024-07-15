@@ -5,7 +5,7 @@
 			・RX64M/RX71M @n
 			・RX65N/RX651 @n
 			・RX66N @n
-			・RX671 @n
+			・RX660/RX671 @n
 			・RX72N/RX72M @n
 			・RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -70,7 +70,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>  ROMCIV;
 		};
 		static inline romciv_t<0x0008'1004> ROMCIV;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX660)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）ダミー
@@ -551,7 +551,7 @@ namespace device {
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) 
 		*/
 		//-----------------------------------------------------------------//
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX660) || defined(SIG_RX66T) || defined(SIG_RX72T)
 		static inline ro32_t<0x007F'B174> UIDR0;
 		static inline ro32_t<0x007F'B1E4> UIDR1;
 		static inline ro32_t<0x007F'B1E8> UIDR2;
@@ -591,7 +591,7 @@ namespace device {
 	typedef flash_t<65536, 3> FLASH;
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef flash_t<32768, 3> FLASH;
-#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX660) || defined(SIG_RX72N) || defined(SIG_RX72M)
 	typedef flash_t<32768, 4> FLASH;
 #elif defined(SIG_RX671)
 	typedef flash_t<8192, 4> FLASH;

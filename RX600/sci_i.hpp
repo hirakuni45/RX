@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ SCIi 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -50,7 +50,7 @@ namespace device {
 		static constexpr bool SPI_SUB   = true;		///< 簡易 SPI が利用可能な場合「true」
 	};
 
-#if defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX671)
+#if defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX660) || defined(SIG_RX671)
 	typedef scii_t<0x000D'0040, peripheral::SCI10, ICU::VECTOR::TXI10, ICU::VECTOR::RXI10,
 		ICU::GROUPAL0, ICU::GROUPAL0::TEI10, ICU::GROUPAL0::ERI10> SCI10;
 	typedef scii_t<0x000D'0060, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
