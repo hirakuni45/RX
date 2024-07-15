@@ -20,6 +20,7 @@
 
 #include "sound/sound_out.hpp"
 #include "sound/dac_stream.hpp"
+#include "sound/dac_stream_intr.hpp"
 #include "sound/psg_mng.hpp"
 
 #include "score.hpp"
@@ -32,8 +33,9 @@ namespace {
 
 #if defined(SIG_RX140)
 	// D/A 出力では、無音出力は、中間電圧とする。
-	typedef sound::sound_out<int16_t, FIFO_NUM, 4> SOUND_OUT;
-	static const int16_t ZERO_LEVEL = 0x8000;
+	// 割り込みでの直接出力の場合、OUTSは １ 固定
+	typedef sound::sound_out<int8_t, FIFO_NUM, 1> SOUND_OUT;
+	static const int8_t ZERO_LEVEL = 0x80;
 
 	// 割り込み毎に D/A 出力
 	typedef device::DA DAC;
@@ -184,10 +186,18 @@ namespace {
 	}
 #else
 	// タイマー割り込みを使って転送
+	typedef sound::dac_stream_intr<DAC, device::MTU0, SOUND_OUT> DAC_STREAM;
+	DAC_STREAM	dac_stream_(sound_out_);
 
 	void start_audio_() noexcept
 	{
-
+		auto timer_intl  = device::ICU::LEVEL::_5;
+		uint32_t freq = 48'000;
+		if(dac_stream_.start(freq, timer_intl)) {
+			utils::format("Start D/A Stream (intr): %u Hz\n") % freq;
+		} else {
+			utils::format("D/A Stream not start (intr) ...\n");
+		}
 	}
 #endif
 }
@@ -289,7 +299,7 @@ int main(int argc, char** argv)
 	cmt_.sync();
 	uint32_t avg = 0;
 	uint32_t pos = sound_out_.get_sample_pos();
-	uint32_t min = sound_out_.get_sample_size();
+	uint32_t min = SOUND_OUT::OUTS_SIZE;
 	uint32_t max = 0;
 
 	uint8_t cnt = 0;
@@ -299,7 +309,7 @@ int main(int argc, char** argv)
 		{  // 減った分を追加する。
 			auto newpos = sound_out_.get_sample_pos();
 			auto n = newpos - pos;
-			n &= sound_out_.get_sample_size() - 1;
+			n &= SOUND_OUT::OUTS_SIZE - 1;
 
 			if(min > n) min = n;
 			if(max < n) max = n;
@@ -311,10 +321,14 @@ int main(int argc, char** argv)
 			pos = newpos;
 			int8_t tmp[n];
 			psg_mng_.render(n, tmp);
-			typename SOUND_OUT::WAVE t;
 			for(uint32_t i = 0; i < n; ++i) {
 				auto w = tmp[i];
-				t.l_ch = t.r_ch = (static_cast<int16_t>(w) << 8) | ((w & 0x7f) << 1);
+				typename SOUND_OUT::WAVE t;
+				if(sizeof(SOUND_OUT::value_type) > 1) {
+					t.set((static_cast<int16_t>(w) << 8) | ((w & 0x7f) << 1));
+				} else {
+					t.set(w);
+				}
 				sound_out_.at_fifo().put(t);
 			}
 

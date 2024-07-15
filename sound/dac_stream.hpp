@@ -1,13 +1,13 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	CPU 内蔵 D/A ストリームクラス @n
+	@brief	CPU 内蔵 D/A ストリームクラス（DMAC による転送） @n
 			内蔵 D/A に、連続した値を流す。 @n
 			MTU を基準タイマーとして利用する。 @n
 			DMAC を使って、D/A に値を書き込む。 @n
 			出力の GND レベルは中心電圧とする。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -123,9 +123,8 @@ namespace sound {
 
 			{  // DMAC マネージャー開始
 				bool cpu_intr = true;
-				auto siz = sound_out_.get_sample_size();
 				auto ret = dmac_mgr_.start(DMAC_MGR::TRANS_MODE::REPEAT, DMAC_MGR::TRANS_TYPE::SP_DN_32, itv_mgr_.get_intr_vec(),
-					reinterpret_cast<uint32_t>(sound_out_.get_sample()), DAC::DADR0.address, 1024, siz,
+					reinterpret_cast<uint32_t>(sound_out_.get_sample()), DAC::DADR0.address, 1024, SOUND_OUT::OUTS_SIZE,
 					dmac_intl, cpu_intr);
 				if(!ret) {
 //					utils::format("DMAC Not start...\n");
