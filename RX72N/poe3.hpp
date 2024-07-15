@@ -1,7 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72M/RX72N ポートアウトプットイネーブル 3（POE3a）定義
+	@brief	ポートアウトプットイネーブル 3（POE3a）定義 @n
+			RX660/RX671 @n
+			RX72M/RX72N
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -457,6 +459,7 @@ namespace device {
 		static inline m4selr2_t<base + 0x27> M4SELR2;
 
 
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	MTU6 端子選択レジスタ（M6SELR）
@@ -475,6 +478,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 4>  M6DSEL;
 		};
 		static inline m6selr_t<base + 0x2A> M6SELR;
+#endif
 	};
 	typedef poe3_t<0x0008'C4C0> POE3;
 }

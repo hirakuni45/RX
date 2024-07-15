@@ -1,16 +1,22 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX671 グループ・ポート・マッピング (TMR)
+	@brief	RX660/RX671 グループ・ポート・マッピング (TMR)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
+#if defined(SIG_RX660)
+#include "RX660/peripheral.hpp"
+#include "RX660/port.hpp"
+#include "RX660/mpc.hpp"
+#elif defined(SIG_RX671)
 #include "RX671/peripheral.hpp"
 #include "RX671/port.hpp"
 #include "RX671/mpc.hpp"
+#endif
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -56,6 +62,7 @@ namespace device {
 			// P01
 			// P21
 			// PB1
+			// PH3 (RX660)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT0::PMR.B1 = 0;
@@ -72,6 +79,13 @@ namespace device {
 					MPC::PB1PFS.PSEL = sel;
 					PORTB::PMR.B1 = ena;
 					break;
+#if defined(SIG_RX660)
+				case ORDER::FOURTH:
+					PORTH::PMR.B3 = 0;
+					MPC::PH3PFS.PSEL = sel;
+					PORTH::PMR.B3 = ena;
+					break;
+#endif
 				default:
 					ret = false;
 					break;
