@@ -10,7 +10,7 @@
 			RX64M/RX71M @n
 			RX65N/RX651 @n
 			RX66N @n
-			RX671 @n
+			RX660/RX671 @n
 			RX66T/RX72T @n
 			RX72N @n
 			RX72M
@@ -4335,7 +4335,7 @@ namespace device {
 	typedef mtu6_t<peripheral::MTU6, ICU::SELECTA, clock_profile::PCLKC> MTU6;
 	typedef mtu7_t<peripheral::MTU7, ICU::SELECTA, clock_profile::PCLKC> MTU7;
 	typedef mtu9_t<peripheral::MTU9, ICU::SELECTA, clock_profile::PCLKC> MTU9;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)  // MTU3a
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX660) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)  // MTU3a
 	typedef mtu0_t<peripheral::MTU0, ICU::SELECTA, clock_profile::PCLKA> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::SELECTA, clock_profile::PCLKA> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::SELECTA, clock_profile::PCLKA> MTU2;

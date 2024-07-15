@@ -40,7 +40,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 10>  BRP;
 			bits_rw_t<io_, bitpos::B10, 7>  SJW;
-			bits_rw_t<io_, bitpos::B17, 8>  TSEG;
+			bits_rw_t<io_, bitpos::B17, 8>  TSEG1;
 			bits_rw_t<io_, bitpos::B25, 7>  TSEG2;
 		};
 		static inline nbcr_t<base + 0x00> NBCR;
@@ -173,6 +173,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0,  8>  BRP;
 			bits_rw_t<io_, bitpos::B8,  5>  TSEG1;
+
 			bits_rw_t<io_, bitpos::B16, 4>  TSEG2;
 			bits_rw_t<io_, bitpos::B24, 4>  SJW;
 		};
@@ -268,6 +269,7 @@ namespace device {
 			using in_::operator ();
 
 			bits_ro_t<in_, bitpos::B0, 21>  CRC21;
+
 			bits_ro_t<in_, bitpos::B24, 4>  SBC;
 		};
 		static inline fdcrc_t<base + 0x110> FDCRC;
@@ -364,12 +366,12 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>      DEDF;
-			bit_rw_t <in_, bitpos::B1>      MLDF;
-			bit_rw_t <in_, bitpos::B2>      THLDF;
-			bit_rw_t <io_, bitpos::B3>      PODF;
+			bit_rw_t <io_, bitpos::B0>    DEDF;
+			bit_rw_t <in_, bitpos::B1>    MLDF;
+			bit_rw_t <in_, bitpos::B2>    THLDF;
+			bit_rw_t <io_, bitpos::B3>    PODF;
 
-			bit_rw_t <io_, bitpos::B16>     EEDF0;
+			bit_rw_t <io_, bitpos::B16>   EEDF0;
 		};
 		static inline gesr_t<base + 0x20> GESR;
 
@@ -1060,7 +1062,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>      TQIE;
 
 			bit_rw_t <io_, bitpos::B7>      TQIM;
-
 			bits_rw_t<io_, bitpos::B8, 2>   QDS;
 		};
 		static inline tqcr0_t<base + 0x8C> TQCR0;
@@ -1190,7 +1191,6 @@ namespace device {
 			using in_::operator ();
 
 			bits_ro_t<in_, bitpos::B0,  16> PTR;
-
 			bits_ro_t<in_, bitpos::B16, 2>  IFL;
 		};
 		static inline thacr1_t<base + 0x744> THACR1;
@@ -1321,8 +1321,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct rtpar_t : public rw8_index_t<ofs> {
-			typedef rw8_index_t<ofs> io_;
+		struct rtpar_t : public rw32_index_t<ofs> {
+			typedef rw32_index_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -1616,7 +1616,7 @@ namespace device {
 #if defined(SIG_RX26T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	CANFD モジュール (CANFD ECC コア) for RX26T
+		@brief	CANFD モジュール (CANFD, ECC コア) for RX26T
 		@param[in]	base	ベースアドレス
 		@param[in]	ecc		ECC 制御アドレス
 	*/
@@ -1631,6 +1631,37 @@ namespace device {
 		static constexpr auto GB0V = ICU::VECTOR::RFDREQ0;	///< グローバル０・割り込みベクター
 		static constexpr auto GB1V = ICU::VECTOR::RFDREQ1;	///< グローバル１・割り込みベクター
 		static constexpr auto CH0V = ICU::VECTOR::CFDREQ0;	///< チャネル０・割り込みベクター
+
+		static constexpr auto CHEV = ICU::GROUPBL2::CHEI;	///< チャネルエラー・割り込みベクター
+		static constexpr auto CFRV = ICU::GROUPBL2::CFRI;	///< 共通 FIFO 受信・割り込みベクター
+		static constexpr auto GLEV = ICU::GROUPBL2::GLEI;	///< グローバルエラー・割り込みベクター
+		static constexpr auto RFRV = ICU::GROUPBL2::RFRI;	///< 受信 FIFO 割り込みベクター
+		static constexpr auto CHTV = ICU::GROUPBL2::CHTI;	///< チャネル送信・割り込みベクター
+		static constexpr auto RMRV = ICU::GROUPBL2::RMRI;	///< 受信メッセージバッファ・割り込みベクター
+
+		static constexpr auto EC1V = ICU::SELECTA::EC1EI;	///< １ビット ECC エラー・割り込みベクター
+		static constexpr auto EC2V = ICU::SELECTA::EC2EI;	///< ２ビット ECC エラー・割り込みベクター
+		static constexpr auto ECOV = ICU::SELECTA::ECOVI;	///< ECC オーバーフロー・割り込みベクター
+	};
+	typedef canfd_t<0x000A'8000, 0x000E'D000> CANFD;
+#elif defined(SIG_RX660)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	CANFD モジュール (CANFD, ECC コア) for RX660
+		@param[in]	base	ベースアドレス
+		@param[in]	ecc		ECC 制御アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, uint32_t ecc>
+	struct canfd_t : canfd_base_t<base>, canfd_ecc_t<ecc> {
+
+		static constexpr auto PERIPHERAL = peripheral::CANFD;	///< ペリフェラル型
+
+		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
+
+		static constexpr auto GB0V = ICU::SELECTB::RFDREQ0;	///< グローバル０・割り込みベクター
+		static constexpr auto GB1V = ICU::SELECTB::RFDREQ1;	///< グローバル１・割り込みベクター
+		static constexpr auto CH0V = ICU::SELECTB::CFDREQ0;	///< チャネル０・割り込みベクター
 
 		static constexpr auto CHEV = ICU::GROUPBL2::CHEI;	///< チャネルエラー・割り込みベクター
 		static constexpr auto CFRV = ICU::GROUPBL2::CFRI;	///< 共通 FIFO 受信・割り込みベクター

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600/RX700 グループ・DOCA 定義 @n
 			RX26T @n
-			RX671
+			RX660/RX671
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

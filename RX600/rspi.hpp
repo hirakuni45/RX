@@ -609,6 +609,9 @@ namespace device {
 #elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef rspi_c_t<0x000D'0100, peripheral::RSPI0, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
 		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUPAL0::SPEI0, ICU::GROUPAL0::SPII0> RSPI0;
+#elif defined(SIG_RX660)
+	typedef rspi_d_t<0x000D'0100, peripheral::RSPI0, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
+		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUPAL0::SPEI0, ICU::GROUPAL0::SPII0> RSPI0;
 #elif defined(SIG_RX671)
 	typedef rspi_d_t<0x000D'0100, peripheral::RSPI0, clock_profile::PCLKA, ICU::GROUPAL0, ICU::GROUPAL0,
 		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::GROUPAL0::SPEI0, ICU::GROUPAL0::SPII0> RSPI0;

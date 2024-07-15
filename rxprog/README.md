@@ -183,6 +183,31 @@ VCL: 4.7uF
 |Single Chip|-|1|
 
 ---
+### RX660/RX671:
+|Terminal|RX660 (144)|RX671 (144)|
+|---|---|---|
+|UB|PC7/UB(60)|PC7/UB(60)|
+|MD|MD/PN6(16)|MD(16)|
+|RXD|P30/RXD1(29)|P30/RXD1(29)|
+|TXD|P26/TXD1(31)|P26/TXD1(31)|
+
+RX660:
+|Mode|UB|MD|
+|---|:---:|:---:|
+|Serial Boot|0|0|
+|User Boot|1|0|
+|Single Chip|-|1|
+
+RX660: USB boot not available due to lack of USB interface
+
+RX671:
+|Mode|UB|MD|
+|---|:---:|:---:|
+|Serial Boot|0|0|
+|USB Boot|1|0|
+|Single Chip|-|1|
+
+---
 
 - MD0、MD1、UB、MD、B/UB, and EMLE terminals are pulled up or down with a resistor (approximately 4.7K).
 - Connect appropriate crystals to XTAL and EXTAL.

@@ -2,7 +2,11 @@
 //=========================================================================//
 /*!	@file
 	@brief	R12DA 定義 @n
-			RX231/RX64M/RX71M/RX65N/RX651/RX66N/RX72N/RX72M @n
+			RX231 @n
+			RX64M/RX71M @n
+			RX65N/RX651 @n
+			RX660 @n
+			RX72N/RX72M @n
 			RX26T/RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
@@ -105,7 +109,7 @@ namespace device {
 #if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX71M) || defined(SIG_RX72N) || defined(SIG_RX72M) 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	12 ビット D/A コンバータ（R12DA）
+		@brief	12 ビット D/A コンバータ（R12DAa）
 		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -195,6 +199,83 @@ namespace device {
 		}
 	};
 	typedef r12da_a_t<peripheral::R12DA> R12DA;
+
+#elif defined(SIG_RX660)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	12 ビット D/A コンバータ（R12DAb）
+		@param[in]	per		ペリフェラル型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <peripheral per>
+	struct r12da_b_t : public r12da_t<per> {
+
+		typedef r12da_t<per> base_type;
+
+		static constexpr bool DACR_DAE = true;	///< DAE フラグの有無
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ出力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ANALOG : uint8_t {
+			DA0,
+			DA1,
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  D/A 出力先選択レジスタ (DADSELR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct dadselr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> OUTDA0;
+			bit_rw_t<io_, bitpos::B1> OUTDA1;
+			bit_rw_t<io_, bitpos::B2> OUTREF0;
+			bit_rw_t<io_, bitpos::B3> OUTREF1;
+		};
+		static inline dadselr_t<0x0008'8049> DADSELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ型
+			@param[in]	f	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(ANALOG an, bool f = true)
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+			switch(an) {
+			case ANALOG::DA0:
+				PORT0::PCR.B3 = 0;
+				PORT0::PMR.B3 = 0;
+				MPC::P03PFS.ASEL = f;
+				break;
+			case ANALOG::DA1:
+				PORT0::PCR.B5 = 0;
+				PORT0::PMR.B5 = 0;
+				MPC::P05PFS.ASEL = f;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
+	};
+	typedef r12da_b_t<peripheral::R12DA> R12DA;
 
 #elif defined(SIG_RX231)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

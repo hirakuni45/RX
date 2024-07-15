@@ -190,9 +190,15 @@ ifeq ($(RX_DEF),SIG_RX66N)
   LDSCRIPT	= ../../RX66N/$(DEVICE).ld
 endif
 
+ifeq ($(RX_DEF),SIG_RX660)
+  RX_CPU = RX660
+  RX_CHOOSE = -misa=v3
+  LDSCRIPT	= ../../RX660/$(DEVICE).ld
+endif
+
 ifeq ($(RX_DEF),SIG_RX671)
   RX_CPU = RX671
-  RX_CHOOSE = -misa=v2
+  RX_CHOOSE = -misa=v3
   LDSCRIPT	= ../../RX671/$(DEVICE).ld
 endif
 

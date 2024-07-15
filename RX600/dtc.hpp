@@ -15,7 +15,7 @@
 			・RX64M/RX71M @n
 			・RX65N/RX651 @n
 			・RX66T/RX72T @n
-			・RX671 @n
+			・RX660/RX671 @n
 			・RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
@@ -183,7 +183,7 @@ namespace device {
 		static inline rw32_t<0x0008'2418> DTCDISP;
 	};
 
-#if defined(SIG_RX140) || defined(SIG_RX671)
+#if defined(SIG_RX140) || defined(SIG_RX660) || defined(SIG_RX671)
 	typedef dtcb_t DTC;
 #else
 	typedef dtca_t DTC;
