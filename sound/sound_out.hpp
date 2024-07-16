@@ -25,8 +25,12 @@ namespace sound {
 
 		wave_t() noexcept { }
 		wave_t(T v) noexcept : l_ch(v), r_ch(v) { }
+		wave_t(T l, T r) noexcept : l_ch(l), r_ch(r) { }
 		wave_t(const wave_t& t) noexcept : l_ch(t.l_ch), r_ch(t.r_ch) { }
-		void set(T zl) noexcept { l_ch = zl; r_ch = zl; }
+
+		void set(T l) noexcept { l_ch = r_ch = l; }
+		void set(T l, T r) noexcept { l_ch = l; r_ch = r; }
+
 		static wave_t linear(int32_t base, int32_t mod, const wave_t& a, const wave_t& b) noexcept
 		{
 			wave_t tmp;
@@ -34,7 +38,9 @@ namespace sound {
 			tmp.r_ch = a.r_ch + (static_cast<int32_t>(b.r_ch - a.r_ch) * mod) / base;
 			return tmp;
 		}
+
 		void offset(T ofs) noexcept { l_ch += ofs; r_ch += ofs; }
+
 		static void abs(const wave_t& in, wave_t& out) noexcept
 		{
 			out.l_ch = std::abs(in.l_ch);
@@ -59,6 +65,8 @@ namespace sound {
 		typedef T value_type;
 		typedef wave_t<T> WAVE;
 		typedef utils::fixed_fifo<WAVE, BFS> FIFO;
+
+		static constexpr auto OUTS_SIZE = OUTS;	///< 出力バッファサイズ
 
 		/// ピークレベルを超える閾値(400 sample: 48KHz : 0.5sec)
 		static constexpr uint16_t PEAK_LEVEL_FRAME = 400;
@@ -251,15 +259,6 @@ namespace sound {
 				}
 			}
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	波形バッファサイズの取得
-			@return 波形バッファサイズ
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_sample_size() const noexcept { return OUTS; }
 
 
 		//-----------------------------------------------------------------//

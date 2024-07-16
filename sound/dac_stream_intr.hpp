@@ -47,8 +47,8 @@ namespace sound {
 				auto p = static_cast<itv_t*>(itv_t_ptr_);
 				uint32_t tmp = p->wpos_;
 				++p->wpos_;
-				if((tmp ^ p->wpos_) & SOUND_OUT::OUT_SIZE) {
-					p->sound_out_.service(SOUND_OUT::OUT_SIZE);
+				if((tmp ^ p->wpos_) & SOUND_OUT::OUTS_SIZE) {
+					p->sound_out_.service(SOUND_OUT::OUTS_SIZE);
 				}
 			}
 		};
