@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ SCIa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,7 +12,6 @@
 
 namespace device {
 
-#if defined(SIG_RX621) || defined(SIG_RX62N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCIa クラス
@@ -49,8 +48,11 @@ namespace device {
 		static constexpr bool I2C_SUB    = false;	///< 簡易 I2C が利用可能な場合「true」
 		// 簡易 SPI 機能の有無
 		static constexpr bool SPI_SUB    = false;	///< 簡易 SPI が利用可能な場合「true」
+		// FIFO 機能の有無
+		static constexpr bool FIFO_FUNC  = false;	///< FIFO バッファ機能が有効な場合「true」
 	};
 
+#if defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef scia_t<0x0008'8240, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
 		ICU::VECTOR::TEI0, ICU::VECTOR::ERI0> SCI0;
 	typedef scia_t<0x0008'8248, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
