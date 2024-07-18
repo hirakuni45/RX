@@ -193,12 +193,17 @@ endif
 ifeq ($(RX_DEF),SIG_RX660)
   RX_CPU = RX660
   RX_CHOOSE = -misa=v3
+# TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+
   LDSCRIPT	= ../../RX660/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX671)
   RX_CPU = RX671
   RX_CHOOSE = -misa=v3
+# TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
   LDSCRIPT	= ../../RX671/$(DEVICE).ld
 endif
 
