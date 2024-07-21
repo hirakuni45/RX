@@ -22,7 +22,8 @@
 		"*.ipp": "cpp",
 		"tuple": "cpp",
 		"cstdint": "cpp",
-		"random": "cpp"
+		"random": "cpp",
+		"cstdlib": "cpp"
 	},
     "editor.detectIndentation": false,
     "editor.insertSpaces": false
