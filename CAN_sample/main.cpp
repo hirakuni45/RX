@@ -37,37 +37,10 @@ namespace {
 
 	static constexpr uint32_t can_cmd_ver_ = 100;
 
-#if defined(SIG_RX62N)
-	typedef device::CAN CAN0_CH;
-	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
-#elif defined(SIG_RX631)
-	// RX631 GR-CITRUS board
-	typedef device::CAN0 CAN0_CH;
-	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
-#elif defined(SIG_RX71M)
-	typedef device::CAN0 CAN0_CH;
-	typedef device::CAN1 CAN1_CH;
-	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
-	static constexpr auto CAN1_PORT = device::port_map::ORDER::FIRST;
+#if defined(SIG_RX71M)
 	#define MULTI
 #elif defined(SIG_RX64M)
-	typedef device::CAN0 CAN0_CH;
-	typedef device::CAN1 CAN1_CH;
-	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
-	static constexpr auto CAN1_PORT = device::port_map::ORDER::FIRST;
 //	#define MULTI
-#elif defined(SIG_RX65N)
-	typedef device::CAN0 CAN0_CH;
-	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
-#elif defined(SIG_RX66T)
-	typedef device::CAN0 CAN0_CH;
-	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
-#elif defined(SIG_RX72N)
-	typedef device::CAN1 CAN0_CH;
-	static constexpr auto CAN0_PORT = device::port_map::ORDER::SECOND;
-#elif defined(SIG_RX72T)
-	typedef device::CAN0 CAN0_CH;
-	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
@@ -88,7 +61,7 @@ namespace {
 	// CAN 送信バッファの定義
 	typedef utils::fixed_fifo<device::can_frame, 256> CAN_TXB;
 
-	typedef device::can_io<CAN0_CH, CAN_RXB, CAN_TXB, CAN0_PORT> CAN0;
+	typedef device::can_io<board_profile::CAN0_CH, CAN_RXB, CAN_TXB, board_profile::CAN0_PORT> CAN0;
 	CAN0	can0_;
 
 	// CAN の解析機能は CAN0 のみとする
@@ -98,7 +71,7 @@ namespace {
 	uint32_t	cur_ch_ = 0;
 
 #ifdef MULTI
-	typedef device::can_io<CAN1_CH, CAN_RXB, CAN_TXB, CAN1_PORT> CAN1;
+	typedef device::can_io<board_profile::CAN1_CH, CAN_RXB, CAN_TXB, board_profile::CAN1_PORT> CAN1;
 	CAN1	can1_;
 
 #ifdef VALID_FILTER
