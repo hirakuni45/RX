@@ -53,7 +53,6 @@ namespace device {
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::HOCO;	///< 発信器種別型
 
 		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
-		static constexpr bool       TURN_USB    = false;			///< USB を使う場合「true」
 
 		static constexpr uint32_t	BASE		=  20'000'000;		///< 外部接続クリスタル
 		static constexpr uint32_t	PLL_BASE	= 240'000'000;		///< PLL ベースクロック（最大240MHz）
@@ -65,6 +64,7 @@ namespace device {
 		static constexpr uint32_t	PCLKD		=  60'000'000;		///< PCLKD 周波数（最大60MHz）
 		static constexpr uint32_t	FCLK		=  60'000'000;		///< FCLK 周波数（最大60MHz）
 		static constexpr uint32_t	BCLK		= 120'000'000;		///< BCLK 周波数（最大120MHz）
+		static constexpr uint32_t   CANFDCLK	=  60'000'000;		///< CANFD 周波数（最大 60MHz）
 
 //		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 		static constexpr uint32_t	DELAY_MS	= ICLK / 3'116'883;	///< ソフトウェアー遅延における定数（1マイクロ秒）

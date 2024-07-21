@@ -59,6 +59,23 @@ namespace device {
 			return true;
 		}
 
+		static constexpr uint8_t canfd_clock_div_() noexcept
+		{
+			auto div = clock_profile::PLL_BASE / clock_profile::CANFDCLK;
+			auto mod = clock_profile::PLL_BASE % clock_profile::CANFDCLK;
+
+			if(mod != 0) return 0;  // fail
+			if(div == 2) return 0b0001;
+			else if(div == 4) return 0b0010;
+			else if(div == 8) return 0b0011;
+			else return 0;  // fail
+		}
+
+		static constexpr bool check_canfd_clock_div_() noexcept
+		{
+			return canfd_clock_div_() != 0;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -128,6 +145,13 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD));
 			{
 				volatile auto tmp = device::SYSTEM::SCKCR();
+			}
+
+			static_assert(check_canfd_clock_div_(), "CANFD can't divided.");
+			device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.CFDCK.b(canfd_clock_div_())
+								   | 0b0001'0001;
+			{
+				volatile auto tmp = device::SYSTEM::SCKCR2();
 			}
 
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
