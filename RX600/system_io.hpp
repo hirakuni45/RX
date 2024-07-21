@@ -5,6 +5,7 @@
 			・RX64M @n
 			・RX65N/RX651 @n
 			・RX66N @n
+			・RX660 @n
 			・RX671 @n
 			・RX71M @n
 			・RX72N/RX72M @n
@@ -115,6 +116,26 @@ namespace device {
 			}
 		}
 
+#if defined(SIG_RX660)
+		static constexpr uint8_t canfd_clock_div_() noexcept
+		{
+			auto div = clock_profile::PLL_BASE / clock_profile::CANFDCLK;
+			auto mod = clock_profile::PLL_BASE % clock_profile::CANFDCLK;
+
+			if(mod != 0) return 0;  // fail
+			if(div == 2) return 0b0001;
+			else if(div == 4) return 0b0010;
+			else if(div == 8) return 0b0011;
+			else return 0;  // fail
+		}
+
+
+		static constexpr bool check_canfd_clock_div_() noexcept
+		{
+			return canfd_clock_div_() != 0;
+		}
+#endif
+
 	public:
 		//---------------------------------------------------------------------//
 		/*!
@@ -208,6 +229,19 @@ namespace device {
 				volatile auto tmp = device::SYSTEM::SCKCR();
 			}
 
+#if defined(SIG_RX660)
+			static_assert(check_canfd_clock_div_(), "CANFD can't divided.");
+			device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.CFDCK.b(canfd_clock_div_())
+								   | 0b0001'0001;
+#else
+			static_assert(usb_div_() >= 2 && usb_div_() <= 5, "USB Clock can't divided.");
+			// 1/2:0b0001, 1/3:0b0010, 1/4:0b0011, 1/5:0b0100
+			device::SYSTEM::SCKCR2.UCK = usb_div_() - 1;
+#endif
+			{
+				volatile auto tmp = device::SYSTEM::SCKCR2();
+			}
+
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
 			// ... MAX x30.0
 			static_assert((clock_profile::PLL_BASE * 2 / clock_profile::BASE) >= 20, "PLL_BASE clock divider underflow.");
@@ -219,10 +253,6 @@ namespace device {
 				volatile auto tmp = device::SYSTEM::PLLCR2();
 			}
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
-
-			static_assert(usb_div_() >= 2 && usb_div_() <= 5, "USB Clock can't divided.");
-			// 1/2:0b0001, 1/3:0b0010, 1/4:0b0011, 1/5:0b0100
-			device::SYSTEM::SCKCR2.UCK = usb_div_() - 1;
 
 			// 機種によっては、ICLK をブーストする前に FCLK 周期を設定する必要がある。
 			device::FLASH::set_eepfclk(clock_profile::FCLK);

@@ -40,4 +40,11 @@ namespace board_profile {
 
 	// RIIC ポートの定義
 	typedef device::RIIC0 RIIC_CH;
+
+	// CAN ポートの定義
+	typedef device::CAN0 CAN0_CH;
+	typedef device::CAN1 CAN1_CH;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
+	static constexpr auto CAN1_PORT = device::port_map::ORDER::FIRST;
+
 }

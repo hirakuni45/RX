@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCIe クラス
+		@brief  SCIa クラス
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -183,7 +183,7 @@ namespace device {
 			@brief	モジュレーションデューティレジスタ（MDDR）ダミー
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw8_null_t<0x00000000> MDDR;
+		static inline rw8_null_t<0x0000'0000> MDDR;
 	};
 
 
@@ -489,13 +489,13 @@ namespace device {
 			@brief	モジュレーションデューティレジスタ（MDDR）ダミー
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw8_null_t<0x00000000> MDDR;
+		static inline rw8_null_t<0x0000'0000> MDDR;
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCIgj クラス
+		@brief  SCIg, SCIj クラス
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -817,12 +817,77 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7> CKPH;
 		};
 		static inline spmr_t<base + 0x0D> SPMR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  比較データレジスタ (CDR)
+			@param[in]	ofs		レジスタ・オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct cdr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 9> CMPD;
+		};
+		static inline cdr_t<base + 0x1A> CDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  データ比較制御レジスタ (DCCR)
+			@param[in]	ofs		レジスタ・オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct dccr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>     DCMF;
+
+			bit_rw_t<io_, bitpos::B3>     DPER;
+			bit_rw_t<io_, bitpos::B4>     DFER;
+
+			bit_rw_t<io_, bitpos::B6>     IDSEL;
+			bit_rw_t<io_, bitpos::B7>     DCME;
+		};
+		static inline dccr_t<base + 0x13> DCCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  シリアルポートレジスタ (SPTR)
+			@param[in]	ofs		レジスタ・オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct sptr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>     RXDMON;
+			bit_rw_t<io_, bitpos::B1>     SPB2DT;
+			bit_rw_t<io_, bitpos::B2>     SPB2IO;
+		};
+		static inline sptr_t<base + 0x13> SPTR;
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCI FIFO クラス（sci_gj_t）に追加する機能（FIFO 制御）
+		@brief  SCI FIFO クラス（sci_[gjm]_t）に追加する機能（FIFO 制御）
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -964,71 +1029,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 5> PNUM;
 		};
 		static inline lsr_t<base + 0x18> LSR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  比較データレジスタ (CDR)
-			@param[in]	ofs		レジスタ・オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct cdr_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 9> CMPD;
-		};
-		static inline cdr_t<base + 0x1A> CDR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  データ比較制御レジスタ (DCCR)
-			@param[in]	ofs		レジスタ・オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct dccr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>     DCMF;
-
-			bit_rw_t<io_, bitpos::B3>     DPER;
-			bit_rw_t<io_, bitpos::B4>     DFER;
-
-			bit_rw_t<io_, bitpos::B6>     IDSEL;
-			bit_rw_t<io_, bitpos::B7>     DCME;
-		};
-		static inline dccr_t<base + 0x13> DCCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  シリアルポートレジスタ (SPTR)
-			@param[in]	ofs		レジスタ・オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct sptr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>     RXDMON;
-			bit_rw_t<io_, bitpos::B1>     SPB2DT;
-			bit_rw_t<io_, bitpos::B2>     SPB2IO;
-		};
-		static inline sptr_t<base + 0x13> SPTR;
 	};
 
 

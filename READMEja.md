@@ -11,8 +11,8 @@ Renesas RX Microcontroller
 ### 現在、Renesas GNU-RX gcc 8.3.0 をメインに使って開発しています。
 - [Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/)からダウンロード出来ます。
 - gcc 8.3.0 は、C++17 に対応したコンパイラで、RXv3、DFPU、TFU に対応しており、最適化も優れています。   
-- RX26T を利用する場合 TFUv2 に対応する、202305 以降のバージョンが必要です。
-- 202305 は、TFU の mathlib オプションを使うと、C++ のコンパイルで、cmath をインクルードするとエラーが発生するようです。
+- RX26T を利用する場合 TFUv2 に対応する、202405 以降のバージョンが必要です。
+- 202405 は、TFU の mathlib オプションを使うと、C++ のコンパイルで、cmath をインクルードするとエラーが発生するようです。
 
 ---
 

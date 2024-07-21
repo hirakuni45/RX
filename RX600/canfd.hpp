@@ -1,8 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX700 グループ・CANFD 定義 @n
+	@brief	CANFD 定義 @n
 			※新型 CAN コントローラー @n
+			・RX660 (CANFD-Lite) @n
 			・RX26T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
@@ -11,7 +12,6 @@
 */
 //=========================================================================//
 #include "common/device.hpp"
-#include "RX600/can_frame.hpp"
 
 namespace device {
 
@@ -1427,94 +1427,216 @@ namespace device {
 		};
 		static inline rmier_t<base + 0x38> RMIER;
 
-#if 0
-		//-----------------------------------------------------------------//
+
+	// -------------------- メッセージ・バッファ関係定義 ---------------------//
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  メールボックスレジスタ j （ MB[j] ）（ j = 0 ～ 31 ） @n
-					※MB0 ～ MB31 の定義は冗長なので割愛してある、MB[n] でアクセスの事
+			@brief  メッセージバッファフィールド（読出し専用データフィールド）
+			@param[in]	BN		バッファ数
+			@param[in]	ofs		オフセット
 		*/
-		//-----------------------------------------------------------------//
-		struct mb_t {
-			typedef rw32_index_t<base +  0> io0_;
-			typedef rw8_index_t <base +  4 + 1> io1_;
-			typedef rw16_index_t<base + 12 + 2> io3_;
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t BN, uint32_t ofs>
+		struct msgbuf_rod_t {
 
-			bits_rw_t<io0_, bitpos::B0,  18>  EID;
-			bits_rw_t<io0_, bitpos::B18, 11>  SID;
-			bit_rw_t <io0_, bitpos::B30>      RTR;
-			bit_rw_t <io0_, bitpos::B31>      IDE;
+			typedef rw32_index_t<base + ofs + 0> hf0_;
+			rw32_t<hf0_::address> HF0;
+			bits_rw_t<hf0_, bitpos::B0,  29>  ID;
+			bit_rw_t <hf0_, bitpos::B29>      THENT;
+			bit_rw_t <hf0_, bitpos::B30>      RTR;
+			bit_rw_t <hf0_, bitpos::B31>      IDE;
 
-			bits_rw_t<io1_, bitpos::B0, 4>    DLC;
+			typedef rw32_index_t<base + ofs + 4> hf1_;
+			rw32_t<hf1_::address> HF1;
+			bits_rw_t<hf1_, bitpos::B0,  16>  TS;
+			bits_rw_t<hf1_, bitpos::B28,  4>  DLC;
+
+			typedef rw32_index_t<base + ofs + 8> hf2_;
+			rw32_t<hf2_::address> HF2;
+			bit_rw_t <hf2_, bitpos::B0>       ESI;
+			bit_rw_t <hf2_, bitpos::B1>       BRS;
+			bit_rw_t <hf2_, bitpos::B2>       FDF;
+
+			bits_rw_t<hf2_, bitpos::B8,  2>   IFL;
+
+			bits_rw_t<hf2_, bitpos::B16, 16>  PTR;
+
+			typedef rw32_index_t<base + ofs + 12> df0_;
+			struct df_t {
+				// 32ビット単位、読出し専用
+				uint32_t operator() (uint32_t n) noexcept {
+					if(n >= 16) n = 15;
+					return rd32_(df0_::address + n * 4);
+				}
+
+				volatile const uint32_t& operator [] (uint32_t n) const noexcept {
+					if(n >= 16) n = 15;
+					return *reinterpret_cast<volatile uint32_t*>(df0_::address + n * 4);
+				}
+			};
+			df_t	DF;
 
 			struct data_t {
-				volatile uint8_t& operator [] (uint32_t n) {
-					return *reinterpret_cast<volatile uint8_t*>(io0_::address + 6 + n);
+				// バイト単位、読出し専用
+				uint8_t operator() (uint32_t n) noexcept {
+					if(n >= 64) n = 63;
+					return rd8_(df0_::address + n);
+				}
+
+
+				volatile const uint8_t& operator [] (uint32_t n) const noexcept {
+					if(n >= 64) n = 63;
+					return *reinterpret_cast<volatile uint8_t*>(df0_::address + n);
 				}
 			};
 			data_t	DATA;
 
-			io3_	TS;
 
-			void set_index(uint32_t j) noexcept
+			void set_index(uint32_t idx) noexcept
 			{
-				if(j < 32) {
-					io0_::index = j * 16;
-					io1_::index = j * 16;
-					io3_::index = j * 16;
+				if(idx < BN) {
+					hf0_::index = idx * 0x4C;
+					hf1_::index = idx * 0x4C;
+					hf2_::index = idx * 0x4C;
+					df0_::index = idx * 0x4C;
 				}
 			}
 
-			void clear(uint32_t d = 0) noexcept
-			{
-				auto a = io0_::address;
-				wr32_(a,      d);
-				wr32_(a +  4, d);
-				wr32_(a +  8, d);
-				wr32_(a + 12, d);
-			}
 
-			uint32_t get_id() noexcept {
-				return SID() | (EID() << 11);
-			}
-
-			void set_id(uint32_t id) noexcept {
-				SID = id & 0x7ff;
-				EID = id >> 11;
-			}
-
-			void copy(uint32_t idx) noexcept {
-				wr32_(io0_::address + io0_::index +  0, rd32_(base + idx * 16 +  0));
-				wr32_(io0_::address + io0_::index +  4, rd32_(base + idx * 16 +  4));
-				wr32_(io0_::address + io0_::index +  8, rd32_(base + idx * 16 +  8));
-				wr32_(io0_::address + io0_::index + 12, rd32_(base + idx * 16 + 12));
-			}
-
-			void set(const can_frame& src) noexcept {
-				wr32_(io0_::address + io0_::index +  0, src[0]);
-				wr32_(io0_::address + io0_::index +  4, src[1]);
-				wr32_(io0_::address + io0_::index +  8, src[2]);
-				wr32_(io0_::address + io0_::index + 12, src[3]);
-			}
-
-			void get(can_frame& dst) noexcept {
-				dst[0] = rd32_(io0_::address + io0_::index +  0);
-				dst[1] = rd32_(io0_::address + io0_::index +  4);
-				dst[2] = rd32_(io0_::address + io0_::index +  8);
-				dst[3] = rd32_(io0_::address + io0_::index + 12);
-			}
-
-			mb_t& operator [] (uint32_t idx) {
+			msgbuf_rod_t& operator [] (uint32_t idx) noexcept {
 				set_index(idx);
 				return *this;
 			}
 
 		private:
-			void operator = (const mb_t& t) { };  // 代入は禁止
+			void operator = (const msgbuf_rod_t& t) { };  // 代入は禁止
 		};
-		typedef mb_t MB_;
-		static  MB_ MB;
-#endif
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メッセージバッファフィールド（読み書きデータフィールド）
+			@param[in]	BN		バッファ数
+			@param[in]	ofs		オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t BN, uint32_t ofs>
+		struct msgbuf_rwd_t {
+
+			typedef rw32_index_t<base + ofs + 0> hf0_;
+			rw32_t<hf0_::address> HF0;
+			bits_rw_t<hf0_, bitpos::B0,  29>  ID;
+			bit_rw_t <hf0_, bitpos::B29>      THENT;
+			bit_rw_t <hf0_, bitpos::B30>      RTR;
+			bit_rw_t <hf0_, bitpos::B31>      IDE;
+
+			typedef rw32_index_t<base + ofs + 4> hf1_;
+			rw32_t<hf1_::address> HF1;
+			bits_rw_t<hf1_, bitpos::B0,  16>  TS;
+			bits_rw_t<hf1_, bitpos::B28,  4>  DLC;
+
+			typedef rw32_index_t<base + ofs + 8> hf2_;
+			rw32_t<hf2_::address> HF2;
+			bit_rw_t <hf2_, bitpos::B0>       ESI;
+			bit_rw_t <hf2_, bitpos::B1>       BRS;
+			bit_rw_t <hf2_, bitpos::B2>       FDF;
+
+			bits_rw_t<hf2_, bitpos::B8,  2>   IFL;
+
+			bits_rw_t<hf2_, bitpos::B16, 16>  PTR;
+
+			typedef rw32_index_t<base + ofs + 12> df0_;
+			struct df_t {
+				// 32ビット単位、読出し専用
+				uint32_t operator() (uint32_t n) noexcept {
+					if(n >= 16) n = 15;
+					return rd32_(df0_::address + n * 4);
+				}
+
+				void set(uint32_t n, uint32_t d) noexcept {
+					if(n >= 16) n = 15;
+					return wr32_(df0_::address + n * 4, d);
+				}
+
+				volatile uint32_t& operator [] (uint32_t n) noexcept {
+					if(n >= 16) n = 15;
+					return *reinterpret_cast<volatile uint32_t*>(df0_::address + n * 4);
+				}
+			};
+			df_t	DF;
+
+			struct data_t {
+				// バイト単位、読出し専用
+				uint8_t operator() (uint32_t n) noexcept {
+					if(n >= 64) n = 63;
+					return rd8_(df0_::address + n);
+				}
+
+				void set(uint32_t n, uint32_t d) noexcept {
+					if(n >= 64) n = 64;
+					return wr8_(df0_::address + n, d);
+				}
+
+				volatile uint8_t& operator [] (uint32_t n) noexcept {
+					if(n >= 64) n = 63;
+					return *reinterpret_cast<volatile uint8_t*>(df0_::address + n);
+				}
+			};
+			data_t	DATA;
+
+
+			void set_index(uint32_t idx) noexcept
+			{
+				if(idx < BN) {
+					hf0_::index = idx * 0x4C;
+					hf1_::index = idx * 0x4C;
+					hf2_::index = idx * 0x4C;
+					df0_::index = idx * 0x4C;
+				}
+			}
+
+
+			msgbuf_rwd_t& operator [] (uint32_t idx) noexcept {
+				set_index(idx);
+				return *this;
+			}
+
+		private:
+			void operator = (const msgbuf_rwd_t& t) { };  // 代入は禁止
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信メッセージバッファ n (RMB[n]) (n = 0 ～ 31) 
+		*/
+		//-----------------------------------------------------------------//
+		static inline msgbuf_rod_t<32, 0x920> RMB;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信 FIFO n (RFB[n]) (n = 0, 1) 
+		*/
+		//-----------------------------------------------------------------//
+		static inline msgbuf_rod_t<2, 0x520> RFB;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  共通 FIFO 0 (CFB)
+		*/
+		//-----------------------------------------------------------------//
+		static inline msgbuf_rod_t<1, 0x5B8> CFB;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  共通 送信メッセージバッファ n (TMB[n]) (n = 0 ～ 3)
+		*/
+		//-----------------------------------------------------------------//
+		static inline msgbuf_rwd_t<4, 0x604> TMB;
 	};
 
 
@@ -1626,7 +1748,7 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = peripheral::CANFD;	///< ペリフェラル型
 
-		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
+		static constexpr auto PCLK = clock_profile::CANFDCLK;	///< クロック周波数
 
 		static constexpr auto GB0V = ICU::VECTOR::RFDREQ0;	///< グローバル０・割り込みベクター
 		static constexpr auto GB1V = ICU::VECTOR::RFDREQ1;	///< グローバル１・割り込みベクター
@@ -1647,7 +1769,7 @@ namespace device {
 #elif defined(SIG_RX660)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	CANFD モジュール (CANFD, ECC コア) for RX660
+		@brief	CANFD-Lite モジュール (CANFD, ECC コア) for RX660
 		@param[in]	base	ベースアドレス
 		@param[in]	ecc		ECC 制御アドレス
 	*/
@@ -1657,7 +1779,7 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = peripheral::CANFD;	///< ペリフェラル型
 
-		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック周波数
+		static constexpr auto PCLK = clock_profile::CANFDCLK;	///< クロック周波数
 
 		static constexpr auto GB0V = ICU::SELECTB::RFDREQ0;	///< グローバル０・割り込みベクター
 		static constexpr auto GB1V = ICU::SELECTB::RFDREQ1;	///< グローバル１・割り込みベクター

@@ -5,7 +5,9 @@
             基板の基本的な定義 @n
 			- LED port order @n
 			- SCI channel, port_map order @n
-			- CMT channel
+			- CMT channel @n
+			- RIIC channel @n
+			- CANFD channel
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -39,4 +41,8 @@ namespace board_profile {
 
 	// RIIC ポートの定義
 	typedef device::RIIC0 RIIC_CH;
+
+	// CANFD ポートの定義
+	typedef device::CANFD CANFD0_CH;
+	static constexpr auto CANFD_PORT = device::port_map::ORDER::FIRST;
 }

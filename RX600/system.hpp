@@ -325,7 +325,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B4, 4> UCK;
+			bits_rw_t<io_, bitpos::B4,  4> UCK;
+
+			bits_rw_t<io_, bitpos::B12, 4> CFDCK;
 		};
 		static inline sckcr2_t<0x0008'0024> SCKCR2;
 

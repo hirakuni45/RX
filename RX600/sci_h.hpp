@@ -37,19 +37,21 @@ namespace device {
 		static constexpr auto PCLK		 = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//ボーレート微調整
-		static constexpr bool SEMR_BRME = true;		///< SEMR.BRME が利用可能な場合「true」
+		static constexpr bool SEMR_BRME  = true;	///< SEMR.BRME が利用可能な場合「true」
 		// ボーレート倍速
-		static constexpr bool SEMR_BGDM = true;		///< SEMR.BGDM  が利用可能な場合「true」
+		static constexpr bool SEMR_BGDM  = true;	///< SEMR.BGDM  が利用可能な場合「true」
 		// ノイズフィルタ
-		static constexpr bool SEMR_NFEN = true;		///< SEMR.NFEN　が利用可能な場合「true」
+		static constexpr bool SEMR_NFEN  = true;	///< SEMR.NFEN　が利用可能な場合「true」
 		// 調歩同期基本クロックセレクト拡張
 		static constexpr bool SEMR_ABCSE = false;	///< SEMR.ABCSE が利用可能な場合「true」
 		// 受信データフル
-		static constexpr bool SSR_RDRF  = true;		///< SSR.RDRF が利用可能な場合「true」
+		static constexpr bool SSR_RDRF   = true;	///< SSR.RDRF が利用可能な場合「true」
 		// 簡易 I2C 機能の有無
-		static constexpr bool I2C_SUB   = true;		///< 簡易 I2C が利用可能な場合「true」
+		static constexpr bool I2C_SUB    = true;	///< 簡易 I2C が利用可能な場合「true」
 		// 簡易 SPI 機能の有無
-		static constexpr bool SPI_SUB   = true;		///< 簡易 SPI が利用可能な場合「true」
+		static constexpr bool SPI_SUB    = true;	///< 簡易 SPI が利用可能な場合「true」
+		// FIFO 機能の有無
+		static constexpr bool FIFO_FUNC  = false;	///< FIFO バッファ機能が有効な場合「true」
 	};
 
 	typedef scih_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
@@ -79,19 +81,21 @@ namespace device {
 		static constexpr auto PCLK		 = clock_profile::PCLKB;	///< PCLK 周波数
 
 		//ボーレート微調整
-		static constexpr bool SEMR_BRME = true;		///< SEMR.BRME が利用可能な場合「true」
+		static constexpr bool SEMR_BRME  = true;	///< SEMR.BRME が利用可能な場合「true」
 		// ボーレート倍速
-		static constexpr bool SEMR_BGDM = true;		///< SEMR.BGDM  が利用可能な場合「true」
+		static constexpr bool SEMR_BGDM  = true;	///< SEMR.BGDM  が利用可能な場合「true」
 		// ノイズフィルタ
-		static constexpr bool SEMR_NFEN = true;		///< SEMR.NFEN　が利用可能な場合「true」
+		static constexpr bool SEMR_NFEN  = true;	///< SEMR.NFEN　が利用可能な場合「true」
 		// 調歩同期基本クロックセレクト拡張
 		static constexpr bool SEMR_ABCSE = false;	///< SEMR.ABCSE が利用可能な場合「true」
 		// 受信データフル
-		static constexpr bool SSR_RDRF  = true;		///< SSR.RDRF が利用可能な場合「true」
+		static constexpr bool SSR_RDRF	 = true;	///< SSR.RDRF が利用可能な場合「true」
 		// 簡易 I2C 機能の有無
-		static constexpr bool I2C_SUB   = true;		///< 簡易 I2C が利用可能な場合「true」
+		static constexpr bool I2C_SUB    = true;	///< 簡易 I2C が利用可能な場合「true」
 		// 簡易 SPI 機能の有無
-		static constexpr bool SPI_SUB   = true;		///< 簡易 SPI が利用可能な場合「true」
+		static constexpr bool SPI_SUB    = true;	///< 簡易 SPI が利用可能な場合「true」
+		// FIFO 機能の有無
+		static constexpr bool FIFO_FUNC  = false;	///< FIFO バッファ機能が有効な場合「true」
 	};
 
 	typedef scih_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,

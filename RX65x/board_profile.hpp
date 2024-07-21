@@ -40,6 +40,10 @@ namespace board_profile {
 	// RIIC ポートの定義
 	typedef device::RIIC0 RIIC_CH;
 
+	// CAN ポートの定義
+	typedef device::CAN0 CAN0_CH;
+	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
+
 	// QSPI ポートの定義
 	static constexpr auto QSPI_PORT = device::port_map_order::RX65N_ENVISION_KIT::QSPI;
 
