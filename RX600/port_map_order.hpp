@@ -2,7 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	ポート・マッピング・オーダー型 @n
-            ポートの機能設定において、どのピンを利用するかを、選択する「型」
+            ポート指定において、どのピンを利用するかを、選択する「型」
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,7 +16,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ポート・マッピング・オーダー型
+		@brief  ポート・マッピング・オーダー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct port_map_order {
@@ -75,13 +75,13 @@ namespace device {
 		/// ポート・マッピング・ユーザー設定関数型
 		typedef std::function<bool (peripheral per, bool ena)> USER_FUNC_TYPE;
 
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  タイマー・チャネル型（MTUx, TPUx, GPTx, GPTWx）
+			@brief  チャネル型（MTUx, TPUx, GPTx, GPTWx）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CHANNEL : uint8_t {
+			NONE,	///< 無効なチャネル
 			A,		///< MTIOCxA(MTUx), TIOCAx(TPUx), GPTWx A (GTIOCxA)
 			B,		///< MTIOCxB(MTUx), TIOCBx(TPUx), GPTWx B (GTIOCxB)
 			C,		///< MTIOCxC(MTUx), TIOCCx(TPUx)
@@ -102,7 +102,6 @@ namespace device {
 			TMO,	///< TMOx  (TMR)
 			TMCI,	///< TMCIx (TMR)
 			TMRI,	///< TMRIx (TMR)
-			NONE,	///< 無効なチャネル
 		};
 
 
@@ -123,6 +122,22 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class RX72N_ENVISION_KIT : uint8_t {
 			QSPI,
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RSPI ポート・チャネル型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class RSPI_PORT : uint8_t {
+			CLK,		///< SPCK
+			MOSI,		///< MOSI
+			MISO,		///< MISO
+			SSL0,		///< SSL0
+			SSL1,		///< SSL1
+			SSL2,		///< SSL2
+			SSL3,		///< SSL3
 		};
 
 

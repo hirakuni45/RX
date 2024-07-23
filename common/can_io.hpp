@@ -1,16 +1,16 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX グループ・CAN I/O 制御 @n
 			・CAN クロックは、正確に一致しない場合、エラーとする。 @n
 			・CAN ポートに、CAN バス・トランシーバーを接続する。 @n
 			・CAN ペリフェラル内蔵 FIFO 機能は使わない設計とする。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
 #include "common/delay.hpp"
