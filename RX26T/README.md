@@ -1,25 +1,26 @@
 
-## RX24T feature / 特徴
+## RX26T feature / 特徴
 
-- RXv2 core / コア
-- Maximum operating frequency / 最大動作周波数 80MHz
+- RXv3 core / コア
+- Maximum operating frequency / 最大動作周波数 120MHz
 - IEEE754 FPU on board (single precision floating point) / FPU 搭載（単精度浮動小数点）
+- TFUv2 on board (Arithmetic Unit for Trigonometric Functions) / TFUv2 搭載（三角関数演算器）
+- CANFD Module on board / CANFD 搭載
 - 2.7V ～ 5.5V Operation / 動作
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
-- 8 Bits D/A / ８ビットＤ／Ａ変換器
+- 12 Bits D/A / １２ビットＤ／Ａ変換器
 
 ---
 
-## RX24T Linker file / リンカーファイル
+## RX26T Linker file / リンカーファイル
 
 |Type|Program|RAM|Data Flash|Source|
 |---|:-:|:-:|:-:|---|
-|R5F524T8|128K|16K|8K|[R5F524T8.ld](R5F524T8.ld)|
-|R5F524TA|256K|16K|8K|[R5F524TA.ld](R5F524TA.ld)|
+|R5F526TF|512K|64K|16K|[R5F526TF.ld](R5F526TF.ld)|
 
 ---
 
-## RX24T Dedicated class / 専用クラス
+## RX26T Dedicated class / 専用クラス
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
@@ -35,13 +36,9 @@
 |Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp)||
 |Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
 |Port Mapping TMR/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp)||
-|Port Mapping GPT/ポートマッピング GPT|[port_map_gpt.hpp](port_map_gpt.hpp)||
+|Port Mapping GPTW/ポートマッピング GPTW|[port_map_gptw.hpp](port_map_gptw.hpp)||
 |FLASH Definition/FLASH 定義|[flash.hpp](flash.hpp)||
-|FLASH Definition/FLASH I/O 定義|[flash_io.hpp](flash_io.hpp)||
-|LVDA Definition/LVDA 定義|[lvda.hpp](lvda.hpp)||
-|POE3 Definition/POE3 定義|[poe2.hpp](poe3.hpp)||
-|D/A Definition/D/A 定義|[da.hpp](da.hpp)||
-|A/D Definition/A/D 定義|[s12ad.hpp](s12ad.hpp)||
+|A/D Definition/A/D 定義|[s12adh.hpp](s12adh.hpp)||
 |System Definition/システム定義|[system.hpp](system.hpp)||
 |System I/O Definition/システム I/O 定義|[system_io.hpp](system_io.hpp)||
 
@@ -50,7 +47,7 @@
 ## Basic Pin Assignments / 基本ピンアサイン
 
 |Terminal/端子|LFQFP 100|
-|---|---|---|
+|---|---|
 |VCL|VCL(5)|
 |Reset Input/リセット入力|RES#(10)|
 |Mode Controle/モード制御|MD/FINED(6)|
@@ -58,9 +55,8 @@
 |TXD|PD3/TXD1(22)|
 |Power/電源|VCC(14), VCC(29), VCC(42), VCC(60)|
 |GND/接地|VSS(3), VSS(12), VSS(31), VSS(44), VSS(62)|
-|Analog Power/アナログ電源|AVCC0(93), AVCC1(92), AVCC2(71)|
+|Analog Power/アナログ電源|AVCC0(93), AVCC1(92), AVCC2(72)|
 |Analog GND/アナログ接地|AVSS0(94), AVSS1(95), AVSS2(73)|
-|Analog Refarence/アナログ基準電源|VREF(72)|
 |OSC in|EXTAL(13)|
 |OSC out|XTAL(11)|
 

@@ -67,7 +67,7 @@ endif
 
 ifeq ($(RX_DEF),SIG_RX140)
   RX_CPU = RX140
-  RX_CHOOSE = -misa=v2
+  RX_CHOOSE = -mcpu=rx140
   LDSCRIPT	= ../../RX140/$(DEVICE).ld
   PROG_ERASE =
 endif
@@ -82,7 +82,7 @@ endif
 
 ifeq ($(RX_DEF),SIG_RX231)
   RX_CPU = RX231
-  RX_CHOOSE = -misa=v2
+  RX_CHOOSE = -mcpu=rx230
   LDSCRIPT	= ../../RX231/$(DEVICE).ld
   PROG_ERASE =
 endif
