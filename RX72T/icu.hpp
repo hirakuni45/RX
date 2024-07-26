@@ -1,8 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72T グループ・ICUC 定義 @n
-			RX72T 共通
+	@brief	RX66T/RX72T グループ・ICUC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
