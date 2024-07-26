@@ -4,7 +4,7 @@
 			RAM:    0 wait (1 cycle) @n
 			ECCRAM: 1 wait (2 cycle)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -27,7 +27,7 @@ MEMORY {
 /*	ISTACK (w) : ORIGIN = 0x01000000, LENGTH = 4 /* istack for ECCRAM (2048) bytes  */
 
 	ECCRAM (w) : ORIGIN = 0x00FFC000, LENGTH = 0x00004000 /* 16K */
-	ROM (w)    : ORIGIN = 0xFFF00000, LENGTH = 0x000FFFD0 /* 1024K - hw_vectors(48) */
+	ROM (w)    : ORIGIN = 0xFFF80000, LENGTH = 0x000FFFD0 /* 512K - hw_vectors(48) */
 }
 
 SECTIONS

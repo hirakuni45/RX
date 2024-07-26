@@ -1,7 +1,7 @@
 /*!	@file
 	@brief	RX671 R5F5671C リンカー・スクリプト
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,9 +15,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX671 chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00800000, LENGTH = 0x0005C000 /* 384k - (USTACK+ISTACK)(0x4000) */
-	USTACK (w) : ORIGIN = 0x0085F000, LENGTH = 4 /* ustack 8192+4096 */
-	ISTACK (w) : ORIGIN = 0x00860000, LENGTH = 4 /* istack 4096 */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0005C000 /* 384k - (USTACK+ISTACK)(16384) */
+	USTACK (w) : ORIGIN = 0x0005F800, LENGTH = 4 /* ustack 14336 */
+	ISTACK (w) : ORIGIN = 0x00060000, LENGTH = 4 /* istack 2048 */
 	ROM (w)    : ORIGIN = 0xFFE80000, LENGTH = 0x0018FFD0 /* 1.5M */
 }
 
