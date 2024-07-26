@@ -1,29 +1,33 @@
-## RX651/RX65N features / 特徴
+## RX72M features / 特徴
 
-- RXv2 core / RXv2 コア
-- Maximum operating frequency 120MHz / 最大動作周波数 120MHz
+- RXv3 core / RXv3 コア
+- Maximum operating frequency 240MHz / 最大動作周波数 240MHz
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
+- Double-precision 64-bit IEEE-754 floating point / 64 ビット倍精度浮動小数点
 - 2.7V ～ 3.6V Operation / 動作
 - IEEE1588 Ether-MAC (10/100 Mbps)
 - USB2.0 Full Speed, Host, Function
 - CAN (ISO11898-1)
+- Serial Sound Interface (SSIE) / シリアルサウンドインタフェース (SSIE)
 - SD Host Interface (SDHI) / SD ホストインタフェース (SDHI)
 - Graphic LCD Controller (GLCDC) / グラフィック LCD コントローラ (GLCDC)
 - 2D Drawing Engine (DRW2D) / 2D 描画エンジン (DRW2D)
+- Arithmetic Unit for Trigonometric Functions (TFUv1) / 三角関数演算器 (TFUv1)
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
 ---
 
-## RX651/RX65N Linker file / リンカーファイル
+## RX72M Linker file / リンカーファイル
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F565NE|2048K|256K+384K+8K|32K|[R5F565NE.ld](R5F565NE.ld)|12288|4096|
+|R5F572MD|2048K|512K+512K+32K+8K|64K|[R5F572MD.ld](R5F572MD.ld)|12288|4096|
+|R5F572MN|4096K|512K+512K+32K+8K|64K|[R5F572MN.ld](R5F572MN.ld)|12288|4096|
 
 ---
 
-## RX651/RX65N Dedicated class / 専用クラス
+## RX72M Dedicated class / 専用クラス
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
@@ -36,10 +40,6 @@
 |Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp)||
 |Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp)||
 |Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
-|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
-|Port Mapping QSPI/ポートマッピング QSPI|[port_map_qspi.hpp](port_map_qspi.hpp)||
-|Port Mapping TPU/ポートマッピング TPU|[port_map_tpu.hpp](port_map_tpu.hpp)||
-|POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp)||
 
 ---
 
@@ -80,6 +80,8 @@
 |Serial BOOT/シリアルブート|0|0|-|
 |USB Boot/USB ブート|1|0|0/1|
 |Single Chip/シングルチップ|-|1|-|
+
+- EMLE: 0
 
 ---
 

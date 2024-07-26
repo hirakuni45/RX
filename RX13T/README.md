@@ -1,21 +1,21 @@
 
-## RX13T feature / 特徴
+## RX13T features / 特徴
 
-- RXv1 core / コア
-- Maximum operating frequency / 最大動作周波数 32MHz
-- FPU on board (single precision floating point) / FPU 搭載（単精度浮動小数点）
+- RXv1 core / RXv1 コア
+- Maximum operating frequency 32MHz / 最大動作周波数 32MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 2.7V ～ 5.5V Operation / 動作
-- 12 Bits A/D, 8 Channels (Sample hold: 3 Channels) / ８チャネル１２ビットＡ／Ｄ変換器（サンプルホールド３チャネル）
-- 8 Bits D/A, 1 Channel (for Compalator) / コンパレーター専用 8 ビットＤ／Ａ変換器
+- 12 Bits A/D / １２ビットＡ／Ｄ変換器
+- 8 Bits D/A / ８ビットＤ／Ａ変換器
 
 ---
 
 ## RX13T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|
-|---|:-:|:-:|:-:|---|
-|R5F513T3|64K|12K|4K|[R5F513T3.ld](R5F513T3.ld)|
-|R5F513T5|128K|12K|4K|[R5F513T5.ld](R5F513T5.ld)|
+|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F513T3|64K|12K|4K|[R5F513T3.ld](R5F513T3.ld)|512|256|
+|R5F513T5|128K|12K|4K|[R5F513T5.ld](R5F513T5.ld)|512|256|
 
 ---
 
@@ -37,8 +37,6 @@
 |A/D Definition/A/D 定義|[s12ad.hpp](s12ad.hpp)||
 |D/A Definition/D/A 定義|[da.hpp](da.hpp)||
 |POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp)||
-|System Definition/システム定義|[RX24T/system.hpp](../RX24T/system.hpp)|RX24T と共有|
-|System I/O Definition/システム I/O 定義|[RX24T/system_io.hpp](../RX24T/system_io.hpp)|RX24T と共有|
 
 ---
 
@@ -64,6 +62,14 @@
 |---|:---:|
 |Serial BOOT/シリアルブート|0|
 |Single Chip/シングルチップ|1|
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|-|-|
 
 ---
 

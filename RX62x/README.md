@@ -1,12 +1,13 @@
 
-## RX621/RX62N feature / 特徴
+## RX621/RX62N features / 特徴
 
-- RXv1 core / コア
-- Maximum operating frequency / 最大動作周波数 100MHz
-- IEEE754 FPU on board (single precision floating point) / FPU 搭載（単精度浮動小数点）
+- RXv1 core / RXv1 コア
+- Maximum operating frequency 100MHz / 最大動作周波数 100MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 2.7V ～ 3.6V Operation / 動作
 - RMII/MII Ethernet MAC 10/100 Mbps (RX62N)
-- USB2.0 Host, Function
+- USB2.0 Full Speed, Host, Function
+- CAN (ISO11898-1)
 - 12/10 Bits A/D / １２・１０ビットＡ／Ｄ変換器
 - 10 Bits D/A / １０ビットＤ／Ａ変換器
 
@@ -14,11 +15,11 @@
 
 ## RX621/RX62N Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|
-|---|:-:|:-:|:-:|---|
-|R5F562N7|384K|64K|32K|[R5F562N7.ld](R5F562N7.ld)|
-|R5F562N8|512K|96K|32K|[R5F562N8.ld](R5F562N8.ld)|
-|R5F56218|512K|96K|32K|[R5F56218.ld](R5F56218.ld)|
+|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F562N7|384K|64K|32K|[R5F562N7.ld](R5F562N7.ld)|1024|512|
+|R5F562N8|512K|96K|32K|[R5F562N8.ld](R5F562N8.ld)|1024|512|
+|R5F56218|512K|96K|32K|[R5F56218.ld](R5F56218.ld)|1024|512|
 
 ---
 
@@ -93,6 +94,14 @@
 |Serial Boot/シリアルブート|1|0|
 |USB Boot/USB ブート|0|1|
 |Single Chip/シングルチップ|1|1|
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|〇|〇|
 
 ---
 

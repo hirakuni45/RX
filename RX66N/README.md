@@ -1,12 +1,14 @@
-## RX651/RX65N features / 特徴
+## RX66N features / 特徴
 
-- RXv2 core / RXv2 コア
+- RXv3 core / RXv3 コア
 - Maximum operating frequency 120MHz / 最大動作周波数 120MHz
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
+- Double-precision 64-bit IEEE-754 floating point / 64 ビット倍精度浮動小数点
 - 2.7V ～ 3.6V Operation / 動作
 - IEEE1588 Ether-MAC (10/100 Mbps)
 - USB2.0 Full Speed, Host, Function
 - CAN (ISO11898-1)
+- Serial Sound Interface (SSIE) / シリアルサウンドインタフェース (SSIE)
 - SD Host Interface (SDHI) / SD ホストインタフェース (SDHI)
 - Graphic LCD Controller (GLCDC) / グラフィック LCD コントローラ (GLCDC)
 - 2D Drawing Engine (DRW2D) / 2D 描画エンジン (DRW2D)
@@ -15,15 +17,16 @@
 
 ---
 
-## RX651/RX65N Linker file / リンカーファイル
+## RX66N Linker file / リンカーファイル
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F565NE|2048K|256K+384K+8K|32K|[R5F565NE.ld](R5F565NE.ld)|12288|4096|
+|R5F566ND|2048K|512K+512K+32K+8K|32K|[R5F566ND.ld](R5F566ND.ld)|12288|4096|
+|R5F566NN|4096K|512K+512K+32K+8K|32K|[R5F566NN.ld](R5F566NN.ld)|12288|4096|
 
 ---
 
-## RX651/RX65N Dedicated class / 専用クラス
+## RX66N Dedicated class / 専用クラス
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
@@ -36,10 +39,6 @@
 |Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp)||
 |Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp)||
 |Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
-|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
-|Port Mapping QSPI/ポートマッピング QSPI|[port_map_qspi.hpp](port_map_qspi.hpp)||
-|Port Mapping TPU/ポートマッピング TPU|[port_map_tpu.hpp](port_map_tpu.hpp)||
-|POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp)||
 
 ---
 
@@ -87,7 +86,7 @@
 
 ||Support/サポート|operation verification/動作検証|
 |-|:-:|:-:|
-|[rxprog](../rxprog)|〇|-|
+|[rxprog](../rxprog)|-|-|
 
 ---
 

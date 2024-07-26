@@ -1,23 +1,24 @@
 
-## RX220 features / 特徴
+## RX63T features / 特徴
 
 - RXv1 core / RXv1 コア
-- Maximum operating frequency 32MHz / 最大動作周波数 32MHz
+- Maximum operating frequency 100MHz / 最大動作周波数 100MHz
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
-- 1.62V ～ 5.5V Operation / 動作
+- 3.3V ～ 5.0V Operation / 動作
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
+- 10 Bits D/A / １０ビットＤ／Ａ変換器
 
 ---
 
-## RX220 Linker file / リンカーファイル
+## RX63T Linker file / リンカーファイル
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F52206|256K|16K|8K|[R5F52206.ld](R5F52206.ld)|768|256|
+|R5F563T6|64K|8K|8K|[R5F563T6.ld](R5F563T6.ld)|768|256|
 
 ---
 
-## RX220 Dedicated class / 専用クラス
+## RX63T Dedicated class / 専用クラス
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
@@ -32,18 +33,16 @@
 |Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
 |Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp)||
 |Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
-|Port Mapping MTU/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp)||
+|Port Mapping GPT/ポートマッピング GPT|[port_map_gpt.hpp](port_map_gpt.hpp)||
+|A/D Definition/A/D 定義|[ad.hpp](ad.hpp)||
 |BUS Definition/BUS 定義|[bus.hpp](bus.hpp)||
-|CMPA Definition/CMPA 定義|[cmpa.hpp](cmpa.hpp)||
-|ELC Definition/ELC 定義|[elc.hpp](elc.hpp)||
-|IrDA Definition/IrDA 定義|[irda.hpp](irda.hpp)||
-|LVDA Definition/LVDA 定義|[lvda.hpp](lvda.hpp)||
-|MTU2 Definition/MTU2 定義|[mtu2.hpp](mtu2.hpp)||
-|POE2 Definition/POE2 定義|[poe2.hpp](poe2.hpp)||
-|RTC Definition/RTC 定義|[rtc.hpp](rtc.hpp)||
-|A/D Definition/A/D 定義|[s12ad.hpp](s12ad.hpp)||
+|D/A Definition/D/A 定義|[da.hpp](da.hpp)||
+|DPC Definition/DPC 定義|[dpc.hpp](dpc.hpp)||
 |FLASH Definition/FLASH 定義|[flash.hpp](flash.hpp)||
-|FLASH I/O Definition/FLASH I/O 定義|[flash_io.hpp](flash_io.hpp)||
+|GPT Definition/GPT 定義|[gpt.hpp](gpt.hpp)||
+|LVDA Definition/LVDA 定義|[lvda.hpp](lvda.hpp)||
+|POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp)||
+|A/D Definition/A/D 定義|[s12adb.hpp](s12adb.hpp)||
 |System Definition/システム定義|[system.hpp](system.hpp)||
 |System I/O Definition/システム I/O 定義|[system_io.hpp](system_io.hpp)||
 
@@ -51,32 +50,29 @@
 
 ## Basic Pin Assignments / 基本ピンアサイン
 
-|Terminal/端子|LFQFP 64|
-|---|---|
-|VCL|VCL(2)|
+|Terminal/端子|LQFP 64|
+|---|---|---|
+|VCL|VCL(3)|
 |Reset Input/リセット入力|RES#(6)|
-|Mode Controle/モード制御|MD/FINED(3)|
-|B/UB|PC7(27)|
-|RXD|P30/RXD1(14)|
-|TXD|P26/TXD1(16)|
-|Power/電源|VCC(10), VCC(38)|
-|GND/接地|VSS(8), VSS(40)|
-|Analog Power/アナログ電源|AVCC0(62)|
-|Analog GND/アナログ接地|AVSS0(64)|
-|Analog Refarence L/アナログ基準電源Ｌ|VREFL0(59)|
-|Analog Refarence H/アナログ基準電源Ｈ|VREFH0(61)|
-|OSC out|XTAL(7)|
+|Mode Controle/モード制御|MD/FINED(5)|
+|EMLE|EMLE(1)|
+|RXD|PD5/RXD1(14)|
+|TXD|PD3/TXD1(16)|
+|Power/電源|VCC(10), VCC(20), VCC(42)|
+|GND/接地|VSS(8), VSS(22), VSS(44)|
+|Analog Power/アナログ電源|AVCC0(57)|
+|Analog GND/アナログ接地|AVSS0(60)|
+|Analog Refarence H/アナログ基準電源 H|VREFH0(58)|
+|Analog Refarence L/アナログ基準電源 L|VREFL0(59)|
 |OSC in|EXTAL(9)|
-|Sub OSC out|XCOUT(5)|
-|Sub OSC in|XCIN(4)|
+|OSC out|XTAL(7)|
 
 - VCL: 0.1uF/25V
 
-|Mode/モード|B/UB|MD|
-|---|:---:|:---:|
-|Serial BOOT/シリアルブート|0|0|
-|User Boot/ユーザーブート|1|0|
-|Single Chip/シングルチップ|-|1|
+|Mode/モード|MD|
+|---|:---:|
+|Serial BOOT/シリアルブート|0|
+|Single Chip/シングルチップ|1|
 
 ---
 

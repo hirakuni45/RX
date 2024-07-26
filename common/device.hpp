@@ -232,7 +232,6 @@
 #include "RX66N/port_map.hpp"
 #include "RX72N/port_map_mtu.hpp"
 #include "RX72N/port_map_gptw.hpp"
-#include "RX72N/port_map_gptw.hpp"
 #include "RX72N/port_map_tpu.hpp"
 #include "RX63x/port_map_tmr.hpp"
 #include "RX72N/port_map_qspi.hpp"

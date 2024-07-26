@@ -1,208 +1,98 @@
-Renesas RX72T 専用ファイル
-=========
+## RX72T features / 特徴
 
-## 概要
-
-ルネサス RX72T 専用ハードウェアー定義 C++ テンプレート・クラス   
-ルネサスが提供する、iodefine.h は C言語の規約に違反している為、特定の環境でしか正しくコンパイルする事が出来ません。   
-※ビットフィールドの定義は、バイトサイズのみ準拠しますが、１６ビット、又はそれ以上は、エンディアンの関係などから、結果はコンパイラに依存します。   
-   
-また、非常に冗長であり、可読性が悪いです。   
-※独自の方法を使い、プログラムで生成しているものと思います。   
-   
----
-   
-C++ テンプレートを活用したハードウェアー定義（ＲＸマイコンフレームワーク）は、C++17 準拠のコンパイラならエラー無くコンパイルする事が可能で、ハードウェアー・マニュアルのレジスター説明に準拠した正式な名称を使っています。   
-
-- 名前空間を利用してあり、名称の衝突を避ける事が出来ます。
-- #define を使っていないので、名称がグローバル名と衝突しません。
-
-```
-    device::CMT0::CMCR.CKS = 2;  // CMT0 クロック選択
-```
-   
-一報「iodefine.h」では、ビットフィールド定義の構造上、ビットアクセス、ワードアクセスで異なった、インスタンスを付加する必要があり冗長です。   
-
-- #define を使用しており「CMT0」は他で利用する事が出来ません。
-- アクセスに対する動作で、リード、ライトが明確ではありません。
-   
-```
-    CMT0.CMCR.BIT.CKS = 2; // CMT0 クロック選択
-```
-   
-ハードウェアーマニュアルに沿った、モジュール別にソースを分割しています。   
-   
-テンプレートクラスなので、最適化も最大限活用でき、必要なら、さらなる最適化に向けた実装の余地もあります。   
-   
-```
-    uint8_t tmp = device::CMT0::CMCR.CKS();
-```
-
-レジスタの読出し動作と書き込み動作を明確にする為、上記のようにして、読出しを行います。   
-   
-専用のマネージャークラスを用意してあり、別プログラムを使って、コードを生成する必要がありません。   
-この為、ソースコードの管理が統一的で、見通しが良く、全体を見渡す事が出来ます。   
-※ほとんどのコードはヘッダーのみなので、リンクファイルを追加する必要がありません。   
-   
----
-
-## ペリフェラル名
-
- - 各デバイスモジュールを抽象化する為、ペリフェラル名（型）を定義しています。
- - デバイスモジュールクラス名とは異なる概念です。
- - 「ペリフェラル名」は、なるべく、ハードウェアーマニュアルで説明されているキーワード
-を使うようにしています、詳しくは、[peripheral.hpp](peripheral.hpp?ts=4)を参照して下さい。
- - この名称は、省電力切り替え、専用ポート制御、割り込み制御など、多様な場面で、識別子として使われており、ペリフェラル全体で必要な細かい設定を自動化する為に使われます。
-   
-たとえば、コンペアマッチタイマー０は、「device::peripheral::CMT0」となります。   
-この名称を使って、全体を参照する場合もあります。   
-   
----
-
-## ポート候補
-   
-このフレームワークでは、ポートの機能を選択する方法として、「ポート・マップ」と呼ばれる機構を使っています。   
-この機能と、各ペリフェラル用に実装されたマネージャークラスにより、簡単に各機能を利用する事が出来ます。   
-   
-たとえば、SCI1 を使う場合、port_map.hpp を参照すると・・・   
-
-```
-		static bool sci1_(ORDER opt, bool enable, bool clock)
-		{
-			uint8_t sel = enable ? 0b001010 : 0;
-			switch(opt) {
-			case ORDER::FIRST:
-			// PD5/RXD1 (20/100) (25/144)
-			// PD4/SCK1 (21/100) (26/144)
-			// PD3/TXD1 (22/100) (27/144)
-				if(clock) {
-					PORTD::PMR.B4 = 0;
-					MPC::PD4PFS.PSEL = sel;
-					PORTD::PMR.B4 = enable;
-				}
-				PORTD::PMR.B3 = 0;
-				PORTD::PMR.B5 = 0;
-				MPC::PD3PFS.PSEL = sel;
-				MPC::PD5PFS.PSEL = sel;
-				PORTD::PMR.B3 = enable;
-				PORTD::PMR.B5 = enable;
-				break;
-			case ORDER::SECOND:
-			// P25/SCK1 (94/144)
-			// PC4/TXD1 (98/144)
-			// PC3/RXD1 (99/144)
-				if(clock) {
-					PORT2::PMR.B5 = 0;
-					MPC::P25PFS.PSEL = sel;
-					PORT2::PMR.B5 = enable;
-				}
-				PORTC::PMR.B4 = 0;
-				PORTC::PMR.B3 = 0;
-				MPC::PC4PFS.PSEL = sel;
-				MPC::PC3PFS.PSEL = sel;
-				PORTC::PMR.B4 = enable;
-				PORTC::PMR.B3 = enable;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-```
-
-となっており、以下のように「typedef」する事で、簡単にポートの機能を選択する事が出来ます。   
-
-```
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
-    typedef device::sci_io<device::SCI1, RXB, TXB, device::port_map::ORDER::SECOND> SCI1_IO;
-    SCI1_IO sci_io_;
-```
-   
-同じように、port_map_mtu.hpp、port_map_gptw.hpp なども用意されています。   
-   
----
-
-## 割り込みベクター名
-
- - 各デバイスが扱う割り込みベクターも、抽象化の為定義されています。
- - 割り込みベクターは、通常ベクター、グループベクター、選択型ベクターなど特有の型を持っており、型の違いを利用して、設定方法が異なる場合でも、統一した設定方法になるように工夫してあります。   
-
-IRQ0, IPR レジスタのアクセス例：
-
- ```
-    device::ICU::IPR.IRQ0 = 1;
-
-又は・
-
-    device::ICU::IPR[device::ICU::VECTOR::IRQ0] = 1;
- ```
+- RXv3 core / RXv3 コア
+- Maximum operating frequency 200MHz / 最大動作周波数 200MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
+- 2.7V ～ 5.5V Operation / 動作
+- USB2.0 Full Speed, Host, Function (Optional)
+- CAN Module (CAN) / CAN モジュール (CAN)
+- Arithmetic Unit for Trigonometric Functions (TFUv1) / 三角関数演算器 (TFUv1)
+- 12 Bits A/D / １２ビットＡ／Ｄ変換器
+- 12 Bits D/A / １２ビットＤ／Ａ変換器
 
 ---
 
-## RX72T 専用ファイル・リスト
+## RX72T Linker file / リンカーファイル
 
-|ファイル名|内容|
-|------|------|
-|[R5F572TK.ld](R5F572TK.ld?ts=4)|R5F572TK リンカースクリプト (RAM:128K, ROM:1M)|
-|[R5F572TE.ld](R5F572TE.ld?ts=4)|R5F572TE リンカースクリプト (RAM:128K, ROM:512K)|
-|[clock_profile.hpp](clock_profile.hpp?ts=4)|クロックプロファイル|
-|[peripheral.hpp](peripheral.hpp?ts=4)|ペリフェラル定義|
-|[system.hpp](system.hpp?ts=4)|システム関係の定義|
-|[icu.hpp](icu.hpp?ts=4)|割り込みコントローラ（ICUA）定義|
-|[icu_mgr.hpp](icu_mgr.hpp?ts=4)|割り込みマネージャー|
-|[port_map.hpp](port_map.hpp?ts=4)|I/Oポート・マップ定義|
-|[port_map_gptw.hpp](port_map_gptw.hpp?ts=4)|GPTW マップ定義|
-|[port_map_mtu.hpp](port_map_mtu.hpp?ts=4)|MTU マップ定義|
-|[power_mgr.hpp](power_mgr.hpp?ts=4)|電源マネージャー|
-|[RX72T PGA,USB 100](RX72T_100_PGA_USB)|評価基板プロジェクト|
-   
----
+|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F572TF|512K|128K+16K|32K|[R5F572TF.ld](R5F572TF.ld)|7168|1024|
+|R5F572TK|1024K|128K+16K|32K|[R5F572TK.ld](R5F572TK.ld)|7168|1024|
 
-## 標準的なクロックソース
-
-- RX72T の最大周波数は 200MHz ですが、USB を使う前提だと、192MHz (8MHzx24) で動作させる事になります。
-- 上記二種類の場合に都合が良いクリスタルは 8MHz 又は、16MHz となります。
-- 標準的なクロックプロファイルは、200MHz となります。
-- USB を使う場合、Makefile 「USER_DEFS」に、「USE_USB」を追加して下さい。（192MHz のクロックプロファイルが選択）
-- main 関数の先頭で、「device::boost_master_clock()」を呼び出す事で、最大速度になります。
-   
-```
-    typedef device::system_io<> SYSTEM_IO;
-    SYSTEM_IO::boost_master_clock();
-```
+RAM: 16K(With ECC)
 
 ---
 
-## RX72T PGA,USB 100 評価ボード
+## RX72T Dedicated class / 専用クラス
 
-<img src="../docs/RX72T_PCB_fin.png" width="75%">
+|Function/機能|Source|Remarks/備考|
+|---|---|:-:|
+|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp)||
+|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp)||
+|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp)||
+|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp)||
+|Port Definition/ポート定義|[port.hpp](port.hpp)||
+|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp)||
+|Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp)||
+|Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp)||
+|Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
+|Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp)||
+|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
+|Port Mapping TMR/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp)||
+|Port Mapping GPTW/ポートマッピング GPTW|[port_map_gptw.hpp](port_map_gptw.hpp)||
+|POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp)||
+|A/D Definition/A/D 定義|[s12adh.hpp](s12adh.hpp)||
 
-RX72T は、コストが低く、それでも超高性能なマイコンです。   
-それを手軽に確認する目的で、評価用ボードを作成しています。   
-   
-- 120mm X 80mm 基板サイズ（両面）
-- RX72T PGA,USB 100 ピン、デバイスを採用
-- CAN サポート(12V 電源入力をサポート)
-- RSPI サポート
-- IICA(I2C) サポート
-- RSPI 接続 SD カードインターフェース
-- 複数のシリアルポート
-- RS-485 インターフェース
-- 3.3V 電源レギュレーター
-- USB マスター動作、USB クライアント動作（切り替え）
-- D/A 出力（２チャネル）
-- シリアルブートモードサポート
-- Renesas E1/E1 Lite エミュレーターインターフェース
-- 16MHz クリスタル
+---
 
-プロジェクトは KiCAD で作成してあり、回路図、トラック、関連部品、専用フットプリントなど一式用意してあります。   
-KiCAD のバージョンは 5.1.4 を使っています。   
-   
------
-   
-License
-----
+## Basic Pin Assignments / 基本ピンアサイン
 
-MIT
+|Terminal/端子|LFQFP 100|LFQFP 144|
+|---|---|---|
+|VCL|VCL(5)|VCL(10)|
+|Reset Input/リセット入力|RES#(10)|RES#(15)|
+|Mode Controle/モード制御|MD/FINED(6)|MD/FINED(11)|
+|UB|P00/UB(4)|P00/UB(9)|
+|EMLE|EMLE(2)|EMLE(7)|
+|RXD|PD5/RXD1(20)|PD5/RXD1(25)|
+|TXD|PD3/TXD1(22)|PD3/TXD1(27)|
+|UPSEL|PE2/UPSEL(15)|PE2/UPSEL(20)|
+|USB_VCC|VCC_USB(26)|VCC_USB(38)|
+|USB_VSS|VSS_USB(31)|VSS_USB(37)|
+|USB+|USB_DP(25)|USB_DP(36)|
+|USB-|USB_DM(24)|USB_DM(35)|
+|Power/電源|VCC(14), VCC(29), VCC(42), VCC(60)|VCC(6), VCC(19), VCC(42), VCC(64), VCC(88)|
+|GND/接地|VSS(3), VSS(12), VSS(31), VSS(44), VSS(62)|VSS(8), VSS(17), VSS(44), VSS(66), VSS(90)|
+|Analog Power/アナログ電源|AVCC0(93), AVCC1(92), AVCC2(72)|AVCC0(134), AVCC1(133), AVCC2(104), AVCC2(105)|
+|Analog GND/アナログ接地|AVSS0(94), AVSS1(95), AVSS2(73)|AVSS0(135), AVSS1(136), AVSS2(106)|
+|Gain GND/ゲイン接地|PGAVSS0(91), PGAVSS1(86)|PGAVSS0(132), PGAVSS1(124)|
+|OSC in|EXTAL(13)|EXTAL(18)|
+|OSC out|XTAL(11)|XTAL(16)|
 
+- VCL: 0.47uF/25V
+
+|Mode/モード|UB|MD|UPSEL|
+|---|:---:|:---:|:---:|
+|Serial BOOT/シリアルブート|0|0|-|
+|USB Boot/USB ブート|1|0|0/1|
+|Single Chip/シングルチップ|-|1|-|
+
+- EMLE: 0
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|〇|〇|
+
+---
+
+Translated with www.DeepL.com/Translator (free version)
+
+---
+
+## License
+
+[MIT](../LICENSE)

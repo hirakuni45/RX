@@ -2,7 +2,7 @@
 	@brief	RX66T R5F566TF リンカー・スクリプト @n
 			Code: 512K, RAM: 128K, DataFlash: 32K
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,9 +16,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX66TF chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001FC00 /* 128K - stack_size (1024) */
-	USTACK (w) : ORIGIN = 0x0001FF80, LENGTH = 4 /* ustack 896 bytes */
-	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4 /* istack 128 bytes  */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001F000 /* 128K - stack_size (4096) */
+	USTACK (w) : ORIGIN = 0x0001FE00, LENGTH = 4 /* ustack 3584 bytes */
+	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4 /* istack 512 bytes  */
 	ROM (w)    : ORIGIN = 0xFFF80000, LENGTH = 0x0007FFD0 /* 512K - hw_vectors(48) */
 }
 

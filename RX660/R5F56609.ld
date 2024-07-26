@@ -15,9 +15,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX660 chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00800000, LENGTH = 0x0001E000 /* 128k - (USTACK+ISTACK)(0x2000) */
-	USTACK (w) : ORIGIN = 0x0081F800, LENGTH = 4 /* ustack 6144+2048 */
-	ISTACK (w) : ORIGIN = 0x00820000, LENGTH = 4 /* istack 2048 */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001E000 /* 128k - (USTACK+ISTACK)(8192) */
+	USTACK (w) : ORIGIN = 0x0001FC00, LENGTH = 4 /* ustack 7168 */
+	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4 /* istack 1024 */
 	ROM (w)    : ORIGIN = 0xFFF00000, LENGTH = 0x000FFFD0 /* 1024K */
 }
 

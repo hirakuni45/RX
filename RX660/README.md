@@ -1,26 +1,24 @@
-
-## RX26T features / 特徴
+## RX660 features / 特徴
 
 - RXv3 core / RXv3 コア
 - Maximum operating frequency 120MHz / 最大動作周波数 120MHz
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 2.7V ～ 5.5V Operation / 動作
 - CAN FD Module (CANFD) / CAN FD (CAN FD)
-- Arithmetic Unit for Trigonometric Functions (TFUv2) / 三角関数演算器 (TFUv2)
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
 ---
 
-## RX26T Linker file / リンカーファイル
+## RX660 Linker file / リンカーファイル
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F526TF|512K|64K|16K|[R5F526TF.ld](R5F526TF.ld)|2048|1024|
+|R5F56609|1024K|128K|32K|[R5F56609.ld](R5F56609.ld)|7168|1024|
 
 ---
 
-## RX26T Dedicated class / 専用クラス
+## RX660 Dedicated class / 専用クラス
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
@@ -33,39 +31,42 @@
 |Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp)||
 |Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp)||
 |Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
-|Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp)||
-|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
-|Port Mapping TMR/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp)||
-|Port Mapping GPTW/ポートマッピング GPTW|[port_map_gptw.hpp](port_map_gptw.hpp)||
-|FLASH Definition/FLASH 定義|[flash.hpp](flash.hpp)||
 |A/D Definition/A/D 定義|[s12adh.hpp](s12adh.hpp)||
-|System Definition/システム定義|[system.hpp](system.hpp)||
-|System I/O Definition/システム I/O 定義|[system_io.hpp](system_io.hpp)||
 
 ---
 
 ## Basic Pin Assignments / 基本ピンアサイン
 
-|Terminal/端子|LFQFP 100|
-|---|---|
-|VCL|VCL(5)|
-|Reset Input/リセット入力|RES#(10)|
-|Mode Controle/モード制御|MD/FINED(6)|
-|RXD|PD5/RXD1(20)|
-|TXD|PD3/TXD1(22)|
-|Power/電源|VCC(14), VCC(29), VCC(42), VCC(60)|
-|GND/接地|VSS(3), VSS(12), VSS(31), VSS(44), VSS(62)|
-|Analog Power/アナログ電源|AVCC0(93), AVCC1(92), AVCC2(72)|
-|Analog GND/アナログ接地|AVSS0(94), AVSS1(95), AVSS2(73)|
-|OSC in|EXTAL(13)|
-|OSC out|XTAL(11)|
+|Terminal/端子|LFQFP 100|LFQFP 144|
+|---|---|---|
+|VCL|VCL(5)|VCL(14)|
+|Reset Input/リセット入力|RES#(10)|RES#(19)|
+|Mode Controle/モード制御|MD/FINED(7)|MD/FINED(16)|
+|UB|PC7/UB(45)|PC7/UB(60)|
+|EMLE|EMLE(2)|EMLE(10)|
+|RXD|P30/RXD1(20)|P30/RXD1(29)|
+|TXD|P26/TXD1(22)|P26/TXD1(31)|
+|Power/電源|VCC(14), VCC(60)|VCC(23), VCC(59), VCC(74), VCC(91)|
+|Power/電源||VCC(103), VCC(118), VCC(132)|
+|GND/接地|VSS(12), VSS(62)|VSS(12), VSS(21), VSS(57), VSS(76)|
+|GND/接地||VSS(93), VSS(105), VSS(116), VSS(130)|
+|Analog Power/アナログ電源|AVCC0(97), AVCC1(1)|AVCC0(143), AVCC1(3)|
+|Analog GND/アナログ接地|AVSS0(99), AVSS1(3)|AVSS0(1), AVSS1(5)|
+|Analog Refarence L0/アナログ基準電源Ｌ0|VREFL0(94)|VREFL0(140)|
+|Analog Refarence H0/アナログ基準電源Ｈ0|VREFH0(96)|VREFH0(142)|
+|VBATT|VBATT(6)|VBATT(15)|
+|OSC in|EXTAL(13)|EXTAL(22)|
+|OSC out|XTAL(11)|XTAL(20)|
+|Sub OSC in|XCIN(8)|XCIN(17)|
+|Sub OSC out|XCOUT(9)|XCOUT(18)|
 
-- VCL: 4.7uF/25V
+- VCL: 0.22uF/25V
 
-|Mode/モード|MD|
-|---|:---:|
-|Serial BOOT/シリアルブート|0|
-|Single Chip/シングルチップ|1|
+|Mode/モード|UB|MD|
+|---|:---:|:---:|:---:|
+|Serial BOOT/シリアルブート|0|0|
+|User Boot/ユーザーブート|1|0|
+|Single Chip/シングルチップ|-|1|
 
 ---
 

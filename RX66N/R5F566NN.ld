@@ -18,8 +18,8 @@ ENTRY(_start)
 /* This memory layout corresponds to the smallest predicted RX72N chip.  */
 MEMORY {
 	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007C000 /* 512k - (USTACK+ISTACK)(0x4000) */
-	USTACK (w) : ORIGIN = 0x0007E000, LENGTH = 4 /* ustack 8192 */
-	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 8192 */
+	USTACK (w) : ORIGIN = 0x0007F000, LENGTH = 4 /* ustack 12288 */
+	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 4096 */
 	EXRAM (w)  : ORIGIN = 0x00800000, LENGTH = 0x00080000 /* 512K */
 	ROM (w)    : ORIGIN = 0xFFC00000, LENGTH = 0x003FFFD0 /* 4M */
 }
