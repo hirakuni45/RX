@@ -1,9 +1,9 @@
 
-## RX23T feature / 特徴
+## RX23T features / 特徴
 
-- RXv2 core / コア
-- Maximum operating frequency / 最大動作周波数 40MHz
-- IEEE754 FPU on board (single precision floating point) / FPU 搭載（単精度浮動小数点）
+- RXv2 core / RXv2 コア
+- Maximum operating frequency 40MHz / 最大動作周波数 40MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 2.7V ～ 5.5V Operation / 動作
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A (for Compalator) / ８ビットＤ／Ａ変換器（コンパレーター用）
@@ -12,9 +12,9 @@
 
 ## RX23T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|
-|---|:-:|:-:|:-:|---|
-|R5F523T5|128K|12K|-|[R5F523T5.ld](R5F523T5.ld)|
+|Type|Program|RAM|Data Flash|Source|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F523T5|128K|12K|-|[R5F523T5.ld](R5F523T5.ld)|512|256|
 
 ---
 
@@ -61,6 +61,14 @@
 |---|:---:|
 |Serial BOOT/シリアルブート|0|
 |Single Chip/シングルチップ|1|
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|-|-|
 
 ---
 

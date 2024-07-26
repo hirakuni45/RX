@@ -1,12 +1,12 @@
 
-## RX26T feature / 特徴
+## RX26T features / 特徴
 
-- RXv3 core / コア
-- Maximum operating frequency / 最大動作周波数 120MHz
-- IEEE754 FPU on board (single precision floating point) / FPU 搭載（単精度浮動小数点）
-- TFUv2 on board (Arithmetic Unit for Trigonometric Functions) / TFUv2 搭載（三角関数演算器）
-- CANFD Module on board / CANFD 搭載
+- RXv3 core / RXv3 コア
+- Maximum operating frequency 120MHz / 最大動作周波数 120MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 2.7V ～ 5.5V Operation / 動作
+- CAN FD Module (CANFD) / CAN FD (CAN FD)
+- Arithmetic Unit for Trigonometric Functions (TFUv2) / 三角関数演算器 (TFUv2)
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
@@ -14,9 +14,9 @@
 
 ## RX26T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|
-|---|:-:|:-:|:-:|---|
-|R5F526TF|512K|64K|16K|[R5F526TF.ld](R5F526TF.ld)|
+|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F526TF|512K|64K|16K|[R5F526TF.ld](R5F526TF.ld)|2048|1024|
 
 ---
 
@@ -66,6 +66,14 @@
 |---|:---:|
 |Serial BOOT/シリアルブート|0|
 |Single Chip/シングルチップ|1|
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|-|-|
 
 ---
 

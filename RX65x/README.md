@@ -1,81 +1,100 @@
-Renesas RX651, RX65N ハードウェアー定義テンプレート
-=========
+## RX651/RX65N features / 特徴
 
-## 概要
-ルネサス RX651, RX65N 専用ハードウェアー定義 C++ テンプレート・クラス   
-ルネサスが提供する、iodefine.h は C言語の規約に違反している為、特定の環境でしか   
-正しくコンパイルする事が出来ません。   
-※ビットフィールドの定義は、バイトサイズのみ準拠しますが、１６ビット、又は   
-それ以上は、エンディアンの関係などから、結果はコンパイラに依存します。
-   
-また、非常に冗長であり、可読性が悪いです。   
-※独自の方法を使い、プログラムで生成しているものと思います。   
-   
-※RX651, RX65N 特有の定義や設定を網羅しています。
-   
-C++ テンプレートを活用したハードウェアー定義は、C++11 準拠のコンパイラならエラー   
-無くコンパイルする事が可能で、ハードウェアー・マニュアルのレジスター説明に準拠し   
-た正式な名称を使っています。   
-「iodefine.h」では、ビットフィールド定義の構造上、ビットアクセス、ワードアクセス   
-で異なった、インスタンスを付加する必要があり冗長です。
-   
-ハードウェアーマニュアルに沿った、モジュール別にソースを分割しています。   
-   
-テンプレートクラスなので、最適化も最大限活用でき、必要なら、さらなる最適化に向け
-た実装の余地もあります。   
-   
-## ペリフェラル名
- - 各デバイスモジュールを抽象化する為、ペリフェラル名を定義しています。
- - 「ペリフェラル名」は、なるべく、ハードウェアーマニュアルで説明されているキーワード
-を使うようにしています、詳しくは、[peripheral.hpp](peripheral.hpp?ts=4)を参照して下さい。
- - この名称は、省電力切り替え、専用ポート制御、割り込み制御など、多様な場面で、識別子    
-として使われており、ペリフェラル全体で必要な細かい設定を自動化する為に使われます。
-   
-## 割り込みベクター名
- - 各デバイスが扱う割り込みベクターも、抽象化の為定義されています。
- - 割り込みベクターは、通常ベクター、グループベクター、選択型ベクターなど特有の型を   
-持っており、型の違いを利用して、設定方法が異なる場合でも、統一した設定方法になるように
-工夫してあります。   
-   
-## コンビニエンス関数
- - 各デバイスクラスには、ドライバーやサービスクラスからの操作をより抽象的に扱えるように、   
-場合により、操作を簡潔に行えるような関数を用意している場合があります。
-   
-## プロジェクト・リスト
- - [R5F565NE リンカースクリプト (RAM:256K+320K, ROM:2M)](R5F565NE.ld?ts=4)
- - [ペリフェラル](peripheral.hpp?ts=4)
- - [割り込みコントローラ（ICUA）](icu.hpp?ts=4)
- - [割り込みマネージャー定義](icu_mgr.hpp?ts=4)
- - [割り込みマネージャー実装](icu_mgr.cpp?ts=4)
- - [I/Oポート・マップ](port_map.hpp?ts=4)
- - [電源マネージャー](power_mgr.hpp?ts=4)
- - [グラフィック LCD コントローラ (GLCDC)](glcdc.hpp?ts=4)
- - [グラフィック LCD コントローラ定義](glcdc_def.hpp?ts=4)
- - [グラフィック LCD コントローラ制御クラス](glcdc_io.hpp?ts=4)
- - [2D 描画エンジン (DRW2D)](drw2d.hpp?ts=4)
- - [2D 描画エンジンマネージャー](drw2d_mgr.hpp?ts=4)
- - [2D 描画エンジンライブラリ](drw_2d_ver1.02)
- - [12 ビット A/D コンバータ（S12ADF）](s12adf.hpp?ts=4)
+- RXv2 core / RXv2 コア
+- Maximum operating frequency 120MHz / 最大動作周波数 120MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
+- 2.7V ～ 3.6V Operation / 動作
+- IEEE1588 Ether-MAC (10/100 Mbps)
+- USB2.0 Full Speed, Host, Function
+- CAN (ISO11898-1)
+- SD Host Interface (SDHI) / SD ホストインタフェース (SDHI)
+- Graphic LCD Controller (GLCDC) / グラフィック LCD コントローラ (GLCDC)
+- 2D Drawing Engine (DRW2D) / 2D 描画エンジン (DRW2D)
+- 12 Bits A/D / １２ビットＡ／Ｄ変換器
+- 12 Bits D/A / １２ビットＤ／Ａ変換器
 
-- The "RTK5RX65N" sold by Renesas is a low-cost, high-performance board with an LCD.   
-- Of course it can not be compared with Raspberry Pi etc. but it seems to be an affordable   microcomputer board that can be operated stand-alone.
-- In addition, this board is equipped with an "E1 Lite Emulator", which allows you to easily write programs via USB connection.
-- In Windows, you can write using Renesus Flash Programmer V3.
-- By setting DIP SW 1-1 to "ON", the built-in emulator is enabled and the execution binary can be written.
-- By setting DIP SW 1-1 to "OFF", the written program runs independently.
-- By default, SD cards and Ethernet components are not installed, but you can attach them later.
-- This board's standard SD card socket has been discontinued, is not available in Japan, and is expensive, so we recommend another method.
-- It is easy to connect via Akizuki Electronics micro SD socket adapter.   
-- It bypasses the power control of the SD card.   
-   
-<img src="docs/RTK5_MSD.jpg" width="50%">   
-   
-- If you can get the standard SD card slot "101-00565-64 (made by AMPHENOL COMMERCIAL PRODUCTS)", it will not take much time.
+---
 
------
-   
-License
-----
+## RX651/RX65N Linker file / リンカーファイル
 
-MIT
+|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F565NE|2048K|256K+384K+8K|32K|[R5F565NE.ld](R5F565NE.ld)|12288|4096|
 
+---
+
+## RX651/RX65N Dedicated class / 専用クラス
+
+|Function/機能|Source|Remarks/備考|
+|---|---|:-:|
+|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp)||
+|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp)||
+|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp)||
+|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp)||
+|Port Definition/ポート定義|[port.hpp](port.hpp)||
+|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp)||
+|Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp)||
+|Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp)||
+|Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
+|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
+|Port Mapping QSPI/ポートマッピング QSPI|[port_map_qspi.hpp](port_map_qspi.hpp)||
+|Port Mapping TPU/ポートマッピング TPU|[port_map_tpu.hpp](port_map_tpu.hpp)||
+|POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp)||
+
+---
+
+## Basic Pin Assignments / 基本ピンアサイン
+
+|Terminal/端子|LFQFP 100|LFQFP 144|LFQFP 176|
+|---|---|---|---|
+|VCL|VCL(5)|VCL(14)|VCL(14)|
+|Reset Input/リセット入力|RES#(10)|RES#(19)|RES#(21)|
+|Mode Controle/モード制御|MD/FINED(7)|MD/FINED(16)|MD/FINED(18)|
+|UB|PC7/UB(45)|PC7/UB(60)|PC7/UB(76)|
+|EMLE|EMLE(2)|EMLE(10)|EMLE(10)|
+|RXD|P30/RXD1(20)|P30/RXD1(29)|PF2/RXD1(31)|
+|TXD|P26/TXD1(22)|P26/TXD1(31)|PF0/RXD1(35)|
+|UPSEL|P35/UPSEL(15)|P35/UPSEL(24)|P35/UPSEL(26)|
+|USB_VCC|VCC_USB(35)|VCC_USB(46)|VCC_USB(54)|
+|USB_VSS|VSS_USB(38)|VSS_USB(49)|VSS_USB(57)|
+|USB+|USB_DP(37)|USB_DP(48)|USB_DP(56)|
+|USB-|USB_DM(36)|USB_DM(47)|USB_DM(55)|
+|Power/電源|VCC(14), VCC(60)|VCC(23), VCC(59), VCC(74), VCC(91)|VCC(25), VCC(39), VCC(75), VCC(90), VCC(103)|
+|Power/電源||VCC(103), VCC(118), VCC(132)|VCC(115), VCC(127), VCC(142), VCC(153), VCC(164)|
+|GND/接地|VSS(12), VSS(62)|VSS(12), VSS(21), VSS(57), VSS(76)|VSS(12), VSS(23), VSS(41), VSS(73), VSS(92)|
+|GND/接地||VSS(93), VSS(105), VSS(116), VSS(130)|VSS(105), VSS(117), VSS(129), VSS(140), VSS(151), VSS(162)|     
+|Analog Power/アナログ電源|AVCC0(97), AVCC1(1)|AVCC0(143), AVCC1(3)|AVCC0(175), AVCC1(3)|
+|Analog GND/アナログ接地|AVSS0(99), AVSS1(3)|AVSS0(1), AVSS1(5)|AVSS0(1), AVSS1(5)|
+|Analog Refarence L0/アナログ基準電源Ｌ0|VREFL0(94)|VREFL0(140)|VREFL0(172)|
+|Analog Refarence H0/アナログ基準電源Ｈ0|VREFH0(96)|VREFH0(142)|VREFH0(174)|
+|VBATT|VBATT(6)|VBATT(15)|VBATT(15)|
+|OSC in|EXTAL(13)|EXTAL(22)|EXTAL(24)|
+|OSC out|XTAL(11)|XTAL(20)|XTAL(22)|
+|Sub OSC in|XCIN(8)|XCIN(17)|XCIN(19)|
+|Sub OSC out|XCOUT(9)|XCOUT(18)|XCOUT(20)|
+
+- VCL: 0.22uF/25V
+
+|Mode/モード|UB|MD|UPSEL|
+|---|:---:|:---:|:---:|
+|Serial BOOT/シリアルブート|0|0|-|
+|USB Boot/USB ブート|1|0|0/1|
+|Single Chip/シングルチップ|-|1|-|
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|〇|-|
+
+---
+
+Translated with www.DeepL.com/Translator (free version)
+
+---
+
+## License
+
+[MIT](../LICENSE)

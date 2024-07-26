@@ -1,11 +1,11 @@
 
-## RX231 feature / 特徴
+## RX231 features / 特徴
 
-- RXv2 core / コア
-- Maximum operating frequency / 最大動作周波数 54MHz
-- IEEE754 FPU on board (single precision floating point) / FPU 搭載（単精度浮動小数点）
+- RXv2 core / RXv2 コア
+- Maximum operating frequency 54MHz / 最大動作周波数 54MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 1.8V ～ 5.5V Operation / 動作
-- USB2.0 Host, Function
+- USB2.0 Full Speed, Host, Function
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
@@ -13,11 +13,11 @@
 
 ## RX231 Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|
-|---|:-:|:-:|:-:|---|
-|R5F52316|256K|32K|8K|[R5F52316.ld](R5F52316.ld)|
-|R5F52317|384K|64K|8K|[R5F52317.ld](R5F52317.ld)|
-|R5F52318|512K|64K|8K|[R5F52318.ld](R5F52318.ld)|
+|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F52316|256K|32K|8K|[R5F52316.ld](R5F52316.ld)|1536|512|
+|R5F52317|384K|64K|8K|[R5F52317.ld](R5F52317.ld)|1536|512|
+|R5F52318|512K|64K|8K|[R5F52318.ld](R5F52318.ld)|1536|512|
 
 ---
 
@@ -85,6 +85,14 @@
 |Serial BOOT/シリアルブート|0|0|
 |USB Boot/USB ブート|1|0|
 |Single Chip/シングルチップ|-|1|
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|〇|〇|
 
 ---
 

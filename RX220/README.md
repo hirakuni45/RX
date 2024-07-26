@@ -1,8 +1,9 @@
 
-## RX220 feature / 特徴
+## RX220 features / 特徴
 
-- RXv1 core / コア
-- Maximum operating frequency / 最大動作周波数 32MHz
+- RXv1 core / RXv1 コア
+- Maximum operating frequency 32MHz / 最大動作周波数 32MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 1.62V ～ 5.5V Operation / 動作
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 
@@ -10,9 +11,9 @@
 
 ## RX220 Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|
-|---|:-:|:-:|:-:|---|
-|R5F52206|256K|16K|8K|[R5F52206.ld](R5F52206.ld)|
+|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F52206|256K|16K|8K|[R5F52206.ld](R5F52206.ld)|768|256|
 
 ---
 
@@ -76,6 +77,14 @@
 |Serial BOOT/シリアルブート|0|0|
 |User Boot/ユーザーブート|1|0|
 |Single Chip/シングルチップ|-|1|
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|〇|〇|
 
 ---
 
