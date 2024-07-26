@@ -1,0 +1,109 @@
+
+## RX631/RX63N features / 特徴
+
+- RXv1 core / RXv1 コア
+- Maximum operating frequency 100MHz / 最大動作周波数 100MHz
+- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
+- 2.7V ～ 3.6V Operation / 動作
+- IEEE802.3 Ether-MAC (10/100 Mbps) on board (for RX63N)
+- USB2.0 Host, Function (Only FULL Speed 12Mbps, Can't select LOW Speed 1.5Mbps)
+- CAN (ISO11898-1)
+- 12 Bits A/D / １２ビットＡ／Ｄ変換器
+- 10 Bits A/D / １０ビットＡ／Ｄ変換器
+- 10 Bits D/A / １０ビットＤ／Ａ変換器
+
+---
+
+## RX631/RX63N Linker file / リンカーファイル
+
+|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F563NE|2048K|128K|32K|[R5F563NE.ld](R5F563NE.ld)|7168|1024|
+|R5F563NF|2048K|256K|32K|[R5F563NF.ld](R5F563NF.ld)|7168|1024|
+
+---
+
+## RX631/RX63N Dedicated class / 専用クラス
+
+|Function/機能|Source|Remarks/備考|
+|---|---|:-:|
+|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp)||
+|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp)||
+|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp)||
+|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp)||
+|Port Definition/ポート定義|[port.hpp](port.hpp)||
+|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp)||
+|Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp)||
+|Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
+|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
+|Port Mapping TMR/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp)||
+|Port Mapping TPU/ポートマッピング TPU|[port_map_tpu.hpp](port_map_tpu.hpp)||
+|A/D Definition/A/D 定義|[ad.hpp](ad.hpp)||
+|D/A Definition/D/A 定義|[da.hpp](da.hpp)||
+|FLASH Definition/FLASH 定義|[flash.hpp](flash.hpp)||
+|IEB Definition/IEB 定義|[ieb.hpp](ieb.hpp)||
+|MCK Definition/MCK 定義|[mck.hpp](mck.hpp)||
+|POE2 Definition/POE2 定義|[poe2.hpp](poe2.hpp)||
+|RTC Definition/RTC 定義|[rtc.hpp](rtc.hpp)||
+|A/D Definition/A/D 定義|[s12ad.hpp](s12ad.hpp)||
+|System Definition/システム定義|[system.hpp](system.hpp)||
+|System I/O Definition/システム I/O 定義|[system_io.hpp](system_io.hpp)||
+
+---
+
+## Basic Pin Assignments / 基本ピンアサイン
+
+|Terminal/端子|LQFP 100|LQFP 176|
+|---|---|---|
+|VCL|VCL(5)|VCL(14)|
+|Reset Input/リセット入力|RES#(10)|RES#(21)|
+|Mode Controle/モード制御|MD/FINED(7)|MD/FINED(18)|
+|B/UB|PC7(45)|PC7(76)|
+|RXD|P30/RXD1(20)|PF2(31)|
+|TXD|P26/TXD1(22)|PF0(35)|
+|P35|P35(15)|P35(26)|
+|USB_VCC|VCC_USB(35)|VCC_USB(57)|
+|USB_VSS|VSS_USB(38)|VSS_USB(60)|
+|USB+|USB_DP(37)|USB_DP(59)|
+|USB-|USB_DM(36)|USB_DM(58)|
+|Power/電源|VCC(14), VCC(60)|VCC(25), VCC(39), VCC(75), VCC(90), VCC(103)|
+|Power/電源||VCC(115), VCC(127), VCC(142), VCC(153), VCC(164)|
+|GND/接地|VSS(12), VSS(62)|VSS(12), VSS(23), VSS(41), VSS(73), VSS(92)|
+|GND/接地||VSS(105), VSS(117), VSS(129), VSS(140), VSS(151), VSS(162)|     
+|Analog Power/アナログ電源|AVCC0(97)|AVCC0(175)|
+|Analog GND/アナログ接地|AVSS0(99)|AVSS0(1)|
+|Analog Refarence L/アナログ基準電源Ｌ|VREFL(3)|VREFL(5)|
+|Analog Refarence H/アナログ基準電源Ｈ|VREFH(1)|VREFH(3)|
+|Analog Refarence L0/アナログ基準電源Ｌ0|VREFL0(94)|VREFL0(172)|
+|Analog Refarence H0/アナログ基準電源Ｈ0|VREFH0(96)|VREFH0(174)|
+|VBATT|VBATT(6)|VBATT(15)|
+|OSC in|EXTAL(13)|EXTAL(24)|
+|OSC out|XTAL(11)|XTAL(22)|
+|Sub OSC in|XCIN(8)|XCIN(19)|
+|Sub OSC out|XCOUT(9)|XCOUT(20)|
+
+- VCL: 0.1uF/25V
+
+|Mode/モード|B/UB|MD|P35(USB BUS Power Select)|
+|---|:---:|:---:|:---:|
+|Serial BOOT/シリアルブート|0|0|-|
+|USB Boot/USB ブート|1|0|0/1|
+|Single Chip/シングルチップ|-|1|-|
+
+---
+
+## rx_prog Flash Programming / rx_prog フラッシュプログラム
+
+||Support/サポート|operation verification/動作検証|
+|-|:-:|:-:|
+|[rxprog](../rxprog)|〇|〇|
+
+---
+
+Translated with www.DeepL.com/Translator (free version)
+
+---
+
+## License
+
+[MIT](../LICENSE)
