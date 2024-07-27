@@ -6,6 +6,9 @@
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 1.8V ～ 5.5V Operation / 動作
 - USB2.0 Full Speed, Host, Function
+- Serial Sound Interface (SSI) / シリアルサウンドインタフェース (SSI)
+- RSCAN (optional)
+- SD Host Interface (SDHI) / SD ホストインタフェース (SDHI) (optional)
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
@@ -15,6 +18,7 @@
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F52315|128K|32K|8K|[R5F52315.ld](R5F52315.ld)|1536|512|
 |R5F52316|256K|32K|8K|[R5F52316.ld](R5F52316.ld)|1536|512|
 |R5F52317|384K|64K|8K|[R5F52317.ld](R5F52317.ld)|1536|512|
 |R5F52318|512K|64K|8K|[R5F52318.ld](R5F52318.ld)|1536|512|
