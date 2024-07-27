@@ -105,8 +105,8 @@ namespace utils {
 				※最適化をしない場合、全てを取り除く事は出来ない。
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class null_chaout {
-	public:
+	struct null_chaout {
+
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
 
 		void operator() (char ch) noexcept { }
@@ -123,8 +123,8 @@ namespace utils {
 				※出力サイズを調査する場合などに使う。
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class size_chaout {
-	public:
+	struct size_chaout {
+
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
 
 	private:
@@ -153,8 +153,8 @@ namespace utils {
 		@brief  標準出力ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class stdout_chaout {
-	public:
+	struct stdout_chaout {
+
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
 
 	private:
@@ -192,8 +192,8 @@ namespace utils {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t BFN>
-	class stdout_buffered_chaout {
-	public:
+	struct stdout_buffered_chaout {
+
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
 
 	private:
@@ -245,8 +245,8 @@ namespace utils {
 		@brief  標準出力ターミネーター・ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class stdout_term {
-	public:
+	struct stdout_term {
+
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
 
 		void operator() (const char* s, uint l) noexcept {
@@ -263,11 +263,11 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  標準出力ターミネーター・ファンクタ
+		@brief  標準出力、無効ターミネーター・ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class null_term {
-	public:
+	struct null_term {
+
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
 
 		void operator() (const char* s, uint l) { }
@@ -336,9 +336,10 @@ namespace utils {
 		@brief  メモリー出力文字列クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class memory_chaout {
-	public:
+	struct memory_chaout {
+
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
+
 	private:
 		char*	dst_;
 		uint	limit_;
@@ -398,9 +399,9 @@ namespace utils {
 		@brief	format 基本クラス定義
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class base_format {
-	public:
-		static constexpr uint16_t VERSION = 101;		///< バージョン番号（整数）
+	struct base_format {
+
+		static constexpr uint16_t VERSION = 111;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -996,11 +997,12 @@ namespace utils {
 		{
 			if(mode_ == mode::STR) {
 				if(val == nullptr) {
-					static const char* nullstr = { "(nullptr)" };
+					static constexpr char nullstr[] = "(nullptr)";
 					out_str_(nullstr, 0, std::strlen(nullstr));
 					error_ = error::null;
 				} else {
-					zerosupp_ = false;
+					// zerosupp_ = false;
+					// ※文字出力で「０サプレス」の場合、スペースに変換しないのが規格の模様
 					out_str_(val, 0, std::strlen(val));
 				}
 			} else {
