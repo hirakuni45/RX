@@ -1,7 +1,10 @@
 #pragma once
 //=====================================================================//
 /*! @file
-    @brief  シンプル、固定長、文字 map
+    @brief  シンプル、固定長 map @n
+			何のひねりも無い固定長 map @n
+			速度は無視して、メモリ消費量を少なくする事だけに特化 @n
+			通常の map と異なり KEY の並びは不定（ランダム）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,7 +12,6 @@
 */
 //=====================================================================//
 #include <stdint.h>
-#include <cstring>
 #include <utility>
 #include <iterator>
 
@@ -18,9 +20,9 @@ namespace utils {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     /*!
         @brief  固定マップ・クラス
-		@param[in]	KEY		キー
-		@param[in]	T		値
-		@param[in]	N		配列数
+		@param[in]	KEY		キークラス
+		@param[in]	T		値クラス
+		@param[in]	N		マップ数
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class KEY, class T, uint32_t N>
@@ -104,19 +106,41 @@ namespace utils {
 		//-------------------------------------------------------------//
 		/*!
 			@brief  削除
+			@param[in]	it	削除イテレータ
+			@return 削除された要素の次を指すイテレータを返す。
+		*/
+		//-------------------------------------------------------------//
+		iterator erase(iterator it) noexcept
+		{
+			if(it != end()) {
+				if(last_ > 0) {
+					--last_;
+					*it = buff_[last_];
+				}
+				++it;
+			}
+			return it;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  削除
+			@param[in]	key		削除キー
+			@return 削除された要素数
 		*/
 		//-------------------------------------------------------------//
 		uint32_t erase(const key_type& key) noexcept
 		{
 			auto it = find(key);
-			if(it == end()) {
-				return 0;
-			}
-			if(last_ > 0) {
-				--last_;
-				*it = buff_[last_];
-			}
-			return 1;
+			if(it != end()) {
+				if(last_ > 0) {
+					--last_;
+					*it = buff_[last_];
+				}
+				return 1;
+			} else {
+				return 0;			}
 		}
 	};
 }

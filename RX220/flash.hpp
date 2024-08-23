@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX220 グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -331,7 +331,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		static inline dflre0_t<0x007F'C440> DFLRE0;
+		typedef dflre0_t<0x007F'C440> DFLRE0_;
+		static inline DFLRE0_ DFLRE0;
 
 
 		//-----------------------------------------------------------------//
@@ -355,7 +356,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		static inline dflwe0_t<0x007F'C450> DFLWE0;
+		typedef dflwe0_t<0x007F'C450> DFLWE0_;
+		static inline DFLWE0_ DFLWE0;
 
 
 		//-----------------------------------------------------------------//
@@ -398,6 +400,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
+					UID が無いので、ROM 内のダミーデータを返す @n
 					ROM 0xFFFF'FFE8 to 0xFFFF'FFF7 互換性ダミー
 		*/
 		//-----------------------------------------------------------------//
