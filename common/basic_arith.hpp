@@ -2,7 +2,10 @@
 //=====================================================================//
 /*!	@file
 	@brief	Arithmetic テンプレート @n
-			※テキストの数式を展開して、計算結果を得る。
+			- テキストの数式を展開して、計算結果を得る。 @n
+			- 0x, 0X で１６進数と認識する @n
+			- 0b, 0B で２進数と認識する @n
+			- A-Z、a-z、_ などがある場合、シンボル、又は関数と認識する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2015, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -26,7 +29,7 @@ namespace utils {
 	struct basic_arith {
 
 		static constexpr uint32_t NUMBER_NUM = 50;  	///< 最大桁数
-		static constexpr uint32_t NEST_MAX   = 10;  	///< 最大ネスト
+		static constexpr uint32_t NEST_MAX   = 20;  	///< 最大ネスト深度
 		static constexpr uint8_t CODE_SYM    = 0x80;	///< 変数の短縮コード（64個）
 		static constexpr uint8_t CODE_FUNC   = 0xC0;	///< 関数の短縮コード（64個）
 
@@ -100,6 +103,11 @@ namespace utils {
 
 		NVAL number_() noexcept
 		{
+			++nest_;
+			if(nest_ >= NEST_MAX) {
+				error_.set(error::nest_fatal);
+			}
+
 			bool minus = false;
 
 			// 符号、反転の判定
@@ -111,7 +119,7 @@ namespace utils {
 			}
 
 			NVAL nval;
-			if((ch_ >= '0' && ch_ <= '9') || ch_ == '(') {  // 数値のチェック
+			if((ch_ >= '0' && ch_ <= '9') || ch_ == '.' || ch_ == '(') {  // 数値のチェック
 
 			} else if(ch_ <= 0x7f) {  // 通常の文字列の場合
 				typename SYMBOL::NAME sc;
@@ -132,7 +140,7 @@ namespace utils {
 				}
 				error_.set(error::symbol_fatal);
 				return nval;
-			} else if(static_cast<uint8_t>(ch_) >= CODE_SYM) {  // symbol?, func?
+			} else if(static_cast<uint8_t>(ch_) >= CODE_SYM) {  // 短縮コード symbol?, func?
 				if(static_cast<uint8_t>(ch_) >= CODE_FUNC) {  // func ?
 					auto fc = static_cast<typename FUNC::NAME>(ch_);
 					func_sub_(fc, nval);
@@ -149,7 +157,7 @@ namespace utils {
 
 			if(ch_ == '(') {
 				nval = factor_();
-			} else {  // 0 - 9
+			} else {  // 0 - 9 .
 				char tmp[NUMBER_NUM];
 				uint32_t idx = 0;
 				auto base = NVAL::BASE::DEC;
@@ -215,15 +223,17 @@ namespace utils {
 					nval.assign(tmp, base);
 				}
 			}
-
 			if(minus) { nval = -nval; }
-
 			return nval;
 		}
 
 
 		auto factor_() noexcept
 		{
+			++nest_;
+			if(nest_ >= NEST_MAX) {
+				error_.set(error::nest_fatal);
+			}
 			NVAL v(0);
 			if(ch_ == '(') {
 				ch_ = *tx_++;
@@ -242,6 +252,10 @@ namespace utils {
 
 		NVAL term_() noexcept
 		{
+			++nest_;
+			if(nest_ >= NEST_MAX) {
+				error_.set(error::nest_fatal);
+			}
 			NVAL v = factor_();
 			while(error_() == 0) {
 				switch(ch_) {

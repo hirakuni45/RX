@@ -1,10 +1,13 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX621/RX62N, RX631/RX63N グループ FLASH 制御 @n
-			このファイルは、「renesas.hpp」にインクルードされる前提なので、個別にインクルードしない。
+	@brief	RXv1 グループ FLASH 制御 @n
+			・RX621/RX62N @n
+			・RX631/RX63N @n
+			このファイルは、「renesas.hpp」でインクルードされる前提なので、 @n
+			個別にインクルードしない事。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -31,10 +34,9 @@ namespace device {
 #endif
 
 	public:
-		static constexpr auto DATA_SIZE  = FLASH::DATA_SIZE;			///< データフラッシュ、サイズ（バイト）
-		static constexpr auto DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データフラッシュ、ブロック数
-		static constexpr auto DATA_BLOCK_NUM  = FLASH::DATA_SIZE / FLASH::DATA_BLOCK_SIZE;	///< データフラッシュ、バンク数
-		static constexpr auto DATA_WORD_SIZE   = FLASH::DATA_WORD_SIZE;	///< データフラッシュ、ワードサイズ（最小書き込みバイト）
+		static constexpr uint32_t DATA_SIZE = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
+		static constexpr uint32_t DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
+		static constexpr uint32_t DATA_BLOCK_NUM  = FLASH::DATA_SIZE / DATA_BLOCK_SIZE;	///< データ・フラッシュのバンク数
 
 	private:
 		enum class MODE : uint8_t {
@@ -52,7 +54,6 @@ namespace device {
 			ST_READ,	///< ステータスリードモード移行
 			LKB_READ,	///< ロックビットリードモード移行
 			SET_CLOCK,	///< 周辺クロック通知
-
 		};
 
 		void step_frdy_(uint32_t timeout_ms) noexcept
@@ -171,29 +172,11 @@ namespace device {
 		{
 			if(trans_farm_) return true;
 
-			/// FCU ファームウェア格納領域 0xFEFF'E000h ～ 0xFEFF'FFFFh 8Kバイト
-			/// FCU-RAM 領域 0x007F'8000h ～ 0x007F'9FFFh 8Kバイト
-			if(device::FLASH::FENTRYR() != 0) {
-				device::FLASH::FENTRYR = 0xAA00;
+			uint8_t frq = clock_profile::FCLK / 500'000;
+			++frq;
+			frq >>= 1;
+			FLASH::PCKAR.PCKA = frq;
 
-				uint32_t wait = 4;
-				while(device::FLASH::FENTRYR() != 0) {
-					if(wait > 0) {
-						--wait;
-					} else {
-						debug_format("FCU Tras FARM timeout\n");
-						return false;
-					}
-				}
-			}
-
-			device::FLASH::FCURAME = 0xC401;  // Write only
-
-			const uint32_t* src = reinterpret_cast<const uint32_t*>(0xFEFF'E000);  // Farm master
-			uint32_t* dst = reinterpret_cast<uint32_t*>(0x007F8000);  // Farm section
-			for(uint32_t i = 0; i < (8192 / 4); ++i) {
-				*dst++ = *src++;
-			}
 #if 0
 			device::FLASH::FCURAME = 0xC400;
 

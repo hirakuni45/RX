@@ -26,7 +26,7 @@ namespace device {
 		static constexpr uint32_t DATA_BLOCK_SIZE = 256;	///< データ・フラッシュ、ブロックサイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 2;		///< データ・フラッシュ最小書き込みサイズ
 
-		static constexpr auto ID_NUM = 0;						///< 個別識別子数
+		static constexpr auto ID_NUM = 0;					///< 個別識別子数
 
 
 		//-----------------------------------------------------------------//
@@ -160,7 +160,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBRE07;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		static inline dflre0_t<0x007F'C440> DFLRE0;
+		typedef dflre0_t<0x007F'C440> DFLRE0_;
+		static inline DFLRE0_ DFLRE0;
 
 
 		//-----------------------------------------------------------------//
@@ -187,7 +188,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBRE15;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		static inline dflre1_t<0x007F'C442> DFLRE1;
+		typedef dflre1_t<0x007F'C442> DFLRE1_;
+		static inline DFLRE1_ DFLRE1;
 
 
 		//-----------------------------------------------------------------//
@@ -214,7 +216,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBWE07;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		static inline dflwe0_t<0x007F'C450> DFLWE0;
+		typedef dflwe0_t<0x007F'C450> DFLWE0_;
+		static inline DFLWE0_ DFLWE0;
 
 
 		//-----------------------------------------------------------------//
@@ -241,7 +244,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    DBWE15;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
 		};
-		static inline dflwe1_t<0x007F'C452> DFLWE1;
+		typedef dflwe1_t<0x007F'C452> DFLWE1_;
+		static inline DFLWE1_ DFLWE1;
 
 
 		//-----------------------------------------------------------------//
