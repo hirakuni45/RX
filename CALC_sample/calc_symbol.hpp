@@ -28,7 +28,7 @@ namespace utils {
 
 		NVAL	ans_;
 
-		NVAL	v_[10 + USER_SYM_NUM];
+		NVAL	v_[4 + 10 + USER_SYM_NUM];  // 基底変数４＋１０個
 
 		MAP&	map_;
 
@@ -37,16 +37,17 @@ namespace utils {
 	public:
 		//=============================================================//
 		/*!
-			@brief  シンボル型 (0x80 to 0xBF) 64 個
+			@brief  固定シンボル型 (0x80 to 0xBF) 64 個
 		*/
 		//=============================================================//
 		enum class NAME : uint8_t {
 			NONE = 0,		///< 未定義
 
 			org = 0x80,
+
 			PI = 0x80,		///< PI
 			LOG2,			///< ２の自然対数
-			EULER,			///< Euler数（ネイピア数）
+			EULER,			///< オイラー数（ネイピア数）
 			ANS,			///< 解答シンボル
 
 			V0,				///< 変素
@@ -65,6 +66,12 @@ namespace utils {
 		};
 
 
+		void insert(const char* str, NAME name) noexcept
+		{
+			map_.insert(std::pair(str, static_cast<uint8_t>(name)));
+		}
+
+
 		//-------------------------------------------------------------//
 		/*!
 			@brief  コンストラクタ
@@ -73,20 +80,20 @@ namespace utils {
 		//-------------------------------------------------------------//
 		calc_symbol(MAP& map) noexcept : ans_(), v_{ }, map_(map), id_(static_cast<uint8_t>(NAME::last))
 		{
-			map_.insert(std::pair("PI", static_cast<uint8_t>(NAME::PI)));
-			map_.insert(std::pair("LOG2", static_cast<uint8_t>(NAME::LOG2)));
-			map_.insert(std::pair("EULER", static_cast<uint8_t>(NAME::EULER)));
-			map_.insert(std::pair("ANS", static_cast<uint8_t>(NAME::ANS)));
-			map_.insert(std::pair("V0", static_cast<uint8_t>(NAME::V0)));
-			map_.insert(std::pair("V1", static_cast<uint8_t>(NAME::V1)));
-			map_.insert(std::pair("V2", static_cast<uint8_t>(NAME::V2)));
-			map_.insert(std::pair("V3", static_cast<uint8_t>(NAME::V3)));
-			map_.insert(std::pair("V4", static_cast<uint8_t>(NAME::V4)));
-			map_.insert(std::pair("V5", static_cast<uint8_t>(NAME::V5)));
-			map_.insert(std::pair("V6", static_cast<uint8_t>(NAME::V6)));
-			map_.insert(std::pair("V7", static_cast<uint8_t>(NAME::V7)));
-			map_.insert(std::pair("V8", static_cast<uint8_t>(NAME::V8)));
-			map_.insert(std::pair("V9", static_cast<uint8_t>(NAME::V9)));
+			insert("PI",    NAME::PI);
+			insert("LOG2",  NAME::LOG2);
+			insert("EULER", NAME::EULER);
+			insert("ANS",   NAME::ANS);
+			insert("V0",    NAME::V0);
+			insert("V1",    NAME::V1);
+			insert("V2",    NAME::V2);
+			insert("V3",    NAME::V3);
+			insert("V4",    NAME::V4);
+			insert("V5",    NAME::V5);
+			insert("V6",    NAME::V6);
+			insert("V7",    NAME::V7);
+			insert("V8",    NAME::V8);
+			insert("V9",    NAME::V9);
 		}
 
 
@@ -134,10 +141,11 @@ namespace utils {
 		{
 			for(auto it : map_) {
 				if(static_cast<NAME>(it.second) == id) {
-					return it.first.c_str();
+					return it.first;
 				}
 			}
-			return "";
+			static typename MAP::key_type t;
+			return t;
 		}
 
 

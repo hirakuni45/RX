@@ -11,13 +11,18 @@
 #include <cmath>
 #include <cstring>
 #include <string>
+#include <cstring>
 
+// #define USE_BOOST_UMAP
+#ifdef USE_BOOST_UMAP
 #include <boost/unordered_map.hpp>
+#else
+#include "common/fixed_map.hpp"
+#endif
 
 #include "common/basic_arith.hpp"
 #include "common/mpfr.hpp"
 #include "common/fixed_string.hpp"
-#include "common/fixed_map.hpp"
 
 #include "calc_func.hpp"
 #include "calc_symbol.hpp"
@@ -31,15 +36,18 @@ namespace app {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     struct calc_cmd {
 
-		static constexpr uint32_t ANS_NUM = 20;  			///< 表示桁
+		static constexpr uint32_t ANS_NUM = 30;  			///< 表示桁
 		// 内部演算を大きくしないと、最下位の表示が曖昧になる・・
 		static constexpr uint32_t CALC_NUM = ANS_NUM * 4;	///< 内部演算
 
 		// 数値クラス
 		typedef mpfr::value<CALC_NUM> NVAL;
 
-//		typedef boost::unordered_map<utils::STR8, uint8_t> MAP;
+#ifdef USE_BOOST_UMAP
+		typedef boost::unordered_map<utils::STR8, uint8_t> MAP;
+#else
 		typedef utils::fixed_map<utils::STR8, uint8_t, 64> MAP;
+#endif
 		typedef utils::calc_symbol<NVAL, MAP> SYMBOL;
 		typedef utils::calc_func<NVAL, MAP> FUNC;
 		typedef utils::basic_arith<NVAL, SYMBOL, FUNC> ARITH;
@@ -54,29 +62,6 @@ namespace app {
 
 		int		shift_;
 		bool	disp_separate_;
-
-		void zerosup_(char* org, char ech) noexcept
-		{
-			// 指数表示の場合スルー
-			if(strrchr(org, ech) != nullptr) return;
-
-			// 小数点が無い場合スルー
-			if(strrchr(org, '.') == nullptr) return;
-
-			auto l = strlen(org);
-			while(l > 0) {
-				--l;
-				if(org[l] != '0') break;
-				else {
-					org[l] = 0;
-				}
-			}
-			if(l > 0) {
-				if(org[l] == '.') {
-					org[l] = 0;
-				}
-			}
-		}
 
 		void sep_(const char* src, int len, int mod, int spn) noexcept
 		{
@@ -101,15 +86,12 @@ namespace app {
 		void disp_(NVAL& ans) noexcept
 		{
 			char cnv = 'f';
-			char ech = 'e';
 			uint32_t spn = 3;
 			if(func_.get_vtype() == FUNC::VTYPE::Hex) {
 				cnv = 'A';
-				ech = 'P';
 				spn = 4;
 			} else if(func_.get_vtype() == FUNC::VTYPE::Bin) {
 				cnv = 'b';
-				ech = 'p';
 				spn = 4;
 			}
 
@@ -120,7 +102,6 @@ namespace app {
 
 			char tmp[ANS_NUM * 4 + 8];  // 2 進表示用に 4 倍を確保 + α
 			ans(ANS_NUM, tmp, sizeof(tmp), cnv);
-			zerosup_(tmp, ech);
 
 			if(disp_separate_) {
 				const char* s = tmp;
@@ -132,12 +113,15 @@ namespace app {
 					++s;
 				}
 				if(cnv == 'A') {
-					if(s[0] == '0' && s[1] == 'X') {
+					if(s[0] == '0' && s[1] == 'x') {
 						s += 2;
 						out_func_("0x");
 					}
 				} else if(cnv == 'b') {
-					out_func_("0b");
+					if(s[0] == '0' && s[1] == 'b') {
+						s += 2;
+						out_func_("0b");
+					}
 				}
 
 				const char* p = strchr(s, '.');
@@ -164,7 +148,7 @@ namespace app {
 		void list_sym_() noexcept
 		{
 			for(auto id = SYMBOL::NAME::V0; id < SYMBOL::NAME::V9; SYMBOL::next(id)) {
-				out_func_(symbol_.get_name(id));
+				out_func_(symbol_.get_name(id).c_str());
 				out_func_(": ");
 				NVAL val;
 				symbol_(id, val);
@@ -172,7 +156,7 @@ namespace app {
 			}
 		}
 
-		bool def_func_(const char* org, uint32_t n)
+		bool def_func_(const char* org, uint32_t n) noexcept
 		{
 			return true;
 		}
@@ -213,27 +197,29 @@ namespace app {
 			if(out_func_ == nullptr) return;
 
 			if(strcmp(cmd, "help") == 0 || strcmp(cmd, "?") == 0) {
-				out_func_("  PI        constant\n");
-				out_func_("  LOG2      constant\n");
-				out_func_("  EULER     constant\n");
-				out_func_("  ANS       constant\n");
-				out_func_("  V[0-9]    Memory symbol 0..9\n");
-				out_func_("  Min[0-9]  Memory In 0..9\n");
-				out_func_("  ListSym   List symbol\n");
-				out_func_("  Rad       0 to 2*PI\n");
-				out_func_("  Grad      0 to 400\n");
-				out_func_("  Deg       0 to 360\n");
-				out_func_("  Dec       Decimal mode\n");
-				out_func_("  Hex       Hexadecimal mode\n");
-				out_func_("  Bin       Binary mode\n");
-				out_func_("  Sep       Separate mode\n");
+				out_func_("  'PI'       constant symbol\n");	// 円周率シンボル
+				out_func_("  'LOG2'     constant symbol\n");	// 自然数シンボル
+				out_func_("  'EULER'    constant symbol\n");	// オイラー数シンボル
+				out_func_("  'ANS'      constant symbol\n");	// 前の計算の答え
+				out_func_("  'V[0-9]'   Memory symbol 0..9\n");	// ユーザー定数
+				out_func_("  Min[0-9]   Memory In 0..9\n");		// ANS の値をユーザー定数へ設定
+				out_func_("  ListSym    List symbol\n");		// シンボルのリスト
+				out_func_("  Rad        0 to 2*PI\n");			// 角度法をラジアンへ
+				out_func_("  Grad       0 to 400\n");			// 角度法をグラジアンへ
+				out_func_("  Deg        0 to 360\n");			// 角度法をデグリへ
+				out_func_("  Dec        Decimal mode\n");		// １０進表示モード
+				out_func_("  Hex        Hexadecimal mode\n");	// １６進表示モード
+				out_func_("  Bin        Binary mode\n");		// ２進表示モード
+				out_func_("  Sep        Separate mode\n");		// セパレート表示モード(On/Off)１０進、３桁毎の表示
+				out_func_("  Unit [cmd] Unit conversion mode\n");	// 単位変換表示モードの選択
 
 				for(auto id = FUNC::NAME::org; id != FUNC::NAME::last; FUNC::next(id)) {
 					out_func_("  ");
-					out_func_(func_.get_name(static_cast<FUNC::NAME>(id)));
+					out_func_(func_.get_name(static_cast<FUNC::NAME>(id)).c_str());
 					out_func_("(x)\n");
 				}
 				return;
+
 			} else if(strncmp(cmd, "Min", 3) == 0) {
 				if(cmd[3] >= '0' && cmd[3] <= '9') {
 					NVAL val;
@@ -271,6 +257,9 @@ namespace app {
 				out_func_(disp_separate_ ? "Separate: ON" : "Separate: OFF");
 				out_func_("\n");
 				return;
+			} else if(strncmp(cmd, "Unit", 4) == 0) {
+
+				return;
 			}
 
 			const auto p = strchr(cmd, ':');
@@ -287,8 +276,31 @@ namespace app {
 			}
 		}
 
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  calc_symbol クラスへの参照
+			@return	calc_symbol クラス
+		*/
+		//-------------------------------------------------------------//
 		auto& at_symbol() { return symbol_; }
 
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  calc_func クラスへの参照
+			@return	calc_func クラス
+		*/
+		//-------------------------------------------------------------//
 		auto& at_func() { return func_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  arith クラスへの参照
+			@return	arith クラス
+		*/
+		//-------------------------------------------------------------//
+		auto& at_arith() { return arith_; }
 	};
 }

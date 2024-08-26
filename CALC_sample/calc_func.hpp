@@ -272,10 +272,11 @@ namespace utils {
 		{
 			for(auto it : map_) {
 				if(static_cast<NAME>(it.second) == name) {
-					return it.first.c_str();
+					return it.first;
 				}
 			}
-			return "";
+			static typename MAP::key_type t;
+			return t;
 		}
 
 
