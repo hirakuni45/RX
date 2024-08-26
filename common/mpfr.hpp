@@ -12,7 +12,11 @@
 #include <cmath>
 #include <mpfr.h>
 #include <cstring>
+#ifdef EMU
+#include "utils/input.hpp"
+#else
 #include "common/input.hpp"
+#endif
 
 namespace mpfr {
 
@@ -28,7 +32,7 @@ namespace mpfr {
 			@brief  BASE 型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class BASE {
+		enum class BASE : uint8_t {
 			BIN = 2,
 			DEC = 10,
 			HEX = 16
@@ -130,6 +134,29 @@ namespace mpfr {
 						*p = '0';
 						num += step;
 					}
+				}
+			}
+		}
+
+		static void zerosup_(char* org, char ech) noexcept
+		{
+			// 指数表示の場合スルー
+			if(strrchr(org, ech) != nullptr) return;
+
+			// 小数点が無い場合スルー
+			if(strrchr(org, '.') == nullptr) return;
+
+			auto l = strlen(org);
+			while(l > 0) {
+				--l;
+				if(org[l] != '0') break;
+				else {
+					org[l] = 0;
+				}
+			}
+			if(l > 0) {
+				if(org[l] == '.') {
+					org[l] = 0;
 				}
 			}
 		}
@@ -473,20 +500,54 @@ namespace mpfr {
 			@param[in]	upn		小数点以下の文字数
 			@param[out]	out		格納文字列ポインター
 			@param[in]	len		格納文字列数
-			@param[in]	cnv		変換文字（a, A, b, f, F）
+			@param[in]	cnv		変換文字（a, A, b, f, F） @n
+								a: hexadecimal @n
+								A: HEXADECIMAL @n
+								b: binary @n
+								f: decimal @n
+								F: DECIMAL
 		*/
 		//-----------------------------------------------------------------//
 		void operator() (int upn, char* out, uint32_t len, char cnv = 'f') noexcept
 		{
 			char form[16];
+			char ech;
 			if(cnv == 'a' || cnv == 'A' || cnv == 'b') {  // Bin, Hex
 				utils::sformat("%%RN%c", form, sizeof(form)) % cnv;
+				ech = 'p';
 			} else {
 				utils::sformat("%%.%dRN%c", form, sizeof(form)) % upn % cnv;
+				ech = 'e';
 			}
-			mpfr_snprintf(out, len, form, t_);
 //			mpfr_snprintf(out, len, "%.50RNf", t_);
+			auto p = out;
+			auto l = len;
+			if(cnv == 'b') {
+				p += 2;
+				l -= 2;
+			}
+
+			mpfr_snprintf(p, l, form, t_);
+
+			if(cnv == 'b') {  // 二進数では、"0b" を追加
+				if(p[0] == '-' || p[0] == '+') {
+					out[0] = p[0];
+					out[1] = '0';
+					out[2] = 'b';
+				} else {
+					out[0] = '0';
+					out[1] = 'b';
+				}
+			} else if(cnv == 'A') {  // １６進で "0X" を "0x" に変換
+				if(p[0] == '-' || p[1] == '+') {
+					if(p[2] == 'X') p[2] = 'x';
+				} else {
+					if(p[1] == 'X') p[1] = 'x';
+				}
+			}
+
 			convert_c99_float_binhex_(cnv, out, len);
+			zerosup_(out, ech);
 		}
 
 
