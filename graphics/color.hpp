@@ -248,6 +248,7 @@ namespace graphics {
 		static constexpr share_color SafeColor    = {  51, 204, 255 };  // セーフカラー（水色系）
 		static constexpr share_color EmeraldGreen = {   0, 164, 116 };
 		static constexpr share_color LightPink    = { 255, 182, 193 };
+		static constexpr share_color Turquoise    = {   0, 162, 232 };  // ターコイズ
 
 		static constexpr share_color DarkSafeColor  = { 23, 54, 64 };
 		static constexpr share_color LightSafeColor = { 23+23/2, 54+54/2, 64+64/2 };

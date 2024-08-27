@@ -2,15 +2,16 @@
 //=====================================================================//
 /*! @file
     @brief  GUI 関数電卓・クラス @n
-			RX65N Envision Kit @n
-			RX72N Envision Kit @n
-			calc_gui
+			- RX65N Envision Kit @n
+			- RX72N Envision Kit @n
+			- glfw3_app/calc
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include <cstring>
 #ifndef EMU
 #include "common/renesas.hpp"
 
@@ -27,7 +28,12 @@
 
 #include "gui/widget_director.hpp"
 
+#ifdef EMU
+#include "utils/format.hpp"
+#else
 #include "common/format.hpp"
+#endif
+
 #include "common/fixed_string.hpp"
 
 #include "resource.hpp"
@@ -75,9 +81,9 @@ namespace app {
 			uint16_t fb_[LCDX * LCDY];
 
 		public:
-			void sync_vpos() { }
+			void sync_vpos() noexcept { }
 
-			void* get_fbp() { return fb_; }
+			void* get_fbp() noexcept { return fb_; }
 		};
 		typedef glcdc_emu<LCD_X, LCD_Y> GLCDC;
 #endif
@@ -86,10 +92,15 @@ namespace app {
 		typedef graphics::kfont<16, 16> KFONT;
 		typedef graphics::font<AFONT, KFONT> FONT;
 
+#ifdef EMU
+		// ソフトウェアーレンダラー
+		typedef graphics::render<GLCDC, FONT> RENDER;
+#else
 		// ソフトウェアーレンダラー
 //		typedef graphics::render<GLCDC, FONT> RENDER;
 		// RX65N/RX72N DRW2D Engine
 		typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
+#endif
 		// 標準カラーインスタンス
 		typedef graphics::def_color DEF_COLOR;
 
@@ -116,24 +127,25 @@ namespace app {
 			uint32_t	num_;
 
 		public:
-			touch_emu() : num_(0) { }
+			touch_emu() noexcept : num_(0) { }
 
-			uint32_t get_touch_num() const { return num_; }
+			uint32_t get_touch_num() const noexcept { return num_; }
 
-			const auto& get_touch_pos(uint32_t idx) const {
+			const auto& get_touch_pos(uint32_t idx) const noexcept
+			{
 				if(idx >= 4) idx = 0;
 				return touch_[idx];
 			}
 
 			void update() { }
 
-			void set_pos(const vtx::spos& pos)
+			void set_pos(const vtx::spos& pos) noexcept
 			{
 				touch_[0].pos = pos;
 				num_ = 1;
 			}
 
-			void reset() { num_ = 0; }
+			void reset() noexcept { num_ = 0; }
 		};
 		typedef touch_emu TOUCH;
 #endif
@@ -154,12 +166,12 @@ namespace app {
 		static constexpr int16_t SPC_X = 47;
 		static constexpr int16_t SPC_Y = 44;
 
-		constexpr int16_t LOC_X(int16_t x)
+		constexpr int16_t LOC_X(int16_t x) noexcept
 		{
 			return ORG_X + SPC_X * x;
 		}
 
-		constexpr int16_t LOC_Y(int16_t y)
+		constexpr int16_t LOC_Y(int16_t y) noexcept
 		{
 			return ORG_Y + SPC_Y * y;
 		}
@@ -181,14 +193,14 @@ namespace app {
 		BUTTON	del_;
 		BUTTON	ac_;
 
-		BUTTON	mul_;
-		BUTTON	div_;
-		BUTTON	add_;
-		BUTTON	sub_;
+		BUTTON	mul_;  // *
+		BUTTON	div_;  // /
+		BUTTON	add_;  // +
+		BUTTON	sub_;  // -
 
 		BUTTON	poi_;  // .
-		BUTTON	x10_;
-		BUTTON	ans_;
+		BUTTON	x10_;  // x10
+		BUTTON	ans_;  // ANS
 		BUTTON	equ_;  // =
 
 		BUTTON	sin_;
@@ -206,16 +218,16 @@ namespace app {
 
 		BUTTON	fc_;
 		BUTTON	angt_;
+		BUTTON	setup_;
+
+		BUTTON	sym_;
+		BUTTON	sym_in_;
+		BUTTON	sym_out_;
 
 		BUTTON	left_;
 		BUTTON	right_;
 		BUTTON	pin_;  // (
 		BUTTON	pot_;  // )
-
-		BUTTON	setup_;
-		BUTTON	sym_;
-		BUTTON	sym_in_;
-		BUTTON	sym_out_;
 
 		typedef utils::fixed_string<256> STR;
 		STR			cbackup_;
@@ -226,7 +238,19 @@ namespace app {
 		static constexpr int16_t limit_ = 3;
 		vtx::spos	cur_pos_;
 
-		bool		fc_mode_;
+		enum class FC_MODE : uint8_t {
+			MODE0,
+			MODE1,
+			MODE2,
+		};
+		FC_MODE		fc_mode_;
+
+		enum class OUT_MODE : uint8_t {
+			BIN,
+			DEC,
+			HEX
+		};
+		OUT_MODE	out_mode_;	
 
 		int			nest_;
 
@@ -234,14 +258,14 @@ namespace app {
 
 		int			shift_;
 
-		void clear_win_()
+		void clear_win_() noexcept
 		{
 			cbackup_.clear();
 			cbuff_.clear();
 			cbuff_pos_ = 0;
 			del_len_ = 0;
 			cur_pos_.set(0);
-			render_.set_fore_color(DEF_COLOR::Darkgray);
+			render_.set_fore_color(DEF_COLOR::DarkSafeColor);
 			render_.round_box(vtx::srect(0, 0, 480, 16 * 5 + 6), 8);
 			nest_ = 0;
 //			symbol_.set_value(SYMBOL::NAME::ANS, NVAL(0));
@@ -252,17 +276,17 @@ namespace app {
 			shift_ = 0;
 		}
 
-		typedef utils::fixed_string<512> OUTSTR;
+		// UTF8 に対応した文字数を確保
+		typedef utils::fixed_string<CALC_CMD::ANS_NUM * 4 * 3> OUTSTR;
 
-
-		void conv_cha_(char ch, OUTSTR& out)
+		void conv_cha_(char ch, OUTSTR& out) noexcept
 		{
 			auto code = static_cast<uint8_t>(ch);
 			if(code >= 0x80 && code < 0xc0) {
-				out += calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code));
+				out += calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code)).c_str();
 				return;
 			} else if(code >= 0xc0) {
-				out += calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code));
+				out += calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code)).c_str();
 				return;
 			}
 			switch(code) {
@@ -282,6 +306,8 @@ namespace app {
 			case 'D': out += "Ｄ"; break;
 			case 'E': out += "Ｅ"; break;
 			case 'F': out += "Ｆ"; break;
+			case 'b': out += "ｂ"; break;
+			case 'x': out += "ｘ"; break;
 			case '+': out += "＋"; break;
 			case '-': out += "－"; break;
 			case '/': out += "÷"; break;
@@ -295,16 +321,16 @@ namespace app {
 			}
 		}
 
-
-		uint32_t size_cha_(char ch)
+#if 0
+		uint32_t size_cha_(char ch) noexcept
 		{
 			auto code = static_cast<uint8_t>(ch);
 			uint32_t l = 8;
 			if(code >= 0x80 && code < 0xc0) {
-				calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code));
-				l = 16;
+				l = strlen(calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code)).c_str());
+				l *= 8;
 			} else if(code >= 0xc0) {
-				l = strlen(calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code)));
+				l = strlen(calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code)).c_str());
 				l *= 8;
 			} else if(ch >= '0' && ch <= '9') {
 				l = 16;
@@ -313,20 +339,22 @@ namespace app {
 			}
 			return l;
 		}
+#endif
 
-
-		OUTSTR conv_str_(const char* str)
+		OUTSTR conv_str_(const char* str, uint32_t n) noexcept
 		{
 			OUTSTR out;
 			char ch;
 			while((ch = *str++) != 0) {
+				if(n == 0) break;
 				conv_cha_(ch, out);
+				--n;
 			}
 			return out;
 		}
 
 
-		void update_calc_()
+		void update_calc_() noexcept
 		{
 			if(cbuff_pos_ == cbuff_.size()) return;
 
@@ -354,7 +382,7 @@ namespace app {
 		}
 
 
-		void parse_cbuff_(OUTSTR& out)
+		void parse_cbuff_(OUTSTR& out) noexcept
 		{
 			uint32_t i = 0;
 			while(i < cbuff_.size()) {
@@ -364,51 +392,118 @@ namespace app {
 		}
 
 
-		// 答え表示
-#if 0
-		void draw_ans_(const NVAL& in, bool ok)
+		int16_t sep_(const char* src, int len, int mod, int spn, int16_t x) noexcept
 		{
-			char tmp[ANS_NUM+1];
+			char sub[8 * 4];
+
+			if(mod == 0) mod = spn;
+			int n = 0;
+			while(len > 0) {
+				strncpy(sub, src, mod);
+				sub[mod] = 0;
+//				if(len > spn) {
+//					sub[mod] = '\'';
+//					sub[mod + 1] = 0;
+//				} else {
+//					sub[mod] = 0;
+//				}
+///				out_func_(sub);
+				auto out = conv_str_(sub, sizeof(sub));
+				if((n & 1) != 0)  {
+					render_.set_fore_color(DEF_COLOR::Silver);
+				} else {
+					render_.set_fore_color(DEF_COLOR::White);
+				}
+				x = render_.draw_text(vtx::spos(x, DISP_OFS_Y + 20 * 3), out.c_str());
+				len -= mod;
+				src += mod;
+				mod = spn;
+				++n;
+			}
+			return x;
+		}
+
+
+		// 答え表示
+		void draw_ans_(const NVAL& in, bool ok) noexcept
+		{
+			char tmp[CALC_CMD::ANS_NUM * 4 + 8];  // 二進表現の場合に桁数を確保する為４倍＋α
+			char cnv = 'f';
+			uint32_t spn = 3;
 			if(ok) {
 				NVAL ans = in;
 				if(shift_ != 0) {
 					auto exp = NVAL::exp10(NVAL(shift_));
 					ans *= exp;
 				}
-				ans(ANS_NUM, tmp, sizeof(tmp));
-				// zero supless
-				auto l = strlen(tmp);
-				while(l > 0) {
-					--l;
-					if(tmp[l] != '0') break;
-					else {
-						tmp[l] = 0;
-					}
+				if(out_mode_ == OUT_MODE::BIN) {
+					cnv = 'b';
+					spn = 4;
+				} else if(out_mode_ == OUT_MODE::HEX) {
+					cnv = 'A';
+					spn = 4;
 				}
-				if(l > 0) { if(tmp[l] == '.') tmp[l] = 0; }
+				ans(CALC_CMD::ANS_NUM, tmp, sizeof(tmp), cnv);
 			} else {
 				utils::sformat("?", tmp, sizeof(tmp));
 			}
-			utils::format(" %s\n") % tmp;
 
-			auto out = conv_str_(tmp);
-			render_.set_fore_color(DEF_COLOR::Darkgray);
+			render_.set_fore_color(DEF_COLOR::DarkSafeColor);
 			render_.round_box(vtx::srect(0, DISP_OFS_Y + 20 * 3, 480, 20), 6, false, true);
-			render_.set_fore_color(DEF_COLOR::White);
-			render_.draw_text(vtx::spos(DISP_OFS_X, DISP_OFS_Y + 20 * 3), out.c_str());
+			{
+				int16_t x = DISP_OFS_X;
+				const char* s = tmp;
+				if(*s == '-') {
+					++s;
+				} else if(*s == '+') {
+					++s;
+				}
+				if(cnv == 'A') {
+					if(s[0] == '0' && s[1] == 'x') {
+						s += 2;
+					}
+				} else if(cnv == 'b') {
+					if(s[0] == '0' && s[1] == 'b') {
+						s += 2;
+					}
+				}
+				{
+					auto out = conv_str_(tmp, s - tmp);
+					render_.set_fore_color(DEF_COLOR::White);
+					x = render_.draw_text(vtx::spos(x, DISP_OFS_Y + 20 * 3), out.c_str());
+				}
+
+				const char* p = strchr(s, '.');
+				int l;
+				if(p != nullptr) {
+					l = p - s;
+				} else {
+					l = strlen(s);
+				}
+				auto m = l % spn;
+				x = sep_(s, l, m, spn, x);
+				if(p != nullptr) {
+					render_.set_fore_color(DEF_COLOR::White);
+					x = render_.draw_text(vtx::spos(x, DISP_OFS_Y + 20 * 3), "．");
+					++p;
+					int l = strlen(p);
+					sep_(p, l, 0, spn, x);
+				}
+			}
+
 			if(shift_ != 0) {  // exp 表示
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(480 - DISP_OFS_X - 24 - 2, DISP_OFS_Y + 20 * 3, 32, 20));
 				char tmp[8];
 				utils::sformat("%+d", tmp, sizeof(tmp)) % -shift_;
 				render_.set_fore_color(DEF_COLOR::White);
-				render_.draw_text(vtx::spos(480 - DISP_OFS_X - 24, DISP_OFS_Y + 20 * 3 + 1), tmp);
+				render_.draw_text(vtx::spos(480 - DISP_OFS_X - 24 + 2, DISP_OFS_Y + 20 * 3), tmp);
 			}
 		}
-#endif
 
-		// 答え表示
-		void update_equ_()
+
+		// 「＝」ボタン、答え表示
+		void update_equ_() noexcept
 		{
 			if(cbuff_.empty()) {
 				cbuff_ = cbackup_;
@@ -419,16 +514,10 @@ namespace app {
 			while(nest_ > 0) { cbuff_ += ')'; nest_--; }
 			update_calc_();
 
-			calc_cmd_(cbuff_.c_str());
-
-//			auto ok = arith_.analize(cbuff_.c_str());
-//			auto ans = arith_();
-//			symbol_.set_value(SYMBOL::NAME::ANS, ans);
-//			draw_ans_(ans, ok);
-
-			OUTSTR cmd;
-			parse_cbuff_(cmd);
-			utils::format("%s\n") % cmd.c_str();
+			auto ok = calc_cmd_.at_arith().analize(cbuff_.c_str());
+			auto ans = calc_cmd_.at_arith()();
+			calc_cmd_.at_symbol().set_value(SYMBOL::NAME::ANS, ans);
+			draw_ans_(ans, ok);
 
 			cbackup_ = cbuff_;
 			cbuff_.clear();
@@ -436,7 +525,7 @@ namespace app {
 			cur_pos_.y++;
 			if(cur_pos_.y >= limit_) {
 				render_.move(vtx::srect(DISP_OFS_X, DISP_OFS_Y + 20, 480 - DISP_OFS_X * 2, 20 * 2), vtx::spos(DISP_OFS_X, DISP_OFS_Y));
-				render_.set_fore_color(DEF_COLOR::Darkgray);
+				render_.set_fore_color(DEF_COLOR::DarkSafeColor);
 				render_.fill_box(vtx::srect(DISP_OFS_X, DISP_OFS_Y + 20 * 2, 480 - DISP_OFS_X * 2, 20));
 				cur_pos_.y = limit_ - 1;
 			}
@@ -444,18 +533,87 @@ namespace app {
 		}
 
 
-		void update_fc_()
+		void update_inv_() noexcept
 		{
-			if(fc_mode_) {
+			switch(out_mode_) {
+			case OUT_MODE::BIN:
+				inv_.set_title("Bin");
+				break;
+			case OUT_MODE::DEC:
+				inv_.set_title("Dec");
+				break;
+			case OUT_MODE::HEX:
+				inv_.set_title("Hex");
+				break;
+			}
+		}
+
+
+		void update_fc_() noexcept
+		{
+			switch(fc_mode_) {
+			case FC_MODE::MODE0:
+				sin_.set_title("sin");
+				sin_.set_base_color(graphics::def_color::EmeraldGreen);
+				cos_.set_title("cos");
+				cos_.set_base_color(graphics::def_color::EmeraldGreen);
+				tan_.set_title("tan");
+				tan_.set_base_color(graphics::def_color::EmeraldGreen);
+				pai_.set_title("π");
+
+				sqr_.set_mobj(resource::bitmap::x_2);
+				sqr_.set_base_color(graphics::def_color::EmeraldGreen);
+				sqrt_.set_title("√");
+				sqrt_.set_base_color(graphics::def_color::EmeraldGreen);
+				pow_.set_mobj(resource::bitmap::x_y);
+				pow_.set_base_color(graphics::def_color::EmeraldGreen);
+
+				log_.set_title("log");
+				ln_.set_title("ln");
+				inv_.set_mobj(resource::bitmap::x_m1);
+				break;
+			case FC_MODE::MODE1:
 				sin_.set_title("asin");
 				cos_.set_title("acos");
 				tan_.set_title("atan");
+				pai_.set_title("е2");
+
+				sqr_.set_mobj(nullptr);
+				sqr_.set_title("sinh");
+				sqrt_.set_title("cosh");
+				pow_.set_mobj(nullptr);
+				pow_.set_title("tanh");
+
+				log_.set_title("asih");
+				ln_.set_title("acoh");
+				inv_.set_mobj(nullptr);
+				inv_.set_title("atah");
+				break;
+			case FC_MODE::MODE2:
+				sin_.set_title("Ａ");
+				sin_.set_base_color(graphics::def_color::White);
+				cos_.set_title("Ｂ");
+				cos_.set_base_color(graphics::def_color::White);
+				tan_.set_title("Ｃ");
+				tan_.set_base_color(graphics::def_color::White);
 				pai_.set_title("е");
-			} else {
-				sin_.set_title("sin");
-				cos_.set_title("cos");
-				tan_.set_title("tan");
-				pai_.set_title("π");
+
+				sqr_.set_mobj(nullptr);
+				sqr_.set_title("Ｄ");
+				sqr_.set_base_color(graphics::def_color::White);
+
+				sqrt_.set_title("Ｅ");
+				sqrt_.set_base_color(graphics::def_color::White);
+
+				pow_.set_mobj(nullptr);
+				pow_.set_title("Ｆ");
+				pow_.set_base_color(graphics::def_color::White);
+
+				log_.set_title("0x");
+				ln_.set_title("0b");
+				inv_.set_mobj(nullptr);
+				update_inv_();
+				break;
 			}
 		}
 
@@ -503,34 +661,35 @@ namespace app {
 			ans_(vtx::srect(LOC_X(8), LOC_Y(3), BTN_W, BTN_H), "Ans"),
 			equ_(vtx::srect(LOC_X(9), LOC_Y(3), BTN_W, BTN_H), "＝"),
 
-			sin_(vtx::srect(LOC_X(4), LOC_Y(0), BTN_W, BTN_H), "sin"),
-			cos_(vtx::srect(LOC_X(4), LOC_Y(1), BTN_W, BTN_H), "cos"),
-			tan_(vtx::srect(LOC_X(4), LOC_Y(2), BTN_W, BTN_H), "tan"),
+			sin_(vtx::srect(LOC_X(4), LOC_Y(0), BTN_W, BTN_H), "sin"),	// sin.  asin, A
+			cos_(vtx::srect(LOC_X(4), LOC_Y(1), BTN_W, BTN_H), "cos"),	// cos,  acos, B
+			tan_(vtx::srect(LOC_X(4), LOC_Y(2), BTN_W, BTN_H), "tan"),	// tan,  atan, C
 			pai_(vtx::srect(LOC_X(4), LOC_Y(3), BTN_W, BTN_H), "π"),
 
-			sqr_ (vtx::srect(LOC_X(3), LOC_Y(0), BTN_W, BTN_H)),
-			sqrt_(vtx::srect(LOC_X(3), LOC_Y(1), BTN_W, BTN_H), "√"),
-			pow_ (vtx::srect(LOC_X(3), LOC_Y(2), BTN_W, BTN_H)),
+			sqr_ (vtx::srect(LOC_X(3), LOC_Y(0), BTN_W, BTN_H)),		// sqr,  sqr,  D
+			sqrt_(vtx::srect(LOC_X(3), LOC_Y(1), BTN_W, BTN_H), "√"),	// sqrt, sqrt, E
+			pow_ (vtx::srect(LOC_X(3), LOC_Y(2), BTN_W, BTN_H)),		// pow,  pow,  F
 
-			log_(vtx::srect(LOC_X(2), LOC_Y(0), BTN_W, BTN_H), "log"),
-			ln_ (vtx::srect(LOC_X(2), LOC_Y(1), BTN_W, BTN_H), "ln"),
-			inv_(vtx::srect(LOC_X(2), LOC_Y(2), BTN_W, BTN_H)),
+			log_(vtx::srect(LOC_X(2), LOC_Y(0), BTN_W, BTN_H), "log"),	// log,  log,  0x
+			ln_ (vtx::srect(LOC_X(2), LOC_Y(1), BTN_W, BTN_H), "ln"),	// ln,   ln,   0b
+			inv_(vtx::srect(LOC_X(2), LOC_Y(2), BTN_W, BTN_H)),			// inv,  inv,  Bin, Dec, Hex
 
-			fc_ (vtx::srect(LOC_X(0), LOC_Y(0), BTN_W, BTN_H), "FC"),
-			angt_(vtx::srect(LOC_X(0), LOC_Y(1), BTN_W, BTN_H), "Deg"),
+			fc_   (vtx::srect(LOC_X(0), LOC_Y(0), BTN_W, BTN_H), "FC"),
+			angt_ (vtx::srect(LOC_X(0), LOC_Y(1), BTN_W, BTN_H), "Deg"), // Deg, Grd, Rad
+			setup_(vtx::srect(LOC_X(0), LOC_Y(2), BTN_W, BTN_H), "＠"),
 
-			left_ (vtx::srect(LOC_X(0), LOC_Y(3), BTN_W, BTN_H), "<--"),
-			right_(vtx::srect(LOC_X(1), LOC_Y(3), BTN_W, BTN_H), "-->"),
-			pin_(vtx::srect(LOC_X(2), LOC_Y(3), BTN_W, BTN_H), "（"),
-			pot_(vtx::srect(LOC_X(3), LOC_Y(3), BTN_W, BTN_H), "）"),
+			sym_    (vtx::srect(LOC_X(1), LOC_Y(0), BTN_W, BTN_H), "V0"),
+			sym_in_ (vtx::srect(LOC_X(1), LOC_Y(1), BTN_W, BTN_H), "Min"),
+			sym_out_(vtx::srect(LOC_X(1), LOC_Y(2), BTN_W, BTN_H), "Rcl"),
 
-			setup_   (vtx::srect(LOC_X(0), LOC_Y(2), BTN_W, BTN_H), "＠"),
-			sym_     (vtx::srect(LOC_X(1), LOC_Y(0), BTN_W, BTN_H), "V0"),
-			sym_in_  (vtx::srect(LOC_X(1), LOC_Y(1), BTN_W, BTN_H), "Min"),
-			sym_out_ (vtx::srect(LOC_X(1), LOC_Y(2), BTN_W, BTN_H), "Rcl"),
+			left_ (vtx::srect(LOC_X(0), LOC_Y(3), BTN_W, BTN_H), "←"),
+			right_(vtx::srect(LOC_X(1), LOC_Y(3), BTN_W, BTN_H), "→"),
+			pin_  (vtx::srect(LOC_X(2), LOC_Y(3), BTN_W, BTN_H), "（"),
+			pot_  (vtx::srect(LOC_X(3), LOC_Y(3), BTN_W, BTN_H), "）"),
 
 			cbackup_(), cbuff_(), cbuff_pos_(0), del_len_(0), cur_pos_(0),
-			fc_mode_(false), nest_(0), symbol_idx_(0), shift_(0)
+			fc_mode_(FC_MODE::MODE0), out_mode_(OUT_MODE::DEC),
+			nest_(0), symbol_idx_(0), shift_(0)
 		{ }
 
 
@@ -661,14 +820,6 @@ namespace app {
 		//-------------------------------------------------------------//
 		void setup() noexcept
 		{
-
-//			for(int y = 0; y < 80; ++y) {
-//				render_.line_h(16*16+(y << 4), 16*16+4, 16*300);
-//			}
-
-//			render_.round_box(vtx::srect(16, 16, 300, 100), 16);
-
-// return;
 			no0_.set_layer(WIDGET::LAYER::_0);
 			no0_.at_select_func() = [=](uint32_t id) { cbuff_ += '0'; };
 			no1_.set_layer(WIDGET::LAYER::_0);
@@ -703,9 +854,9 @@ namespace app {
 					if(!cbuff_.empty()) {					
 						auto code = static_cast<uint8_t>(cbuff_.back());
 						if(code >= 0xc0) {
-							auto p = calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code));
-							if(p != nullptr) {
-								del_len_ += strlen(p);
+							auto s = calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code));
+							if(s.c_str() != nullptr) {
+								del_len_ += strlen(s.c_str()) * 8;
 							}
 							cbuff_.pop_back();
 						}
@@ -717,18 +868,22 @@ namespace app {
 					del_len_ = 8;
 				} else if(code >= '0' && code <= '9') {
 					del_len_ = 16;
-				} else if(code == '+' || code == '-' || code == '*' || code == '/') {
+				} else if(code >= 'A' && code <= 'F') {
+					del_len_ = 16;
+				} else if(code == '+' || code == '-' || code == '*' || code == '/' || code == 'b' || code == 'x') {
 					del_len_ = 16;
 				} else if(code >= 0x80 && code < 0xc0) {
-					auto p = calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code));
-					if(p != nullptr) {
-						del_len_ = strlen(p);
+					auto s = calc_cmd_.at_symbol().get_name(static_cast<typename SYMBOL::NAME>(code));
+					if(s.c_str() != nullptr) {
+						del_len_ = strlen(s.c_str()) * 8;
 					}
 				} else if(code >= 0xc0) {
-					auto p = calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code));
-					if(p != nullptr) {
-						del_len_ = strlen(p);
+					auto s = calc_cmd_.at_func().get_name(static_cast<typename FUNC::NAME>(code));
+					if(s.c_str() != nullptr) {
+						del_len_ = strlen(s.c_str()) * 8;
 					}
+				} else {
+					del_len_ = 8;
 				}
 			};
 			ac_.set_layer(WIDGET::LAYER::_0);
@@ -752,15 +907,17 @@ namespace app {
 				shift_++;
 				NVAL ans;
 				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
-//				draw_ans_(ans, true);
+				draw_ans_(ans, true);
 			};
+
 			right_.set_layer(WIDGET::LAYER::_0);
 			right_.at_select_func() = [=](uint32_t id) {
 				shift_--;
 				NVAL ans;
 				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
-//				draw_ans_(ans, true);
+				draw_ans_(ans, true);
 			};
+
 			pin_.set_layer(WIDGET::LAYER::_0);
 			pin_.at_select_func() = [=](uint32_t id) { cbuff_ += '('; nest_++; };
 			pot_.set_layer(WIDGET::LAYER::_0);
@@ -775,11 +932,11 @@ namespace app {
 			};
 			ans_.set_layer(WIDGET::LAYER::_0);
 			ans_.at_select_func() = [=](uint32_t id) {
-//				NVAL tmp;
-//				symbol_(SYMBOL::NAME::ANS, tmp);
-//				if(tmp != 0) {
-//					cbuff_ += static_cast<char>(SYMBOL::NAME::ANS);
-//				}
+				NVAL tmp;
+				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, tmp);
+				if(tmp != 0) {
+					cbuff_ += static_cast<char>(SYMBOL::NAME::ANS);
+				}
 			};
 
 			equ_.set_layer(WIDGET::LAYER::_0);
@@ -788,83 +945,219 @@ namespace app {
 			sin_.set_layer(WIDGET::LAYER::_0);
 			sin_.set_base_color(graphics::def_color::EmeraldGreen);
 			sin_.at_select_func() = [=](uint32_t id) {
-				if(fc_mode_) {
-					cbuff_ += static_cast<char>(FUNC::NAME::ASIN);
-				} else {
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
 					cbuff_ += static_cast<char>(FUNC::NAME::SIN);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::ASIN);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += 'A';
+					break;
 				}
-				cbuff_ += '('; nest_++;
 			};
 			cos_.set_layer(WIDGET::LAYER::_0);
 			cos_.set_base_color(graphics::def_color::EmeraldGreen);
 			cos_.at_select_func() = [=](uint32_t id) {
-				if(fc_mode_) {
-					cbuff_ += static_cast<char>(FUNC::NAME::ACOS);
-				} else {
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
 					cbuff_ += static_cast<char>(FUNC::NAME::COS);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::ACOS);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += 'B';
+					break;
 				}
-				cbuff_ += '('; nest_++;
 			};
 			tan_.set_layer(WIDGET::LAYER::_0);
 			tan_.set_base_color(graphics::def_color::EmeraldGreen);
 			tan_.at_select_func() = [=](uint32_t id) {
-				if(fc_mode_) {
-					cbuff_ += static_cast<char>(FUNC::NAME::ATAN);
-				} else {
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
 					cbuff_ += static_cast<char>(FUNC::NAME::TAN);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::ATAN);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += 'C';
 				}
-				cbuff_ += '('; nest_++;
 			};
 			pai_.set_layer(WIDGET::LAYER::_0);
 			pai_.set_base_color(graphics::def_color::LightPink);
 			pai_.at_select_func() = [=](uint32_t id) {
-				if(fc_mode_) {
-					cbuff_ += static_cast<char>(SYMBOL::NAME::LOG2);
-				} else {
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
 					cbuff_ += static_cast<char>(SYMBOL::NAME::PI);
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(SYMBOL::NAME::LOG2);
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += static_cast<char>(SYMBOL::NAME::EULER);
+					break;
 				}
 			};
 
 			sqr_.set_layer(WIDGET::LAYER::_0);
+			sqr_.set_base_color(graphics::def_color::EmeraldGreen);
 			sqr_.set_mobj(resource::bitmap::x_2);
 			sqr_.at_select_func() = [=](uint32_t id) {
-				cbuff_ += '^';
-				cbuff_ += '2';
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
+					cbuff_ += '^';
+					cbuff_ += '2';
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::SINH);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += 'D';
+					break;
+				}
 			};
 			sqrt_.set_layer(WIDGET::LAYER::_0);
+			sqrt_.set_base_color(graphics::def_color::EmeraldGreen);
 			sqrt_.at_select_func() = [=](uint32_t id) {
-				cbuff_ += static_cast<char>(FUNC::NAME::SQRT);
-				cbuff_ += '('; nest_++;
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
+					cbuff_ += static_cast<char>(FUNC::NAME::SQRT);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::COSH);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += 'E';
+					break;
+				}
 			};
 			pow_.set_layer(WIDGET::LAYER::_0);
+			pow_.set_base_color(graphics::def_color::EmeraldGreen);
 			pow_.set_mobj(resource::bitmap::x_y);
 			pow_.at_select_func() = [=](uint32_t id) {
-				cbuff_ += '^';
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
+					cbuff_ += '^';
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::TANH);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += 'F';
+					break;
+				}
 			};
 
 			log_.set_layer(WIDGET::LAYER::_0);
+			log_.set_base_color(graphics::def_color::EmeraldGreen);
 			log_.at_select_func() = [=](uint32_t id) {
-				cbuff_ += static_cast<char>(FUNC::NAME::LOG);
-				cbuff_ += '('; nest_++;
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
+					cbuff_ += static_cast<char>(FUNC::NAME::LOG);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::ASINH);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += "0x";
+					break;
+				}
 			};
 			ln_.set_layer(WIDGET::LAYER::_0);
+			ln_.set_base_color(graphics::def_color::EmeraldGreen);
 			ln_.at_select_func() = [=](uint32_t id) {
-				cbuff_ += static_cast<char>(FUNC::NAME::LN);
-				cbuff_ += '('; nest_++;
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
+					cbuff_ += static_cast<char>(FUNC::NAME::LN);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::ACOSH);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					cbuff_ += "0b";
+					break;
+				}
 			};
 			inv_.set_layer(WIDGET::LAYER::_0);
+			inv_.set_base_color(graphics::def_color::EmeraldGreen);
 			inv_.set_mobj(resource::bitmap::x_m1);
 			inv_.at_select_func() = [=](uint32_t id) {
-				cbuff_ += '^';
-				cbuff_ += '-';
-				cbuff_ += '1';
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
+					cbuff_ += "^-1";
+					break;
+				case FC_MODE::MODE1:
+					cbuff_ += static_cast<char>(FUNC::NAME::ATANH);
+					cbuff_ += '(';
+					nest_++;
+					break;
+				case FC_MODE::MODE2:
+					{
+						switch(out_mode_) {
+						case OUT_MODE::BIN:
+							out_mode_ = OUT_MODE::DEC;
+							break;
+						case OUT_MODE::DEC:
+							out_mode_ = OUT_MODE::HEX;
+							break;
+						case OUT_MODE::HEX:
+							out_mode_ = OUT_MODE::BIN;
+							break;
+						}
+						update_inv_();
+						NVAL ans;
+						calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
+						draw_ans_(ans, true);
+					}
+					break;
+				}
 			};
 
-
 			fc_.set_layer(WIDGET::LAYER::_0);  // 機能キー
-			fc_.set_base_color(graphics::def_color::SafeColor);
+			fc_.set_base_color(graphics::def_color::Red);
 			fc_.at_select_func() = [=](uint32_t id) {
-				fc_mode_ = !fc_mode_;
+				switch(fc_mode_) {
+				case FC_MODE::MODE0:
+					fc_mode_ = FC_MODE::MODE1;
+					break;
+				case FC_MODE::MODE1:
+					fc_mode_ = FC_MODE::MODE2;
+					break;
+				case FC_MODE::MODE2:
+					fc_mode_ = FC_MODE::MODE0;
+					break;
+				}
 				update_fc_();
 			};
 
@@ -892,15 +1185,17 @@ namespace app {
 			setup_.at_select_func() = [=](uint32_t id) {
 			};
 			sym_.set_layer(WIDGET::LAYER::_0);  // シンボル変更
-			sym_.set_base_color(graphics::def_color::SafeColor);
+			sym_.set_base_color(graphics::def_color::Turquoise);
 			sym_.at_select_func() = [=](uint32_t id) {
 				symbol_idx_++;
 				symbol_idx_ %= 10;
 				auto i = static_cast<typename SYMBOL::NAME>(static_cast<uint32_t>(SYMBOL::NAME::V0) + symbol_idx_);
-				sym_.set_title(calc_cmd_.at_symbol().get_name(i));
+				static char tmp[4];
+				strcpy(tmp, calc_cmd_.at_symbol().get_name(i).c_str());
+				sym_.set_title(tmp);
 			};
 			sym_in_.set_layer(WIDGET::LAYER::_0);  // シンボル(in)
-			sym_in_.set_base_color(graphics::def_color::SafeColor);
+			sym_in_.set_base_color(graphics::def_color::Turquoise);
 			sym_in_.at_select_func() = [=](uint32_t id) {
 				NVAL tmp;
 				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, tmp);
@@ -909,7 +1204,7 @@ namespace app {
 				calc_cmd_.at_symbol().set_value(name, tmp);
 			};
 			sym_out_.set_layer(WIDGET::LAYER::_0);  // シンボル(out)
-			sym_out_.set_base_color(graphics::def_color::SafeColor);
+			sym_out_.set_base_color(graphics::def_color::Turquoise);
 			sym_out_.at_select_func() = [=](uint32_t id) {
 				cbuff_ += static_cast<char>(
 					static_cast<uint32_t>(SYMBOL::NAME::V0) + symbol_idx_);

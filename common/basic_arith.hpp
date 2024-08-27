@@ -121,7 +121,7 @@ namespace utils {
 			NVAL nval;
 			if((ch_ >= '0' && ch_ <= '9') || ch_ == '.' || ch_ == '(') {  // 数値のチェック
 
-			} else if(ch_ <= 0x7f) {  // 通常の文字列の場合
+			} else if(static_cast<uint8_t>(ch_) <= 0x7f) {  // 通常の文字列の場合
 				typename SYMBOL::NAME sc;
 				auto tmp = symbol_.get_code(tx_ - 1, sc);
 				if(sc == SYMBOL::NAME::NONE) ;
@@ -140,7 +140,7 @@ namespace utils {
 				}
 				error_.set(error::symbol_fatal);
 				return nval;
-			} else if(static_cast<uint8_t>(ch_) >= CODE_SYM) {  // 短縮コード symbol?, func?
+			} else if(static_cast<uint8_t>(ch_) >= CODE_SYM) {  // 短縮コード symbol, func
 				if(static_cast<uint8_t>(ch_) >= CODE_FUNC) {  // func ?
 					auto fc = static_cast<typename FUNC::NAME>(ch_);
 					func_sub_(fc, nval);
@@ -153,9 +153,13 @@ namespace utils {
 				}
 				if(minus) { nval = -nval; }
 				return nval;
+			} else {
+				error_.set(error::number_fatal);
 			}
 
-			if(ch_ == '(') {
+			if(error_() != 0) {
+
+			} else if(ch_ == '(') {
 				nval = factor_();
 			} else {  // 0 - 9 .
 				char tmp[NUMBER_NUM];
@@ -385,18 +389,18 @@ namespace utils {
 			@brief	解析を開始 @n
 					高速化の場合、シンボル名、関数名は修飾コードを使う事が出来る。 @n
 					※スペースは取り除く事
-			@param[in]	text	解析テキスト
+			@param[in]	str		解析文字列
 			@return	文法にエラーがあった場合、「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool analize(const char* text) noexcept
+		bool analize(const char* str) noexcept
 		{
-			if(text == nullptr) {
+			if(str == nullptr) {
 				error_.set(error::fatal);
 				return false;
 			}
 
-			tx_ = text;
+			tx_ = str;
 			error_.clear();
 			nest_ = 0;
 
