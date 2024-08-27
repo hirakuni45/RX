@@ -52,6 +52,8 @@ tinyusb/tools/
 .vscode/*.log
 !NESEMU_sample/RX65N/nesemu_stable.mot
 !NESEMU_sample/RX72N/nesemu_stable.mot
+!CALC_sample/RX65N/calc_sample.mot
+!CALC_sample/RX72N/calc_sample.mot
 !RX600/drw2d/libdrw2d.a
 !rxlib/lib/libmad.a
 !rxlib/lib/libmadv1.a
