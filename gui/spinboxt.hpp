@@ -1,14 +1,13 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	スピンボックス表示と制御 @n
+	@brief	スピンボックス表示と制御（テキスト） @n
 			通常のスピンボックスは、右端に小さい上下ボタンがあるが @n
 			タッチパネル操作を考慮して、左右にボタンを配置する @n
 			領域を三等分して、左、中央、右を判断する @n
-			左右のアクションにより、定数を進めたり、戻したりする。 @n
-			長押しの場合、加速する機能を有する。（許可／不許可）
+			左右のアクションにより、ワードを進めたり、戻したりする。 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,6 +15,7 @@
 #include <functional>
 #include "gui/widget.hpp"
 #include "common/format.hpp"
+#include "common/string_utils.hpp"
 
 namespace gui {
 
@@ -24,12 +24,9 @@ namespace gui {
 		@brief	スピンボックス・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct spinbox : public widget {
+	struct spinboxt : public widget {
 
-		typedef spinbox value_type;
-
-		static constexpr uint8_t ACCEL_WAIT = 75;	///< 加速開始までの遅延（フレーム数）
-		static constexpr uint8_t ACCEL_TICK = 4;	///< 加速遅延（フレーム数）
+		typedef spinboxt value_type;
 
 		// 横幅を三等分した領域
 		enum class TOUCH_AREA : uint8_t {
@@ -38,63 +35,41 @@ namespace gui {
 			RIGHT,		///< 右側領域
 		};
 
-		/// 数値設定構造体
-		struct number_t {
-			int16_t	min;	///< 最小値
-			int16_t	value;	///< 値
-			int16_t	max;	///< 最大値
-			int16_t	step;	///< 加算、減算幅
-			bool	accel;	///< 数値変更の加速を有効にする場合「true」
-			/// 変数初期化は、gcc の拡張機能でー
-			/// { .min = -100, .value = 0, .max = 100, .step = 1, .accel = true }
-
-			void add() noexcept
-			{
-				if((value + step) <= max) {
-					value += step;
-				}
-			}
-
-			void sub() noexcept
-			{
-				if(min <= (value - step)) {
-					value -= step;
-				}
-			}
-		};
-
-		typedef std::function<void(TOUCH_AREA, int16_t)> SELECT_FUNC_TYPE;	///< 選択関数型
+		typedef std::function<void(TOUCH_AREA, uint16_t pos, uint16_t num)> SELECT_FUNC_TYPE;	///< 選択関数型
 
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
 		TOUCH_AREA			area_;
-		number_t			number_;
-		uint8_t				ace_wait_;
-		uint8_t				ace_tick_;
+		vtx::spos			item_size_;
+		char				sch_;
+		uint16_t			num_;
+		uint16_t			select_pos_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター（整数版）
 			@param[in]	loc		ロケーション
-			@param[in]	nmb		数値構造体の参照
+			@param[in]	str		アイテム文字列
+			@param[in]	sch		セパレート・キャラクタを指定する場合
 		*/
 		//-----------------------------------------------------------------//
-		spinbox(const vtx::srect& loc, const number_t& nmb) noexcept :
-			widget(loc, nullptr), select_func_(),
-			area_(TOUCH_AREA::CENTER), number_(nmb),
-			ace_wait_(0), ace_tick_(0)
+		spinboxt(const vtx::srect& loc, const char* str, char sch = ',') noexcept :
+			widget(loc, str), select_func_(),
+			area_(TOUCH_AREA::CENTER),
+			item_size_(0),
+			sch_(sch), num_(utils::str::get_words(str, sch_)), select_pos_(0)
 		{
 			if(get_location().size.y <= 0) {
-				at_location().size.y = DEF_SPINBOX_HEIGHT;
+				at_location().size.y = DEF_SPINBOXT_HEIGHT;
 			}
 			insert_widget(this);
 		}
 
 
-		spinbox(const spinbox& th) = delete;
-		spinbox& operator = (const spinbox& th) = delete;
+		spinboxt(const spinboxt& th) = delete;
+		spinboxt& operator = (const spinboxt& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -102,7 +77,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~spinbox() { remove_widget(this); }
+		virtual ~spinboxt() { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -111,7 +86,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "SpinBox"; }
+		const char* get_name() const noexcept override { return "SpinBoxT"; }
 
 
 		//-----------------------------------------------------------------//
@@ -120,7 +95,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::SPINBOX; }
+		ID get_id() const noexcept override { return ID::SPINBOXT; }
 
 
 		//-----------------------------------------------------------------//
@@ -141,19 +116,8 @@ namespace gui {
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
 		{
 			update_touch_def(pos, num);
-			if(get_touch_state().level_) {
-				if(number_.accel) {
-					if(ace_wait_ < ACCEL_WAIT) {
-						++ace_wait_;
-					} else {
-						if(ace_tick_ < ACCEL_TICK) {
-							++ace_tick_;
-						} else {
-							ace_tick_ = 0;
-							set_exec_request();
-						}
-					}
-				}
+			if(get_touch_state().negative_) {
+				set_exec_request();
 				auto pos = get_touch_state().relative_.x;
 				if(pos <= (get_location().size.x / 3)) {
 					area_ = TOUCH_AREA::LEFT;
@@ -162,10 +126,23 @@ namespace gui {
 				} else {
 					area_ = TOUCH_AREA::CENTER;
 				}
-			} else {
-				ace_wait_ = 0;
-				ace_tick_ = 0;
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイトル更新時処理 @n
+					「タイトル」は、メニューのアイテムとする。
+		*/
+		//-----------------------------------------------------------------//
+		void update_title() noexcept override
+		{
+			num_ = utils::str::get_words(get_title(), sch_);
+			if(select_pos_ >= num_) {
+				select_pos_ = num_ - 1;
+			}
+			set_update();
 		}
 
 
@@ -177,12 +154,16 @@ namespace gui {
 		void exec_select() noexcept override
 		{
 			if(area_ == TOUCH_AREA::LEFT) {
-				number_.sub();
+				if(select_pos_ > 0) {
+					--select_pos_;
+				}
 			} else if(area_ == TOUCH_AREA::RIGHT) {
-				number_.add();
+				if(num_ > 1 && select_pos_ < (num_ - 1)) {
+					++select_pos_;
+				}
 			}
 			if(select_func_) {
-				select_func_(area_, number_.value);
+				select_func_(area_, select_pos_, num_);
 			}
 		}
 
@@ -206,44 +187,53 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	アイテム数の取得
+			@return	アイテム数
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_item_num() const noexcept { return num_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	セレクト位置の取得
+			@return	セレクト位置
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_select_pos() const noexcept { return select_pos_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	セレクト位置の設定
+			@param[in]	pos	セレクト位置
+		*/
+		//-----------------------------------------------------------------//
+		void set_select_pos(uint32_t pos) noexcept { select_pos_ = pos; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	セレクト位置の文字取得
+			@param[in]	dst		文字列バッファ
+			@param[in]	len		文字列バッファサイズ
+			@return	セレクト位置
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_select_text(char* dst, uint32_t len) const noexcept
+		{
+			utils::str::get_word(get_title(), select_pos_, dst, len, sch_);
+			return select_pos_;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	セレクト関数への参照
 			@return	セレクト関数
 		*/
 		//-----------------------------------------------------------------//
 		SELECT_FUNC_TYPE& at_select_func() noexcept { return select_func_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	数値構造体の取得
-			@return	数値構造体
-		*/
-		//-----------------------------------------------------------------//
-		const auto& get_number() const noexcept { return number_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	数値構造体の参照
-			@return	数値構造体
-		*/
-		//-----------------------------------------------------------------//
-		auto& at_number() const noexcept { return number_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	値の変更
-			@param[in] value	値
-		*/
-		//-----------------------------------------------------------------//
-		void set_value(int16_t value) noexcept
-		{
-			if(number_.min <= value && value <= number_.max && number_.value != value) {
-				number_.value = value;
-				set_update();
-			}
-		}
 
 
 		//-----------------------------------------------------------------//
@@ -257,7 +247,7 @@ namespace gui {
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
 			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, DEF_SPINBOX_ROUND_RADIUS);
+			rdr.round_box(r, DEF_SPINBOXT_ROUND_RADIUS);
 
 			uint8_t inten = 64;
 			if(get_touch_state().level_) {  // 0.75
@@ -268,30 +258,35 @@ namespace gui {
 			sc.set_color(get_base_color().rgba8, inten);
 			rdr.set_fore_color(sc);
 
-			r.org  += DEF_SPINBOX_FRAME_WIDTH;
-			r.size -= DEF_SPINBOX_FRAME_WIDTH * 2;
-			rdr.round_box(r, DEF_SPINBOX_ROUND_RADIUS - DEF_SPINBOX_FRAME_WIDTH);
+			r.org  += DEF_SPINBOXT_FRAME_WIDTH;
+			r.size -= DEF_SPINBOXT_FRAME_WIDTH * 2;
+			rdr.round_box(r, DEF_SPINBOXT_ROUND_RADIUS - DEF_SPINBOXT_FRAME_WIDTH);
 
 			{
-				rdr.set_fore_color(get_font_color());
-				char tmp[8];  // 最大７桁（符号を入れて）
-				utils::sformat("%d", tmp, sizeof(tmp)) % number_.value;
-				auto sz = rdr.at_font().get_text_size(tmp);
-				rdr.draw_text(r.org + (r.size - sz) / 2, tmp);
+				char tmp[32];
+				if(utils::str::get_word(get_title(), select_pos_, tmp, sizeof(tmp), sch_)) {
+					auto sz = rdr.at_font().get_text_size(tmp);
+					rdr.set_fore_color(get_font_color());
+					rdr.draw_text(r.org + (r.size - sz) / 2, tmp);
+				}
 			}
 
 			// 左右のポイント描画
 			rdr.set_fore_color(get_base_color());
 			vtx::spos t[3];
-			t[0].x = r.org.x + DEF_SPINBOX_ARROW_SPACE;
+			t[0].x = r.org.x + DEF_SPINBOXT_ARROW_SPACE;
 			t[0].y = r.org.y + r.size.y / 2;
-			t[1].x = t[2].x = r.org.x + DEF_SPINBOX_ARROW_SPACE + DEF_SPINBOX_ARROW_W;
-			t[1].y = r.org.y + r.size.y / 2 - DEF_SPINBOX_ARROW_H / 2;
-			t[2].y = r.org.y + r.size.y / 2 + DEF_SPINBOX_ARROW_H / 2;
-			rdr.fill_triangle(t[0], t[1], t[2]);
-			t[0].x = r.end_x() - DEF_SPINBOX_ARROW_SPACE - 1;
-			t[1].x = t[2].x = r.end_x() - DEF_SPINBOX_ARROW_SPACE - DEF_SPINBOX_ARROW_W - 1;
-			rdr.fill_triangle(t[0], t[2], t[1]);
+			t[1].x = t[2].x = r.org.x + DEF_SPINBOXT_ARROW_SPACE + DEF_SPINBOX_ARROW_W;
+			t[1].y = r.org.y + r.size.y / 2 - DEF_SPINBOXT_ARROW_H / 2;
+			t[2].y = r.org.y + r.size.y / 2 + DEF_SPINBOXT_ARROW_H / 2;
+			if(select_pos_ > 0) {
+				rdr.fill_triangle(t[0], t[1], t[2]);
+			}
+			if(select_pos_ < (num_ - 1)) {
+				t[0].x = r.end_x() - DEF_SPINBOXT_ARROW_SPACE - 1;
+				t[1].x = t[2].x = r.end_x() - DEF_SPINBOXT_ARROW_SPACE - DEF_SPINBOXT_ARROW_W - 1;
+				rdr.fill_triangle(t[0], t[2], t[1]);
+			}
 		}
 	};
 }

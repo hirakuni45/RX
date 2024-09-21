@@ -22,8 +22,8 @@
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F572ND|2048K|512K+512K+32K+8K|64K|[R5F572ND.ld](R5F572ND.ld)|12288|4096|
-|R5F572NN|4096K|512K+512K+32K+8K|64K|[R5F572NN.ld](R5F572NN.ld)|12288|4096|
+|R5F572ND|2048K|512K+512K+32K+8K|64K|[R5F572ND.ld](R5F572ND.ld?ts=4)|12288|4096|
+|R5F572NN|4096K|512K+512K+32K+8K|64K|[R5F572NN.ld](R5F572NN.ld?ts=4)|12288|4096|
 
 ---
 
@@ -31,21 +31,21 @@
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
-|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp)||
-|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp)||
-|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp)||
-|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp)||
-|Port Definition/ポート定義|[port.hpp](port.hpp)||
-|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp)||
-|Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp)||
-|Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp)||
-|Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
-|Port Mapping ETHER/ポートマッピング ETHER|[port_map_ether.hpp](port_map_ether.hpp)||
-|Port Mapping GPTW/ポートマッピング GPTW|[port_map_gptw.hpp](port_map_gptw.hpp)||
-|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
-|Port Mapping QSPI/ポートマッピング QSPI|[port_map_qspi.hpp](port_map_qspi.hpp)||
-|Port Mapping TPU/ポートマッピング TPU|[port_map_tpu.hpp](port_map_tpu.hpp)||
-|POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp)||
+|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp?ts=4)||
+|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp?ts=4)||
+|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp?ts=4)||
+|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp?ts=4)||
+|Port Definition/ポート定義|[port.hpp](port.hpp?ts=4)||
+|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp?ts=4)||
+|Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp?ts=4)||
+|Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp?ts=4)||
+|Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp?ts=4)||
+|Port Mapping ETHER/ポートマッピング ETHER|[port_map_ether.hpp](port_map_ether.hpp?ts=4)||
+|Port Mapping GPTW/ポートマッピング GPTW|[port_map_gptw.hpp](port_map_gptw.hpp?ts=4)||
+|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp?ts=4)||
+|Port Mapping QSPI/ポートマッピング QSPI|[port_map_qspi.hpp](port_map_qspi.hpp?ts=4)||
+|Port Mapping TPU/ポートマッピング TPU|[port_map_tpu.hpp](port_map_tpu.hpp?ts=4)||
+|POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp?ts=4)||
 
 ---
 

@@ -233,7 +233,7 @@ namespace utils {
 			@return 名前がマッチしない場合「false」
 		*/
 		//-------------------------------------------------------------//
-		bool operator() (NAME name, NVAL& out) noexcept
+		bool operator() (NAME name, NVAL& out) const noexcept
 		{
 			bool ret = true;
 			switch(name) {

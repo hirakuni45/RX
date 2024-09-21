@@ -14,8 +14,8 @@
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F524UE|512K|32K|8K|[R5F524UE.ld](R5F524UE.ld)|1536|512|
-|R5F524UB|256K|32K|8K|[R5F524UB.ld](R5F524UB.ld)|1536|512|
+|R5F524UE|512K|32K|8K|[R5F524UE.ld](R5F524UE.ld?ts=4)|1536|512|
+|R5F524UB|256K|32K|8K|[R5F524UB.ld](R5F524UB.ld?ts=4)|1536|512|
 
 ---
 
@@ -23,11 +23,11 @@
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
-|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp)||
-|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp)||
-|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp)||
-|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp)||
-|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp)||
+|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp?ts=4)||
+|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp?ts=4)||
+|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp?ts=4)||
+|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp?ts=4)||
+|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp?ts=4)||
 
 ---
 

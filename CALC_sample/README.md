@@ -16,28 +16,30 @@ Calculator Sample
 - Internal processing of multiple digits (number of digits can be changed by changing constants)
 - Binary, decimal, and hexadecimal display
 - Calculations including binary (0b), decimal, and hexadecimal (0x)
+- Interconversion of units (length, speed, weight, monetary rate)
 
 ## Project list
 
-- main.cpp
-- calc_gui.hpp
-- calc_symbol.hpp
-- calc_func.hpp
-- calc_cmd.hpp
-- calc_graph.hpp
-- resource.hpp
-- resource/
-- README.md
-- READMEja.md
-- RX26T/Makefile CUI
-- RX62N/Makefile CUI
-- RX631/Makefile CUI
-- RX64M/Makefile CUI
-- RX71M/Makefile CUI
-- RX66T/Makefile CUI
-- RX72T/Makefile CUI
-- RX65N/Makefile GUI (RX65N Envision Kit)
-- RX72N/Makefile GUI (RX72N Envision Kit)
+- [README.md](README.md)
+- [READMEja.md](READMEja.md)
+- [main.cpp](main.cpp?ts=4)
+- [calc_gui.hpp](calc_gui.hpp?ts=4)
+- [calc_symbol.hpp](calc_symbol.hpp?ts=4)
+- [calc_func.hpp](calc_func.hpp?ts=4)
+- [calc_cmd.hpp](calc_cmd.hpp?ts=4)
+- [calc_graph.hpp](calc_graph.hpp?ts=4)
+- [calc_unit.hpp](calc_unit.hpp?ts=4)
+- [resource.hpp](resource.hpp?ts=4)
+- [resource/](./resource)
+- [RX26T/Makefile CUI](RX26T/Makefile?ts=4)
+- [RX62N/Makefile CUI](RX62N/Makefile?ts=4)
+- [RX631/Makefile CUI](RX631/Makefile?ts=4)
+- [RX64M/Makefile CUI](RX64M/Makefile?ts=4)
+- [RX71M/Makefile CUI](RX71M/Makefile?ts=4)
+- [RX66T/Makefile CUI](RX66T/Makefile?ts=4)
+- [RX72T/Makefile CUI](RX72T/Makefile?ts=4)
+- [RX65N/Makefile GUI (RX65N Envision Kit)](RX65N/Makefile?ts=4)
+- [RX72N/Makefile GUI (RX72N Envision Kit)](RX72N/Makefile?ts=4)
 
 ---
 
@@ -70,13 +72,13 @@ Calculator Sample
 ## Corresponding function
 
 |function name|Button(GUI)|function|
-|:-:|:-:|-------|
-|sin|sin|正弦（サイン）|
-|cos|cos|余弦（コサイン）|
-|tan|tan|正接（タンジェント）|
-|asin|asin|逆正弦（アークサイン）|
-|acos|acos|逆余弦（アークコサイン）|
-|atan|atan|逆正接（アークタンジェント）|
+|:-:|:-:|---|
+|sin|sin|sine|
+|cos|cos|cosine|
+|tan|tan|tangent|
+|asin|asin|arcsine|
+|acos|acos|arccosine|
+|atan|atan|arctangent|
 |sinh|sinh|双曲線関数（ハイパボリックサイン）|
 |cosh|cosh|双曲線関数（ハイパボリックコサイン）|
 |tanh|tanh|双曲線関数（ハイパボリックタンジェント）|
@@ -97,7 +99,7 @@ Calculator Sample
 |Bin|Bin|output binary|
 |π|PI|円周率（定数）|
 |LOG2|LOG2|自然数（定数）|
-|EULER|EULER|オイラー数（定数）|
+|EULER|EULER|オイラー数（定数 1/X）|
 |Deg|Deg|角度法、360|
 |Rad|Rad|角度法、2 π|
 |Grad|Grad|角度法、400|

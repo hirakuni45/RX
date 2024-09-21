@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX231 システム制御
+	@brief	RX231 システム制御 @n
+			・クロックのブースト
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -84,7 +85,8 @@ namespace device {
 			if(clock_profile::TURN_USB) {
 				if((48'000'000 % clock_profile::BASE) != 0) return 0;  // 割り切れない場合
 				auto n = 48'000'000 / clock_profile::BASE;
-				if(n == 4 || n == 6 || n == 8 || n ==12) return true;
+				auto m = 48'000'000 % clock_profile::BASE;
+				if(m == 0 && (n == 4 || n == 6 || n == 8 || n ==12)) return true;
 				return false;
 			} else {
 				return true;

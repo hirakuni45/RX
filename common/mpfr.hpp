@@ -333,6 +333,7 @@ namespace mpfr {
 		//-----------------------------------------------------------------//
 		void assign(const char* str, BASE base = BASE::DEC) noexcept
 		{
+			mpfr_init2(t_, NUM);
 			mpfr_set_str(t_, str, static_cast<int>(base), rnd_);
 		}
 
