@@ -90,6 +90,11 @@ namespace graphics {
 			plot(vtx::spos(cen.x + org.x + ofs.x, cen.y - org.y        ), fore_color_.rgb565);
 		}
 
+		int16_t sgn_(int x, int d) noexcept
+		{
+			return ((x > 0) ? d : (x < 0) ? -d : 0);
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -777,38 +782,89 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void fill_triangle(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2) noexcept
 		{
-			vtx::spos tmp[3];
-			if(p0.y < p1.y && p1.y < p2.y) {
-				tmp[0] = p0;
-				tmp[1] = p1;
-				tmp[2] = p2;
-			} else if(p1.y < p2.y) {
-				tmp[0] = p1;
-				if(p2.y < p0.y) {
-					tmp[1] = p2;
-					tmp[2] = p0;
-				} else {
-					tmp[1] = p0;
-					tmp[2] = p2;
-				}
-			} else {
-				tmp[0] = p2;
-				if(p0.y < p1.y) {
-					tmp[1] = p0;
-					tmp[2] = p1;
-				} else {
-					tmp[1] = p1;
-					tmp[2] = p0;
-				}
+			auto c0 = vtx::spos(p0.x << 4, p0.y << 4);
+			auto c1 = vtx::spos(p1.x << 4, p1.y << 4);
+			auto c2 = vtx::spos(p2.x << 4, p2.y << 4);
+			if(c0.y > c1.y) { std::swap(c0, c1); }
+			if(c1.y > c2.y) { std::swap(c2, c1); }
+			if(c0.y > c1.y) { std::swap(c0, c1); }
+			int16_t a;
+			int16_t b;
+			if(c0.y == c2.y) {
+				a = b = c0.x;
+				if(c1.x < a) { a = c1.x; }
+				else if(c1.x > b) { b = c1.x; }
+				if(c2.x < a) { a = c2.x; }
+				else if(c2.x > b) { b = c2.x; }
+				line_h(c0.y, a, (b - a + 16));
+				return;
+			}
+			if((p1.x - p0.x) * (p2.y - p0.y) == (p2.x - p0.x) * (p1.y - p0.y)) {
+				line(p0, p2);
+				return;
 			}
 
-//			vtx::ipos ps = tmp[1] - tmp[0];
-//			vtx::ipos ns = tmp[2] - tmp[0];
-			for(auto i = tmp[0].y; i < tmp[2].y; ++i) {
-				
-				auto w = 0;
-				line_h(tmp[0].y, tmp[0].x, w);
+			auto dy1 = c1.y - c0.y;
+			auto dy2 = c2.y - c0.y;
+			bool change = ((c1.x - c0.x) * dy2 > (c2.x - c0.x) * dy1);
+			auto dx1 = std::abs(c1.x - c0.x);
+			auto dx2 = std::abs(c2.x - c0.x);
+			auto xstep1 = c1.x < c0.x ? -16 : 16;
+			auto xstep2 = c2.x < c0.x ? -16 : 16;
+			a = b = c0.x;
+			if(change) {
+				std::swap(dx1, dx2);
+				std::swap(dy1, dy2);
+				std::swap(xstep1, xstep2);
 			}
+			auto err1 = (std::max(dx1, dy1) >> 1)
+				+ (xstep1 < 0 ? std::min(dx1, dy1) : dx1);
+			auto err2 = (std::max(dx2, dy2) >> 1)
+				+ (xstep2 > 0 ? std::min(dx2, dy2) : dx2);
+
+			// startWrite();
+			if(c0.y != c1.y) {
+				do {
+					err1 -= dx1;
+					while(err1 < 0) { err1 += dy1; a += xstep1; }
+					err2 -= dx2;
+					while(err2 < 0) { err2 += dy2; b += xstep2; }
+					line_h(c0.y, a, b - a + 16);
+					c0.y += 16;
+				} while(c0.y < c1.y) ;
+			}
+
+			if(change) {
+				b = c1.x;
+				xstep2 = c2.x < c1.x ? -16 : 16;
+				dx2 = std::abs(c2.x - c1.x);
+				dy2 = c2.y - c1.y;
+				err2 = (std::max(dx2, dy2) >> 1)
+					+ (xstep2 > 0 ? std::min(dx2, dy2) : dx2);
+			} else {
+				a = c1.x;
+				dx1 = std::abs(c2.x - c1.x);
+				dy1 = c2.y - c1.y;
+				xstep1 = c2.x < c1.x ? -16 : 16;
+				err1 = (std::max(dx1, dy1) >> 1)
+					+ (xstep1 < 0 ? std::min(dx1, dy1) : dx1);
+			}
+
+			do {
+				err1 -= dx1;
+				while(err1 < 0) {
+					err1 += dy1;
+					if((a += xstep1) == c2.x) break;
+				}
+				err2 -= dx2;
+				while(err2 < 0) {
+					err2 += dy2;
+					if((b += xstep2) == c2.x) break;
+				}
+				line_h(c0.y, a, b - a + 16);
+				c0.y += 16;
+			} while(c0.y <= c2.y) ;
+			// endWrite();
 		}
 
 
