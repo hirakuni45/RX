@@ -2,8 +2,7 @@
 //=====================================================================//
 /*! @file
     @brief  GUI 関数電卓・クラス @n
-			- RX65N Envision Kit @n
-			- RX72N Envision Kit @n
+			- RX65N/RX72N Envision Kit @n
 			- glfw3_app/calc
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
@@ -14,7 +13,6 @@
 #include <cstring>
 #ifndef EMU
 #include "common/renesas.hpp"
-
 #include "common/fixed_fifo.hpp"
 #include "common/sci_i2c_io.hpp"
 #include "chip/FT5206.hpp"
@@ -52,6 +50,7 @@ namespace app {
 		typedef typename CALC_CMD::NVAL NVAL;
 		typedef typename CALC_CMD::SYMBOL SYMBOL;
 		typedef typename CALC_CMD::FUNC FUNC;
+		typedef typename CALC_CMD::UNIT UNIT;
 
 		static constexpr int16_t  DISP_OFS_X = 4;
 		static constexpr int16_t  DISP_OFS_Y = 6;
@@ -59,6 +58,11 @@ namespace app {
 		static constexpr int16_t LCD_X = 480;
 		static constexpr int16_t LCD_Y = 272;
 		static constexpr auto PIX = graphics::pixel::TYPE::RGB565;
+
+		static constexpr int16_t DIALOG_MONEY_RATE_W = 100;
+		static constexpr int16_t DIALOG_MONEY_RATE_H = 60;
+
+		static constexpr uint32_t WIDGET_NUM = 64;
 
 		CALC_CMD&	calc_cmd_;
 
@@ -153,18 +157,23 @@ namespace app {
 		// RX65N Envision Kit: INT to P02(IRQ10), not use
 		// RX72N Envision Kit: INT to P34(IRQ4), not use
 
-		typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
-		DIALOG	dialog_;
+		typedef gui::simple_dialog<RENDER, TOUCH> SDIALOG;
+		SDIALOG	sdialog_;
 
-		typedef gui::widget_director<RENDER, TOUCH, 60> WIDD;
+		typedef gui::widget_director<RENDER, TOUCH, WIDGET_NUM> WIDD;
 		WIDD	widd_;
 
-		static constexpr int16_t BTN_W = 41;
-		static constexpr int16_t BTN_H = 38;
-		static constexpr int16_t ORG_X = 8;
-		static constexpr int16_t ORG_Y = 94;
-		static constexpr int16_t SPC_X = 47;
-		static constexpr int16_t SPC_Y = 44;
+		static constexpr int16_t BTN_W = 41;	///< ボタン横幅
+		static constexpr int16_t BTN_2 = 47+41;	///< ２ワイドボタン横幅
+		static constexpr int16_t BTN_H = 38;	///< ボタン高さ
+		static constexpr int16_t ORG_X = 8;		///< 開始位置Ｘ
+		static constexpr int16_t ORG_Y = 94;	///< 開始位置Ｙ
+		static constexpr int16_t SPC_X = 47;	///< ボタン幅＋隙間
+		static constexpr int16_t SPC_2 = 47+47;	///< ２ワイドボタン幅＋隙間
+		static constexpr int16_t SPC_Y = 44;	///< ボタン高さ＋隙間
+		static constexpr int16_t W2C_O = 41-3-1;	///< ２ワイドボタン中間オフセット（消去用）
+		static constexpr int16_t W2C_W = 3+6+3;		///< ２ワイドボタン中間幅（消去用）
+		static constexpr int16_t W2C_H = 38*3+3*2;	///< ２ワイドボタン中間高（消去用）
 
 		constexpr int16_t LOC_X(int16_t x) noexcept
 		{
@@ -224,10 +233,17 @@ namespace app {
 		BUTTON	sym_in_;
 		BUTTON	sym_out_;
 
-		BUTTON	left_;
-		BUTTON	right_;
+		BUTTON	left_;	// <-
+		BUTTON	right_;	// ->
 		BUTTON	pin_;  // (
 		BUTTON	pot_;  // )
+
+		typedef gui::spinboxt SPINBOXT;
+		SPINBOXT	uni_;
+		char		inp_item_[8 * 16];
+		SPINBOXT	inp_;
+		char		out_item_[8 * 16];
+		SPINBOXT	out_;
 
 		typedef utils::fixed_string<256> STR;
 		STR			cbackup_;
@@ -239,9 +255,10 @@ namespace app {
 		vtx::spos	cur_pos_;
 
 		enum class FC_MODE : uint8_t {
-			MODE0,
-			MODE1,
-			MODE2,
+			MODE0,	// sin, cos,tan
+			MODE1,	// asin, acos, atan
+			MODE2,	// ABCDEF,0x,0b,
+			MODE3,	// abs, unit..
 		};
 		FC_MODE		fc_mode_;
 
@@ -257,6 +274,7 @@ namespace app {
 		uint32_t	symbol_idx_;
 
 		int			shift_;
+
 
 		void clear_win_() noexcept
 		{
@@ -353,7 +371,6 @@ namespace app {
 			return out;
 		}
 
-
 		void update_calc_() noexcept
 		{
 			if(cbuff_pos_ == cbuff_.size()) return;
@@ -361,7 +378,7 @@ namespace app {
 			if(cbuff_pos_ > cbuff_.size()) {
 				if(del_len_ > 0) {
 					auto x = cur_pos_.x - del_len_;
-					render_.set_fore_color(DEF_COLOR::Darkgray);
+					render_.set_fore_color(DEF_COLOR::DarkSafeColor);
 					render_.fill_box(vtx::srect(DISP_OFS_X + x, DISP_OFS_Y + cur_pos_.y * 20, del_len_, 16));
 					cur_pos_.x -= del_len_;
 					del_len_ = 0;
@@ -381,7 +398,6 @@ namespace app {
 			cbuff_pos_ = cbuff_.size();
 		}
 
-
 		void parse_cbuff_(OUTSTR& out) noexcept
 		{
 			uint32_t i = 0;
@@ -390,7 +406,6 @@ namespace app {
 				++i;
 			}
 		}
-
 
 		int16_t sep_(const char* src, int len, int mod, int spn, int16_t x) noexcept
 		{
@@ -422,7 +437,6 @@ namespace app {
 			}
 			return x;
 		}
-
 
 		// 答え表示
 		void draw_ans_(const NVAL& in, bool ok) noexcept
@@ -498,9 +512,18 @@ namespace app {
 				utils::sformat("%+d", tmp, sizeof(tmp)) % -shift_;
 				render_.set_fore_color(DEF_COLOR::White);
 				render_.draw_text(vtx::spos(480 - DISP_OFS_X - 24 + 2, DISP_OFS_Y + 20 * 3), tmp);
+// calc_cmd_.at_unit().get_ext(calc_cmd_.at_unit().get_out());
 			}
 		}
 
+		const char* conv_unit_(const char* t) noexcept
+		{
+			if(strcmp(t, "um") == 0) {
+				return "μm";
+			} else {
+				return t;
+			}
+		}
 
 		// 「＝」ボタン、答え表示
 		void update_equ_() noexcept
@@ -517,7 +540,8 @@ namespace app {
 			auto ok = calc_cmd_.at_arith().analize(cbuff_.c_str());
 			auto ans = calc_cmd_.at_arith()();
 			calc_cmd_.at_symbol().set_value(SYMBOL::NAME::ANS, ans);
-			draw_ans_(ans, ok);
+			auto a = calc_cmd_.at_unit()(ans);
+			draw_ans_(a, ok);
 
 			cbackup_ = cbuff_;
 			cbuff_.clear();
@@ -531,7 +555,6 @@ namespace app {
 			}
 			shift_ = 0;
 		}
-
 
 		void update_inv_() noexcept
 		{
@@ -548,17 +571,19 @@ namespace app {
 			}
 		}
 
-
 		void update_fc_() noexcept
 		{
 			switch(fc_mode_) {
 			case FC_MODE::MODE0:
+				widd_.enable(WIDGET::LAYER::_1);
+				widd_.enable(WIDGET::LAYER::_2, false);
 				sin_.set_title("sin");
 				sin_.set_base_color(graphics::def_color::EmeraldGreen);
 				cos_.set_title("cos");
 				cos_.set_base_color(graphics::def_color::EmeraldGreen);
 				tan_.set_title("tan");
 				tan_.set_base_color(graphics::def_color::EmeraldGreen);
+				pai_.set_base_color(graphics::def_color::LightPink);
 				pai_.set_title("π");
 
 				sqr_.set_mobj(resource::bitmap::x_2);
@@ -571,6 +596,9 @@ namespace app {
 				log_.set_title("log");
 				ln_.set_title("ln");
 				inv_.set_mobj(resource::bitmap::x_m1);
+
+				render_.set_fore_color(DEF_COLOR::Black);
+				render_.fill_box(vtx::srect(LOC_X(2)+W2C_O, LOC_Y(0), W2C_W, W2C_H));
 				break;
 			case FC_MODE::MODE1:
 				sin_.set_title("asin");
@@ -614,7 +642,48 @@ namespace app {
 				inv_.set_mobj(nullptr);
 				update_inv_();
 				break;
+			case FC_MODE::MODE3:
+				sin_.set_title("abs");
+				sin_.set_base_color(graphics::def_color::EmeraldGreen);
+				cos_.set_title("rint");
+				cos_.set_base_color(graphics::def_color::EmeraldGreen);
+				tan_.set_title("frac");
+				tan_.set_base_color(graphics::def_color::EmeraldGreen);
+				pai_.set_base_color(graphics::def_color::EmeraldGreen);
+				pai_.set_title("eint");
+
+				widd_.enable(WIDGET::LAYER::_1, false);
+				widd_.enable(WIDGET::LAYER::_2);
+				break;
 			}
+		}
+
+		void update_uni_() noexcept
+		{
+			auto& unit = calc_cmd_.at_unit();
+			inp_item_[0] = 0;
+			out_item_[0] = 0;
+			auto n = unit.get_num();
+			for(uint32_t i = 0; i < n; ++i) {
+				typename UNIT::UNIT u;
+				u.val = i;
+				strcat(inp_item_, "I: ");
+				strcat(inp_item_, unit.get_ext(u));
+				if(i < (n - 1)) {
+					strcat(inp_item_, ",");
+				}
+				strcat(out_item_, "O: ");
+				strcat(out_item_, unit.get_ext(u));
+				if(i < (n - 1)) {
+					strcat(out_item_, ",");
+				}
+			}
+			inp_.set_title(inp_item_);
+			out_.set_title(out_item_);
+			inp_.update_title();
+			out_.update_title();
+			inp_.set_select_pos(unit.get_inp().val);
+			out_.set_select_pos(unit.get_out().val);
 		}
 
 	public:
@@ -638,7 +707,7 @@ namespace app {
 #else
 			touch_(),
 #endif
-			dialog_(render_, touch_),
+			sdialog_(render_, touch_),
 			widd_(render_, touch_),
 			no0_(vtx::srect(LOC_X(5), LOC_Y(3), BTN_W, BTN_H), "０"),
 			no1_(vtx::srect(LOC_X(5), LOC_Y(2), BTN_W, BTN_H), "１"),
@@ -674,7 +743,7 @@ namespace app {
 			ln_ (vtx::srect(LOC_X(2), LOC_Y(1), BTN_W, BTN_H), "ln"),	// ln,   ln,   0b
 			inv_(vtx::srect(LOC_X(2), LOC_Y(2), BTN_W, BTN_H)),			// inv,  inv,  Bin, Dec, Hex
 
-			fc_   (vtx::srect(LOC_X(0), LOC_Y(0), BTN_W, BTN_H), "FC"),
+			fc_   (vtx::srect(LOC_X(0), LOC_Y(0), BTN_W, BTN_H), "FC0"),
 			angt_ (vtx::srect(LOC_X(0), LOC_Y(1), BTN_W, BTN_H), "Deg"), // Deg, Grd, Rad
 			setup_(vtx::srect(LOC_X(0), LOC_Y(2), BTN_W, BTN_H), "＠"),
 
@@ -686,6 +755,12 @@ namespace app {
 			right_(vtx::srect(LOC_X(1), LOC_Y(3), BTN_W, BTN_H), "→"),
 			pin_  (vtx::srect(LOC_X(2), LOC_Y(3), BTN_W, BTN_H), "（"),
 			pot_  (vtx::srect(LOC_X(3), LOC_Y(3), BTN_W, BTN_H), "）"),
+
+			uni_  (vtx::srect(LOC_X(2), LOC_Y(0), BTN_2, BTN_H), "NIL,LENGTH,SPEED,WEIGHT,MONEY"),
+			inp_item_{ 0 },
+			inp_  (vtx::srect(LOC_X(2), LOC_Y(1), BTN_2, BTN_H), ""),
+			out_item_{ 0 },
+			out_  (vtx::srect(LOC_X(2), LOC_Y(2), BTN_2, BTN_H), ""),
 
 			cbackup_(), cbuff_(), cbuff_pos_(0), del_len_(0), cur_pos_(0),
 			fc_mode_(FC_MODE::MODE0), out_mode_(OUT_MODE::DEC),
@@ -784,6 +859,7 @@ namespace app {
 				render_.start(device::ICU::LEVEL::_2);
 			}
 #endif
+			calc_cmd_.init();
 		}
 
 
@@ -795,7 +871,7 @@ namespace app {
 		void setup_touch_panel() noexcept
 		{
 			render_.sync_frame();
-			dialog_.modal(vtx::spos(400, 60),
+			sdialog_.modal(vtx::spos(400, 60),
 				"Touch panel device wait...\nPlease touch it with some screen.");
 			uint8_t nnn = 0;
 			while(1) {
@@ -907,7 +983,8 @@ namespace app {
 				shift_++;
 				NVAL ans;
 				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
-				draw_ans_(ans, true);
+				auto a = calc_cmd_.at_unit()(ans);
+				draw_ans_(a, true);
 			};
 
 			right_.set_layer(WIDGET::LAYER::_0);
@@ -915,7 +992,8 @@ namespace app {
 				shift_--;
 				NVAL ans;
 				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
-				draw_ans_(ans, true);
+				auto a = calc_cmd_.at_unit()(ans);
+				draw_ans_(a, true);
 			};
 
 			pin_.set_layer(WIDGET::LAYER::_0);
@@ -959,6 +1037,11 @@ namespace app {
 				case FC_MODE::MODE2:
 					cbuff_ += 'A';
 					break;
+				case FC_MODE::MODE3:
+					cbuff_ += static_cast<char>(FUNC::NAME::ABS);
+					cbuff_ += '(';
+					nest_++;
+					break;
 				}
 			};
 			cos_.set_layer(WIDGET::LAYER::_0);
@@ -978,6 +1061,11 @@ namespace app {
 				case FC_MODE::MODE2:
 					cbuff_ += 'B';
 					break;
+				case FC_MODE::MODE3:
+					cbuff_ += static_cast<char>(FUNC::NAME::RINT);
+					cbuff_ += '(';
+					nest_++;
+					break;
 				}
 			};
 			tan_.set_layer(WIDGET::LAYER::_0);
@@ -996,6 +1084,12 @@ namespace app {
 					break;
 				case FC_MODE::MODE2:
 					cbuff_ += 'C';
+					break;
+				case FC_MODE::MODE3:
+					cbuff_ += static_cast<char>(FUNC::NAME::FRAC);
+					cbuff_ += '(';
+					nest_++;
+					break;
 				}
 			};
 			pai_.set_layer(WIDGET::LAYER::_0);
@@ -1011,10 +1105,15 @@ namespace app {
 				case FC_MODE::MODE2:
 					cbuff_ += static_cast<char>(SYMBOL::NAME::EULER);
 					break;
+				case FC_MODE::MODE3:
+					cbuff_ += static_cast<char>(FUNC::NAME::EINT);
+					cbuff_ += '(';
+					nest_++;
+					break;
 				}
 			};
 
-			sqr_.set_layer(WIDGET::LAYER::_0);
+			sqr_.set_layer(WIDGET::LAYER::_1);
 			sqr_.set_base_color(graphics::def_color::EmeraldGreen);
 			sqr_.set_mobj(resource::bitmap::x_2);
 			sqr_.at_select_func() = [=](uint32_t id) {
@@ -1031,9 +1130,11 @@ namespace app {
 				case FC_MODE::MODE2:
 					cbuff_ += 'D';
 					break;
+				case FC_MODE::MODE3:
+					break;
 				}
 			};
-			sqrt_.set_layer(WIDGET::LAYER::_0);
+			sqrt_.set_layer(WIDGET::LAYER::_1);
 			sqrt_.set_base_color(graphics::def_color::EmeraldGreen);
 			sqrt_.at_select_func() = [=](uint32_t id) {
 				switch(fc_mode_) {
@@ -1050,9 +1151,11 @@ namespace app {
 				case FC_MODE::MODE2:
 					cbuff_ += 'E';
 					break;
+				case FC_MODE::MODE3:
+					break;
 				}
 			};
-			pow_.set_layer(WIDGET::LAYER::_0);
+			pow_.set_layer(WIDGET::LAYER::_1);
 			pow_.set_base_color(graphics::def_color::EmeraldGreen);
 			pow_.set_mobj(resource::bitmap::x_y);
 			pow_.at_select_func() = [=](uint32_t id) {
@@ -1068,10 +1171,12 @@ namespace app {
 				case FC_MODE::MODE2:
 					cbuff_ += 'F';
 					break;
+				case FC_MODE::MODE3:
+					break;
 				}
 			};
 
-			log_.set_layer(WIDGET::LAYER::_0);
+			log_.set_layer(WIDGET::LAYER::_1);
 			log_.set_base_color(graphics::def_color::EmeraldGreen);
 			log_.at_select_func() = [=](uint32_t id) {
 				switch(fc_mode_) {
@@ -1088,9 +1193,11 @@ namespace app {
 				case FC_MODE::MODE2:
 					cbuff_ += "0x";
 					break;
+				case FC_MODE::MODE3:
+					break;
 				}
 			};
-			ln_.set_layer(WIDGET::LAYER::_0);
+			ln_.set_layer(WIDGET::LAYER::_1);
 			ln_.set_base_color(graphics::def_color::EmeraldGreen);
 			ln_.at_select_func() = [=](uint32_t id) {
 				switch(fc_mode_) {
@@ -1107,9 +1214,11 @@ namespace app {
 				case FC_MODE::MODE2:
 					cbuff_ += "0b";
 					break;
+				case FC_MODE::MODE3:
+					break;
 				}
 			};
-			inv_.set_layer(WIDGET::LAYER::_0);
+			inv_.set_layer(WIDGET::LAYER::_1);
 			inv_.set_base_color(graphics::def_color::EmeraldGreen);
 			inv_.set_mobj(resource::bitmap::x_m1);
 			inv_.at_select_func() = [=](uint32_t id) {
@@ -1141,6 +1250,8 @@ namespace app {
 						draw_ans_(ans, true);
 					}
 					break;
+				case FC_MODE::MODE3:
+					break;
 				}
 			};
 
@@ -1150,12 +1261,19 @@ namespace app {
 				switch(fc_mode_) {
 				case FC_MODE::MODE0:
 					fc_mode_ = FC_MODE::MODE1;
+					fc_.set_title("FC1");
 					break;
 				case FC_MODE::MODE1:
 					fc_mode_ = FC_MODE::MODE2;
+					fc_.set_title("FC2");
 					break;
 				case FC_MODE::MODE2:
+					fc_mode_ = FC_MODE::MODE3;
+					fc_.set_title("FC3");
+					break;
+				case FC_MODE::MODE3:
 					fc_mode_ = FC_MODE::MODE0;
+					fc_.set_title("FC0");
 					break;
 				}
 				update_fc_();
@@ -1210,7 +1328,38 @@ namespace app {
 					static_cast<uint32_t>(SYMBOL::NAME::V0) + symbol_idx_);
 			};
 
+			// unit 関係
+			uni_.set_layer(WIDGET::LAYER::_2);  // unit 選択
+			uni_.set_base_color(graphics::def_color::SafeColor);
+			uni_.at_select_func() = [=](SPINBOXT::TOUCH_AREA area, uint16_t pos, uint16_t num) {
+				calc_cmd_.at_unit().set_type(static_cast<typename UNIT::TYPE>(pos));
+				update_uni_();
+			};
+			inp_.set_layer(WIDGET::LAYER::_2);  // input ボタン
+			inp_.set_base_color(graphics::def_color::SafeColor);
+			inp_.at_select_func() = [=](SPINBOXT::TOUCH_AREA area, uint16_t pos, uint16_t num) {
+				typename UNIT::UNIT u;
+				u.val = pos;
+				calc_cmd_.at_unit().set_inp(u);
+				NVAL ans;
+				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
+				auto a = calc_cmd_.at_unit()(ans);
+				draw_ans_(a, true);
+			};
+			out_.set_layer(WIDGET::LAYER::_2);  // output ボタン
+			out_.set_base_color(graphics::def_color::SafeColor);
+			out_.at_select_func() = [=](SPINBOXT::TOUCH_AREA area, uint16_t pos, uint16_t num) {
+				typename UNIT::UNIT u;
+				u.val = pos;
+				calc_cmd_.at_unit().set_out(u);
+				NVAL ans;
+				calc_cmd_.at_symbol()(SYMBOL::NAME::ANS, ans);
+				auto a = calc_cmd_.at_unit()(ans);
+				draw_ans_(a, true);
+			};
+
 			widd_.enable(WIDGET::LAYER::_0);
+			widd_.enable(WIDGET::LAYER::_1);
 
 			clear_win_();
 		}

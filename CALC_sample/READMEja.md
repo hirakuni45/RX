@@ -16,30 +16,32 @@ Renesas RX マイコン関数電卓サンプル
 - 多数桁の内部処理（定数変更で桁数変更可能）
 - ２進、１０進、１６進表示
 - ２進（0b）、１０進、１６進（0x）を含めた、計算
+- 単位の相互変換（長さ、速度、重量、貨幣レート）
 
 ---
 
 ## プロジェクト・リスト
 
-- main.cpp
-- calc_gui.hpp
-- calc_symbol.hpp
-- calc_func.hpp
-- calc_cmd.hpp
-- calc_graph.hpp
-- resource.hpp
-- resource/
-- README.md
-- READMEja.md
-- RX26T/Makefile CUI
-- RX62N/Makefile CUI
-- RX631/Makefile CUI
-- RX64M/Makefile CUI
-- RX71M/Makefile CUI
-- RX66T/Makefile CUI
-- RX72T/Makefile CUI
-- RX65N/Makefile GUI (RX65N Envision Kit)
-- RX72N/Makefile GUI (RX72N Envision Kit)
+- [README.md](README.md)
+- [READMEja.md](READMEja.md)
+- [main.cpp](main.cpp?ts=4)
+- [calc_gui.hpp](calc_gui.hpp?ts=4)
+- [calc_symbol.hpp](calc_symbol.hpp?ts=4)
+- [calc_func.hpp](calc_func.hpp?ts=4)
+- [calc_cmd.hpp](calc_cmd.hpp?ts=4)
+- [calc_graph.hpp](calc_graph.hpp?ts=4)
+- [calc_unit.hpp](calc_unit.hpp?ts=4)
+- [resource.hpp](resource.hpp?ts=4)
+- [resource/](./resource)
+- [RX26T/Makefile CUI](RX26T/Makefile?ts=4)
+- [RX62N/Makefile CUI](RX62N/Makefile?ts=4)
+- [RX631/Makefile CUI](RX631/Makefile?ts=4)
+- [RX64M/Makefile CUI](RX64M/Makefile?ts=4)
+- [RX71M/Makefile CUI](RX71M/Makefile?ts=4)
+- [RX66T/Makefile CUI](RX66T/Makefile?ts=4)
+- [RX72T/Makefile CUI](RX72T/Makefile?ts=4)
+- [RX65N/Makefile GUI (RX65N Envision Kit)](RX65N/Makefile?ts=4)
+- [RX72N/Makefile GUI (RX72N Envision Kit)](RX72N/Makefile?ts=4)
 
 ---
 
@@ -88,7 +90,7 @@ Renesas RX マイコン関数電卓サンプル
 |log10|log|基数 10 の対数関数|
 |log|ln|基数 e の対数関数|
 |x^y|x^y|X の Y 乗|
-|x^-1|x^-1|X の -1 乗（逆数）|
+|x^-1|x^-1|X の -1 乗（逆数 1/X）|
 |x^2|x^2|二乗|
 |sqrt|sqrt|平方根（ルート）|
 |exp10|exp|エクスポーネント１０|
