@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Widget ディレクター
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,6 +23,7 @@
 #include "gui/menu.hpp"
 #include "gui/term.hpp"
 #include "gui/spinbox.hpp"
+#include "gui/spinboxt.hpp"
 #include "gui/toggle.hpp"
 #include "gui/progress.hpp"
 #include "gui/closebox.hpp"
@@ -475,6 +476,13 @@ namespace gui {
 						w->draw(rdr_);
 					}
 					break;
+				case widget::ID::SPINBOXT:
+					{
+						auto* w = dynamic_cast<spinboxt*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
 				case widget::ID::TOGGLE:
 					{
 						auto* w = dynamic_cast<toggle*>(t.w_);
@@ -516,6 +524,8 @@ namespace gui {
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}
+					break;
+				default:
 					break;
 				}
 			}

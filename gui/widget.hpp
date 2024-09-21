@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "common/vtx.hpp"
 #include "graphics/color.hpp"
-#include "common/file_io.hpp"
+// #include "common/file_io.hpp"
 
 namespace gui {
 
@@ -23,54 +23,61 @@ namespace gui {
 
 		typedef graphics::def_color DEF_COLOR;	///< 標準カラー
 
-		static constexpr int16_t DEF_FRAME_ROUND_RADIUS   = 6;	///< 標準、フレーム、コーナーの半径
-		static constexpr int16_t DEF_FRAME_FRAME_WIDTH    = 2;	///< 標準、フレーム、外周のフレーム幅
+		static constexpr int16_t DEF_FRAME_ROUND_RADIUS    = 6;		///< 標準、フレーム、コーナーの半径
+		static constexpr int16_t DEF_FRAME_FRAME_WIDTH     = 2;		///< 標準、フレーム、外周のフレーム幅
 
-		static constexpr int16_t DEF_DIALOG_ROUND_RADIUS  = 6;	///< 標準、ダイアログ、コーナーの半径
-		static constexpr int16_t DEF_DIALOG_FRAME_WIDTH   = 2;	///< 標準、ダイアログ、外周のフレーム幅
+		static constexpr int16_t DEF_DIALOG_ROUND_RADIUS   = 6;		///< 標準、ダイアログ、コーナーの半径
+		static constexpr int16_t DEF_DIALOG_FRAME_WIDTH    = 2;		///< 標準、ダイアログ、外周のフレーム幅
 
-		static constexpr int16_t DEF_BUTTON_ROUND_RADIUS  = 6;	///< 標準、ボタン、コーナーの半径
-		static constexpr int16_t DEF_BUTTON_FRAME_WIDTH   = 3;	///< 標準、ボタン、外周のフレーム幅
-		static constexpr int16_t DEF_BUTTON_HEIGHT        = 30;	///< 標準、ボタン、サイズが省略された場合の高さ
-		static constexpr int16_t DEF_BUTTON_TO_STR        = 4;	///< 標準、ボタン、フレームからタイトルまでの距離
+		static constexpr int16_t DEF_BUTTON_ROUND_RADIUS   = 6;		///< 標準、ボタン、コーナーの半径
+		static constexpr int16_t DEF_BUTTON_FRAME_WIDTH    = 3;		///< 標準、ボタン、外周のフレーム幅
+		static constexpr int16_t DEF_BUTTON_HEIGHT         = 30;	///< 標準、ボタン、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_BUTTON_TO_STR         = 4;		///< 標準、ボタン、フレームからタイトルまでの距離
 
-		static constexpr int16_t DEF_SLIDER_ROUND_RADIUS  = 10;	///< 標準、スライダー、コーナーの半径
-		static constexpr int16_t DEF_SLIDER_FRAME_WIDTH   = 3;	///< 標準、スライダー、外周のフレーム幅
-		static constexpr int16_t DEF_SLIDER_HANDLE_SIZE   = 20;	///< 標準、スライダー、ハンドルの大きさ
+		static constexpr int16_t DEF_SLIDER_ROUND_RADIUS   = 10;	///< 標準、スライダー、コーナーの半径
+		static constexpr int16_t DEF_SLIDER_FRAME_WIDTH    = 3;		///< 標準、スライダー、外周のフレーム幅
+		static constexpr int16_t DEF_SLIDER_HANDLE_SIZE    = 20;	///< 標準、スライダー、ハンドルの大きさ
 
-		static constexpr int16_t DEF_MENU_ROUND_RADIUS    = 6;	///< 標準、メニュー、コーナー半径
-		static constexpr int16_t DEF_MENU_HEIGHT          = 28;	///< 標準、メニュー、アイテムの高さ
-		static constexpr int16_t DEF_MENU_SIGN_SPACE      = 5;	///< 標準、メニュー、サインまでの隙間
-		static constexpr int16_t DEF_MENU_SIGN_SIZE       = 6;	///< 標準、メニュー、サインの大きさ
+		static constexpr int16_t DEF_MENU_ROUND_RADIUS     = 6;		///< 標準、メニュー、コーナー半径
+		static constexpr int16_t DEF_MENU_HEIGHT           = 28;	///< 標準、メニュー、アイテムの高さ
+		static constexpr int16_t DEF_MENU_SIGN_SPACE       = 5;		///< 標準、メニュー、サインまでの隙間
+		static constexpr int16_t DEF_MENU_SIGN_SIZE        = 6;		///< 標準、メニュー、サインの大きさ
 
-		static constexpr int16_t DEF_CHECK_ROUND_RADIUS   = 2;	///< 標準、チェックボックス、コーナー半径
-		static constexpr int16_t DEF_CHECK_FRAME_WIDTH    = 3;	///< 標準、チェックボックス、外周フレーム幅
-		static constexpr int16_t DEF_CHECK_BOX_SIZE       = 22;	///< 標準、チェックボックス、大きさ
-		static constexpr int16_t DEF_CHECK_SPACE          = 4;	///< 標準、チェックボックス、有効アイテムの隙間
-		static constexpr int16_t DEF_CHECK_TO_STR         = 5;	///< 標準、チェックボックス、文字までの隙間
+		static constexpr int16_t DEF_CHECK_ROUND_RADIUS    = 2;		///< 標準、チェックボックス、コーナー半径
+		static constexpr int16_t DEF_CHECK_FRAME_WIDTH     = 3;		///< 標準、チェックボックス、外周フレーム幅
+		static constexpr int16_t DEF_CHECK_BOX_SIZE        = 22;	///< 標準、チェックボックス、大きさ
+		static constexpr int16_t DEF_CHECK_SPACE           = 4;		///< 標準、チェックボックス、有効アイテムの隙間
+		static constexpr int16_t DEF_CHECK_TO_STR          = 5;		///< 標準、チェックボックス、文字までの隙間
 
-		static constexpr int16_t DEF_RADIO_FRAME_WIDTH    = 3;	///< 標準、ラジオボタン、外周フレーム幅
-		static constexpr int16_t DEF_RADIO_BOX            = 22;	///< 標準、ラジオボタン、大きさ
-		static constexpr int16_t DEF_RADIO_SPACE          = 4;	///< 標準、ラジオボタン、有効アイテムの隙間
-		static constexpr int16_t DEF_RADIO_TO_STR         = 5;	///< 標準、ラジオボタン、文字までの隙間
+		static constexpr int16_t DEF_RADIO_FRAME_WIDTH     = 3;		///< 標準、ラジオボタン、外周フレーム幅
+		static constexpr int16_t DEF_RADIO_BOX             = 22;	///< 標準、ラジオボタン、大きさ
+		static constexpr int16_t DEF_RADIO_SPACE           = 4;		///< 標準、ラジオボタン、有効アイテムの隙間
+		static constexpr int16_t DEF_RADIO_TO_STR          = 5;		///< 標準、ラジオボタン、文字までの隙間
 
-		static constexpr int16_t DEF_SPINBOX_ROUND_RADIUS = 6;	///< 標準、スピンボックス、コーナー半径
-		static constexpr int16_t DEF_SPINBOX_FRAME_WIDTH  = 2;	///< 標準、スピンボックス、外周フレーム幅
-		static constexpr int16_t DEF_SPINBOX_HEIGHT       = 30;	///< 標準、スピンボックス、サイズが省略された場合の高さ
-		static constexpr int16_t DEF_SPINBOX_ARROW_SPACE  = 2;	///< 標準、スピンボックス、矢印までの隙間
-		static constexpr int16_t DEF_SPINBOX_ARROW_W      = 5;	///< 標準、スピンボックス、矢印の幅
-		static constexpr int16_t DEF_SPINBOX_ARROW_H      = 8;	///< 標準、スピンボックス、矢印の高さ
+		static constexpr int16_t DEF_SPINBOX_ROUND_RADIUS  = 6;		///< 標準、スピンボックス、コーナー半径
+		static constexpr int16_t DEF_SPINBOX_FRAME_WIDTH   = 2;		///< 標準、スピンボックス、外周フレーム幅
+		static constexpr int16_t DEF_SPINBOX_HEIGHT        = 30;	///< 標準、スピンボックス、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_SPINBOX_ARROW_SPACE   = 2;		///< 標準、スピンボックス、矢印までの隙間
+		static constexpr int16_t DEF_SPINBOX_ARROW_W       = 5;		///< 標準、スピンボックス、矢印の幅
+		static constexpr int16_t DEF_SPINBOX_ARROW_H       = 8;		///< 標準、スピンボックス、矢印の高さ
 
-		static constexpr int16_t DEF_TOGGLE_WIDTH         = 58;	///< 標準、トグルスイッチ、横幅
-		static constexpr int16_t DEF_TOGGLE_HEIGHT        = 29;	///< 標準、トグルスイッチ、サイズが省略された場合の高さ
-		static constexpr int16_t DEF_TOGGLE_FRAME_WIDTH   = 2;	///< 標準、トグルスイッチ、外周フレーム幅
+		static constexpr int16_t DEF_SPINBOXT_ROUND_RADIUS = 6;		///< 標準、スピンボックスＴ、コーナー半径
+		static constexpr int16_t DEF_SPINBOXT_FRAME_WIDTH  = 2;		///< 標準、スピンボックスＴ、外周フレーム幅
+		static constexpr int16_t DEF_SPINBOXT_HEIGHT       = 30;	///< 標準、スピンボックスＴ、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_SPINBOXT_ARROW_SPACE  = 2;		///< 標準、スピンボックスＴ、矢印までの隙間
+		static constexpr int16_t DEF_SPINBOXT_ARROW_W      = 5;		///< 標準、スピンボックスＴ、矢印の幅
+		static constexpr int16_t DEF_SPINBOXT_ARROW_H      = 8;		///< 標準、スピンボックスＴ、矢印の高さ
 
-		static constexpr int16_t DEF_PROGRESS_HEIGHT      = 24;	///< 標準、プログレスバー、サイズが省略された場合の高さ
-		static constexpr int16_t DEF_PROGRESS_FRAME_WIDTH = 2;	///< 標準、プログレスバー、フレーム幅
+		static constexpr int16_t DEF_TOGGLE_WIDTH          = 58;	///< 標準、トグルスイッチ、横幅
+		static constexpr int16_t DEF_TOGGLE_HEIGHT         = 29;	///< 標準、トグルスイッチ、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_TOGGLE_FRAME_WIDTH    = 2;		///< 標準、トグルスイッチ、外周フレーム幅
 
-		static constexpr int16_t DEF_FILER_HEIGHT         = 20;	///< 標準、ファイラー、アイテムの高さ
-		static constexpr int16_t DEF_FILER_DRAG_TH        = 10; ///< 標準、ファイラー、ドラッグ開始のスレッショルド幅
-		static constexpr uint16_t DEF_FILER_LOOP		  = 2;	///< 標準、１フレームに取得するファイル情報数
+		static constexpr int16_t DEF_PROGRESS_HEIGHT       = 24;	///< 標準、プログレスバー、サイズが省略された場合の高さ
+		static constexpr int16_t DEF_PROGRESS_FRAME_WIDTH  = 2;		///< 標準、プログレスバー、フレーム幅
+
+		static constexpr int16_t DEF_FILER_HEIGHT          = 20;	///< 標準、ファイラー、アイテムの高さ
+		static constexpr int16_t DEF_FILER_DRAG_TH         = 10; 	///< 標準、ファイラー、ドラッグ開始のスレッショルド幅
+		static constexpr uint16_t DEF_FILER_LOOP		   = 2;		///< 標準、１フレームに取得するファイル情報数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -108,6 +115,7 @@ namespace gui {
 			MENU,		///< メニュー
 			TERM,		///< ターミナル
 			SPINBOX,	///< スピンボックス
+			SPINBOXT,	///< スピンボックス・テキスト
 			TOGGLE,		///< トグルスイッチ
 			PROGRESS,	///< プログレスバー
 			CLOSEBOX,	///< クローズボックス
@@ -287,7 +295,7 @@ namespace gui {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		virtual bool save(utils::file_io& fio) { return false; }
+//		virtual bool save(utils::file_io& fio) { return false; }
 
 
 		//-----------------------------------------------------------------//
@@ -297,7 +305,7 @@ namespace gui {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		virtual bool load(utils::file_io& fio) { return false; }
+//		virtual bool load(utils::file_io& fio) { return false; }
 
 
 		//-----------------------------------------------------------------//
