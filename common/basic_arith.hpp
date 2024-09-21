@@ -166,6 +166,7 @@ namespace utils {
 				uint32_t idx = 0;
 				auto base = NVAL::BASE::DEC;
 				char back = 0;
+				bool point = false;
 				do {
 					if(ch_ == '+' || ch_ == '-') {
 						if(base == NVAL::BASE::DEC && (back == 'E' || back == 'e')) {
@@ -188,8 +189,16 @@ namespace utils {
 								continue;
 							}
 						}
-						if(base == NVAL::BASE::DEC) {
-							if((ch_ >= '0' && ch_ <= '9') || ch_=='.' || ch_=='e' || ch_=='E') {
+						if(ch_ == '.') {
+							if(point) {
+								error_.set(error::number_fatal);
+								break;
+							}
+							tmp[idx] = ch_;
+							idx++;
+							point = true;
+						} else if(base == NVAL::BASE::DEC) {
+							if((ch_ >= '0' && ch_ <= '9') || ch_=='e' || ch_=='E') {
 								tmp[idx] = ch_;
 								idx++;
 							} else {
@@ -198,7 +207,7 @@ namespace utils {
 							}
 						} else if(base == NVAL::BASE::HEX) {
 							if((ch_ >= '0' && ch_ <= '9') || (ch_ >= 'A' && ch_ <= 'F')
-								|| (ch_ >= 'a' && ch_ <= 'f') || ch_ == '.') {
+								|| (ch_ >= 'a' && ch_ <= 'f')) {
 								tmp[idx] = ch_;
 								idx++;
 							} else {
@@ -206,7 +215,7 @@ namespace utils {
 								break;
 							}
 						} else if(base == NVAL::BASE::BIN) {
-							if(ch_ == '0' || ch_ == '1' || ch_ == '.') {
+							if(ch_ == '0' || ch_ == '1') {
 								tmp[idx] = ch_;
 								idx++;
 							} else {

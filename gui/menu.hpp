@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	メニュー・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -29,25 +29,29 @@ namespace gui {
 
 		SELECT_FUNC_TYPE	select_func_;
 		vtx::spos			item_size_;
+		bool				check_draw_;
+		char				sch_;
 		uint16_t			num_;
 		uint16_t			focus_pos_;
 		uint16_t			select_pos_;
-		bool				check_draw_;
+
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		メニュー・アイテム文字列（',' で分割）
+			@param[in]	str		メニュー・アイテム文字列
 			@param[in]	chd		チェック描画を行わない場合「false」
+			@param[in]	sch		セパレート・キャラクタ
 		*/
 		//-----------------------------------------------------------------//
-		menu(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr, bool chd = true)
+		menu(const vtx::srect& loc = vtx::srect(0), const char* str = nullptr, bool chd = true, char sch = ',')
 			noexcept :
 			widget(loc, str),
 			select_func_(), item_size_(0),
-			num_(utils::str::get_words(str, ',')), focus_pos_(0), select_pos_(0), check_draw_(chd)
+			check_draw_(chd), sch_(sch),
+			num_(utils::str::get_words(str, sch)), focus_pos_(0), select_pos_(0)
 		{
 			if(loc.size.y <= 0) {
 				at_location().size.y = num_ * DEF_MENU_HEIGHT;
@@ -150,7 +154,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void update_title() noexcept override
 		{
-			num_ = utils::str::get_words(get_title(), ',');
+			num_ = utils::str::get_words(get_title(), sch_);
 			at_location().size.y = num_ * item_size_.y;
 			if(select_pos_ >= num_) {
 				select_pos_ = num_ - 1;
@@ -210,8 +214,9 @@ namespace gui {
 			@return	セレクト位置
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_select_text(char* dst, uint32_t len) const noexcept {
-			utils::str::get_word(get_title(), select_pos_, dst, len, ',');
+		uint32_t get_select_text(char* dst, uint32_t len) const noexcept
+		{
+			utils::str::get_word(get_title(), select_pos_, dst, len, sch_);
 			return select_pos_;
 		}
 
@@ -266,7 +271,7 @@ namespace gui {
 				}
 
 				char tmp[32];
-				if(utils::str::get_word(get_title(), i, tmp, sizeof(tmp), ',')) {
+				if(utils::str::get_word(get_title(), i, tmp, sizeof(tmp), sch_)) {
 					auto sz = rdr.at_font().get_text_size(tmp);
 					rdr.set_fore_color(get_font_color());
 					rdr.draw_text(r.org + (r.size - sz) / 2, tmp);
