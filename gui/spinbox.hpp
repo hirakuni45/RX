@@ -2,11 +2,13 @@
 //=====================================================================//
 /*!	@file
 	@brief	スピンボックス表示と制御 @n
+			通常のスピンボックスは、右端に小さい上下ボタンがあるが @n
+			タッチパネル操作を考慮して、左右にボタンを配置する @n
 			領域を三等分して、左、中央、右を判断する @n
 			左右のアクションにより、定数を進めたり、戻したりする。 @n
 			長押しの場合、加速する機能を有する。（許可／不許可）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -76,10 +78,7 @@ namespace gui {
 		/*!
 			@brief	コンストラクター（整数版）
 			@param[in]	loc		ロケーション
-			@param[in]	min		最小値
-			@param[in]	max		最大値
-			@param[in]	org		初期値
-			@param[in]	ace		アクセレーターを許可する場合「true」
+			@param[in]	nmb		数値構造体の参照
 		*/
 		//-----------------------------------------------------------------//
 		spinbox(const vtx::srect& loc, const number_t& nmb) noexcept :
