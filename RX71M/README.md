@@ -18,10 +18,10 @@
 
 |Type|Program|RAM|Data Flash|Source|
 |---|:-:|:-:|:-:|---|
-|R5F571MF|2048K|512K+32K|64K|[R5F571MF.ld](R5F571MF.ld)|
-|R5F571MG|2560K|512K+32K|64K|[R5F571MG.ld](R5F571MG.ld)|
-|R5F571MJ|3072K|512K+32K|64K|[R5F571MJ.ld](R5F571MJ.ld)|
-|R5F571ML|4096K|512K+32K|64K|[R5F571ML.ld](R5F571ML.ld)|
+|R5F571MF|2048K|512K+32K|64K|[R5F571MF.ld](R5F571MF.ld?ts=4)|
+|R5F571MG|2560K|512K+32K|64K|[R5F571MG.ld](R5F571MG.ld?ts=4)|
+|R5F571MJ|3072K|512K+32K|64K|[R5F571MJ.ld](R5F571MJ.ld?ts=4)|
+|R5F571ML|4096K|512K+32K|64K|[R5F571ML.ld](R5F571ML.ld?ts=4)|
 
 ---
 
@@ -29,8 +29,8 @@
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
-|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp)||
-|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp)||
+|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp?ts=4)||
+|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp?ts=4)||
 
 ---
 

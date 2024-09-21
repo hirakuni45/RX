@@ -16,10 +16,10 @@
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F566TA|256K|64K+16K|32K|[R5F566TA.ld](R5F566TA.ld)|1792|256|
-|R5F566TE|512K|64K+16K|32K|[R5F566TE.ld](R5F566TE.ld)|1792|256|
-|R5F566TF|512K|128K+16K|32K|[R5F566TF.ld](R5F566TF.ld)|3584|512|
-|R5F566TK|1024K|128K+16K|32K|[R5F566TK.ld](R5F566TK.ld)|3584|512|
+|R5F566TA|256K|64K+16K|32K|[R5F566TA.ld](R5F566TA.ld?ts=4)|1792|256|
+|R5F566TE|512K|64K+16K|32K|[R5F566TE.ld](R5F566TE.ld?ts=4)|1792|256|
+|R5F566TF|512K|128K+16K|32K|[R5F566TF.ld](R5F566TF.ld?ts=4)|3584|512|
+|R5F566TK|1024K|128K+16K|32K|[R5F566TK.ld](R5F566TK.ld?ts=4)|3584|512|
 
 RAM: 16K(With ECC)
 
@@ -29,8 +29,8 @@ RAM: 16K(With ECC)
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
-|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp)||
-|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp)||
+|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp?ts=4)||
+|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp?ts=4)||
 
 ---
 

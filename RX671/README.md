@@ -16,8 +16,8 @@
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F5671C|1536K|384K+4K|32K|[R5F5671C.ld](R5F5671C.ld)|14336|2048|
-|R5F5671E|2048K|384K+4K|32K|[R5F5671E.ld](R5F5671E.ld)|14336|2048|
+|R5F5671C|1536K|384K+4K|32K|[R5F5671C.ld](R5F5671C.ld?ts=4)|14336|2048|
+|R5F5671E|2048K|384K+4K|32K|[R5F5671E.ld](R5F5671E.ld?ts=4)|14336|2048|
 
 ---
 
@@ -25,19 +25,19 @@
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
-|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp)||
-|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp)||
-|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp)||
-|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp)||
-|Port Definition/ポート定義|[port.hpp](port.hpp)||
-|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp)||
-|Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp)||
-|Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp)||
-|Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp)||
-|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp)||
-|Port Mapping QSPI/ポートマッピング QSPI|[port_map_qspi.hpp](port_map_qspi.hpp)||
-|Port Mapping TMR/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp)||
-|Port Mapping TPU/ポートマッピング TPU|[port_map_tpu.hpp](port_map_tpu.hpp)||
+|Peripheral Name/ペリフェラル名|[peripheral.hpp](peripheral.hpp?ts=4)||
+|Hardware-specific Definition/ハード固有定義|[board_profile.hpp](board_profile.hpp?ts=4)||
+|Operating Frequency Definition/動作周波数定義|[clock_profile.hpp](clock_profile.hpp?ts=4)||
+|Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp?ts=4)||
+|Port Definition/ポート定義|[port.hpp](port.hpp?ts=4)||
+|Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp?ts=4)||
+|Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp?ts=4)||
+|Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp?ts=4)||
+|Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp?ts=4)||
+|Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp?ts=4)||
+|Port Mapping QSPI/ポートマッピング QSPI|[port_map_qspi.hpp](port_map_qspi.hpp?ts=4)||
+|Port Mapping TMR/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp?ts=4)||
+|Port Mapping TPU/ポートマッピング TPU|[port_map_tpu.hpp](port_map_tpu.hpp?ts=4)||
 
 ---
 
