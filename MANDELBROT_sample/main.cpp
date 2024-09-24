@@ -88,7 +88,7 @@ extern "C" {
 
 	uint32_t micros()
 	{
-		return cmt_mgr_.get_counter() * 10;
+		return cmt_mgr_.get_counter() * 4;
 	}
 }
 
@@ -112,8 +112,8 @@ int main(int argc, char** argv)
 //		sci_.start(baud, intr, SCI::PROTOCOL::B8_E_1S);
 	}
 
-	{  // タイマー設定（100KHz）
-		constexpr uint32_t freq = 100'000;
+	{  // タイマー設定（250000KHz）
+		constexpr uint32_t freq = 250'000;
 		static_assert(CMT_MGR::probe_freq(freq), "Failed CMT rate accuracy test");
 		if(!cmt_mgr_.start(freq, device::ICU::LEVEL::_4)) {
 			utils::format("CMT not start!\n");
@@ -150,10 +150,10 @@ int main(int argc, char** argv)
 		cmt_mgr_.sync();
 
 		++cnt;
-		if(cnt >= 50000) {
+		if(cnt >= 50000 * 4) {
 			cnt = 0;
 		}
-		if(cnt < 25000) {
+		if(cnt < 25000 * 4) {
 			LED::P = 0;
 		} else {
 			LED::P = 1;
