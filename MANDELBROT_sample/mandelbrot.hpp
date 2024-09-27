@@ -37,7 +37,7 @@ struct mandelbrot {
 				for (i = 0; i <= 15; i++) {     // 1座標毎に16回下記の計算を行い、
 					calcCount++;
 					t = a * a - b * b + ca;
-					b = 2.0f * a * b + cb;
+					b = 2.0 * a * b + cb;
 					a = t;
 					if ((a * a + b * b) > 4.0) {  // 値が4以上だったら発散したとみなして
 						break;                      // 計算中止してループを抜ける
