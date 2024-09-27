@@ -98,6 +98,10 @@
 |-|:-:|:-:|
 |[rxprog](../rxprog)|〇|〇|
 
+rx_prog option:
+- --write-page-wait=10000
+- --erase-page-wait=5000
+
 ---
 
 Translated with www.DeepL.com/Translator (free version)

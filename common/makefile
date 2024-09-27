@@ -57,7 +57,7 @@ INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)
 PROG_ERASE = --erase
 # rx_prog verify command
 PROG_VERIFY = --verify
-
+PROG_OPT =
 ifeq ($(RX_DEF),SIG_RX13T)
   RX_CPU = RX13T
   RX_CHOOSE = -misa=v1
@@ -84,7 +84,8 @@ ifeq ($(RX_DEF),SIG_RX231)
   RX_CPU = RX231
   RX_CHOOSE = -mcpu=rx230
   LDSCRIPT	= ../../RX231/$(DEVICE).ld
-  PROG_ERASE =
+#  PROG_ERASE =
+  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
 endif
 
 ifeq ($(RX_DEF),SIG_RX63T)
@@ -365,4 +366,4 @@ bin: $(TARGET).bin
 # Serial Flash write 
 run:
 	$(MAKE)
-	rx_prog -d $(RX_CPU) --progress $(PROG_ERASE) --write $(PROG_VERIFY) $(TARGET).mot
+	rx_prog -d $(RX_CPU) $(PROG_OPT) --progress $(PROG_ERASE) --write $(PROG_VERIFY) $(TARGET).mot
