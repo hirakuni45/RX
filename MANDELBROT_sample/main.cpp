@@ -5,10 +5,9 @@
 			「ラジオペンチ」さんが行っているマンデルブロベンチマークをＲＸマイコンに移植したもの @n
 			- 元は Arduino のスケッチを元にしている。(mandelbrot.hpp を参照) @n
 			- 部分的に自分の C++ フレームワーク都合で変更している @n
-			- 時間計測は、マイクロ秒単位を１０マイクロ秒単位に変更している @n
-			基本的な接続は RXxxx/board_profile.hpp を参照の事 @n
-			RX64M/RX71M に搭載された、SCIF を利用する場合、「scif_io」クラスを利用。 @n
-			RX26T/RX671 などに搭載された、RSCI を利用する場合、「rsci_io」クラスを利用。
+			- 時間計測は、Arduino と同等の 250KHz(4us) で行っている @n
+			- RX231 では、クロックの関係で 250KHz が設定不可な為 125KHz としている @n
+			基本的な接続は RXxxx/board_profile.hpp を参照の事
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -19,15 +18,9 @@
 
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
-#include "common/scif_io.hpp"
-#include "common/rsci_io.hpp"
 #include "common/cmt_mgr.hpp"
-#include "common/cmtw_mgr.hpp"
-#include "common/command.hpp"
-
 #include "common/format.hpp"
-#include "common/input.hpp"
-
+#include "common/string_utils.hpp"
 #include "mandelbrot.hpp"
 
 namespace {
@@ -35,14 +28,8 @@ namespace {
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
-// SCIF を使う場合：
-//	typedef device::scif_io<device::SCIF8, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
-// RSCI を使う場合：
-//	typedef device::rsci_io<device::RSCI8, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
 	SCI_IO	sci_io_;
 
-	//	typedef device::cmtw_mgr<device::CMTW0> CMT;
-	//	typedef device::tmr_mgr<device::TMR0> CMT;
 	typedef device::cmt_mgr<board_profile::CMT_CH> CMT_MGR;
 	CMT_MGR	cmt_mgr_;
 
@@ -60,6 +47,14 @@ namespace {
 	}
 
 	mandelbrot m_;
+
+#if defined(SIG_RX231)
+	static constexpr uint32_t TIME_RESO = 125'000;
+	static constexpr uint32_t TIME_MULTI = 8;
+#else
+	static constexpr uint32_t TIME_RESO = 250'000;
+	static constexpr uint32_t TIME_MULTI = 4;
+#endif
 }
 
 extern "C" {
@@ -88,7 +83,7 @@ extern "C" {
 
 	uint32_t micros()
 	{
-		return cmt_mgr_.get_counter() * 4;
+		return cmt_mgr_.get_counter() * TIME_MULTI;
 	}
 }
 
@@ -107,13 +102,10 @@ int main(int argc, char** argv)
 		if(!sci_io_.start(baud, intr)) {  // 標準では、８ビット、１ストップビットを自動選択
 			halt_();
 		}
-// 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
-// sci_io.hpp PROTOCOL enum class のタイプを参照
-//		sci_.start(baud, intr, SCI::PROTOCOL::B8_E_1S);
 	}
 
-	{  // タイマー設定（250000KHz）
-		constexpr uint32_t freq = 250'000;
+	{  // タイマー設定
+		constexpr uint32_t freq = TIME_RESO;
 		static_assert(CMT_MGR::probe_freq(freq), "Failed CMT rate accuracy test");
 		if(!cmt_mgr_.start(freq, device::ICU::LEVEL::_4)) {
 			utils::format("CMT not start!\n");
@@ -150,10 +142,10 @@ int main(int argc, char** argv)
 		cmt_mgr_.sync();
 
 		++cnt;
-		if(cnt >= 50000 * 4) {
+		if(cnt >= 500'000 / TIME_MULTI) {
 			cnt = 0;
 		}
-		if(cnt < 25000 * 4) {
+		if(cnt < 250'000 / TIME_MULTI) {
 			LED::P = 0;
 		} else {
 			LED::P = 1;
