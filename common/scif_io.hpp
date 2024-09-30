@@ -1,12 +1,12 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・SCIF I/O 制御（FIFO 内臓型） @n
+	@brief	RX グループ・SCIF I/O 制御（FIFO 内臓型、調歩同期モード） @n
 			※内臓のFIFOバッファを利用しない実装（扱いにくいので使わない） @n
 			現状 SCIF は、RX64M/RX71M 専用となっている。 @n
 			SCIF8 ～ SCIF11
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -38,9 +38,11 @@ namespace device {
 		typedef SBF  sbf_type;
 
 	private:
-		static RBF	recv_;
-		static SBF	send_;
-		static volatile uint16_t errc_;
+		static inline RBF	recv_;
+		static inline SBF	send_;
+		static inline volatile uint8_t	orer_cnt_;
+		static inline volatile uint8_t	per_cnt_;
+		static inline volatile uint8_t	fer_cnt_;
 
 		ICU::LEVEL	level_;
 		bool		auto_crlf_;
@@ -49,24 +51,37 @@ namespace device {
 		// ※必要なら、実装する
 		void sleep_() { asm("nop"); }
 
-		static INTERRUPT_FUNC void rxi_task_()
+		static inline void eri_task_()
 		{
-			bool err = false;
-			///< フレーミングエラー/パリティエラー状態確認
+			// オーバランエラー状態確認
+//			if(SCIF::SSR.ORER()) {
+//				SCIF::SSR.ORER = 0;
+//				++orer_cnt_;
+//			}
+			// フレーミングエラー
+			if(SCIF::FSR.FER()) {
+				// エラーフラグの消去
+				SCIF::FSR.FER = 0;
+				++fer_cnt_;
+			}
+			// パリティエラー状態確認
 			if(SCIF::FSR.PER()) {
 				SCIF::FSR.PER = 0;
-				err = true;
+				++per_cnt_;
 			}
-			if(SCIF::FSR.FER()) {
-				SCIF::FSR.FER = 0;
-				err = true;
-			}
+			volatile uint8_t rd = SCIF::FRDR();
+		}
+
+		static INTERRUPT_FUNC void eri_itask_()
+		{
+			eri_task_();
+		}
+
+		static INTERRUPT_FUNC void rxi_task_()
+		{
 			volatile uint8_t data = SCIF::FRDR();
-			SCIF::FSR.RDF = 0;
-			if(!err) {
-				recv_.put(data);
-				++errc_;
-			}
+//			SCIF::FSR.RDF = 0;
+			recv_.put(data);
 		}
 
 		static INTERRUPT_FUNC void txi_task_()
@@ -85,9 +100,18 @@ namespace device {
 			if(level_ != ICU::LEVEL::NONE) {
 				icu_mgr::set_interrupt(SCIF::RXI, rxi_task_, level_);
 				icu_mgr::set_interrupt(SCIF::TXI, txi_task_, level_);
+				{  // エラー割り込みの設定
+					auto gv = icu_mgr::get_group_vector(SCIF::ERI);
+					if(gv == ICU::VECTOR::NONE) {  // not group vector
+						icu_mgr::set_interrupt(SCIF::ERI, eri_itask_, level_);
+					} else {  // for group vector
+						icu_mgr::set_interrupt(SCIF::ERI, eri_task_, level_);
+					}
+				}
 			} else {
 				icu_mgr::set_interrupt(SCIF::RXI, nullptr, level_);
 				icu_mgr::set_interrupt(SCIF::TXI, nullptr, level_);
+				icu_mgr::set_interrupt(SCIF::ERI, nullptr, level_);
 			}
 		}
 
@@ -150,7 +174,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		scif_io(bool crlf = true) noexcept : level_(ICU::LEVEL::NONE), auto_crlf_(crlf), baud_(0)
 		{
-			errc_ = 0;
+			orer_cnt_ = 0;
+			fer_cnt_ = 0;
+			per_cnt_ = 0;
 		}
 
 
@@ -165,11 +191,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	エラー数の取得
-			@return エラー数
+			@brief	ORER エラー数の取得
+			@return ORER エラー数
 		 */
 		//-----------------------------------------------------------------//
-		static auto get_error_count() noexcept { return errc_; }
+		static auto get_orer_count() noexcept { return orer_cnt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	FER エラー数の取得
+			@return FER エラー数
+		 */
+		//-----------------------------------------------------------------//
+		static auto get_fer_count() noexcept { return fer_cnt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PER エラー数の取得
+			@return PER エラー数
+		 */
+		//-----------------------------------------------------------------//
+		static auto get_per_count() noexcept { return per_cnt_; }
 
 
 		//-----------------------------------------------------------------//
@@ -317,7 +361,7 @@ namespace device {
 			SCIF::BRR = static_cast<uint8_t>(brr);
 
 			if(level_ != ICU::LEVEL::NONE) {
-				SCIF::SCR = SCIF::SCR.RIE.b() | SCIF::SCR.TE.b() | SCIF::SCR.RE.b();
+				SCIF::SCR = SCIF::SCR.REIE.b() | SCIF::SCR.RIE.b() | SCIF::SCR.TE.b() | SCIF::SCR.RE.b();
 			} else {
 				SCIF::SCR = SCIF::SCR.TE.b() | SCIF::SCR.RE.b();
 			}
@@ -503,10 +547,4 @@ namespace device {
 			}
 		}
 	};
-	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
-		RBF scif_io<SCIF, RBF, SBF, PSEL>::recv_;
-	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
-		SBF scif_io<SCIF, RBF, SBF, PSEL>::send_;
-	template<class SCIF, class RBF, class SBF, port_map::ORDER PSEL>
-		volatile uint16_t scif_io<SCIF, RBF, SBF, PSEL>::errc_;
 }

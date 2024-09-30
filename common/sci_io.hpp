@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・SCI I/O 制御 @n
+	@brief	RX グループ・SCI I/O 制御（調歩同期モード） @n
 			・SCI のバリエーションは多義に渡っており、機能的に利用出来ない機能が数多くあります。 @n
 			  詳しくは、ハードウェアーマニュアルを参照して下さい。 @n
 			  通常の非同期通信では、ボーレートの設定範囲と精度が異なるだけです。 @n
@@ -92,12 +92,14 @@ namespace device {
 
 		static inline RBF	recv_;
 		static inline SBF	send_;
+		static inline volatile bool		stop_;
+		static inline volatile uint8_t	orer_cnt_;
+		static inline volatile uint8_t	per_cnt_;
+		static inline volatile uint8_t	fer_cnt_;
 
 		ICU::LEVEL	level_;
 		bool		auto_crlf_;
 		uint32_t	baud_;
-		static inline volatile bool		stop_;
-		static inline volatile uint16_t	errc_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept
@@ -105,44 +107,53 @@ namespace device {
 			asm("nop");
 		}
 
+		static inline void eri_task_()
+		{
+			// オーバランエラー状態確認
+			if(SCI::SSR.ORER()) {
+				SCI::SSR.ORER = 0;
+				++orer_cnt_;
+			}
+			// フレーミングエラー
+			if(SCI::SSR.FER()) {
+				// エラーフラグの消去
+				SCI::SSR.FER = 0;
+				++fer_cnt_;
+			}
+			// パリティエラー状態確認
+			if(SCI::SSR.PER()) {
+				SCI::SSR.PER = 0;
+				++per_cnt_;
+			}
+			volatile uint8_t rd = SCI::RDR();
+		}
+
+		static INTERRUPT_FUNC void eri_itask_()
+		{
+			eri_task_();
+		}
 
 		static INTERRUPT_FUNC void rxi_task_()
 		{
-			bool err = false;
-			if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
-				SCI::SSR.ORER = 0;	///< 受信オーバランエラークリア
-				err = true;
-			}
-			///< フレーミングエラー/パリティエラー状態確認
-			if(SCI::SSR() & (SCI::SSR.FER.b() | SCI::SSR.PER.b())) {
-				// エラーフラグの消去
-				SCI::SSR.FER = 0;
-				SCI::SSR.PER = 0;
-				err = true;
-			}
 			volatile uint8_t rd = SCI::RDR();
-			if(err) {
-				++errc_;
-			} else {
-				if(FLCT == FLOW_CTRL::SOFT || FLCT == FLOW_CTRL::HARD || FLCT == FLOW_CTRL::SOFT_HARD) {
-					if(recv_.length() >= (recv_.size() - 6)) {
-						stop_ = true;
-						if(FLCT == FLOW_CTRL::HARD || FLCT == FLOW_CTRL::SOFT_HARD) {
-							RTS::P = 0;
-						}
+			if(FLCT == FLOW_CTRL::SOFT || FLCT == FLOW_CTRL::HARD || FLCT == FLOW_CTRL::SOFT_HARD) {
+				if(recv_.length() >= (recv_.size() - 6)) {
+					stop_ = true;
+					if(FLCT == FLOW_CTRL::HARD || FLCT == FLOW_CTRL::SOFT_HARD) {
+						RTS::P = 0;
 					}
 				}
 #if 0
-			if(FLCT == FLOW_CTRL::SOFT || FLCT == FLOW_CTRL::SOFT_HARD) {
-				if(ch == XON) {
-					send_stop_ = false;
-				} else if(ch == XOFF) {
-					send_stop_ = true;
+				if(FLCT == FLOW_CTRL::SOFT || FLCT == FLOW_CTRL::SOFT_HARD) {
+					if(ch == XON) {
+						send_stop_ = false;
+					} else if(ch == XOFF) {
+						send_stop_ = true;
+					}
 				}
+#endif
 			}
-#endif	
-				recv_.put(rd);
-			}
+			recv_.put(rd);
 		}
 
 		static INTERRUPT_FUNC void txi_task_()
@@ -183,9 +194,18 @@ namespace device {
 						icu_mgr::set_interrupt(SCI::TEI, tei_task_, level);
 					}
 				}
+				{  // エラー割り込みの設定
+					auto gv = icu_mgr::get_group_vector(SCI::ERI);
+					if(gv == ICU::VECTOR::NONE) {  // not group vector
+						icu_mgr::set_interrupt(SCI::ERI, eri_itask_, level);
+					} else {  // for group vector
+						icu_mgr::set_interrupt(SCI::ERI, eri_task_, level);
+					}
+				}
 			} else {
 				icu_mgr::set_interrupt(SCI::RXI, nullptr, level);
 				icu_mgr::set_interrupt(SCI::TXI, nullptr, level);
+				icu_mgr::set_interrupt(SCI::ERI, nullptr, level);
 				if(FLCT == FLOW_CTRL::RS485) {
 					icu_mgr::set_interrupt(SCI::TEI, nullptr, level);
 				}
@@ -253,21 +273,40 @@ namespace device {
 		//-----------------------------------------------------------------//
 		sci_io(bool autocrlf = true,
 			const port_map_order::sci_port_t& sci_port = port_map_order::sci_port_t()) noexcept :
-			port_map_(sci_port),
-			level_(ICU::LEVEL::NONE),
-			auto_crlf_(autocrlf), baud_(0) {
+			port_map_(sci_port), level_(ICU::LEVEL::NONE), auto_crlf_(autocrlf), baud_(0)
+		{
 			stop_ = false;
-			errc_ = 0;
+			orer_cnt_ = 0;
+			fer_cnt_ = 0;
+			per_cnt_ = 0;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	エラー数の取得
-			@return エラー数
+			@brief	ORER エラー数の取得
+			@return ORER エラー数
 		 */
 		//-----------------------------------------------------------------//
-		static uint16_t get_error_count() noexcept { return errc_; }
+		static auto get_orer_count() noexcept { return orer_cnt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	FER エラー数の取得
+			@return FER エラー数
+		 */
+		//-----------------------------------------------------------------//
+		static auto get_fer_count() noexcept { return fer_cnt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PER エラー数の取得
+			@return PER エラー数
+		 */
+		//-----------------------------------------------------------------//
+		static auto get_per_count() noexcept { return per_cnt_; }
 
 
 		//-----------------------------------------------------------------//

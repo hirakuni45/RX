@@ -1,6 +1,6 @@
 //=========================================================================//
 /*! @file
-    @brief  SCI (UART) サンプル @n
+    @brief  SCI (UART) 調歩同期モード、シリアル通信、サンプル @n
 			基本的な接続は RXxxx/board_profile.hpp を参照の事 @n
 			RX64M/RX71M に搭載された、SCIF を利用する場合、「scif_io」クラスを利用。 @n
 			RX26T/RX671 などに搭載された、RSCI を利用する場合、「rsci_io」クラスを利用。
@@ -47,8 +47,10 @@ namespace {
 //	typedef device::rsci_io<device::RSCI8, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
 	SCI_IO	sci_io_;
 
-	//	typedef device::cmtw_mgr<device::CMTW0> CMT;
-	//	typedef device::tmr_mgr<device::TMR0> CMT;
+// CMTW を使う場合：
+//	typedef device::cmtw_mgr<device::CMTW0> CMT;
+// TMR を使う場合：
+//	typedef device::tmr_mgr<device::TMR0> CMT;
 	typedef device::cmt_mgr<board_profile::CMT_CH> CMT_MGR;
 	CMT_MGR	cmt_mgr_;
 
@@ -173,7 +175,6 @@ int main(int argc, char** argv)
 
 	uint8_t cnt = 0;
 	while(1) {
-
 		cmt_mgr_.sync();
 #ifdef MEMORY_MONITOR
 		monitor_.service();
@@ -182,19 +183,30 @@ int main(int argc, char** argv)
 			uint32_t cmdn = cmd_.get_words();
 			uint32_t n = 0;
 			while(n < cmdn) {
-				char tmp[256];
-				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
-					utils::format("Param%d: '%s'\n") % n % tmp;
+				if(cmd_.cmp_word(n, "error")) {
+					utils::format("SCI ORER err: %d\n") % static_cast<int>(SCI_IO::get_orer_count());
+					utils::format("SCI FER err: %d\n") % static_cast<int>(SCI_IO::get_fer_count());
+					utils::format("SCI PER err: %d\n") % static_cast<int>(SCI_IO::get_per_count());
+				} else {
+					char tmp[256];
+					if(cmd_.get_word(n, tmp, sizeof(tmp))) {
+						utils::format("Param%d: '%s'\n") % n % tmp;
+					}
 				}
 				++n;
 			}
 		}
 #endif
 		++cnt;
-		if(cnt >= 50) {
+		auto n = SCI_IO::get_orer_count() + SCI_IO::get_fer_count() + SCI_IO::get_per_count();
+		uint8_t thc = 50;
+		if(n > 0) {
+			thc = 30;
+		}
+		if(cnt >= thc) {
 			cnt = 0;
 		}
-		if(cnt < 25) {
+		if(cnt < (thc / 2)) {
 			LED::P = 0;
 		} else {
 			LED::P = 1;
