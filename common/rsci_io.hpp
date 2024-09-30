@@ -1,10 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・RSCI I/O 制御 @n
-			※内臓のFIFOバッファを利用しない実装（扱いにくいので使わない）
+	@brief	RX グループ・RSCI I/O 制御（調歩同期モード） @n
+			※内臓の FIFO バッファを利用しない実装（扱いにくいので利用しない）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,7 +18,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  RSCI I/O 制御クラス
-		@param[in]	SCIF	SCIF 定義クラス
+		@param[in]	RSCI	RSCI 定義クラス
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
 		@param[in]	PSEL	ポート選択
@@ -36,34 +36,48 @@ namespace device {
 		typedef SBF  sbf_type;
 
 	private:
-		static RBF	recv_;
-		static SBF	send_;
+		static inline RBF	recv_;
+		static inline SBF	send_;
+		static inline volatile uint8_t	orer_cnt_;
+		static inline volatile uint8_t	per_cnt_;
+		static inline volatile uint8_t	fer_cnt_;
 
 		ICU::LEVEL	level_;
 		bool		auto_crlf_;
 		uint32_t	baud_;
 
-		static volatile uint16_t errc_;
-
 		// ※必要なら、実装する
 		void sleep_() { asm("nop"); }
 
+		static inline void eri_task_()
+		{
+			// オーバランエラー状態確認
+			if(RSCI::SSR.ORER()) {
+				RSCI::SSCR.ORERC = 1;
+				++orer_cnt_;
+			}
+			// フレーミングエラー
+			if(RSCI::SSR.DFER()) {
+				RSCI::SSCR.DFERC = 1;
+				++fer_cnt_;
+			}
+			// パリティエラー状態確認
+			if(RSCI::SSR.DPER()) {
+				RSCI::SSCR.DPERC = 1;
+				++per_cnt_;
+			}
+			volatile uint8_t rd = RSCI::RDR();
+		}
+
+		static INTERRUPT_FUNC void eri_itask_()
+		{
+			eri_task_();
+		}
+
 		static INTERRUPT_FUNC void rxi_task_()
 		{
-			bool err = false;
-			///< フレーミングエラー/パリティエラー状態確認
-			if(RSCI::RDR.PER()) {
-				err = true;
-			}
-			if(RSCI::RDR.FER()) {
-				err = true;
-			}
 			volatile uint8_t rd = RSCI::RDR.RDAT();
-			if(err) {
-				++errc_;
-			} else {
-				recv_.put(rd);
-			}
+			recv_.put(rd);
 		}
 
 		static INTERRUPT_FUNC void txi_task_()
@@ -80,9 +94,18 @@ namespace device {
 			if(level_ != ICU::LEVEL::NONE) {
 				icu_mgr::set_interrupt(RSCI::RXI, rxi_task_, level_);
 				icu_mgr::set_interrupt(RSCI::TXI, txi_task_, level_);
+				{  // エラー割り込みの設定
+					auto gv = icu_mgr::get_group_vector(RSCI::ERI);
+					if(gv == ICU::VECTOR::NONE) {  // not group vector
+						icu_mgr::set_interrupt(RSCI::ERI, eri_itask_, level_);
+					} else {  // for group vector
+						icu_mgr::set_interrupt(RSCI::ERI, eri_task_, level_);
+					}
+				}
 			} else {
 				icu_mgr::set_interrupt(RSCI::RXI, nullptr, level_);
 				icu_mgr::set_interrupt(RSCI::TXI, nullptr, level_);
+				icu_mgr::set_interrupt(RSCI::ERI, nullptr, level_);
 			}
 		}
 
@@ -146,17 +169,37 @@ namespace device {
 		//-----------------------------------------------------------------//
 		rsci_io(bool crlf = true) noexcept : level_(ICU::LEVEL::NONE), auto_crlf_(crlf), baud_(0)
 		{
-			errc_ = 0;
+			orer_cnt_ = 0;
+			fer_cnt_ = 0;
+			per_cnt_ = 0;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	エラー数の取得
-			@return エラー数
+			@brief	ORER エラー数の取得
+			@return ORER エラー数
 		 */
 		//-----------------------------------------------------------------//
-		static auto get_error_count() noexcept { return errc_; }
+		static auto get_orer_count() noexcept { return orer_cnt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	FER エラー数の取得
+			@return FER エラー数
+		 */
+		//-----------------------------------------------------------------//
+		static auto get_fer_count() noexcept { return fer_cnt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PER エラー数の取得
+			@return PER エラー数
+		 */
+		//-----------------------------------------------------------------//
+		static auto get_per_count() noexcept { return per_cnt_; }
 
 
 		//-----------------------------------------------------------------//
@@ -492,9 +535,4 @@ namespace device {
 		void operator = (char ch) noexcept { putch(ch); }
 		void operator = (const char* str) noexcept { puts(str); }
 	};
-
-	template<class RSCI, class RBF, class SBF, port_map::ORDER PSEL> RBF rsci_io<RSCI, RBF, SBF, PSEL>::recv_;
-	template<class RSCI, class RBF, class SBF, port_map::ORDER PSEL> SBF rsci_io<RSCI, RBF, SBF, PSEL>::send_;
-	template<class RSCI, class RBF, class SBF, port_map::ORDER PSEL>
-		volatile uint16_t rsci_io<RSCI, RBF, SBF, PSEL>::errc_;
 }
