@@ -40,9 +40,9 @@ namespace device {
 	private:
 		static inline RBF	recv_;
 		static inline SBF	send_;
-		static inline volatile uint8_t	orer_cnt_;
-		static inline volatile uint8_t	per_cnt_;
-		static inline volatile uint8_t	fer_cnt_;
+		static inline volatile uint16_t	orer_cnt_;
+		static inline volatile uint16_t	per_cnt_;
+		static inline volatile uint16_t	fer_cnt_;
 
 		ICU::LEVEL	level_;
 		bool		auto_crlf_;
@@ -214,6 +214,19 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		static auto get_per_count() noexcept { return per_cnt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	エラー数のリセット
+		 */
+		//-----------------------------------------------------------------//
+		static void reset_err_count() noexcept
+		{
+			orer_cnt_ = 0;
+			fer_cnt_ = 0;
+			per_cnt_ = 0;
+		}
 
 
 		//-----------------------------------------------------------------//

@@ -151,6 +151,8 @@ int main(int argc, char** argv)
 
 #ifndef MEMORY_MONITOR
 	cmd_.set_prompt("# ");
+	utils::format("\nerror      list SCI-error count\n");
+	utils::format("reset      reset SCI-error count\n");
 #endif
 
 #ifdef TEST_TFU
@@ -187,6 +189,8 @@ int main(int argc, char** argv)
 					utils::format("SCI ORER err: %d\n") % static_cast<int>(SCI_IO::get_orer_count());
 					utils::format("SCI FER err: %d\n") % static_cast<int>(SCI_IO::get_fer_count());
 					utils::format("SCI PER err: %d\n") % static_cast<int>(SCI_IO::get_per_count());
+				} else if(cmd_.cmp_word(n, "reset")) {
+					SCI_IO::reset_err_count();
 				} else {
 					char tmp[256];
 					if(cmd_.get_word(n, tmp, sizeof(tmp))) {
@@ -201,7 +205,7 @@ int main(int argc, char** argv)
 		auto n = SCI_IO::get_orer_count() + SCI_IO::get_fer_count() + SCI_IO::get_per_count();
 		uint8_t thc = 50;
 		if(n > 0) {
-			thc = 30;
+			thc = 20;
 		}
 		if(cnt >= thc) {
 			cnt = 0;
