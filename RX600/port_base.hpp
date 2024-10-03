@@ -19,6 +19,7 @@ namespace device {
 	*/
 	//=====================================================================//
 	struct PORT_BASE {
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ポート型
@@ -69,14 +70,14 @@ namespace device {
 	/*!
 		@brief  ポート定義基底クラス（PDR, PODR, PIDR, PMR, PCR, DSCR）
 		@param[in]	base	ベースアドレス
-		@param[in]	option	オプション
+		@param[in]	option	オプション・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, class option>
 	struct portx_t : public option {
 
 		static constexpr uint32_t base_address_ = base;	///< ベースアドレス
-		static constexpr auto N = static_cast<PORT_BASE::PORT>(base & 0x1f);
+		static constexpr auto N = static_cast<PORT_BASE::PORT>(base & 0x1f);	///< ポート型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -120,10 +121,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  駆動能力制御レジスタ（DSCR）
+			@brief  駆動能力制御レジスタ（DSCR） @n
+					※ポートによっては「存在しない」がアクセス出来てしまう・・・
 		*/
 		//-----------------------------------------------------------------//
 		static inline basic_rw_t<rw8_t<base + 0xE0> > DSCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  駆動能力制御レジスタ（DSCR2） @n
+					※ポートによっては「存在しない」がアクセス出来てしまう・・・
+		*/
+		//-----------------------------------------------------------------//
+		static inline basic_rw_t<rw8_t<base + 0x128> > DSCR2;
 	};
 
 
