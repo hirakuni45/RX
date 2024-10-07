@@ -6,12 +6,13 @@
 			DFLREk、DFLWEk レジスタ (k=0,1) の初期値が 0000h であるため、 @n
 			リセット起動直後のデータマットの読み出し／書き込み／消去は禁止状態です。 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "protocol_base.hpp"
+#include <set>
 
 namespace rx62x {
 
@@ -47,6 +48,9 @@ namespace rx62x {
 		bool						erase_select_ = false;
 		bool						select_write_area_ = false;
 
+		typedef std::set<uint32_t> ERASE_SET;
+		ERASE_SET					erase_set_;
+
 		uint32_t	   				baud_speed_ = 0;
 		speed_t						baud_rate_ = B9600;
 
@@ -58,7 +62,7 @@ namespace rx62x {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		protocol() { }
+		protocol() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -885,7 +889,7 @@ namespace rx62x {
 			@return ブロック情報
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_block() const { return blocks_; }
+		const rx::protocol::areas& get_block() const noexcept { return blocks_; }
 
 
 		//-----------------------------------------------------------------//
@@ -894,7 +898,8 @@ namespace rx62x {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_prog_size() {
+		bool inquiry_prog_size() noexcept
+		{
 			if(!connection_) return false;
 
 			if(!command_(0x27)) {
@@ -921,7 +926,7 @@ namespace rx62x {
 			@return ページサイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_page_size() const { return 256; }
+		uint32_t get_page_size() const noexcept { return 256; }
 
 
 		//-----------------------------------------------------------------//
@@ -930,7 +935,7 @@ namespace rx62x {
 			@return プログラム・サイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_prog_size() const { return prog_size_; }
+		uint32_t get_prog_size() const noexcept { return prog_size_; }
 
 #if 0
 		//-----------------------------------------------------------------//
@@ -1034,11 +1039,8 @@ namespace rx62x {
 				return false;
 			}
 
-			timeval tv;
-			tv.tv_sec  = 10;
-			tv.tv_usec = 0;
 			uint8_t head[1];
-			if(!read_(head, 1, tv)) {  // レスポンス
+			if(!read_(head, 1)) {  // レスポンス
 				return false;
 			}
 			if(head[0] == 0x26) {  // IDコードプロテクト無効の場合
@@ -1048,7 +1050,7 @@ namespace rx62x {
 				id_protect_ = true;
 ///				std::cout << "Return: 0x16" << std::endl;
 			} else if(head[0] == 0xc0) {  // エラーレスポンス
-				if(!read_(head, 1, tv)) {
+				if(!read_(head, 1)) {
 					return false;
 				}
 				last_error_ = head[0];  // 通常 0x51
@@ -1074,122 +1076,69 @@ namespace rx62x {
 		/*!
 			@brief	イレース・ページ
 			@param[in]	address	アドレス
-			@return エラー無ければ「true」
+			@return イレース・ステートを返す
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) noexcept
+		rx::protocol::erase_state erase_page(uint32_t address) noexcept
 		{
-			if(!connection_) return false;
-//			if(!verification_) return false;
+			if(!connection_) return rx::protocol::erase_state::ERROR;
+			if(!pe_turn_on_) return rx::protocol::erase_state::ERROR;
 
 			if(!erase_select_) {  // 消去選択
 				if(!command_(0x48)) {
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
-				timeval tv;
-				tv.tv_sec  = 10;
-				tv.tv_usec = 0;
 				uint8_t tmp[1];
-				if(!read_(tmp, 1, tv)) {  // レスポンス
-					return false;
+				if(!read_(tmp, 1)) {  // レスポンス
+					return rx::protocol::erase_state::ERROR;
 				}
 				if(tmp[0] != 0x06) {
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
 				erase_select_ = true;
 			}
 
 			// ブロック消去コマンド発行
-			uint8_t cmd[4];
-			cmd[0] = 0x58;
-			cmd[1] = 0x01;  // size 固定値１
-			cmd[2] = (address >> 14) & 0xff;
-			cmd[3] = sum_(cmd, 3);
-			if(!write_(cmd, 4)) {
-				return false;
+			uint8_t block = 0;
+			if(address >= 0xffff'8000) {
+				block = ((address >> 12) & 0x7) ^ 0x7;
+			} else {
+				block = ((address >> 14) & 0x1f) ^ 0x1f;
+				block += 8;
+			}
+			if(erase_set_.find(block) != erase_set_.end()) {
+				return rx::protocol::erase_state::CHECK_OK;
+			} else {
+				erase_set_.insert(block);
+			}
+			uint8_t tmp[4];
+			tmp[0] = 0x58;
+			tmp[1] = 0x01;  // size 固定値１
+			tmp[2] = block;
+			tmp[3] = sum_(tmp, 3);
+			if(!write_(tmp, 4)) {
+				return rx::protocol::erase_state::ERROR;
 			}
 
 			{
-				timeval tv;
-				tv.tv_sec  = 10;
-				tv.tv_usec = 0;
 				uint8_t tmp[1];
-				if(!read_(tmp, 1, tv)) {  // レスポンス
-					return false;
+				if(!read_(tmp, 1)) {  // レスポンス
+					return rx::protocol::erase_state::ERROR;
 				}
 				if(tmp[0] == 0xD8) {
-					if(!read_(tmp, 1, tv)) {  // エラーコード
-						return false;
+					if(!read_(tmp, 1)) {  // エラーコード
+						return rx::protocol::erase_state::ERROR;
 					}
 					// 0x11: サムチェックエラー
 					// 0x29: ブロック番号エラー
 					// 0x51: 消去エラーが発生
 					last_error_ = tmp[0];  // エラーコード
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				} else if(tmp[0] != 0x06) {
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
+				return rx::protocol::erase_state::ERASE_OK;
 			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	リード・ページ
-			@param[in]	adr	アドレス
-			@param[out]	dst	リード・データ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool read_page(uint32_t adr, uint8_t* dst) noexcept
-		{
-			if(!connection_) return false;
-			if(!pe_turn_on_) return false;
-
-			uint8_t cmd[12];
-			cmd[0] = 0x52;
-			cmd[1] = 9;
-			cmd[2] = 0x01;  // user-area, data-area
-			put32_big_(&cmd[3], adr);
-			put32_big_(&cmd[7], 256);
-			cmd[11] = sum_(cmd, 11);
-			if(!write_(cmd, 12)) {
-				return false;
-			}
-
-			{
-				timeval tv;
-				tv.tv_sec  = 5;
-				tv.tv_usec = 0;
-				uint8_t head[5];
-				if(!read_(head, 5, tv)) {
-					return false;
-				}
-				if(head[0] != 0x52) {
-					return false;
-				}
-				auto rs = get32_big_(&head[1]);
-				/// std::cout << "Read size: " << rs << std::endl;
-				tv.tv_sec  = 5;
-				tv.tv_usec = 0;
-				if(!read_(dst, rs, tv)) {
-//					std::cout << "Read error #0" << std::endl;
-					return false;
-				}
-			}
-			{
-				timeval tv;
-				tv.tv_sec  = 5;
-				tv.tv_usec = 0;
-				uint8_t sum[1];
-				if(!read_(sum, 1, tv)) {
-//					std::cout << "Read error #1" << std::endl;
-					return false;
-				}
-			}
-			return true;
 		}
 
 
@@ -1204,17 +1153,41 @@ namespace rx62x {
 		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
+			if(erase_select_) {  // erase-select を解除
+				uint8_t tmp[4];
+				tmp[0] = 0x58;
+				tmp[1] = 0x01;  // size 固定値１
+				tmp[2] = 0xff;
+				tmp[3] = sum_(tmp, 3);
+				if(!write_(tmp, 4)) {
+					return false;
+				}
+
+				if(!read_(tmp, 1)) {  // レスポンス
+					return false;
+				}
+				if(tmp[0] == 0xD8) {
+					if(!read_(tmp, 1)) {  // エラーコード
+						return false;
+					}
+					// 0x11: サムチェックエラー
+					// 0x29: ブロック番号エラー
+					// 0x51: 消去エラーが発生
+					last_error_ = tmp[0];  // エラーコード
+					return false;
+				} else if(tmp[0] != 0x06) {
+					return false;
+				}
+				erase_select_ = false;
+			}
 
 			// 領域選択
 			if(!command_(0x43)) {  // ユーザーマット選択コマンド
 				return false;
 			}
 
-			timeval tv;
-			tv.tv_sec  = 10;
-			tv.tv_usec = 0;
 			uint8_t head[1];
-			if(!read_(head, 1, tv)) {
+			if(!read_(head, 1)) {
 				return false;
 			}
 			if(head[0] != 0x06) {
@@ -1273,11 +1246,8 @@ namespace rx62x {
 			}
 
 			// レスポンス
-			timeval tv;
-			tv.tv_sec  = 10;
-			tv.tv_usec = 0;
 			uint8_t head[1];
-			if(!read_(head, 1, tv)) {
+			if(!read_(head, 1)) {
 				select_write_area_ = false;
 				return false;
 			}
@@ -1287,7 +1257,7 @@ namespace rx62x {
 				if(head[0] != 0xd0) {
 					return false;
 				}
-				if(!read_(head, 1, tv)) {
+				if(!read_(head, 1)) {
 					return false;
 				}
 				last_error_ = head[0];
@@ -1295,6 +1265,56 @@ namespace rx62x {
 				return false;
 			}
 
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	リード・ページ
+			@param[in]	adr	アドレス
+			@param[out]	dst	リード・データ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool read_page(uint32_t adr, uint8_t* dst) noexcept
+		{
+			if(!connection_) return false;
+			if(!pe_turn_on_) return false;
+
+			uint8_t tmp[12];
+			tmp[0] = 0x52;
+			tmp[1] = 9;
+			tmp[2] = 0x01;  // user-area, data-area
+			put32_big_(&tmp[3], adr);
+			put32_big_(&tmp[7], 256);
+			tmp[11] = sum_(tmp, 11);
+			if(!write_(tmp, 12)) {
+				return false;
+			}
+
+			{
+				uint8_t head[5];
+				if(!read_(head, 5)) {
+					return false;
+				}
+				if(head[0] != 0x52) {
+					return false;
+				}
+				auto rs = get32_big_(&head[1]);
+				/// std::cout << "Read size: " << rs << std::endl;
+				if(!read_(dst, rs)) {
+//					std::cout << "Read error #0" << std::endl;
+					return false;
+				}
+			}
+			{
+				uint8_t sum[1];
+				if(!read_(sum, 1)) {
+//					std::cout << "Read error #1" << std::endl;
+					return false;
+				}
+			}
 			return true;
 		}
 

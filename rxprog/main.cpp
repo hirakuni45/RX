@@ -16,7 +16,7 @@
 
 namespace {
 
-	static constexpr char version_[] = "1.88";
+	static constexpr char version_[] = "1.90";
 	static constexpr char conf_file_[] = "rx_prog.conf";
 	static constexpr uint32_t cpr_last_year_ = 2024;
 	static constexpr uint32_t progress_num_ = 50;
@@ -569,14 +569,18 @@ int main(int argc, char* argv[])
 				} else if(opts.verbose) {
 					std::cout << boost::format("Erase: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
 				}
-				if(!prog_.erase_page(adr)) {  // 256/128 バイト単位で消去要求を送る
+				// 256/128 バイト単位で消去要求を送る
+				auto st = prog_.erase_page(adr);
+				if(st == rx::protocol::erase_state::ERROR) {  
 					prog_.end();
 					return -1;
 				}
 				adr += page_size;
 				len += page_size;
 				++page.n;
-				usleep(erase_page_wait);	// 2[ms] wait 待ちを入れないとマイコン側がロストする・・
+				if(st == rx::protocol::erase_state::ERASE_OK) {  // ブロックイレースが走ったら、時間待ち～
+					usleep(erase_page_wait);	// 2[ms] wait 待ちを入れないとマイコン側がロストする・・
+				}
 			}
 		}
 		if(opts.progress) {
@@ -613,7 +617,7 @@ int main(int argc, char* argv[])
 				adr += page_size;
 				len += page_size;
 				++page.n;
-				usleep(write_page_wait);	// 5[ms] wait 待ちを入れないとマイコン側がロストする・・
+				usleep(write_page_wait);	// 待ち（通常、5ms）を入れないとマイコン側がストールする・・
 			}
 		}
 		if(opts.progress) {
