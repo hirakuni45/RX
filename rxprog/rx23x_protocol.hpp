@@ -22,15 +22,15 @@ namespace rx23x {
 
 		bool				verbose_ = false;
 
-		bool				connection_ = false;
-
 		rx::protocol::devices	devices_;
 		uint8_t					data_ = 0;
 		rx::protocol::areas		areas_;
 		rx::protocol::areas		data_areas_;
 		rx::protocol::blocks	blocks_;
-		bool					id_protect_ = false;
-		bool					pe_turn_on_ = false;
+		bool					id_protect_   = false;
+		bool					pe_turn_on_   = false;
+		bool					blank_check_  = false;
+		bool					blank_all_    = false;
 		bool					erase_select_ = false;
 		typedef std::set<uint32_t> ERASE_SET;
 		ERASE_SET				erase_set_;
@@ -38,8 +38,6 @@ namespace rx23x {
 
 		uint32_t	   			baud_speed_ = 0;
 		speed_t					baud_rate_ = B9600;
-
-		uint8_t					last_error_ = 0;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -245,56 +243,13 @@ namespace rx23x {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	開始
-			@param[in]	path	シリアルデバイスパス
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool start(const std::string& path) noexcept
-		{
-			return rx::protocol_base::start(path);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	コネクションの確立（startが成功したら呼ぶ）
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
 		bool connection() noexcept
 		{
-			bool ok = false;
-			for(int i = 0; i < 30; ++i) {
-				if(!command_(0x00)) {
-					return false;
-				}
-				timeval tv;
-				tv.tv_sec  = 0;
-				tv.tv_usec = 10000;  // 10ms
-				int ch = rs232c_.recv(tv);
-				if(ch == 0x00) {
-					ok =  true;
-					break;
-				}
-			}
-			if(!ok) return false;
-
-			if(!command_(0x55)) {
-				return false;
-			}
-
-			timeval tv;
-			tv.tv_sec  = 1;
-			tv.tv_usec = 0;
-			int ch = rs232c_.recv(tv);
-			if(ch == 0xff || ch != 0xE6) {
-				return false;
-			}
-
-			connection_ = true;
-
-			return true;
+			return rx::protocol_base::connection(0xE6);
 		}
 
 
@@ -695,15 +650,25 @@ namespace rx23x {
 			if(!connection_) return rx::protocol::erase_state::ERROR;
 			if(!pe_turn_on_) return rx::protocol::erase_state::ERROR;
 
+			if(!blank_check_) {  // ブランク・チェック
+				switch(user_blank_check()) {
+				case BLANK_STATE::ERROR:
+					return rx::protocol::erase_state::ERROR;
+				case BLANK_STATE::BLANK_OK:
+					blank_all_ = true;
+					break;
+				case BLANK_STATE::BLANK_NG:
+					blank_all_ = false;
+					break;
+				}
+				blank_check_ = true;
+			}
+			if(blank_all_) {
+				return rx::protocol::erase_state::CHECK_OK;
+			}
+
 			if(!erase_select_) {  // 消去選択
-				if(!command_(0x48)) {
-					return rx::protocol::erase_state::ERROR;
-				}
-				uint8_t tmp[1];
-				if(!read_(tmp, 1)) {  // レスポンス
-					return rx::protocol::erase_state::ERROR;
-				}
-				if(tmp[0] != 0x06) {
+				if(!enable_erase_select(RX_GROUP::RX2xx)) {
 					return rx::protocol::erase_state::ERROR;
 				}
 				erase_select_ = true;
@@ -761,30 +726,7 @@ namespace rx23x {
 			if(!pe_turn_on_) return false;
 
 			if(erase_select_) {  // erase-select を解除
-				uint8_t tmp[7];
-				tmp[0] = 0x59;
-				tmp[1] = 0x04;
-				tmp[2] = 0xff;
-				tmp[3] = 0xff;
-				tmp[4] = 0xff;
-				tmp[5] = 0xff;
-				tmp[6] = 0xa7;
-				if(!write_(tmp, 7)) {
-					return false;
-				}
-				if(!read_(tmp, 1)) {  // レスポンス
-					return false;
-				}
-				if(tmp[0] == 0xD9) {
-					if(!read_(tmp, 1)) {  // エラーコード
-						return false;
-					}
-					// 0x11: サムチェックエラー
-					// 0x29: ブロック先頭エラー
-					// 0x51: 消去エラーが発生
-					last_error_ = tmp[0];  // エラーコード
-					return false;
-				} else if(tmp[0] != 0x06) {
+				if(!enable_erase_select(RX_GROUP::RX2xx, false)) {
 					return false;
 				}
 				erase_select_ = false;

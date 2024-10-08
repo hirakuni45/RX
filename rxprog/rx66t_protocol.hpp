@@ -8,10 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "rs232c_io.hpp"
-#include "rx_protocol.hpp"
-#include <vector>
-#include <set>
+#include "protocol_base.hpp"
 #include <boost/format.hpp>
 
 namespace rx66t {
@@ -21,13 +18,9 @@ namespace rx66t {
 		@brief	RX66T プログラミング・プロトコル・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class protocol {
-
-		utils::rs232c_io	rs232c_;
+	class protocol : public rx::protocol_base {
 
 		bool				verbose_ = false;
-
-		bool				connection_ = false;
 
 		rx::protocol::device_type	device_type_;
 
@@ -42,80 +35,6 @@ namespace rx66t {
 		bool				pe_turn_on_ = false;
 		bool				data_area_ = false;
 		bool				select_write_area_ = false;
-
-		typedef std::set<uint32_t> erase_map;
-		erase_map erase_map_;
-
-//		uint8_t				last_error_ = 0;
-
-
-		static uint32_t get16_big_(const uint8_t* p) noexcept
-		{
-			uint32_t v;
-			v = p[1];
-			v |= static_cast<uint32_t>(p[0]) << 8;
-			return v;
-		}
-
-
-		static void put16_big_(uint8_t* p, uint32_t val) noexcept
-		{
-			p[0] = (val >> 8) & 0xff;
-			p[1] = val & 0xff;
-		}
-
-
-		static uint32_t get32_big_(const uint8_t* p) noexcept
-		{
-			uint32_t v;
-			v = p[3];
-			v |= static_cast<uint32_t>(p[2]) << 8;
-			v |= static_cast<uint32_t>(p[1]) << 16;
-			v |= static_cast<uint32_t>(p[0]) << 24;
-			return v;
-		}
-
-
-		static void put32_big_(uint8_t* p, uint32_t val) noexcept
-		{
-			p[0] = (val >> 24) & 0xff;
-			p[1] = (val >> 16) & 0xff;
-			p[2] = (val >> 8) & 0xff;
-			p[3] =  val & 0xff;
-		}
-
-
-		static uint8_t sum_(const uint8_t* buff, uint32_t len) noexcept
-		{
-			uint16_t sum = 0;
-			for(uint32_t i = 0; i < len; ++i) {
-				sum += *buff++;
-			}
-			return (0 - sum) & 0xff;
-		}
-
-
-		bool read_(void* buff, uint32_t len, const timeval& tv) noexcept
-		{
-			return rs232c_.recv(buff, len, tv) == len;
-		}
-
-
-		bool read_(void* buff, uint32_t len) noexcept
-		{
-			timeval tv;
-			tv.tv_sec  = 5;
-			tv.tv_usec = 0;
-			return rs232c_.recv(buff, len, tv) == len;
-		}
-
-
-		bool write_(const void* buff, uint32_t len) noexcept
-		{
-			uint32_t wr = rs232c_.send(buff, len);
-			rs232c_.sync_send();
-			return wr == len;
-		}
 
 
 		bool com_(uint8_t soh, uint8_t cmd, uint8_t ext, const uint8_t* src = nullptr, uint32_t len = 0) noexcept
@@ -374,31 +293,8 @@ namespace rx66t {
 			if(enable_id_) {
 			}
 
-			pe_turn_on_ = true;			
-			erase_map_.clear();
+			pe_turn_on_ = true;
 
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	開始
-			@param[in]	path	シリアルデバイスパス
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool start(const std::string& path) noexcept
-		{
-			if(!rs232c_.open(path, B9600)) {
-				return false;
-			}
-			if(!rs232c_.enable_RTS(false)) {
-				return false;
-			}
-			if(!rs232c_.enable_DTR(false)) {
-				return false;
-			}
 			return true;
 		}
 
@@ -411,36 +307,7 @@ namespace rx66t {
 		//-----------------------------------------------------------------//
 		bool connection() noexcept
 		{
-			bool ok = false;
-			for(int i = 0; i < 30; ++i) {
-				if(!rs232c_.send(0x00)) {
-					return false;
-				}
-				timeval tv;
-				tv.tv_sec  = 0;
-				tv.tv_usec = 10000;  // 10ms
-				int ch = rs232c_.recv(tv);
-				if(ch == 0x00) {
-					ok =  true;
-					break;
-				}
-			}
-			if(!ok) return false;
-
-			if(!rs232c_.send(0x55)) {
-				return false;
-			}
-
-			timeval tv;
-			tv.tv_sec  = 1;
-			tv.tv_usec = 0;
-			int ch = rs232c_.recv(tv);
-			if(ch == 0xC1) {
-				connection_ = true;
-				return true;
-			}
-
-			return false;
+			return rx::protocol_base::connection(0xC1);
 		}
 
 
@@ -694,10 +561,10 @@ namespace rx66t {
 				}
 				// erase NG;
 				// std::cout << boost::format("Erase NG: %08X") % address << std::endl;
-				if(address >= 0xFFFF0000) {  // 8K block
-					org = address & 0xFFFFE000;
-				} else if(address >= 0xFFC00000) {  // 32K block
-					org = address & 0xFFFF8000;
+				if(address >= 0xFFFF'0000) {  // 8K block
+					org = address & 0xFFFF'E000;
+				} else if(address >= 0xFFC0'0000) {  // 32K block
+					org = address & 0xFFFF'8000;
 				}
 				put32_big_(&tmp[0], org);
 				if(!command_(0x12, tmp, 4)) {  // erase command

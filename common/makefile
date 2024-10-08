@@ -81,7 +81,7 @@ ifeq ($(RX_DEF),SIG_RX231)
   RX_CPU = RX231
   RX_CHOOSE = -mcpu=rx230
   LDSCRIPT	= ../../RX231/$(DEVICE).ld
-  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
+  PROG_OPT = --write-page-wait=15000 --erase-page-wait=5000
 endif
 
 ifeq ($(RX_DEF),SIG_RX63T)
