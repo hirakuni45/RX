@@ -24,6 +24,9 @@ namespace rx {
 
 		utils::rs232c_io	rs232c_;
 
+		bool				connection_;
+		uint8_t				last_error_;
+
 		static uint32_t get32_(const uint8_t* p) noexcept
 		{
 			uint32_t v;
@@ -109,6 +112,26 @@ namespace rx {
 			return wr == len;
 		}
 
+		enum class BLANK_STATE {
+			ERROR,
+			BLANK_OK,
+			BLANK_NG
+		};
+
+		enum class RX_GROUP {
+			RX2xx,
+			RX6xx
+		};
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		protocol_base() :
+			rs232c_(), connection_(false), last_error_(0)
+		{ }
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -130,6 +153,162 @@ namespace rx {
 				return false;
 			}
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コネクションの確立（start が成功したら呼ぶ）
+			@param[in]	id	コネクション確率 ID
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool connection(uint8_t id) noexcept
+		{
+			bool ok = false;
+			for(int i = 0; i < 30; ++i) {
+				if(!command_(0x00)) {
+					return false;
+				}
+				timeval tv;
+				tv.tv_sec  = 0;
+				tv.tv_usec = 10000;  // 10ms
+				int ch = rs232c_.recv(tv);
+				if(ch == 0x00) {
+					ok =  true;
+					break;
+				}
+			}
+			if(!ok) return false;
+
+			if(!command_(0x55)) {
+				return false;
+			}
+
+			uint8_t tmp[1];
+			if(!read_(tmp, 1)) {
+				return false;
+			}
+			if(tmp[0] == 0xff) {
+				return false;
+			}
+			if(tmp[0] != id) {
+				return false;
+			}
+
+			connection_ = true;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ユーザー領域、ブランクチェック
+			@return ブランクチェック後の状態を返す 
+		*/
+		//-----------------------------------------------------------------//
+		BLANK_STATE user_blank_check() noexcept
+		{
+			if(!command_(0x4D)) {
+				return BLANK_STATE::ERROR;
+			}
+			uint8_t tmp[1];
+			if(!read_(tmp, 1)) {  // レスポンス
+				return BLANK_STATE::ERROR;
+			}
+			if(tmp[0] == 0x06) {
+				return BLANK_STATE::BLANK_OK;
+			} else if(tmp[0] == 0xCD) {
+				if(!read_(tmp, 1)) {  // エラーコード
+					return BLANK_STATE::ERROR;
+				} else if(tmp[0] == 0x52) {
+					return BLANK_STATE::BLANK_NG;
+				} else {
+					return BLANK_STATE::ERROR;
+				}
+			} else {
+				return BLANK_STATE::ERROR;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	消去選択
+			@param[in]	grp		RX マイコン・グループ型
+			@param[in]	ena		消去選択を解除する場合「false」
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool enable_erase_select(RX_GROUP grp, bool ena = true) noexcept
+		{
+			if(ena) {
+				if(!command_(0x48)) {  // 消去選択
+					return false;
+				}
+				uint8_t tmp[1];
+				if(!read_(tmp, 1)) {  // レスポンス
+					return false;
+				}
+				if(tmp[0] != 0x06) {
+					return false;
+				}
+				return true;
+			} else {
+				if(grp == RX_GROUP::RX2xx) {
+					uint8_t tmp[7];
+					tmp[0] = 0x59;
+					tmp[1] = 0x04;
+					tmp[2] = 0xff;
+					tmp[3] = 0xff;
+					tmp[4] = 0xff;
+					tmp[5] = 0xff;
+					tmp[6] = 0xa7;
+					if(!write_(tmp, 7)) {
+						return false;
+					}
+
+					if(!read_(tmp, 1)) {  // レスポンス
+						return false;
+					}
+					if(tmp[0] == 0x06) {
+						return true;
+					} else if(tmp[0] == 0xD9) {
+						if(!read_(tmp, 1)) {  // エラーコード
+							return false;
+						}
+						// 0x11: サムチェックエラー
+						last_error_ = tmp[0];  // エラーコード
+					}
+					return false;
+				} else if(grp == RX_GROUP::RX6xx) {
+					uint8_t tmp[4];
+					tmp[0] = 0x58;
+					tmp[1] = 0x01;  // size 固定値１
+					tmp[2] = 0xff;
+					tmp[3] = sum_(tmp, 3);
+					if(!write_(tmp, 4)) {
+						return false;
+					}
+
+					if(!read_(tmp, 1)) {  // レスポンス
+						return false;
+					}
+					if(tmp[0] == 0x06) {
+						return true;
+					} else if(tmp[0] == 0xD8) {
+						if(!read_(tmp, 1)) {  // エラーコード
+							return false;
+						}
+						// 0x11: サムチェックエラー
+						last_error_ = tmp[0];  // エラーコード
+					}
+					return false;
+				} else {
+					return false;
+				}
+			}
 		}
 
 
