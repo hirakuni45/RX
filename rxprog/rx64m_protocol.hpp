@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX64M プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "rs232c_io.hpp"
 #include "rx_protocol.hpp"
 #include <vector>
@@ -640,12 +640,13 @@ namespace rx64m {
 		/*!
 			@brief	イレース・ページ
 			@param[in]	address	アドレス
-			@return エラー無ければ「true」
+			@return イレース・ステートを返す
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) {
-			if(!connection_) return false;
-			if(!pe_turn_on_) return false;
+		rx::protocol::erase_state erase_page(uint32_t address) noexcept
+		{
+			if(!connection_) return rx::protocol::erase_state::ERROR;
+			if(!pe_turn_on_) return rx::protocol::erase_state::ERROR;
 
 			// ブランク・チェックを行う
 			uint8_t tmp[8];
@@ -653,19 +654,19 @@ namespace rx64m {
 			put32_big_(&tmp[0], org);
 			put32_big_(&tmp[4], org + 255);
 			if(!command_(0x10, tmp, sizeof(tmp))) {
-				return false;
+				return rx::protocol::erase_state::ERROR;
 			}
 			uint8_t res;
 			uint8_t err;
 			if(!response_(res, err)) {
-				return false;
+				return rx::protocol::erase_state::ERROR;
 			}
-			if(res == 0x10) return true;  // erase OK
+			if(res == 0x10) return rx::protocol::erase_state::CHECK_OK;
 			else if(res != 0x90) {
-				return false;
+				return rx::protocol::erase_state::ERROR;
 			} else {
 				if(err != 0xe0) { // do erase
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
 				// erase NG;
 				// std::cout << boost::format("Erase NG: %08X") % address << std::endl;
@@ -676,21 +677,21 @@ namespace rx64m {
 				}
 				put32_big_(&tmp[0], org);
 				if(!command_(0x12, tmp, 4)) {  // erase command
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
 				if(!response_(res, err)) {
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
 				if(res == 0x12) ;
 				else if(res == 0x92) {
 					std::cout << boost::format("Erase response: %02X") % static_cast<uint32_t>(err)
 						<< std::endl;
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				} else {
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
+				return rx::protocol::erase_state::ERASE_OK;
 			}
-			return true;
 		}
 
 

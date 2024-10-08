@@ -62,14 +62,12 @@ ifeq ($(RX_DEF),SIG_RX13T)
   RX_CPU = RX13T
   RX_CHOOSE = -misa=v1
   LDSCRIPT	= ../../RX13T/$(DEVICE).ld
-  PROG_VERIFY =
 endif
 
 ifeq ($(RX_DEF),SIG_RX140)
   RX_CPU = RX140
   RX_CHOOSE = -mcpu=rx140
   LDSCRIPT	= ../../RX140/$(DEVICE).ld
-  PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX220)
@@ -77,14 +75,12 @@ ifeq ($(RX_DEF),SIG_RX220)
   RX_CHOOSE = -mcpu=rx200
   AS_OPT	+=	--defsym NO_FLOAT=1
   LDSCRIPT	= ../../RX220/$(DEVICE).ld
-  PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX231)
   RX_CPU = RX231
   RX_CHOOSE = -mcpu=rx230
   LDSCRIPT	= ../../RX231/$(DEVICE).ld
-#  PROG_ERASE =
   PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
 endif
 
@@ -92,7 +88,6 @@ ifeq ($(RX_DEF),SIG_RX63T)
   RX_CPU = RX63T
   RX_CHOOSE = -misa=v1
   LDSCRIPT	= ../../RX63T/$(DEVICE).ld
-  PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX63T_S)
@@ -100,21 +95,18 @@ ifeq ($(RX_DEF),SIG_RX63T_S)
   RX_CPU = RX63T
   RX_CHOOSE = -misa=v1
   LDSCRIPT	= ../../RX63T/$(DEVICE).ld
-  PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX621)
   RX_CPU = RX621
   RX_CHOOSE = -misa=v1
   LDSCRIPT	= ../../RX62x/$(DEVICE).ld
-  PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX62N)
   RX_CPU = RX62N
   RX_CHOOSE = -misa=v1
   LDSCRIPT	= ../../RX62x/$(DEVICE).ld
-  PROG_ERASE =
 endif
 
 ifeq ($(RX_DEF),SIG_RX631)
@@ -133,21 +125,21 @@ ifeq ($(RX_DEF),SIG_RX23T)
   RX_CPU = RX23T
   RX_CHOOSE = -misa=v2
   LDSCRIPT	= ../../RX23T/$(DEVICE).ld
-  PROG_VERIFY =
+  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
 endif
 
 ifeq ($(RX_DEF),SIG_RX24T)
   RX_CPU = RX24T
   RX_CHOOSE = -misa=v2
   LDSCRIPT	= ../../RX24T/$(DEVICE).ld
-  PROG_VERIFY =
+  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
 endif
 
 ifeq ($(RX_DEF),SIG_RX24U)
   RX_CPU = RX24U
   RX_CHOOSE = -misa=v2
   LDSCRIPT	= ../../RX24U/$(DEVICE).ld
-  PROG_VERIFY =
+  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
 endif
 
 ifeq ($(RX_DEF),SIG_RX26T)
@@ -156,6 +148,7 @@ ifeq ($(RX_DEF),SIG_RX26T)
   # TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic,mathlib
   TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic
   LDSCRIPT	= ../../RX26T/$(DEVICE).ld
+  PROG_OPT = --write-page-wait=2500
 endif
 
 ifeq ($(RX_DEF),SIG_RX64M)
@@ -196,7 +189,6 @@ ifeq ($(RX_DEF),SIG_RX660)
   RX_CHOOSE = -misa=v3
 # TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
   TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
-
   LDSCRIPT	= ../../RX660/$(DEVICE).ld
 endif
 

@@ -26,8 +26,8 @@ namespace utils {
 		@brief	Motolora S[1-9] Format Encode/Decode クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class motsx_io {
-	public:
+	struct motsx_io {
+
 		static constexpr uint32_t PAGE_MASK = 0xffff'ff00;  ///< Under 256 bytes mask 
 
 		typedef std::array<uint8_t, 256> array;

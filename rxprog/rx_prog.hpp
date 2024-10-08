@@ -71,13 +71,13 @@ namespace rx {
 
 
 		struct erase_page_visitor {
-			using result_type = bool;
+			using result_type = rx::protocol::erase_state;
 
 			uint32_t adr_;
 			erase_page_visitor(uint32_t adr) : adr_(adr) { }
 
 			template <class T>
-			bool operator()(T& x) {
+			rx::protocol::erase_state operator()(T& x) {
 				return x.erase_page(adr_);
 			}
 		};
@@ -221,15 +221,15 @@ namespace rx {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool erase_page(uint32_t adr) noexcept
+		rx::protocol::erase_state erase_page(uint32_t adr) noexcept
 		{
 			erase_page_visitor vis(adr);
-           	if(!boost::apply_visitor(vis, protocol_)) {
+			auto st = boost::apply_visitor(vis, protocol_);
+           	if(st == rx::protocol::erase_state::ERROR) {
 				end();
 				std::cerr << std::endl << boost::format("Erase page error: %08X") % adr << std::endl;
-				return false;
 			}
-			return true;
+			return st;
 		}
 
 
@@ -268,7 +268,7 @@ namespace rx {
 				return false;
 			}
 			uint32_t errcnt = 0;
-			for(uint32_t i = 0; i < 256; ++i) {
+			for(uint32_t i = 0; i < get_page_size(); ++i) {
 				auto m = *src++;
 				if(dev[i] != m) {
 					++errcnt;
@@ -280,7 +280,7 @@ namespace rx {
 				++adr;
 			}
 			if(errcnt > 0) {
-				std::cerr << "Verify page error: " << errcnt << std::endl;
+				std::cerr << "Verify page error (count): " << errcnt << std::endl;
 				return false;
 			}
 			return true;

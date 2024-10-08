@@ -73,7 +73,7 @@
 
 ||Support/サポート|operation verification/動作検証|
 |-|:-:|:-:|
-|[rxprog](../rxprog)|-|-|
+|[rxprog](../rxprog)|〇|〇|
 
 ---
 

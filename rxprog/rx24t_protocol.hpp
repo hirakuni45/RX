@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include "protocol_base.hpp"
+#include <set>
 
 namespace rx24t {
 
@@ -23,19 +24,23 @@ namespace rx24t {
 
 		bool				connection_ = false;
 
-		rx::protocol::devices		devices_;
-		uint8_t						data_ = 0;
-		rx::protocol::areas			areas_;
-		rx::protocol::areas			data_areas_;
-		rx::protocol::blocks		blocks_;
-		bool						id_protect_ = false;
-		bool						pe_turn_on_ = false;
-		bool						select_write_area_ = false;
+		rx::protocol::devices	devices_;
+		uint8_t					data_ = 0;
+		rx::protocol::areas		areas_;
+		rx::protocol::areas		data_areas_;
+		rx::protocol::blocks	blocks_;
+		bool					id_protect_ = false;
+		bool					pe_turn_on_ = false;
+		bool					erase_select_ = false;
+		bool					select_write_area_ = false;
 
-		uint32_t	   				baud_speed_ = 0;
-		speed_t						baud_rate_ = B9600;
+		typedef std::set<uint32_t> ERASE_SET;
+		ERASE_SET				erase_set_;
 
-		uint8_t						last_error_ = 0;
+		uint32_t	   			baud_speed_ = 0;
+		speed_t					baud_rate_ = B9600;
+
+		uint8_t					last_error_ = 0;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -679,19 +684,71 @@ namespace rx24t {
 			@return ページサイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_page_size() const { return 256; }
+		uint32_t get_page_size() const noexcept { return 256; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	イレース・ページ
 			@param[in]	address	アドレス
-			@return エラー無ければ「true」
+			@return イレース・ステートを返す
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) noexcept
+		rx::protocol::erase_state erase_page(uint32_t address) noexcept
 		{
-			return true;
+			if(!connection_) return rx::protocol::erase_state::ERROR;
+			if(!pe_turn_on_) return rx::protocol::erase_state::ERROR;
+
+			if(!erase_select_) {  // 消去選択
+				if(!command_(0x48)) {
+					return rx::protocol::erase_state::ERROR;
+				}
+				uint8_t tmp[1];
+				if(!read_(tmp, 1)) {  // レスポンス
+					return rx::protocol::erase_state::ERROR;
+				}
+				if(tmp[0] != 0x06) {
+					return rx::protocol::erase_state::ERROR;
+				}
+				erase_select_ = true;
+			}
+
+			// ブロック消去コマンド発行
+			auto org = address & 0xffff'f800; // erase block (2K)
+			if(erase_set_.find(org) != erase_set_.end()) {
+				return rx::protocol::erase_state::CHECK_OK;
+			} else {
+				erase_set_.insert(org);
+			}
+			uint8_t cmd[7];
+			cmd[0] = 0x59;
+			cmd[1] = 0x04;  // size 固定値 4
+			put32_big_(&cmd[2], org);
+			cmd[6] = sum_(cmd, 6);
+			if(!write_(cmd, 7)) {
+				return rx::protocol::erase_state::ERROR;
+			}
+//		std::cout << std::endl << boost::format("Erase org: %08X") % org << std::endl;
+
+			{
+				uint8_t tmp[1];
+				if(!read_(tmp, 1)) {  // レスポンス
+					return rx::protocol::erase_state::ERROR;
+				}
+				if(tmp[0] == 0xD9) {
+					if(!read_(tmp, 1)) {  // エラーコード
+						return rx::protocol::erase_state::ERROR;
+					}
+					// 0x11: サムチェックエラー
+					// 0x29: ブロック番号エラー
+					// 0x51: 消去エラーが発生
+					last_error_ = tmp[0];  // エラーコード
+					return rx::protocol::erase_state::ERROR;
+				} else if(tmp[0] != 0x06) {
+					return rx::protocol::erase_state::ERROR;
+				}
+			}
+			return rx::protocol::erase_state::ERASE_OK;
 		}
 
 
@@ -707,16 +764,43 @@ namespace rx24t {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
+			if(erase_select_) {  // erase-select を解除
+				uint8_t tmp[7];
+				tmp[0] = 0x59;
+				tmp[1] = 0x04;
+				tmp[2] = 0xff;
+				tmp[3] = 0xff;
+				tmp[4] = 0xff;
+				tmp[5] = 0xff;
+				tmp[6] = 0xa7;
+				if(!write_(tmp, 7)) {
+					return false;
+				}
+				if(!read_(tmp, 1)) {  // レスポンス
+					return false;
+				}
+				if(tmp[0] == 0xD9) {
+					if(!read_(tmp, 1)) {  // エラーコード
+						return false;
+					}
+					// 0x11: サムチェックエラー
+					// 0x29: ブロック先頭エラー
+					// 0x51: 消去エラーが発生
+					last_error_ = tmp[0];  // エラーコード
+					return false;
+				} else if(tmp[0] != 0x06) {
+					return false;
+				}
+				erase_select_ = false;
+			}
+
 			// ユーザ／データ領域プログラム準備
 			if(!command_(0x43)) {
 				return false;
 			}
 
-			timeval tv;
-			tv.tv_sec  = 1;
-			tv.tv_usec = 0;
 			uint8_t head[1];
-			if(!read_(head, 1, tv)) {
+			if(!read_(head, 1)) {
 				return false;
 			}
 			if(head[0] != 0x06) {
@@ -746,7 +830,7 @@ namespace rx24t {
 			uint8_t cmd[5 + 256 + 1];
 			cmd[0] = 0x50;
 ///			std::cout << boost::format("Address: %08X") % address << std::endl;			
-			if(address != 0xffffffff) {
+			if(address != 0xffff'ffff) {
 				put32_big_(&cmd[1], address);
 				std::memcpy(&cmd[5], src, 256);
 				cmd[5 + 256] = sum_(cmd, 5 + 256);
@@ -775,11 +859,8 @@ namespace rx24t {
 			}
 
 			// レスポンス
-			timeval tv;
-			tv.tv_sec  = 10;
-			tv.tv_usec = 0;
 			uint8_t head[1];
-			if(!read_(head, 1, tv)) {
+			if(!read_(head, 1)) {
 				select_write_area_ = false;
 				return false;
 			}
@@ -789,7 +870,7 @@ namespace rx24t {
 				if(head[0] != 0xd0) {
 					return false;
 				}
-				if(!read_(head, 1, tv)) {
+				if(!read_(head, 1)) {
 					return false;
 				}
 				last_error_ = head[0];
@@ -826,11 +907,8 @@ namespace rx24t {
 			}
 
 			{
-				timeval tv;
-				tv.tv_sec  = 10;
-				tv.tv_usec = 0;
 				uint8_t head[5];
-				if(!read_(head, 5, tv)) {
+				if(!read_(head, 5)) {
 					return false;
 				}
 				if(head[0] != 0x52) {
@@ -838,19 +916,14 @@ namespace rx24t {
 				}
 				auto rs = get32_big_(&head[1]);
 				/// std::cout << "Read size: " << rs << std::endl;
-				tv.tv_sec  = 5;
-				tv.tv_usec = 0;
-				if(!read_(dst, rs, tv)) {
+				if(!read_(dst, rs)) {
 //					std::cout << "Read error #0" << std::endl;
 					return false;
 				}
 			}
 			{
-				timeval tv;
-				tv.tv_sec  = 5;
-				tv.tv_usec = 0;
 				uint8_t sum[1];
-				if(!read_(sum, 1, tv)) {
+				if(!read_(sum, 1)) {
 //					std::cout << "Read error #1" << std::endl;
 					return false;
 				}
@@ -859,40 +932,6 @@ namespace rx24t {
 		}
 
 
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	イレース・ページ
-			@param[in]	address	アドレス
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) {
-			if(!connection_) return false;
-			if(!verification_) return false;
-
-			char buff[4];
-			buff[0] = 0x20;
-			buff[1] = (address >> 8) & 0xff;
-			buff[2] = (address >> 16) & 0xff;
-			buff[3] = 0xD0;
-			if(rs232c_.send(buff, 4) != 4) {
-				return false;
-			}
-			rs232c_.sync_send();
-
-			status st;
-			if(!get_status(st)) {
-				return false;
-			}
-			if(st.get_SR5() != 0) {
-				return false;
-			}
-
-			return clear_status();
-		}
-
-#endif
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	終了

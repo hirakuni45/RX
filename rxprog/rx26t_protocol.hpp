@@ -50,7 +50,7 @@ namespace rx26t {
 
 //		uint8_t				last_error_ = 0;
 
-		static uint32_t get16_big_(const uint8_t* p)
+		static uint32_t get16_big_(const uint8_t* p) noexcept
 		{
 			uint32_t v;
 			v = p[1];
@@ -59,14 +59,14 @@ namespace rx26t {
 		}
 
 
-		static void put16_big_(uint8_t* p, uint32_t val)
+		static void put16_big_(uint8_t* p, uint32_t val) noexcept
 		{
 			p[0] = (val >> 8) & 0xff;
 			p[1] = val & 0xff;
 		}
 
 
-		static uint32_t get32_big_(const uint8_t* p)
+		static uint32_t get32_big_(const uint8_t* p) noexcept
 		{
 			uint32_t v;
 			v = p[3];
@@ -77,7 +77,7 @@ namespace rx26t {
 		}
 
 
-		static void put32_big_(uint8_t* p, uint32_t val)
+		static void put32_big_(uint8_t* p, uint32_t val) noexcept
 		{
 			p[0] = (val >> 24) & 0xff;
 			p[1] = (val >> 16) & 0xff;
@@ -86,7 +86,7 @@ namespace rx26t {
 		}
 
 
-		static uint8_t sum_(const uint8_t* buff, uint32_t len)
+		static uint8_t sum_(const uint8_t* buff, uint32_t len) noexcept
 		{
 			uint16_t sum = 0;
 			for(uint32_t i = 0; i < len; ++i) {
@@ -96,13 +96,13 @@ namespace rx26t {
 		}
 
 
-		bool read_(void* buff, uint32_t len, const timeval& tv)
+		bool read_(void* buff, uint32_t len, const timeval& tv) noexcept
 		{
 			return rs232c_.recv(buff, len, tv) == len;
 		}
 
 
-		bool read_(void* buff, uint32_t len)
+		bool read_(void* buff, uint32_t len) noexcept
 		{
 			timeval tv;
 			tv.tv_sec  = 5;
@@ -111,7 +111,7 @@ namespace rx26t {
 		}
 
 
-		bool write_(const void* buff, uint32_t len)
+		bool write_(const void* buff, uint32_t len) noexcept
 		{
 			uint32_t wr = rs232c_.send(buff, len);
 			rs232c_.sync_send();
@@ -119,7 +119,7 @@ namespace rx26t {
 		}
 
 
-		bool com_(uint8_t soh, uint8_t cmd, uint8_t ext, const uint8_t* src = nullptr, uint32_t len = 0)
+		bool com_(uint8_t soh, uint8_t cmd, uint8_t ext, const uint8_t* src = nullptr, uint32_t len = 0) noexcept
 		{
 			uint8_t tmp[1 + 2 + 1 + len + 1 + 1];
 			tmp[0] = soh;
@@ -136,13 +136,13 @@ namespace rx26t {
 		}
 
 
-		bool command_(uint8_t cmd, const uint8_t* src = nullptr, uint32_t len = 0)
+		bool command_(uint8_t cmd, const uint8_t* src = nullptr, uint32_t len = 0) noexcept
 		{
 			return com_(0x01, cmd, 0x03, src, len);
 		}
 
 
-		bool status_sub_(uint8_t* dst)
+		bool status_sub_(uint8_t* dst) noexcept
 		{
 			if(!read_(dst, 4)) {
 				return false;
@@ -170,7 +170,7 @@ namespace rx26t {
 		}
 
 
-		void dump_status_()
+		void dump_status_() noexcept
 		{
 			uint8_t tmp[4 + 1024 + 2];
 			if(!read_(tmp, 4)) {
@@ -195,7 +195,7 @@ namespace rx26t {
 		}
 
 
-		bool status_(uint8_t res)
+		bool status_(uint8_t res) noexcept
 		{
 			uint8_t tmp[4 + 1 + 1 + 1];
 
@@ -207,7 +207,7 @@ namespace rx26t {
 		}
 
 
-		bool response_(uint8_t& res, uint8_t& err)
+		bool response_(uint8_t& res, uint8_t& err) noexcept
 		{
 			uint8_t tmp[4 + 1 + 1 + 1];
 
@@ -220,7 +220,7 @@ namespace rx26t {
 		}
 
 
-		bool status_back_(uint8_t res)
+		bool status_back_(uint8_t res) noexcept
 		{
 			uint8_t tmp[4 + 1 + 1 + 1];
 
@@ -239,7 +239,7 @@ namespace rx26t {
 		}
 
 
-		bool status_data_(uint8_t res, uint8_t* dst, uint32_t len)
+		bool status_data_(uint8_t res, uint8_t* dst, uint32_t len) noexcept
 		{
 			uint8_t tmp[4 + len + 2];
 			if(!read_(tmp, 4)) {
@@ -269,7 +269,7 @@ namespace rx26t {
 		}
 
 
-		std::string out_section_(uint32_t n, uint32_t num) const
+		std::string out_section_(uint32_t n, uint32_t num) const noexcept
 		{
 			return (boost::format("#%02d/%02d: ") % n % num).str();
 		}
@@ -280,7 +280,7 @@ namespace rx26t {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		protocol() { }
+		protocol() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -292,7 +292,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool bind(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx)
+		bool bind(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) noexcept
 		{
 			verbose_ = rx.verbose_;
 
@@ -389,7 +389,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(const std::string& path)
+		bool start(const std::string& path) noexcept
 		{
 			if(!rs232c_.open(path, B9600)) {
 				return false;
@@ -410,7 +410,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool connection()
+		bool connection() noexcept
 		{
 			bool ok = false;
 			for(int i = 0; i < 30; ++i) {
@@ -451,7 +451,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_device_type()
+		bool inquiry_device_type() noexcept
 		{
 			if(!connection_) return false;
 
@@ -484,7 +484,7 @@ namespace rx26t {
 			@return デバイス
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::device_type& get_device_type() const { return device_type_; }
+		const rx::protocol::device_type& get_device_type() const noexcept { return device_type_; }
 
 
 		//-----------------------------------------------------------------//
@@ -493,7 +493,7 @@ namespace rx26t {
 			@return ページサイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_page_size() const { return PAGE_SIZE; }
+		uint32_t get_page_size() const noexcept { return PAGE_SIZE; }
 
 
 		//-----------------------------------------------------------------//
@@ -503,7 +503,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool select_endian(uint8_t endian)
+		bool select_endian(uint8_t endian) noexcept
 		{
 
 			if(!connection_) return false;
@@ -528,7 +528,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool select_frequency()
+		bool select_frequency() noexcept
 		{
 
 			if(!connection_) return false;
@@ -557,13 +557,33 @@ namespace rx26t {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	同期コマンド
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool sync() noexcept
+		{
+			// 同期コマンド
+			if(!command_(0x00)) {
+				return false;
+			}
+			if(!status_(0x00)) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	新ビットレート選択
 			@param[in]	rx		マイコン設定
 			@param[in]	spped	シリアル速度
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed)
+		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) noexcept
 		{
 			if(!connection_) return false;
 
@@ -604,7 +624,6 @@ namespace rx26t {
 			if(!command_(0x34, tmp, sizeof(tmp))) {
 				return false;
 			}
-
 			if(!status_(0x34)) {
 				return false;
 			}
@@ -633,7 +652,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_id()
+		bool inquiry_id() noexcept
 		{
 
 			if(!connection_) return false;
@@ -641,7 +660,6 @@ namespace rx26t {
 			if(!command_(0x2C)) {
 				return false;
 			}
-
 			if(!status_back_(0x2C)) {
 				return false;
 			}
@@ -663,15 +681,16 @@ namespace rx26t {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	イレース・ページ（PAGE_SIZE による）
+			@brief	イレース・ページ（PAGE_SIZE による） @n
+					ブランクチェックを行い、ブランクなら、消去をパスする
 			@param[in]	address	アドレス
-			@return エラー無ければ「true」
+			@return イレース・ステートを返す
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address)
+		rx::protocol::erase_state erase_page(uint32_t address) noexcept
 		{
-			if(!connection_) return false;
-			if(!pe_turn_on_) return false;
+			if(!connection_) return rx::protocol::erase_state::ERROR;
+			if(!pe_turn_on_) return rx::protocol::erase_state::ERROR;
 
 			// ブランク・チェックを行う
 			uint8_t tmp[8];
@@ -679,44 +698,44 @@ namespace rx26t {
 			put32_big_(&tmp[0], org);
 			put32_big_(&tmp[4], org + PAGE_SIZE - 1);
 			if(!command_(0x10, tmp, sizeof(tmp))) {
-				return false;
+				return rx::protocol::erase_state::ERROR;
 			}
 			uint8_t res;
 			uint8_t err;
 			if(!response_(res, err)) {
-				return false;
+				return rx::protocol::erase_state::ERROR;
 			}
-			if(res == 0x10) return true;  // erase OK
-			else if(res != 0x90) {
-				return false;
-			} else {
+			if(res == 0x10) {
+				return rx::protocol::erase_state::CHECK_OK;
+			} else if(res != 0x90) {
+				return rx::protocol::erase_state::ERROR;
+			} else {  // erase check NG!
 				if(err != 0xe0) { // do erase
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
-				// erase NG;
-				// std::cout << boost::format("Erase NG: %08X") % address << std::endl;
-				if(address >= 0xFFFF0000) {  // 8K block
-					org = address & 0xFFFFE000;
-				} else if(address >= 0xFFC00000) {  // 32K block
-					org = address & 0xFFFF8000;
+
+				if(org >= 0xffff'8000) { // 4K block
+					org &= 0xffff'f000;
+				} else {  // 16K block
+					org &= 0xffff'c000;
 				}
 				put32_big_(&tmp[0], org);
 				if(!command_(0x12, tmp, 4)) {  // erase command
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
 				if(!response_(res, err)) {
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
 				if(res == 0x12) ;
 				else if(res == 0x92) {
-					std::cout << boost::format("Erase response: %02X") % static_cast<uint32_t>(err)
-						<< std::endl;
-					return false;
+					std::cerr << std::endl <<
+						boost::format("Erase response: %02X") % static_cast<uint32_t>(err) << std::endl;
+					return rx::protocol::erase_state::ERROR;
 				} else {
-					return false;
+					return rx::protocol::erase_state::ERROR;
 				}
+				return rx::protocol::erase_state::ERASE_OK;
 			}
-			return true;
 		}
 
 
@@ -727,7 +746,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool select_write_area(bool data)
+		bool select_write_area(bool data) noexcept
 		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
@@ -747,7 +766,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool write_page(uint32_t address, const uint8_t* src)
+		bool write_page(uint32_t address, const uint8_t* src) noexcept
 		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
@@ -770,6 +789,7 @@ namespace rx26t {
 			}
 
 			uint8_t etx = 0x03;
+//			if(address >= 0xffff'ff80) etx = 0x17;
 			if(!com_(0x81, 0x13, etx, src, PAGE_SIZE)) {
 				return false;
 			}
@@ -798,7 +818,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read_page(uint32_t adr, uint8_t* dst)
+		bool read_page(uint32_t adr, uint8_t* dst) noexcept
 		{
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
@@ -831,7 +851,7 @@ namespace rx26t {
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool end()
+		bool end() noexcept
 		{
 			connection_ = false;
 			pe_turn_on_ = false;
