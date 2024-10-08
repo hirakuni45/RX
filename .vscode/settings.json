@@ -23,7 +23,8 @@
 		"tuple": "cpp",
 		"cstdint": "cpp",
 		"random": "cpp",
-		"cstdlib": "cpp"
+		"cstdlib": "cpp",
+		"ostream": "cpp"
 	},
     "editor.detectIndentation": false,
     "editor.insertSpaces": false

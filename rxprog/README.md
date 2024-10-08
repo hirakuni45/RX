@@ -21,6 +21,7 @@ Tool to write program to flash memory of RX microcontroller using serial interfa
  - rx220_protocol.hpp
  - rx23x_protocol.hpp
  - rx24t_protocol.hpp
+ - rx26t_protocol.hpp
  - rx62x_protocol.hpp
  - rx63x_protocol.hpp
  - rx64m_protocol.hpp
