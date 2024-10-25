@@ -28,12 +28,15 @@ namespace rx {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct device {
-			uint32_t	code_ = 0;
+			uint32_t	code_;
 			std::string	name_;
 
-			void info(const std::string& head = "") const {
-				std::cout << head << (boost::format("Device: %s") % name_) << std::endl;
+			device() noexcept : code_(0), name_() { }
+
+			void info(const std::string& head = "") const noexcept
+			{
 				std::cout << head << (boost::format("Device ID: 0x%0X") % code_) << std::endl;
+				std::cout << head << (boost::format("Device Name: '%s'") % name_) << std::endl;
 			}
 		};
 		typedef std::vector<device> devices;
@@ -51,9 +54,10 @@ namespace rx {
 			uint32_t	CPA;
 			uint32_t	CPI;
 
-			device_type() : TYP{ 0 }, OSA(0), OSI(0), CPA(0), CPI(0) { }
+			device_type() noexcept : TYP{ 0 }, OSA(0), OSI(0), CPA(0), CPI(0) { }
 
-			void info(const std::string& head = "") const {
+			void info(const std::string& head = "") const noexcept
+			{
 				std::cout << head << "Device Type TYP:";
 				for(int i = 0; i < 8; ++i) {
 					std::cout << boost::format(" %02X") % static_cast<uint32_t>(TYP[i]);
@@ -73,9 +77,12 @@ namespace rx {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct clock_mode {
-			uint8_t	type_ = 0;
+			uint8_t	type_;
 
-			void info(const std::string& head = "") const {
+			clock_mode() noexcept : type_(0) { }
+
+			void info(const std::string& head = "") const noexcept
+			{
 				std::cout << head << (boost::format("Clock Mode: 0x%02X") % static_cast<int>(type_))
 					<< std::endl;
 			}

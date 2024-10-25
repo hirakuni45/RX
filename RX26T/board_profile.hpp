@@ -43,6 +43,6 @@ namespace board_profile {
 	typedef device::RIIC0 RIIC_CH;
 
 	// CANFD ポートの定義
-	typedef device::CANFD CANFD0_CH;
+	typedef device::CANFD0 CANFD0_CH;
 	static constexpr auto CANFD_PORT = device::port_map::ORDER::FIRST;
 }

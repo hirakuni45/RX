@@ -266,21 +266,12 @@ namespace device {
 		static constexpr bool BIND16 = false;	///< 16 ビットバインド不可
 	};
 
-#if defined(SIG_RX140)
+#if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23T) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef tmra0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
 		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
 	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,
 		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1, clock_profile::PCLKB> TMR1;
 	typedef tmra0246_t<0x0008'8210, peripheral::TMR2, ICU::VECTOR,
-		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLKB> TMR2;
-	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::VECTOR,
-		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLKB> TMR3;
-#elif defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX23T) || defined(SIG_RX631) || defined(SIG_RX63N)
-	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::VECTOR,
-		ICU::VECTOR::CMIA0, ICU::VECTOR::CMIB0, ICU::VECTOR::OVI0, clock_profile::PCLKB> TMR0;
-	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::VECTOR,
-		ICU::VECTOR::CMIA1, ICU::VECTOR::CMIB1, ICU::VECTOR::OVI1, clock_profile::PCLKB> TMR1;
-	typedef tmr0246_t<0x0008'8210, peripheral::TMR2, ICU::VECTOR,
 		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLKB> TMR2;
 	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::VECTOR,
 		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLKB> TMR3;

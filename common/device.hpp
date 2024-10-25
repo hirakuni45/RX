@@ -6,6 +6,7 @@
 			RX140 @n
 			RX220 @n
 			RX231 @n
+			RX23W @n
 			RX62N/RX621 @n
 			RX63N/RX631 @n
 			RX63T @n
@@ -77,6 +78,17 @@
 #include "RX231/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX23W)
+#include "RX23W/clock_profile.hpp"
+#include "RX23W/peripheral.hpp"
+#include "RX231/system.hpp"
+#include "RX23W/power_mgr.hpp"
+#include "RX23W/icu.hpp"
+#include "RX231/icu_mgr.hpp"
+#include "RX23W/port_map.hpp"
+
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX23T)
 #include "RX23T/clock_profile.hpp"
 #include "RX23T/peripheral.hpp"
@@ -116,6 +128,19 @@
 #include "RX24T/port_map_gpt.hpp"
 #include "RX24T/port_map_tmr.hpp"
 #include "RX24T/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX260) || defined(SIG_RX261)
+#include "RX26x/clock_profile.hpp"
+#include "RX26x/peripheral.hpp"
+#include "RX26x/system.hpp"
+#include "RX26x/power_mgr.hpp"
+#include "RX26x/icu.hpp"
+#include "RX26x/icu_mgr.hpp"
+#include "RX26x/port_map.hpp"
+#include "RX26x/port_map_gptw.hpp"
+// #include "RX26x/port_map_tmr.hpp"
+#include "RX26x/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX26T)

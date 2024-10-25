@@ -668,11 +668,13 @@ namespace device {
 		@param[in]	per		ペリフェラル型
 		@param[in]	txi		送信割り込み
 		@param[in]	rxi		受信割り込み
+		@param[in]	VECT	割り込みベクタ型
 		@param[in]	tei		送信終了割り込み
 		@param[in]	eri		エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 tei, ICU::GROUPBL1 eri>
+	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi,
+		typename VECT, VECT tei, VECT eri>
 	struct rsci8_t : public rsci_base_t<base> {
 
 		typedef rsci_base_t<base> RSCI_BASE;
@@ -715,11 +717,13 @@ namespace device {
 		@param[in]	per		ペリフェラル型
 		@param[in]	txi		送信割り込み
 		@param[in]	rxi		受信割り込み
+		@param[in]	VECT	割り込みベクタ型
 		@param[in]	tei		送信終了割り込み
 		@param[in]	eri		エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPBL1 tei, ICU::GROUPBL1 eri>
+	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi,
+		typename VECT, VECT tei, VECT eri>
 	struct rsci9_t : public rsci_base_t<base>, rsci_9b_t<base> {
 
 		typedef rsci_base_t<base> RSCI_BASE;
@@ -762,11 +766,13 @@ namespace device {
 		@param[in]	per		ペリフェラル型
 		@param[in]	txi		送信割り込み
 		@param[in]	rxi		受信割り込み
+		@param[in]	VECT	割り込みベクタ型
 		@param[in]	tei		送信終了割り込み
 		@param[in]	eri		エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi, ICU::GROUPAL0 tei, ICU::GROUPAL0 eri>
+	template <uint32_t base, peripheral per, ICU::VECTOR txi, ICU::VECTOR rxi,
+		typename VECT, VECT tei, VECT eri>
 	struct rscib_t : public rsci_base_t<base>, rsci_9b_t<base> {
 
 		typedef rsci_base_t<base> RSCI_BASE;
@@ -886,17 +892,24 @@ namespace device {
 		static inline rfscr_t<base + 0x70> RFSCR;
 	};
 
-#if defined(SIG_RX26T)
+#if defined(SIG_RX260) || defined(SIG_RX261)
+	typedef rsci8_t<0x000A'1000, peripheral::RSCI0,  ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
+		ICU::VECTOR, ICU::VECTOR::TEI0, ICU::VECTOR::ERI0>  RSCI0;
 	typedef rsci8_t<0x000A'1400, peripheral::RSCI8,  ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
-		ICU::GROUPBL1::TEI8, ICU::GROUPBL1::ERI8>  RSCI8;
+		ICU::VECTOR, ICU::VECTOR::TEI8, ICU::VECTOR::ERI8>  RSCI8;
 	typedef rsci9_t<0x000A'1480, peripheral::RSCI9,  ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
-		ICU::GROUPBL1::TEI9, ICU::GROUPBL1::ERI9>  RSCI9;
+		ICU::VECTOR, ICU::VECTOR::TEI9, ICU::VECTOR::ERI9>  RSCI9;
+#elif defined(SIG_RX26T)
+	typedef rsci8_t<0x000A'1400, peripheral::RSCI8,  ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
+		ICU::GROUPBL1, ICU::GROUPBL1::TEI8, ICU::GROUPBL1::ERI8>  RSCI8;
+	typedef rsci9_t<0x000A'1480, peripheral::RSCI9,  ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
+		ICU::GROUPBL1, ICU::GROUPBL1::TEI9, ICU::GROUPBL1::ERI9>  RSCI9;
 	typedef rscib_t<0x000E'2080, peripheral::RSCI11,  ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
-		ICU::GROUPAL0::TEI11, ICU::GROUPAL0::ERI11>  RSCI11;
+		ICU::GROUPAL0, ICU::GROUPAL0::TEI11, ICU::GROUPAL0::ERI11>  RSCI11;
 #elif defined(SIG_RX660) || defined(SIG_RX671)
 	typedef rscib_t<0x000E'2000, peripheral::RSCI10,  ICU::VECTOR::RTXI10, ICU::VECTOR::RRXI10,
-		ICU::GROUPAL0::RTEI10, ICU::GROUPAL0::RERI10>  RSCI10;
+		ICU::GROUPAL0, ICU::GROUPAL0::RTEI10, ICU::GROUPAL0::RERI10>  RSCI10;
 	typedef rscib_t<0x000E'2080, peripheral::RSCI11,  ICU::VECTOR::RTXI11, ICU::VECTOR::RRXI11,
-		ICU::GROUPAL0::RTEI11, ICU::GROUPAL0::RERI11>  RSCI11;
+		ICU::GROUPAL0, ICU::GROUPAL0::RTEI11, ICU::GROUPAL0::RERI11>  RSCI11;
 #endif
 }

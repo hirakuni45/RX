@@ -135,6 +135,17 @@
 
 #include "RX231/board_profile.hpp"
 
+#elif defined(SIG_RX23W)
+
+
+#include "RX231/system_io.hpp"
+#include "RX24T/flash_io.hpp"
+#include "ff14/sdhi_io.hpp"
+#include "RX600/dmac_mgr.hpp"
+#include "RX600/dac_out.hpp"
+
+#include "RX23W/board_profile.hpp"
+
 #elif defined(SIG_RX23T)
 #include "RX24T/lvda.hpp"
 #include "RX600/cac.hpp"
@@ -208,6 +219,23 @@
 #include "RX24T/dac_out.hpp"
 
 #include "RX24U/board_profile.hpp"
+
+#elif defined(SIG_RX260) || defined(SIG_RX261)
+
+#include "RX600/dmac.hpp"
+
+#include "RX600/gptw.hpp"
+
+#include "RX600/tmr.hpp"
+
+#include "RX600/sci_k.hpp"
+#include "RX600/sci_h.hpp"
+#include "RX600/rsci.hpp"
+
+#include "RX26x/system_io.hpp"
+#include "RX600/dmac_mgr.hpp"
+
+#include "RX26x/board_profile.hpp"
 
 #elif defined(SIG_RX26T)
 #include "RX24T/lvda.hpp"

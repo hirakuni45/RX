@@ -6,6 +6,7 @@
 			RX231 @n
 			RX23T @n
 			RX24T/RX24U @n
+			RX260/RX261 @n
 			RX621/RX62N @n
 			RX63T @n
 			RX631/RX63N @n
@@ -574,6 +575,9 @@ namespace device {
 #elif defined(SIG_RX24T) || defined(SIG_RX24U)
 	typedef rspi_b_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB,
 		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
+#elif defined(SIG_RX260) || defined(SIG_RX261)
+	typedef rspi_c_t<0x0008'8300, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR, ICU::VECTOR,
+		ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLK, ICU::VECTOR, ICU::VECTOR,
 		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;

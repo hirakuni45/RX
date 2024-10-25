@@ -1,10 +1,11 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ・汎用 PWM タイマ（GPTW）定義 @n
-			RX26T:  GPTW0 - GPTW7 @n
-			RX66N/RX72N/RX72M:  GPTW0 - GPTW3 @n
-			RX66T/RX72T:  GPTW0 - GPTW9
+	@brief	RX600/RX700 グループ・汎用 PWM タイマ定義 @n
+			RX260/RX261 (GPTWa):      GPTW0 - GPTW7 @n
+			RX26T (GPTW):             GPTW0 - GPTW7 @n
+			RX66N/RX72N/RX72M (GPTW): GPTW0 - GPTW3 @n
+			RX66T/RX72T (GPTW):       GPTW0 - GPTW9
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -20,6 +21,7 @@ namespace device {
 		@brief  汎用 PWM タイマ・クラス
 		@param[in]	base	ベースアドレス
 		@param[in]	peri	ペリフェラル型
+		@param[in]	VECT	割り込みベクタ型
 		@param[in]	gtcia	GTCIAn GTCCRAレジスタのインプットキャプチャ /コンペアマッチ
 		@param[in]	gtcib	GTCIBn GTCCRBレジスタのインプットキャプチャ /コンペアマッチ
 		@param[in]	gtcic	GTCICn GTCCRCレジスタのコンペアマッチ
@@ -31,10 +33,10 @@ namespace device {
 		@param[in]	gtciv	GTCIVn GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per,
-		ICU::SELECTA gtcia, ICU::SELECTA gtcib, ICU::SELECTA gtcic,
-		ICU::SELECTA gtcid, ICU::SELECTA gdte,  ICU::SELECTA gtcie,
-		ICU::SELECTA gtcif, ICU::SELECTA gtciu, ICU::SELECTA gtciv>
+	template <uint32_t base, peripheral per, typename VECT,
+		VECT gtcia, VECT gtcib, VECT gtcic,
+		VECT gtcid, VECT gdte,  VECT gtcie,
+		VECT gtcif, VECT gtciu, VECT gtciv>
 	struct gptw_t {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
@@ -51,10 +53,9 @@ namespace device {
 
 #if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 		static constexpr uint32_t PCLK = clock_profile::PCLKC;	///< カウント基準クロック
-#elif defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		static constexpr uint32_t PCLK = clock_profile::PCLKA;	///< カウント基準クロック
 #endif
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -75,6 +76,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>     STPWP;
 			bit_rw_t <io_, bitpos::B3>     CLRWP;
 			bit_rw_t <io_, bitpos::B4>     CMNWP;
+
 			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
 		};
 		static inline gtwp_t<base + 0x00> GTWP;
@@ -1032,50 +1034,86 @@ namespace device {
 		};
 		static inline gtsecr_t<base + 0xD4> GTSECR;
 	};
+
+#if defined(SIG_RX260) || defined(SIG_RX261)
+	typedef gptw_t<0x000C'2000, peripheral::GPTW0, ICU::VECTOR,
+		ICU::VECTOR::GTCIA0, ICU::VECTOR::GTCIB0, ICU::VECTOR::GTCIC0,
+		ICU::VECTOR::GTCID0, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE0,
+		ICU::VECTOR::GTCIF0, ICU::VECTOR::GTCIV0, ICU::VECTOR::GTCIU0> GPTW0;
+	typedef gptw_t<0x000C'2100, peripheral::GPTW1, ICU::VECTOR,
+		ICU::VECTOR::GTCIA1, ICU::VECTOR::GTCIB1, ICU::VECTOR::GTCIC1,
+		ICU::VECTOR::GTCID1, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE1,
+		ICU::VECTOR::GTCIF1, ICU::VECTOR::GTCIV1, ICU::VECTOR::GTCIU1> GPTW1;
+	typedef gptw_t<0x000C'2200, peripheral::GPTW2, ICU::VECTOR,
+		ICU::VECTOR::GTCIA2, ICU::VECTOR::GTCIB2, ICU::VECTOR::GTCIC2,
+		ICU::VECTOR::GTCID2, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE2,
+		ICU::VECTOR::GTCIF2, ICU::VECTOR::GTCIV2, ICU::VECTOR::GTCIU2> GPTW2;
+	typedef gptw_t<0x000C'2300, peripheral::GPTW3, ICU::VECTOR,
+		ICU::VECTOR::GTCIA3, ICU::VECTOR::GTCIB3, ICU::VECTOR::GTCIC3,
+		ICU::VECTOR::GTCID3, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE3,
+		ICU::VECTOR::GTCIF3, ICU::VECTOR::GTCIV3, ICU::VECTOR::GTCIU3> GPTW3;
+	typedef gptw_t<0x000C'2400, peripheral::GPTW4, ICU::VECTOR,
+		ICU::VECTOR::GTCIA4, ICU::VECTOR::GTCIB4, ICU::VECTOR::GTCIC4,
+		ICU::VECTOR::GTCID4, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE4,
+		ICU::VECTOR::GTCIF4, ICU::VECTOR::GTCIV4, ICU::VECTOR::GTCIU4> GPTW4;
+	typedef gptw_t<0x000C'2500, peripheral::GPTW5, ICU::VECTOR,
+		ICU::VECTOR::GTCIA5, ICU::VECTOR::GTCIB5, ICU::VECTOR::GTCIC5,
+		ICU::VECTOR::GTCID5, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE5,
+		ICU::VECTOR::GTCIF5, ICU::VECTOR::GTCIV5, ICU::VECTOR::GTCIU5> GPTW5;
+	typedef gptw_t<0x000C'2600, peripheral::GPTW6, ICU::VECTOR,
+		ICU::VECTOR::GTCIA6, ICU::VECTOR::GTCIB6, ICU::VECTOR::GTCIC6,
+		ICU::VECTOR::GTCID6, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE6,
+		ICU::VECTOR::GTCIF6, ICU::VECTOR::GTCIV6, ICU::VECTOR::GTCIU6> GPTW6;
+	typedef gptw_t<0x000C'2700, peripheral::GPTW7, ICU::VECTOR,
+		ICU::VECTOR::GTCIA7, ICU::VECTOR::GTCIB7, ICU::VECTOR::GTCIC7,
+		ICU::VECTOR::GTCID7, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE7,
+		ICU::VECTOR::GTCIF7, ICU::VECTOR::GTCIV7, ICU::VECTOR::GTCIU7> GPTW7;
+#endif
+
 #if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M) 
-	typedef gptw_t<0x000C'2000, peripheral::GPTW0,
+	typedef gptw_t<0x000C'2000, peripheral::GPTW0, ICU::SELECTA,
 		ICU::SELECTA::GTCIA0, ICU::SELECTA::GTCIB0, ICU::SELECTA::GTCIC0,
 		ICU::SELECTA::GTCID0, ICU::SELECTA::GDTE0,  ICU::SELECTA::GTCIE0,
 		ICU::SELECTA::GTCIF0, ICU::SELECTA::GTCIV0, ICU::SELECTA::GTCIU0> GPTW0;
-	typedef gptw_t<0x000C'2100, peripheral::GPTW1,
+	typedef gptw_t<0x000C'2100, peripheral::GPTW1, ICU::SELECTA,
 		ICU::SELECTA::GTCIA1, ICU::SELECTA::GTCIB1, ICU::SELECTA::GTCIC1,
 		ICU::SELECTA::GTCID1, ICU::SELECTA::GDTE1,  ICU::SELECTA::GTCIE1,
 		ICU::SELECTA::GTCIF1, ICU::SELECTA::GTCIV1, ICU::SELECTA::GTCIU1> GPTW1;
-	typedef gptw_t<0x000C'2200, peripheral::GPTW2,
+	typedef gptw_t<0x000C'2200, peripheral::GPTW2, ICU::SELECTA,
 		ICU::SELECTA::GTCIA2, ICU::SELECTA::GTCIB2, ICU::SELECTA::GTCIC2,
 		ICU::SELECTA::GTCID2, ICU::SELECTA::GDTE2,  ICU::SELECTA::GTCIE2,
 		ICU::SELECTA::GTCIF2, ICU::SELECTA::GTCIV2, ICU::SELECTA::GTCIU2> GPTW2;
-	typedef gptw_t<0x000C'2300, peripheral::GPTW3,
+	typedef gptw_t<0x000C'2300, peripheral::GPTW3, ICU::SELECTA,
 		ICU::SELECTA::GTCIA3, ICU::SELECTA::GTCIB3, ICU::SELECTA::GTCIC3,
 		ICU::SELECTA::GTCID3, ICU::SELECTA::GDTE3,  ICU::SELECTA::GTCIE3,
 		ICU::SELECTA::GTCIF3, ICU::SELECTA::GTCIV3, ICU::SELECTA::GTCIU3> GPTW3;
 #endif
 
 #if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) 
-	typedef gptw_t<0x000C'2400, peripheral::GPTW4,
+	typedef gptw_t<0x000C'2400, peripheral::GPTW4, ICU::SELECTA,
 		ICU::SELECTA::GTCIA4, ICU::SELECTA::GTCIB4, ICU::SELECTA::GTCIC4,
 		ICU::SELECTA::GTCID4, ICU::SELECTA::GDTE4,  ICU::SELECTA::GTCIE4,
 		ICU::SELECTA::GTCIF4, ICU::SELECTA::GTCIV4, ICU::SELECTA::GTCIU4> GPTW4;
-	typedef gptw_t<0x000C'2500, peripheral::GPTW5,
+	typedef gptw_t<0x000C'2500, peripheral::GPTW5, ICU::SELECTA,
 		ICU::SELECTA::GTCIA5, ICU::SELECTA::GTCIB5, ICU::SELECTA::GTCIC5,
 		ICU::SELECTA::GTCID5, ICU::SELECTA::GDTE5,  ICU::SELECTA::GTCIE5,
 		ICU::SELECTA::GTCIF5, ICU::SELECTA::GTCIV5, ICU::SELECTA::GTCIU5> GPTW5;
-	typedef gptw_t<0x000C'2600, peripheral::GPTW6,
+	typedef gptw_t<0x000C'2600, peripheral::GPTW6, ICU::SELECTA,
 		ICU::SELECTA::GTCIA6, ICU::SELECTA::GTCIB6, ICU::SELECTA::GTCIC6,
 		ICU::SELECTA::GTCID6, ICU::SELECTA::GDTE6,  ICU::SELECTA::GTCIE6,
 		ICU::SELECTA::GTCIF6, ICU::SELECTA::GTCIV6, ICU::SELECTA::GTCIU6> GPTW6;
-	typedef gptw_t<0x000C'2700, peripheral::GPTW7,
+	typedef gptw_t<0x000C'2700, peripheral::GPTW7, ICU::SELECTA,
 		ICU::SELECTA::GTCIA7, ICU::SELECTA::GTCIB7, ICU::SELECTA::GTCIC7,
 		ICU::SELECTA::GTCID7, ICU::SELECTA::GDTE7,  ICU::SELECTA::GTCIE7,
 		ICU::SELECTA::GTCIF7, ICU::SELECTA::GTCIV7, ICU::SELECTA::GTCIU7> GPTW7;
 #endif
 
 #if defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef gptw_t<0x000C'2800, peripheral::GPTW8,
+	typedef gptw_t<0x000C'2800, peripheral::GPTW8, ICU::SELECTA,
 		ICU::SELECTA::GTCIA8, ICU::SELECTA::GTCIB8, ICU::SELECTA::GTCIC8,
 		ICU::SELECTA::GTCID8, ICU::SELECTA::GDTE8,  ICU::SELECTA::GTCIE8,
 		ICU::SELECTA::GTCIF8, ICU::SELECTA::GTCIV8, ICU::SELECTA::GTCIU8> GPTW8;
-	typedef gptw_t<0x000C'2900, peripheral::GPTW9,
+	typedef gptw_t<0x000C'2900, peripheral::GPTW9, ICU::SELECTA,
 		ICU::SELECTA::GTCIA9, ICU::SELECTA::GTCIB9, ICU::SELECTA::GTCIC9,
 		ICU::SELECTA::GTCID9, ICU::SELECTA::GDTE9,  ICU::SELECTA::GTCIE9,
 		ICU::SELECTA::GTCIF9, ICU::SELECTA::GTCIV9, ICU::SELECTA::GTCIU9> GPTW9;

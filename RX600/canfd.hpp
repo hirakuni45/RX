@@ -1746,7 +1746,7 @@ namespace device {
 	template <uint32_t base, uint32_t ecc>
 	struct canfd_t : canfd_base_t<base>, canfd_ecc_t<ecc> {
 
-		static constexpr auto PERIPHERAL = peripheral::CANFD;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = peripheral::CANFD0;	///< ペリフェラル型
 
 		static constexpr auto PCLK = clock_profile::CANFDCLK;	///< クロック周波数
 
@@ -1765,7 +1765,7 @@ namespace device {
 		static constexpr auto EC2V = ICU::SELECTA::EC2EI;	///< ２ビット ECC エラー・割り込みベクター
 		static constexpr auto ECOV = ICU::SELECTA::ECOVI;	///< ECC オーバーフロー・割り込みベクター
 	};
-	typedef canfd_t<0x000A'8000, 0x000E'D000> CANFD;
+	typedef canfd_t<0x000A'8000, 0x000E'D000> CANFD0;
 #elif defined(SIG_RX660)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
