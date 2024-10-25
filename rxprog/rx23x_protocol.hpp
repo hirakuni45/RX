@@ -20,11 +20,10 @@ namespace rx23x {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class protocol : public rx::protocol_base {
 
-		bool				verbose_ = false;
+		static constexpr uint32_t LIMIT_BAUDRATE = 230400;
+		static constexpr uint8_t SEL_DEV_RES = 0x46;
 
-		rx::protocol::devices	devices_;
 		uint8_t					data_ = 0;
-		rx::protocol::areas		areas_;
 		rx::protocol::areas		data_areas_;
 		rx::protocol::blocks	blocks_;
 		bool					id_protect_   = false;
@@ -35,9 +34,6 @@ namespace rx23x {
 		typedef std::set<uint32_t> ERASE_SET;
 		ERASE_SET				erase_set_;
 		bool					select_write_area_ = false;
-
-		uint32_t	   			baud_speed_ = 0;
-		speed_t					baud_rate_ = B9600;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -50,20 +46,60 @@ namespace rx23x {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	デバイスを取得
-			@return デバイス
+			@brief	コネクションの確立（startが成功したら呼ぶ）
+			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		const auto& get_device() const noexcept { return devices_; }
+		bool connection() noexcept
+		{
+			return rx::protocol_base::connection(0xE6);
+		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ユーザー領域を取得
-			@return ユーザー領域
+			@brief	新ビットレート選択
+			@param[in]	rx		マイコン設定
+			@param[in]	spped	シリアル速度
+			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		const auto& get_area() const noexcept { return areas_; }
+		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) noexcept
+		{
+			return rx::protocol_base::change_speed_legacy(rx, speed, LIMIT_BAUDRATE);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	データ量域有無問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_data() noexcept
+		{
+			if(!connection_) return false;
+
+			if(!command1_(0x2A)) {
+				return false;
+			}
+
+			uint8_t tmp[4];
+			if(!read_(tmp, 4)) {
+				return false;
+			}
+			if(tmp[0] != 0x3A) {
+				return false;
+			}
+
+			if(sum_(tmp, 3) != tmp[4 - 1]) {
+				return false;
+			}
+
+			data_ = tmp[2];
+
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -77,11 +113,104 @@ namespace rx23x {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	データ量域情報問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_data_area() noexcept
+		{
+			if(!connection_) return false;
+
+			if(!command1_(0x2B)) {
+				return false;
+			}
+
+			uint8_t tmp[256];
+			if(!read_(tmp, 2)) {
+				return false;
+			}
+			if(tmp[0] != 0x3B) {
+				return false;
+			}
+			uint32_t total = tmp[1] + 1;
+			if(!read_(&tmp[2], total)) {
+				return false;
+			}
+
+			auto sum = sum_(tmp, tmp[1] + 2);
+			if(sum != tmp[2 + total - 1]) {
+				return false;
+			}
+
+			auto num = tmp[2];
+			const uint8_t* p = &tmp[3];
+			for(uint8_t i = 0; i < num; ++i) {
+				rx::protocol::area a;
+				a.org_ = get32_big_(p);
+				p += 4;
+				a.end_ = get32_big_(p);
+				p += 4;
+				data_areas_.push_back(a);			
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	データ量域情報を取得
 			@return データ量域情報
 		*/
 		//-----------------------------------------------------------------//
 		const auto& get_data_area() const noexcept { return data_areas_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ブロック情報問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_block() noexcept
+		{
+			if(!connection_) return false;
+
+			if(!command1_(0x26)) {
+				return false;
+			}
+
+			uint8_t tmp[256 + 1];
+			if(!read_(tmp, 3)) {
+				return false;
+			}
+			if(tmp[0] != 0x36) {
+				return false;
+			}
+			uint32_t total = get16_big_(&tmp[1]) + 1;
+			if(!read_(&tmp[3], total)) {
+				return false;
+			}
+
+			auto sum = sum_(tmp, 3 + total - 1);
+			if(sum != tmp[3 + total - 1]) {
+				return false;
+			}
+
+			const uint8_t* p = &tmp[4];
+			for(uint32_t i = 0; i < 2; ++i) {
+				rx::protocol::block a;
+				a.org_ = get32_big_(p);
+				p += 4;
+				a.size_ = get32_big_(p);
+				p += 4;
+				a.num_ = get32_big_(p);
+				p += 4;
+				blocks_.push_back(a);
+			}
+
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -126,8 +255,8 @@ namespace rx23x {
 					std::cerr << "Inquiry device error." << std::endl;
 					return false;
 				}
-				const auto& dv = get_device();
 				if(verbose_) {
+					const auto& dv = get_device();
 					int i = 0;
 					for(auto t : dv) {
 						++i;
@@ -202,7 +331,7 @@ namespace rx23x {
 			// デバイス選択
 			{
 				auto as = get_device();
-				if(!select_device(as[0].code_)) {
+				if(!select_device(as[0].code_, SEL_DEV_RES)) {
 					std::cerr << "Select device error." << std::endl;
 					return false;
 				}
@@ -243,347 +372,6 @@ namespace rx23x {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	コネクションの確立（startが成功したら呼ぶ）
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool connection() noexcept
-		{
-			return rx::protocol_base::connection(0xE6);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	サポートデバイス問い合わせ（connection が成功したら呼ぶ）
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_device() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x20)) {
-				return false;
-			}
-			uint8_t tmp[2 + 256 + 16];
-			if(!read_(tmp, 2)) {
-				return false;
-			}
-			if(tmp[0] != 0x30) {
-				return false;
-			}
-			uint32_t total = tmp[1] + 1;
-
-			if(!read_(&tmp[2], total)) {
-				return false;
-			}
-			auto sum = sum_(tmp, tmp[1] + 2);
-			if(sum != tmp[2 + total - 1]) {
-				return false;
-			}
-
-			rx::protocol::device d;
-			d.code_ = get32_(&tmp[3 + 1]);
-			tmp[3 + 1 + tmp[3]] = 0;
-			d.name_ = reinterpret_cast<const char*>(&tmp[3 + 1 + 4]);
-			devices_.push_back(d);
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ユーザー領域問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_area() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x25)) {
-				return false;
-			}
-
-			uint8_t tmp[256];
-			if(!read_(tmp, 2)) {
-				return false;
-			}
-			if(tmp[0] != 0x35) {
-				return false;
-			}
-			uint32_t total = tmp[1] + 1;
-			if(!read_(&tmp[2], total)) {
-				return false;
-			}
-
-			auto sum = sum_(tmp, tmp[1] + 2);
-			if(sum != tmp[2 + total - 1]) {
-				return false;
-			}
-
-			auto num = tmp[2];
-			const uint8_t* p = &tmp[3];
-			for(uint8_t i = 0; i < num; ++i) {
-				rx::protocol::area a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.end_ = get32_big_(p);
-				p += 4;
-				areas_.push_back(a);
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	データ量域有無問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_data() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x2A)) {
-				return false;
-			}
-
-			uint8_t tmp[4];
-			if(!read_(tmp, 4)) {
-				return false;
-			}
-			if(tmp[0] != 0x3A) {
-				return false;
-			}
-
-			if(sum_(tmp, 3) != tmp[4 - 1]) {
-				return false;
-			}
-
-			data_ = tmp[2];
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	データ量域情報問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_data_area() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x2B)) {
-				return false;
-			}
-
-			uint8_t tmp[256];
-			if(!read_(tmp, 2)) {
-				return false;
-			}
-			if(tmp[0] != 0x3B) {
-				return false;
-			}
-			uint32_t total = tmp[1] + 1;
-			if(!read_(&tmp[2], total)) {
-				return false;
-			}
-
-			auto sum = sum_(tmp, tmp[1] + 2);
-			if(sum != tmp[2 + total - 1]) {
-				return false;
-			}
-
-			auto num = tmp[2];
-			const uint8_t* p = &tmp[3];
-			for(uint8_t i = 0; i < num; ++i) {
-				rx::protocol::area a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.end_ = get32_big_(p);
-				p += 4;
-				data_areas_.push_back(a);			
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ブロック情報問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_block() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x26)) {
-				return false;
-			}
-
-			uint8_t tmp[256 + 1];
-			if(!read_(tmp, 3)) {
-				return false;
-			}
-			if(tmp[0] != 0x36) {
-				return false;
-			}
-			uint32_t total = get16_big_(&tmp[1]) + 1;
-			if(!read_(&tmp[3], total)) {
-				return false;
-			}
-
-			auto sum = sum_(tmp, 3 + total - 1);
-			if(sum != tmp[3 + total - 1]) {
-				return false;
-			}
-
-			const uint8_t* p = &tmp[4];
-			for(uint32_t i = 0; i < 2; ++i) {
-				rx::protocol::block a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.size_ = get32_big_(p);
-				p += 4;
-				a.num_ = get32_big_(p);
-				p += 4;
-				blocks_.push_back(a);
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	デバイスを選択
-			@param[in]	code	デバイス・コード
-		*/
-		//-----------------------------------------------------------------//
-		bool select_device(uint32_t code) noexcept
-		{
-			if(!connection_) return false;
-
-			uint8_t tmp[7];
-			tmp[0] = 0x10;
-			tmp[1] = 4;
-			tmp[2] = code & 0xff;
-			tmp[3] = (code >> 8) & 0xff;
-			tmp[4] = (code >> 16) & 0xff;
-			tmp[5] = (code >> 24) & 0xff;
-			tmp[6] = sum_(tmp, 6);
-			if(!write_(tmp, 7)) {
-				return false;
-			}
-			uint8_t res[1];
-			if(!read_(res, 1)) {
-				return false;
-			}
-			if(res[0] == 0x46) {
-				return true;
-			} else if(res[0] == 0x90) {
-				read_(res, 1);
-				last_error_ = res[0];
-			}
-			return false;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	新ビットレート選択
-			@param[in]	rx		マイコン設定
-			@param[in]	spped	シリアル速度
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) noexcept
-		{
-			if(!connection_) return false;
-
-			uint32_t nbr;
-			switch(speed) {
-			case 19200:
-				nbr = 192;
-				baud_rate_ = B19200;
-				break;
-			case 38400:
-				nbr = 384;
-				baud_rate_ = B38400;
-				break;
-			case 57600:
-				nbr = 576;
-				baud_rate_ = B57600;
-				break;
-			case 115200:
-				nbr = 1152;
-				baud_rate_ = B115200;
-				break;
-			case 230400:
-				nbr = 2304;
-				baud_rate_ = B230400;
-				break;
-			default:
-				return false;
-			}
-			baud_speed_ = speed; 
-
-			uint8_t cmd[10];
-			cmd[0] = 0x3F;
-			cmd[1] = 7;
-			put16_big_(&cmd[2], nbr);
-			cmd[4] = 0x00;  // dummy
-			cmd[5] = 0x00;  // dummy
-			cmd[6] = 0x02;
-			cmd[7] = 0x01;
-			cmd[8] = 0x01;
-			cmd[9] = sum_(cmd, 9);
-			if(!write_(cmd, 10)) {
-				return false;
-			}
-			uint8_t res[1];
-			if(!read_(res, 1)) {
-				return false;
-			}
-			if(res[0] == 0xBF) {
-				read_(res, 1);
-				last_error_ = res[0];
-				return false;
-			} else if(res[0] != 0x06) {
-				return false;
-			}
-
-			usleep(25000);	// 25[ms]
-
-			if(!rs232c_.change_speed(baud_rate_)) {
-				return false;
-			}
-
-			if(!command_(0x06)) {  // 通信確認
-				return false;
-			}
-			if(!read_(res, 1)) {
-				return false;
-			}
-			if(res[0] != 0x06) {  // 通信確認レスポンス
-				return false;
-			}
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	P/E ステータス遷移
 			@return エラー無ければ「true」
 		*/
@@ -592,7 +380,7 @@ namespace rx23x {
 		{
 			if(!connection_) return false;
 
-			if(!command_(0x40)) {
+			if(!command1_(0x40)) {
 				return false;
 			}
 
@@ -733,7 +521,7 @@ namespace rx23x {
 			}
 
 			// ユーザ／データ領域プログラム準備
-			if(!command_(0x43)) {
+			if(!command1_(0x43)) {
 				return false;
 			}
 

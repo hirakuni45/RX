@@ -27,16 +27,8 @@ namespace rx62x {
 	class protocol : public rx::protocol_base {
 
 		static constexpr uint32_t LIMIT_BAUDRATE = 115200;
+		static constexpr uint8_t SEL_DEV_RES = 0x06;
 
-		bool	verbose_ = false;
-
-		rx::protocol::devices		devices_;
-		rx::protocol::clock_modes	clock_modes_;
-		uint8_t						clock_num_ = 0;
-		rx::protocol::multipliers	multipliers_;
-		rx::protocol::frequencies	frequencies_;
-		rx::protocol::areas			boot_area_;
-		rx::protocol::areas			area_;
 		rx::protocol::areas			blocks_;
 		uint32_t					prog_size_ = 0;
 //		bool						data_ = false;
@@ -51,9 +43,6 @@ namespace rx62x {
 		typedef std::set<uint32_t> ERASE_SET;
 		ERASE_SET					erase_set_;
 
-		uint32_t	   				baud_speed_ = 0;
-		speed_t						baud_rate_ = B9600;
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -61,6 +50,84 @@ namespace rx62x {
 		*/
 		//-----------------------------------------------------------------//
 		protocol() noexcept { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コネクションの確立（startが成功したら呼ぶ）
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool connection() noexcept
+		{
+			return rx::protocol_base::connection(0xE6);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	新ビットレート選択
+			@param[in]	rx		マイコン設定
+			@param[in]	spped	シリアル速度
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) noexcept
+		{
+			return rx::protocol_base::change_speed_legacy(rx, speed, LIMIT_BAUDRATE);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	消去ブロック情報問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_block() noexcept
+		{
+			if(!connection_) return false;
+
+			if(!command1_(0x26)) {
+				return false;
+			}
+
+			uint8_t head[4];
+			if(!read_(head, 4)) {
+				return false;
+			}
+			if(head[0] != 0x36) {
+				return false;
+			}
+
+			auto num = head[3];
+			for(uint8_t i = 0; i < num; ++i) {
+				uint8_t tmp[8];
+				if(!read_(tmp, 8)) {
+					return false;
+				}
+				rx::protocol::area a;
+				a.org_ = get32_big_(&tmp[0]);
+				a.end_ = get32_big_(&tmp[4]);
+				blocks_.push_back(a);			
+			}
+
+			uint8_t sum[1];
+			if(!read_(sum, 1)) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ブロック情報を取得
+			@return ブロック情報
+		*/
+		//-----------------------------------------------------------------//
+		const rx::protocol::areas& get_block() const noexcept { return blocks_; }
 
 
 		//-----------------------------------------------------------------//
@@ -104,8 +171,8 @@ namespace rx62x {
 						a.info(out_section_(i, as.size()));
 					}
 				}
-				// デバイス選択
-				if(!select_device(as[0].code_)) {  // デバイスリストの最初をサポートとして返す
+				// デバイス選択（リトルエンディアン）
+				if(!select_device(as[0].code_, SEL_DEV_RES)) {
 					std::cerr << "Select device error." << std::endl;
 					return false;
 				}
@@ -296,559 +363,6 @@ namespace rx62x {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	コネクションの確立（startが成功したら呼ぶ）
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool connection() noexcept
-		{
-			return rx::protocol_base::connection(0xE6);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	サポートデバイス問い合わせ（connection が成功したら呼ぶ）
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_device() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x20)) {
-				std::cerr << "(Inquiry) First command error." << std::endl;
-				return false;
-			}
-			uint8_t head[3];
-			// head[0]: 0x30
-			// head[1]: サイズ
-			// head[2]: デバイス数
-			if(!read_(head, 3)) {
-				std::cerr << "(Inquiry) Read head error." << std::endl;
-				return false;
-			}
-			if(head[0] != 0x30) {
-				std::cerr << "(Inquiry) Read status error." << std::endl;
-				return false;
-			}
-			uint32_t total = head[1];
-
-//			std::cout << boost::format("Size: %d") % total << std::endl;
-//			std::cout << boost::format("Num:  %d") % static_cast<int>(head[2]) << std::endl;
-
-			uint8_t tmp[total];
-			if(!read_(tmp, total)) {
-				std::cerr << "(Inquiry) Read body error." << std::endl;
-				return false;
-			}
-
-//			for(uint32_t i = 0; i < total; ++i) {
-//				std::cout << boost::format("0x%02X ") % static_cast<uint16_t>(tmp[i]);
-//			}
-//			std::cout << std::endl;
-
-			uint8_t sum = sum_(tmp, total - 1);
-			sum -= head[0] + head[1] + head[2];
-			if(sum != tmp[total - 1]) { 
-				std::cerr << boost::format("(Inquiry) Body sum error. (0x%02X : 0x%02X)")
-					% static_cast<uint16_t>(sum) % static_cast<uint16_t>(tmp[total - 1]);
-				std::cerr << std::endl;
-				return false;
-			}
-
-			rx::protocol::device d;
-			d.code_ = get32_(&tmp[1]);
-			tmp[tmp[0] + 1] = 0;
-			d.name_ = reinterpret_cast<const char*>(&tmp[5]);
-			devices_.push_back(d);
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	デバイスを取得
-			@return デバイス
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::devices& get_device() const noexcept { return devices_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	デバイスを選択
-			@param[in]	code	デバイス・コード
-		*/
-		//-----------------------------------------------------------------//
-		bool select_device(uint32_t code) noexcept
-		{
-			if(!connection_) return false;
-
-			uint8_t tmp[7];
-			tmp[0] = 0x10;
-			tmp[1] = 4;
-			tmp[2] = code & 0xff;
-			tmp[3] = (code >> 8) & 0xff;
-			tmp[4] = (code >> 16) & 0xff;
-			tmp[5] = (code >> 24) & 0xff;
-			tmp[6] = sum_(tmp, 6);
-			if(!write_(tmp, 7)) {
-				return false;
-			}
-			uint8_t res[1];
-			if(!read_(res, 1)) {  // レスポンス取得
-				return false;
-			}
-			if(res[0] == 0x06) {
-				return true;
-			} else if(res[0] == 0x90) {  // エラーの場合
-				read_(res, 1);  // エラーコード
-				last_error_ = res[0];
-			}
-			return false;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	クロック・モード問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_clock_mode() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x21)) {
-				return false;
-			}
-
-			uint8_t head[2];
-			if(!read_(head, 2)) {
-				return false;
-			}
-			if(head[0] != 0x31) {
-				return false;
-			}
-			uint8_t tmp[256];
-			if(!read_(tmp, head[1] + 1)) {
-				return false;
-			}
-			for(uint8_t i = 0; i < head[1]; ++i) {
-				rx::protocol::clock_mode cm;
-				cm.type_ = tmp[i];
-				clock_modes_.push_back(cm);
-			}
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	デバイスを取得
-			@return デバイス
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::clock_modes& get_clock_mode() const noexcept { return clock_modes_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	クロック・モードを選択
-			@param[in]	cm	クロック・モード
-		*/
-		//-----------------------------------------------------------------//
-		bool select_clock_mode(const rx::protocol::clock_mode& cm) noexcept
-		{
-			if(!connection_) return false;
-
-			uint8_t tmp[4];
-			tmp[0] = 0x11;
-			tmp[1] = 1;
-			tmp[2] = cm.type_;
-			tmp[3] = sum_(tmp, 3);
-			if(!write_(tmp, 4)) {
-				return false;
-			}
-			uint8_t res[1];
-			if(!read_(res, 1)) {
-				return false;
-			}
-			if(res[0] == 0x06) {
-				return true;
-			} else if(res[0] == 0x91) {  // エラーレスポンス
-				read_(res, 1);
-				last_error_ = res[0];
-			}
-			return false;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	逓倍比問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_multiplier() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x22)) {
-				return false;
-			}
-
-			uint8_t head[3];
-			if(!read_(head, 3)) {
-				return false;
-			}
-			if(head[0] != 0x32) {
-				return false;
-			}
-			uint8_t tmp[256];
-			if(!read_(tmp, head[1])) {
-				return false;
-			}
-
-			clock_num_ = head[2];
-			uint8_t i = 0;
-			const uint8_t* p = tmp;
-			while(i < (head[1] - 1)) {
-				auto n = *p++;
-				rx::protocol::multiplier mp;
-				mp.list_.resize(n);
-				for(uint8_t j = 0; j < n; ++j) {
-					mp.list_[j] = *p++;
-				}
-				multipliers_.push_back(mp);
-				i += n + 1;
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	逓倍比を取得
-			@return 逓倍比
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::multipliers& get_multiplier() const noexcept { return multipliers_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	動作周波数問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_frequency() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x23)) {
-				return false;
-			}
-
-			uint8_t head[3];
-			if(!read_(head, 3)) {
-				return false;
-			}
-			if(head[0] != 0x33) {
-				return false;
-			}
-			uint8_t tmp[256];
-			if(!read_(tmp, head[1])) {
-				return false;
-			}
-
-			auto num = head[2];
-			const uint8_t* p = tmp;
-			for(uint8_t i = 0; i < num; ++i) {
-				rx::protocol::frequency q;
-				q.min_ = static_cast<uint16_t>(p[1]) | (static_cast<uint16_t>(p[0]) << 8);
-				p += 2;
-				q.max_ = static_cast<uint16_t>(p[1]) | (static_cast<uint16_t>(p[0]) << 8);
-				p += 2;
-//				std::cout << (int)q.min_ << std::endl;
-//				std::cout << (int)q.max_ << std::endl;
-				frequencies_.push_back(q);
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	動作周波数を取得
-			@return 動作周波数
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::frequencies& get_frequency() const noexcept { return frequencies_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	新ビットレート選択
-			@param[in]	rx		マイコン設定
-			@param[in]	spped	シリアル速度
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) noexcept
-		{
-			if(!connection_) return false;
-
-			// RX62x では、最大１１５２００ボーまでとする（誤差が大きい為）
-			if(speed > LIMIT_BAUDRATE) {
-				speed = LIMIT_BAUDRATE;
-			}
-
-			uint32_t nbr;
-			switch(speed) {
-			case 19200:
-				nbr = 192;
-				baud_rate_ = B19200;
-				break;
-			case 38400:
-				nbr = 384;
-				baud_rate_ = B38400;
-				break;
-			case 57600:
-				nbr = 576;
-				baud_rate_ = B57600;
-				break;
-			case 115200:
-				nbr = 1152;
-				baud_rate_ = B115200;
-				break;
-			case 230400:
-				nbr = 2304;
-				baud_rate_ = B230400;
-				break;
-			default:
-				std::cerr << "(Change speed) Invalid baud rate error." << std::endl;
-				return false;
-			}
-			baud_speed_ = speed; 
-
-			uint8_t cmd[10];
-			cmd[0] = 0x3f;
-			cmd[1] = 7;
-			put16_big_(&cmd[2], nbr);
-			put16_big_(&cmd[4], rx.master_);
-			cmd[6] = 0x02;  // クロック数（システムクロックと周辺クロックの2種類）
-			cmd[7] = rx.iclk_multi_;
-			cmd[8] = rx.pclk_multi_;
-			cmd[9] = sum_(cmd, 9);
-			if(!write_(cmd, 10)) {
-				std::cerr << "(Change speed) Write command error." << std::endl;
-				return false;
-			}
-			uint8_t res[1];
-			if(!read_(res, 1)) {
-				std::cerr << "(Change speed) Read respons error." << std::endl;
-				return false;
-			}
-			if(res[0] == 0xbf) {  // エラーレスポンス
-				read_(res, 1);
-				// 0x11: サムチェックエラー
-				// 0x24: ビットレート選択不可エラー
-				// 0x25: 入力周波数エラー
-				// 0x26: 逓倍エラー
-				// 0x27: 動作周波数エラー
-				last_error_ = res[0];  // エラーコード
-				std::cerr << boost::format("(Change speed) Respons error. (0x%02X)")
-					% static_cast<uint16_t>(res[0]) << std::endl;
-				if(res[0] == 0x24) {
-					std::cerr << boost::format("Change speed select error: %u") % speed << std::endl;
-				} else {
-					std::cerr << boost::format("(Change speed) Respons error. (0x%02X)")
-						% static_cast<uint16_t>(res[0]) << std::endl;
-				}
-				return false;
-			} else if(res[0] != 0x06) {  // 正常レスポンス
-				return false;
-			}
-
-			usleep(25000);	// 25[ms]
-
-			if(!rs232c_.change_speed(baud_rate_)) {
-				std::cerr << "(Change speed) Serial speed change error." << std::endl;
-				return false;
-			}
-
-			if(!command_(0x06)) {  // 確認
-				return false;
-			}
-			if(!read_(res, 1)) {
-				return false;
-			}
-			if(res[0] != 0x06) {  // レスポンス
-				return false;
-			}
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ユーザーブートマット情報問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_boot_area() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x24)) {
-				return false;
-			}
-
-			uint8_t head[3];
-			if(!read_(head, 3)) {
-				return false;
-			}
-			if(head[0] != 0x34) {
-				return false;
-			}
-			uint8_t tmp[256];
-			if(!read_(tmp, head[1])) {
-				return false;
-			}
-
-			auto num = head[2];
-			const uint8_t* p = tmp;
-			for(uint8_t i = 0; i < num; ++i) {
-				rx::protocol::area a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.end_ = get32_big_(p);
-				p += 4;
-				boot_area_.push_back(a);
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ユーザー・ブート領域を取得
-			@return ユーザー・ブート領域
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_boot_area() const noexcept { return boot_area_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ユーザーマット領域問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_area() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x25)) {
-				return false;
-			}
-
-			uint8_t head[3];
-			if(!read_(head, 3)) {
-				return false;
-			}
-			if(head[0] != 0x35) {
-				return false;
-			}
-			uint8_t tmp[256];
-			if(!read_(tmp, head[1])) {
-				return false;
-			}
-
-			auto num = head[2];
-			const uint8_t* p = tmp;
-			for(uint8_t i = 0; i < num; ++i) {
-				rx::protocol::area a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.end_ = get32_big_(p);
-				p += 4;
-				area_.push_back(a);
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ユーザー領域を取得
-			@return ユーザー領域
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_area() const { return area_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	消去ブロック情報問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_block() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command_(0x26)) {
-				return false;
-			}
-
-			uint8_t head[4];
-			if(!read_(head, 4)) {
-				return false;
-			}
-			if(head[0] != 0x36) {
-				return false;
-			}
-
-			auto num = head[3];
-			for(uint8_t i = 0; i < num; ++i) {
-				uint8_t tmp[8];
-				if(!read_(tmp, 8)) {
-					return false;
-				}
-				rx::protocol::area a;
-				a.org_ = get32_big_(&tmp[0]);
-				a.end_ = get32_big_(&tmp[4]);
-				blocks_.push_back(a);			
-			}
-
-			uint8_t sum[1];
-			if(!read_(sum, 1)) {
-				return false;
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ブロック情報を取得
-			@return ブロック情報
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_block() const noexcept { return blocks_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	書き込みサイズ問い合わせ
 			@return エラー無ければ「true」
 		*/
@@ -857,7 +371,7 @@ namespace rx62x {
 		{
 			if(!connection_) return false;
 
-			if(!command_(0x27)) {
+			if(!command1_(0x27)) {
 				return false;
 			}
 
@@ -902,7 +416,7 @@ namespace rx62x {
 		bool inquiry_data() {
 			if(!connection_) return false;
 
-			if(!command_(0x2a)) {
+			if(!command1_(0x2a)) {
 				return false;
 			}
 
@@ -938,7 +452,7 @@ namespace rx62x {
 		bool inquiry_data_area() {
 			if(!connection_) return false;
 
-			if(!command_(0x2b)) {
+			if(!command1_(0x2b)) {
 				return false;
 			}
 
@@ -990,7 +504,7 @@ namespace rx62x {
 		{
 			if(!connection_) return false;
 
-			if(!command_(0x40)) {
+			if(!command1_(0x40)) {
 				return false;
 			}
 
@@ -1127,7 +641,7 @@ namespace rx62x {
 			}
 
 			// 領域選択
-			if(!command_(0x43)) {  // ユーザーマット選択コマンド
+			if(!command1_(0x43)) {  // ユーザーマット選択コマンド
 				return false;
 			}
 
