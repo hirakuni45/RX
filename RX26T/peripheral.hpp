@@ -91,7 +91,7 @@ namespace device {
 
 		RI3C0,		///< I3C バスインタフェース (RI3C)
 
-		CANFD,		///< CAN FD モジュール (CANFD)
+		CANFD0,		///< CAN FD モジュール (CANFD)
 
 		RSPI0,		///< シリアルペリフェラルインタフェース (RSPId)
 

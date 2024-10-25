@@ -861,7 +861,7 @@ namespace device {
 				case peripheral::RI3C0:
 					ret = ri3c0_(odr, ena);
 					break;
-				case peripheral::CANFD:
+				case peripheral::CANFD0:
 					ret = canfd0_(odr, ena);
 					break;
 				case peripheral::CMTW0:
