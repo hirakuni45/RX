@@ -8,6 +8,7 @@
 			・RX231 @n
 			・RX23T @n
 			・RX24T/RX24U @n
+			・RX260/RX261 @n
 			・RX26T @n
 			・RX62N/RX621 @n
 			・RX63N/RX631 @n
@@ -183,7 +184,7 @@ namespace device {
 		static inline rw32_t<0x0008'2418> DTCDISP;
 	};
 
-#if defined(SIG_RX140) || defined(SIG_RX660) || defined(SIG_RX671)
+#if defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX660) || defined(SIG_RX671)
 	typedef dtcb_t DTC;
 #else
 	typedef dtca_t DTC;

@@ -77,11 +77,69 @@ ifeq ($(RX_DEF),SIG_RX220)
   LDSCRIPT	= ../../RX220/$(DEVICE).ld
 endif
 
+ifeq ($(RX_DEF),SIG_RX230)
+  RX_CPU = RX230
+  RX_CHOOSE = -mcpu=rx230
+  LDSCRIPT	= ../../RX231/$(DEVICE).ld
+  PROG_OPT = --write-page-wait=15000 --erase-page-wait=5000
+endif
+
 ifeq ($(RX_DEF),SIG_RX231)
   RX_CPU = RX231
   RX_CHOOSE = -mcpu=rx230
   LDSCRIPT	= ../../RX231/$(DEVICE).ld
   PROG_OPT = --write-page-wait=15000 --erase-page-wait=5000
+endif
+
+ifeq ($(RX_DEF),SIG_RX23W)
+  RX_CPU = RX23W
+  RX_CHOOSE = -mcpu=rx230
+  LDSCRIPT	= ../../RX23W/$(DEVICE).ld
+#  PROG_OPT = --write-page-wait=15000 --erase-page-wait=5000
+endif
+
+ifeq ($(RX_DEF),SIG_RX23T)
+  RX_CPU = RX23T
+  RX_CHOOSE = -misa=v2
+  LDSCRIPT	= ../../RX23T/$(DEVICE).ld
+  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
+endif
+
+ifeq ($(RX_DEF),SIG_RX24T)
+  RX_CPU = RX24T
+  RX_CHOOSE = -misa=v2
+  LDSCRIPT	= ../../RX24T/$(DEVICE).ld
+  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
+endif
+
+ifeq ($(RX_DEF),SIG_RX24U)
+  RX_CPU = RX24U
+  RX_CHOOSE = -misa=v2
+  LDSCRIPT	= ../../RX24U/$(DEVICE).ld
+  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
+endif
+
+ifeq ($(RX_DEF),SIG_RX260)
+  RX_CPU = RX260
+  RX_CHOOSE = -misa=v3
+  LDSCRIPT	= ../../RX26x/$(DEVICE).ld
+#  PROG_OPT = --write-page-wait=2500
+endif
+
+ifeq ($(RX_DEF),SIG_RX261)
+  RX_CPU = RX261
+  RX_CHOOSE = -misa=v3
+  LDSCRIPT	= ../../RX26x/$(DEVICE).ld
+#  PROG_OPT = --write-page-wait=2500
+endif
+
+ifeq ($(RX_DEF),SIG_RX26T)
+  RX_CPU = RX26T
+  RX_CHOOSE = -misa=v3
+  # TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic
+  LDSCRIPT	= ../../RX26T/$(DEVICE).ld
+  PROG_OPT = --write-page-wait=2500
 endif
 
 ifeq ($(RX_DEF),SIG_RX63T)
@@ -119,36 +177,6 @@ ifeq ($(RX_DEF),SIG_RX63N)
   RX_CPU = RX63N
   RX_CHOOSE = -misa=v1
   LDSCRIPT	= ../../RX63x/$(DEVICE).ld
-endif
-
-ifeq ($(RX_DEF),SIG_RX23T)
-  RX_CPU = RX23T
-  RX_CHOOSE = -misa=v2
-  LDSCRIPT	= ../../RX23T/$(DEVICE).ld
-  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
-endif
-
-ifeq ($(RX_DEF),SIG_RX24T)
-  RX_CPU = RX24T
-  RX_CHOOSE = -misa=v2
-  LDSCRIPT	= ../../RX24T/$(DEVICE).ld
-  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
-endif
-
-ifeq ($(RX_DEF),SIG_RX24U)
-  RX_CPU = RX24U
-  RX_CHOOSE = -misa=v2
-  LDSCRIPT	= ../../RX24U/$(DEVICE).ld
-  PROG_OPT = --write-page-wait=10000 --erase-page-wait=5000
-endif
-
-ifeq ($(RX_DEF),SIG_RX26T)
-  RX_CPU = RX26T
-  RX_CHOOSE = -misa=v3
-  # TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic,mathlib
-  TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic
-  LDSCRIPT	= ../../RX26T/$(DEVICE).ld
-  PROG_OPT = --write-page-wait=2500
 endif
 
 ifeq ($(RX_DEF),SIG_RX64M)
