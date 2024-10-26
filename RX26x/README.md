@@ -6,14 +6,17 @@
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 1.6V ～ 5.5V Operation / 動作
 - High-speed operation mode: 84 µA/MHz / 高速動作モード：84 µA/MHz
+- USB2.0 Full Speed, Host, Function
 - CAN FD Module (CANFD) / CAN FD (CAN FD)
-- Arithmetic Unit for Trigonometric Functions (TFUv2) / 三角関数演算器 (TFUv2)
+- Real time clock / リアルタイムクロック内蔵
+- Capacitive touch sensor / 静電容量式タッチセンサ
+- Renesas Secure IP (RSIP-E11A) / セキュリティ機能
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
 ---
 
-## RX26T Linker file / リンカーファイル
+## RX260/RX261 Linker file / リンカーファイル
 
 |Type|Program|RAM|Data Flash|Source|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
@@ -21,7 +24,7 @@
 
 ---
 
-## RX26T Dedicated class / 専用クラス
+## RX260/RX261 Dedicated class / 専用クラス
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
@@ -37,8 +40,6 @@
 |Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp?ts=4)||
 |Port Mapping TMR/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp?ts=4)||
 |Port Mapping GPTW/ポートマッピング GPTW|[port_map_gptw.hpp](port_map_gptw.hpp?ts=4)||
-|FLASH Definition/FLASH 定義|[flash.hpp](flash.hpp?ts=4)||
-|A/D Definition/A/D 定義|[s12adh.hpp](s12adh.hpp?ts=4)||
 |System Definition/システム定義|[system.hpp](system.hpp?ts=4)||
 |System I/O Definition/システム I/O 定義|[system_io.hpp](system_io.hpp?ts=4)||
 

@@ -165,9 +165,9 @@ namespace rx {
 		{
 			if(rx.cpu_type_ == "RX220") {
 				protocol_ = rx220::protocol();
-			} else if(rx.cpu_type_ == "RX140" || rx.cpu_type_ == "RX231") {
+			} else if(rx.cpu_type_ == "RX140" || rx.cpu_type_ == "RX230" || rx.cpu_type_ == "RX231" || rx.cpu_type_ == "RX260" || rx.cpu_type_ == "RX261") {
 				protocol_ = rx23x::protocol();
-			} else if(rx.cpu_type_ == "RX13T" || rx.cpu_type_ == "RX24T" || rx.cpu_type_ == "RX24U") {
+			} else if(rx.cpu_type_ == "RX13T" || rx.cpu_type_ == "RX23T" || rx.cpu_type_ == "RX24T" || rx.cpu_type_ == "RX24U") {
 				protocol_ = rx24t::protocol();
 			} else if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N") {
 				protocol_ = rx62x::protocol();
@@ -175,7 +175,7 @@ namespace rx {
 				protocol_ = rx63x::protocol();
 			} else if(rx.cpu_type_ == "RX26T") {
 				protocol_ = rx26t::protocol();
-			} else if(rx.cpu_type_ == "RX64M" || rx.cpu_type_ == "RX71M" || rx.cpu_type_ == "RX72M") {
+			} else if(rx.cpu_type_ == "RX64M" || rx.cpu_type_ == "RX71M" || rx.cpu_type_ == "RX72N" || rx.cpu_type_ == "RX72M") {
 				protocol_ = rx64m::protocol();
 			} else if(rx.cpu_type_ == "RX651" || rx.cpu_type_ == "RX65N") {
 				protocol_ = rx65x::protocol();
