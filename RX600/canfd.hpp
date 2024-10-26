@@ -4,6 +4,7 @@
 	@brief	CANFD 定義 @n
 			※新型 CAN コントローラー @n
 			・RX660 (CANFD-Lite) @n
+			・RX261 @n
 			・RX26T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
@@ -1734,8 +1735,38 @@ namespace device {
 		static inline ecear_t<base + 0x10> ECEAR;
 	};
 
+#if defined(SIG_RX261)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	CANFD モジュール (CANFD, ECC コア) for RX261
+		@param[in]	base	ベースアドレス
+		@param[in]	ecc		ECC 制御アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, uint32_t ecc>
+	struct canfd_t : canfd_base_t<base>, canfd_ecc_t<ecc> {
 
-#if defined(SIG_RX26T)
+		static constexpr auto PERIPHERAL = peripheral::CANFD0;	///< ペリフェラル型
+
+		static constexpr auto PCLK = clock_profile::CANFDCLK;	///< クロック周波数
+
+		static constexpr auto GB0V = ICU::VECTOR::RFDREQ0;	///< グローバル０・割り込みベクター
+		static constexpr auto GB1V = ICU::VECTOR::RFDREQ1;	///< グローバル１・割り込みベクター
+		static constexpr auto CH0V = ICU::VECTOR::CFDREQ0;	///< チャネル０・割り込みベクター
+
+		static constexpr auto CHEV = ICU::VECTOR::CHEI;		///< チャネルエラー・割り込みベクター
+		static constexpr auto CFRV = ICU::VECTOR::CFRI;		///< 共通 FIFO 受信・割り込みベクター
+		static constexpr auto GLEV = ICU::VECTOR::GLEI;		///< グローバルエラー・割り込みベクター
+		static constexpr auto RFRV = ICU::VECTOR::RFRI;		///< 受信 FIFO 割り込みベクター
+		static constexpr auto CHTV = ICU::VECTOR::CHTI;		///< チャネル送信・割り込みベクター
+		static constexpr auto RMRV = ICU::VECTOR::RMRI;		///< 受信メッセージバッファ・割り込みベクター
+
+		static constexpr auto EC1V = ICU::VECTOR::EC1EI;	///< １ビット ECC エラー・割り込みベクター
+		static constexpr auto EC2V = ICU::VECTOR::EC2EI;	///< ２ビット ECC エラー・割り込みベクター
+		static constexpr auto ECOV = ICU::VECTOR::ECOVI;	///< ECC オーバーフロー・割り込みベクター
+	};
+	typedef canfd_t<0x000A'8000, 0x000E'D000> CANFD0;
+#elif defined(SIG_RX26T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	CANFD モジュール (CANFD, ECC コア) for RX26T

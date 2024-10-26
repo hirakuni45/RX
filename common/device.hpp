@@ -139,7 +139,7 @@
 #include "RX26x/icu_mgr.hpp"
 #include "RX26x/port_map.hpp"
 #include "RX26x/port_map_gptw.hpp"
-// #include "RX26x/port_map_tmr.hpp"
+#include "RX26x/port_map_tmr.hpp"
 #include "RX26x/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 

@@ -263,7 +263,7 @@ namespace device {
 			ICTXI0,
 			ICTEI0,
 
-			LPT			= 255	///< LPT
+			LPTCMI1		= 255	///< LPT
 		};
 
 

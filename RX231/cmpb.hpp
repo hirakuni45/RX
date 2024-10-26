@@ -377,7 +377,7 @@ namespace device {
 		static inline cpb1ocr_t<0x0008'C5A7> CPB1OCR;
 	};
 
-#if defined(SIG_RX140)
+#if defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  コンパレータ B（CMPBa）

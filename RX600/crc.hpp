@@ -6,6 +6,7 @@
 			・RX231 @n
 			・RX23T @n
 			・RX24T/RX24U @n
+			・RX260/RX261 @n
 			・RX26T @n
 			・RX62N/RX621 @n
 			・RX63N/RX631 @n

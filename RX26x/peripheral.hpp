@@ -87,8 +87,7 @@ namespace device {
 
 		TEMPS,		///< 温度センサ（TEMPS）
 
-		CMPB0,		///< コンパレーター０
-		CMPB1,		///< コンパレーター１
+		CMPB,		///< コンパレーターＢ
 
 		DOC,		///< データ演算回路 (DOC)
 	};

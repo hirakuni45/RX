@@ -28,24 +28,24 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO0
-			// P33
-			// PB0
-			// PD3
+			// P22
+			// PB3
+			// PH1
 				switch(odr) {
 				case ORDER::FIRST:
-					PORT3::PMR.B3 = 0;
-					MPC::P33PFS.PSEL = sel;  // ok
-					PORT3::PMR.B3 = ena;
+					PORT2::PMR.B2 = 0;
+					MPC::P22PFS.PSEL = sel;  // ok
+					PORT2::PMR.B2 = ena;
 					break;
 				case ORDER::SECOND:
-					PORTB::PMR.B0 = 0;
-					MPC::PB0PFS.PSEL = sel;  // ok
-					PORTB::PMR.B0 = ena;
+					PORTB::PMR.B3 = 0;
+					MPC::PB3PFS.PSEL = sel;  // ok
+					PORTB::PMR.B3 = ena;
 					break;
 				case ORDER::THIRD:
-					PORTD::PMR.B3 = 0;
-					MPC::PD3PFS.PSEL = sel;  // ok
-					PORTD::PMR.B3 = ena;
+					PORTH::PMR.B1 = 0;
+					MPC::PH1PFS.PSEL = sel;  // ok
+					PORTH::PMR.B1 = ena;
 					break;
 				default:
 					ret = false;
@@ -53,294 +53,9 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:  // TMCI0 
-			// PB1
-			// PD4
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTB::PMR.B1 = 0;
-					MPC::PB1PFS.PSEL = sel;  // ok
-					PORTB::PMR.B1 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTD::PMR.B4 = 0;
-					MPC::PD4PFS.PSEL = sel;  // ok
-					PORTD::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMRI:  // TMRI0 
-			// PB2
-			// PD5
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTB::PMR.B2 = 0;
-					MPC::PB2PFS.PSEL = sel;  // ok
-					PORTB::PMR.B2 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTD::PMR.B5 = 0;
-					MPC::PD5PFS.PSEL = sel;  // ok
-					PORTD::PMR.B5 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
-		}
-
-
-		static bool tmr1_(CHANNEL ch, bool ena, ORDER odr) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = ena ? 0b0'0101 : 0;
-			switch(ch) {
-			case CHANNEL::TMO:  // TMO1
-			// PD6
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTD::PMR.B6 = 0;
-					MPC::PD6PFS.PSEL = sel;  // ok
-					PORTD::PMR.B6 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMCI:  // TMCI1
-			// PD2
-			// PE0
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTD::PMR.B2 = 0;
-					MPC::PD2PFS.PSEL = sel;  // ok
-					PORTD::PMR.B2 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTE::PMR.B0 = 0;
-					MPC::PE0PFS.PSEL = sel;  // ok
-					PORTE::PMR.B0 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMRI:  // TMRI1
-			// PD7
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTD::PMR.B7 = 0;
-					MPC::PD7PFS.PSEL = sel; // ok
-					PORTD::PMR.B7 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
-		}
-
-
-		static bool tmr2_(CHANNEL ch, bool ena, ORDER odr) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = ena ? 0b0'0101 : 0;
-			switch(ch) {
-			case CHANNEL::TMO:  // TMO2
-			// P20
-			// P23
-			// P27
-			// P92
-			// PA0
-			// PD1
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT2::PMR.B0 = 0;
-					MPC::P20PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORT2::PMR.B0 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT2::PMR.B3 = 0;
-					MPC::P23PFS.PSEL = sel;  // ok
-					PORT2::PMR.B3 = ena;
-					break;
-				case ORDER::THIRD:
-					PORT2::PMR.B7 = 0;
-					MPC::P27PFS.PSEL = sel;  // ok
-					PORT2::PMR.B7 = ena;
-					break;
-				case ORDER::FOURTH:
-					PORT9::PMR.B2 = 0;
-					MPC::P92PFS.PSEL = sel;  // ok
-					PORT9::PMR.B2 = ena;
-					break;
-				case ORDER::FIFTH:
-					PORTA::PMR.B0 = 0;
-					MPC::PA0PFS.PSEL = sel;  // ok
-					PORTA::PMR.B0 = ena;
-					break;
-				case ORDER::SIXTH:
-					PORTD::PMR.B1 = 0;
-					MPC::PD1PFS.PSEL = sel;  // ok
-					PORTD::PMR.B1 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMCI:  // TMCI2
-			// P24
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = sel;  // ok
-					PORT2::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMRI:  // TMRI2
-			// P22
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = sel;  // ok
-					PORT2::PMR.B2 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
-		}
-
-
-		static bool tmr3_(CHANNEL ch, bool ena, ORDER odr) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = ena ? 0b0'0101 : 0;
-			switch(ch) {
-			case CHANNEL::TMO:  // TMO3
-			// P11
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT1::PMR.B1 = 0;
-					MPC::P11PFS.PSEL = sel;  // ok
-					PORT1::PMR.B1 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMCI:  // TMCI3 
-			// P95
-			// PA5
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT9::PMR.B5 = 0;
-					MPC::P95PFS.PSEL = sel;  // ok
-					PORT9::PMR.B5 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTA::PMR.B5 = 0;
-					MPC::PA5PFS.PSEL = sel;  // ok
-					PORTA::PMR.B5 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMRI:  // TMRI3 
-			// P10
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT1::PMR.B0 = 0;
-					MPC::P10PFS.PSEL = sel;  // ok
-					PORT1::PMR.B0 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
-		}
-
-
-		static bool tmr4_(CHANNEL ch, bool ena, ORDER odr) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = ena ? 0b0'0101 : 0;
-			switch(ch) {
-			case CHANNEL::TMO:  // TMO4
-			// P22
-			// P82
-			// P93
-			// PA1
-			// PD2
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORT2::PMR.B2 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT8::PMR.B2 = 0;
-					MPC::P82PFS.PSEL = sel;  // ok
-					PORT8::PMR.B2 = ena;
-					break;
-				case ORDER::THIRD:
-					PORT9::PMR.B3 = 0;
-					MPC::P93PFS.PSEL = sel;  // ok
-					PORT9::PMR.B3 = ena;
-					break;
-				case ORDER::FOURTH:
-					PORTA::PMR.B1 = 0;
-					MPC::PA1PFS.PSEL = sel;  // ok
-					PORTA::PMR.B1 = ena;
-					break;
-				case ORDER::FIFTH:
-					PORTD::PMR.B2 = 0;
-					MPC::PD2PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORTD::PMR.B2 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMCI:  // TMCI4 
 			// P21
-			// P81
+			// PB1
+			// PH3
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -348,18 +63,24 @@ namespace device {
 					PORT2::PMR.B1 = ena;
 					break;
 				case ORDER::SECOND:
-					PORT8::PMR.B1 = 0;
-					MPC::P81PFS.PSEL = sel;  // ok
-					PORT8::PMR.B1 = ena;
+					PORTB::PMR.B1 = 0;
+					MPC::PB1PFS.PSEL = sel;  // ok
+					PORTB::PMR.B1 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTH::PMR.B3 = 0;
+					MPC::PH3PFS.PSEL = sel;  // ok
+					PORTH::PMR.B3 = ena;
 					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI4 
+			case CHANNEL::TMRI:  // TMRI0 
 			// P20
-			// P80
+			// PA4
+			// PH2
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -367,120 +88,235 @@ namespace device {
 					PORT2::PMR.B0 = ena;
 					break;
 				case ORDER::SECOND:
-					PORT8::PMR.B0 = 0;
-					MPC::P80PFS.PSEL = sel;  // ok
-					PORT8::PMR.B0 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
-		}
-
-
-		static bool tmr5_(CHANNEL ch, bool ena, ORDER odr) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = ena ? 0b0'0101 : 0;
-			switch(ch) {
-			case CHANNEL::TMO:  // TMO5
-			// PE1
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTE::PMR.B1 = 0;
-					MPC::PE1PFS.PSEL = sel;  // ok
-					PORTE::PMR.B1 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMCI:  // TMCI5
-			// PE0
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTE::PMR.B0 = 0;
-					MPC::PE0PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORTE::PMR.B0 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMRI:  // TMRI5
-			// PD7
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTD::PMR.B7 = 0;
-					MPC::PD7PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORTD::PMR.B7 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
-		}
-
-
-		static bool tmr6_(CHANNEL ch, bool ena, ORDER odr) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = ena ? 0b0'0101 : 0;
-			switch(ch) {
-			case CHANNEL::TMO:  // TMO6
-			// P21
-			// P24
-			// P27
-			// P32
-			// PD0
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT2::PMR.B1 = 0;
-					MPC::P21PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORT2::PMR.B1 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORT2::PMR.B4 = ena;
+					PORTA::PMR.B4 = 0;
+					MPC::PA4PFS.PSEL = sel;  // ok
+					PORTA::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
-					PORT2::PMR.B7 = 0;
-					MPC::P27PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORT2::PMR.B7 = ena;
+					PORTH::PMR.B2 = 0;
+					MPC::PH2PFS.PSEL = sel;  // ok
+					PORTH::PMR.B2 = ena;
 					break;
-				case ORDER::FOURTH:
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool tmr1_(CHANNEL ch, bool ena, ORDER odr) noexcept
+		{
+			bool ret = true;
+			uint8_t sel = ena ? 0b0'0101 : 0;
+			switch(ch) {
+			case CHANNEL::TMO:  // TMO1
+			// P17
+			// P26
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B7 = 0;
+					MPC::P17PFS.PSEL = sel;  // ok
+					PORT1::PMR.B7 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT2::PMR.B6 = 0;
+					MPC::P26PFS.PSEL = sel;  // ok
+					PORT2::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case CHANNEL::TMCI:  // TMCI1
+			// P12
+			// P54
+			// PC4
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B2 = 0;
+					MPC::P12PFS.PSEL = sel;  // ok
+					PORT1::PMR.B2 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT5::PMR.B4 = 0;
+					MPC::P54PFS.PSEL = sel;  // ok
+					PORT5::PMR.B4 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = sel;  // ok
+					PORTC::PMR.B4 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case CHANNEL::TMRI:  // TMRI1
+			// P24
+			// PB5
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT2::PMR.B4 = 0;
+					MPC::P24PFS.PSEL = sel;  // ok
+					PORT2::PMR.B4 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTB::PMR.B5 = 0;
+					MPC::PB5PFS.PSEL = sel;  // ok
+					PORTB::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool tmr2_(CHANNEL ch, bool ena, ORDER odr) noexcept
+		{
+			bool ret = true;
+			uint8_t sel = ena ? 0b0'0101 : 0;
+			switch(ch) {
+			case CHANNEL::TMO:  // TMO2
+			// P16
+			// PC7
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B6 = 0;
+					MPC::P16PFS.PSEL = sel;  // ok
+					PORT1::PMR.B6 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B7 = 0;
+					MPC::PC7PFS.PSEL = sel;  // ok
+					PORTC::PMR.B7 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case CHANNEL::TMCI:  // TMCI2
+			// P15
+			// P31
+			// PC6
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B5 = 0;
+					MPC::P15PFS.PSEL = sel;  // ok
+					PORT1::PMR.B5 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT3::PMR.B1 = 0;
+					MPC::P31PFS.PSEL = sel;  // ok
+					PORT3::PMR.B1 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTC::PMR.B6 = 0;
+					MPC::PC6PFS.PSEL = sel;  // ok
+					PORTC::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case CHANNEL::TMRI:  // TMRI2
+			// P14
+			// PC5
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B4 = 0;
+					MPC::P14PFS.PSEL = sel;  // ok
+					PORT1::PMR.B4 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B5 = 0;
+					MPC::PC5PFS.PSEL = sel;  // ok
+					PORTC::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool tmr3_(CHANNEL ch, bool ena, ORDER odr) noexcept
+		{
+			bool ret = true;
+			uint8_t sel = ena ? 0b0'0101 : 0;
+			switch(ch) {
+			case CHANNEL::TMO:  // TMO3
+			// P13
+			// P32
+			// P55
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B3 = 0;
+					MPC::P13PFS.PSEL = sel;  // ok
+					PORT1::PMR.B3 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT3::PMR.B2 = 0;
 					MPC::P32PFS.PSEL = sel;  // ok
 					PORT3::PMR.B2 = ena;
 					break;
-				case ORDER::FIFTH:
-					PORTD::PMR.B0 = 0;
-					MPC::PD0PFS.PSEL = sel;  // ok
-					PORTD::PMR.B0 = ena;
+				case ORDER::THIRD:
+					PORT5::PMR.B5 = 0;
+					MPC::P55PFS.PSEL = sel;  // ok
+					PORT5::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI6 
+			case CHANNEL::TMCI:  // TMCI3 
+			// P27
+			// P34
+			// PA6
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT2::PMR.B7 = 0;
+					MPC::P27PFS.PSEL = sel;  // ok
+					PORT2::PMR.B7 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT3::PMR.B4 = 0;
+					MPC::P34PFS.PSEL = sel;  // ok
+					PORT3::PMR.B4 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTA::PMR.B6 = 0;
+					MPC::PA6PFS.PSEL = sel;  // ok
+					PORTA::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case CHANNEL::TMRI:  // TMRI3 
 			// P30
-			// PD4
+			// P33
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B0 = 0;
@@ -488,92 +324,9 @@ namespace device {
 					PORT3::PMR.B0 = ena;
 					break;
 				case ORDER::SECOND:
-					PORTD::PMR.B4 = 0;
-					MPC::PD4PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORTD::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMRI:  // TMRI6 
-			// P31
-			// P70
-			// PD5
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT3::PMR.B1 = 0;
-					MPC::P31PFS.PSEL = sel;  // ok
-					PORT3::PMR.B1 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT7::PMR.B0 = 0;
-					MPC::P70PFS.PSEL = sel;  // ok
-					PORT7::PMR.B0 = ena;
-					break;
-				case ORDER::THIRD:
-					PORTD::PMR.B5 = 0;
-					MPC::PD5PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
-					PORTD::PMR.B5 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
-		}
-
-
-		static bool tmr7_(CHANNEL ch, bool ena, ORDER odr) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = ena ? 0b0'0101 : 0;
-			switch(ch) {
-			case CHANNEL::TMO:  // TMO1
-			// PA2
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTA::PMR.B2 = 0;
-					MPC::PA2PFS.PSEL = sel;  // ok
-					PORTA::PMR.B2 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMCI:  // TMCI0 
-			// PA4
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTA::PMR.B4 = 0;
-					MPC::PA4PFS.PSEL = sel;  // ok
-					PORTA::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			case CHANNEL::TMRI:  // TMRI0
-			// P94
-			// PA3
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT9::PMR.B4 = 0;
-					MPC::P94PFS.PSEL = sel;  // ok
-					PORT9::PMR.B4 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = sel;  // ok
-					PORTA::PMR.B3 = ena;
+					PORT3::PMR.B3 = 0;
+					MPC::P33PFS.PSEL = sel;  // ok
+					PORT3::PMR.B3 = ena;
 					break;
 				default:
 					ret = false;
@@ -600,7 +353,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			if(odr == ORDER::BYPASS) return true;
+			if(odr == ORDER::BYPASS) {
+				return true;
+			} else if(odr == ORDER::USER) {
+				return false;
+			}
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -618,18 +375,6 @@ namespace device {
 				break;
 			case peripheral::TMR3:
 				ret = tmr3_(ch, ena, odr);
-				break;
-			case peripheral::TMR4:
-				ret = tmr4_(ch, ena, odr);
-				break;
-			case peripheral::TMR5:
-				ret = tmr5_(ch, ena, odr);
-				break;
-			case peripheral::TMR6:
-				ret = tmr6_(ch, ena, odr);
-				break;
-			case peripheral::TMR7:
-				ret = tmr7_(ch, ena, odr);
 				break;
 			default:
 				ret = false;

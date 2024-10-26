@@ -97,7 +97,7 @@
 
 #include "RX220/board_profile.hpp"
 
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX230) || defined(SIG_RX231)
 #include "RX231/lvda.hpp"
 #include "RX600/cac.hpp"
 #include "RX231/bus.hpp"
@@ -221,19 +221,36 @@
 #include "RX24U/board_profile.hpp"
 
 #elif defined(SIG_RX260) || defined(SIG_RX261)
-
+#include "RX231/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/bus.hpp"
+#include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
-
+#include "RX600/elc.hpp"
 #include "RX600/gptw.hpp"
-
+#include "RX600/poeg.hpp"
 #include "RX600/tmr.hpp"
-
+#include "RX231/rtc.hpp"
+#include "RX600/lpt.hpp"
+#include "RX600/wdta.hpp"
+#include "RX600/usb.hpp"
 #include "RX600/sci_k.hpp"
 #include "RX600/sci_h.hpp"
 #include "RX600/rsci.hpp"
+#include "RX600/canfd.hpp"
+#include "RX600/crc.hpp"
+#include "RX600/remc.hpp"
+#include "RX600/ctsu2.hpp"
+#include "RX231/s12ade.hpp"
+#include "RX140/da.hpp"
+#include "RX231/cmpb.hpp"
+#include "RX600/doc.hpp"
+#include "RX140/flash.hpp"
 
 #include "RX26x/system_io.hpp"
+#include "RX24T/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX600/dac_out.hpp"
 
 #include "RX26x/board_profile.hpp"
 
