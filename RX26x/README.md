@@ -50,22 +50,31 @@
 |---|---|
 |VCL|VCL(5)|
 |Reset Input/リセット入力|RES#(10)|
-|Mode Controle/モード制御|MD/FINED(6)|
-|RXD|PD5/RXD1(20)|
-|TXD|PD3/TXD1(22)|
-|Power/電源|VCC(14), VCC(29), VCC(42), VCC(60)|
-|GND/接地|VSS(3), VSS(12), VSS(31), VSS(44), VSS(62)|
-|Analog Power/アナログ電源|AVCC0(93), AVCC1(92), AVCC2(72)|
-|Analog GND/アナログ接地|AVSS0(94), AVSS1(95), AVSS2(73)|
+|Mode Controle/モード制御|MD/FINED(7)|
+|B/UB|PC7(45)|
+|RXD|P30/RXD1(20)|
+|TXD|P26/TXD1(22)|
+|USB+|USB_DP(37)|
+|USB-|USB_DM(36)|
+|UPSEL|P35/UPSEL(15)|
+|Power/電源|VCC(14), VCC(60)|
+|GND/接地|VSS(12), VSS(62)|
+|Analog Power/アナログ電源|AVCC0(97)|
+|Analog GND/アナログ接地|AVSS0(99)|
+|Analog Refarence L0/アナログ基準電源Ｌ０|VREFL0(94)|
+|Analog Refarence H0/アナログ基準電源Ｈ０|VREFH0(96)|
 |OSC in|EXTAL(13)|
 |OSC out|XTAL(11)|
+|Sub OSC in|XCIN(8)|
+|Sub OSC out|XCOUT(9)|
 
 - VCL: 4.7uF/25V
 
-|Mode/モード|MD|
-|---|:---:|
-|Serial BOOT/シリアルブート|0|
-|Single Chip/シングルチップ|1|
+|Mode/モード|B/UB|MD|
+|---|:---:|:---:|
+|Serial BOOT/シリアルブート|0|0|
+|USB Boot/USB ブート|1|0|
+|Single Chip/シングルチップ|-|1|
 
 ---
 

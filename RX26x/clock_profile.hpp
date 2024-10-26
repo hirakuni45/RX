@@ -20,7 +20,7 @@ namespace device {
 				・PLL_BASE は、BASE の 0.5 倍単位 @n
 				・他は、PLL_BASE を基数とする整数除算値 @n
 				・選択出来ない値を指定すると、コンパイルエラーとなる @n
-				・HOCO 周波数は、OFSM で設定する。（初期：32MHz） @n
+				・USB を使う場合で、ICLK:64MHz にする場合は、8MHz、16MHz のいずれか @n
 				・詳細はハードウェアーマニュアル参照の事
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -32,7 +32,8 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発信器タイプ @n
-					HOCO を使う場合、同時に、BASE に 16, 18, 20 MHz を設定 @n
+					HOCO を使う場合、OFSM の設定値（24, 32, 48, 64 MHz）を利用 @n
+					OFSM: 0xFFFF'FFFF の初期値 32MHz @n
 					LOCO は、起動時のモードなので、設定する事はない。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -50,8 +51,8 @@ namespace device {
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		=  16'000'000;		///< 外部接続クリスタル（1MHz ～ 24MHz）
 #else
-		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
-		static constexpr uint32_t   BASE		=  32'000'000;		///< HOCO 指定の固定値 (16, 18, 20MHz)
+		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< 内部オシレーターの選択
+		static constexpr uint32_t   BASE		=  32'000'000;		///< HOCO 指定の固定値
 #endif
 
 		static constexpr uint32_t   PLL_BASE	=  64'000'000;		///< PLL ベースクロック（最大 24 to 64MHz）

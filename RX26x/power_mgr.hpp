@@ -23,7 +23,6 @@ namespace device {
 		static inline uint8_t	gptw_ = 0;
 		static inline uint8_t	cmt_ = 0;
 		static inline uint8_t	dma_dtc_ = 0;
-		static inline uint8_t	cmpb_ = 0;
 
 		static void sr_(bool f, uint8_t& pad, peripheral org, peripheral tgt)
 		{
@@ -119,10 +118,8 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB9 = f;
 				break;
 
-			case peripheral::CMPB0:
-			case peripheral::CMPB1:
-				sr_(ena, cmpb_, peripheral::CMPB0, per);
-				SYSTEM::MSTPCRB.MSTPB10 = ((cmpb_ & 0b11) == 0);
+			case peripheral::CMPB:
+				SYSTEM::MSTPCRB.MSTPB10 = f;
 				break;
 
 			case peripheral::RSPI0:
