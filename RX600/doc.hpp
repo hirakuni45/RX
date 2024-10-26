@@ -8,6 +8,7 @@
 			RX231 @n
 			RX23T @n
 			RX24T/RX24U @n
+			RX260/RX261 @n
 			RX63T @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
@@ -73,7 +74,7 @@ namespace device {
 		static inline rw16_t<base + 0x04> DODSR;
 	};
 
-#if defined(SIG_RX13T) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX63T) || defined(SIG_RX63T_S)
+#if defined(SIG_RX13T) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データ演算回路（DOC）

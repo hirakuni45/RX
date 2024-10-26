@@ -3,6 +3,8 @@
 /*!	@file
 	@brief	RX600 グループ・バス定義 @n
 			RX24T/RX24U (CSx レジスタ 0 ～ 3, SDRAM 制御無し) @n
+			RX13T/RX23T（ベースレジスタのみ） @n
+			RX260/RX261（ベースレジスタのみ） @n
 			RX26T (CSx レジスタ 0 ～ 3, SDRAM 制御無し) @n
 			RX62N/RX621 @n
 			RX63N/RX631 @n
@@ -786,7 +788,7 @@ namespace device {
 		static inline ebmapcr_t<0x000C'5800> EBMAPCR;
 	};
 
-#if defined(SIG_RX13T) || defined(SIG_RX23T)
+#if defined(SIG_RX13T) || defined(SIG_RX23T) || defined(SIG_RX260) || defined(SIG_RX261)
 	typedef bus_base0_t BUS;
 #elif defined(SIG_RX62N) || defined(SIG_RX621) || defined(SIG_RX63N) || defined(SIG_RX631) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX671)
 	typedef bus_all_t BUS;

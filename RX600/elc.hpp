@@ -46,13 +46,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  イベントリンク設定レジスタ n（ELSRn） @n
-					（n = 0、3、4、7、10 ～ 15、16、18 ～ 28、33、35 ～ 38、41 ～ 45）
+					（n = 0、3、4、7、8、10 ～ 15、16、18 ～ 28、33、35 ～ 38、41 ～ 45）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<base + 0x01>  ELSR0;
 		static inline rw8_t<base + 0x04>  ELSR3;
 		static inline rw8_t<base + 0x05>  ELSR4;
 		static inline rw8_t<base + 0x08>  ELSR7;
+		static inline rw8_t<base + 0x09>  ELSR8;
 
 		static inline rw8_t<base + 0x0B>  ELSR10;
 		static inline rw8_t<base + 0x0C>  ELSR11;
@@ -155,6 +156,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B2, 2>  CMT1MD;
+			bits_rw_t<io_, bitpos::B4, 2>  LPTMD;
 		};
 		static inline elopc_t<base + 0x21> ELOPC;
 

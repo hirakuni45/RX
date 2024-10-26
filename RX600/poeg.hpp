@@ -64,7 +64,8 @@ namespace device {
 		static inline poegg_t<base + 0x0200> POEGGC;
 		static inline poegg_t<base + 0x0300> POEGGD;
 
-
+#if defined(SIG_RX260) || defined(SIG_RX261)
+#else
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	GPTW 出力停止制御グループ n 書き込み保護レジスタ (GTONCWPn)(n = A~D)
@@ -112,6 +113,7 @@ namespace device {
 		static inline gtonccrn_t<base + 0x0144> GTONCCRB;
 		static inline gtonccrn_t<base + 0x0244> GTONCCRC;
 		static inline gtonccrn_t<base + 0x0344> GTONCCRD;
+#endif
 	};
 	typedef poeg_t<0x0009'E000, peripheral::POEG> POEG;
 }

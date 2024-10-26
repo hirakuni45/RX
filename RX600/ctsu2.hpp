@@ -2,7 +2,8 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX マイコン静電容量式タッチセンサ (CTSU2SL/CTSU2L) 定義 @n
-			・RX140
+			・RX140 @n
+			・RX260/RX261 (CTSU2SL)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -272,7 +273,6 @@ namespace device {
 				MPC::PC4PFS.PSEL = sel;  // ok
 				PORTC::PMR.B4 = ena;
 				break;
-
 			default:
 				break;
 			}
@@ -913,8 +913,12 @@ namespace device {
 		static inline ctsuadcc_t<0x00A'0700> CTSUADCC;
 	};
 
-	// ROM 容量 64K CTSU2L
+#if defined(SIG_RX140)
+	// RX140 ROM 容量 64K CTSU2L
 //	static inline ctsu2l_t<0x000A'0900> CTSU;
-	// ROM 容量 128K 以上 CTSU2SL
+	// RX140 ROM 容量 128K 以上 CTSU2SL
 	static inline ctsu2sl_t<0x000A'0900> CTSU;
+#elif defined(SIG_RX260) || defined(SIG_RX261)
+	static inline ctsu2sl_t<0x000A'0900> CTSU;
+#endif
 }

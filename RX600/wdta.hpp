@@ -101,7 +101,7 @@ namespace device {
 		static inline wdtrcr_t<base + 0x06> WDTRCR;
 	};
 
-#if defined(SIG_RX231) || defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX631) || defined(SIG_RX63N)
 	// WUNI for NMI
 	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::NONE, clock_profile::PCLKB> WDT;
 #else
