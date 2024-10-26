@@ -644,7 +644,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SODRV;
 
-			bit_ro_t <io_, bitpos::B7>    SOSEL;
+			bit_rw_t <io_, bitpos::B7>    SOSEL;
 		};
 		static inline somcr_t<0x0008'0083> SOMCR;
 
@@ -967,7 +967,7 @@ namespace device {
 		static inline rpscr_t<0x0008'009F> RPSCR;
 
 
-//------  レジスタライトプロテクション機能  --------//
+		//----  レジスタライトプロテクション機能  ----------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -993,33 +993,7 @@ namespace device {
 		static inline prcr_t<0x0008'03FE> PRCR;
 
 
-//------  RSCI 機能  --------//
-#if 0
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  製品機能選択レジスタ 0 (PRDFR0)
-			@param[in]	base	ベースアドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct prdfr0_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B10, 2>  SCI5RXD;
-
-			bits_rw_t<io_, bitpos::B16, 2>  SCI8RXD;
-			bits_rw_t<io_, bitpos::B18, 2>  SCI9RXD;
-
-			bits_rw_t<io_, bitpos::B22, 2>  SCI11RXD;
-		};
-		static inline prdfr0_t<0x0008'00D0> PRDFR0;
-#endif
-
-//------  TEMPS  --------//
+		//----  TEMPS  ----------------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

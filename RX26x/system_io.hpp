@@ -78,12 +78,13 @@ namespace device {
 			return true;
 		}
 
-		// ベースクロックは標準的には 8MHz, 16MHz を使うので、それに見合った分周と倍率を使う。
+		// ベースクロックは標準的には 4, 8, 16MHz を使うので、それに見合った分周と倍率を使う。
 		// BASE / 4 * 12.0
 		static constexpr uint8_t usb_clock_div_() noexcept
 		{
 			if(clock_profile::BASE > 8'000'000) return 0b10;  // 1/4
-			else return 0b01;  // 1/2
+			else if(clock_profile::BASE > 4'000'000) return 0b01;  // 1/2
+			else return 0b00;  // 1/1
 		}
 
 		static constexpr uint8_t usb_clock_stc_() noexcept
@@ -127,8 +128,6 @@ namespace device {
 
 			// ベースクロック周波数の検査
 			static_assert(check_base_clock_(), "BASE clock out of range.");
-
-//			device::SYSTEM::MOSCWTCR = 0x53;  // リセット時、初期値を利用
 
 			// メインクロック強制発振とドライブ能力設定
 			if(OSCT == clock_profile::OSC_TYPE::XTAL) {
@@ -221,7 +220,20 @@ namespace device {
 				device::SYSTEM::USBCKCR.USBCKSEL = 0b110;
 			}
 
-			device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
+			if(clock_profile::TURN_SBC) {
+				if(clock_profile::SBCT == clock_profile::SBC_TYPE::EXT) {
+					device::SYSTEM::SOMCR.SOSEL = 1;
+				} else {
+					device::SYSTEM::SOMCR.SODRV = static_cast<uint8_t>(clock_profile::SBCT);
+				}
+				{
+					volatile auto tmp = device::SYSTEM::SOMCR();
+				}
+				device::SYSTEM::SOSCCR.SOSTP = 0;
+				{
+					volatile auto tmp = device::SYSTEM::SOSCCR();
+				}
+			}
 
 			if(OSCT == clock_profile::OSC_TYPE::XTAL || OSCT == clock_profile::OSC_TYPE::EXT) {
 				device::SYSTEM::LOCOCR.LCSTP = 1;  // 低速オンチップオシレータ停止
