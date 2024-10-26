@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX231 グループ・RTCe 定義
+	@brief	RX230/RX231/RX260/RX261 グループ・RTCe/RTCBa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -21,8 +21,11 @@ namespace device {
 	template <peripheral per>
 	struct rtc_t {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr bool BINARY = true;	///< バイナリーカウントモード
+		static constexpr auto PERIPHERAL = per;			///< ペリフェラル型
+		static constexpr auto ALM = ICU::VECTOR::ALM;	///< アラーム割り込み
+		static constexpr auto PRD = ICU::VECTOR::PRD;	///< 周期割り込み
+		static constexpr auto CUP = ICU::VECTOR::CUP;	///< 桁上げ割り込み
+		static constexpr bool BINARY = true;			///< バイナリーカウントモード
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -502,6 +505,7 @@ namespace device {
 		static inline rcr2_t<0x0008'C424> RCR2;
 
 
+#if defined(SIG_RX230) || defined(SIG_RX231)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  RTC コントロールレジスタ 3（RCR3）
@@ -520,7 +524,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B1, 3> RTCDV;
 		};
 		static inline rcr3_t<0x0008'C426> RCR3;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!

@@ -14,16 +14,10 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  フラッシュ・メモリー制御クラス
+		@brief  フラッシュ・メモリー・ベース制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct flash_t {
-
-		static constexpr auto DATA_SIZE = 4096;
-//		static constexpr auto DATA_SIZE = 8192;
-		static constexpr uint32_t DATA_BLOCK_SIZE = 1024;
-		static constexpr uint32_t DATA_WORD_SIZE = 1;
-		static constexpr auto ID_NUM = 4;
+	struct flash_base_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -85,27 +79,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 8>  MEKEY;
 		};
 		static inline memwaitr_t<0x007F'FFC0> MEMWAITR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  データフラッシュウェイトサイクル設定レジスタ (DFLWAITR)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct dflwaitr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     DFLWAIT;
-
-			bits_rw_t<io_, bitpos::B8, 8>  DFKEY;
-		};
-		static inline dflwaitr_t<0x007F'FFC4> DFLWAITR;
 
 
 		//-----------------------------------------------------------------//
@@ -400,5 +373,58 @@ namespace device {
 		static inline ro32_t<0x007F'C358> UIDR2;
 		static inline ro32_t<0x007F'C35C> UIDR3;
 	};
+
+#if defined(SIG_RX140)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  フラッシュ・メモリー制御クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		// RX140 Flash: 64K  ---> 4096
+		// RX140 Flash: 128K/256K ---> 8192
+		static constexpr auto DATA_SIZE = 4096;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 256;
+		static constexpr uint32_t DATA_WORD_SIZE = 1;
+		static constexpr auto ID_NUM = 4;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  データフラッシュウェイトサイクル設定レジスタ (DFLWAITR)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct dflwaitr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     DFLWAIT;
+
+			bits_rw_t<io_, bitpos::B8, 8>  DFKEY;
+		};
+		static inline dflwaitr_t<0x007F'FFC4> DFLWAITR;
+	};
 	typedef flash_t FLASH;
+
+#elif defined(SIG_RX260) || defined(SIG_RX261)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  フラッシュ・メモリー制御クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr auto DATA_SIZE = 8192;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 256;
+		static constexpr uint32_t DATA_WORD_SIZE = 1;
+		static constexpr auto ID_NUM = 4;
+
+	};
+	typedef flash_t FLASH;
+#endif
 }

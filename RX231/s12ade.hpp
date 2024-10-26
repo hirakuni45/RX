@@ -2,9 +2,10 @@
 //=========================================================================//
 /*!	@file
 	@brief	S12ADE 定義 @n
-			ユニット構成は同等だが、RX140, RX231 でチャネル構成が異なる @n
+			ユニット構成は同等だがチャネル構成が異なる @n
 			RX140:       8+9  input single A/D @n
-			RX230/RX231: 8+16 input single A/D
+			RX230/RX231: 8+16 input single A/D @n
+			RX260/RX261: 8+1+16 input single A/D
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -1272,403 +1273,10 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX231)
+#if defined(SIG_RX140)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  S12ADE 定義
-		@param[in]	base	ベース・アドレス
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
-	struct s12ade_t : public s12ade_base_t<base> {
-
-		typedef s12ade_base_t<base> BASE;
-
-		static constexpr auto PERIPHERAL = peripheral::S12AD;		///< ペリフェラル型
-		static constexpr auto ADI		 = ICU::VECTOR::S12ADI0;	///< 変換終了割り込みベクター
-		static constexpr auto GBADI		 = ICU::VECTOR::GBADI;		///< グループＢ変換終了割り込みベクター
-		static constexpr auto GCADI		 = ICU::VECTOR::NONE;		///< グループＣ変換終了割り込みベクター
-		static constexpr auto CMPAI		 = ICU::VECTOR::NONE;		///< コンペアＡ割り込みベクター
-		static constexpr auto CMPBI		 = ICU::VECTOR::NONE;		///< コンペアＢ割り込みベクター
-
-		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
-		static constexpr uint32_t CONV_TIME_NS = 830;				///< A/D 変換時間 0.83uS、単位「ns」
-
-		static constexpr uint32_t ANALOG_NUM = 24;	///< アナログ入力数
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  アナログ入力型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ANALOG : uint8_t {
-			AN000,	///< AN000 入力
-			AN001,
-			AN002,
-			AN003,
-			AN004,
-			AN005,
-			AN006,
-			AN007,
-
-			AN016 = 16,
-			AN017,
-			AN018,
-			AN019,
-			AN020,
-			AN021,
-			AN022,
-			AN023,
-			AN024,
-			AN025,
-			AN026,
-			AN027,
-			AN028,
-			AN029,
-			AN030,
-			AN031,
-
-			TEMP,	///< 温度センサ
-			REF,	///< 内部基準電圧
-		};
-
-	
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ポート設定と解除
-			@param[in]	an	アナログ入力型
-			@param[in]	ena	ポート無効の場合「false」
-		*/
-		//-----------------------------------------------------------------//		
-		static void enable(ANALOG an, bool ena = true)
-		{
-			MPC::PWPR.B0WI  = 0;
-			MPC::PWPR.PFSWE = 1;
-
-			switch(an) {
-			case ANALOG::AN000:
-				if(ena) {
-					PORT4::PDR.B0 = 0;
-					PORT4::PMR.B0 = 0;
-				}
-				MPC::P40PFS.ASEL = ena;
-				break;
-			case ANALOG::AN001:
-				if(ena) {
-					PORT4::PDR.B1 = 0;
-					PORT4::PMR.B1 = 0;
-				}
-				MPC::P41PFS.ASEL = ena;
-				break;
-			case ANALOG::AN002:
-				if(ena) {
-					PORT4::PDR.B2 = 0;
-					PORT4::PMR.B2 = 0;
-				}
-				MPC::P42PFS.ASEL = ena;
-				break;
-			case ANALOG::AN003:
-				if(ena) {
-					PORT4::PDR.B3 = 0;
-					PORT4::PMR.B3 = 0;
-				}
-				MPC::P43PFS.ASEL = ena;
-				break;
-			case ANALOG::AN004:
-				if(ena) {
-					PORT4::PDR.B4 = 0;
-					PORT4::PMR.B4 = 0;
-				}
-				MPC::P44PFS.ASEL = ena;
-				break;
-			case ANALOG::AN005:
-				if(ena) {
-					PORT4::PDR.B5 = 0;
-					PORT4::PMR.B5 = 0;
-				}
-				MPC::P45PFS.ASEL = ena;
-				break;
-			case ANALOG::AN006:
-				if(ena) {
-					PORT4::PDR.B6 = 0;
-					PORT4::PMR.B6 = 0;
-				}
-				MPC::P46PFS.ASEL = ena;
-				break;
-			case ANALOG::AN007:
-				if(ena) {
-					PORT4::PDR.B7 = 0;
-					PORT4::PMR.B7 = 0;
-				}
-				MPC::P47PFS.ASEL = ena;
-				break;
-			case ANALOG::AN016:
-				if(ena) {
-					PORTE::PDR.B0 = 0;
-					PORTE::PMR.B0 = 0;
-				}
-				MPC::PE0PFS.ASEL = ena;
-				break;
-			case ANALOG::AN017:
-				if(ena) {
-					PORTE::PDR.B1 = 0;
-					PORTE::PMR.B1 = 0;
-				}
-				MPC::PE1PFS.ASEL = ena;
-				break;
-			case ANALOG::AN018:
-				if(ena) {
-					PORTE::PDR.B2 = 0;
-					PORTE::PMR.B2 = 0;
-				}
-				MPC::PE2PFS.ASEL = ena;
-				break;
-			case ANALOG::AN019:
-				if(ena) {
-					PORTE::PDR.B3 = 0;
-					PORTE::PMR.B3 = 0;
-				}
-				MPC::PE3PFS.ASEL = ena;
-				break;
-			case ANALOG::AN020:
-				if(ena) {
-					PORTE::PDR.B4 = 0;
-					PORTE::PMR.B4 = 0;
-				}
-				MPC::PE4PFS.ASEL = ena;
-				break;
-			case ANALOG::AN021:
-				if(ena) {
-					PORTE::PDR.B5 = 0;
-					PORTE::PMR.B5 = 0;
-				}
-				MPC::PE5PFS.ASEL = ena;
-				break;
-			case ANALOG::AN022:
-				if(ena) {
-					PORTE::PDR.B6 = 0;
-					PORTE::PMR.B6 = 0;
-				}
-				MPC::PE6PFS.ASEL = ena;
-				break;
-			case ANALOG::AN023:
-				if(ena) {
-					PORTE::PDR.B7 = 0;
-					PORTE::PMR.B7 = 0;
-				}
-				MPC::PE7PFS.ASEL = ena;
-				break;
-			case ANALOG::AN024:
-				if(ena) {
-					PORTD::PDR.B0 = 0;
-					PORTD::PMR.B0 = 0;
-				}
-				MPC::PD0PFS.ASEL = ena;
-				break;
-			case ANALOG::AN025:
-				if(ena) {
-					PORTD::PDR.B1 = 0;
-					PORTD::PMR.B1 = 0;
-				}
-				MPC::PD1PFS.ASEL = ena;
-				break;
-			case ANALOG::AN026:
-				if(ena) {
-					PORTD::PDR.B2 = 0;
-					PORTD::PMR.B2 = 0;
-				}
-				MPC::PD2PFS.ASEL = ena;
-				break;
-			case ANALOG::AN027:
-				if(ena) {
-					PORTD::PDR.B3 = 0;
-					PORTD::PMR.B3 = 0;
-				}
-				MPC::PD3PFS.ASEL = ena;
-				break;
-			case ANALOG::AN028:
-				if(ena) {
-					PORTD::PDR.B4 = 0;
-					PORTD::PMR.B4 = 0;
-				}
-				MPC::PD4PFS.ASEL = ena;
-				break;
-			case ANALOG::AN029:
-				if(ena) {
-					PORTD::PDR.B5 = 0;
-					PORTD::PMR.B5 = 0;
-				}
-				MPC::PD5PFS.ASEL = ena;
-				break;
-			case ANALOG::AN030:
-				if(ena) {
-					PORTD::PDR.B6 = 0;
-					PORTD::PMR.B6 = 0;
-				}
-				MPC::PD6PFS.ASEL = ena;
-				break;
-			case ANALOG::AN031:
-				if(ena) {
-					PORTD::PDR.B7 = 0;
-					PORTD::PMR.B7 = 0;
-				}
-				MPC::PD7PFS.ASEL = ena;
-				break;
-			default:
-				break;
-			}
-
-			MPC::PWPR = device::MPC::PWPR.B0WI.b();
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D データレジスタ（ADDR）
-		*/
-		//-----------------------------------------------------------------//
-		static inline ad_utils::addr_tr_t<ANALOG, BASE::ADDR0_::address, ANALOG::TEMP, BASE::ADTSDR_::address,
-			ANALOG::REF, BASE::ADOCDR_::address> ADDR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  A/D チャネル選択レジスタ（ADANS）
-			@param[in] regadr0	レジスタアドレス０
-			@param[in] regadr1	レジスタアドレス１
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t regadr0, uint32_t regadr1>
-		struct adans_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
-			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
-			using base_::operator ();
-
-			typedef rw16_t<regadr0> io0_;
-			bits_rw_t<io0_, bitpos::B0, 8>  ANSA0;
-			typedef rw16_t<regadr1> io1_;
-			bits_rw_t<io1_, bitpos::B0, 16> ANSA1;
-		};
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ A (ADANSA)
-		*/
-		//-----------------------------------------------------------------//
-		static inline adans_t<BASE::ADANSA0_::address, BASE::ADANSA1_::address> ADANSA;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ B (ADANSB)
-		*/
-		//-----------------------------------------------------------------//
-		static inline adans_t<BASE::ADANSB0_::address, BASE::ADANSB1_::address> ADANSB;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D 変換値加算 / 平均機能チャネル選択レジスタ (ADADS)
-			@param[in] regadr0	レジスタアドレス０
-			@param[in] regadr1	レジスタアドレス１
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t regadr0, uint32_t regadr1>
-		struct adads_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
-			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
-			using base_::operator ();
-
-			typedef rw16_t<regadr0> io0_;
-			bits_rw_t<io0_, bitpos::B0, 8>  ADS0;
-			typedef rw16_t<regadr1> io1_;
-			bits_rw_t<io1_, bitpos::B0, 16> ADS1;
-		};
-		static inline adads_t<BASE::ADADS0_::address, BASE::ADADS1_::address> ADADS;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ（ADSSTR）
-		*/
-		//-----------------------------------------------------------------//
-		static inline ad_utils::adsstr1il_tr_t<ANALOG, BASE::ADSSTR0_::address, BASE::ADSSTR1_::address,
-			BASE::ADSSTRL_::address, ANALOG::TEMP, BASE::ADSSTRT_::address, ANALOG::REF, BASE::ADSSTRO_::address> ADSSTR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D コンペア機能ウィンドウ A チャネル選択レジスタ (ADCMPANSR)
-			@param[in] regadr0	レジスタアドレス０
-			@param[in] regadr1	レジスタアドレス１
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t regadr0, uint32_t regadr1>
-		struct adcmpansr_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
-			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
-			using base_::operator ();
-
-			typedef rw16_t<regadr0> io0_;
-			bits_rw_t<io0_, bitpos::B0, 8>  CMPCHA0;
-			typedef rw16_t<regadr1> io1_;
-			bits_rw_t<io1_, bitpos::B0, 16> CMPCHA1;
-		};
-		static inline adcmpansr_t<BASE::ADCMPANSR0_::address, BASE::ADCMPANSR1_::address> ADCMPANSR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D コンペア機能ウィンドウ A 比較条件設定レジスタ (ADCMPLR)
-			@param[in] regadr0	レジスタアドレス０
-			@param[in] regadr1	レジスタアドレス１
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t regadr0, uint32_t regadr1>
-		struct adcmplr_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
-			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
-			using base_::operator ();
-
-			typedef rw16_t<regadr0> io0_;
-			bits_rw_t<io0_, bitpos::B0, 8>  CMPLCHA0;
-			typedef rw16_t<regadr1> io1_;
-			bits_rw_t<io1_, bitpos::B0, 16> CMPLCHA1;
-		};
-		static inline adcmplr_t<BASE::ADCMPLR0_::address, BASE::ADCMPLR1_::address> ADCMPLR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D コンペア機能ウィンドウ A チャネルステータスレジスタ (ADCMPSR)
-			@param[in] regadr0	レジスタアドレス０
-			@param[in] regadr1	レジスタアドレス１
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t regadr0, uint32_t regadr1>
-		struct adcmpsr_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
-			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
-			using base_::operator ();
-
-			typedef rw16_t<regadr0> io0_;
-			bits_rw_t<io0_, bitpos::B0, 8>  CMPSTCHA0;
-			typedef rw16_t<regadr1> io1_;
-			bits_rw_t<io1_, bitpos::B0, 16> CMPSTCHA1;
-		};
-		static inline adcmpsr_t<BASE::ADCMPSR0_::address, BASE::ADCMPSR1_::address> ADCMPSR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D データ格納バッファレジスタ (ADBUF) (idx = 0 ～ 15)
-		*/
-		//-----------------------------------------------------------------//
-		static inline ad_utils::adbuf_t<BASE::ADBUF_::address, 15> ADBUF;
-	};
-
-
-#elif defined(SIG_RX140)
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  S12ADE 定義
+		@brief  RX140 S12ADE 定義
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2021,6 +1629,405 @@ namespace device {
 		};
 		static inline adccr_t<base + 0x7E>  ADCCR;
 	};
+
+#elif defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX230/RX231 S12ADE 定義
+		@param[in]	base	ベース・アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct s12ade_t : public s12ade_base_t<base> {
+
+		typedef s12ade_base_t<base> BASE;
+
+		static constexpr auto PERIPHERAL = peripheral::S12AD;		///< ペリフェラル型
+		static constexpr auto ADI		 = ICU::VECTOR::S12ADI0;	///< 変換終了割り込みベクター
+		static constexpr auto GBADI		 = ICU::VECTOR::GBADI;		///< グループＢ変換終了割り込みベクター
+		static constexpr auto GCADI		 = ICU::VECTOR::NONE;		///< グループＣ変換終了割り込みベクター
+		static constexpr auto CMPAI		 = ICU::VECTOR::NONE;		///< コンペアＡ割り込みベクター
+		static constexpr auto CMPBI		 = ICU::VECTOR::NONE;		///< コンペアＢ割り込みベクター
+
+		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
+#if defined(SIG_RX230) || defined(SIG_RX231)
+		static constexpr uint32_t CONV_TIME_NS = 830;				///< A/D 変換時間 0.83uS、単位「ns」
+		static constexpr uint32_t ANALOG_NUM = 24;	///< アナログ入力数
+#else
+		static constexpr uint32_t CONV_TIME_NS  = 700;				///< A/D 変換時間 (ADCCR.CCS=0) 0.7uS、単位「ns」
+		static constexpr uint32_t CONV_TIME2_NS = 500;				///< A/D 変換時間 (ADCCR.CCS=1) 0.5uS、単位「ns」
+		static constexpr uint32_t ANALOG_NUM = 25;	///< アナログ入力数
+#endif
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ANALOG : uint8_t {
+			AN000,	///< AN000 入力
+			AN001,
+			AN002,
+			AN003,
+			AN004,
+			AN005,
+			AN006,
+			AN007,
+#if defined(SIG_RX260) || defined(SIG_RX261)
+			AN008,	///< CTSU input
+#endif
+			AN016 = 16,
+			AN017,
+			AN018,
+			AN019,
+			AN020,
+			AN021,
+			AN022,
+			AN023,
+			AN024,
+			AN025,
+			AN026,
+			AN027,
+			AN028,
+			AN029,
+			AN030,
+			AN031,
+
+			TEMP,	///< 温度センサ
+			REF,	///< 内部基準電圧
+		};
+
+	
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	ena	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(ANALOG an, bool ena = true)
+		{
+			MPC::PWPR.B0WI  = 0;
+			MPC::PWPR.PFSWE = 1;
+
+			switch(an) {
+			case ANALOG::AN000:
+				if(ena) {
+					PORT4::PDR.B0 = 0;
+					PORT4::PMR.B0 = 0;
+				}
+				MPC::P40PFS.ASEL = ena;
+				break;
+			case ANALOG::AN001:
+				if(ena) {
+					PORT4::PDR.B1 = 0;
+					PORT4::PMR.B1 = 0;
+				}
+				MPC::P41PFS.ASEL = ena;
+				break;
+			case ANALOG::AN002:
+				if(ena) {
+					PORT4::PDR.B2 = 0;
+					PORT4::PMR.B2 = 0;
+				}
+				MPC::P42PFS.ASEL = ena;
+				break;
+			case ANALOG::AN003:
+				if(ena) {
+					PORT4::PDR.B3 = 0;
+					PORT4::PMR.B3 = 0;
+				}
+				MPC::P43PFS.ASEL = ena;
+				break;
+			case ANALOG::AN004:
+				if(ena) {
+					PORT4::PDR.B4 = 0;
+					PORT4::PMR.B4 = 0;
+				}
+				MPC::P44PFS.ASEL = ena;
+				break;
+			case ANALOG::AN005:
+				if(ena) {
+					PORT4::PDR.B5 = 0;
+					PORT4::PMR.B5 = 0;
+				}
+				MPC::P45PFS.ASEL = ena;
+				break;
+			case ANALOG::AN006:
+				if(ena) {
+					PORT4::PDR.B6 = 0;
+					PORT4::PMR.B6 = 0;
+				}
+				MPC::P46PFS.ASEL = ena;
+				break;
+			case ANALOG::AN007:
+				if(ena) {
+					PORT4::PDR.B7 = 0;
+					PORT4::PMR.B7 = 0;
+				}
+				MPC::P47PFS.ASEL = ena;
+				break;
+			case ANALOG::AN016:
+				if(ena) {
+					PORTE::PDR.B0 = 0;
+					PORTE::PMR.B0 = 0;
+				}
+				MPC::PE0PFS.ASEL = ena;
+				break;
+			case ANALOG::AN017:
+				if(ena) {
+					PORTE::PDR.B1 = 0;
+					PORTE::PMR.B1 = 0;
+				}
+				MPC::PE1PFS.ASEL = ena;
+				break;
+			case ANALOG::AN018:
+				if(ena) {
+					PORTE::PDR.B2 = 0;
+					PORTE::PMR.B2 = 0;
+				}
+				MPC::PE2PFS.ASEL = ena;
+				break;
+			case ANALOG::AN019:
+				if(ena) {
+					PORTE::PDR.B3 = 0;
+					PORTE::PMR.B3 = 0;
+				}
+				MPC::PE3PFS.ASEL = ena;
+				break;
+			case ANALOG::AN020:
+				if(ena) {
+					PORTE::PDR.B4 = 0;
+					PORTE::PMR.B4 = 0;
+				}
+				MPC::PE4PFS.ASEL = ena;
+				break;
+			case ANALOG::AN021:
+				if(ena) {
+					PORTE::PDR.B5 = 0;
+					PORTE::PMR.B5 = 0;
+				}
+				MPC::PE5PFS.ASEL = ena;
+				break;
+			case ANALOG::AN022:
+				if(ena) {
+					PORTE::PDR.B6 = 0;
+					PORTE::PMR.B6 = 0;
+				}
+				MPC::PE6PFS.ASEL = ena;
+				break;
+			case ANALOG::AN023:
+				if(ena) {
+					PORTE::PDR.B7 = 0;
+					PORTE::PMR.B7 = 0;
+				}
+				MPC::PE7PFS.ASEL = ena;
+				break;
+			case ANALOG::AN024:
+				if(ena) {
+					PORTD::PDR.B0 = 0;
+					PORTD::PMR.B0 = 0;
+				}
+				MPC::PD0PFS.ASEL = ena;
+				break;
+			case ANALOG::AN025:
+				if(ena) {
+					PORTD::PDR.B1 = 0;
+					PORTD::PMR.B1 = 0;
+				}
+				MPC::PD1PFS.ASEL = ena;
+				break;
+			case ANALOG::AN026:
+				if(ena) {
+					PORTD::PDR.B2 = 0;
+					PORTD::PMR.B2 = 0;
+				}
+				MPC::PD2PFS.ASEL = ena;
+				break;
+			case ANALOG::AN027:
+				if(ena) {
+					PORTD::PDR.B3 = 0;
+					PORTD::PMR.B3 = 0;
+				}
+				MPC::PD3PFS.ASEL = ena;
+				break;
+			case ANALOG::AN028:
+				if(ena) {
+					PORTD::PDR.B4 = 0;
+					PORTD::PMR.B4 = 0;
+				}
+				MPC::PD4PFS.ASEL = ena;
+				break;
+			case ANALOG::AN029:
+				if(ena) {
+					PORTD::PDR.B5 = 0;
+					PORTD::PMR.B5 = 0;
+				}
+				MPC::PD5PFS.ASEL = ena;
+				break;
+			case ANALOG::AN030:
+				if(ena) {
+					PORTD::PDR.B6 = 0;
+					PORTD::PMR.B6 = 0;
+				}
+				MPC::PD6PFS.ASEL = ena;
+				break;
+			case ANALOG::AN031:
+				if(ena) {
+					PORTD::PDR.B7 = 0;
+					PORTD::PMR.B7 = 0;
+				}
+				MPC::PD7PFS.ASEL = ena;
+				break;
+			default:
+				break;
+			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ（ADDR）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::addr_tr_t<ANALOG, BASE::ADDR0_::address, ANALOG::TEMP, BASE::ADTSDR_::address,
+			ANALOG::REF, BASE::ADOCDR_::address> ADDR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  A/D チャネル選択レジスタ（ADANS）
+			@param[in] regadr0	レジスタアドレス０
+			@param[in] regadr1	レジスタアドレス１
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t regadr0, uint32_t regadr1>
+		struct adans_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
+			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
+			using base_::operator ();
+
+			typedef rw16_t<regadr0> io0_;
+			bits_rw_t<io0_, bitpos::B0, 9>  ANSA0;
+			typedef rw16_t<regadr1> io1_;
+			bits_rw_t<io1_, bitpos::B0, 16> ANSA1;
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ A (ADANSA)
+		*/
+		//-----------------------------------------------------------------//
+		static inline adans_t<BASE::ADANSA0_::address, BASE::ADANSA1_::address> ADANSA;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ B (ADANSB)
+		*/
+		//-----------------------------------------------------------------//
+		static inline adans_t<BASE::ADANSB0_::address, BASE::ADANSB1_::address> ADANSB;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D 変換値加算 / 平均機能チャネル選択レジスタ (ADADS)
+			@param[in] regadr0	レジスタアドレス０
+			@param[in] regadr1	レジスタアドレス１
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t regadr0, uint32_t regadr1>
+		struct adads_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
+			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
+			using base_::operator ();
+
+			typedef rw16_t<regadr0> io0_;
+			bits_rw_t<io0_, bitpos::B0, 9>  ADS0;
+			typedef rw16_t<regadr1> io1_;
+			bits_rw_t<io1_, bitpos::B0, 16> ADS1;
+		};
+		static inline adads_t<BASE::ADADS0_::address, BASE::ADADS1_::address> ADADS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ（ADSSTR）
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adsstr1il_tr_t<ANALOG, BASE::ADSSTR0_::address, BASE::ADSSTR1_::address,
+			BASE::ADSSTRL_::address, ANALOG::TEMP, BASE::ADSSTRT_::address, ANALOG::REF, BASE::ADSSTRO_::address> ADSSTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペア機能ウィンドウ A チャネル選択レジスタ (ADCMPANSR)
+			@param[in] regadr0	レジスタアドレス０
+			@param[in] regadr1	レジスタアドレス１
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t regadr0, uint32_t regadr1>
+		struct adcmpansr_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
+			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
+			using base_::operator ();
+
+			typedef rw16_t<regadr0> io0_;
+			bits_rw_t<io0_, bitpos::B0, 9>  CMPCHA0;
+			typedef rw16_t<regadr1> io1_;
+			bits_rw_t<io1_, bitpos::B0, 16> CMPCHA1;
+		};
+		static inline adcmpansr_t<BASE::ADCMPANSR0_::address, BASE::ADCMPANSR1_::address> ADCMPANSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペア機能ウィンドウ A 比較条件設定レジスタ (ADCMPLR)
+			@param[in] regadr0	レジスタアドレス０
+			@param[in] regadr1	レジスタアドレス１
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t regadr0, uint32_t regadr1>
+		struct adcmplr_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
+			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
+			using base_::operator ();
+
+			typedef rw16_t<regadr0> io0_;
+			bits_rw_t<io0_, bitpos::B0, 9>  CMPLCHA0;
+			typedef rw16_t<regadr1> io1_;
+			bits_rw_t<io1_, bitpos::B0, 16> CMPLCHA1;
+		};
+		static inline adcmplr_t<BASE::ADCMPLR0_::address, BASE::ADCMPLR1_::address> ADCMPLR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペア機能ウィンドウ A チャネルステータスレジスタ (ADCMPSR)
+			@param[in] regadr0	レジスタアドレス０
+			@param[in] regadr1	レジスタアドレス１
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t regadr0, uint32_t regadr1>
+		struct adcmpsr_t : public ad_utils::adans2_t<ANALOG, regadr0, regadr1> {
+			typedef ad_utils::adans2_t<ANALOG, regadr0, regadr1> base_;
+			using base_::operator ();
+
+			typedef rw16_t<regadr0> io0_;
+			bits_rw_t<io0_, bitpos::B0, 9>  CMPSTCHA0;
+			typedef rw16_t<regadr1> io1_;
+			bits_rw_t<io1_, bitpos::B0, 16> CMPSTCHA1;
+		};
+		static inline adcmpsr_t<BASE::ADCMPSR0_::address, BASE::ADCMPSR1_::address> ADCMPSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データ格納バッファレジスタ (ADBUF) (idx = 0 ～ 15)
+		*/
+		//-----------------------------------------------------------------//
+		static inline ad_utils::adbuf_t<BASE::ADBUF_::address, 15> ADBUF;
+	};
+
 #endif
 
 	typedef s12ade_t<0x0008'9000>  S12AD;
