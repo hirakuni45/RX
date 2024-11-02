@@ -10,6 +10,7 @@
 //=========================================================================//
 #include "protocol_base.hpp"
 #include <boost/format.hpp>
+#include <set>
 
 namespace rx72t {
 
@@ -25,6 +26,19 @@ namespace rx72t {
 		bool	data_area_;
 		bool	select_write_area_;
 
+		typedef std::set<uint32_t> ERASE_SET;
+		ERASE_SET				erase_set_;
+
+		static auto erase_page_block_(uint32_t org) noexcept
+		{
+			if(org >= 0xFFFF'0000) {  // 8K block
+				org &= 0xFFFF'E000;
+			} else {  // 32K block
+				org &= 0xFFFF'8000;
+			}
+			return org;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -32,7 +46,8 @@ namespace rx72t {
 		*/
 		//-----------------------------------------------------------------//
 		protocol() noexcept :
-			data_area_(false), select_write_area_(false)
+			data_area_(false), select_write_area_(false),
+			erase_set_()
 		{ }
 
 
@@ -72,6 +87,10 @@ namespace rx72t {
 			if(!connection_) return rx::protocol::erase_state::ERROR;
 			if(!pe_turn_on_) return rx::protocol::erase_state::ERROR;
 
+			if(erase_set_.find(erase_page_block_(address)) != erase_set_.end()) {
+				return rx::protocol::erase_state::CHECK_OK;
+			}
+
 			// ブランク・チェックを行う
 			uint8_t tmp[8];
 			auto org = address & 0xffff'ff00;
@@ -92,12 +111,12 @@ namespace rx72t {
 				if(err != 0xe0) { // do erase
 					return rx::protocol::erase_state::ERROR;
 				}
-				// erase NG;
-				// std::cout << boost::format("Erase NG: %08X") % address << std::endl;
-				if(address >= 0xFFFF'0000) {  // 8K block
-					org = address & 0xFFFF'E000;
-				} else if(address >= 0xFFC0'0000) {  // 32K block
-					org = address & 0xFFFF'8000;
+
+				org = erase_page_block_(org);
+				if(erase_set_.find(org) != erase_set_.end()) {
+					return rx::protocol::erase_state::CHECK_OK;
+				} else {
+					erase_set_.insert(org);
 				}
 				put32_big_(&tmp[0], org);
 				if(!command_(0x12, tmp, 4)) {  // erase command

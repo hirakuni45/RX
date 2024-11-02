@@ -10,6 +10,7 @@
 //=========================================================================//
 #include "protocol_base.hpp"
 #include <boost/format.hpp>
+#include <set>
 
 namespace rx26t {
 
@@ -27,6 +28,19 @@ namespace rx26t {
 		bool	data_area_;
 		bool	select_write_area_;
 
+		typedef std::set<uint32_t> ERASE_SET;
+		ERASE_SET				erase_set_;
+
+		static auto erase_page_block_(uint32_t org) noexcept
+		{
+			if(org >= 0xFFFF'8000) { // 4K block
+				org &= 0xFFFF'F000;
+			} else {  // 16K block
+				org &= 0xFFFF'C000;
+			}
+			return org;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -34,7 +48,8 @@ namespace rx26t {
 		*/
 		//-----------------------------------------------------------------//
 		protocol() noexcept :
-			data_area_(false), select_write_area_(false)
+			data_area_(false), select_write_area_(false),
+			erase_set_()
 		{ }
 
 
@@ -95,6 +110,10 @@ namespace rx26t {
 			if(!connection_) return rx::protocol::erase_state::ERROR;
 			if(!pe_turn_on_) return rx::protocol::erase_state::ERROR;
 
+			if(erase_set_.find(erase_page_block_(address)) != erase_set_.end()) {
+				return rx::protocol::erase_state::CHECK_OK;
+			}
+
 			// ブランク・チェックを行う
 			uint8_t tmp[8];
 			auto org = address & ~(PAGE_SIZE - 1);
@@ -116,11 +135,11 @@ namespace rx26t {
 				if(err != 0xe0) { // do erase
 					return rx::protocol::erase_state::ERROR;
 				}
-
-				if(org >= 0xffff'8000) { // 4K block
-					org &= 0xffff'f000;
-				} else {  // 16K block
-					org &= 0xffff'c000;
+				org = erase_page_block_(org);
+				if(erase_set_.find(org) != erase_set_.end()) {
+					return rx::protocol::erase_state::CHECK_OK;
+				} else {
+					erase_set_.insert(org);
 				}
 				put32_big_(&tmp[0], org);
 				if(!command_(0x12, tmp, 4)) {  // erase command
