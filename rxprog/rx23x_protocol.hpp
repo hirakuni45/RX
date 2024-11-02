@@ -23,17 +23,22 @@ namespace rx23x {
 		static constexpr uint32_t LIMIT_BAUDRATE = 230400;
 		static constexpr uint8_t SEL_DEV_RES = 0x46;
 
-		uint8_t					data_ = 0;
+		uint8_t					data_;
 		rx::protocol::areas		data_areas_;
 		rx::protocol::blocks	blocks_;
-		bool					id_protect_   = false;
-		bool					pe_turn_on_   = false;
-		bool					blank_check_  = false;
-		bool					blank_all_    = false;
-		bool					erase_select_ = false;
+		bool					id_protect_;
+		bool					pe_turn_on_;
+		bool					blank_check_;
+		bool					blank_all_;
+		bool					erase_select_;
 		typedef std::set<uint32_t> ERASE_SET;
 		ERASE_SET				erase_set_;
-		bool					select_write_area_ = false;
+		bool					select_write_area_;
+
+		static auto erase_page_block_(uint32_t org) noexcept
+		{
+			return org & 0xFFFF'F800; // erase block (2K)
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -41,7 +46,13 @@ namespace rx23x {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		protocol() noexcept { }
+		protocol() noexcept :
+			data_(0), data_areas_(), blocks_(),
+			id_protect_(false), pe_turn_on_(false), blank_check_(false),
+			blank_all_(false), erase_select_(false),
+			erase_set_(),
+			select_write_area_(false)
+		{ }
 
 
 		//-----------------------------------------------------------------//
@@ -462,13 +473,14 @@ namespace rx23x {
 				erase_select_ = true;
 			}
 
-			// ブロック消去コマンド発行
-			auto org = address & 0xffff'f800; // erase block (2K)
+			auto org = erase_page_block_(address);
 			if(erase_set_.find(org) != erase_set_.end()) {
 				return rx::protocol::erase_state::CHECK_OK;
 			} else {
 				erase_set_.insert(org);
 			}
+
+			// ブロック消去コマンド発行
 			uint8_t cmd[7];
 			cmd[0] = 0x59;
 			cmd[1] = 0x04;  // size 固定値 4

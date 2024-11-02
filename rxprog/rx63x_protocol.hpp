@@ -27,16 +27,15 @@ namespace rx63x {
 		static constexpr uint8_t SEL_DEV_RES = 0x06;
 
 		rx::protocol::areas			blocks_;
-		uint32_t					prog_size_ = 0;
-		bool						data_ = false;
+		uint32_t					prog_size_;
+		bool						data_;
 		rx::protocol::areas			data_areas_;
-		bool						id_protect_   = false;
-		bool						pe_turn_on_   = false;
-		bool						blank_check_  = false;
-		bool						blank_all_    = false;
-		bool						erase_select_ = false;
-
-		bool						select_write_area_ = false;
+		bool						id_protect_;
+		bool						pe_turn_on_;
+		bool						blank_check_;
+		bool						blank_all_;
+		bool						erase_select_;
+		bool						select_write_area_;
 
 		typedef std::set<uint32_t> ERASE_SET;
 		ERASE_SET					erase_set_;
@@ -47,7 +46,12 @@ namespace rx63x {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		protocol() noexcept { }
+		protocol() noexcept :
+			blocks_(), prog_size_(0), data_(false), data_areas_(),
+			id_protect_(false), pe_turn_on_(false), blank_check_(false),
+			blank_all_(false), erase_select_(false), select_write_area_(false),
+			erase_set_()
+		{ }
 
 
 		//-----------------------------------------------------------------//
