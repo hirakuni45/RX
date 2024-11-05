@@ -83,7 +83,7 @@ namespace device {
 		RIIC0,		///< I 2 C バスインタフェース０（RIIC0a）
 		RIIC2,		///< I 2 C バスインタフェース１（RIIC2a）
 
-		CANFD,		///< CANFD-Lite インタフェース（CANFD）
+		CANFD0,		///< CANFD-Lite インタフェース（CANFD）
 
 		RSPI0,		///< シリアルペリフェラルインタフェース（RSPI0）
 

@@ -64,6 +64,12 @@ ifeq ($(RX_DEF),SIG_RX13T)
   LDSCRIPT	= ../../RX13T/$(DEVICE).ld
 endif
 
+ifeq ($(RX_DEF),SIG_RX130)
+  RX_CPU = RX130
+  RX_CHOOSE = -mcpu=rx100
+  LDSCRIPT	= ../../RX130/$(DEVICE).ld
+endif
+
 ifeq ($(RX_DEF),SIG_RX140)
   RX_CPU = RX140
   RX_CHOOSE = -mcpu=rx140
