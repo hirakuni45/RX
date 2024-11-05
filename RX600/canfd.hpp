@@ -1808,7 +1808,7 @@ namespace device {
 	template <uint32_t base, uint32_t ecc>
 	struct canfd_t : canfd_base_t<base>, canfd_ecc_t<ecc> {
 
-		static constexpr auto PERIPHERAL = peripheral::CANFD;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = peripheral::CANFD0;	///< ペリフェラル型
 
 		static constexpr auto PCLK = clock_profile::CANFDCLK;	///< クロック周波数
 

@@ -62,6 +62,7 @@ namespace device {
 			NONE,		///< 無し
 			SCI_I2C,	///< SCI 簡易 I2C 通信
 			SCI_SPI,	///< SCI 簡易 SPI 通信
+			RSCI_DE,	///< RSCI DE 信号制御（RS-485）
 			RSPI_SSL0,	///< RSPI SSL0 制御
 			RSPI_SSL1,	///< RSPI SSL1 制御
 			RSPI_SSL2,	///< RSPI SSL2 制御

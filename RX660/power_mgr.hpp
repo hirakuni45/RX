@@ -226,7 +226,7 @@ namespace device {
 				SYSTEM::MSTPCRD.MSTPD7 = f;		// REMC のストップ状態解除
 				break;
 
-			case peripheral::CANFD:
+			case peripheral::CANFD0:
 				SYSTEM::MSTPCRD.MSTPD10 = f;	// CANFD のストップ状態解除
 				break;
 

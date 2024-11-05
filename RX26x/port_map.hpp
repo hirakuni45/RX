@@ -231,6 +231,21 @@ namespace device {
 			return true;
 		}
 
+		static bool rsci0_de_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b0'1100 : 0;
+			switch(odr) {
+			case ORDER::FIRST:  // P23
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;  // ok
+				PORT2::PMR.B3 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
 		static bool rsci0_(ORDER odr, bool enable, OPTIONAL opt)
 		{
 			uint8_t i2c = 0;
@@ -263,6 +278,21 @@ namespace device {
 			return true;
 		}
 
+		static bool rsci8_de_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b0'1100 : 0;
+			switch(odr) {
+			case ORDER::FIRST:  // PC4
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = sel;  // ok
+				PORTC::PMR.B4 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
 		static bool rsci8_(ORDER odr, bool enable, OPTIONAL opt)
 		{
 			uint8_t i2c = 0;
@@ -288,6 +318,21 @@ namespace device {
 					MPC::PC5PFS.PSEL = sel;  // ok
 					PORTC::PMR.B5 = enable;
 				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool rsci9_de_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b0'1100 : 0;
+			switch(odr) {
+			case ORDER::FIRST:  // PB4
+				PORTB::PMR.B4 = 0;
+				MPC::PB4PFS.PSEL = sel;  // ok
+				PORTB::PMR.B4 = enable;
 				break;
 			default:
 				return false;
@@ -557,6 +602,50 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static void set_user_func(USER_FUNC_TYPE func) noexcept { user_func_ = func; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  RSCI 専用ポート切り替え
+			@param[in]	per		周辺機器タイプ
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	odr		候補を選択する場合
+			@param[in]	opt		オプショナル設定を行う場合	
+			@return 無効な周辺機器の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn_rsci(peripheral per, bool ena = true, ORDER odr = ORDER::FIRST, OPTIONAL opt = OPTIONAL::NONE) noexcept
+		{
+			if(odr == ORDER::BYPASS) return false;
+
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = false;
+			switch(per) {
+			case peripheral::RSCI0:
+				if(opt == OPTIONAL::RSCI_DE) {
+					ret = rsci0_de_(odr, ena);
+				}
+				break;
+			case peripheral::RSCI8:
+				if(opt == OPTIONAL::RSCI_DE) {
+					ret = rsci8_de_(odr, ena);
+				}
+				break;
+			case peripheral::RSCI9:
+				if(opt == OPTIONAL::RSCI_DE) {
+					ret = rsci9_de_(odr, ena);
+				}
+				break;
+			default:
+				break;
+			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
 
 
 		//-----------------------------------------------------------------//

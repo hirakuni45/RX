@@ -54,7 +54,7 @@ namespace device {
 		static constexpr uint32_t   ICLK		= 120'000'000;		///< ICLK 周波数（最大 120MHz）
 		static constexpr uint32_t   PCLKA		= 120'000'000;		///< PCLKA 周波数（最大 120MHz）
 		static constexpr uint32_t   PCLKB		=  60'000'000;		///< PCLKB 周波数（最大 60MHz）
-		static constexpr uint32_t   PCLKC		= 120'000'000;		///< PCLKB 周波数（最大 120MHz）
+		static constexpr uint32_t   PCLKC		= 120'000'000;		///< PCLKC 周波数（最大 120MHz）
 		static constexpr uint32_t   PCLKD		=  60'000'000;		///< PCLKD 周波数（最大 60MHz）
 		static constexpr uint32_t   FCLK		=  60'000'000;		///< FCLK 周波数（最大 60MHz）
 		static constexpr uint32_t   CANFDCLK	=  60'000'000;		///< CANFD 周波数（最大 60MHz）

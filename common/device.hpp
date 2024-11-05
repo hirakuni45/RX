@@ -64,7 +64,7 @@
 #include "RX220/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX230) || defined(SIG_RX231)
 #include "RX231/clock_profile.hpp"
 #include "RX231/peripheral.hpp"
 #include "RX231/system.hpp"

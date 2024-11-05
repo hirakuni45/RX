@@ -27,7 +27,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
 
-		static bool sci1_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool sci1_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
 			bool spi = false;
@@ -59,7 +59,7 @@ namespace device {
 			return true;
 		}
 
-		static bool sci5_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool sci5_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
 			bool spi = false;
@@ -145,7 +145,7 @@ namespace device {
 			return true;
 		}
 
-		static bool sci6_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool sci6_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
 			bool spi = false;
@@ -213,7 +213,37 @@ namespace device {
 			return true;
 		}
 
-		static bool rsci8_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool rsci8_de_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b10'1110 : 0;
+			switch(odr) {
+			case ORDER::FIRST:  // P20
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = sel;  // ok
+				PORT2::PMR.B0 = enable;
+				break;
+			case ORDER::SECOND:  // P24
+				PORT2::PMR.B4 = 0;
+				MPC::P24PFS.PSEL = sel;  // ok
+				PORT2::PMR.B4 = enable;
+				break;
+			case ORDER::THIRD:   // P30
+				PORT3::PMR.B0 = 0;
+				MPC::P30PFS.PSEL = sel;  // ok
+				PORT3::PMR.B0 = enable;
+				break;
+			case ORDER::FOURTH:  // P96
+				PORT9::PMR.B6 = 0;
+				MPC::P96PFS.PSEL = sel;  // ok
+				PORT9::PMR.B6 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool rsci8_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
 			bool spi = false;
@@ -244,7 +274,32 @@ namespace device {
 			return true;
 		}
 
-		static bool rsci9_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool rsci9_de_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b10'1110 : 0;
+			switch(odr) {
+			case ORDER::FIRST:  // P70
+				PORT7::PMR.B0 = 0;
+				MPC::P70PFS.PSEL = sel;  // ok
+				PORT7::PMR.B0 = enable;
+				break;
+			case ORDER::SECOND:  // PB3
+				PORTB::PMR.B3 = 0;
+				MPC::PB3PFS.PSEL = sel;  // ok
+				PORTB::PMR.B3 = enable;
+				break;
+			case ORDER::THIRD:   // PE3
+				PORTE::PMR.B3 = 0;
+				MPC::PE3PFS.PSEL = sel;  // ok
+				PORTE::PMR.B3 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool rsci9_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
 			bool spi = false;
@@ -275,7 +330,27 @@ namespace device {
 			return true;
 		}
 
-		static bool rsci11_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool rsci11_de_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b10'1110 : 0;
+			switch(odr) {
+			case ORDER::FIRST:  // PB0
+				PORTB::PMR.B0 = 0;
+				MPC::PB0PFS.PSEL = sel;  // ok
+				PORTB::PMR.B0 = enable;
+				break;
+			case ORDER::SECOND:  // PD6
+				PORTD::PMR.B6 = 0;
+				MPC::PD6PFS.PSEL = sel;  // ok
+				PORTD::PMR.B6 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool rsci11_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
 			bool spi = false;
@@ -306,7 +381,7 @@ namespace device {
 			return true;
 		}
 
-		static bool sci12_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool sci12_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
 			bool spi = false;
@@ -439,7 +514,7 @@ namespace device {
 		}
 
 
-		static bool rspia0_(ORDER odr, bool enable)
+		static bool rspia0_(ORDER odr, bool enable) noexcept
 		{
 			uint8_t sel = enable ? 0b00'1110 : 0;
 			switch(odr) {
@@ -601,7 +676,7 @@ namespace device {
 
 
 		/// RIIC0 ポート候補（順番は、MPC の解説に準拠）
-		static bool riic0_(ORDER odr, bool enable)
+		static bool riic0_(ORDER odr, bool enable) noexcept
 		{
 			uint8_t sel = enable ? 0b00'1111 : 0;
 			switch(odr) {
@@ -622,7 +697,7 @@ namespace device {
 		}
 
 		/// RIIC0 ポート候補（順番は、MPC の解説に準拠）
-		static bool ri3c0_(ORDER odr, bool enable)
+		static bool ri3c0_(ORDER odr, bool enable) noexcept
 		{
 			uint8_t sel = enable ? 0b11'0010 : 0;
 			switch(odr) {
@@ -643,7 +718,7 @@ namespace device {
 		}
 
 		/// CANFD ポート候補（順番は、MPC の解説に準拠）
-		static bool canfd0_(ORDER odr, bool enable)
+		static bool canfd0_(ORDER odr, bool enable) noexcept
 		{
 			uint8_t sel = enable ? 0b01'0000 : 0;
 			switch(odr) {
@@ -714,7 +789,7 @@ namespace device {
 		}
 
 
-		static bool cmtw0_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool cmtw0_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			switch(odr) {
 			case ORDER::FIRST:
@@ -749,7 +824,7 @@ namespace device {
 		}
 
 
-		static bool cmtw1_(ORDER odr, bool enable, OPTIONAL opt)
+		static bool cmtw1_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			switch(odr) {
 			case ORDER::FIRST:
@@ -804,6 +879,50 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static void set_user_func(USER_FUNC_TYPE func) noexcept { user_func_ = func; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  RSCI 専用ポート切り替え
+			@param[in]	per		周辺機器タイプ
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	odr		候補を選択する場合
+			@param[in]	opt		オプショナル設定を行う場合	
+			@return 無効な周辺機器の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn_rsci(peripheral per, bool ena = true, ORDER odr = ORDER::FIRST, OPTIONAL opt = OPTIONAL::NONE) noexcept
+		{
+			if(odr == ORDER::BYPASS) return false;
+
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = false;
+			switch(per) {
+			case peripheral::RSCI8:
+				if(opt == OPTIONAL::RSCI_DE) {
+					ret = rsci8_de_(odr, ena);
+				}
+				break;
+			case peripheral::RSCI9:
+				if(opt == OPTIONAL::RSCI_DE) {
+					ret = rsci9_de_(odr, ena);
+				}
+				break;
+			case peripheral::RSCI11:
+				if(opt == OPTIONAL::RSCI_DE) {
+					ret = rsci11_de_(odr, ena);
+				}
+				break;
+			default:
+				break;
+			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
 
 
 		//-----------------------------------------------------------------//
