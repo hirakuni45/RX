@@ -24,7 +24,7 @@ namespace board_profile {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 
 	// 基板シグネチュア
-	static constexpr char system_str_[] = "RX71M DIY";
+	static constexpr char system_str_[] = "RX71M LFQFP176 DIY";
 
 	/// LED インジケーター
 	// DIY RX72M board

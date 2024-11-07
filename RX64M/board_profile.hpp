@@ -40,7 +40,7 @@ namespace board_profile {
 	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
 #else
 	// 基板シグネチュア
-	static constexpr char system_str_[] = "RX64M DIY";
+	static constexpr char system_str_[] = "RX64M LFQFP 176 DIY";
 
 	/// LED インジケーター
 	static constexpr bool LED_ACTIVE = 0;
