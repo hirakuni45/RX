@@ -23,6 +23,35 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  GR-KAEDE (RX64M) 型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class RX64M_GR_KAEDE {
+			_
+		};
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RX65N Envision Kit 型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class RX65N_ENVISION_KIT {
+			_
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RX72N Envision Kit 型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class RX72N_ENVISION_KIT {
+			_
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  ポート・マッピング・オーダー型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -41,12 +70,6 @@ namespace device {
 			TENTH,			///< 第１０候補
 
 			USER,			///< ユーザー設定
-
-			FIRST_MII,		///< ETHERC MII 接続、第１候補
-			SECOND_MII,		///< ETHERC MII 接続、第２候補
-
-			FIRST_RMII,		///< ETHERC RMII 接続、第１候補
-			SECOND_RMII,	///< ETHERC RMII 接続、第２候補
 
 			LOCAL0,			///< 独自の特殊な設定０
 			LOCAL1,			///< 独自の特殊な設定１
@@ -67,10 +90,12 @@ namespace device {
 			RSPI_SSL1,	///< RSPI SSL1 制御
 			RSPI_SSL2,	///< RSPI SSL2 制御
 			RSPI_SSL3,	///< RSPI SSL3 制御
-			CMTW_TOC0,	///< CMTW TOC0
-			CMTW_TOC1,	///< CMTW TOC1
-			CMTW_TIC0,	///< CMTW TIC0
-			CMTW_TIC1,	///< CMTW TIC1
+			CMTW_TOC0,	///< CMTW TOC0/TOC2
+			CMTW_TOC1,	///< CMTW TOC1/TOC3
+			CMTW_TIC0,	///< CMTW TIC0/TIC2
+			CMTW_TIC1,	///< CMTW TIC1/TIC3
+			ETH_RMII,	///< EtherNET/RMII
+			ETH_MII,	///< EtherNET/MII
 		};
 
 		/// ポート・マッピング・ユーザー設定関数型
@@ -104,27 +129,6 @@ namespace device {
 			TMCI,	///< TMCIx (TMR)
 			TMRI,	///< TMRIx (TMR)
 		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  RX65N_ENVISION_KIT 型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class RX65N_ENVISION_KIT : uint8_t {
-			QSPI,
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  RX72N_ENVISION_KIT 型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class RX72N_ENVISION_KIT : uint8_t {
-			QSPI,
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -276,7 +280,7 @@ namespace device {
 				io3(ORDER::BYPASS)
 			{ }
 
-			constexpr qspi_port_t(RX65N_ENVISION_KIT qspi) noexcept :
+			constexpr qspi_port_t(RX65N_ENVISION_KIT _) noexcept :
 				clk(ORDER::SECOND),	///< PD5
 				ssl(ORDER::SECOND),	///< PD4
 				io0(ORDER::SECOND),	///< PD6
@@ -285,7 +289,7 @@ namespace device {
 				io3(ORDER::SECOND)	///< PD3
 			{ }
 
-			constexpr qspi_port_t(RX72N_ENVISION_KIT qspi) noexcept :
+			constexpr qspi_port_t(RX72N_ENVISION_KIT _) noexcept :
 				clk(ORDER::SECOND),	///< PD5
 				ssl(ORDER::SECOND),	///< PD4
 				io0(ORDER::SECOND),	///< PD6
@@ -313,7 +317,20 @@ namespace device {
 			ORDER	mdc_;
 			ORDER	mdio_;
 
-			ether_rmii_t() noexcept :
+			constexpr ether_rmii_t() noexcept :
+				ref50ck_(ORDER::BYPASS),
+				crs_dv_(ORDER::BYPASS),
+				txd0_(ORDER::BYPASS),
+				txd1_(ORDER::BYPASS),
+				rxd0_(ORDER::BYPASS),
+				rxd1_(ORDER::BYPASS),
+				txd_en_(ORDER::BYPASS),
+				rx_er_(ORDER::BYPASS),
+				mdc_(ORDER::BYPASS),
+				mdio_(ORDER::BYPASS)
+			{ }
+
+			constexpr ether_rmii_t(RX65N_ENVISION_KIT t) noexcept :
 				ref50ck_(ORDER::BYPASS),
 				crs_dv_(ORDER::BYPASS),
 				txd0_(ORDER::BYPASS),
@@ -356,7 +373,7 @@ namespace device {
 			ORDER	mdc_;
 			ORDER	mdio_;
 
-			ether_mii_t() noexcept :
+			constexpr ether_mii_t() noexcept :
 				crs_(ORDER::BYPASS),
 				rx_dv_(ORDER::BYPASS),
 				exout_(ORDER::BYPASS),
@@ -378,6 +395,30 @@ namespace device {
 				wol_(ORDER::BYPASS),
 				mdc_(ORDER::BYPASS),
 				mdio_(ORDER::BYPASS)
+			{ }
+
+			constexpr ether_mii_t(RX72N_ENVISION_KIT t) noexcept :
+				crs_(ORDER::FIRST),
+				rx_dv_(ORDER::FIRST),
+				exout_(ORDER::BYPASS),
+				linksta_(ORDER::BYPASS),
+				etxd0_(ORDER::FIRST),
+				etxd1_(ORDER::FIRST),
+				etxd2_(ORDER::FIRST),
+				etxd3_(ORDER::FIRST),
+				erxd0_(ORDER::FIRST),
+				erxd1_(ORDER::FIRST),
+				erxd2_(ORDER::FIRST),
+				erxd3_(ORDER::FIRST),
+				tx_en_(ORDER::FIRST),
+				tx_er_(ORDER::FIRST),
+				rx_er_(ORDER::FIRST),
+				tx_clk_(ORDER::FIRST),
+				rx_clk_(ORDER::FIRST),
+				col_(ORDER::FIRST),
+				wol_(ORDER::BYPASS),
+				mdc_(ORDER::FIRST),
+				mdio_(ORDER::FIRST)
 			{ }
 		};
     };

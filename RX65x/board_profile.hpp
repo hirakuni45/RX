@@ -45,7 +45,7 @@ namespace board_profile {
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
 
 	// QSPI ポートの定義
-	static constexpr auto QSPI_PORT = device::port_map_order::RX65N_ENVISION_KIT::QSPI;
+	static constexpr auto QSPI_PORT = device::port_map_order::RX65N_ENVISION_KIT::_;
 
 	// SDHI 定義
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ

@@ -3,17 +3,22 @@
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー @n
 			RX13T @n
+			EX130 @n
 			RX140 @n
 			RX220 @n
-			RX231 @n
+			RX230/RX231 @n
 			RX23W @n
+			RX23T @n
+			RX24T/RX24U @n
+			RX260/RX261 @n
+			RX26T @n
 			RX62N/RX621 @n
 			RX63N/RX631 @n
 			RX63T @n
-			RX24T/RX24U @n
-			RX26T @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
+			RX66N @n
+			RX660 @n
 			RX671 @n
 			RX72N @n
 			RX72M @n
@@ -36,6 +41,18 @@
 #include "RX13T/port_map.hpp"
 #include "RX13T/port_map_mtu.hpp"
 #include "RX13T/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX130)
+#include "RX130/clock_profile.hpp"
+#include "RX130/peripheral.hpp"
+#include "RX130/system.hpp"
+#include "RX130/power_mgr.hpp"
+// #include "RX130/icu.hpp"
+// #include "RX24T/icu_mgr.hpp"
+// #include "RX13T/port_map.hpp"
+// #include "RX13T/port_map_mtu.hpp"
+// #include "RX13T/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX140)
@@ -181,6 +198,9 @@
 #include "RX63x/port_map_tpu.hpp"
 #include "RX63x/port_map_tmr.hpp"
 #include "RX600/port_map_irq.hpp"
+#if defined(SIG_RX63N)
+#include "RX64M/port_map_ether.hpp"
+#endif
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
@@ -244,6 +264,7 @@
 #include "RX65x/port_map_tpu.hpp"
 #include "RX63x/port_map_tmr.hpp"
 #include "RX65x/port_map_qspi.hpp"
+#include "RX64M/port_map_ether.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -260,7 +281,7 @@
 #include "RX72N/port_map_tpu.hpp"
 #include "RX63x/port_map_tmr.hpp"
 #include "RX72N/port_map_qspi.hpp"
-
+#include "RX72N/port_map_ether.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
@@ -324,6 +345,7 @@
 #include "RX72N/port_map_tpu.hpp"
 #include "RX63x/port_map_tmr.hpp"
 #include "RX72N/port_map_qspi.hpp"
+#include "RX72N/port_map_ether.hpp"
 #include "RX600/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
