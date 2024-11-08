@@ -188,27 +188,21 @@ namespace device {
 				break;
 
 			case peripheral::SCI6:
-			case peripheral::SCI6C:
 				SYSTEM::MSTPCRB.MSTPB25 = f;
 				break;
 			case peripheral::SCI5:
-			case peripheral::SCI5C:
 				SYSTEM::MSTPCRB.MSTPB26 = f;
 				break;
 			case peripheral::SCI3:
-			case peripheral::SCI3C:
 				SYSTEM::MSTPCRB.MSTPB28 = f;
 				break;
 			case peripheral::SCI2:
-			case peripheral::SCI2C:
 				SYSTEM::MSTPCRB.MSTPB29 = f;
 				break;
 			case peripheral::SCI1:
-			case peripheral::SCI1C:
 				SYSTEM::MSTPCRB.MSTPB30 = f;
 				break;
 			case peripheral::SCI0:
-			case peripheral::SCI0C:
 				SYSTEM::MSTPCRB.MSTPB31 = f;
 				break;
 

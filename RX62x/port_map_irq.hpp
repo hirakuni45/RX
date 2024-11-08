@@ -252,6 +252,7 @@ namespace device {
 
 		static bool irq12_(bool ena, ORDER odr) noexcept
 		{
+			// 端子無し
 #if 0
 			switch(odr) {
 			// PC0
@@ -289,6 +290,7 @@ namespace device {
 
 		static bool irq14_(bool ena, ORDER odr) noexcept
 		{
+			// 端子無し
 #if 0
 			switch(odr) {
 			// PC3

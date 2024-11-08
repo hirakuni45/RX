@@ -4,7 +4,8 @@
 	@brief	RX66N/RX72N/RX72M グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化して設定 @n
 			・候補の順番は基本的に MPC のテーブルに沿っていますが、 @n
-			　多少異なる場合もあるので、候補を決める場合、ソースコードを確認の事
+			　多少異なる場合もあるので、候補を決める場合、ソースコードを確認の事 @n
+			・SSIE、Ethernet、GLCDC、のマッピングは指定ポート用
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -1224,102 +1225,6 @@ namespace device {
 			return true;
 		}
 
-		static bool etherc0_(ORDER odr, bool enable) noexcept
-		{
-			switch(odr) {
-			case ORDER::FIRST:  // only RMII mode, not use link status interrupt
-				{
-					uint8_t  mii = enable ? 0b01'0001 : 0;
-					uint8_t rmii = enable ? 0b01'0010 : 0;
-					PORT7::PMR.B1 = 0;
-					PORT7::PMR.B2 = 0;
-//					PORT7::PMR.B3 = 0;
-					PORT7::PMR.B4 = 0;
-					PORT7::PMR.B5 = 0;
-					PORT7::PMR.B6 = 0;
-					PORT7::PMR.B7 = 0;
-//					MPC::P34PFS.PSEL = mii;   // ET0_LINKSTA
-//					PORT3::PMR.B4 = enable;
-					MPC::P71PFS.PSEL = mii;   // ET0_MDIO
-					MPC::P72PFS.PSEL = mii;   // ET0_MDC
-//					MPC::P73PFS.PSEL = mii;   // ET0_WOL
-					MPC::P74PFS.PSEL = rmii;  // RMII0_RXD1
-					MPC::P75PFS.PSEL = rmii;  // RMII0_RXD0
-					MPC::P76PFS.PSEL = rmii;  // REF50CK0
-					MPC::P77PFS.PSEL = rmii;  // RMII0_RX_ER
-					PORT7::PMR.B1 = enable;
-					PORT7::PMR.B2 = enable;
-//					PORT7::PMR.B3 = enable;
-					PORT7::PMR.B4 = enable;
-					PORT7::PMR.B5 = enable;
-					PORT7::PMR.B6 = enable;
-					PORT7::PMR.B7 = enable;
-					PORT8::PMR.B0 = 0;
-					PORT8::PMR.B1 = 0;
-					PORT8::PMR.B2 = 0;
-					PORT8::PMR.B3 = 0;
-					MPC::P80PFS.PSEL = rmii;  // RMII0_TXD_EN
-					MPC::P81PFS.PSEL = rmii;  // RMII0_TXD0
-					MPC::P82PFS.PSEL = rmii;  // RMII0_TXD1
-					MPC::P83PFS.PSEL = rmii;  // RMII0_CRS_DV
-					PORT8::PMR.B0 = enable;
-					PORT8::PMR.B1 = enable;
-					PORT8::PMR.B2 = enable;
-					PORT8::PMR.B3 = enable;
-					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
-				}
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-
-#if 0
-			case peripheral::ETHERCA:  // only RMII mode, not use link status interrupt
-				{
-					uint8_t  mii = enable ? 0b010001 : 0;
-					uint8_t rmii = enable ? 0b010010 : 0;
-
-///					PORT7::PMR.B3 = 0;
-					PORT7::PMR.B2 = 0;
-					PORT7::PMR.B1 = 0;
-///					MPC::P73PFS.PSEL = mii;   // ET0_WOL  (144LQFP: 77)
-					MPC::P72PFS.PSEL = mii;   // ET0_MDC  (144LQFP: 85)
-					MPC::P71PFS.PSEL = mii;   // ET0_MDIO (144LQFP: 86)
-///					PORT7::PMR.B3 = enable;
-					PORT7::PMR.B2 = enable;
-					PORT7::PMR.B1 = enable;
-
-					PORTB::PMR.B7 = 0;
-					PORTB::PMR.B6 = 0;
-					PORTB::PMR.B5 = 0;
-					PORTB::PMR.B4 = 0;
-					PORTB::PMR.B3 = 0;
-					PORTB::PMR.B2 = 0;
-					PORTB::PMR.B1 = 0;
-					PORTB::PMR.B0 = 0;
-					MPC::PB7PFS.PSEL = rmii;  // RMII0_CRS_DV (144LQFP: 78)
-					MPC::PB6PFS.PSEL = rmii;  // RMII0_TXD1   (144LQFP: 79)
-					MPC::PB5PFS.PSEL = rmii;  // RMII0_TXD0   (144LQFP: 80)
-					MPC::PB4PFS.PSEL = rmii;  // RMII0_TXD_EN (144LQFP: 81)
-					MPC::PB3PFS.PSEL = rmii;  // RMII0_RX_ER  (144LQFP: 82)
-					MPC::PB2PFS.PSEL = rmii;  // REF50CK0     (144LQFP: 83)
-					MPC::PB1PFS.PSEL = rmii;  // RMII0_RXD0   (144LQFP: 84)
-					MPC::PB0PFS.PSEL = rmii;  // RMII0_RXD1   (144LQFP: 87)
-					PORTB::PMR.B7 = enable;
-					PORTB::PMR.B6 = enable;
-					PORTB::PMR.B5 = enable;
-					PORTB::PMR.B4 = enable;
-					PORTB::PMR.B3 = enable;
-					PORTB::PMR.B2 = enable;
-					PORTB::PMR.B1 = enable;
-					PORTB::PMR.B0 = enable;
-					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
-				}
-				break;
-#endif
-
 		static bool cmtw0_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			switch(odr) {
@@ -1440,72 +1345,71 @@ namespace device {
 
 		static bool glcdc_(ORDER odr, bool enable) noexcept
 		{
+			uint8_t sel = enable ? 0b10'0101 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				{
-					uint8_t sel = enable ? 0b10'0101 : 0;
-					PORTB::PMR.B5 = 0;
-					PORTB::PMR.B4 = 0;
-					PORTB::PMR.B2 = 0;
-					PORTB::PMR.B1 = 0;
-					PORTB::PMR.B0 = 0;
-					PORTB::PMR.B0 = 0;
-					PORTA::PMR.B7 = 0;
-					PORTA::PMR.B6 = 0;
-					PORTA::PMR.B5 = 0;
-					PORTA::PMR.B4 = 0;
-					PORTA::PMR.B3 = 0;
-					PORTA::PMR.B2 = 0;
-					PORTA::PMR.B1 = 0;
-					PORTA::PMR.B0 = 0;
-					PORTE::PMR.B7 = 0;
-					PORTE::PMR.B6 = 0;
-					PORTE::PMR.B5 = 0;
-					PORTE::PMR.B4 = 0;
-					PORTE::PMR.B3 = 0;
-					PORTE::PMR.B2 = 0;
-					PORTE::PMR.B1 = 0;
-					MPC::PB5PFS.PSEL = sel;  // LCD_CLK
-					PORTB::PMR.B5 = enable;
-					MPC::PB4PFS.PSEL = sel;  // LCD_TCON0
-					PORTB::PMR.B4 = enable;
-					MPC::PB2PFS.PSEL = sel;  // LCD_TCON2
-					PORTB::PMR.B2 = enable;
-					MPC::PB1PFS.PSEL = sel;  // LCD_TCON3
-					PORTB::PMR.B1 = enable;
-					MPC::PB0PFS.PSEL = sel;  // LCD_DATA0
-					PORTB::PMR.B0 = enable;
-					MPC::PA7PFS.PSEL = sel;  // LCD_DATA1
-					PORTA::PMR.B7 = enable;
-					MPC::PA6PFS.PSEL = sel;  // LCD_DATA2
-					PORTA::PMR.B6 = enable;
-					MPC::PA5PFS.PSEL = sel;  // LCD_DATA3
-					PORTA::PMR.B5 = enable;
-					MPC::PA4PFS.PSEL = sel;  // LCD_DATA4
-					PORTA::PMR.B4 = enable;
-					MPC::PA3PFS.PSEL = sel;  // LCD_DATA5
-					PORTA::PMR.B3 = enable;
-					MPC::PA2PFS.PSEL = sel;  // LCD_DATA6
-					PORTA::PMR.B2 = enable;
-					MPC::PA1PFS.PSEL = sel;  // LCD_DATA7
-					PORTA::PMR.B1 = enable;
-					MPC::PA0PFS.PSEL = sel;  // LCD_DATA8
-					PORTA::PMR.B0 = enable;
-					MPC::PE7PFS.PSEL = sel;  // LCD_DATA9
-					PORTE::PMR.B7 = enable;
-					MPC::PE6PFS.PSEL = sel;  // LCD_DATA10
-					PORTE::PMR.B6 = enable;
-					MPC::PE5PFS.PSEL = sel;  // LCD_DATA11
-					PORTE::PMR.B5 = enable;
-					MPC::PE4PFS.PSEL = sel;  // LCD_DATA12
-					PORTE::PMR.B4 = enable;
-					MPC::PE3PFS.PSEL = sel;  // LCD_DATA13
-					PORTE::PMR.B3 = enable;
-					MPC::PE2PFS.PSEL = sel;  // LCD_DATA14
-					PORTE::PMR.B2 = enable;
-					MPC::PE1PFS.PSEL = sel;  // LCD_DATA15
-					PORTE::PMR.B1 = enable;
-				}
+				// RX72N Envision Kit LCD connections
+				PORTB::PMR.B5 = 0;
+				PORTB::PMR.B4 = 0;
+				PORTB::PMR.B2 = 0;
+				PORTB::PMR.B1 = 0;
+				PORTB::PMR.B0 = 0;
+				PORTB::PMR.B0 = 0;
+				PORTA::PMR.B7 = 0;
+				PORTA::PMR.B6 = 0;
+				PORTA::PMR.B5 = 0;
+				PORTA::PMR.B4 = 0;
+				PORTA::PMR.B3 = 0;
+				PORTA::PMR.B2 = 0;
+				PORTA::PMR.B1 = 0;
+				PORTA::PMR.B0 = 0;
+				PORTE::PMR.B7 = 0;
+				PORTE::PMR.B6 = 0;
+				PORTE::PMR.B5 = 0;
+				PORTE::PMR.B4 = 0;
+				PORTE::PMR.B3 = 0;
+				PORTE::PMR.B2 = 0;
+				PORTE::PMR.B1 = 0;
+				MPC::PB5PFS.PSEL = sel;  // LCD_CLK
+				PORTB::PMR.B5 = enable;
+				MPC::PB4PFS.PSEL = sel;  // LCD_TCON0
+				PORTB::PMR.B4 = enable;
+				MPC::PB2PFS.PSEL = sel;  // LCD_TCON2
+				PORTB::PMR.B2 = enable;
+				MPC::PB1PFS.PSEL = sel;  // LCD_TCON3
+				PORTB::PMR.B1 = enable;
+				MPC::PB0PFS.PSEL = sel;  // LCD_DATA0
+				PORTB::PMR.B0 = enable;
+				MPC::PA7PFS.PSEL = sel;  // LCD_DATA1
+				PORTA::PMR.B7 = enable;
+				MPC::PA6PFS.PSEL = sel;  // LCD_DATA2
+				PORTA::PMR.B6 = enable;
+				MPC::PA5PFS.PSEL = sel;  // LCD_DATA3
+				PORTA::PMR.B5 = enable;
+				MPC::PA4PFS.PSEL = sel;  // LCD_DATA4
+				PORTA::PMR.B4 = enable;
+				MPC::PA3PFS.PSEL = sel;  // LCD_DATA5
+				PORTA::PMR.B3 = enable;
+				MPC::PA2PFS.PSEL = sel;  // LCD_DATA6
+				PORTA::PMR.B2 = enable;
+				MPC::PA1PFS.PSEL = sel;  // LCD_DATA7
+				PORTA::PMR.B1 = enable;
+				MPC::PA0PFS.PSEL = sel;  // LCD_DATA8
+				PORTA::PMR.B0 = enable;
+				MPC::PE7PFS.PSEL = sel;  // LCD_DATA9
+				PORTE::PMR.B7 = enable;
+				MPC::PE6PFS.PSEL = sel;  // LCD_DATA10
+				PORTE::PMR.B6 = enable;
+				MPC::PE5PFS.PSEL = sel;  // LCD_DATA11
+				PORTE::PMR.B5 = enable;
+				MPC::PE4PFS.PSEL = sel;  // LCD_DATA12
+				PORTE::PMR.B4 = enable;
+				MPC::PE3PFS.PSEL = sel;  // LCD_DATA13
+				PORTE::PMR.B3 = enable;
+				MPC::PE2PFS.PSEL = sel;  // LCD_DATA14
+				PORTE::PMR.B2 = enable;
+				MPC::PE1PFS.PSEL = sel;  // LCD_DATA15
+				PORTE::PMR.B1 = enable;
 				break;
 			default:
 				return false;
@@ -1517,7 +1421,7 @@ namespace device {
 		{
 			bool ret = true;
 			bool enable = true;
-			uint8_t sel = enable ? 0b011010 : 0;
+			uint8_t sel = enable ? 0b01'1010 : 0;
 			switch(state) {
 			case SDHI_STATE::START:
 				MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
@@ -1576,7 +1480,7 @@ namespace device {
 		{
 			bool ret = true;
 			bool enable = true;
-			uint8_t sel = 0b011010;
+			uint8_t sel = 0b01'1010;
 			switch(state) {
 			case SDHI_STATE::START:
 ///				PORT2::PMR.B4 = 0;
@@ -1880,9 +1784,6 @@ namespace device {
 				case peripheral::CMTW1:
 					ret = cmtw1_(odr, ena, opt);
 					break;
-				case peripheral::ETHERC0:
-					ret = etherc0_(odr, ena);
-					break;
 				case peripheral::GLCDC:
 					ret = glcdc_(odr, ena);
 					break;
@@ -1964,7 +1865,7 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			PORT5::PMR.B6 = 0;
-			uint8_t sel = ena ? 0b101010 : 0;			
+			uint8_t sel = ena ? 0b10'1010 : 0;			
 			MPC::P56PFS.PSEL = sel;
 			PORT5::PMR.B6 = ena;
 
