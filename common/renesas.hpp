@@ -43,6 +43,14 @@
 
 #include "RX13T/board_profile.hpp"
 
+#elif defined(SIG_RX130)
+
+// #include "RX140/system_io.hpp"
+// #include "RX24T/flash_io.hpp"
+// #include "RX600/dac_out.hpp"
+
+#include "RX130/board_profile.hpp"
+
 #elif defined(SIG_RX140)
 #include "RX231/lvda.hpp"
 #include "RX600/cac.hpp"

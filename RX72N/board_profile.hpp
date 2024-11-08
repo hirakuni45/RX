@@ -46,7 +46,7 @@ namespace board_profile {
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::SECOND;
 
 	// QSPI ポートの定義
-	static constexpr auto QSPI_PORT = device::port_map_order::RX72N_ENVISION_KIT::QSPI;
+	static constexpr auto QSPI_PORT = device::port_map_order::RX72N_ENVISION_KIT::_;
 
 	// SDHI 定義
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
@@ -61,4 +61,7 @@ namespace board_profile {
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 	typedef device::SCI6 FT5206_SCI_CH;
 	static constexpr auto FT5206_SCI_ORDER = device::port_map::ORDER::SECOND;
+
+	// Ethernet ハードウェアー定義 (ET0_RMII)
+	static constexpr device::port_map_order::ether_mii_t ETHER0(device::port_map_order::RX72N_ENVISION_KIT _);
 }

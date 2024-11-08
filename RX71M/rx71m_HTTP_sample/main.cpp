@@ -419,7 +419,7 @@ int main(int argc, char** argv)
 
 	device::power_mgr::turn(device::peripheral::ETHERC0);
 	{
-		auto f = device::port_map::turn_ethernet(device::peripheral::ETHERC0, true, device::port_map::ORDER::FIRST_RMII);
+		auto f = device::port_map::turn_ethernet(device::peripheral::ETHERC0, true, device::port_map::ORDER::FIRST);
 		if(!f) {
 			utils::format("Ethernet portmap fail...\n");
 		}

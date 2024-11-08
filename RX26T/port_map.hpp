@@ -217,22 +217,26 @@ namespace device {
 		{
 			uint8_t sel = enable ? 0b10'1110 : 0;
 			switch(odr) {
-			case ORDER::FIRST:  // P20
+			case ORDER::FIRST:
+			// DE008: P20
 				PORT2::PMR.B0 = 0;
 				MPC::P20PFS.PSEL = sel;  // ok
 				PORT2::PMR.B0 = enable;
 				break;
-			case ORDER::SECOND:  // P24
+			case ORDER::SECOND:
+			// DE008: P24
 				PORT2::PMR.B4 = 0;
 				MPC::P24PFS.PSEL = sel;  // ok
 				PORT2::PMR.B4 = enable;
 				break;
-			case ORDER::THIRD:   // P30
+			case ORDER::THIRD:
+			// DE008: P30
 				PORT3::PMR.B0 = 0;
 				MPC::P30PFS.PSEL = sel;  // ok
 				PORT3::PMR.B0 = enable;
 				break;
-			case ORDER::FOURTH:  // P96
+			case ORDER::FOURTH:
+			// DE008: P96
 				PORT9::PMR.B6 = 0;
 				MPC::P96PFS.PSEL = sel;  // ok
 				PORT9::PMR.B6 = enable;
@@ -278,17 +282,20 @@ namespace device {
 		{
 			uint8_t sel = enable ? 0b10'1110 : 0;
 			switch(odr) {
-			case ORDER::FIRST:  // P70
+			case ORDER::FIRST:
+			// DE009: P70
 				PORT7::PMR.B0 = 0;
 				MPC::P70PFS.PSEL = sel;  // ok
 				PORT7::PMR.B0 = enable;
 				break;
-			case ORDER::SECOND:  // PB3
+			case ORDER::SECOND:
+			// DE009: PB3
 				PORTB::PMR.B3 = 0;
 				MPC::PB3PFS.PSEL = sel;  // ok
 				PORTB::PMR.B3 = enable;
 				break;
-			case ORDER::THIRD:   // PE3
+			case ORDER::THIRD:
+			// DE009: PE3
 				PORTE::PMR.B3 = 0;
 				MPC::PE3PFS.PSEL = sel;  // ok
 				PORTE::PMR.B3 = enable;
@@ -334,12 +341,14 @@ namespace device {
 		{
 			uint8_t sel = enable ? 0b10'1110 : 0;
 			switch(odr) {
-			case ORDER::FIRST:  // PB0
+			case ORDER::FIRST:
+			// DE011: PB0
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
 				break;
-			case ORDER::SECOND:  // PD6
+			case ORDER::SECOND:
+			// DE011: PD6
 				PORTD::PMR.B6 = 0;
 				MPC::PD6PFS.PSEL = sel;  // ok
 				PORTD::PMR.B6 = enable;
@@ -418,256 +427,239 @@ namespace device {
 			uint8_t sel = enable ? 0b00'1101 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// P20/RSPCKA ( 69/100)
+			// RSPCKA: P20 ( 69/100)
 				PORT2::PMR.B0 = 0;
 				MPC::P20PFS.PSEL = sel;  // ok
 				PORT2::PMR.B0 = enable;
-				// P21/MOSIA  ( 68/100)
+			// MOSIA:  P21 ( 68/100)
 				PORT2::PMR.B1 = 0;
 				MPC::P21PFS.PSEL = sel;  // ok
 				PORT2::PMR.B1 = enable;
-				// P22/MISOA  ( 67/100)
+			// MISOA:  P22 ( 67/100)
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // ok
 				PORT2::PMR.B2 = enable;
 				break;
-
 			case ORDER::SECOND:
-				// P24/RSPCKA ( 65/100)
+			// RSPCKA: P24 ( 65/100)
 				PORT2::PMR.B4 = 0;
 				MPC::P24PFS.PSEL = sel;  // ok
 				PORT2::PMR.B4 = enable;
-				// P23/MOSIA  ( 66/100)
+			// MOSIA:  P23 ( 66/100)
 				PORT2::PMR.B3 = 0;
 				MPC::P23PFS.PSEL = sel;  // ok
 				PORT2::PMR.B3 = enable;
-				// P22/MISOA  ( 67/100)
+			// MISOA:  P22 ( 67/100)
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // ok
 				PORT2::PMR.B2 = enable;
 				break;
-
 			case ORDER::THIRD:
-				// P27/RSPCKA ( 64/100)
+			// RSPCKA: P27 ( 64/100)
 				PORT2::PMR.B7 = 0;
 				MPC::P27PFS.PSEL = sel;  // ok
 				PORT2::PMR.B7 = enable;
-				// P23/MOSIA  ( 66/100)
+			// MOSIA:  P23 ( 66/100)
 				PORT2::PMR.B3 = 0;
 				MPC::P23PFS.PSEL = sel;  // ok
 				PORT2::PMR.B3 = enable;
-				// P22/MISOA  ( 67/100)
+			// MISOA:  P22 ( 67/100)
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // ok
 				PORT2::PMR.B2 = enable;
 				break;
-
 			case ORDER::FOURTH:
-				// PA4/RSPCKA ( 37/100)
+			// RSPCKA: PA4 ( 37/100)
 				PORTA::PMR.B4 = 0;
 				MPC::PA4PFS.PSEL = sel;  // ok
 				PORTA::PMR.B4 = enable;
-				// PB0/MOSIA  ( 35/100)
+			// MOSIA:  PB0 ( 35/100)
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
-				// PA5/MISOA  ( 36/100)
+			// MISOA:  PA5 ( 36/100)
 				PORTA::PMR.B5 = 0;
 				MPC::PA5PFS.PSEL = sel;  // ok
 				PORTA::PMR.B5 = enable;
 				break;
-
 			case ORDER::FIFTH:
-				// PB3/RSPCKA ( 32/100)
+			// RSPCKA: PB3 ( 32/100)
 				PORTB::PMR.B3 = 0;
 				MPC::PB3PFS.PSEL = sel;  // ok
 				PORTB::PMR.B3 = enable;
-				// PB0/MOSIA  ( 35/100)
+			// MOSIA:  PB0 ( 35/100)
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
-				// PA5/MISOA  ( 36/100)
+			// MISOA:  PA5 ( 36/100)
 				PORTB::PMR.B4 = 0;
 				MPC::PB4PFS.PSEL = sel;  // ok
 				PORTB::PMR.B4 = enable;
 				break;
-
 			case ORDER::SIXTH:
-				// PD0/RSPCKA ( 25/100)
+			// RSPCKA: PD0 ( 25/100)
 				PORTD::PMR.B0 = 0;
 				MPC::PD0PFS.PSEL = sel;  // ok
 				PORTD::PMR.B0 = enable;
-				// PD2/MOSIA  ( 23/100)
+			// MOSIA:  PD2 ( 23/100)
 				PORTD::PMR.B2 = 0;
 				MPC::PD2PFS.PSEL = sel;  // ok
 				PORTD::PMR.B2 = enable;
-				// PD1/MISOA  ( 24/100)
+			// MISOA:  PD1 ( 24/100)
 				PORTD::PMR.B1 = 0;
 				MPC::PD1PFS.PSEL = sel;  // ok
 				PORTD::PMR.B1 = enable;
 				break;
-
 			default:
 				return false;
 			}
 			return true;
 		}
 
-
 		static bool rspia0_(ORDER odr, bool enable) noexcept
 		{
 			uint8_t sel = enable ? 0b00'1110 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// P20/RSPCK0 ( 69/100)
+			// RSPCK0: P20 ( 69/100)
 				PORT2::PMR.B0 = 0;
 				MPC::P20PFS.PSEL = sel;  // ok
 				PORT2::PMR.B0 = enable;
-				// P21/MOSI0  ( 68/100)
+			// MOSI0:  P21 ( 68/100)
 				PORT2::PMR.B1 = 0;
 				MPC::P21PFS.PSEL = sel;  // ok
 				PORT2::PMR.B1 = enable;
-				// P22/MISO0  ( 67/100)
+			// MISO0:  P22 ( 67/100)
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // ok
 				PORT2::PMR.B2 = enable;
 				break;
-
 			case ORDER::SECOND:
-				// P24/RSPCK0 ( 65/100)
+			// RSPCK0: P24 ( 65/100)
 				PORT2::PMR.B4 = 0;
 				MPC::P24PFS.PSEL = sel;  // ok
 				PORT2::PMR.B4 = enable;
-				// P23/MOSI0  ( 66/100)
+			// MOSI0:  P23 ( 66/100)
 				PORT2::PMR.B3 = 0;
 				MPC::P23PFS.PSEL = sel;  // ok
 				PORT2::PMR.B3 = enable;
-				// P22/MISO0  ( 67/100)
+			// MISO0:  P22 ( 67/100)
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // ok
 				PORT2::PMR.B2 = enable;
 				break;
-
 			case ORDER::THIRD:
-				// P27/RSPCK0 ( 64/100)
+			// RSPCK0: P27 ( 64/100)
 				PORT2::PMR.B7 = 0;
 				MPC::P27PFS.PSEL = sel;  // ok
 				PORT2::PMR.B7 = enable;
-				// P23/MOSI0  ( 66/100)
+			// MOSI0:  P23 ( 66/100)
 				PORT2::PMR.B3 = 0;
 				MPC::P23PFS.PSEL = sel;  // ok
 				PORT2::PMR.B3 = enable;
-				// P22/MISO0  ( 67/100)
+			// MISO0:  P22 ( 67/100)
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // ok
 				PORT2::PMR.B2 = enable;
 				break;
-
 			case ORDER::FOURTH:
-				// P70/RSPCK0 ( 57/100)
+			// RSPCK0: P70 ( 57/100)
 				PORT7::PMR.B0 = 0;
 				MPC::P70PFS.PSEL = sel;  // ok
 				PORT7::PMR.B0 = enable;
-				// P72/MOSI0  ( 55/100)
+			// MOSI0:  P72 ( 55/100)
 				PORT7::PMR.B2 = 0;
 				MPC::P72PFS.PSEL = sel;  // ok
 				PORT7::PMR.B2 = enable;
-				// P71/MISO0  ( 56/100)
+			// MISO0:  P71 ( 56/100)
 				PORT7::PMR.B1 = 0;
 				MPC::P71PFS.PSEL = sel;  // ok
 				PORT7::PMR.B1 = enable;
 				break;
-
 			case ORDER::FIFTH:
-				// P91/RSPCK0 ( 49/100)
+			// RSPCK0: P91 ( 49/100)
 				PORT9::PMR.B1 = 0;
 				MPC::P91PFS.PSEL = sel;  // ok
 				PORT9::PMR.B1 = enable;
-				// P93/MOSI0  ( 47/100)
+			// MOSI0:  P93 ( 47/100)
 				PORT9::PMR.B3 = 0;
 				MPC::P93PFS.PSEL = sel;  // ok
 				PORT9::PMR.B3 = enable;
-				// P92/MISO0  ( 48/100)
+			// MISO0:  P92 ( 48/100)
 				PORT9::PMR.B2 = 0;
 				MPC::P92PFS.PSEL = sel;  // ok
 				PORT9::PMR.B2 = enable;
 				break;
-
 			case ORDER::SIXTH:
-				// P96/RSPCK0 ( 43/100)
+			// RSPCK0: P96 ( 43/100)
 				PORT9::PMR.B6 = 0;
 				MPC::P96PFS.PSEL = sel;  // ok
 				PORT9::PMR.B6 = enable;
-				// P93/MOSI0  ( 47/100)
+			// MOSI0:  P93 ( 47/100)
 				PORT9::PMR.B3 = 0;
 				MPC::P93PFS.PSEL = sel;  // ok
 				PORT9::PMR.B3 = enable;
-				// P95/MISO0  ( 45/100)
+			// MISO0:  P95 ( 45/100)
 				PORT9::PMR.B5 = 0;
 				MPC::P95PFS.PSEL = sel;  // ok
 				PORT9::PMR.B5 = enable;
 				break;
-
 			case ORDER::SEVENTH:
-				// PA4/RSPCK0 ( 37/100)
+			// RSPCK0: PA4 ( 37/100)
 				PORTA::PMR.B4 = 0;
 				MPC::PA4PFS.PSEL = sel;  // ok
 				PORTA::PMR.B4 = enable;
-				// PB0/MOSI0  ( 35/100)
+			// MOSI0:  PB0 ( 35/100)
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
-				// PA5/MISO0  ( 36/100)
+			// MISO0:  PA5 ( 36/100)
 				PORTA::PMR.B5 = 0;
 				MPC::PA5PFS.PSEL = sel;  // ok
 				PORTA::PMR.B5 = enable;
 				break;
-
 			case ORDER::EIGHTH:
-				// PB5/RSPCK0 ( 28/100)
+			// RSPCK0: PB5 ( 28/100)
 				PORTB::PMR.B5 = 0;
 				MPC::PB5PFS.PSEL = sel;  // ok
 				PORTB::PMR.B5 = enable;
-				// PB0/MOSI0  ( 35/100)
+			// MOSI0:  PB0 ( 35/100)
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
-				// PB6/MISO0  ( 27/100)
+			// MISO0:  PB6 ( 27/100)
 				PORTB::PMR.B6 = 0;
 				MPC::PB6PFS.PSEL = sel;  // ok
 				PORTB::PMR.B6 = enable;
 				break;
-
 			case ORDER::NINTH:
-				// PD0/RSPCK0 ( 25/100)
+			// RSPCK0: PD0 ( 25/100)
 				PORTD::PMR.B0 = 0;
 				MPC::PD0PFS.PSEL = sel;  // ok
 				PORTD::PMR.B0 = enable;
-				// PD2/MOSI0  ( 23/100)
+			// MOSI0:  PD2  ( 23/100)
 				PORTD::PMR.B2 = 0;
 				MPC::PD2PFS.PSEL = sel;  // ok
 				PORTD::PMR.B2 = enable;
-				// PD1/MISO0  ( 24/100)
+			// MISO0:  PD1 ( 24/100)
 				PORTD::PMR.B1 = 0;
 				MPC::PD1PFS.PSEL = sel;  // ok
 				PORTD::PMR.B1 = enable;
 				break;
-
 			case ORDER::TENTH:
-				// PD0/RSPCK0 ( 25/100)
+			// RSPCK0: PD0 ( 25/100)
 				PORTD::PMR.B0 = 0;
 				MPC::PD0PFS.PSEL = sel;  // ok
 				PORTD::PMR.B0 = enable;
-				// PD3/MOSI0  ( 22/100)
+			// MOSI0:  PD3 ( 22/100)
 				PORTD::PMR.B3 = 0;
 				MPC::PD3PFS.PSEL = sel;  // ok
 				PORTD::PMR.B3 = enable;
-				// PD1/MISO0  ( 24/100)
+			// MISO0:  PD1 ( 24/100)
 				PORTD::PMR.B1 = 0;
 				MPC::PD1PFS.PSEL = sel;  // ok
 				PORTD::PMR.B1 = enable;
 				break;
-
 			default:
 				return false;
 			}
@@ -681,11 +673,11 @@ namespace device {
 			uint8_t sel = enable ? 0b00'1111 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// PB1/SCL0
+			// SCL0: PB1
 				PORTB::PMR.B1 = 0;
 				MPC::PB1PFS.PSEL = sel;
 				PORTB::PMR.B1 = enable;
-				// PB2/SDA0
+			// SDA0: PB2
 				PORTB::PMR.B2 = 0;
 				MPC::PB2PFS.PSEL = sel;
 				PORTB::PMR.B2 = enable;
@@ -702,11 +694,11 @@ namespace device {
 			uint8_t sel = enable ? 0b11'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// PB1/SCL0
+			// SCL0: PB1
 				PORTB::PMR.B1 = 0;
 				MPC::PB1PFS.PSEL = sel;
 				PORTB::PMR.B1 = enable;
-				// PB2/SDA0
+			// SDA0: PB2
 				PORTB::PMR.B2 = 0;
 				MPC::PB2PFS.PSEL = sel;
 				PORTB::PMR.B2 = enable;
@@ -723,61 +715,61 @@ namespace device {
 			uint8_t sel = enable ? 0b01'0000 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// P22/CRX0
+			// CRX0: P22
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;
 				PORT2::PMR.B2 = enable;
-				// P23/CTX0
+			// CTX0: P23
 				PORT2::PMR.B3 = 0;
 				MPC::P23PFS.PSEL = sel;
 				PORT2::PMR.B3 = enable;
 				break;
 			case ORDER::SECOND:
-				// P93/CRX0
+			// CRX0: P93
 				PORT9::PMR.B3 = 0;
 				MPC::P93PFS.PSEL = sel;
 				PORT9::PMR.B3 = enable;
-				// P92/CTX0
+			// CTX0: P92
 				PORT9::PMR.B2 = 0;
 				MPC::P92PFS.PSEL = sel;
 				PORT9::PMR.B2 = enable;
 				break;
 			case ORDER::THIRD:
-				// PA1/CRX0
+			// CRX0: PA1
 				PORTA::PMR.B1 = 0;
 				MPC::PA1PFS.PSEL = sel;
 				PORTA::PMR.B1 = enable;
-				// PA0/CTX0
+			// CTX0: PA0
 				PORTA::PMR.B0 = 0;
 				MPC::PA0PFS.PSEL = sel;
 				PORTA::PMR.B0 = enable;
 				break;
 			case ORDER::FOURTH:
-				// PB4/CRX0
+			// CRX0: PB4
 				PORTB::PMR.B4 = 0;
 				MPC::PB4PFS.PSEL = sel;
 				PORTB::PMR.B4 = enable;
-				// PB3/CTX0
+			// CTX0: PB3
 				PORTB::PMR.B3 = 0;
 				MPC::PB3PFS.PSEL = sel;
 				PORTB::PMR.B3 = enable;
 				break;
 			case ORDER::FIFTH:
-				// PB6/CRX0
+			// CRX0: PB6
 				PORTB::PMR.B6 = 0;
 				MPC::PB6PFS.PSEL = sel;
 				PORTB::PMR.B6 = enable;
-				// PB5/CTX0
+			// CTX0: PB5
 				PORTB::PMR.B5 = 0;
 				MPC::PB5PFS.PSEL = sel;
 				PORTB::PMR.B5 = enable;
 				break;
 			case ORDER::SIXTH:
-				// PE0/CRX0
+			// CRX0: PE0
 				PORTE::PMR.B0 = 0;
 				MPC::PE0PFS.PSEL = sel;
 				PORTE::PMR.B0 = enable;
-				// PD7/CTX0
+			// CTX0: PD7
 				PORTD::PMR.B7 = 0;
 				MPC::PD7PFS.PSEL = sel;
 				PORTD::PMR.B7 = enable;
@@ -794,22 +786,22 @@ namespace device {
 			switch(odr) {
 			case ORDER::FIRST:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// PB6
+				// TOC0: PB6
 					PORTB::PMR.B6 = 0;
 					MPC::PB6PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTB::PMR.B6 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// PB5
+				// TIC0: PB5
 					PORTB::PMR.B5 = 0;
 					MPC::PB5PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTB::PMR.B5 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// PB3
+				// TOC1: PB3
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTB::PMR.B3 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// PB2
+				// TIC1: PB2
 					PORTB::PMR.B2 = 0;
 					MPC::PB2PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTB::PMR.B2 = enable;
@@ -829,22 +821,22 @@ namespace device {
 			switch(odr) {
 			case ORDER::FIRST:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// PB1
+				// TOC2: PB1
 					PORTB::PMR.B1 = 0;
 					MPC::PB1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTB::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// PB0
+				// TIC2: PB0
 					PORTB::PMR.B0 = 0;
 					MPC::PB0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTB::PMR.B0 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// P11
+				// TOC3: P11
 					PORT1::PMR.B1 = 0;
 					MPC::P11PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORT1::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// P00
+				// TIC3: P00
 					PORT0::PMR.B0 = 0;
 					MPC::P00PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORT0::PMR.B0 = enable;
@@ -854,7 +846,7 @@ namespace device {
 				break;
 			case ORDER::SECOND:
 				if(opt == OPTIONAL::CMTW_TIC1) {
-					// P10
+				// TIC3: P10
 					PORT1::PMR.B0 = 0;
 					MPC::P10PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORT1::PMR.B0 = enable;
@@ -867,7 +859,6 @@ namespace device {
 			}
 			return true;
 		}
-
 
 		static inline USER_FUNC_TYPE	user_func_;
 

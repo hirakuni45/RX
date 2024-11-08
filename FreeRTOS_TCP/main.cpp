@@ -51,7 +51,7 @@ namespace {
 	// Ethernet PHY device
     typedef chip::phy_base<ETHERC, chip::phy_device::LAN8720, chip::phy_interface::RMII> PHY;
 	// Ethernet MAC device
-    typedef device::ether_io<ETHERC, EDMAC, PHY, device::port_map::ORDER::FIRST_RMII> ETHD;
+    typedef device::ether_io<ETHERC, EDMAC, PHY, device::port_map::ORDER::FIRST> ETHD;
 #elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;

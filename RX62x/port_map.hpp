@@ -25,140 +25,199 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
 
-		static bool sub_1st_(peripheral t, bool enable) noexcept
+		static bool sci0_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
-			switch(t) {
-			///	SCK0:   P22
-			///	TxD0:   P20
-			///	RxD0:   P21
-			case peripheral::SCI0:
+			switch(odr) {
+			case ORDER::FIRST:
+			//	SCK0:   P22
+			//	TxD0:   P20
+			//	RxD0:   P21
 				PORT2::ICR.B1 = enable;  ///< RxD0
 				break;
-			///	SCK1-A: P27
-			///	TxD1-A: P26
-			///	RxD1-A: P30
-			case peripheral::SCI1:
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool sci1_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			//	SCK1-A: P27
+			//	TxD1-A: P26
+			//	RxD1-A: P30
 				MPC::PFFSCI.SCI1S = 0;
 				PORT3::ICR.B0 = enable;  ///< RxD1-A
 				break;
-			///	SCK2-A: P11
-			///	TxD2-A: P13
-			///	RxD2-A: P12
-			case peripheral::SCI2:
+			case ORDER::SECOND:
+			//	SCK1-B: PF1
+			//	TxD1-B: PF0
+			//	RxD1-B: PF2
+				MPC::PFFSCI.SCI1S = 1;
+				PORTF::ICR.B2 = enable;  ///< RxD1-B
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool sci2_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			//	SCK2-A: P11
+			//	TxD2-A: P13
+			//	RxD2-A: P12
 				MPC::PFFSCI.SCI2S = 0;
 				PORT1::ICR.B2 = enable;  ///< RxD2-A
 				break;
-			///	SCK3-A: P15
-			///	TxD3-A: P17
-			///	RxD3-A: P16
-			case peripheral::SCI3:
+			case ORDER::SECOND:
+			//	SCK2-B: P51
+			//	TxD2-B: P50 
+			//	RxD2-B: P52
+				MPC::PFFSCI.SCI2S = 1;
+				PORT5::ICR.B2 = enable;  ///< RxD2-B
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool sci3_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			//	SCK3-A: P15
+			//	TxD3-A: P17
+			//	RxD3-A: P16
 				MPC::PFFSCI.SCI3S = 0;
 				PORT1::ICR.B6 = enable;  ///< RxD3-A
 				break;
-			///	SCK5:   PC1
-			///	TxD5:   PC3
-			///	RxD5:   PC2
-			case peripheral::SCI5:
+			case ORDER::SECOND:
+			//	SCK3-B: P24
+			//	TxD3-B: P23
+			//	RxD3-B: P25
+				MPC::PFFSCI.SCI3S = 1;
+				PORT2::ICR.B5 = enable;  ///< RxD3-B
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool sci5_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			//	SCK5:   PC1
+			//	TxD5:   PC3
+			//	RxD5:   PC2
 				PORTC::ICR.B2 = enable;  ///< RxD5
 				break;
-			///	SCK6-A: P02
-			///	TxD6-A: P00
-			///	RxD6-A: P01
-			case peripheral::SCI6:
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool sci6_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			//	SCK6-A: P02
+			//	TxD6-A: P00
+			//	RxD6-A: P01
 				MPC::PFFSCI.SCI6S = 0;
 				PORT0::ICR.B1 = enable;  ///< RxD6-A
 				break;
+			case ORDER::SECOND:
+			//	SCK6-B: P34
+			//	TxD6-B: P32
+			//	RxD6-B: P33
+				MPC::PFFSCI.SCI6S = 1;
+				PORT3::ICR.B3 = enable;  ///< RxD6-B
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
 
-			/// SCL0: P12
-			/// SDA0: P13
-			case peripheral::RIIC0:
+		static bool riic0_(ORDER odr, bool enable) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			// SCL0: P12
+			// SDA0: P13
 				// 設定は特に無し（SCL/SDA 入出力として扱う）
 				break;
-			/// SCL1: P21
-			/// SDA1: P20
-			case peripheral::RIIC1:
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool riic1_(ORDER odr, bool enable) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			// SCL1: P21
+			// SDA1: P20
 				// 設定は特に無し（SCL/SDA 入出力として扱う）
 				break;
+			default:
+				return false;
+			}
+			return true;
+		}
 
-			/// RSPCKA-A: PC5
-			/// MOSIA-A:  PC6
-			/// MISOA-A:  PC7
-			case peripheral::RSPI0:
+		static bool rspi0_(ORDER odr, bool enable) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			// RSPCKA-A: PC5
+			// MOSIA-A:  PC6
+			// MISOA-A:  PC7
 				MPC::PFGSPI.RSPIS = 0;
 				MPC::PFGSPI.RSPCKE = enable;
 				MPC::PFGSPI.MOSIE = enable;
 				MPC::PFGSPI.MISOE = enable;
 				break;
-			/// RSPCKB-A: P27
-			/// MOSIB-A:  P26
-			/// MISOB-A:  P30
-			case peripheral::RSPI1:
-				MPC::PFHSPI.RSPIS = 0;
-				MPC::PFHSPI.RSPCKE = enable;
-				MPC::PFHSPI.MOSIE = enable;
-				MPC::PFHSPI.MISOE = enable;
-				break;
-
-			/// CTX0: P32
-			/// CRX0: P33
-			case peripheral::CAN:
-				MPC::PFJCAN.CAN0E = enable;
-				PORT3::ICR.B3 = enable;  ///< CRX0
-				break;
-
-			default:
-				return false;
-				break;
-			}
-			return true;
-		}
-
-
-		static bool sub_2nd_(peripheral t, bool enable) noexcept
-		{
-			switch(t) {
-			///	SCK1-B: PF1
-			///	TxD1-B: PF0
-			///	RxD1-B: PF2
-			case peripheral::SCI1:
-				MPC::PFFSCI.SCI1S = 1;
-				PORTF::ICR.B2 = enable;  ///< RxD1-B
-				break;
-			///	SCK2-B: P51
-			///	TxD2-B: P50 
-			///	RxD2-B: P52
-			case peripheral::SCI2:
-				MPC::PFFSCI.SCI2S = 1;
-				PORT5::ICR.B2 = enable;  ///< RxD2-B
-				break;
-			///	SCK3-B: P24
-			///	TxD3-B: P23
-			///	RxD3-B: P25
-			case peripheral::SCI3:
-				MPC::PFFSCI.SCI3S = 1;
-				PORT2::ICR.B5 = enable;  ///< RxD3-B
-				break;
-			///	SCK6-B: P34
-			///	TxD6-B: P32
-			///	RxD6-B: P33
-			case peripheral::SCI6:
-				MPC::PFFSCI.SCI6S = 1;
-				PORT3::ICR.B3 = enable;  ///< RxD6-B
-				break;
-
-			/// RSPCKA-B: PA5
-			/// MOSIA-B:  PA6
-			/// MISOA-B:  PA7
-			case peripheral::RSPI0:
+			case ORDER::SECOND:
+			// RSPCKA-B: PA5
+			// MOSIA-B:  PA6
+			// MISOA-B:  PA7
 				MPC::PFGSPI.RSPIS = 1;
 				MPC::PFGSPI.RSPCKE = enable;
 				MPC::PFGSPI.MOSIE = enable;
 				MPC::PFGSPI.MISOE = enable;
 				break;
-			/// RSPCKB-B: PE5
-			/// MOSIB-B:  PE6
-			/// MISOB-B:  PE7
-			case peripheral::RSPI1:
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool rspi1_(ORDER odr, bool enable) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			// RSPCKB-A: P27
+			// MOSIB-A:  P26
+			// MISOB-A:  P30
+				MPC::PFHSPI.RSPIS = 0;
+				MPC::PFHSPI.RSPCKE = enable;
+				MPC::PFHSPI.MOSIE = enable;
+				MPC::PFHSPI.MISOE = enable;
+				break;
+			case ORDER::SECOND:
+			// RSPCKB-B: PE5
+			// MOSIB-B:  PE6
+			// MISOB-B:  PE7
 				MPC::PFHSPI.RSPIS = 1; 
 				MPC::PFHSPI.RSPCKE = enable;
 				MPC::PFHSPI.MOSIE = enable;
@@ -166,10 +225,46 @@ namespace device {
 				break;
 			default:
 				return false;
-				break;
 			}
 			return true;
 		}
+
+		static bool can0_(ORDER odr, bool enable) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			// CTX0: P32
+			// CRX0: P33
+				MPC::PFJCAN.CAN0E = enable;
+				PORT3::ICR.B3 = enable;  ///< CRX0
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool etherc_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			switch(odr) {
+			case ORDER::FIRST:
+			// RMII/MII Ethernet
+				if(opt == OPTIONAL::ETH_RMII) {
+					MPC::PFENET.PHYMODE = 0;
+				} else if(opt == OPTIONAL::ETH_MII) {
+					MPC::PFENET.PHYMODE = 0;
+				} else {
+					return false;
+				}
+				MPC::PFENET.EE = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		//----------------------------------------------------------------
 
 		static inline USER_FUNC_TYPE	user_func_;
 
@@ -198,18 +293,49 @@ namespace device {
 			if(odr == ORDER::BYPASS) return false;
 
 			bool ret = false;
-			switch(odr) {
-			case ORDER::FIRST:
-				ret = sub_1st_(per, ena);
-				break;
-			case ORDER::SECOND:
-				ret = sub_2nd_(per, ena);
-				break;
-			case ORDER::USER:
+			if(odr == ORDER::USER) {
 				ret = user_func_(per, ena);
-				break;
-			default:
-				break;
+			} else {
+				switch(per) {
+				case peripheral::SCI0:
+					ret = sci0_(odr, ena, opt);
+					break;
+				case peripheral::SCI1:
+					ret = sci1_(odr, ena, opt);
+					break;
+				case peripheral::SCI2:
+					ret = sci2_(odr, ena, opt);
+					break;
+				case peripheral::SCI3:
+					ret = sci3_(odr, ena, opt);
+					break;
+				case peripheral::SCI5:
+					ret = sci5_(odr, ena, opt);
+					break;
+				case peripheral::SCI6:
+					ret = sci6_(odr, ena, opt);
+					break;
+				case peripheral::RIIC0:
+					ret = riic0_(odr, ena);
+					break;
+				case peripheral::RIIC1:
+					ret = riic1_(odr, ena);
+					break;
+				case peripheral::RSPI0:
+					ret = rspi0_(odr, ena);
+					break;
+				case peripheral::RSPI1:
+					ret = rspi1_(odr, ena);
+					break;
+				case peripheral::CAN:
+					ret = can0_(odr, ena);
+					break;
+				case peripheral::ETHERC:
+					ret = etherc_(odr, ena, opt);
+					break;
+				default:
+					break;
+				}
 			}
 
 			return ret;

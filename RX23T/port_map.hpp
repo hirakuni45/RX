@@ -32,17 +32,17 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:  // for Serial BOOT interface
-				// RXD1: PD5
-				// TXD1: PD3
-				// SCK1: PD4
+			// RXD1: PD5
 				PORTD::PMR.B5 = 0;
 				PORTD::ODR.B5 = i2c;
 				MPC::PD5PFS.PSEL = sel;  // ok
 				PORTD::PMR.B5 = enable;
+			// TXD1: PD3
 				PORTD::PMR.B3 = 0;
 				PORTD::ODR.B3 = i2c;
 				MPC::PD3PFS.PSEL = sel;  // ok
 				PORTD::PMR.B3 = enable;
+			// SCK1: PD4
 				if(spi) {
 					PORTD::PMR.B4 = 0;
 					MPC::PD4PFS.PSEL = sel;  // ok
@@ -64,17 +64,17 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// RXD5: PB1
-				// TXD5: PB2
-				// SCK5: PB3
+			// RXD5: PB1
 				PORTB::PMR.B1 = 0;
 				PORTB::ODR.B1 = i2c;
 				MPC::PB1PFS.PSEL = sel;  // ok
 				PORTB::PMR.B1 = enable;
+			// TXD5: PB2
 				PORTB::PMR.B2 = 0;
 				PORTB::ODR.B2 = i2c;
 				MPC::PB2PFS.PSEL = sel;  // ok
 				PORTB::PMR.B2 = enable;
+			// SCK5: PB3
 				if(spi) {
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;  // ok
@@ -82,18 +82,18 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:
-				// RXD5: PB6
-				// TXD5: PB5
-				// SCK5: PB3
+			// RXD5: PB6
 				sel = enable ? 0b0'1011 : 0;
 				PORTB::PMR.B6 = 0;
 				PORTB::ODR.B6 = i2c;
 				MPC::PB6PFS.PSEL = sel;  // ok
 				PORTB::PMR.B6 = enable;
+			// TXD5: PB5
 				PORTB::PMR.B5 = 0;
 				PORTB::ODR.B5 = i2c;
 				MPC::PB5PFS.PSEL = sel;  // ok
 				PORTB::PMR.B5 = enable;
+			// SCK5: PB3
 				if(spi) {
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = enable ? 0b0'1010 : 0;  // ok
@@ -101,18 +101,18 @@ namespace device {
 				}
 				break;
 			case ORDER::THIRD:
-				// RXD5: PB6
-				// TXD5: PB5
-				// SCK5: PB7
+			// RXD5: PB6
 				sel = enable ? 0b0'1011 : 0;
 				PORTB::PMR.B6 = 0;
 				PORTB::ODR.B6 = i2c;
 				MPC::PB6PFS.PSEL = sel;  // ok
 				PORTB::PMR.B6 = enable;
+			// TXD5: PB5
 				PORTB::PMR.B5 = 0;
 				PORTB::ODR.B5 = i2c;
 				MPC::PB5PFS.PSEL = sel;  // ok
 				PORTB::PMR.B5 = enable;
+			// SCK5: PB7
 				if(spi) {
 					PORTB::PMR.B7 = 0;
 					MPC::PB7PFS.PSEL = enable ? 0b0'1010 : 0;  // ok
@@ -130,11 +130,11 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1111 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// SCL0: PB1
-				// SDA0: PB2
+			// SCL0: PB1
 				PORTB::PMR.B1 = 0;
 				MPC::PB1PFS.PSEL = sel;  // ok
 				PORTB::PMR.B1 = enable;
+			// SDA0: PB2
 				PORTB::PMR.B2 = 0;
 				MPC::PB2PFS.PSEL = sel;  // ok
 				PORTB::PMR.B2 = enable;
@@ -150,57 +150,57 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1101 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// RSPCKA: P24
-				// MOSIA:  P23
-				// MISOA:  P22		
+			// RSPCKA: P24
 				PORT2::PMR.B4 = 0;
 				MPC::P24PFS.PSEL = sel;  // ok
 				PORT2::PMR.B4 = enable;
+			// MOSIA:  P23
 				PORT2::PMR.B3 = 0;
 				MPC::P23PFS.PSEL = sel;  // ok
 				PORT2::PMR.B3 = enable;
+			// MISOA:  P22
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // ok
 				PORT2::PMR.B2 = enable;
 				break;
 			case ORDER::SECOND:
-				// RSPCKA: P93
-				// MOSIA:  P23
-				// MISOA:  P94
+			// RSPCKA: P93
 				PORT9::PMR.B3 = 0;
 				MPC::P93PFS.PSEL = sel;  // ok
 				PORT9::PMR.B3 = enable;
+			// MOSIA:  P23
 				PORT2::PMR.B3 = 0;
 				MPC::P23PFS.PSEL = sel;  // ok
 				PORT2::PMR.B3 = enable;
+			// MISOA:  P94
 				PORT9::PMR.B4 = 0;
 				MPC::P94PFS.PSEL = sel;  // ok
 				PORT9::PMR.B4 = enable;
 				break;
 			case ORDER::THIRD:
-				// RSPCKA: PA4
-				// MOSIA:  PB0
-				// MISOA:  PA5
+			// RSPCKA: PA4
 				PORTA::PMR.B4 = 0;
 				MPC::PA4PFS.PSEL = sel;  // ok
 				PORTA::PMR.B4 = enable;
+			// MOSIA:  PB0
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
+			// MISOA:  PA5
 				PORTA::PMR.B5 = 0;
 				MPC::PA5PFS.PSEL = sel;  // ok
 				PORTA::PMR.B5 = enable;
 				break;
 			case ORDER::FOURTH:
-				// RSPCKA: PB3
-				// MOSIA:  PB0
-				// MISOA:  PA5
+			// RSPCKA: PB3
 				PORTB::PMR.B3 = 0;
 				MPC::PB3PFS.PSEL = sel;  // ok
 				PORTB::PMR.B3 = enable;
+			// MOSIA:  PB0
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
+			// MISOA:  PA5
 				PORTA::PMR.B5 = 0;
 				MPC::PA5PFS.PSEL = sel;  // ok
 				PORTA::PMR.B5 = enable;
