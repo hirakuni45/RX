@@ -331,16 +331,16 @@ namespace device {
 			{ }
 
 			constexpr ether_rmii_t(RX65N_ENVISION_KIT t) noexcept :
-				ref50ck_(ORDER::BYPASS),
-				crs_dv_(ORDER::BYPASS),
-				txd0_(ORDER::BYPASS),
-				txd1_(ORDER::BYPASS),
-				rxd0_(ORDER::BYPASS),
-				rxd1_(ORDER::BYPASS),
-				txd_en_(ORDER::BYPASS),
-				rx_er_(ORDER::BYPASS),
-				mdc_(ORDER::BYPASS),
-				mdio_(ORDER::BYPASS)
+				ref50ck_(ORDER::FIRST),
+				crs_dv_(ORDER::FIRST),
+				txd0_(ORDER::FIRST),
+				txd1_(ORDER::FIRST),
+				rxd0_(ORDER::FIRST),
+				rxd1_(ORDER::FIRST),
+				txd_en_(ORDER::FIRST),
+				rx_er_(ORDER::FIRST),
+				mdc_(ORDER::FIRST),
+				mdio_(ORDER::FIRST)
 			{ }
 		};
 

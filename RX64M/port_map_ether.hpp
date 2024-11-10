@@ -76,8 +76,7 @@ namespace device {
 			}
 		}
 
-#if defined(SIG_RX63N) || defined(SIG_RX65N)
-#else
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 		static void ether1_mdc_mdio_(ORDER mdc, ORDER mdio, bool ena, uint8_t& err)
 		{
 			uint8_t mii = ena ? 0b01'0001 : 0;
@@ -293,13 +292,14 @@ namespace device {
 
 			ether0_mdc_mdio_(port.mdc_, port.mdio_, ena, err);
 
+			MPC::PFENET.PHYMODE0 = 0;  // RMII
+
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return err == 0;
 		}
 
-#if defined(SIG_RX63N) || defined(SIG_RX65N)
-#else
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 		static bool ether1_(const ether_rmii_t& port, bool ena)
 		{
 			uint8_t err = 0;
@@ -421,6 +421,8 @@ namespace device {
 			}
 
 			ether1_mdc_mdio_(port.mdc_, port.mdio_, ena, err);
+
+			MPC::PFENET.PHYMODE1 = 0;  // RMII
 
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
@@ -828,13 +830,14 @@ namespace device {
 
 			ether0_mdc_mdio_(port.mdc_, port.mdio_, ena, err);
 
+			MPC::PFENET.PHYMODE0 = 1;  // MII
+
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return err == 0;
 		}
 
-#if defined(SIG_RX63N) || defined(SIG_RX65N)
-#else
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 		static bool ether1_(const ether_mii_t& port, bool ena)
 		{
 			uint8_t err = 0;
@@ -1111,20 +1114,22 @@ namespace device {
 
 			ether1_mdc_mdio_(port.mdc_, port.mdio_, ena, err);
 
+			MPC::PFENET.PHYMODE1 = 1;  // MII
+
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return err == 0;
 		}
 #endif
 	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  Ethernet ポートを切り替える RMII 型
 			@param[in]	per		周辺機器タイプ
 			@param[in]	port	ポート・マッピング・グループ
 			@return 無効な周辺機器の場合「false」
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn(peripheral per, const ether_rmii_t& port, bool ena = true) noexcept
 		{
             bool ret = true;
@@ -1133,8 +1138,7 @@ namespace device {
 			case peripheral::ETHERC0:
 				ret = ether0_(port, ena);
 				break;
-#if defined(SIG_RX63N) || defined(SIG_RX65N)
-#else
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::ETHERC1:
 				ret = ether1_(port, ena);
 				break;
@@ -1147,14 +1151,14 @@ namespace device {
 		}
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  Ethernet ポートを切り替える MII 型
 			@param[in]	per		周辺機器タイプ
 			@param[in]	port	ポート・マッピング・グループ
 			@return 無効な周辺機器の場合「false」
 		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn(peripheral per, const ether_mii_t& port, bool ena = true) noexcept
 		{
             bool ret = true;
@@ -1163,8 +1167,7 @@ namespace device {
 			case peripheral::ETHERC0:
 				ret = ether0_(port, ena);
 				break;
-#if defined(SIG_RX63N) || defined(SIG_RX65N)
-#else
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::ETHERC1:
 				ret = ether1_(port, ena);
 				break;

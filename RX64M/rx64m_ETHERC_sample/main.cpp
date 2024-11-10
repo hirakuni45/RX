@@ -1,13 +1,13 @@
-//=====================================================================//
+//=========================================================================//
 /*! @file
     @brief  RX64M RTC サンプル @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "common/renesas.hpp"
 #include "common/cmt_mgr.hpp"
 #include "common/sci_io.hpp"

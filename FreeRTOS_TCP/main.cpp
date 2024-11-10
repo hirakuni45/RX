@@ -51,7 +51,7 @@ namespace {
 	// Ethernet PHY device
     typedef chip::phy_base<ETHERC, chip::phy_device::LAN8720, chip::phy_interface::RMII> PHY;
 	// Ethernet MAC device
-    typedef device::ether_io<ETHERC, EDMAC, PHY, device::port_map::ORDER::FIRST> ETHD;
+    typedef device::ether_io<ETHERC, EDMAC, PHY, device::port_map_order::ether_rmii_t> ETHD;
 #elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
@@ -216,10 +216,22 @@ extern "C" {
 	//
 	//--------------------------------------------------------------------------//
 	/// Ethernet の開始
-	int InitializeEth(void)
+	int InitializeEth()
     {
+		// Microchip PHY: LAN8720 connected
+		device::port_map_order::ether_rmii_t et;
+		et.mdc_     = device::port_map_order::ORDER::FIRST;
+		et.mdio_    = device::port_map_order::ORDER::FIRST;
+		et.ref50ck_ = device::port_map_order::ORDER::FIRST;
+		et.crs_dv_  = device::port_map_order::ORDER::FIRST;
+		et.txd0_    = device::port_map_order::ORDER::FIRST;
+		et.txd1_    = device::port_map_order::ORDER::FIRST;
+		et.rxd0_    = device::port_map_order::ORDER::FIRST;
+		et.rxd1_    = device::port_map_order::ORDER::FIRST;
+		et.txd_en_  = device::port_map_order::ORDER::FIRST;
+		et.rx_er_   = device::port_map_order::ORDER::FIRST;
 		auto intr_level = device::ICU::LEVEL::_4;
-		if(!ethd_.start(intr_level)) {
+		if(!ethd_.start(et, intr_level)) {
 			utils::format("Ethernet start fail...\n");
 			return 0;
 		}

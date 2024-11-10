@@ -969,6 +969,7 @@ namespace device {
 			return true;
 		}
 
+#if 0
 		static bool qspi_(ORDER odr, bool enable) noexcept
 		{
 			uint8_t sel = enable ? 0b01'1011 : 0;  // ok
@@ -1030,6 +1031,7 @@ namespace device {
 			}
 			return true;
 		}
+#endif
 
 		static bool cmtw0_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
@@ -1098,7 +1100,7 @@ namespace device {
 			}
 			return true;
 		}
-
+#if 0
 		static bool etherc0_(ORDER odr, bool enable) noexcept
 		{
 			switch(odr) {
@@ -1144,7 +1146,7 @@ namespace device {
 					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
 				}
 				break;
-#if 0
+
 			case peripheral::ETHERCA:  // only RMII mode, not use link status interrupt
 				{
 					uint8_t  mii = enable ? 0b010001 : 0;
@@ -1187,12 +1189,12 @@ namespace device {
 					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
 				}
 				break;
-#endif
 			default:
 				return false;
 			}
 			return true;
 		}
+#endif
 
 		static bool glcdc_(ORDER odr, bool enable) noexcept
 		{
@@ -1649,17 +1651,11 @@ namespace device {
 				case peripheral::USB0:
 					ret = usb0_(odr, ena);
 					break;
-				case peripheral::QSPI:
-					ret = qspi_(odr, ena);
-					break;
 				case peripheral::CMTW0:
 					ret = cmtw0_(odr, ena, opt);
 					break;
 				case peripheral::CMTW1:
 					ret = cmtw1_(odr, ena, opt);
-					break;
-				case peripheral::ETHERC0:
-					ret = etherc0_(odr, ena);
 					break;
 				case peripheral::GLCDC:
 					ret = glcdc_(odr, ena);

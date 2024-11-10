@@ -60,4 +60,7 @@ namespace board_profile {
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 	typedef device::SCI6 FT5206_SCI_CH;
 	static constexpr auto FT5206_SCI_ORDER = device::port_map::ORDER::FIRST;
+
+	// Ethernet ハードウェアー定義 (RX65N Envision Kit / LAN8720A: ET0_RMII)
+	static constexpr device::port_map_order::ether_rmii_t ETHER0(device::port_map_order::RX65N_ENVISION_KIT _);
 }
