@@ -1,13 +1,15 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX220 RIIC @n
-			RX231 RIIC @n
+	@brief	RIIC 定義 @n
+			RX130/RX140 @n
+			RX220 @n
+			RX230/RX231 @n
 			RX24T/RX24U/RX260/RX261/RX26T @n
-			RX621/RX62N RIIC 定義 @n
-			RX631/RX63N RIIC 定義 @n
-			RX66T/RX72T 定義 @n
-			RX64M/RX71M/RX65N/RX660/RX671 RIICa
+			RX621/RX62N @n
+			RX631/RX63N @n
+			RX66T/RX72T @n
+			RX64M/RX71M/RX65N/RX660/RX671 (RIICa)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -442,7 +444,7 @@ namespace device {
 		static constexpr auto PCLK = pclk;		///< クロック周波数
 	};
 
-#if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX13T) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261)
+#if defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX13T) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261)
 	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
