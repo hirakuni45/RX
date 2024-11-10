@@ -88,8 +88,7 @@ namespace device {
 			}
 		}
 
-#if defined(SIG_RX66N)
-#else
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 		static void ether1_mdc_mdio_(ORDER mdc, ORDER mdio, bool ena, uint8_t& err)
 		{
 			uint8_t mii = ena ? 0b01'0001 : 0;
@@ -377,13 +376,14 @@ namespace device {
 
 			ether0_mdc_mdio_(port.mdc_, port.mdio_, ena, err);
 
+			MPC::PFENET.PHYMODE0 = 0;  // RMII
+
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return err == 0;
 		}
 
-#if defined(SIG_RX66N)
-#else
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 		static bool ether1_(const ether_rmii_t& port, bool ena)
 		{
 			uint8_t err = 0;
@@ -589,6 +589,8 @@ namespace device {
 			}
 
 			ether1_mdc_mdio_(port.mdc_, port.mdio_, ena, err);
+
+			MPC::PFENET.PHYMODE1 = 0;  // RMII
 
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
@@ -1076,13 +1078,14 @@ namespace device {
 
 			ether0_mdc_mdio_(port.mdc_, port.mdio_, ena, err);
 
+			MPC::PFENET.PHYMODE0 = 1;  // MII
+
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return err == 0;
 		}
 
-#if defined(SIG_RX66N)
-#else
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 		static bool ether1_(const ether_mii_t& port, bool ena)
 		{
 			uint8_t err = 0;
@@ -1509,6 +1512,8 @@ namespace device {
 
 			ether1_mdc_mdio_(port.mdc_, port.mdio_, ena, err);
 
+			MPC::PFENET.PHYMODE1 = 1;  // MII
+
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return err == 0;
@@ -1532,8 +1537,7 @@ namespace device {
 			case peripheral::ETHERC0:
 				ret = ether0_(port, ena);
 				break;
-#if defined(SIG_RX66N)
-#else
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 			case peripheral::ETHERC1:
 				ret = ether1_(port, ena);
 				break;
@@ -1562,8 +1566,7 @@ namespace device {
 			case peripheral::ETHERC0:
 				ret = ether0_(port, ena);
 				break;
-#if defined(SIG_RX66N)
-#else
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
 			case peripheral::ETHERC1:
 				ret = ether1_(port, ena);
 				break;

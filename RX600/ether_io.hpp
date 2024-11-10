@@ -114,12 +114,12 @@ namespace device {
 		@param[in]	ETHRC	インサーネット・コントローラー
 		@param[in]	EDMAC	インサーネットＤＭＡコントローラー
 		@param[in]	PHY		物理層コントローラー
-		@param[in]	PSEL	ポート候選択（候補）
+		@param[in]	ETHT	イーサーネット・ハードウェアー設定構造体型
 		@param[in]	TXDN	送信バッファ数（標準４）
 		@param[in]	RXDN	受信バッファ数（標準４）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHRC, class EDMAC, class PHY, port_map::ORDER PSEL, uint32_t TXDN = 4, uint32_t RXDN = 4>
+	template <class ETHRC, class EDMAC, class PHY, typename ETHT, uint32_t TXDN = 4, uint32_t RXDN = 4>
 	class ether_io {
 	public:
 		static constexpr int EMAC_BUFSIZE = 1536;	///< イーサーネット・バッファ最大値
@@ -262,8 +262,8 @@ namespace device {
 		volatile descriptor_s*	app_rx_desc_;
 		volatile descriptor_s*	app_tx_desc_;
 
-		static volatile void* 	intr_task_;
-   		static volatile bool	mpd_flag_;
+		static inline volatile void* 	intr_task_;
+   		static inline volatile bool		mpd_flag_;
 
 		PHY				phy_;
 
@@ -713,10 +713,10 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(ICU::LEVEL level)
+		bool start(const ETHT& etht, ICU::LEVEL level)
 		{
 			power_mgr::turn(ETHRC::PERIPHERAL);
-			port_map::turn(ETHRC::PERIPHERAL, true, PSEL);
+			port_map_ether::turn(ETHRC::PERIPHERAL, etht, true);
 
 			intr_level_ = level;
 
@@ -1259,11 +1259,4 @@ namespace device {
 			stat_.inc_error_count(err_code);
 		}
 	};
-
-	template <class ETHRC, class EDMAC, class PHY, port_map::ORDER PSEL, uint32_t TXDN, uint32_t RXDN>
-		volatile void* ether_io<ETHRC, EDMAC, PHY, PSEL, TXDN, RXDN>::intr_task_ = nullptr;
-
-	template <class ETHRC, class EDMAC, class PHY, port_map::ORDER PSEL, uint32_t TXDN, uint32_t RXDN>
-		volatile bool ether_io<ETHRC, EDMAC, PHY, PSEL, TXDN, RXDN>::mpd_flag_ = false;
-
 }
