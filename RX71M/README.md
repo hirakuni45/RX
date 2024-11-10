@@ -12,16 +12,44 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+|R5F571M---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F571MxxxFC|LFQFP|176|0.50|
+|R5F571MxxxBG|LFBGA|176|0.80|
+|R5F571MxxxLC|TFLGA|177|0.50|
+|R5F571MxxxFB|LFQFP|144|0.50|
+|R5F571MxxxLK|TFLGA|145|0.50|
+|R5F571MxxxFP|LFQFP|100|0.50|
+|R5F571MxxxLJ|TFLGA|100|0.65|
+
+### Crypt/暗号、SDHI
+
+|R5F571M-X---|Crypt/暗号|SDHI|
+|---|:-:|:-:|
+|R5F571MxDxxx|-|〇|
+|R5F571MxHxxx|〇|〇|
+|R5F571MxCxxx|-|-|
+|R5F571MxGxxx|〇|-|
+
+### Memoey size/メモリ容量
+
+|R5F571MX----|Code Flash|RAM|Data Flash|
+|---|:-:|:-:|:-:|
+|R5F571MLxxxx|4M|512K+32K|64K|
+|R5F571MJxxxx|3M|512K+32K|64K|
+|R5F571MGxxxx|2.5M|512K+32K|64K|
+|R5F571MFxxxx|2M|512K+32K|64K|
+
 ---
 
 ## RX71M Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|
-|---|:-:|:-:|:-:|---|
-|R5F571MF|2048K|512K+32K|64K|[R5F571MF.ld](R5F571MF.ld?ts=4)|
-|R5F571MG|2560K|512K+32K|64K|[R5F571MG.ld](R5F571MG.ld?ts=4)|
-|R5F571MJ|3072K|512K+32K|64K|[R5F571MJ.ld](R5F571MJ.ld?ts=4)|
-|R5F571ML|4096K|512K+32K|64K|[R5F571ML.ld](R5F571ML.ld?ts=4)|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
+|---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F571ML|4096K|512K+32K|64K|[R5F571ML.ld](R5F571ML.ld?ts=4)|6144|2048|
+|R5F571MJ|3072K|512K+32K|64K|[R5F571MJ.ld](R5F571MJ.ld?ts=4)|6144|2048|
+|R5F571MG|2560K|512K+32K|64K|[R5F571MG.ld](R5F571MG.ld?ts=4)|6144|2048|
+|R5F571MF|2048K|512K+32K|64K|[R5F571MF.ld](R5F571MF.ld?ts=4)|6144|2048|
 
 ---
 

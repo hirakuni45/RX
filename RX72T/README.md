@@ -10,14 +10,39 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F572T---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F572TxxxFB|LFQFP|144|0.50|
+|R5F572TxxxFP|LFQFP|100|0.50|
+
+### PGA, TSIP, USB
+
+|R5F572T-X---|PGA|TSIP|USB|
+|---|:-:|:-:|:-:|
+|R5F572TxAxxx|〇|-|-|
+|R5F572TxBxxx|-|-|-|
+|R5F572TxCxxx|〇|-|〇|
+|R5F572TxExxx|〇|〇|-|
+|R5F572TxFxxx|-|〇|-|
+|R5F572TxGxxx|〇|〇|〇|
+
+### Memoey size/メモリ容量
+
+|R5F572TX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F572TKxxxx|1M|128K|32K|
+|R5F572TFxxxx|512K|128K|32K|
+
 ---
 
 ## RX72T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F572TF|512K|128K+16K|32K|[R5F572TF.ld](R5F572TF.ld?ts=4)|7168|1024|
 |R5F572TK|1024K|128K+16K|32K|[R5F572TK.ld](R5F572TK.ld?ts=4)|7168|1024|
+|R5F572TF|512K|128K+16K|32K|[R5F572TF.ld](R5F572TF.ld?ts=4)|7168|1024|
 
 RAM: 16K(With ECC)
 

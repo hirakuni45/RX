@@ -12,14 +12,62 @@
 - 10 Bits A/D / １０ビットＡ／Ｄ変換器
 - 10 Bits D/A / １０ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F563y---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F563yxxxFC|LFQFP|176|0.50|
+|R5F563yxxxBG|LFBGA|176|0.80|
+|R5F563yxxxLC|TFLGA|177|0.50|
+|R5F563yxxxFB|LFQFP|144|0.50|
+|R5F563yxxxLK|TFLGA|145|0.50|
+|R5F563yxxxLJ|TFLGA|100|0.65|
+|R5F563yxxxFP|LFQFP|100|0.50|
+|R5F563yxxxLH|TFLGA|64|0.65|
+|R5F563yxxxFM|LFQFP|64|0.50|
+|R5F563yxxxFL|LFQFP|48|0.50|
+
+### CAN、DEU、PDC
+
+|R5F563y-X---|CAN|DEU|PDC|
+|---|:-:|:-:|:-:|
+|R5F563yxHxxx|〇|〇|-|
+|R5F563yxDxxx|〇|-|-|
+|R5F563yxGxxx|-|〇|-|
+|R5F563yxCxxx|-|-|-|
+|R5F563yxSxxx|〇|-|〇|
+|R5F563yxFxxx|〇|〇|-|
+
+### Memoey size/メモリ容量
+
+|R5F563yX----|Code Flash|RAM|Data Flash|
+|---|:-:|:-:|:-:|
+|R5F563yFxxxx|2M|256K|32K|
+|R5F563yKxxxx|3M|192K|32K|
+|R5F563yExxxx|2M|128K|32K|
+|R5F563yJxxxx|1.5M|256K|32K|
+|R5F563yGxxxx|1.5M|192K|32K|
+|R5F563yDxxxx|1.5M|128K|32K|
+|R5F563yYxxxx|1M|256K|32K|
+|R5F563yWxxxx|1M|192K|32K|
+|R5F563yBxxxx|1M|128K|32K|
+|R5F563yAxxxx|768K|128K|32K|
+|R5F563y8xxxx|512K|128K|32K|
+|R5F563y7xxxx|384K|128K|32K|
+|R5F563y6xxxx|256K|128K|32K|
+|R5F563yPxxxx|512K|64K|32K|
+|R5F563yNxxxx|384K|64K|32K|
+|R5F563yMxxxx|256K|64K|32K|
+|R5F563y0xxxx|0|128K|0|
+
 ---
 
 ## RX631/RX63N Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F563NE|2048K|128K|32K|[R5F563NE.ld](R5F563NE.ld?ts=4)|7168|1024|
 |R5F563NF|2048K|256K|32K|[R5F563NF.ld](R5F563NF.ld?ts=4)|7168|1024|
+|R5F563NE|2048K|128K|32K|[R5F563NE.ld](R5F563NE.ld?ts=4)|7168|1024|
 
 ---
 

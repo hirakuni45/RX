@@ -12,16 +12,46 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F564M---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F564MxxxFC|LFQFP|176|0.50|
+|R5F564MxxxBG|LFBGA|176|0.80|
+|R5F564MxxxLC|TFLGA|177|0.50|
+|R5F564MxxxFB|LFQFP|144|0.50|
+|R5F564MxxxLK|TFLGA|145|0.50|
+|R5F564MxxxFP|LFQFP|100|0.50|
+|R5F564MxxxLJ|TFLGA|100|0.65|
+
+### Crypt/暗号、SDHI
+
+|R5F564M-X---|Crypt/暗号|SDHI|
+|---|:-:|:-:|
+|R5F564MxDxxx|-|〇|
+|R5F564MxHxxx|〇|〇|
+|R5F564MxCxxx|-|-|
+|R5F564MxGxxx|〇|-|
+
+### Memoey size/メモリ容量
+
+|R5F564MX----|Code Flash|RAM|Data Flash|
+|---|:-:|:-:|:-:|
+|R5F564MLxxxx|4M|512K+32K|64K|
+|R5F564MJxxxx|3M|512K+32K|64K|
+|R5F564MGxxxx|2.5M|512K+32K|64K|
+|R5F564MFxxxx|2M|512K+32K|64K|
+
 ---
 
 ## RX64M Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F564MF|2048K|512K+32K|64K|[R5F564MF.ld](R5F564MF.ld?ts=4)|6144|2048|
-|R5F564MG|2560K|512K+32K|64K|[R5F564MG.ld](R5F564MG.ld?ts=4)|6144|2048|
-|R5F564MJ|3072K|512K+32K|64K|[R5F564MJ.ld](R5F564MJ.ld?ts=4)|6144|2048|
-|R5F564ML|4096K|512K+32K|64K|[R5F564ML.ld](R5F564ML.ld?ts=4)|6144|2048|
+|R5F564MLxxxx|4096K|512K+32K|64K|[R5F564ML.ld](R5F564ML.ld?ts=4)|6144|2048|
+|R5F564MJxxxx|3072K|512K+32K|64K|[R5F564MJ.ld](R5F564MJ.ld?ts=4)|6144|2048|
+|R5F564MGxxxx|2560K|512K+32K|64K|[R5F564MG.ld](R5F564MG.ld?ts=4)|6144|2048|
+|R5F564MFxxxx|2048K|512K+32K|64K|[R5F564MF.ld](R5F564MF.ld?ts=4)|6144|2048|
 
 ---
 

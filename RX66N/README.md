@@ -15,14 +15,39 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F566N---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F566NxxxBD|LFBGA|224|0.80|
+|R5F566NxxxFC|LFQFP|176|0.50|
+|R5F566NxxxBG|LFBGA|176|0.80|
+|R5F566NxxxFB|LFQFP|144|0.50|
+|R5F566NxxxLK|TFLGA|145|0.50|
+|R5F566NxxxFP|LFQFP|100|0.50|
+
+### Crypt/暗号
+
+|R5F566N-X---|Crypt/暗号|
+|---|:-:|
+|R5F566NxDxxx|-|
+|R5F566NxHxxx|〇|
+
+### Memoey size/メモリ容量
+
+|R5F566NX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F566NNxxxx|4M|1M|32K|
+|R5F566NDxxxx|2M|1M|32K|
+
 ---
 
 ## RX66N Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F566ND|2048K|512K+512K+32K+8K|32K|[R5F566ND.ld](R5F566ND.ld?ts=4)|12288|4096|
 |R5F566NN|4096K|512K+512K+32K+8K|32K|[R5F566NN.ld](R5F566NN.ld?ts=4)|12288|4096|
+|R5F566ND|2048K|512K+512K+32K+8K|32K|[R5F566ND.ld](R5F566ND.ld?ts=4)|12288|4096|
 
 ---
 

@@ -8,15 +8,42 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F5140---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F5140xxxFN|LFQFP|80|0.50|
+|R5F5140xxxFM|LFQFP|64|0.50|
+|R5F5140xxxFK|LQFP|64|0.80|
+|R5F5140xxxFL|LFQFP|48|0.50|
+|R5F5140xxxNE|HWQFN|48|0.50|
+|R5F5140xxxFJ|LFQFP|32|0.80|
+|R5F5140xxxNH|HWQFN|32|0.50|
+
+### Crypt
+
+|R5F5140-X---|Crypt|
+|---|:-:|:-:|:-:|
+|R5F5140xAxxx|-|
+|R5F5140xBxxx|〇|
+
+### Memoey size/メモリ容量
+
+|R5F5140X----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F51406xxxx|256K|64K|8K|
+|R5F51405xxxx|128K|32K|8K|
+|R5F51403xxxx|64K|16K|4K|
+
 ---
 
 ## RX140 Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F51403|64K|16K|4K|[R5F51403.ld](R5F51403.ld?ts=4)|768|256|
-|R5F51405|128K|32K|8K|[R5F51405.ld](R5F51405.ld?ts=4)|768|256|
 |R5F51406|256K|64K|8K|[R5F51406.ld](R5F51406.ld?ts=4)|1536|512|
+|R5F51405|128K|32K|8K|[R5F51405.ld](R5F51405.ld?ts=4)|768|256|
+|R5F51403|64K|16K|4K|[R5F51403.ld](R5F51403.ld?ts=4)|768|256|
 
 ---
 

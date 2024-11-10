@@ -10,11 +10,39 @@
 - SD Host Interface (SDHI) / SD ホストインタフェース (SDHI)
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 
+### Package/パッケージ
+
+|R5F5671---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F5671xxxLE|TFLGA|145|0.65|
+|R5F5671xxxLK|TFLGA|145|0.50|
+|R5F5671xxxFB|LFQFP|144|0.50|
+|R5F5671xxxFP|LFQFP|100|0.50|
+|R5F5671xxxLJ|TFLGA|100|0.65|
+|R5F5671xxxFM|LFQFP|64|0.50|
+|R5F5671xxxBP|TFBGA|64|0.50|
+|R5F5671xxxNE|HWQFN|48|0.50|
+
+### Crypt
+
+|R5F5671-X---|Crypt|
+|---|:-:|
+|R5F5671xDxxx|-|
+|R5F5671xHxxx|〇|
+
+### Memoey size/メモリ容量
+
+|R5F5671X----|Code Flash|RAM|Data Flash|
+|---|:-:|:-:|:-:|
+|R5F56719xxxx|1M|384K|8K|
+|R5F5671Cxxxx|1.5M|384K|8K|
+|R5F5671Exxxx|2M|384K|8K|
+
 ---
 
 ## RX671 Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F5671C|1536K|384K+4K|32K|[R5F5671C.ld](R5F5671C.ld?ts=4)|14336|2048|
 |R5F5671E|2048K|384K+4K|32K|[R5F5671E.ld](R5F5671E.ld?ts=4)|14336|2048|

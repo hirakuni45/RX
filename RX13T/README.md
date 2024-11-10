@@ -8,14 +8,30 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F513T---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F513TxxxFL|LFQFP|48|0.50|
+|R5F513TxxxFJ|LQFP|32|0.80|
+|R5F513TxxxNE|HWQFN|48|0.50|
+|R5F513TxxxNH|HWQFN|32|0.50|
+
+### Memoey size/メモリ容量
+
+|R5F513TX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F513T5xxxx|128K|12K|0|
+|R5F513T3xxxx|64K|12K|0|
+
 ---
 
 ## RX13T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Link File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F513T3|64K|12K|4K|[R5F513T3.ld](R5F513T3.ld?ts=4)|512|256|
 |R5F513T5|128K|12K|4K|[R5F513T5.ld](R5F513T5.ld?ts=4)|512|256|
+|R5F513T3|64K|12K|4K|[R5F513T3.ld](R5F513T3.ld?ts=4)|512|256|
 
 ---
 

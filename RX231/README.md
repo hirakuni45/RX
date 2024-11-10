@@ -12,16 +12,48 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F523y---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F523yxxxFP|LFQFP|100|0.50|
+|R5F523yxxxFM|LFQFP|64|0.50|
+|R5F523yxxxFL|LFQFP|48|0.50|
+|R5F523yxxxLA|TFLGA|100|0.50|
+|R5F523yxxxLF|WFLGA|64|0.50|
+|R5F523yxxxND|HWQFN|64|0.50|
+|R5F523yxxxNE|HWQFN|48|0.50|
+
+### Crypt, SDHI, CAN
+
+|R5F523y-X---|Crypt|USB|CANFD|
+|---|:-:|:-:|:-:|
+|R5F5231xAxxx|-|-|〇|
+|R5F5231xBxxx|〇|〇|〇|
+|R5F5231xCxxx|-|-|-|
+|R5F5230xAxxx|-|-|-|
+
+※R5F5231xBxxx: Not for 48-pin device
+
+### Memoey size/メモリ容量
+
+|R5F523yX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F523y8xxxx|512K|64K|8K|
+|R5F523y7xxxx|384K|64K|8K|
+|R5F523y6xxxx|256K|32K|8K|
+|R5F523y5xxxx|128K|32K|8K|
+
 ---
 
 ## RX230/RX231 Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F52315|128K|32K|8K|[R5F52315.ld](R5F52315.ld?ts=4)|1536|512|
-|R5F52316|256K|32K|8K|[R5F52316.ld](R5F52316.ld?ts=4)|1536|512|
-|R5F52317|384K|64K|8K|[R5F52317.ld](R5F52317.ld?ts=4)|1536|512|
 |R5F52318|512K|64K|8K|[R5F52318.ld](R5F52318.ld?ts=4)|1536|512|
+|R5F52317|384K|64K|8K|[R5F52317.ld](R5F52317.ld?ts=4)|1536|512|
+|R5F52316|256K|32K|8K|[R5F52316.ld](R5F52316.ld?ts=4)|1536|512|
+|R5F52315|128K|32K|8K|[R5F52315.ld](R5F52315.ld?ts=4)|1536|512|
 
 ---
 

@@ -8,11 +8,26 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A (for Compalator) / ８ビットＤ／Ａ変換器（コンパレーター用）
 
+### Package/パッケージ
+
+|R5F523T---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F523TxxxFM|LFQFP|64|0.50|
+|R5F523TxxxFD|LQFP|52|0.65|
+|R5F523TxxxFL|LFQFP|48|0.50|
+
+### Memoey size/メモリ容量
+
+|R5F523TX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F523TExxxx|128K|12K|0|
+|R5F523TCxxxx|64K|12K|0|
+
 ---
 
 ## RX23T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Source|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F523T5|128K|12K|-|[R5F523T5.ld](R5F523T5.ld?ts=4)|512|256|
 

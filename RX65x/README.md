@@ -13,11 +13,46 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F565y---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F565yxxxFC|LFQFP|176|0.50|
+|R5F565yxxxBG|LFBGA|176|0.80|
+|R5F565yxxxLC|TFLGA|177|0.50|
+|R5F565yxxxFB|LFQFP|144|0.50|
+|R5F565yxxxLK|TFLGA|145|0.50|
+|R5F565yxxxFP|LFQFP|100|0.50|
+|R5F565yxxxLJ|TFLGA|100|0.65|
+|R5F565yxxxFM|TFQFP|64|0.5|
+|R5F565yxxxBP|TFBGA|64|0.5|
+
+### Crypt/暗号、SDHI/SDSI
+
+|R5F565y-X---|Crypt/暗号|SDHI/SDSI|Dual bank|
+|---|:-:|:-:|:-:|
+|R5F565yxAxxx|-|-|-|
+|R5F565yxBxxx|-|〇|-|
+|R5F565yxDxxx|〇|〇|〇|
+|R5F565yxExxx|-|-|-|
+|R5F565yxFxxx|-|〇|-|
+|R5F565yxHxxx|〇|-|〇|
+
+### Memoey size/メモリ容量
+
+|R5F565yX----|Code Flash|RAM|Data Flash|
+|---|:-:|:-:|:-:|
+|R5F565y4xxxx|512K|256K|-|
+|R5F565y7xxxx|768K|256K|-|
+|R5F565y9xxxx|1M|256K|-|
+|R5F565yCxxxx|1.5M|640K|32K|
+|R5F565yExxxx|2M|640K|32K|
+
 ---
 
 ## RX651/RX65N Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F565NE|2048K|256K+384K+8K|32K|[R5F565NE.ld](R5F565NE.ld?ts=4)|12288|4096|
 

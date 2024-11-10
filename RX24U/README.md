@@ -8,11 +8,26 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F524U---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F524UxxxFB|LFQFP|144|0.50|
+|R5F524UxxxFP|LFQFP|100|0.50|
+
+### Memoey size/メモリ容量
+
+|R5F524UX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F524UExxxx|512K|32K|8K|
+|R5F524UCxxxx|384K|32K|8K|
+|R5F524UBxxxx|256K|32K|8K|
+
 ---
 
 ## RX24U Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F524UE|512K|32K|8K|[R5F524UE.ld](R5F524UE.ld?ts=4)|1536|512|
 |R5F524UB|256K|32K|8K|[R5F524UB.ld](R5F524UB.ld?ts=4)|1536|512|

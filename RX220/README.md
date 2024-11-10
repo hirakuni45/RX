@@ -7,11 +7,29 @@
 - 1.62V ～ 5.5V Operation / 動作
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 
+### Package/パッケージ
+
+|R5F5220---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F5220xxxFP|LQFP|100|0.50|
+|R5F5220xxxFM|LQFP|64|0.50|
+|R5F5220xxxFK|LQFP|64|0.50|
+|R5F5220xxxFL|LQFP|48|0.50|
+
+### Memoey size/メモリ容量
+
+|R5F5220X----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F52206xxxx|256K|16K|8K|
+|R5F52205xxxx|128K|8K|8K|
+|R5F52203xxxx|64K|8K|8K|
+|R5F52201xxxx|32K|4K|8K|
+
 ---
 
 ## RX220 Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F52206|256K|16K|8K|[R5F52206.ld](R5F52206.ld?ts=4)|768|256|
 
