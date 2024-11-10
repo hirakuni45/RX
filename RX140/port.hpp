@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140 グループ・ポート・レジスター定義
+	@brief	RX130/RX140 グループ・ポート・レジスター定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -23,7 +23,9 @@ namespace device {
 	typedef portx_t<0x0008'C00C, odr_oo_t<0x0008'C098> > PORTC;
 	typedef portx_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
 	typedef portx_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
+#if defined(SIG_RX140)
 	typedef portx_t<0x0008'C010, odr_xx_t<0x0008'C0A0> > PORTG;
+#endif
 	typedef portx_t<0x0008'C011, odr_xx_t<0x0008'C0A2> > PORTH;
 	typedef portx_t<0x0008'C012, odr_xx_t<0x0008'C0A4> > PORTJ;
 

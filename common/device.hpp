@@ -48,11 +48,11 @@
 #include "RX130/peripheral.hpp"
 #include "RX130/system.hpp"
 #include "RX130/power_mgr.hpp"
-// #include "RX130/icu.hpp"
-// #include "RX24T/icu_mgr.hpp"
-// #include "RX13T/port_map.hpp"
-// #include "RX13T/port_map_mtu.hpp"
-// #include "RX13T/port_map_irq.hpp"
+#include "RX130/icu.hpp"
+#include "RX140/icu_mgr.hpp"
+#include "RX130/port_map.hpp"
+#include "RX130/port_map_mtu.hpp"
+#include "RX130/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX140)

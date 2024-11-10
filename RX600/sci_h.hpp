@@ -12,7 +12,7 @@
 
 namespace device {
 
-#if defined(SIG_RX13T) || defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
+#if defined(SIG_RX13T) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCIh 定義クラス（通常ベクター版）

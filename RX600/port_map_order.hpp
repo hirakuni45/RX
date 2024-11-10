@@ -271,13 +271,13 @@ namespace device {
 			ORDER	io2;
 			ORDER	io3;
 
-			constexpr qspi_port_t() noexcept :
-				clk(ORDER::BYPASS),
-				ssl(ORDER::BYPASS),
-				io0(ORDER::BYPASS),
-				io1(ORDER::BYPASS),
-				io2(ORDER::BYPASS),
-				io3(ORDER::BYPASS)
+			constexpr qspi_port_t(ORDER odr = ORDER::BYPASS) noexcept :
+				clk(odr),
+				ssl(odr),
+				io0(odr),
+				io1(odr),
+				io2(odr),
+				io3(odr)
 			{ }
 
 			constexpr qspi_port_t(RX65N_ENVISION_KIT _) noexcept :
@@ -317,17 +317,17 @@ namespace device {
 			ORDER	mdc_;
 			ORDER	mdio_;
 
-			constexpr ether_rmii_t() noexcept :
-				ref50ck_(ORDER::BYPASS),
-				crs_dv_(ORDER::BYPASS),
-				txd0_(ORDER::BYPASS),
-				txd1_(ORDER::BYPASS),
-				rxd0_(ORDER::BYPASS),
-				rxd1_(ORDER::BYPASS),
-				txd_en_(ORDER::BYPASS),
-				rx_er_(ORDER::BYPASS),
-				mdc_(ORDER::BYPASS),
-				mdio_(ORDER::BYPASS)
+			constexpr ether_rmii_t(ORDER odr = ORDER::BYPASS) noexcept :
+				ref50ck_(odr),
+				crs_dv_(odr),
+				txd0_(odr),
+				txd1_(odr),
+				rxd0_(odr),
+				rxd1_(odr),
+				txd_en_(odr),
+				rx_er_(odr),
+				mdc_(odr),
+				mdio_(odr)
 			{ }
 
 			constexpr ether_rmii_t(RX65N_ENVISION_KIT t) noexcept :

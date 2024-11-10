@@ -44,10 +44,28 @@
 #include "RX13T/board_profile.hpp"
 
 #elif defined(SIG_RX130)
+#include "RX231/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX140/bus.hpp"
+#include "RX140/elc.hpp"
+#include "RX220/mtu2.hpp"
+// #include "RX220/poe2.hpp"
+#include "RX600/tmr.hpp"
+// #include "RX140/rtc.hpp"
+#include "RX600/lpt.hpp"
+#include "RX600/sci_g.hpp"
+#include "RX600/sci_h.hpp"
+#include "RX600/crc.hpp"
+// #include "RX600/ctsu2.hpp"
+// #include "RX231/s12ade.hpp"
+#include "RX140/da.hpp"
+// #include "RX231/cmpb.hpp"
+#include "RX600/doc.hpp"
+#include "RX130/flash.hpp"
 
-// #include "RX140/system_io.hpp"
-// #include "RX24T/flash_io.hpp"
-// #include "RX600/dac_out.hpp"
+#include "RX140/system_io.hpp"
+#include "RX24T/flash_io.hpp"
+#include "RX600/dac_out.hpp"
 
 #include "RX130/board_profile.hpp"
 

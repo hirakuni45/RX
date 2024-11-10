@@ -8,14 +8,33 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F524T---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F524TxxxFP|LFQFP|100|0.50|
+|R5F524TxxxFF|LQFP|80|0.65|
+|R5F524TxxxFN|LFQFP|80|0.50|
+|R5F524TxxxFM|LFQFP|64|0.50|
+
+### Memoey size/メモリ容量
+
+|R5F524TX----|CodeFlash|RAM|DataFlash|ChipVersion|
+|---|:-:|:-:|:-:|:-:|
+|R5F524TExxxx|512K|32K|8K|B|
+|R5F524TCxxxx|384K|32K|8K|B|
+|R5F524TBxxxx|256K|32K|8K|B|
+|R5F524TAxxxx|256K|16K|8K|A|
+|R5F524T8xxxx|128K|16K|8K|A|
+
 ---
 
 ## RX24T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F524T8|128K|16K|8K|[R5F524T8.ld](R5F524T8.ld?ts=4)|1024|512|
 |R5F524TA|256K|16K|8K|[R5F524TA.ld](R5F524TA.ld?ts=4)|1024|512|
+|R5F524T8|128K|16K|8K|[R5F524T8.ld](R5F524T8.ld?ts=4)|1024|512|
 
 ---
 

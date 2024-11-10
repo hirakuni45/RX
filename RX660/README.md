@@ -8,11 +8,41 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F5660---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F5660xxxFB|LFQFP|144|0.50|
+|R5F5660xxxFP|LFQFP|100|0.50|
+|R5F5660xxxFN|LFQFP|80|0.50|
+|R5F5660xxxFM|LFQFP|64|0.50|
+|R5F5660xxxFL|LFQFP|48|0.50|
+
+### JTAG, Sub-clock, CAN
+
+|R5F5660-X---|JTAG|Sub-clock|CAN|
+|---|:-:|:-:|:-:|
+|R5F5660xAxxx|-|-|2.0|
+|R5F5660xBxxx|-|-|FD|
+|R5F5660xCxxx|-|〇|2.0|
+|R5F5660xDxxx|-|〇|FD|
+|R5F5660xExxx|〇|-|2.0|
+|R5F5660xFxxx|〇|-|FD|
+|R5F5660xGxxx|〇|〇|2.0|
+|R5F5660xHxxx|〇|〇|FD|
+
+### Memoey size/メモリ容量
+
+|R5F5660X----|Code Flash|RAM|Data Flash|
+|---|:-:|:-:|:-:|
+|R5F56609xxxx|1M|128K|32K|
+|R5F56604xxxx|512K|128K|32K|
+
 ---
 
 ## RX660 Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F56609|1024K|128K|32K|[R5F56609.ld](R5F56609.ld?ts=4)|7168|1024|
 

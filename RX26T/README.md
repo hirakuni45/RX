@@ -10,11 +10,41 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F526T---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F526TxxxFP|LFQFP|100|0.50|
+|R5F526TxxxFN|LQFP|80|0.50|
+|R5F526TxxxFM|LFQFP|64|0.50|
+|R5F526TxxxFL|LQFP|48|0.50|
+|R5F526TxxxND|HWQFN|64|0.50|
+|R5F526TxxxNE|HWQFN|48|0.50|
+
+### CAN 2.0/CAN FD, TSIP-Lite
+
+|R5F526T-X---|CAN||TSIP-Lite|
+|---|:-:|:-:|
+|R5F526TxAxxx|2.0|-|
+|R5F526TxBxxx|2.0|〇|
+|R5F526TxCxxx|FD|-|
+|R5F526TxDxxx|FD|〇|
+
+### Memoey size/メモリ容量
+
+|R5F526TX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F526TFxxxx|512K|64K|16K|
+|R5F526TBxxxx|256K|64K|16K|
+|R5F526TAxxxx|256K|48K|16K|
+|R5F526T9xxxx|128K|64K|16K|
+|R5F526T8xxxx|128K|48K|16K|
+
 ---
 
 ## RX26T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F526TF|512K|64K|16K|[R5F526TF.ld](R5F526TF.ld?ts=4)|2048|1024|
 

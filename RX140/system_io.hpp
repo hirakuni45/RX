@@ -1,15 +1,20 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140 システム制御
+	@brief	RX130/RX140 システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
+#if defined(SIG_RX130)
+#include "RX130/system.hpp"
+#include "RX130/clock_profile.hpp"
+#elif defined(SIG_RX140)
 #include "RX140/system.hpp"
 #include "RX140/clock_profile.hpp"
+#endif
 
 namespace device {
 
@@ -152,13 +157,16 @@ namespace device {
 				while(device::SYSTEM::OPCCR.OPCMTSF() != 0) { asm("nop"); }
 				device::SYSTEM::OPCCR.OPCM = 0b000;
 				while(device::SYSTEM::OPCCR.OPCMTSF() != 0) { asm("nop"); }
-
+#if defined(SIG_RX140)	
 				// Setup memory wait cycle register
 				FLASH::MEMWAITR = FLASH::MEMWAITR.MEKEY.b(0xAA) | FLASH::MEMWAITR.MEMWAIT.b(1);
 				FLASH::DFLWAITR = FLASH::DFLWAITR.DFKEY.b(0xAA) | FLASH::DFLWAITR.DFLWAIT.b(1);
+#endif
 			} else {
+#if defined(SIG_RX140)	
 				FLASH::MEMWAITR = FLASH::MEMWAITR.MEKEY.b(0xAA) | FLASH::MEMWAITR.MEMWAIT.b(0);
 				FLASH::DFLWAITR = FLASH::DFLWAITR.DFKEY.b(0xAA) | FLASH::DFLWAITR.DFLWAIT.b(0);
+#endif
 			}
 
 			// Master PLL settings
@@ -186,8 +194,10 @@ namespace device {
 			}
 
 			if(clock_profile::TURN_SBC) {  // サブクロック発信器制御
+#if defined(SIG_RX140)
 				device::SYSTEM::SOMCR.SODRV = 0b00;  // ドライブ能力指定
 				device::SYSTEM::SOMCR = static_cast<uint8_t>(clock_profile::SOMCR);
+#endif
 				device::SYSTEM::SOSCCR.SOSTP.b(0);
 			}
 

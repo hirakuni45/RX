@@ -235,7 +235,11 @@ namespace device {
 					device::FLASH::FSARL = org;
 					page = org & ~(DATA_BLOCK_SIZE - 1);
 				}
+#if defined(SIG_RX130)
+				device::FLASH::FWBL = *p++;
+#else
 				device::FLASH::FWB0 = *p++;
+#endif
 				device::FLASH::FCR = 0x81;
 				while(device::FLASH::FSTATR1.FRDY() == 0) ;
 				device::FLASH::FCR = 0x00;

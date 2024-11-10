@@ -8,11 +8,42 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 10 Bits D/A / １０ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F563T---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F563TxxxFB|LFQFP|144|0.50|
+|R5F563TxxxFP|LFQFP|100|0.50|
+|R5F563TxxxFP|LFQFP|100|0.50|
+|R5F563TxxxFP|LFQFP|100|0.50|
+|R5F563TxxxFP|LFQFP|100|0.50|
+|R5F563TxxxFP|LFQFP|100|0.50|
+
+### VCC, CAN
+
+|R5F563T-X---|VCC|CAN|
+|---|:-:|:-:|
+|R5F563TxAxxx|5V|〇|
+|R5F563TxBxxx|3V|〇|
+|R5F563TxDxxx|5V|-|
+|R5F563TxExxx|3V|-|
+
+### Memoey size/メモリ容量
+
+|R5F563TX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F563TExxxx|512K|48K|32K|
+|R5F563TCxxxx|384K|32K|32K|
+|R5F563TBxxxx|256K|24K|32K|
+|R5F563T6xxxx|64K|8K|8K|
+|R5F563T5xxxx|48K|8K|8K|
+|R5F563T4xxxx|32K|8K|8K|
+
 ---
 
 ## RX63T Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F563T6|64K|8K|8K|[R5F563T6.ld](R5F563T6.ld?ts=4)|768|256|
 

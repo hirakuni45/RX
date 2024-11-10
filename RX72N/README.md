@@ -16,14 +16,39 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F572N---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F572NxxxBD|LFBGA|224|0.80|
+|R5F572NxxxFC|LFQFP|176|0.50|
+|R5F572NxxxBG|LFBGA|176|0.80|
+|R5F572NxxxFB|LFQFP|144|0.50|
+|R5F572NxxxLK|TFLGA|145|0.50|
+|R5F572NxxxFP|LFQFP|100|0.50|
+
+### Crypt/暗号
+
+|R5F572N-X---|Crypt/暗号|
+|---|:-:|
+|R5F572NxDxxx|-|
+|R5F572NxHxxx|〇|
+
+### Memoey size/メモリ容量
+
+|R5F572NX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F572NNxxxx|4M|1M|32K|
+|R5F572NDxxxx|2M|1M|32K|
+
 ---
 
 ## RX72N Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F572ND|2048K|512K+512K+32K+8K|64K|[R5F572ND.ld](R5F572ND.ld?ts=4)|12288|4096|
 |R5F572NN|4096K|512K+512K+32K+8K|64K|[R5F572NN.ld](R5F572NN.ld?ts=4)|12288|4096|
+|R5F572ND|2048K|512K+512K+32K+8K|64K|[R5F572ND.ld](R5F572ND.ld?ts=4)|12288|4096|
 
 ---
 

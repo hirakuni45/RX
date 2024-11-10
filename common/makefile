@@ -67,6 +67,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX130)
   RX_CPU = RX130
   RX_CHOOSE = -mcpu=rx100
+  AS_OPT	+=	--defsym NO_FLOAT=1
   LDSCRIPT	= ../../RX130/$(DEVICE).ld
 endif
 

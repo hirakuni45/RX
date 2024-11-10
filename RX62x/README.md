@@ -11,15 +11,40 @@
 - 12/10 Bits A/D / １２・１０ビットＡ／Ｄ変換器
 - 10 Bits D/A / １０ビットＤ／Ａ変換器
 
+### Package/パッケージ
+
+|R5F562y---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|---|:-:|:-:|:-:|
+|R5F562yxxxBG|LFBGA|176|0.80|
+|R5F562yxxxLE|TFLGA|145|0.65|
+|R5F562yxxxFB|LQFP|144|0.50|
+|R5F562yxxxFP|LQFP|100|0.50|
+|R5F562yxxxLD|TFLGA|85|0.65|
+
+### CAN
+
+|R5F562y-X---|CAN|
+|---|:-:|
+|R5F563yxAxxx|-|
+|R5F563yxBxxx|〇|
+
+### Memoey size/メモリ容量
+
+|R5F562yX----|CodeFlash|RAM|DataFlash|
+|---|:-:|:-:|:-:|
+|R5F562yExxxx|512K|96K|32K|
+|R5F562yCxxxx|384K|64K|32K|
+|R5F562yBxxxx|256K|64K|32K|
+
 ---
 
 ## RX621/RX62N Linker file / リンカーファイル
 
-|Type|Program|RAM|Data Flash|Source|Ustack|Istack|
+|Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F562N7|384K|64K|32K|[R5F562N7.ld](R5F562N7.ld?ts=4)|1024|512|
-|R5F562N8|512K|96K|32K|[R5F562N8.ld](R5F562N8.ld?ts=4)|1024|512|
 |R5F56218|512K|96K|32K|[R5F56218.ld](R5F56218.ld?ts=4)|1024|512|
+|R5F562N8|512K|96K|32K|[R5F562N8.ld](R5F562N8.ld?ts=4)|1024|512|
+|R5F562N7|384K|64K|32K|[R5F562N7.ld](R5F562N7.ld?ts=4)|1024|512|
 
 ---
 
