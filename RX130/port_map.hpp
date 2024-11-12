@@ -152,14 +152,14 @@ namespace device {
 				// RXD5: PC2
 				// TXD5: PC3
 				// SCK5: PC4
-				PORTA::PMR.B3 = 0;
-				PORTA::ODR.B3 = i2c;
-				MPC::PA3PFS.PSEL = sel;  // ok
-				PORTA::PMR.B3 = enable;
-				PORTA::PMR.B4 = 0;
-				PORTA::ODR.B4 = i2c;
-				MPC::PA4PFS.PSEL = sel;  // ok
-				PORTA::PMR.B4 = enable;
+				PORTC::PMR.B3 = 0;
+				PORTC::ODR.B3 = i2c;
+				MPC::PC3PFS.PSEL = sel;  // ok
+				PORTC::PMR.B3 = enable;
+				PORTC::PMR.B4 = 0;
+				PORTC::ODR.B4 = i2c;
+				MPC::PC4PFS.PSEL = sel;  // ok
+				PORTC::PMR.B4 = enable;
 				if(spi) {
 					PORTC::PMR.B4 = 0;
 					MPC::PC4PFS.PSEL = sel;  // ok

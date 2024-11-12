@@ -1,8 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	S12ADE 定義 @n
+	@brief	S12ADb S12ADE 定義 @n
 			ユニット構成は同等だがチャネル構成が異なる @n
+			RX130:       8+16 input single A/D @n
 			RX140:       8+9  input single A/D @n
 			RX230/RX231: 8+16 input single A/D @n
 			RX260/RX261: 8+1+16 input single A/D
@@ -1630,10 +1631,10 @@ namespace device {
 		static inline adccr_t<base + 0x7E>  ADCCR;
 	};
 
-#elif defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
+#elif defined(SIG_RX130) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX230/RX231 S12ADE 定義
+		@brief  RX130/RX230/RX231/RX260/RX261 S12ADE 定義
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1652,6 +1653,9 @@ namespace device {
 		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
 #if defined(SIG_RX230) || defined(SIG_RX231)
 		static constexpr uint32_t CONV_TIME_NS = 830;				///< A/D 変換時間 0.83uS、単位「ns」
+		static constexpr uint32_t ANALOG_NUM = 24;	///< アナログ入力数
+#elif defined(SIG_RX130)
+		static constexpr uint32_t CONV_TIME_NS = 1400;				///< A/D 変換時間 0.83uS、単位「ns」
 		static constexpr uint32_t ANALOG_NUM = 24;	///< アナログ入力数
 #else
 		static constexpr uint32_t CONV_TIME_NS  = 700;				///< A/D 変換時間 (ADCCR.CCS=0) 0.7uS、単位「ns」
@@ -2027,7 +2031,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static inline ad_utils::adbuf_t<BASE::ADBUF_::address, 15> ADBUF;
 	};
-
 #endif
 
 	typedef s12ade_t<0x0008'9000>  S12AD;

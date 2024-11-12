@@ -4,6 +4,7 @@
 - RXv1 core / RXv1 コア
 - Maximum operating frequency 32MHz / 最大動作周波数 32MHz
 - 1.8V ～ 5.5V Operation / 動作
+- Capacitive touch sensor / 静電容量式タッチセンサ
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
@@ -41,8 +42,8 @@
 
 |Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F51306|256K|32K|8K|[R5F51306.ld](R5F51405.ld?ts=4)|1536|512|
-|R5F51305|128K|16K|8K|[R5F51305.ld](R5F51406.ld?ts=4)|1024|256|
+|R5F51306|256K|32K|8K|[R5F51306.ld](R5F51306.ld?ts=4)|1536|512|
+|R5F51305|128K|16K|8K|[R5F51305.ld](R5F51305.ld?ts=4)|1024|256|
 
 ---
 
@@ -59,11 +60,6 @@
 |Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp?ts=4)||
 |Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp?ts=4)||
 |Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp?ts=4)||
-|A/D Definition/A/D 定義|[s12ad.hpp](s12ad.hpp?ts=4)||
-|D/A Definition/D/A 定義|[da.hpp](da.hpp?ts=4)||
-|BUS Definition/BUS 定義|[bus.hpp](bus.hpp?ts=4)||
-|ELC Definition/ELC 定義|[elc.hpp](elc.hpp?ts=4)||
-|RTC Definition/RTC 定義|[rtc.hpp](rtc.hpp?ts=4)||
 |FLASH Definition/FLASH 定義|[flash.hpp](flash.hpp?ts=4)||
 |System Definition/システム定義|[system.hpp](system.hpp?ts=4)||
 
@@ -71,23 +67,23 @@
 
 ## Basic Pin Assignments / 基本ピンアサイン
 
-|Terminal/端子|LFQFP 64|LFQFP 80|
-|---|---|---|
-|VCL|VCL(2)|VCL(4)|
-|Reset Input/リセット入力|RES#(6)|RES#(9)|
-|Mode Controle/モード制御|MD/FINED(3)|MD/FINED(6)|
-|RXD|P30/RXD1(14)|P30/RXD1(18)|
-|TXD|P26/TXD1(16)|P26/TXD1(20)|
-|Power/電源|VCC(10), VCC(38)|VCC(13), VCC(48)|
-|GND/接地|VSS(8), VSS(40)|VSS(11), VSS(50)|
-|Analog Power/アナログ電源|AVCC0(62)|AVCC0(77)|
-|Analog GND/アナログ接地|AVSS0(64)|AVSS0(79)|
-|Analog Refarence L/アナログ基準電源Ｌ|VREFL0(59)|VREFL0(74)|
-|Analog Refarence H/アナログ基準電源Ｈ|VREFH0(61)|VREFH0(76)|
-|OSC out|XTAL(7)|XTAL(10)|
-|OSC in|EXTAL(9)|EXTAL(12)|
-|Sub OSC out|XCOUT(5)|XCOUT(8)|
-|Sub OSC in|XCIN(4)|XCIN(7)|
+|Terminal/端子|LFQFP 64|LFQFP 80|LFQFP100|
+|---|---|---|---|
+|VCL|VCL(2)|VCL(4)|VCL(5)|
+|Reset Input/リセット入力|RES#(6)|RES#(9)|RES#(10)|
+|Mode Controle/モード制御|MD/FINED(3)|MD/FINED(6)|MD/FINED(7)|
+|RXD|P30/RXD1(14)|P30/RXD1(18)|P30/RXD1(20)|
+|TXD|P26/TXD1(16)|P26/TXD1(20)|P26/TXD1(22)|
+|Power/電源|VCC(10), VCC(38)|VCC(13), VCC(48)|VCC(14), VCC(60)|
+|GND/接地|VSS(8), VSS(40)|VSS(11), VSS(50)|VSS(12), VSS(62)|
+|Analog Power/アナログ電源|AVCC0(62)|AVCC0(77)|AVCC0(97)|
+|Analog GND/アナログ接地|AVSS0(64)|AVSS0(79)|AVSS0(99)|
+|Analog Refarence L/アナログ基準電源Ｌ|VREFL0(59)|VREFL0(74)|VREFL0(94)|
+|Analog Refarence H/アナログ基準電源Ｈ|VREFH0(61)|VREFH0(76)|VREFH0(96)|
+|OSC out|XTAL(7)|XTAL(10)|XTAL(11)|
+|OSC in|EXTAL(9)|EXTAL(12)|EXTAL(13)|
+|Sub OSC out|XCOUT(5)|XCOUT(8)|XCOUT(9)|
+|Sub OSC in|XCIN(4)|XCIN(7)|XCIN(8)|
 
 - VCL: 4.7uF/25V
 

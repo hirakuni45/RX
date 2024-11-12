@@ -161,6 +161,13 @@ namespace device {
 				SYSTEM::MSTPCRC.MSTPC27 = f;
 				break;
 
+			case peripheral::REMC1:
+				SYSTEM::MSTPCRC.MSTPC28 = f;
+				break;
+			case peripheral::REMC0:
+				SYSTEM::MSTPCRC.MSTPC29 = f;
+				break;
+
 			case peripheral::CTSU:
 				SYSTEM::MSTPCRD.MSTPD10 = f;
 				break;
