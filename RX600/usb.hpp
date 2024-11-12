@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・USB[abd] 定義 @n
+	@brief	RX600 グループ・USB[abcd] 定義 @n
+			RX111 @n
 			RX231 @n
 			RX261 @n
 			RX63T @n
@@ -526,7 +527,8 @@ namespace device {
 		};
 		static inline frmnum_t<base + 0x4C> FRMNUM;
 
-
+#if defined(SIG_RX111)
+#else
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  デバイスステート切り替えレジスタ（DVCHGR）
@@ -564,7 +566,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 4>   STSRECOV;
 		};
 		static inline usbaddr_t<base + 0x50> USBADDR;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -1187,6 +1189,100 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  USBc 定義クラス
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	IVT		割り込みベクター型
+		@param[in]	ivec	USBI 割り込み Vector
+		@param[in]	rvec	USBR 割り込み Vector
+		@param[in]	d0vec	D0 割り込み Vector
+		@param[in]	d1vec	D1 割り込み Vector
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, typename IVT,
+		IVT ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+	struct usb_c_t : public usb_core_t<base> {
+
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr auto I_VEC      = ivec;	///< USBI 割り込み Vector
+		static constexpr auto R_VEC      = rvec;	///< USBR 割り込み Vector
+		static constexpr auto D0_VEC     = d0vec;	///< D0 割り込み Vector
+		static constexpr auto D1_VEC     = d1vec;	///< D1 割り込み Vector
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SOF 出力コンフィギュレーションレジスタ（SOFCFGc）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct sofcfg_c_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B4>    EDGESTS;
+
+			bit_rw_t<io_, bitpos::B6>    BRDYM;
+
+			bit_rw_t<io_, bitpos::B8>    TRNENSEL;
+		};
+		static inline sofcfg_c_t<base + 0x3C> SOFCFG;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  USB モジュール制御レジスタ (USBMC)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct usbmc_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>    VDDUSBE;
+		};
+		static inline usbmc_t<base + 0xCC> USBMC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  BC コントロールレジスタ 0 (USBBCCTRL0)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct usbbcctrl0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>    RPDME0;
+			bit_rw_t<io_, bitpos::B1>    IDPSRCE0;
+			bit_rw_t<io_, bitpos::B2>    IDMSINKE0;
+			bit_rw_t<io_, bitpos::B3>    VDPSRCE0;
+			bit_rw_t<io_, bitpos::B4>    IDPSINKE0;
+			bit_rw_t<io_, bitpos::B5>    VDMSRCE0;
+
+			bit_rw_t<io_, bitpos::B7>    BATCHGE0;
+			bit_rw_t<io_, bitpos::B8>    GHGDETSTS0;
+			bit_rw_t<io_, bitpos::B9>    PDDETSTS0;
+		};
+		static inline usbbcctrl0_t<base + 0xB0> USBBCCTRL0;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  USBd 定義クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
@@ -1325,8 +1421,10 @@ namespace device {
 		static inline sofcfg_a_t<base + 0x3C> SOFCFG;
 	};
 
-
-#if defined(SIG_RX231)
+#if defined(SIG_RX111)
+	typedef usb_a_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
+		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
+#elif defined(SIG_RX231)
 	typedef usb_a_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #elif defined(SIG_RX231)

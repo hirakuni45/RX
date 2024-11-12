@@ -58,6 +58,14 @@ PROG_ERASE = --erase
 # rx_prog verify command
 PROG_VERIFY = --verify
 PROG_OPT =
+
+ifeq ($(RX_DEF),SIG_RX111)
+  RX_CPU = RX111
+  RX_CHOOSE = -mcpu=rx100
+  AS_OPT	+=	--defsym NO_FLOAT=1
+  LDSCRIPT	= ../../RX111/$(DEVICE).ld
+endif
+
 ifeq ($(RX_DEF),SIG_RX13T)
   RX_CPU = RX13T
   RX_CHOOSE = -misa=v1

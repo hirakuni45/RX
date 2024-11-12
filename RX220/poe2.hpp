@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140/RX220 ポートアウトプットイネーブル POE2a 定義
+	@brief	RX111/RX130/RX140/RX220 ポートアウトプットイネーブル POE2a 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n

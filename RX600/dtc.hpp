@@ -3,6 +3,8 @@
 /*!	@file
 	@brief	RX600/RX700 グループ　DTCa, DTCb 定義 @n
 			・RX13T @n
+			・RX111 @n
+			・RX130 @n
 			・RX140 @n
 			・RX220 @n
 			・RX231 @n

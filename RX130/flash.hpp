@@ -62,27 +62,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メモリウェイトサイクル設定レジスタ (MEMWAITR)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct memwaitr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     MEMWAIT;
-
-			bits_rw_t<io_, bitpos::B8, 8>  MEKEY;
-		};
-		static inline memwaitr_t<0x007F'FFC0> MEMWAITR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  プロテクト解除レジスタ (FPR)
 		*/
 		//-----------------------------------------------------------------//
@@ -238,7 +217,7 @@ namespace device {
 			@brief  フラッシュ処理開始アドレスレジスタ H (FSARH)
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<0x007F'FF84> FSARH;
+		static inline rw8_t<0x007F'FF84> FSARH;
 
 
 		//-----------------------------------------------------------------//
@@ -246,7 +225,7 @@ namespace device {
 			@brief  フラッシュ処理開始アドレスレジスタ L (FSARL)
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<0x007F'FF82> FSARL;
+		static inline rw8_t<0x007F'FF82> FSARL;
 
 
 		//-----------------------------------------------------------------//
@@ -340,7 +319,7 @@ namespace device {
 			@brief  フラッシュエラーアドレスモニタレジスタ H (FEAMH)
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<0x007F'C0BA> FEAMH;
+		static inline rw8_t<0x007F'C0BA> FEAMH;
 
 
 		//-----------------------------------------------------------------//

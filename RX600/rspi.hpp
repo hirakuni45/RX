@@ -2,7 +2,7 @@
 //=============================================================================//
 /*!	@file
 	@brief	RX600 グループ・RSPI[abcd] 制御 @n
-			RX130/RX140 @n
+			RX111/RX130/RX140 @n
 			RX220 @n
 			RX231 @n
 			RX23T @n
@@ -564,7 +564,7 @@ namespace device {
 		static constexpr bool SPCR3_reg   = true;	///< SPCR3 機能
 	};
 
-#if defined(SIG_RX130) || defined(SIG_RX140)
+#if defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140)
 	typedef rspi_c_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR, ICU::VECTOR,
 		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
 #elif defined(SIG_RX220)
