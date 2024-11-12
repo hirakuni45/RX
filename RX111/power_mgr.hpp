@@ -1,15 +1,15 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX130 グループ・電力制御クラス
+	@brief	RX111 グループ・電力制御クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX130/system.hpp"
-#include "RX130/peripheral.hpp"
+#include "RX111/system.hpp"
+#include "RX111/peripheral.hpp"
 
 namespace device {
 
@@ -22,12 +22,10 @@ namespace device {
 
 		struct pad_t {
 
-			uint8_t		tmr_;
 			uint8_t		mtu_;
 			uint8_t		cmt_;
 
 			pad_t() :
-				tmr_(0),
 				mtu_(0),
 				cmt_(0)
 			{ }
@@ -68,16 +66,6 @@ namespace device {
 			bool ret = true;
 			bool f = !ena;
 			switch(per) {
-			case peripheral::TMR3:
-			case peripheral::TMR2:
-				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
-				SYSTEM::MSTPCRA.MSTPA4 = ((pad_.tmr_ & 0b00'00'11'00) == 0);
-				break;
-			case peripheral::TMR1:
-			case peripheral::TMR0:
-				sr_(ena, pad_.tmr_, peripheral::TMR0, per);
-				SYSTEM::MSTPCRA.MSTPA5 = ((pad_.tmr_ & 0b00'00'00'11) == 0);
-				break;
 
 			case peripheral::MTU0:
 			case peripheral::MTU1:
@@ -120,10 +108,6 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB9 = f;
 				break;
 
-			case peripheral::CMPB:
-				SYSTEM::MSTPCRB.MSTPB10 = f;
-				break;
-
 			case peripheral::RSPI0:
 				SYSTEM::MSTPCRB.MSTPB17 = f;
 				break;
@@ -136,9 +120,6 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB23 = f;
 				break;
 
-			case peripheral::SCI6:
-				SYSTEM::MSTPCRB.MSTPB25 = f;
-				break;
 			case peripheral::SCI5:
 				SYSTEM::MSTPCRB.MSTPB26 = f;
 				break;
@@ -146,30 +127,9 @@ namespace device {
 			case peripheral::SCI1:
 				SYSTEM::MSTPCRB.MSTPB30 = f;
 				break;
-			case peripheral::SCI0:
-				SYSTEM::MSTPCRB.MSTPB31 = f;
-				break;
 
 			case peripheral::CAC:
 				SYSTEM::MSTPCRC.MSTPC19 = f;
-				break;
-
-			case peripheral::SCI9:
-				SYSTEM::MSTPCRC.MSTPC26 = f;
-				break;
-			case peripheral::SCI8:
-				SYSTEM::MSTPCRC.MSTPC27 = f;
-				break;
-
-			case peripheral::REMC1:
-				SYSTEM::MSTPCRC.MSTPC28 = f;
-				break;
-			case peripheral::REMC0:
-				SYSTEM::MSTPCRC.MSTPC29 = f;
-				break;
-
-			case peripheral::CTSU:
-				SYSTEM::MSTPCRD.MSTPD10 = f;
 				break;
 
 			default:

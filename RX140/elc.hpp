@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX130/RX140 グループ・ELC 定義
+	@brief	RX111/RX130/RX140 グループ・ELC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -46,7 +46,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  イベントリンク設定レジスタ n (ELSRn) @n
-					(n = 1 ～ 4, 7, 8, 10, 12, 14 ～ 16, 18, 20, 22, 24, 25)
+					(n = 1 ～ 4, 7, 8, 10, 12, 14 ～ 16, 18, 20, 22, 24, 25) @n
+					(n = 1 ～ 4, 7, 15, 16, 18, 20, 22, 24, 25) 
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
@@ -65,6 +66,8 @@ namespace device {
 		static inline elsr_t<base + 0x05> ELSR4;
 
 		static inline elsr_t<base + 0x08> ELSR7;
+#if defined(SIG_RX111)
+#else
 		static inline elsr_t<base + 0x09> ELSR8;
 
 		static inline elsr_t<base + 0x0B> ELSR10;
@@ -72,6 +75,7 @@ namespace device {
 		static inline elsr_t<base + 0x0D> ELSR12;
 
 		static inline elsr_t<base + 0x0F> ELSR14;
+#endif
 		static inline elsr_t<base + 0x10> ELSR15;
 		static inline elsr_t<base + 0x11> ELSR16;
 
@@ -140,11 +144,15 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B2, 2>  CMT1MD;
+#if defined(SIG_RX111)
+#else
 			bits_rw_t<io_, bitpos::B4, 2>  LPTMD;
+#endif
 		};
 		static inline elopc_t<base + 0x21> ELOPC;
 
-
+#if defined(SIG_RX111)
+#else
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	イベントリンクオプション設定レジスタ D（ELOPD）
@@ -164,7 +172,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  TMR2MD;
 		};
 		static inline elopd_t<base + 0x22> ELOPD;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -277,8 +285,8 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  SEG;	// write-only
-			bit_rw_t<io_, bitpos::B6>  WE;
 
+			bit_rw_t<io_, bitpos::B6>  WE;
 			bit_rw_t<io_, bitpos::B7>  WI;	// write-only
 		};
 		static inline elsegr_t<base + 0x2D> ELSEGR;

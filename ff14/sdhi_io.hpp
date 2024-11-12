@@ -303,7 +303,7 @@ namespace fatfs {
 		static void sdaci_task_() noexcept {
 		}
 
-		static volatile uint32_t i_count_;
+		static inline volatile uint32_t i_count_;
 
 		static INTERRUPT_FUNC void sbfai_task_() noexcept {
 			++i_count_;
@@ -987,8 +987,4 @@ namespace fatfs {
         //-----------------------------------------------------------------//
         bool get_mount() const noexcept { return mount_; }
 	};
-
-	// テンプレート関数、実態の定義
-	template <class SDHI, class POW, class WPRT, device::port_map::ORDER PSEL>
-		volatile uint32_t sdhi_io<SDHI, POW, WPRT, PSEL>::i_count_ = 0;
 }

@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140 グループ RTCB 定義
+	@brief	RX111/RX130/RX140 グループ RTCc/RTCB 定義 @n
+			RTCA: RX111
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -123,6 +124,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  HR1;
 			bits_rw_t<io_, bitpos::B4, 2>  HR10;
+			bit_rw_t <io_, bitpos::B6>     PM;
 		};
 		static inline rhrcnt_t<0x0008'C406> RHRCNT;
 
@@ -218,8 +220,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0,  4> YEAR;
 			bits_rw_t<io_, bitpos::B4,  4> YEAR10;
+#if defined(SIG_RX140)
 			bits_rw_t<io_, bitpos::B8,  4> YEAR100;
 			bits_rw_t<io_, bitpos::B12, 4> YEAR1000;
+#endif
 		};
 		static inline ryrcnt_t<0x0008'C40E> RYRCNT;
 
@@ -298,6 +302,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4> HR1;
 			bits_rw_t<io_, bitpos::B4, 2> HR10;
+			bit_rw_t <io_, bitpos::B6>    PM;
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
 		static inline rhrar_t<0x0008'C414> RHRAR;
@@ -356,6 +361,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4> DATE1;
 			bits_rw_t<io_, bitpos::B4, 2> DATE10;
+
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
 		static inline rdayar_t<0x0008'C418> RDAYAR;
@@ -385,6 +391,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4> MON1;
 			bit_rw_t <io_, bitpos::B4>    MON10;
+
 			bit_rw_t <io_, bitpos::B7>    ENB;
 		};
 		static inline rmonar_t<0x0008'C41A> RMONAR;
@@ -414,8 +421,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0,  4> YEAR;
 			bits_rw_t<io_, bitpos::B4,  4> YEAR10;
+#if defined(SIG_RX140)
 			bits_rw_t<io_, bitpos::B8,  4> YEAR100;
 			bits_rw_t<io_, bitpos::B12, 4> YEAR1000;
+#endif
 		};
 		static inline ryrar_t<0x0008'C41C> RYRAR;
 
@@ -503,6 +512,27 @@ namespace device {
 		};
 		static inline rcr2_t<0x0008'C424> RCR2;
 
+#if defined(SIG_RX111) || defined(SIG_RX130)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  RTC コントロールレジスタ 3（RCR3）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rcr3_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>      RTCEN;
+
+			bits_rw_t<io_, bitpos::B6, 2>  RTCDV;
+		};
+		static inline rcr3_t<0x0008'C426> RCR3;
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -521,7 +551,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 6>  ADJ;
 			bits_rw_t<io_, bitpos::B6, 2>  PMAD;
 		};
-		static inline radj_t<0x0008'C428> RADJ;
+		static inline radj_t<0x0008'C42E> RADJ;
 	};
 	typedef rtcb_t RTC;
 }

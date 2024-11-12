@@ -16,6 +16,8 @@ Development is now possible in multiple environments.
 Currently supported and tested devices:   
 |Series|Core|FPU|TFU|DFPU|Peripheral class|Operation check|rx_prog supports|Linker file|
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|---|
+|[RX111](RX111)|RXv1|No|－|－|△|||R5F51115/6/7|
+|[RX130](RX130)|RXv1|No|－|－|△|||R5F51305/6|
 |[RX140](RX140)|RXv2|Yes|－|－|〇|〇|〇|R5F51403/5/6|
 |[RX13T](RX13T)|RXv1|Yes|－|－|〇|||R5F513T3/5|
 |[RX220](RX220)|RXv1|No|－|－|〇|〇|〇|R5F52206|
@@ -115,6 +117,8 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |directory|contents|
 |---|---|
 |[all_project_build.sh](./all_project_build.sh)|build all projects (shell script) |
+|[/RX111](./RX111)|RX111 specific device definition class, linker script|
+|[/RX130](./RX130)|RX130 specific device definition class, linker script|
 |[/RX13T](./RX13T)|RX13T specific device definition class, linker script|
 |[/RX140](./RX140)|RX140 specific device definition class, linker script|
 |[/RX220](./RX220)|RX220 specific device definition class, linker script|
@@ -124,26 +128,27 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |[/RX24U](./RX24U)|RX24U specific device definition class, linker script|
 |[/RX26x](./RX26x)|RX260/RX261 specific device definition class, linker script|
 |[/RX26T](./RX26T)|RX26T specific device definition class, linker script|
-|[/RX62x](./RX62x)|RX621/N dedicated device definition class, linker script|
-|[/RX63x](./RX63x)|RX631/N specific device definition class, linker script|
+|[/RX62x](./RX62x)|RX621/RX62N dedicated device definition class, linker script|
+|[/RX63x](./RX63x)|RX631/RX63N specific device definition class, linker script|
 |[/RX63T](./RX63T)|RX63T specific device definition class, linker script|
 |[/RX64M](./RX64M)|RX64M dedicated device definition class, linker script|
-|[/RX65x](./RX65x)|RX651/N specific device definition class, linker script|
+|[/RX65x](./RX65x)|RX651/RX65N specific device definition class, linker script|
+|[/RX660](./RX660)|RX660 specific device definition class, linker script|
 |[/RX66N](./RX66N)|RX66N specific device definition class, linker script|
 |[/RX66T](./RX66T)|RX66T dedicated device definition class, linker script|
-|[/RX660](./RX660)|RX660 specific device definition class, linker script|
 |[/RX671](./RX671)|RX671 specific device definition class, linker script|
 |[/RX71M](./RX71M)|RX71M dedicated device definition class, linker script|
 |[/RX72N](./RX72N)|RX72N dedicated device definition class, linker script|
 |[/RX72M](./RX72M)|RX72M dedicated device definition class, linker script|
 |[/RX72T](./RX72T)|RX72T dedicated device definition class, linker script|
 |[/RX600](./RX600)|RX microcontroller common device definition class|
+|[/common](./common)|shared classes, headers, etc.|
 |[/rxlib](./rxlib)|zlib, png, mad, gmp, mpfr libraries|
 |[/FreeRTOS](./FreeRTOS)|FreeRTOS for various RX microcontrollers and simple samples|
 |[/ff14](./ff14)|ChaN's fatfs source code and handler for RX microcontrollers|
-|[/common](./common)|shared classes, headers, etc.|
 |[/chip](./chip)|various device specific control driver libraries such as I2C, SPI, etc|
-|[/graphics](./graphics)|Graphics drawing related classes, GUI Widget|
+|[/graphics](./graphics)|Graphics drawing related classes|
+|[/gui](./gui)|Graphics user interface related classes (GUI Widget)|
 |[/sound](./sound)|sound and audio related classes|
 |[/usb](./usb)|USB handler, manage class|
 |[/tinyusb](./tinyusb)|TinyUSB source code|
@@ -156,7 +161,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 |Directory|RX220|RX631|RX63T|RX62N|RX24T|RX66T|RX72T|RX64M|RX71M|RX65N|RX72N|Contents|
 |---------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|Serial Communication Sample Program|
+|[/FIRST_sample](./FIRST_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|LED blinking Sample Program|
 |[/SCI_sample](./SCI_sample)|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|〇|serial communication Sample Program|
 |[/MTU_sample](./MTU_sample)|－|－|－|〇|〇|〇|〇|〇|〇|〇|〇|Multi-Function Timer Pulse Unit Sample Program|
 |[/CAN_sample](./CAN_sample)|－|〇|－|〇|－|〇|〇|〇|〇|△|〇|CAN Communication Sample Program|

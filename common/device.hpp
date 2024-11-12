@@ -2,6 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー @n
+			RX111 @n
 			RX13T @n
 			EX130 @n
 			RX140 @n
@@ -31,7 +32,19 @@
 //=========================================================================//
 #include "common/io_utils.hpp"
 
-#if defined(SIG_RX13T)
+#if defined(SIG_RX111)
+#include "RX111/clock_profile.hpp"
+#include "RX111/peripheral.hpp"
+#include "RX111/system.hpp"
+#include "RX111/power_mgr.hpp"
+#include "RX111/icu.hpp"
+#include "RX140/icu_mgr.hpp"
+#include "RX111/port_map.hpp"
+#include "RX111/port_map_mtu.hpp"
+#include "RX111/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX13T)
 #include "RX13T/clock_profile.hpp"
 #include "RX13T/peripheral.hpp"
 #include "RX24T/system.hpp"

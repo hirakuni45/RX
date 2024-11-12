@@ -5,7 +5,7 @@
 - Maximum operating frequency 54MHz / 最大動作周波数 54MHz
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 1.8V ～ 5.5V Operation / 動作
-- USB2.0 Full Speed, Host, Function (RX231)
+- USB2.0 Full Speed, Low Speed, Host, Function
 - Serial Sound Interface (SSI) / シリアルサウンドインタフェース (SSI)
 - RSCAN (RX231 optional)
 - SD Host Interface (SDHI) / SD ホストインタフェース (SDHI) (RX231 optional)

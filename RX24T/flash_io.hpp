@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX140/RX231/RX24T/RX24U グループ FLASH データ 制御
+	@brief	RX13T/RX111/RX130/RX140/RX231/RX24T/RX24U グループ FLASH データ 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -144,9 +144,10 @@ namespace device {
 			device::FLASH::FASR.EXS = 0;
 
 			uint32_t org = bank * DATA_BLOCK_SIZE;
-			device::FLASH::FSARH = 0xFE00;
+
+			device::FLASH::FSARH = 0x00;
 			device::FLASH::FSARL = org;
-			device::FLASH::FEARH = 0xFE00;
+			device::FLASH::FEARH = 0x00;
 			device::FLASH::FEARL = org + DATA_BLOCK_SIZE - 1;
 
 			device::FLASH::FCR = 0x83;
@@ -183,9 +184,9 @@ namespace device {
 			device::FLASH::FASR.EXS = 0;
 
 			uint16_t org = bank * DATA_BLOCK_SIZE;
-			device::FLASH::FSARH = 0xFE00;
+			device::FLASH::FSARH = 0x00;
 			device::FLASH::FSARL = org;
-			device::FLASH::FEARH = 0xFE00;
+			device::FLASH::FEARH = 0x00;
 			device::FLASH::FEARL = org + DATA_BLOCK_SIZE - 1;
 
 			device::FLASH::FCR = 0x84;
@@ -231,11 +232,11 @@ namespace device {
 			uint16_t page = DATA_SIZE;
 			for(uint16_t i = 0; i < len; ++i) {
 				if(page != (org & ~(DATA_BLOCK_SIZE - 1))) {
-					device::FLASH::FSARH = 0xFE00;
+					device::FLASH::FSARH = 0x00;
 					device::FLASH::FSARL = org;
 					page = org & ~(DATA_BLOCK_SIZE - 1);
 				}
-#if defined(SIG_RX130)
+#if defined(SIG_RX111) || defined(SIG_RX130)
 				device::FLASH::FWBL = *p++;
 #else
 				device::FLASH::FWB0 = *p++;
