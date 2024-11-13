@@ -35,7 +35,7 @@ namespace device {
 			XTAL,	///< クリスタル接続（1～20MHz）
 			CERA,	///< セラミック発振子リード品（16MHz ～ 20MHz）
 			EXT,	///< 外部クロック入力（最大 20MHz）
-			HOCO,	///< 内蔵高速オンチップオシレーター（BASE: 24MHz, 32MHz, 48MHz）
+			HOCO,	///< 内蔵高速オンチップオシレーター（BASE: 32MHz）
 			LOCO,	///< 内蔵低速オンチップオシレーター (125KHz)
 		};
 
@@ -44,7 +44,7 @@ namespace device {
 
 		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
 
-		static constexpr uint32_t   PLL_BASE	= 32'000'000;		///< PLL ベースクロック（最大 24MHz ～ 48MHz）
+		static constexpr uint32_t   PLL_BASE	= 32'000'000;		///< PLL ベースクロック（最大 24MHz ～ 32MHz）
 
 		static constexpr uint32_t   ICLK		= 32'000'000;		///< ICLK 周波数（最大 32MHz）
 		static constexpr uint32_t   PCLKB		= 32'000'000;		///< PCLKB 周波数（最大 32MHz）

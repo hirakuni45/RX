@@ -5,6 +5,8 @@
 - Maximum operating frequency 32MHz / 最大動作周波数 32MHz
 - 1.8V ～ 5.5V Operation / 動作
 - Capacitive touch sensor / 静電容量式タッチセンサ
+- Low power timer / ローパワータイマー
+- Remote control signal reception function / リモコン信号受信機能
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
@@ -22,7 +24,7 @@
 ### Version
 
 |R5F5130-X---|Version|
-|---|:-:|:-:|:-:|
+|---|:-:|
 |R5F5130xAxxx|A|
 |R5F5130xBxxx|B|
 
