@@ -17,6 +17,12 @@
 |R5F524TxxxFN|LFQFP|80|0.50|
 |R5F524TxxxFM|LFQFP|64|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F524T--X--|degree Celsius|
+|---|:-:|
+|R5F524TxxDxx|-40 ～ +85℃|
+
 ### Memoey size/メモリ容量
 
 |R5F524TX----|CodeFlash|RAM|DataFlash|ChipVersion|

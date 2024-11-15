@@ -16,6 +16,13 @@
 |R5F5220xxxFK|LQFP|64|0.50|
 |R5F5220xxxFL|LQFP|48|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F5220--X--|degree Celsius|
+|---|:-:|
+|R5F5220xxDxx|-40 ～ +85℃|
+|R5F5220xxGxx|-40 ～ +105℃|
+
 ### Memoey size/メモリ容量
 
 |R5F5220X----|CodeFlash|RAM|DataFlash|

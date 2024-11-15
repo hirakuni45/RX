@@ -9,10 +9,9 @@
 */
 //=========================================================================//
 #include <cstring>
-#include "common/vect.h"
 #include "common/renesas.hpp"
+#include "common/vect.h"
 #include "common/format.hpp"
-#include "common/delay.hpp"
 #include "common/i2c_base.hpp"
 
 namespace device {
@@ -114,7 +113,7 @@ namespace device {
 		};
 		static inline intr_t	intr_;
 
-		static void event_ntask_()
+		static void ee_ntask_()
 		{
 			switch(intr_.event_) {
 			case event::NONE:
@@ -145,9 +144,9 @@ namespace device {
 			}
 		}
 
-		static INTERRUPT_FUNC void event_itask_() { event_ntask_(); }
+		static INTERRUPT_FUNC void ee_itask_() { ee_ntask_(); }
 
-		static INTERRUPT_FUNC void recv_itask_()
+		static INTERRUPT_FUNC void rx_itask_()
 		{
 			if(intr_.dst_ == nullptr || intr_.len_ == 0) {
 				IICA::ICIER.RIE = 0;
@@ -168,7 +167,7 @@ namespace device {
 			}
 		}
 
-		static INTERRUPT_FUNC void send_itask_()
+		static INTERRUPT_FUNC void tx_itask_()
 		{
 			if(intr_.firstb_) {
 				IICA::ICDRT = intr_.firstb_;
@@ -191,8 +190,7 @@ namespace device {
 			}
 		}
 
-
-		static void tend_ntask_()
+		static void te_ntask_()
 		{
 			IICA::ICSR2.STOP = 0;
 			IICA::ICCR2.SP = 1;
@@ -201,7 +199,7 @@ namespace device {
 			IICA::ICIER.SPIE = 1;
 		}
 
-		static INTERRUPT_FUNC void tend_itask_() { tend_ntask_(); }
+		static INTERRUPT_FUNC void te_itask_() { te_ntask_(); }
 
 		void sleep_() noexcept
 		{
@@ -314,18 +312,18 @@ namespace device {
 ///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
 			if(level_ != ICU::LEVEL::NONE) {
-				icu_mgr::set_interrupt(IICA::RXI, recv_itask_, level_);
-				icu_mgr::set_interrupt(IICA::TXI, send_itask_, level_);
+				icu_mgr::set_interrupt(IICA::RXI, rx_itask_, level_);
+				icu_mgr::set_interrupt(IICA::TXI, tx_itask_, level_);
 
 				if(icu_mgr::get_group_vector(IICA::EEI) == ICU::VECTOR::NONE) {  // 通常割り込みの場合
-					icu_mgr::set_interrupt(IICA::EEI, event_itask_, level_);
+					icu_mgr::set_interrupt(IICA::EEI, ee_itask_, level_);
 				} else {
-					icu_mgr::set_interrupt(IICA::EEI, event_ntask_, level_);	// グループ割り込みの場合、通常の関数を登録
+					icu_mgr::set_interrupt(IICA::EEI, ee_ntask_, level_);	// グループ割り込みの場合、通常の関数を登録
 				}
 				if(icu_mgr::get_group_vector(IICA::TEI) == ICU::VECTOR::NONE) {  // 通常割り込みの場合
-					icu_mgr::set_interrupt(IICA::TEI, tend_itask_, level_);
+					icu_mgr::set_interrupt(IICA::TEI, te_itask_, level_);
 				} else {
-					icu_mgr::set_interrupt(IICA::TEI, tend_ntask_, level_);  // グループ割り込みの場合、通常の関数を登録
+					icu_mgr::set_interrupt(IICA::TEI, te_ntask_, level_);  // グループ割り込みの場合、通常の関数を登録
 				}
 			} else {
 				icu_mgr::set_interrupt(IICA::RXI, nullptr, level_);

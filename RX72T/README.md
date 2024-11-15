@@ -17,6 +17,13 @@
 |R5F572TxxxFB|LFQFP|144|0.50|
 |R5F572TxxxFP|LFQFP|100|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F572T--X--|degree Celsius|
+|---|:-:|
+|R5F572TxxDxx|-40 ～ +85℃|
+|R5F572TxxGxx|-40 ～ +105℃|
+
 ### PGA, TSIP, USB
 
 |R5F572T-X---|PGA|TSIP|USB|

@@ -27,6 +27,13 @@
 |R5F563yxxxFM|LFQFP|64|0.50|
 |R5F563yxxxFL|LFQFP|48|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F563y--X--|degree Celsius|
+|---|:-:|
+|R5F563yxxDxx|-40 ～ +85℃|
+|R5F563yxxGxx|-40 ～ +105℃|
+
 ### CAN、DEU、PDC
 
 |R5F563y-X---|CAN|DEU|PDC|

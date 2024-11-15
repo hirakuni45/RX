@@ -27,9 +27,16 @@
 |R5F565yxxxFM|TFQFP|64|0.5|
 |R5F565yxxxBP|TFBGA|64|0.5|
 
-### Crypt/暗号、SDHI/SDSI
+### Ambient operating temperature/動作周囲温度
 
-|R5F565y-X---|Crypt/暗号|SDHI/SDSI|Dual bank|
+|R5F565y--X--|degree Celsius|
+|---|:-:|
+|R5F565yxxDxx|-40 ～ +85℃|
+|R5F565yxxGxx|-40 ～ +105℃|
+
+### Crypt/暗号、SDHI/SDSI、Dual bank
+
+|R5F565y-X---|Crypt|SDHI/SDSI|Dual bank|
 |---|:-:|:-:|:-:|
 |R5F565yxAxxx|-|-|-|
 |R5F565yxBxxx|-|〇|-|

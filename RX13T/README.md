@@ -17,6 +17,13 @@
 |R5F513TxxxNE|HWQFN|48|0.50|
 |R5F513TxxxNH|HWQFN|32|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F513T--X--|degree Celsius|
+|---|:-:|
+|R5F513TxxDxx|-40 ～ +85℃|
+|R5F513TxxGxx|-40 ～ +105℃|
+
 ### Memoey size/メモリ容量
 
 |R5F513TX----|CodeFlash|RAM|DataFlash|

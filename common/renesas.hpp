@@ -162,14 +162,20 @@
 #include "RX231/rtc.hpp"
 #include "RX600/lpt.hpp"
 #include "RX600/wdta.hpp"
+#if defined(SIG_RX231)
 #include "RX600/usb.hpp"
+#endif
 #include "RX600/sci_g.hpp"
 #include "RX600/sci_h.hpp"
 #include "RX220/irda.hpp"
+#if defined(SIG_RX231)
 #include "RX600/rscan.hpp"
+#endif
 #include "RX600/ssi.hpp"
 #include "RX600/crc.hpp"
+#if defined(SIG_RX231)
 #include "RX600/sdhi.hpp"
+#endif
 #include "RX600/ctsu.hpp"
 #include "RX231/s12ade.hpp"
 #include "RX600/r12da.hpp"

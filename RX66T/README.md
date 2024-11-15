@@ -21,6 +21,13 @@
 |R5F566TxxxFN|LFQFP|80|0.50|
 |R5F566TxxxFM|LFQFP|64|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F566T--X--|degree Celsius|
+|---|:-:|
+|R5F566TxxDxx|-40 ～ +85℃|
+|R5F566TxxGxx|-40 ～ +105℃|
+
 ### PGA, TSIP, USB
 
 |R5F566T-X---|PGA|TSIP|USB|

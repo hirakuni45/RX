@@ -21,6 +21,13 @@
 |R5F5130xxxFL|LFQFP|48|0.50|
 |R5F5130xxxNE|HWQFN|48|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F5130--X--|degree Celsius|
+|---|:-:|
+|R5F5130xxDxx|-40 ～ +85℃|
+|R5F5130xxGxx|-40 ～ +105℃|
+
 ### Version
 
 |R5F5130-X---|Version|

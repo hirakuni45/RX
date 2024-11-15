@@ -1427,7 +1427,7 @@ namespace device {
 #elif defined(SIG_RX231)
 	typedef usb_a_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX261)
 	typedef usb_e_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)

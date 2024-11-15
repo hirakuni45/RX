@@ -5,10 +5,10 @@
 - Maximum operating frequency 54MHz / 最大動作周波数 54MHz
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 1.8V ～ 5.5V Operation / 動作
-- USB2.0 Full Speed, Low Speed, Host, Function
-- Serial Sound Interface (SSI) / シリアルサウンドインタフェース (SSI)
+- USB2.0 Full Speed, Low Speed, Host, Function (RX231 Only)
 - RSCAN (RX231 optional)
 - SD Host Interface (SDHI) / SD ホストインタフェース (SDHI) (RX231 optional)
+- Serial Sound Interface (SSI) / シリアルサウンドインタフェース (SSI)
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 12 Bits D/A / １２ビットＤ／Ａ変換器
 
@@ -24,16 +24,23 @@
 |R5F523yxxxND|HWQFN|64|0.50|
 |R5F523yxxxNE|HWQFN|48|0.50|
 
-### Crypt, SDHI, CAN
+### Ambient operating temperature/動作周囲温度
 
-|R5F523y-X---|Crypt|USB|CANFD|
-|---|:-:|:-:|:-:|
-|R5F5231xAxxx|-|-|〇|
-|R5F5231xBxxx|〇|〇|〇|
-|R5F5231xCxxx|-|-|-|
-|R5F5230xAxxx|-|-|-|
+|R5F523y--X--|degree Celsius|
+|---|:-:|
+|R5F523yxxDxx|-40 ～ +85℃|
+|R5F523yxxGxx|-40 ～ +105℃|
 
-※R5F5231xBxxx: Not for 48-pin device
+### Crypt/暗号, SDHI, RSCAN, USB
+
+|R5F523y-X---|Crypt|SDHI|RSCAN|USB|
+|---|:-:|:-:|:-:|:-:|
+|R5F5231xAxxx|-|-|〇|〇|
+|R5F5231xBxxx|〇|〇|〇|〇|
+|R5F5231xCxxx|-|-|-|〇|
+|R5F5230xAxxx|-|-|-|-|
+
+※R5F5231xBxxx: Excluding 48-pin version / ４８ピン版を除く
 
 ### Memoey size/メモリ容量
 

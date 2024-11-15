@@ -20,6 +20,13 @@
 |R5F5111xxxNF|HWQFN|40|0.50|
 |R5F5111xxxLM|WFLGA|36|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F5111--X--|degree Celsius|
+|---|:-:|
+|R5F5111xxDxx|-40 ～ +85℃|
+|R5F5111xxGxx|-40 ～ +105℃|
+
 ### Memoey size/メモリ容量
 
 |R5F5111X----|CodeFlash|RAM|DataFlash|

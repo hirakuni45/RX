@@ -1152,17 +1152,15 @@ namespace device {
 				case peripheral::SCI12:
 					ret = sci12_(odr, ena, opt);
 					break;
-
-				case peripheral::RSPI0:
-					ret = rspi0_(odr, ena);
-					break;
 				case peripheral::RIIC0:
 					ret = riic0_(odr, ena);
 					break;
 				case peripheral::CAN0:
 					ret = can0_(odr, ena);
 					break;
-
+				case peripheral::RSPI0:
+					ret = rspi0_(odr, ena);
+					break;
 				case peripheral::USB0:
 					if(odr == ORDER::FIRST) {  // RX72N hira_kuni_board
 						ret = turn_usb(USB_PORT::VBUSEN,  ena, ORDER::THIRD);  // PB5

@@ -21,6 +21,13 @@
 |R5F526TxxxND|HWQFN|64|0.50|
 |R5F526TxxxNE|HWQFN|48|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F526T--X--|degree Celsius|
+|---|:-:|
+|R5F526TxxDxx|-40 ～ +85℃|
+|R5F526TxxGxx|-40 ～ +105℃|
+
 ### CAN 2.0/CAN FD, TSIP-Lite
 
 |R5F526T-X---|CAN||TSIP-Lite|
