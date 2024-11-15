@@ -24,9 +24,16 @@
 |R5F572MxxxFC|LFQFP|176|0.50|
 |R5F572MxxxBG|LFBGA|176|0.80|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F572M--X--|degree Celsius|
+|---|:-:|
+|R5F572MxxDxx|-40 ～ +85℃|
+|R5F572MxxGxx|-40 ～ +105℃|
+
 ### Crypt/暗号
 
-|R5F572M-X---|Crypt/暗号|
+|R5F572M-X---|Crypt|
 |---|:-:|
 |R5F572MxDxxx|-|
 |R5F572MxHxxx|〇|

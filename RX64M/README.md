@@ -24,9 +24,16 @@
 |R5F564MxxxFP|LFQFP|100|0.50|
 |R5F564MxxxLJ|TFLGA|100|0.65|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F564M--X--|degree Celsius|
+|---|:-:|
+|R5F564MxxDxx|-40 ～ +85℃|
+|R5F564MxxGxx|-40 ～ +105℃|
+
 ### Crypt/暗号、SDHI
 
-|R5F564M-X---|Crypt/暗号|SDHI|
+|R5F564M-X---|Crypt|SDHI|
 |---|:-:|:-:|
 |R5F564MxDxxx|-|〇|
 |R5F564MxHxxx|〇|〇|

@@ -24,7 +24,14 @@
 |R5F526yxxxFL|LQFP|48|0.50|
 |R5F526yxxxNE|HWQFN|48|0.50|
 
-### Crypt, USB, CANFD
+### Ambient operating temperature/動作周囲温度
+
+|R5F526y--X--|degree Celsius|
+|---|:-:|
+|R5F526yxxDxx|-40 ～ +85℃|
+|R5F526yxxGxx|-40 ～ +105℃|
+
+### Crypt/暗号, USB, CANFD
 
 |R5F526y-X---|Crypt|USB|CANFD|
 |---|:-:|:-:|:-:|

@@ -16,12 +16,19 @@
 |R5F523TxxxFD|LQFP|52|0.65|
 |R5F523TxxxFL|LFQFP|48|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F523T--X--|degree Celsius|
+|---|:-:|
+|R5F523TxxDxx|-40 ～ +85℃|
+|R5F523TxxGxx|-40 ～ +105℃|
+
 ### Memoey size/メモリ容量
 
 |R5F523TX----|CodeFlash|RAM|DataFlash|
 |---|:-:|:-:|:-:|
-|R5F523TExxxx|128K|12K|0|
-|R5F523TCxxxx|64K|12K|0|
+|R5F523T5xxxx|128K|12K|0|
+|R5F523T3xxxx|64K|12K|0|
 
 ---
 

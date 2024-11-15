@@ -23,7 +23,14 @@
 |R5F5671xxxBP|TFBGA|64|0.50|
 |R5F5671xxxNE|HWQFN|48|0.50|
 
-### Crypt
+### Ambient operating temperature/動作周囲温度
+
+|R5F5671--X--|degree Celsius|
+|---|:-:|
+|R5F5671xxDxx|-40 ～ +85℃|
+|R5F5671xxGxx|-40 ～ +105℃|
+
+### Crypt/暗号
 
 |R5F5671-X---|Crypt|
 |---|:-:|

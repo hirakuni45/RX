@@ -18,6 +18,13 @@
 |R5F5660xxxFM|LFQFP|64|0.50|
 |R5F5660xxxFL|LFQFP|48|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F5660--X--|degree Celsius|
+|---|:-:|
+|R5F5660xxDxx|-40 ～ +85℃|
+|R5F5660xxGxx|-40 ～ +105℃|
+
 ### JTAG, Sub-clock, CAN
 
 |R5F5660-X---|JTAG|Sub-clock|CAN|

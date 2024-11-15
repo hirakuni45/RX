@@ -19,6 +19,13 @@
 |R5F563TxxxFP|LFQFP|100|0.50|
 |R5F563TxxxFP|LFQFP|100|0.50|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F563T--X--|degree Celsius|
+|---|:-:|
+|R5F563TxxDxx|-40 ～ +85℃|
+|R5F563TxxGxx|-40 ～ +105℃|
+
 ### VCC, CAN
 
 |R5F563T-X---|VCC|CAN|

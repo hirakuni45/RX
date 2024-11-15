@@ -20,10 +20,17 @@
 |R5F5140xxxFJ|LFQFP|32|0.80|
 |R5F5140xxxNH|HWQFN|32|0.50|
 
-### Crypt
+### Ambient operating temperature/動作周囲温度
+
+|R5F5140--X--|degree Celsius|
+|---|:-:|
+|R5F5140xxDxx|-40 ～ +85℃|
+|R5F5140xxGxx|-40 ～ +105℃|
+
+### Crypt/暗号
 
 |R5F5140-X---|Crypt|
-|---|:-:|:-:|:-:|
+|---|:-:|
 |R5F5140xAxxx|-|
 |R5F5140xBxxx|〇|
 

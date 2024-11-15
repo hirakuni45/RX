@@ -32,9 +32,9 @@
 
 |R5F562yX----|CodeFlash|RAM|DataFlash|
 |---|:-:|:-:|:-:|
-|R5F562yExxxx|512K|96K|32K|
-|R5F562yCxxxx|384K|64K|32K|
-|R5F562yBxxxx|256K|64K|32K|
+|R5F562y8xxxx|512K|96K|32K|
+|R5F562y7xxxx|384K|64K|32K|
+|R5F562y6xxxx|256K|64K|32K|
 
 ---
 

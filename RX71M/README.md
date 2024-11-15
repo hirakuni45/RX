@@ -22,9 +22,16 @@
 |R5F571MxxxFP|LFQFP|100|0.50|
 |R5F571MxxxLJ|TFLGA|100|0.65|
 
+### Ambient operating temperature/動作周囲温度
+
+|R5F571M--X--|degree Celsius|
+|---|:-:|
+|R5F571MxxDxx|-40 ～ +85℃|
+|R5F571MxxGxx|-40 ～ +105℃|
+
 ### Crypt/暗号、SDHI
 
-|R5F571M-X---|Crypt/暗号|SDHI|
+|R5F571M-X---|Crypt|SDHI|
 |---|:-:|:-:|
 |R5F571MxDxxx|-|〇|
 |R5F571MxHxxx|〇|〇|
