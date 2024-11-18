@@ -27,9 +27,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO0
-			// PB3
-			// PH1
+			case CHANNEL::TMO:
+			// TMO0: PB3
+			// TMO0: PH1
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTB::PMR.B3 = 0;
@@ -46,10 +46,10 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI0 
-			// P21
-			// PB1
-			// PH3
+			case CHANNEL::TMCI:
+			// TMCI0: P21
+			// TMCI0: PB1
+			// TMCI0: PH3
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -71,10 +71,10 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI0 
-			// P20
-			// PA4
-			// PH2
+			case CHANNEL::TMRI:
+			// TMRI0: P20
+			// TMRI0: PA4
+			// TMRI0: PH2
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -109,9 +109,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO1
-			// P17
-			// P26
+			case CHANNEL::TMO:
+			// TMO1: P17
+			// TMO1: P26
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
@@ -128,10 +128,10 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI1
-			// P12
-			// P54
-			// PC4
+			case CHANNEL::TMCI:
+			// TMCI1: P12
+			// TMCI1: P54
+			// TMCI1: PC4
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B2 = 0;
@@ -153,8 +153,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI1
-			// PB5
+			case CHANNEL::TMRI:
+			// TMRI1: PB5
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTB::PMR.B5 = 0;
@@ -179,9 +179,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO2
-			// P16
-			// PC7
+			case CHANNEL::TMO:
+			// TMO2: P16
+			// TMO2: PC7
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
@@ -198,10 +198,10 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI2
-			// P15
-			// P31
-			// PC6
+			case CHANNEL::TMCI:
+			// TMCI2: P15
+			// TMCI2: P31
+			// TMCI2: PC6
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
@@ -223,9 +223,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI2
-			// P14
-			// PC5
+			case CHANNEL::TMRI:
+			// TMRI2: P14
+			// TMRI2: PC5
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -255,10 +255,10 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO3
-			// P13
-			// P32
-			// P55
+			case CHANNEL::TMO:
+			// TMO3: P13
+			// TMO3: P32
+			// TMO3: P55
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B3 = 0;
@@ -280,10 +280,10 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI3 
-			// P27
-			// P34
-			// PA6
+			case CHANNEL::TMCI:
+			// TMCI3: P27
+			// TMCI3: P34
+			// TMCI3: PA6
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B7 = 0;
@@ -305,8 +305,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI3 
-			// P30
+			case CHANNEL::TMRI:
+			// TMRI3: P30
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B0 = 0;

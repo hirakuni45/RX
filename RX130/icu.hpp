@@ -149,7 +149,7 @@ namespace device {
 			TXI5		= 224,  ///< SCI5
 			TEI5		= 225,  ///< SCI5
 
-			ERI6		= 226	,  ///< SCI6
+			ERI6		= 226,  ///< SCI6
 			RXI6		= 227,  ///< SCI6
 			TXI6		= 228,  ///< SCI6
 			TEI6		= 229,  ///< SCI6

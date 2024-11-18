@@ -236,7 +236,7 @@ namespace device {
 					device::FLASH::FSARL = org;
 					page = org & ~(DATA_BLOCK_SIZE - 1);
 				}
-#if defined(SIG_RX111) || defined(SIG_RX130)
+#if defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
 				device::FLASH::FWBL = *p++;
 #else
 				device::FLASH::FWB0 = *p++;

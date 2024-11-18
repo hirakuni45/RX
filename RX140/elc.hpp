@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX111/RX130/RX140 グループ・ELC 定義
+	@brief	RX111/RX113/RX130/RX140 グループ・ELC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -46,8 +46,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  イベントリンク設定レジスタ n (ELSRn) @n
-					(n = 1 ～ 4, 7, 8, 10, 12, 14 ～ 16, 18, 20, 22, 24, 25) @n
-					(n = 1 ～ 4, 7, 15, 16, 18, 20, 22, 24, 25) 
+					(RX111: n = 1 ～ 4, 7, 15, 16, 18, 20, 22, 24, 25)  @n
+					(RX113: n = 1 ～ 4, 7, 10, 12, 14, 15, 17 ～ 20, 22, 24, 25)  @n
+					(n = 1 ～ 4, 7, 8, 10, 12, 14, 15, 16, 18, 20, 22, 24, 25) 
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
@@ -67,6 +68,12 @@ namespace device {
 
 		static inline elsr_t<base + 0x08> ELSR7;
 #if defined(SIG_RX111)
+#elif defined(SIG_RX113)
+		static inline elsr_t<base + 0x0B> ELSR10;
+
+		static inline elsr_t<base + 0x0D> ELSR12;
+
+		static inline elsr_t<base + 0x0F> ELSR14;
 #else
 		static inline elsr_t<base + 0x09> ELSR8;
 
@@ -78,9 +85,13 @@ namespace device {
 #endif
 		static inline elsr_t<base + 0x10> ELSR15;
 		static inline elsr_t<base + 0x11> ELSR16;
-
+#if defined(SIG_RX111)
+		static inline elsr_t<base + 0x12> ELSR17;
+#endif
 		static inline elsr_t<base + 0x13> ELSR18;
-
+#if defined(SIG_RX111)
+		static inline elsr_t<base + 0x13> ELSR19;
+#endif
 		static inline elsr_t<base + 0x15> ELSR20;
 
 		static inline elsr_t<base + 0x17> ELSR22;
@@ -144,7 +155,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B2, 2>  CMT1MD;
-#if defined(SIG_RX111)
+#if defined(SIG_RX111) || defined(SIG_RX113)
 #else
 			bits_rw_t<io_, bitpos::B4, 2>  LPTMD;
 #endif

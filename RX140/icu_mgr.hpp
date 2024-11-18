@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX111/RX130/RX140 グループ・割り込みマネージャー
+	@brief	RX111/RX113/RX130/RX140 グループ・割り込みマネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
