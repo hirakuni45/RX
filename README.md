@@ -17,6 +17,7 @@ Currently supported and tested devices:
 |Series|MinV|MaxV|MHz|Core|FPU|TFU|DFPU|Operation check|rx_prog|Linker file|
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|---|
 |[RX111](RX111)|1.8|3.6|32|RXv1|－|－|－|||R5F51115/6/7|
+|[RX113](RX113)|1.8|3.6|32|RXv1|－|－|－|||R5F51136/8|
 |[RX130](RX130)|1.8|5.5|32|RXv1|－|－|－|||R5F51305/6|
 |[RX140](RX140)|1.8|5.5|48|RXv2|Yes|－|－|〇|〇|R5F51403/5/6|
 |[RX13T](RX13T)|2.7|5.5|32|RXv1|Yes|－|－|||R5F513T3/5|
