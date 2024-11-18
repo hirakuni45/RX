@@ -2,7 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600 グループ・USB[abcd] 定義 @n
-			RX111 @n
+			RX111/RX113 @n
 			RX231 @n
 			RX261 @n
 			RX63T @n
@@ -1421,7 +1421,7 @@ namespace device {
 		static inline sofcfg_a_t<base + 0x3C> SOFCFG;
 	};
 
-#if defined(SIG_RX111)
+#if defined(SIG_RX111) || defined(SIG_RX113)
 	typedef usb_a_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #elif defined(SIG_RX231)

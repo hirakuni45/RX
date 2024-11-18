@@ -2,6 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX マイコン 静電容量式タッチセンサ (CTSU/CTSUa) 定義 @n
+			・RX113 @n
 			・RX130 @n
 			・RX231 @n
 			・RX671
@@ -413,7 +414,160 @@ namespace device {
 		};
 	};
 
-#if defined(SIG_RX130)
+#if defined(SIG_RX113)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX113 静電容量式タッチセンサ CTSU クラス
+		@param[in]	base	ベース・アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct ctsu_t : public ctsu_base_t<base> {
+
+		static constexpr auto PERIPHERAL = peripheral::CTSU;	///< ペリフェラル型
+		static constexpr auto WRI = ICU::VECTOR::CTSUWR;		///< チャネル毎の設定レジスタ書き込み要求割り込み
+		static constexpr auto RDI = ICU::VECTOR::CTSURD;		///< 測定データ転送要求割り込み
+		static constexpr auto FNI = ICU::VECTOR::CTSUFN;		///< 測定終了割り込み
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CTSU ポート型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class PORT : uint8_t {
+			TSCAP = 12,	///< P26
+			TS0 = 0,	///< P07
+			TS1,		///< P04
+			TS2,		///< P02
+			TS3,		///< PJ3
+			TS4,		///< P25
+			TS5,		///< P24
+			TS6,		///< P23
+			TS7,		///< P22
+			TS8,		///< P21
+			TS9,		///< P20
+			TS10,		///< P27
+			TS11,		///< P26
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU ポートを有効にする
+			@param[in]	port	CTSU ポート
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(PORT port, bool ena = true) noexcept
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+			uint8_t sel = ena ? 0b1'1001 : 0;
+			switch(port) {
+			case PORT::TSCAP:
+				PORT2::PMR.B6 = 0;
+				MPC::P26PFS.PSEL = sel;
+				PORT2::PMR.B6 = ena;
+				break;
+			case PORT::TS0:
+				PORT0::PMR.B7 = 0;
+				MPC::P07PFS.PSEL = sel;
+				PORT0::PMR.B7 = ena;
+				break;
+			case PORT::TS1:
+				PORT0::PMR.B4 = 0;
+				MPC::P04PFS.PSEL = sel;
+				PORT0::PMR.B4 = ena;
+				break;
+			case PORT::TS2:
+				PORT0::PMR.B2 = 0;
+				MPC::P02PFS.PSEL = sel;
+				PORT0::PMR.B2 = ena;
+				break;
+			case PORT::TS3:
+				PORTJ::PMR.B3 = 0;
+				MPC::PJ3PFS.PSEL = sel;
+				PORTJ::PMR.B3 = ena;
+				break;
+			case PORT::TS4:
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = sel;
+				PORT2::PMR.B5 = ena;
+				break;
+			case PORT::TS5:
+				PORT2::PMR.B4 = 0;
+				MPC::P24PFS.PSEL = sel;
+				PORT2::PMR.B4 = ena;
+				break;
+			case PORT::TS6:
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;
+				PORT2::PMR.B3 = ena;
+				break;
+			case PORT::TS7:
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;
+				PORT2::PMR.B2 = ena;
+				break;
+			case PORT::TS8:
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = sel;
+				PORT2::PMR.B1 = ena;
+				break;
+			case PORT::TS9:
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = sel;
+				PORT2::PMR.B0 = ena;
+				break;
+			case PORT::TS10:
+				PORT2::PMR.B7 = 0;
+				MPC::P27PFS.PSEL = sel;
+				PORT2::PMR.B7 = ena;
+				break;
+			case PORT::TS11:
+				PORT2::PMR.B6 = 0;
+				MPC::P26PFS.PSEL = sel;
+				PORT2::PMR.B6 = ena;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル有効制御レジスタ n (CTSUCHACn) (n = 0 ～ 3)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ctsu_utils::ctsuchacn_t<base + 0x06> CTSUCHAC0_;
+		static inline CTSUCHAC0_ CTSUCHAC0;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x07> CTSUCHAC1;
+		static inline ctsu_utils::ctsuchctrl_t<base + 0x06, PORT> CTSUCHAC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル送受信制御レジスタ n (CTSUCHTRCn) (n = 0 ～ 3)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0B> CTSUCHTRC0_;
+		static inline CTSUCHTRC0_ CTSUCHTRC0;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0C> CTSUCHTRC1;
+		static inline ctsu_utils::ctsuchctrl_t<base + 0x08, PORT> CTSUCHTRC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU 基準電流調整レジスタ (CTSUTRMR)
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		static inline rw8_t<0x007F'FFBE> CTSUTRMR;
+	};
+
+#elif defined(SIG_RX130)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  RX130 静電容量式タッチセンサ CTSUa クラス

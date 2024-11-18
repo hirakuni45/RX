@@ -190,7 +190,7 @@ namespace device {
 		static inline ssitdmr_t<base + 0x20> SSITDMR;
 	};
 
-#if defined(SIG_RX231)
+#if defined(SIG_RX113) || defined(SIG_RX231)
 	typedef ssi_t<0x0008'A500, peripheral::SSI0,
 		ICU::VECTOR, ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSIF0> SSI0;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)

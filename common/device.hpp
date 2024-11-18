@@ -44,6 +44,19 @@
 #include "RX111/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX113)
+#include "RX113/clock_profile.hpp"
+#include "RX113/peripheral.hpp"
+#include "RX113/system.hpp"
+#include "RX113/power_mgr.hpp"
+#include "RX113/icu.hpp"
+#include "RX140/icu_mgr.hpp"
+#include "RX113/port_map.hpp"
+#include "RX113/port_map_mtu.hpp"
+#include "RX113/port_map_tmr.hpp"
+#include "RX113/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX13T)
 #include "RX13T/clock_profile.hpp"
 #include "RX13T/peripheral.hpp"
