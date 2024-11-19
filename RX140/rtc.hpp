@@ -1,8 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX111/RX130/RX140 グループ RTCc/RTCB 定義 @n
-			RTCA: RX111
+	@brief	RX111/RX113/RX130/RX140 グループ RTCc/RTCB 定義 @n
+			RTCA: RX111/RX113
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -512,7 +512,7 @@ namespace device {
 		};
 		static inline rcr2_t<0x0008'C424> RCR2;
 
-#if defined(SIG_RX111) || defined(SIG_RX130)
+#if defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  RTC コントロールレジスタ 3（RCR3）

@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX130 グループ・フラッシュ 定義
+	@brief	RX111/RX113/RX130 グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -367,7 +367,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3)
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
+					※エクストラ領域
 		*/
 		//-----------------------------------------------------------------//
 		static inline ro32_t<0x0000'0850> UIDR0;

@@ -20,6 +20,7 @@ Ray tracing rendering program using RX microcontroller
 - RX62N/Makefile
 - RX631/Makefile
 - RX24T/Makefile
+- RX26T/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
 - RX65N/Makefile

@@ -213,7 +213,7 @@ namespace device {
 
 #if defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261)
 	typedef lpta_t<ICU::VECTOR::LPTCMI1> LPT;
-#elif defined(SIG_RX130) || defined(SIG_RX231)
+#elif defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX231)
 	typedef lpt_t<ICU::VECTOR::NONE> LPT;
 #endif
 }

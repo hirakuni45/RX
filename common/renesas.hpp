@@ -42,6 +42,36 @@
 
 #include "RX111/board_profile.hpp"
 
+#elif defined(SIG_RX113)
+#include "RX231/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX140/bus.hpp"
+#include "RX140/elc.hpp"
+#include "RX220/mtu2.hpp"
+#include "RX220/poe2.hpp"
+#include "RX600/tmr.hpp"
+#include "RX140/rtc.hpp"
+#include "RX600/lpt.hpp"
+#include "RX600/usb.hpp"
+#include "RX600/sci_e.hpp"
+#include "RX600/sci_f.hpp"
+#include "RX220/irda.hpp"
+#include "RX600/ssi.hpp"
+#include "RX600/crc.hpp"
+// #include "RX600/lcdc.hpp"
+#include "RX600/ctsu.hpp"
+#include "RX111/s12adb.hpp"
+#include "RX600/r12da.hpp"
+#include "RX231/cmpb.hpp"
+#include "RX600/doc.hpp"
+#include "RX130/flash.hpp"
+
+#include "RX113/system_io.hpp"
+#include "RX24T/flash_io.hpp"
+#include "RX600/dac_out.hpp"
+
+#include "RX113/board_profile.hpp"
+
 #elif defined(SIG_RX13T)
 #include "RX24T/lvda.hpp"
 #include "RX600/cac.hpp"

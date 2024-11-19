@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX130/RX140/RX231 グループ・CMPBa 定義
+	@brief	RX113/RX130/RX140/RX231 グループ・CMPBa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -377,7 +377,7 @@ namespace device {
 		static inline cpb1ocr_t<0x0008'C5A7> CPB1OCR;
 	};
 
-#if defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261)
+#if defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  コンパレータ B（CMPBa）

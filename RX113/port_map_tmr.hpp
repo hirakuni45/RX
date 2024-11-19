@@ -1,23 +1,23 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140 グループ・ポート・マッピング (TMR)
+	@brief	RX113 グループ・ポート・マッピング (TMR)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX140/peripheral.hpp"
-#include "RX140/port.hpp"
-#include "RX140/mpc.hpp"
+#include "RX113/peripheral.hpp"
+#include "RX113/port.hpp"
+#include "RX113/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX140 TMR ポート・マッピング・ユーティリティー
+		@brief  RX113 TMR ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_tmr : public port_map_order {
@@ -28,18 +28,18 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:
+			// TMO0: P22
 			// TMO0: PB3
-			// TMO0: PH1
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT2::PMR.B2 = 0;
+					MPC::P22PFS.PSEL = sel;  // ok
+					PORT2::PMR.B2 = ena;
+					break;
+				case ORDER::SECOND:
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;  // ok
 					PORTB::PMR.B3 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTH::PMR.B1 = 0;
-					MPC::PH1PFS.PSEL = sel;  // ok
-					PORTH::PMR.B1 = ena;
 					break;
 				default:
 					ret = false;
@@ -49,7 +49,6 @@ namespace device {
 			case CHANNEL::TMCI:
 			// TMCI0: P21
 			// TMCI0: PB1
-			// TMCI0: PH3
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -61,11 +60,6 @@ namespace device {
 					MPC::PB1PFS.PSEL = sel;  // ok
 					PORTB::PMR.B1 = ena;
 					break;
-				case ORDER::THIRD:
-					PORTH::PMR.B3 = 0;
-					MPC::PH3PFS.PSEL = sel;  // ok
-					PORTH::PMR.B3 = ena;
-					break;
 				default:
 					ret = false;
 					break;
@@ -74,7 +68,6 @@ namespace device {
 			case CHANNEL::TMRI:
 			// TMRI0: P20
 			// TMRI0: PA4
-			// TMRI0: PH2
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -85,11 +78,6 @@ namespace device {
 					PORTA::PMR.B4 = 0;
 					MPC::PA4PFS.PSEL = sel;  // ok
 					PORTA::PMR.B4 = ena;
-					break;
-  				case ORDER::THIRD:
-					PORTH::PMR.B2 = 0;
-					MPC::PH2PFS.PSEL = sel;  // ok
-					PORTH::PMR.B2 = ena;
 					break;
 				default:
 					ret = false;
@@ -102,7 +90,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool tmr1_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
@@ -154,9 +141,15 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:
+			// TMRI1: P24
 			// TMRI1: PB5
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT2::PMR.B4 = 0;
+					MPC::P24PFS.PSEL = sel;  // ok
+					PORT2::PMR.B4 = ena;
+					break;
+				case ORDER::SECOND:
 					PORTB::PMR.B5 = 0;
 					MPC::PB5PFS.PSEL = sel;  // ok
 					PORTB::PMR.B5 = ena;
@@ -172,7 +165,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool tmr2_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
@@ -249,7 +241,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool tmr3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -281,19 +272,19 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:
+			// TMCI3: P04
 			// TMCI3: P27
-			// TMCI3: P34
 			// TMCI3: PA6
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT0::PMR.B4 = 0;
+					MPC::P04PFS.PSEL = sel;  // ok
+					PORT0::PMR.B4 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT2::PMR.B7 = 0;
 					MPC::P27PFS.PSEL = sel;  // ok
 					PORT2::PMR.B7 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT3::PMR.B4 = 0;
-					MPC::P34PFS.PSEL = sel;  // ok
-					PORT3::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTA::PMR.B6 = 0;
@@ -306,9 +297,15 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:
+			// TMRI3: P02
 			// TMRI3: P30
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT0::PMR.B2 = 0;
+					MPC::P02PFS.PSEL = sel;  // ok
+					PORT0::PMR.B2 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT3::PMR.B0 = 0;
 					MPC::P30PFS.PSEL = sel;  // ok
 					PORT3::PMR.B0 = ena;

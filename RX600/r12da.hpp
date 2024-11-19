@@ -2,6 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	R12DA 定義 @n
+			RX113 @n
 			RX231 @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
@@ -276,6 +277,82 @@ namespace device {
 		}
 	};
 	typedef r12da_b_t<peripheral::R12DA> R12DA;
+
+#elif defined(SIG_RX113)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	12 ビット D/A コンバータ（R12DAA）
+		@param[in]	per		ペリフェラル型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <peripheral per>
+	struct r12da_A_t : public r12da_t<per> {
+
+		typedef r12da_t<per> base_type;
+
+		static constexpr bool DACR_DAE = false;	///< DAE フラグの有無
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ出力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ANALOG : uint8_t {
+			DA0,
+			DA1,
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  D/A VREF 制御レジスタ（DAVREFCR）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct davrefcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 3> REF;
+		};
+		static inline davrefcr_t<0x0008'8047> DAVREFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	f	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(ANALOG an, bool f = true)
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+			switch(an) {
+			case ANALOG::DA0:
+				PORTJ::PCR.B0 = 0;
+				PORTJ::PDR.B0 = 0;
+				PORTJ::PMR.B0 = 0;
+				MPC::PJ0PFS.ASEL = f;
+				break;
+			case ANALOG::DA1:
+				PORTJ::PCR.B2 = 0;
+				PORTJ::PDR.B2 = 0;
+				PORTJ::PMR.B2 = 0;
+				MPC::PJ2PFS.ASEL = f;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
+	};
+	typedef r12da_A_t<peripheral::R12DA> R12DA;
 
 #elif defined(SIG_RX231)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

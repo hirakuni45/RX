@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX130 グループ・ICUb 定義
+	@brief	RX113 グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX130 割り込みコントローラ・テンプレート・クラス（ICUb）
+		@brief  RX113 割り込みコントローラ・テンプレート・クラス（ICUb）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icu_t : public ICU_BASE, ICU_IRQ8 {
@@ -35,10 +35,16 @@ namespace device {
 			SWINT		= 27,   ///< ICU
 			CMI0		= 28,   ///< CMT0
 			CMI1		= 29,   ///< CMT1
+			CMI2		= 30,   ///< CMT2
+			CMI3		= 31,   ///< CMT3
 
 			FERRF		= 32,	///< CAC
 			MENDF		= 33,	///< CAC
 			OVFF		= 34,	///< CAC
+
+			D0FIFO0		= 36,	///< USB0
+			D1FIFO0		= 37,	///< USB0
+			USBI0		= 38,	///< USB0
 
 			SPEI0		= 44,	///< RSPI0
 			SPRI0		= 45,
@@ -65,21 +71,24 @@ namespace device {
 			IRQ6		= 70,
 			IRQ7		= 71,
 
-			ELSR8I		= 80,	///< ELC
+			ELSR19I		= 80,	///< ELC
 
 			LVD1		= 88,   ///< LVD/CMPA
 			LVD2    	= 89,	///< LVD/CMPA
 
+			USBR0		= 90,	///< USB0
+
 			ALM			= 92,	///< RTC
 			PRD			= 93,	///< RTC
-
-			REMCI0		= 94,	///< REMC0
-			REMCI1		= 95,	///< REMC1
 
 			S12ADI0		= 102,	///< S12AD
 			GBADI		= 103,	///< S12AD
 
 			ELSR18I		= 106,	///< ELC
+
+			SSIF0		= 108,	///< SSI0
+			SSIRXI0		= 109,
+			SSITXI0		= 110,
 
 			TGIA0		= 114,  ///< MTU0
 			TGIB0		= 115,
@@ -133,6 +142,11 @@ namespace device {
 			CMIA3		= 183,	///< TMR3: CMIA3
 			CMIB3		= 184,	///< TMR3: CMIB3
 			OVI3		= 185,	///< TMR3: OVI3
+
+			ERI2		= 186,  ///< SCI2
+			RXI2		= 187,  ///< SCI2
+			TXI2		= 188,  ///< SCI2
+			TEI2		= 189,  ///< SCI2
 
 			ERI0		= 214,  ///< SCI0
 			RXI0		= 215,  ///< SCI0
@@ -281,11 +295,19 @@ namespace device {
 				case VECTOR::SPII0:
 					idx = static_cast<uint32_t>(VECTOR::SPEI0);
 					break;
+
 				case VECTOR::CTSUWR:
 				case VECTOR::CTSURD:
 				case VECTOR::CTSUFN:
 					idx = static_cast<uint32_t>(VECTOR::CTSUWR);
 					break;
+
+				case VECTOR::SSIF0:
+				case VECTOR::SSIRXI0:
+				case VECTOR::SSITXI0:
+					idx = static_cast<uint32_t>(VECTOR::SSIF0);
+					break;
+
 				case VECTOR::TGIA0:
 				case VECTOR::TGIB0:
 				case VECTOR::TGIC0:
@@ -336,6 +358,7 @@ namespace device {
 				case VECTOR::TGIW5:
 					idx = static_cast<uint32_t>(VECTOR::TGIU5);
 					break;
+
 				case VECTOR::CMIA0:
 				case VECTOR::CMIB0:
 				case VECTOR::OVI0:
@@ -355,6 +378,13 @@ namespace device {
 				case VECTOR::CMIB3:
 				case VECTOR::OVI3:
 					idx = static_cast<uint32_t>(VECTOR::CMIA3);
+					break;
+
+				case VECTOR::ERI2:
+				case VECTOR::RXI2:
+				case VECTOR::TXI2:
+				case VECTOR::TEI2:
+					idx = static_cast<uint32_t>(VECTOR::ERI2);
 					break;
 				case VECTOR::ERI0:
 				case VECTOR::RXI0:
