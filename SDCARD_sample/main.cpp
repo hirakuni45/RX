@@ -105,7 +105,7 @@ namespace {
 
 	// 内臓 RTC を有効
 	#define ENABLE_RTC
-	typedef utils::rtc_io RTC;
+	typedef utils::rtc_io<device::RTC> RTC;
 
 #elif defined(SIG_RX65N)
 

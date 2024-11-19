@@ -53,7 +53,7 @@ namespace {
 
 	static constexpr uint32_t sdc_spi_speed_ = 20'000'000;
 #elif defined(SIG_RX64M)
-	typedef utils::rtc_io RTC;
+	typedef utils::rtc_io<device::RTC> RTC;
 
 #ifdef GR_KAEDE
 #if SOFT_SPI

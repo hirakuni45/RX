@@ -38,6 +38,7 @@
 
 #include "RX140/system_io.hpp"
 #include "RX24T/flash_io.hpp"
+#include "RX24T/adc_in.hpp"
 #include "RX600/dac_out.hpp"
 
 #include "RX111/board_profile.hpp"
@@ -58,7 +59,7 @@
 #include "RX220/irda.hpp"
 #include "RX600/ssi.hpp"
 #include "RX600/crc.hpp"
-// #include "RX600/lcdc.hpp"
+#include "RX600/lcdc.hpp"
 #include "RX600/ctsu.hpp"
 #include "RX111/s12adb.hpp"
 #include "RX600/r12da.hpp"
@@ -68,6 +69,7 @@
 
 #include "RX113/system_io.hpp"
 #include "RX24T/flash_io.hpp"
+#include "RX24T/adc_in.hpp"
 #include "RX600/dac_out.hpp"
 
 #include "RX113/board_profile.hpp"
@@ -119,6 +121,7 @@
 
 #include "RX140/system_io.hpp"
 #include "RX24T/flash_io.hpp"
+#include "RX24T/adc_in.hpp"
 #include "RX600/dac_out.hpp"
 
 #include "RX130/board_profile.hpp"
@@ -147,6 +150,7 @@
 
 #include "RX140/system_io.hpp"
 #include "RX24T/flash_io.hpp"
+#include "RX24T/adc_in.hpp"
 #include "RX600/dac_out.hpp"
 
 #include "RX140/board_profile.hpp"
@@ -173,6 +177,7 @@
 
 #include "RX220/system_io.hpp"
 // #include "RX24T/flash_io.hpp"
+#include "RX24T/adc_in.hpp"
 #include "RX600/dmac_mgr.hpp"
 
 #include "RX220/board_profile.hpp"
@@ -217,12 +222,12 @@
 #include "RX24T/flash_io.hpp"
 #include "ff14/sdhi_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX24T/adc_in.hpp"
 #include "RX600/dac_out.hpp"
 
 #include "RX231/board_profile.hpp"
 
 #elif defined(SIG_RX23W)
-
 
 #include "RX231/system_io.hpp"
 #include "RX24T/flash_io.hpp"
@@ -248,7 +253,6 @@
 #include "RX600/doc.hpp"
 
 #include "RX24T/system_io.hpp"
-// #include "RX24T/flash_io.hpp"
 #include "RX24T/adc_in.hpp"
 #include "RX24T/dac_out.hpp"
 
