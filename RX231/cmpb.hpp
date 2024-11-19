@@ -377,7 +377,107 @@ namespace device {
 		static inline cpb1ocr_t<0x0008'C5A7> CPB1OCR;
 	};
 
-#if defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261)
+#if defined(SIG_RX113)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX113 コンパレータ B（CMPBa）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct cmpb_t : public cmpb01_t {
+
+		static constexpr auto PERIPHERAL = peripheral::CMPB;	///< ペリフェラル型
+		static constexpr uint32_t CH_NUM = 2;					///< CMP channel num
+		static constexpr auto LVD1  = ICU::VECTOR::LVD1;		///< LVD1 割り込みベクター
+		static constexpr auto LVD2  = ICU::VECTOR::LVD2;		///< LVD2 割り込みベクター
+		static constexpr auto CMPB0 = ICU::VECTOR::CMPB0;		///< CMPB0 割り込みベクター
+		static constexpr auto CMPB1 = ICU::VECTOR::CMPB1;		///< CMPB1 割り込みベクター
+		static constexpr auto CMPB2 = ICU::VECTOR::NONE;		///< CMPB2 割り込みベクター
+		static constexpr auto CMPB3 = ICU::VECTOR::NONE;		///< CMPB3 割り込みベクター
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ANALOG : uint8_t {
+			CMPA2,		///< P27/CMPA2 入力
+			CMPB0,		///< PE1/CMPB0 入力
+			CVREFB0,	///< PE2/CVREFB0 入力
+			CMPB1,		///< PA3/CMPB1 入力
+			CVREFB1,	///< PA4/CVREFB1 入力
+			CMPOB0,		///< PE7/CMPOB1 出力
+			CMPOB1,		///< PE5/CMPOB1 出力
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ型
+			@param[in]	ena	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(ANALOG an, bool ena = true)
+		{
+			MPC::PWPR.B0WI  = 0;
+			MPC::PWPR.PFSWE = 1;
+
+			switch(an) {
+			case ANALOG::CMPA2:
+				if(ena) {
+					PORTE::PDR.B4 = 0;
+					PORTE::PMR.B4 = 0;
+				}
+				MPC::PE4PFS.ASEL = ena;
+				break;
+			case ANALOG::CMPB0:
+				if(ena) {
+					PORTE::PDR.B1 = 0;
+					PORTE::PMR.B1 = 0;
+				}
+				MPC::PE1PFS.ASEL = ena;
+				break;
+			case ANALOG::CVREFB0:
+				if(ena) {
+					PORTE::PDR.B2 = 0;
+					PORTE::PMR.B2 = 0;
+				}
+				MPC::PE2PFS.ASEL = ena;
+				break;
+			case ANALOG::CMPB1:
+				if(ena) {
+					PORTA::PDR.B3 = 0;
+					PORTA::PMR.B3 = 0;
+				}
+				MPC::PA3PFS.ASEL = ena;
+				break;
+			case ANALOG::CVREFB1:
+				if(ena) {
+					PORTA::PDR.B4 = 0;
+					PORTA::PMR.B4 = 0;
+				}
+				MPC::PA4PFS.ASEL = ena;
+				break;
+			case ANALOG::CMPOB0:
+				if(ena) {
+					PORTE::PDR.B7 = ena;
+					PORTE::PMR.B7 = 0;
+				}
+				break;
+			case ANALOG::CMPOB1:
+				if(ena) {
+					PORTE::PDR.B5 = ena;
+					PORTE::PMR.B5 = 0;
+				}
+				break;
+			default:
+				break;
+			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
+	};
+#elif defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  コンパレータ B（CMPBa）
@@ -386,18 +486,107 @@ namespace device {
 	struct cmpb_t : public cmpb01_t {
 
 		static constexpr auto PERIPHERAL = peripheral::CMPB;	///< ペリフェラル型
-		static constexpr auto LVD1 = ICU::VECTOR::LVD1;			///< 割り込みベクター
-		static constexpr auto LVD2 = ICU::VECTOR::LVD2;			///< 割り込みベクター
+		static constexpr uint32_t CH_NUM = 2;					///< CMP channel num
+		static constexpr auto LVD1  = ICU::VECTOR::LVD1;		///< LVD1 割り込みベクター
+		static constexpr auto LVD2  = ICU::VECTOR::LVD2;		///< LVD2 割り込みベクター
+		static constexpr auto CMPB0 = ICU::VECTOR::CMPB0;		///< CMPB0 割り込みベクター
+		static constexpr auto CMPB1 = ICU::VECTOR::CMPB1;		///< CMPB1 割り込みベクター
+		static constexpr auto CMPB2 = ICU::VECTOR::NONE;		///< CMPB2 割り込みベクター
+		static constexpr auto CMPB3 = ICU::VECTOR::NONE;		///< CMPB3 割り込みベクター
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ANALOG : uint8_t {
+			CMPA2,		///< PE4/CMPA2 入力
+			CMPB0,		///< PE1/CMPB0 入力
+			CVREFB0,	///< PE2/CVREFB0 入力
+			CMPB1,		///< PA3/CMPB1 入力
+			CVREFB1,	///< PA4/CVREFB1 入力
+			CMPOB0,		///< PE5/CMPOB1 出力
+			CMPOB1,		///< PB1/CMPOB1 出力
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ型
+			@param[in]	ena	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(ANALOG an, bool ena = true)
+		{
+			MPC::PWPR.B0WI  = 0;
+			MPC::PWPR.PFSWE = 1;
+
+			switch(an) {
+			case ANALOG::CMPA2:
+				if(ena) {
+					PORTE::PDR.B4 = 0;
+					PORTE::PMR.B4 = 0;
+				}
+				MPC::PE4PFS.ASEL = ena;
+				break;
+			case ANALOG::CMPB0:
+				if(ena) {
+					PORTE::PDR.B1 = 0;
+					PORTE::PMR.B1 = 0;
+				}
+				MPC::PE1PFS.ASEL = ena;
+				break;
+			case ANALOG::CVREFB0:
+				if(ena) {
+					PORTE::PDR.B2 = 0;
+					PORTE::PMR.B2 = 0;
+				}
+				MPC::PE2PFS.ASEL = ena;
+				break;
+			case ANALOG::CMPB1:
+				if(ena) {
+					PORTA::PDR.B3 = 0;
+					PORTA::PMR.B3 = 0;
+				}
+				MPC::PA3PFS.ASEL = ena;
+				break;
+			case ANALOG::CVREFB1:
+				if(ena) {
+					PORTA::PDR.B4 = 0;
+					PORTA::PMR.B4 = 0;
+				}
+				MPC::PA4PFS.ASEL = ena;
+				break;
+			case ANALOG::CMPOB0:
+				if(ena) {
+					PORTE::PDR.B5 = ena;
+					PORTE::PMR.B5 = 0;
+				}
+				break;
+			case ANALOG::CMPOB1:
+				if(ena) {
+					PORTB::PDR.B1 = ena;
+					PORTB::PMR.B1 = 0;
+				}
+				break;
+			default:
+				break;
+			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
 	};
 #elif defined(SIG_RX231)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  コンパレータ B（CMPBa）
+		@brief  RX231 コンパレータ B（CMPBa）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct cmpb_t : public cmpb01_t, cmpb23_t {
 
 		static constexpr auto PERIPHERAL = peripheral::CMPB;	///< ペリフェラル型
+		static constexpr uint32_t CH_NUM = 4;					///< CMP channel num
 		static constexpr auto LVD1  = ICU::VECTOR::LVD1;		///< LVD1 割り込みベクター
 		static constexpr auto LVD2  = ICU::VECTOR::LVD2;		///< LVD2 割り込みベクター
 		static constexpr auto CMPB0 = ICU::VECTOR::CMPB0;		///< CMPB0 割り込みベクター
@@ -506,31 +695,27 @@ namespace device {
 				break;
 			case ANALOG::CMPOB0:
 				if(ena) {
-					PORTE::PDR.B5 = 1;
+					PORTE::PDR.B5 = ena;
 					PORTE::PMR.B5 = 0;
 				}
-//				MPC::PE5PFS.ASEL = ena;
 				break;
 			case ANALOG::CMPOB1:
 				if(ena) {
-					PORTB::PDR.B1 = 1;
+					PORTB::PDR.B1 = ena;
 					PORTB::PMR.B1 = 0;
 				}
-//				MPC::PB1PFS.ASEL = ena;
 				break;
 			case ANALOG::CMPOB2:
 				if(ena) {
-					PORT1::PDR.B7 = 1;
+					PORT1::PDR.B7 = ena;
 					PORT1::PMR.B7 = 0;
 				}
-//				MPC::P17PFS.ASEL = ena;
 				break;
 			case ANALOG::CMPOB3:
 				if(ena) {
-					PORT3::PDR.B0 = 1;
+					PORT3::PDR.B0 = ena;
 					PORT3::PMR.B0 = 0;
 				}
-//				MPC::P30PFS.ASEL = ena;
 				break;
 			default:
 				break;
