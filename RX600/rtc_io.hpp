@@ -96,7 +96,7 @@ namespace utils {
 			for(int i = 0; i < 5; ++i) {
 				b = get_();
 				if(a == b) {
-					tp = static_cast<time_t>(a[0]);
+					tp = static_cast<time_t>(a);
 					return true;
 				}
 				a = b;

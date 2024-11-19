@@ -61,7 +61,7 @@ namespace {
 
 	utils::command<256> cmd_;
 
-	typedef utils::rtc_io RTC;
+	typedef utils::rtc_io<device::RTC> RTC;
 	RTC			rtc_;
 
 	net::ethernet   ethernet_;

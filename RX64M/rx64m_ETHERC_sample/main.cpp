@@ -28,7 +28,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 256> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
-	utils::rtc_io rtc_;
+	utils::rtc_io<device::RTC> rtc_;
 
 	utils::command<64> command_;
 
