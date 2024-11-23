@@ -55,6 +55,7 @@ namespace device {
 		enum class error : uint8_t {
 			NONE,		///< エラー無し
 			INIT,		///< 初期化エラー
+			BANK,		///< バンクエラー
 			ADDRESS,	///< アドレス・エラー
 			TIMEOUT,	///< タイム・アウト・エラー
 			LOCK,		///< ロック・エラー
@@ -388,14 +389,13 @@ namespace device {
 		/*!
 			@brief  消去チェック
 			@param[in]	org		開始アドレス
-			@param[in]	len		検査長（バイト単位）
 			@return 消去されていれば「true」（エラーは「false」）
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_check(uint32_t org, uint32_t len = DATA_BLOCK_SIZE) noexcept
+		bool erase_check(uint32_t bank) noexcept
 		{
-			if(org >= DATA_SIZE) {
-				error_ = error::ADDRESS;
+			if(bank >= DATA_BLOCK_NUM) {
+				error_ = error::BANK;
 				return false;
 			}
 
@@ -404,8 +404,8 @@ namespace device {
 			}
 
 			device::FLASH::FBCCNT = 0x00;  // address increment
-			device::FLASH::FSADDR = org;
-			device::FLASH::FEADDR = org + len - 1;
+			device::FLASH::FSADDR = bank * DATA_BLOCK_SIZE;
+			device::FLASH::FEADDR = (bank + 1) * DATA_BLOCK_SIZE - 1;
 
 			faci_cmd_(FACI::CHECK_BLANK1, FACI::CHECK_BLANK2);
 
@@ -440,14 +440,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  消去
-			@param[in]	org		開始アドレス
+			@param[in]	bank	開始アドレス
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase(uint32_t org) noexcept
+		bool erase(uint32_t bank) noexcept
 		{
-			if(org >= DATA_SIZE) {
-				error_ = error::ADDRESS;
+			if(bank >= DATA_BLOCK_NUM) {
+				error_ = error::BANK;
 				return false;
 			}
 
@@ -459,7 +459,7 @@ namespace device {
 			device::FLASH::FPROTR = 0x5501;  // ロックビットプロテクト無効
 #endif
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
-			device::FLASH::FSADDR = org;
+			device::FLASH::FSADDR = bank * DATA_BLOCK_SIZE;
 
 			faci_cmd_(FACI::ERASE1, FACI::ERASE2);
 

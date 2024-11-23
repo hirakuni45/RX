@@ -1,7 +1,11 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX111/RX113/RX130 グループ・フラッシュ 定義
+	@brief	RX グループ・フラッシュ 定義 @n
+			RX110 @n
+			RX111 @n
+			RX113 @n
+			RX130 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -18,25 +22,6 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_base_t {
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct dflctl_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> DFLEN;
-		};
-		static inline dflctl_t<0x007F'C090> DFLCTL;
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -225,7 +210,7 @@ namespace device {
 			@brief  フラッシュ処理開始アドレスレジスタ L (FSARL)
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw8_t<0x007F'FF82> FSARL;
+		static inline rw16_t<0x007F'FF82> FSARL;
 
 
 		//-----------------------------------------------------------------//
@@ -233,7 +218,7 @@ namespace device {
 			@brief  フラッシュ処理終了アドレスレジスタ H (FEARH)
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<0x007F'FF88> FEARH;
+		static inline rw8_t<0x007F'FF88> FEARH;
 
 
 		//-----------------------------------------------------------------//
@@ -308,6 +293,8 @@ namespace device {
 			typedef ro8_t<base> io_;
 			using io_::operator ();
 
+			bit_ro_t<io_, bitpos::B1>  DRRDY;
+
 			bit_ro_t<io_, bitpos::B6>  FRDY;
 			bit_ro_t<io_, bitpos::B7>  EXRDY;
 		};
@@ -377,7 +364,24 @@ namespace device {
 		static inline ro32_t<0x0000'085C> UIDR3;
 	};
 
+#if defined(SIG_RX110)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX110 フラッシュ・メモリー制御クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
 
+		static constexpr auto DATA_SIZE = 0;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 1;
+		static constexpr uint32_t DATA_WORD_SIZE = 0;
+		static constexpr auto ID_NUM = 4;
+
+		static constexpr uint8_t  DF_VA_H = 0x0F;  ///< E2 データフラッシュアドレス（0x0F'1000）
+		static constexpr uint16_t DF_VA_L = 0x1000;
+	};
+
+#else
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  フラッシュ・メモリー制御クラス
@@ -390,6 +394,27 @@ namespace device {
 		static constexpr uint32_t DATA_WORD_SIZE = 1;
 		static constexpr auto ID_NUM = 4;
 
+		static constexpr uint8_t  DF_VA_H = 0x0F;  ///< E2 データフラッシュアドレス（0x0F'1000）
+		static constexpr uint16_t DF_VA_L = 0x1000;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct dflctl_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> DFLEN;
+		};
+		static inline dflctl_t<0x007F'C090> DFLCTL;
 	};
+#endif
 	typedef flash_t FLASH;
 }

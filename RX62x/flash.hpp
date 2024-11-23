@@ -17,14 +17,7 @@ namespace device {
 		@brief  フラッシュ・メモリー制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct flash_t {
-
-		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
-		static constexpr uint32_t DATA_SIZE = 32768;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 2;		///< データ・フラッシュ最小書き込みサイズ
-
-		static constexpr auto ID_NUM = 0;					///< 個別識別子数
+	struct flash_base_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -124,17 +117,17 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr0_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B0>  PRGSPD;
-			bit_rw_t<io_, bitpos::B1>  ERSSPD;
+			bit_ro_t<in_, bitpos::B0>  PRGSPD;
+			bit_ro_t<in_, bitpos::B1>  ERSSPD;
 
-			bit_rw_t<io_, bitpos::B3>  SUSRDY;
-			bit_rw_t<io_, bitpos::B4>  PRGERR;
-			bit_rw_t<io_, bitpos::B5>  ERSERR;
-			bit_rw_t<io_, bitpos::B6>  ILGERR;
-			bit_rw_t<io_, bitpos::B7>  FRDY;
+			bit_ro_t<in_, bitpos::B3>  SUSRDY;
+			bit_ro_t<in_, bitpos::B4>  PRGERR;
+			bit_ro_t<in_, bitpos::B5>  ERSERR;
+			bit_ro_t<in_, bitpos::B6>  ILGLERR;
+			bit_ro_t<in_, bitpos::B7>  FRDY;
 		};
 		static inline fstatr0_t<0x007F'FFB0> FSTATR0;
 
@@ -147,12 +140,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr1_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B4>  FLOCKST;
+			bit_rw_t<in_, bitpos::B4>  FLOCKST;
 
-			bit_rw_t<io_, bitpos::B7>  FCUERR;
+			bit_rw_t<in_, bitpos::B7>  FCUERR;
 		};
 		static inline fstatr1_t<0x007F'FFB1> FSTATR1;
 
@@ -218,7 +211,7 @@ namespace device {
 		static inline fresetr_t<0x007F'FFB6> FRESETR;
 
 
-		//-----------------------------------------------------------------//
+	//-----------------------------------------------------------------//
 		/*!
 			@brief  FCU コマンドレジスタ（FCMDR）
 			@param[in]	base	ベース
@@ -472,21 +465,56 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct dflbcstat_t : public ro16_t<base> {
-			typedef ro16_t<base> io_;
-			using io_::operator ();
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t <io_, bitpos::B0>    BCST;
+			bit_ro_t <in_, bitpos::B0>    BCST;
 		};
 		static inline dflbcstat_t<0x007F'FFCE> DFLBCSTAT;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX621/RX62N フラッシュ・メモリー制御クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
+		static constexpr uint32_t DATA_SIZE = 32768;		///< データ・フラッシュ、サイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 8;		///< データ・フラッシュ最小書き込みサイズ
+		static constexpr auto ID_NUM = 0;					///< 個別識別子数
+
+		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
+		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
+
+		static constexpr uint8_t DATA_PROG_CMD_2ND = 0x04;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  FCU E2 データフラッシュコマンドレジスタ
+			@brief  ファームの転送
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
-		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
+		static void transfer_farm() noexcept
+		{
+			// ファームの転送は、RX621/RX62N/RX631/RX63N
+			if(FENTRYR() != 0) {
+				FENTRYR = 0x0000;  // FCU 停止
+			}
+			utils::delay::micro_second(10);  // 念の為・・
+			FCURAME = 0xC401;
+
+			auto src = reinterpret_cast<const uint8_t*>(0xFEFF'E000);
+			auto dst = reinterpret_cast<uint8_t*>(0x007F'8000);
+			if(src != nullptr && dst != nullptr) {
+				for(uint32_t i = 0; i < 0x2000; ++i) {
+					*dst++ = *src++;
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//

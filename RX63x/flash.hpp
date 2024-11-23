@@ -20,7 +20,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t {
 
-		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
+		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
 		static constexpr uint32_t DATA_SIZE = 32768;		///< データ・フラッシュ、サイズ
 		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 2;		///< データ・フラッシュ最小書き込みサイズ
@@ -30,6 +30,35 @@ namespace device {
 #else
 		static constexpr auto ID_NUM = 0;					///< 個別識別子数
 #endif
+		static constexpr uint8_t DATA_PROG_CMD_2ND = 0x01;
+
+		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
+		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ファームの転送
+		*/
+		//-----------------------------------------------------------------//
+		static void transfer_farm() noexcept
+		{
+			// ファームの転送は、RX621/RX62N/RX631/RX63N
+			if(FENTRYR() != 0) {
+				FENTRYR = 0x0000;  // FCU 停止
+			}
+			utils::delay::micro_second(10);  // 念の為・・
+			FCURAME = 0xC401;
+
+			auto src = reinterpret_cast<const uint8_t*>(0xFEFF'E000);
+			auto dst = reinterpret_cast<uint8_t*>(0x007F'8000);
+			if(src != nullptr && dst != nullptr) {
+				for(uint32_t i = 0; i < 0x2000; ++i) {
+					*dst++ = *src++;
+				}
+			}
+		}
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -288,7 +317,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>  SUSRDY;
 			bit_rw_t<io_, bitpos::B4>  PRGERR;
 			bit_rw_t<io_, bitpos::B5>  ERSERR;
-			bit_rw_t<io_, bitpos::B6>  ILGERR;
+			bit_rw_t<io_, bitpos::B6>  ILGLERR;
 			bit_rw_t<io_, bitpos::B7>  FRDY;
 		};
 		static inline fstatr0_t<0x007F'FFB0> FSTATR0;
@@ -327,6 +356,9 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>    FENTRY0;
+			bit_rw_t <io_, bitpos::B1>    FENTRY1;
+			bit_rw_t <io_, bitpos::B2>    FENTRY2;
+			bit_rw_t <io_, bitpos::B3>    FENTRY3;
 
 			bit_rw_t <io_, bitpos::B7>    FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8> KEY;
@@ -384,12 +416,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fcmdr_t : public ro16_t<base> {
-			typedef ro16_t<base> io_;
-			using io_::operator ();
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bits_rw_t<io_, bitpos::B0, 8> PCMDR;
-
-			bits_rw_t<io_, bitpos::B8, 8> CMDR;
+			bits_ro_t<in_, bitpos::B0, 8> PCMDR;
+			bits_ro_t<in_, bitpos::B8, 8> CMDR;
 		};
 		static inline fcmdr_t<0x007F'FFBA> FCMDR;
 
@@ -427,9 +458,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>    BCSIZE;
+			bits_rw_t<io_, bitpos::B0, 11> BCADR;
 
-			bits_rw_t<io_, bitpos::B3, 8> BCADR;
+			bit_rw_t <io_, bitpos::B15>    BCSIZE;
 		};
 		static inline dflbccnt_t<0x007F'FFCA> DFLBCCNT;
 
@@ -458,10 +489,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct dflbcstat_t : public ro16_t<base> {
-			typedef ro16_t<base> io_;
-			using io_::operator ();
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t <io_, bitpos::B0>    BCST;
+			bit_ro_t<in_, bitpos::B0>   BCST;
 		};
 		static inline dflbcstat_t<0x007F'FFCE> DFLBCSTAT;
 
@@ -483,15 +514,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8> PCKA;
 		};
 		static inline pckar_t<0x007F'FFE8> PCKAR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  FCU E2 データフラッシュコマンドレジスタ
-		*/
-		//-----------------------------------------------------------------//
-		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
-		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
 
 
 		//-----------------------------------------------------------------//
