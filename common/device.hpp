@@ -2,7 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX マイコン、デバイス固有ヘッダー @n
-			RX111 @n
+			RX110/RX111/RX113 @n
 			RX13T @n
 			EX130 @n
 			RX140 @n
@@ -32,8 +32,12 @@
 //=========================================================================//
 #include "common/io_utils.hpp"
 
-#if defined(SIG_RX111)
+#if defined(SIG_RX110) || defined(SIG_RX111)
+#if defined(SIG_RX110)
+#include "RX110/clock_profile.hpp"
+#else
 #include "RX111/clock_profile.hpp"
+#endif
 #include "RX111/peripheral.hpp"
 #include "RX111/system.hpp"
 #include "RX111/power_mgr.hpp"

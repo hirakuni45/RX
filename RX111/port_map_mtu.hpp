@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX111 グループ・ポート・マッピング (MTU2a) 
+	@brief	RX110/RX111 グループ・ポート・マッピング (MTU2a) 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -238,7 +238,7 @@ namespace device {
 			}
 			return ret;
 		}
-
+#if defined(SIG_RX111)
 		static bool mtu3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -480,7 +480,7 @@ namespace device {
 			}
 			return ret;
 		}
-
+#endif
 		static bool mtu5_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -669,12 +669,14 @@ namespace device {
 			case peripheral::MTU2:
 				ret = mtu2_(ch, ena, odr);
 				break;
+#if defined(SIG_RX111)
 			case peripheral::MTU3:
 				ret = mtu3_(ch, ena, odr);
 				break;
 			case peripheral::MTU4:
 				ret = mtu4_(ch, ena, odr);
 				break;
+#endif
 			case peripheral::MTU5:
 				ret = mtu5_(ch, ena, odr);
 				break;

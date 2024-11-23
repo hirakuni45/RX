@@ -19,29 +19,41 @@
 #include "RX600/riic.hpp"
 #include "RX600/rspi.hpp"
 
-#if defined(SIG_RX111)
+#if defined(SIG_RX110) || defined(SIG_RX111)
 #include "RX231/lvda.hpp"
 #include "RX600/cac.hpp"
 #include "RX140/bus.hpp"
 #include "RX140/elc.hpp"
 #include "RX220/mtu2.hpp"
+#if defined(SIG_RX111)
 #include "RX220/poe2.hpp"
+#endif
 #include "RX140/rtc.hpp"
+#if defined(SIG_RX111)
 #include "RX600/usb.hpp"
+#endif
 #include "RX600/sci_e.hpp"
 #include "RX600/sci_f.hpp"
 #include "RX600/crc.hpp"
 #include "RX111/s12adb.hpp"
+#if defined(SIG_RX111)
 #include "RX140/da.hpp"
+#endif
 #include "RX600/doc.hpp"
 #include "RX130/flash.hpp"
 
 #include "RX140/system_io.hpp"
 #include "RX24T/flash_io.hpp"
 #include "RX24T/adc_in.hpp"
+#if defined(SIG_RX111)
 #include "RX600/dac_out.hpp"
+#endif
 
+#if defined(SIG_RX110)
+#include "RX110/board_profile.hpp"
+#elif defined(SIG_RX111)
 #include "RX111/board_profile.hpp"
+#endif
 
 #elif defined(SIG_RX113)
 #include "RX231/lvda.hpp"
@@ -176,7 +188,7 @@
 #include "RX220/flash.hpp"
 
 #include "RX220/system_io.hpp"
-// #include "RX24T/flash_io.hpp"
+#include "RX62x/flash_io.hpp"
 #include "RX24T/adc_in.hpp"
 #include "RX600/dmac_mgr.hpp"
 
@@ -375,7 +387,7 @@
 #include "RX26T/flash.hpp"
 
 #include "RX26T/system_io.hpp"
-// #include "RX600/flash_io.hpp"
+#include "RX62x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/dac_out.hpp"
 
@@ -474,7 +486,7 @@
 #include "RX63T/flash.hpp"
 
 #include "RX63T/system_io.hpp"
-// #include "RX63T/flash_io.hpp"
+#include "RX24T/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 // #include "RX63T/dac_out.hpp"
 

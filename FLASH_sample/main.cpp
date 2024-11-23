@@ -33,7 +33,7 @@ namespace {
 	FLASH_IO	flash_io_;
 
 
-	void dump_(uint32_t org, uint32_t len)
+	void dump_(uint32_t org, uint32_t len) noexcept
 	{
 		bool adr = true;
 		for(uint32_t i = 0; i < len; i += device::FLASH::DATA_WORD_SIZE) {
@@ -44,9 +44,12 @@ namespace {
 			for(uint32_t j = 0; j < device::FLASH::DATA_WORD_SIZE; ++j) {
 				uint8_t dat = flash_io_.read(org + j);
 				if(j == 0) {
-					utils::format(" %02X%") % static_cast<uint32_t>(dat);
+					utils::format(" ");
+				}
+				if(flash_io_.get_last_error() != FLASH_IO::ERROR::NONE) {
+					utils::format("--");
 				} else {
-					utils::format("%02X%") % static_cast<uint32_t>(dat);
+					utils::format("%02X") % static_cast<uint32_t>(dat);
 				}
 			}
 			auto a = org;
@@ -61,8 +64,39 @@ namespace {
 		}
 	}
 
+	void shift4_(uint8_t* val) noexcept
+	{
+		for(uint32_t i = 0; i < device::FLASH::DATA_WORD_SIZE; ++i) {
+			val[i] <<= 4;
+			if(device::FLASH::DATA_WORD_SIZE <= (i + 1)) break;
+			val[i] |= val[i + 1] >> 4;
+		}
+	}
 
-	void command_service_()
+	bool get_hex_data_(const char* inp, uint8_t* out) noexcept
+	{
+		for(u_int32_t i = 0; i < device::FLASH::DATA_WORD_SIZE; ++i) {
+			out[i] = 0;
+		}
+		char ch;
+		while((ch = *inp++) != 0) {
+			if(ch >= '0' && ch <= '9') {
+				shift4_(out);
+				out[device::FLASH::DATA_WORD_SIZE - 1] |= ch - '0';
+			} else if(ch >= 'A' && ch <= 'F') {
+				shift4_(out);
+				out[device::FLASH::DATA_WORD_SIZE - 1] |= ch - 'A' + 10;
+			} else if(ch >= 'a' && ch <= 'f') {
+				shift4_(out);
+				out[device::FLASH::DATA_WORD_SIZE - 1] |= ch - 'a' + 10;
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	void command_service_() noexcept
 	{
 		// コマンド入力と、コマンド解析
 		if(!command_.service()) {
@@ -77,7 +111,7 @@ namespace {
 				int bank = 0;
 				if((utils::input("%d", buff) % bank).status()) {
 					if(static_cast<uint32_t>(bank) < FLASH_IO::DATA_BLOCK_NUM) {
-						f = flash_io_.erase(bank * FLASH_IO::DATA_BLOCK_SIZE);
+						f = flash_io_.erase(bank);
 						if(!f) {
 							utils::format("Erase error: bank %d\n") % bank;
 							f = true;
@@ -105,7 +139,7 @@ namespace {
 				int bank = 0;
 				if((utils::input("%d", buff) % bank).status()) {
 					if(static_cast<uint32_t>(bank) < FLASH_IO::DATA_BLOCK_NUM) {
-						f = flash_io_.erase_check(bank * FLASH_IO::DATA_BLOCK_SIZE);
+						f = flash_io_.erase_check(bank);
 						uint32_t s = bank * FLASH_IO::DATA_BLOCK_SIZE;
 						uint32_t e = s + FLASH_IO::DATA_BLOCK_SIZE - 1;
 						utils::format("Erase check: bank %d: 0x%04X to 0x%04X %s\n") % bank % s % e % (f ? "OK" : "NG");
@@ -144,33 +178,32 @@ namespace {
 				utils::format("Read param error: %s\n") % command_.get_command();
 			}
 		} else if(command_.cmp_word(0, "write") && n >= 3) {
-			char buff[16];
+			char buff[20];
 			if(command_.get_word(1, buff, sizeof(buff))) {
-				bool f = false;
+				uint8_t err = 0;
 				uint32_t org = 0;
 				if((utils::input("%x", buff) % org).status()) {
-					for(uint8_t i = 2; i < n; ++i) {
-						if(command_.get_word(i, buff, sizeof(buff))) {
-							uint32_t data = 0;
-							if(!(utils::input("%x", buff) % data).status()) {
-								break;
+					for(uint8_t i = 0; i < (n - 2); ++i) {
+						if(command_.get_word(i + 2, buff, sizeof(buff))) {
+							uint8_t tmp[device::FLASH::DATA_WORD_SIZE];
+							if(get_hex_data_(buff, tmp)) {
+								if(!flash_io_.write(org, tmp, device::FLASH::DATA_WORD_SIZE)) {
+									utils::format("Write error: 0x%04X: '%s'\n") % org % buff;
+								}
+								org += device::FLASH::DATA_WORD_SIZE;								
+							} else {
+								++err;
 							}
-							uint8_t tmp[4];
-							auto d = data;
-							for(uint32_t j = 0; j < device::FLASH::DATA_WORD_SIZE; ++j) {
-								tmp[device::FLASH::DATA_WORD_SIZE - j - 1] = d;
-								d >>= 8;
-							}
-							if(!flash_io_.write(org, tmp, device::FLASH::DATA_WORD_SIZE)) {
-								utils::format("Write error: 0x%04X: 0x%08X\n") % org % data;
-							}
-							org += device::FLASH::DATA_WORD_SIZE;
+						} else {
+							++err;
 						}
+						if(err > 0) break;
 					}
-					f = true;
+				} else {
+					++err;
 				}
-				if(!f) {
-					utils::format("Write param error: %s\n") % command_.get_command();
+				if(err > 0) {
+					utils::format("Write param error: '%s'\n") % command_.get_command();
 				}
 			}
 		} else if(command_.cmp_word(0, "uid")) {
@@ -258,7 +291,9 @@ int main(int argc, char** argv)
 	}
 
 	{  // DataFlash 開始
-		flash_io_.start();
+		if(!flash_io_.start()) {
+			utils::format("Data Flash stat fail...\n");
+		}
 	}
 
 	command_.set_prompt("# ");

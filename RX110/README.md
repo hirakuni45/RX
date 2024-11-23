@@ -1,58 +1,54 @@
 
-## RX111 features / 特徴
+## RX110 features / 特徴
 
 - RXv1 core / RXv1 コア
 - Maximum operating frequency 32MHz / 最大動作周波数 32MHz
 - 1.8V ～ 3.6V Operation / 動作
-- USB2.0 Full Speed, Low Speed, Host, Function
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
-- 8 Bits D/A / ８ビットＤ／Ａ変換器
 
 ### Package/パッケージ
 
-|R5F5111---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|R5F5110---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
 |---|:-:|:-:|:-:|
-|R5F5111xxxFM|LFQFP|64|0.50|
-|R5F5111xxxFK|LQFP|64|0.80|
-|R5F5111xxxLF|WFLGA|64|0.50|
-|R5F5111xxxFL|LFQFP|48|0.50|
-|R5F5111xxxNE|HWQFN|48|0.50|
-|R5F5111xxxNF|HWQFN|40|0.50|
-|R5F5111xxxLM|WFLGA|36|0.50|
+|R5F5110xxxFM|LFQFP|64|0.50|
+|R5F5110xxxFK|LQFP|64|0.80|
+|R5F5110xxxLF|WFLGA|64|0.50|
+|R5F5110xxxFL|LFQFP|48|0.50|
+|R5F5110xxxNE|HWQFN|48|0.50|
+|R5F5110xxxNF|HWQFN|40|0.50|
+|R5F5110xxxLM|WFLGA|36|0.50|
 
 ### Ambient operating temperature/動作周囲温度
 
-|R5F5111--X--|degree Celsius|
+|R5F5110--X--|degree Celsius|
 |---|:-:|
-|R5F5111xxDxx|-40 ～ +85℃|
-|R5F5111xxGxx|-40 ～ +105℃|
+|R5F5110xxDxx|-40 ～ +85℃|
+|R5F5110xxGxx|-40 ～ +105℃|
 
 ### Memoey size/メモリ容量
 
-|R5F5111X----|CodeFlash|RAM|DataFlash|
+|R5F5110X----|CodeFlash|RAM|DataFlash|
 |---|:-:|:-:|:-:|
-|R5F51118xxxx|512K|64K|8K|
-|R5F51117xxxx|384K|64K|8K|
-|R5F51116xxxx|256K|32K|8K|
-|R5F51115xxxx|128K|16K|8K|
-|R5F51114xxxx|96K|16K|8K|
-|R5F51113xxxx|64K|10K|8K|
-|R5F51111xxxx|32K|10K|8K|
-|R5F5111Jxxxx|16K|8K|8K|
+|R5F51105xxxx|128K|16K|0K|
+|R5F51104xxxx|96K|16K|0K|
+|R5F51103xxxx|64K|10K|0K|
+|R5F51101xxxx|32K|10K|0K|
+|R5F5110Jxxxx|16K|8K|0K|
+|R5F5110Hxxxx|8K|8K|0K|
 
 ---
 
-## RX111 Linker file / リンカーファイル
+## RX110 Linker file / リンカーファイル
 
 |Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F51117|384K|64K|8K|[R5F51117.ld](R5F51117.ld?ts=4)|4096|1024|
-|R5F51116|256K|32K|8K|[R5F51116.ld](R5F51116.ld?ts=4)|1536|512|
-|R5F51115|128K|16K|8K|[R5F51115.ld](R5F51115.ld?ts=4)|768|256|
+|R5F51105|128K|16K|0K|[R5F51105.ld](R5F51105.ld?ts=4)|768|256|
+|R5F51104|96K|16K|0K|[R5F51104.ld](R5F51104.ld?ts=4)|768|256|
+|R5F51103|64K|10K|0K|[R5F51113.ld](R5F51103.ld?ts=4)|256|128|
 
 ---
 
-## RX111 Dedicated class / 専用クラス
+## RX110 Dedicated class / 専用クラス
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
@@ -98,11 +94,10 @@
 
 - VCL: 4.7uF/25V
 
-|Mode/モード|B/UB|MD|
-|---|:---:|:---:|
-|Serial BOOT/シリアルブート|0|0|
-|USB Boot/USB ブート|1|0|
-|Single Chip/シングルチップ|-|1|
+|Mode/モード|MD|
+|---|:---:|
+|Serial BOOT/シリアルブート|0|
+|Single Chip/シングルチップ|1|
 
 ---
 

@@ -1,16 +1,17 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
-#	RX220 Makefile
+#   @file
+#   @brief  RX26T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
 TARGET		=	flash_sample
 
-DEVICE		=	R5F52206
+DEVICE		=	R5F526TF
 
-RX_DEF		=	SIG_RX220
+RX_DEF		=	SIG_RX26T
 
 BUILD		=	release
 # BUILD		=	debug
@@ -25,9 +26,9 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	FLASH_sample/main.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
-USER_DEFS   +=
+USER_DEFS	=
 
 INC_APP		=	. ../ ../../
 

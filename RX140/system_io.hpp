@@ -1,14 +1,17 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX111/RX130/RX140 システム制御
+	@brief	RX110/RX111/RX130/RX140 システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#if defined(SIG_RX111)
+#if defined(SIG_RX110)
+#include "RX111/system.hpp"
+#include "RX110/clock_profile.hpp"
+#elif defined(SIG_RX111)
 #include "RX111/system.hpp"
 #include "RX111/clock_profile.hpp"
 #elif defined(SIG_RX130)

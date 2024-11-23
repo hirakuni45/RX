@@ -1,16 +1,16 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
-#	RX220 Makefile
+#	RX110 Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	flash_sample
+TARGET		=	led_sample
 
-DEVICE		=	R5F52206
+DEVICE		=	R5F51105
 
-RX_DEF		=	SIG_RX220
+RX_DEF		=	SIG_RX110
 
 BUILD		=	release
 # BUILD		=	debug
@@ -20,10 +20,9 @@ VPATH		=	../../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c \
-				common/syscalls.c
+				common/vect.c
 
-PSOURCES	=	FLASH_sample/main.cpp
+PSOURCES	=	FIRST_sample/main.cpp
 
 USER_LIBS	=
 

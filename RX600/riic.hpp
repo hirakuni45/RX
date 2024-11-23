@@ -2,7 +2,7 @@
 //=============================================================================//
 /*!	@file
 	@brief	RIIC 定義 @n
-			RX113/RX111/RX130/RX140 @n
+			RX110/RX111/RX113/RX130/RX140 @n
 			RX220 @n
 			RX230/RX231 @n
 			RX24T/RX24U/RX260/RX261/RX26T @n
@@ -444,7 +444,7 @@ namespace device {
 		static constexpr auto PCLK = pclk;		///< クロック周波数
 	};
 
-#if defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX13T) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX13T) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261)
 	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)

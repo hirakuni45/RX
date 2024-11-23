@@ -19,12 +19,16 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t {
 
-		static constexpr uint32_t DATA_FLASH_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
-		static constexpr uint32_t DATA_FLASH_SIZE = 8192;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_FLASH_BLOCK = 64;		///< データ・フラッシュ、ブロックサイズ(128)
-		static constexpr uint32_t DATA_WORD_SIZE = 2;			///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
+		static constexpr uint32_t DATA_SIZE = 8192;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 128;
+		static constexpr uint32_t DATA_WORD_SIZE = 2;
+		static constexpr uint32_t ID_NUM = 4;
 
-		static constexpr auto ID_NUM = 0;						///< 個別識別子数
+		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
+		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
+
+		static constexpr uint8_t DATA_PROG_CMD_2ND = 0x01;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -122,17 +126,17 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr0_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B0>  PRGSPD;
-			bit_rw_t<io_, bitpos::B1>  ERSSPD;
+			bit_ro_t<in_, bitpos::B0>  PRGSPD;
+			bit_ro_t<in_, bitpos::B1>  ERSSPD;
 
-			bit_rw_t<io_, bitpos::B3>  SUSRDY;
-			bit_rw_t<io_, bitpos::B4>  PRGERR;
-			bit_rw_t<io_, bitpos::B5>  ERSERR;
-			bit_rw_t<io_, bitpos::B6>  ILGERR;
-			bit_rw_t<io_, bitpos::B7>  FRDY;
+			bit_ro_t<in_, bitpos::B3>  SUSRDY;
+			bit_ro_t<in_, bitpos::B4>  PRGERR;
+			bit_ro_t<in_, bitpos::B5>  ERSERR;
+			bit_ro_t<in_, bitpos::B6>  ILGLERR;
+			bit_ro_t<in_, bitpos::B7>  FRDY;
 		};
 		static inline fstatr0_t<0x007F'FFB0> FSTATR0;
 
@@ -145,12 +149,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr1_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B4>  FLOCKST;
+			bit_ro_t<in_, bitpos::B4>  FLOCKST;
 
-			bit_rw_t<io_, bitpos::B7>  FCUERR;
+			bit_ro_t<in_, bitpos::B7>  FCUERR;
 		};
 		static inline fstatr1_t<0x007F'FFB1> FSTATR1;
 
@@ -246,12 +250,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fcmdr_t : public ro16_t<base> {
-			typedef ro16_t<base> io_;
-			using io_::operator ();
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bits_rw_t<io_, bitpos::B0, 8> PCMDR;
-
-			bits_rw_t<io_, bitpos::B8, 8> CMDR;
+			bits_ro_t<in_, bitpos::B0, 8> PCMDR;
+			bits_ro_t<in_, bitpos::B8, 8> CMDR;
 		};
 		static inline fcmdr_t<0x007F'FFBA> FCMDR;
 
@@ -283,10 +286,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fpestat_t : public ro16_t<base> {
-			typedef ro16_t<base> io_;
-			using io_::operator ();
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bits_rw_t<io_, bitpos::B0, 8> PEERRST;
+			bits_ro_t<in_, bitpos::B0, 8> PEERRST;
 		};
 		static inline fpestat_t<0x007F'FFCC> FPESTAT;
 
@@ -395,6 +398,16 @@ namespace device {
 			bit_ro_t <io_, bitpos::B0>    BCST;
 		};
 		static inline dflbcstat_t<0x007F'FFCE> DFLBCSTAT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ファームの転送
+		*/
+		//-----------------------------------------------------------------//
+		static void transfer_farm() noexcept
+		{
+		}
 
 
 		//-----------------------------------------------------------------//

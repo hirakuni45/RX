@@ -1,7 +1,14 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX111/RX130/RX140/RX231/RX24T/RX24U グループ FLASH データ 制御
+	@brief	RX グループ FLASH データ 制御 @n
+			RX110 (UID: extra area) (DataFlash: 0) @n
+			RX111 (UID: extra area) @n
+			RX130 (UID: extra area) @n
+			RX13T (UID: extra area) (DataFlash: 0) @n
+			RX140 @n
+			RX231 @n
+			RX24T/RX24U
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -11,6 +18,8 @@
 #include <cstring>
 #include "common/delay.hpp"
 
+#include "common/format.hpp"
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -18,9 +27,8 @@ namespace device {
 		@brief  FLASH 制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class flash_io {
+	struct flash_io {
 
-	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  データ・フラッシュ構成
@@ -32,62 +40,104 @@ namespace device {
 
 	private:
 
-		void turn_rd_() const
-		{
-			if(device::FLASH::FENTRYR.FENTRYD() == 0) return;
-			device::FLASH::FENTRYR.FENTRYD = 0;  // read mode
+		static inline uint32_t	uid_[4];
 
-			device::FLASH::FPR = 0xA5;
-			device::FLASH::FPMCR =  0x08;
-			device::FLASH::FPMCR = ~0x08;
-			device::FLASH::FPMCR =  0x08;
+		static void turn_rd_() noexcept
+		{
+			if(FLASH::FENTRYR.FENTRYD() == 0) return;
+			FLASH::FENTRYR.FENTRYD = 0;  // read mode
+
+			FLASH::FPR = 0xA5;
+			FLASH::FPMCR =  0x08;
+			FLASH::FPMCR = ~0x08;
+			FLASH::FPMCR =  0x08;
 			utils::delay::micro_second(3);  // tMS
-			device::FLASH::FENTRYR = 0xAA00;
-			while(device::FLASH::FENTRYR() != 0) ;
+			FLASH::FENTRYR = 0xAA00;
+			while(FLASH::FENTRYR() != 0) ;
 		}
 
-		void turn_pe_() const
+		static void turn_pe_() noexcept
 		{
-			if(device::FLASH::FENTRYR.FENTRYD() != 0) return;
-			device::FLASH::FENTRYR.FENTRYD = 1;  // P/E mode
+			if(FLASH::FENTRYR.FENTRYD() != 0) return;
+			FLASH::FENTRYR.FENTRYD = 1;  // P/E mode
 
-			device::FLASH::FENTRYR = 0xAA80;
+			FLASH::FENTRYR = 0xAA80;
 			utils::delay::micro_second(5);  // tDSTOP
-			if(device::SYSTEM::OPCCR.OPCM() == 0) {
-				device::FLASH::FPR = 0xA5;
-				device::FLASH::FPMCR =  0x10;
-				device::FLASH::FPMCR = ~0x10;
-				device::FLASH::FPMCR =  0x10;
+			if(SYSTEM::OPCCR.OPCM() == 0) {
+				FLASH::FPR = 0xA5;
+				FLASH::FPMCR =  0x10;
+				FLASH::FPMCR = ~0x10;
+				FLASH::FPMCR =  0x10;
 			} else {
-				device::FLASH::FPR = 0xA5;
-				device::FLASH::FPMCR =  0x50;
-				device::FLASH::FPMCR = ~0x50;
-				device::FLASH::FPMCR =  0x50;
+				FLASH::FPR = 0xA5;
+				FLASH::FPMCR =  0x50;
+				FLASH::FPMCR = ~0x50;
+				FLASH::FPMCR =  0x50;
 			}
 			uint8_t frq = clock_profile::FCLK / 1'000'000;
 			if(frq > 32) frq = 32;
-			device::FLASH::FISR.PCKA = frq - 1;
+			FLASH::FISR.PCKA = frq - 1;
 		}
 
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
+		static void read_unique_id_() noexcept
+		{
+			// Entry P/E mode
+			FLASH::FASR.EXS = 1;
+			FLASH::FSARH = 0x00;
+			FLASH::FSARL = 0x0850;
+			FLASH::FEARH = 0x00;
+			FLASH::FEARL = 0x086F;
+			FLASH::FCR   = 0x85;
+			while(1) {
+				if(FLASH::FSTATR0.ILGLERR() != 0) break;
+				if(FLASH::FSTATR1.DRRDY() != 0) break;
+			}
+			if(FLASH::FSTATR0.ILGLERR() == 0) {
+				uint32_t i = 0;
+				do {
+					uint32_t tmp = FLASH::FRBH();
+					tmp <<= 16;
+					tmp |= FLASH::FRBL();
+					uid_[i] = tmp;
+					while(FLASH::FSTATR1.DRRDY() != 0) ;
+					FLASH::FCR = 0x85;
+					while(1) {
+						if(FLASH::FSTATR1.DRRDY() != 0) break;
+						if(FLASH::FSTATR1.FRDY() != 0) break;
+					}
+					++i;
+				} while(FLASH::FSTATR1.DRRDY() != 0 && i < 4) ;
+			}
+			FLASH::FCR = 0x00;
+			while(FLASH::FSTATR1.FRDY() != 0) ;
+		}
+#endif
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io() { }
+		flash_io() noexcept { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
+			@return エラー無ければ「true」
 		 */
 		//-----------------------------------------------------------------//
-		void start() const
+		bool start() const noexcept
 		{
-			device::FLASH::DFLCTL.DFLEN = 1;
+#if defined(SIG_RX110)
+#else
+			FLASH::DFLCTL.DFLEN = 1;
+#endif
 			utils::delay::micro_second(5);  // tDSTOP by high speed
 			turn_rd_();
+
+			return true;
 		}
 
 
@@ -98,11 +148,11 @@ namespace device {
 			@return データ
 		*/
 		//-----------------------------------------------------------------//
-		uint8_t read(uint16_t org) const
+		uint8_t read(uint16_t org) const noexcept
 		{
 			if(org >= DATA_SIZE) return 0;
 			turn_rd_();
-			return device::rd8_(0x00100000 + org);
+			return rd8_(0x0010'0000 + org);
 		}
 
 
@@ -114,14 +164,14 @@ namespace device {
 			@param[out]	dst	先
 		*/
 		//-----------------------------------------------------------------//
-		void read(uint16_t org, uint16_t len, void* dst) const
+		void read(uint16_t org, uint16_t len, void* dst) const noexcept
 		{
 			if(org >= DATA_SIZE) return;
 			if((org + len) > DATA_SIZE) {
 				len = DATA_SIZE - org;
 			}
 			turn_rd_();
-			const void* src = reinterpret_cast<const void*>(0x00100000 + org);
+			const void* src = reinterpret_cast<const void*>(0x0010'0000 + org);
 			std::memcpy(dst, src, len);
 		}
 
@@ -133,7 +183,7 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_check(uint32_t bank) const
+		bool erase_check(uint32_t bank) const noexcept
 		{
 			if(bank >= DATA_BLOCK_NUM) {
 				return false;
@@ -141,28 +191,25 @@ namespace device {
 
 			turn_pe_();
 
-			device::FLASH::FASR.EXS = 0;
+			FLASH::FASR.EXS = 0;
 
 			uint32_t org = bank * DATA_BLOCK_SIZE;
 
-			device::FLASH::FSARH = 0x00;
-			device::FLASH::FSARL = org;
-			device::FLASH::FEARH = 0x00;
-			device::FLASH::FEARL = org + DATA_BLOCK_SIZE - 1;
+			FLASH::FSARH = FLASH::DF_VA_H;
+			FLASH::FSARL = FLASH::DF_VA_L + org;
+			FLASH::FEARH = FLASH::DF_VA_H;
+			FLASH::FEARL = FLASH::DF_VA_L + (org + DATA_BLOCK_SIZE - 1);
 
-			device::FLASH::FCR = 0x83;
-			while(device::FLASH::FSTATR1.FRDY() == 0) ;
-			device::FLASH::FCR = 0x00;
-			while(device::FLASH::FSTATR1.FRDY() != 0) ;
+			FLASH::FCR = 0x83;
+			while(FLASH::FSTATR1.FRDY() == 0) ;
+			FLASH::FCR = 0x00;
+			while(FLASH::FSTATR1.FRDY() != 0) ;
 
-			bool ret = true;
-			if(device::FLASH::FSTATR0.ILGLERR() != 0 || device::FLASH::FSTATR0.ERERR() != 0) {
-				ret = false;
-			} else {
-				device::FLASH::FRESETR.FRESET = 1;
-				device::FLASH::FRESETR.FRESET = 0;
+			if(FLASH::FSTATR0.ILGLERR() != 0 || FLASH::FSTATR0.ERERR() != 0) {
+				FLASH::FRESETR.FRESET = 1;
+				FLASH::FRESETR.FRESET = 0;
 			}
-			return ret;
+			return FLASH::FSTATR0.BCERR() == 0;
 		}
 
 
@@ -173,7 +220,7 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase(uint32_t bank) const
+		bool erase(uint32_t bank) const noexcept
 		{
 			if(bank >= DATA_BLOCK_NUM) {
 				return false;
@@ -181,25 +228,25 @@ namespace device {
 
 			turn_pe_();
 
-			device::FLASH::FASR.EXS = 0;
+			FLASH::FASR.EXS = 0;
 
 			uint16_t org = bank * DATA_BLOCK_SIZE;
-			device::FLASH::FSARH = 0x00;
-			device::FLASH::FSARL = org;
-			device::FLASH::FEARH = 0x00;
-			device::FLASH::FEARL = org + DATA_BLOCK_SIZE - 1;
+			FLASH::FSARH = FLASH::DF_VA_H;
+			FLASH::FSARL = FLASH::DF_VA_L + org;
+			FLASH::FEARH = FLASH::DF_VA_H;
+			FLASH::FEARL = FLASH::DF_VA_L + org + DATA_BLOCK_SIZE - 1;
 
-			device::FLASH::FCR = 0x84;
-			while(device::FLASH::FSTATR1.FRDY() == 0) ;
-			device::FLASH::FCR = 0x00;
-			while(device::FLASH::FSTATR1.FRDY() != 0) ;
+			FLASH::FCR = 0x84;
+			while(FLASH::FSTATR1.FRDY() == 0) ;
+			FLASH::FCR = 0x00;
+			while(FLASH::FSTATR1.FRDY() != 0) ;
 
 			bool ret = true;
-			if(device::FLASH::FSTATR0.ILGLERR() != 0 || device::FLASH::FSTATR0.ERERR() != 0) {
+			if(FLASH::FSTATR0.ILGLERR() != 0 || FLASH::FSTATR0.ERERR() != 0) {
 				ret = false;
 			} else {
-				device::FLASH::FRESETR.FRESET = 1;
-				device::FLASH::FRESETR.FRESET = 0;
+				FLASH::FRESETR.FRESET = 1;
+				FLASH::FRESETR.FRESET = 0;
 			}
 			return ret;
 		}
@@ -208,13 +255,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  書き込み
-			@param[in]	src ソース
 			@param[in]	org	開始オフセット
+			@param[in]	src ソース
 			@param[in]	len	バイト数
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool write(uint32_t org, const void* src, uint32_t len) const
+		bool write(uint32_t org, const void* src, uint32_t len) const noexcept
 		{
 			if(org >= DATA_SIZE) return false;
 
@@ -224,37 +271,32 @@ namespace device {
 
 			turn_pe_();
 
-			device::FLASH::FASR.EXS = 0;
+			FLASH::FASR.EXS = 0;
 
-			const uint8_t*p = static_cast<const uint8_t*>(src);
+			const uint8_t* p = static_cast<const uint8_t*>(src);
 
 			bool ret = true;
-			uint16_t page = DATA_SIZE;
+			FLASH::FSARH = FLASH::DF_VA_H;  // データ・フラッシュ仮想アドレスＨ
+			FLASH::FSARL = FLASH::DF_VA_L + org;
 			for(uint16_t i = 0; i < len; ++i) {
-				if(page != (org & ~(DATA_BLOCK_SIZE - 1))) {
-					device::FLASH::FSARH = 0x00;
-					device::FLASH::FSARL = org;
-					page = org & ~(DATA_BLOCK_SIZE - 1);
-				}
-#if defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
-				device::FLASH::FWBL = *p++;
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
+				FLASH::FWBL = *p++;
 #else
-				device::FLASH::FWB0 = *p++;
+				FLASH::FWB0 = *p++;
 #endif
-				device::FLASH::FCR = 0x81;
-				while(device::FLASH::FSTATR1.FRDY() == 0) ;
-				device::FLASH::FCR = 0x00;
-				while(device::FLASH::FSTATR1.FRDY() != 0) ;
-
-				if(device::FLASH::FSTATR0.ILGLERR() != 0 || device::FLASH::FSTATR0.ERERR() != 0) {
+				FLASH::FCR = 0x81;
+				while(FLASH::FSTATR1.FRDY() == 0) ;
+				FLASH::FCR = 0x00;
+				while(FLASH::FSTATR1.FRDY() != 0) ;
+				if(FLASH::FSTATR0.ILGLERR() != 0 || FLASH::FSTATR0.ERERR() != 0) {
 					ret = false;
 					break;
 				}
 				++org;
 			}
-			if(ret) { 
-				device::FLASH::FRESETR.FRESET = 1;
-				device::FLASH::FRESETR.FRESET = 0;
+			if(!ret) {
+				FLASH::FRESETR.FRESET = 1;
+				FLASH::FRESETR.FRESET = 0;
 			}
 			return ret;
 		}
@@ -283,6 +325,11 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static uint32_t get_uid(uint32_t idx) noexcept
 		{
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
+			turn_pe_();
+			read_unique_id_();
+			return uid_[idx & 3];
+#else
 			switch(idx) {
 			case 0:
 				return FLASH::UIDR0();
@@ -295,6 +342,7 @@ namespace device {
 			default:
 				return 0;
 			}
+#endif
 		}
 	};
 }

@@ -1,9 +1,9 @@
 /* -*- tab-width : 4 -*- */
 /*!	@file
-	@brief	RX111 R5F51115 リンカー・スクリプト @n
+	@brief	RX110 R5F51105 リンカー・スクリプト @n
 			ROM: 128K @n
 			RAM: 16K @n
-			EEPROM: 8K
+			EEPROM: 0K
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -17,7 +17,7 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX1115 chip.  */
+/* This memory layout corresponds to the smallest predicted RX1105 chip.  */
 MEMORY {
 	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00003C00 /* 16K - stack_size (0x400) */
 	USTACK (w) : ORIGIN = 0x00003F00, LENGTH = 4 /* ustack 768 bytes */

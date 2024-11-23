@@ -52,7 +52,7 @@ namespace device {
 		static constexpr bool FIFO_FUNC  = false;	///< FIFO バッファ機能が有効な場合「true」
 	};
 
-#if defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX220)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX220)
 	typedef scif_t<0x0008'B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
 		ICU::VECTOR::TEI12, ICU::VECTOR::ERI12> SCI12;
 #endif

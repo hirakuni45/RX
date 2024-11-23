@@ -389,6 +389,9 @@ namespace device {
 		static constexpr uint32_t DATA_WORD_SIZE = 1;
 		static constexpr auto ID_NUM = 4;
 
+		static constexpr uint16_t DF_VA_H = 0xFE00;  // E2 データフラッシュアドレス（0xFE00'0000）
+		static constexpr uint16_t DF_VA_L = 0x0000;
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  データフラッシュウェイトサイクル設定レジスタ (DFLWAITR)
@@ -423,6 +426,9 @@ namespace device {
 		static constexpr uint32_t DATA_BLOCK_SIZE = 256;
 		static constexpr uint32_t DATA_WORD_SIZE = 1;
 		static constexpr auto ID_NUM = 4;
+
+		static constexpr uint16_t DF_VA_H = 0xFE00;  // E2 データフラッシュアドレス（0xFE00'0000）
+		static constexpr uint16_t DF_VA_L = 0x0000;
 
 	};
 	typedef flash_t FLASH;

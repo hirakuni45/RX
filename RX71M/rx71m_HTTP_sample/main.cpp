@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX71M http サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -61,8 +61,8 @@ namespace {
 
 	utils::command<256> cmd_;
 
-	typedef utils::rtc_io<device::RTC> RTC;
-	RTC			rtc_;
+	typedef utils::rtc_io<device::RTC> RTC_IO;
+	RTC_IO		rtc_;
 
 	net::ethernet   ethernet_;
 	HTTP_SERVER     https_(ethernet_);
