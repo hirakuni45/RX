@@ -2,9 +2,9 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX600/RX700 グループ　DTCa, DTCb 定義 @n
-			・RX13T @n
-			・RX111/RX113 @n
+			・RX110/RX111/RX113 @n
 			・RX130 @n
+			・RX13T @n
 			・RX140 @n
 			・RX220 @n
 			・RX231 @n
@@ -186,7 +186,9 @@ namespace device {
 		static inline rw32_t<0x0008'2418> DTCDISP;
 	};
 
-#if defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX660) || defined(SIG_RX671)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113)
+	typedef dtca_t DTC;
+#elif defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX660) || defined(SIG_RX671)
 	typedef dtcb_t DTC;
 #else
 	typedef dtca_t DTC;
