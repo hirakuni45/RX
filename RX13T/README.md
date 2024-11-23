@@ -28,8 +28,8 @@
 
 |R5F513TX----|CodeFlash|RAM|DataFlash|
 |---|:-:|:-:|:-:|
-|R5F513T5xxxx|128K|12K|0|
-|R5F513T3xxxx|64K|12K|0|
+|R5F513T5xxxx|128K|12K|0K|
+|R5F513T3xxxx|64K|12K|0K|
 
 ---
 
@@ -60,6 +60,38 @@
 |A/D Definition/A/D 定義|[s12ad.hpp](s12ad.hpp?ts=4)||
 |D/A Definition/D/A 定義|[da.hpp](da.hpp?ts=4)||
 |POE3 Definition/POE3 定義|[poe3.hpp](poe3.hpp?ts=4)||
+
+```C++
+namespace board_profile {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  基板プロファイル空間 @n
+				DIY RX13T board
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+
+	// 基板シグネチュア
+	static constexpr char system_str_[] = "RX13T DIY";
+
+	/// LED インジケーター
+	static constexpr bool LED_ACTIVE = 0;
+	typedef device::PORT<device::PORT1, device::bitpos::B0, LED_ACTIVE> LED;
+
+	// SCI ポートの定義
+	typedef device::SCI1 SCI_CH;
+	static constexpr auto SCI_ORDER = device::port_map::ORDER::SECOND;
+
+	// インターバル・タイマーの定義
+	typedef device::CMT0 CMT_CH;
+
+	// RIIC ポートの定義
+	typedef device::RIIC0 RIIC_CH;
+	// ソフト制御 I2C ポートの定義
+	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
+	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
+}
+```
 
 ---
 
