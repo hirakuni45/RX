@@ -2,7 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX グループ・MTU2a 定義 @n
-			RX111/RX113 @n
+			RX110/RX111/RX113 @n
 			RX130/RX140 @n
 			RX220/RX231 @n
 			RX631/RX63N 
@@ -347,6 +347,8 @@ namespace device {
 			//-------------------------------------------------------------//
 			void disable()
 			{
+#if defined(SIG_RX110)
+#else
 				IOA = 0;
 				IOB = 0;
 				IOC = 0;
@@ -365,6 +367,7 @@ namespace device {
 				default:
 					break;
 				}
+#endif
 			}
 
 
@@ -377,6 +380,8 @@ namespace device {
 			//-------------------------------------------------------------//
 			bool set(CH ch, uint8_t val)
 			{
+#if defined(SIG_RX110)
+#else
 				switch(ch) {
 				case CH::A:
 					switch(PER) {
@@ -427,6 +432,7 @@ namespace device {
 				default:
 					return false;
 				}
+#endif
 				return true;
 			}
 
@@ -1179,7 +1185,7 @@ namespace device {
 		};
 		static inline twcr_t<base + 0x60> TWCR;
 	};
-#if defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef mtu_ab_t<0x0008'8680> MTUA;
 #elif defined(SIG_RX231)
 	typedef mtu_ab_t<0x000D'0A80> MTUA;
@@ -1756,7 +1762,8 @@ namespace device {
 		static inline tgr_ab_t<TGRA_, TGRB_, CHANNEL> TGR;
 	};
 
-
+#if defined(SIG_RX110)
+#else
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU3 定義クラス
@@ -2190,7 +2197,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static inline tgr_abcd_t<TGRA_, TGRB_, TGRC_, TGRD_, CHANNEL> TGR;
 	};
-
+#endif
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -2393,7 +2400,12 @@ namespace device {
 		static inline tgr_uvw_t<TGRU_, TGRV_, TGRW_, CHANNEL> TGR;
 	};
 
-#if defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220)
+#if defined(SIG_RX110)
+	typedef mtu0_t<0x0008'8700, ICU::VECTOR, ICU::VECTOR> MTU0;
+	typedef mtu1_t<0x0008'8780, ICU::VECTOR, ICU::VECTOR> MTU1;
+	typedef mtu2_t<0x0008'8800, ICU::VECTOR, ICU::VECTOR> MTU2;
+	typedef mtu5_t<0x0008'8880, ICU::VECTOR> MTU5;
+#elif defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220)
 	typedef mtu0_t<0x0008'8700, ICU::VECTOR, ICU::VECTOR> MTU0;
 	typedef mtu1_t<0x0008'8780, ICU::VECTOR, ICU::VECTOR> MTU1;
 	typedef mtu2_t<0x0008'8800, ICU::VECTOR, ICU::VECTOR> MTU2;

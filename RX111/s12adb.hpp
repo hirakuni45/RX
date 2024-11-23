@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	S12ADb 定義 @n
 			ユニット構成は同等だがチャネル構成が異なる @n
-			RX111: 14 input single A/D @n
+			RX110/RX111: 14 input single A/D @n
 			RX113: 17 input single A/D
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
@@ -473,7 +473,7 @@ namespace device {
 		static inline rw8_t<base + 0x78>  ADSSTR6;
 	};
 
-#if defined(SIG_RX111)
+#if defined(SIG_RX110) || defined(SIG_RX111)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  RX111 S12ADb 定義

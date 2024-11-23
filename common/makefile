@@ -59,6 +59,13 @@ PROG_ERASE = --erase
 PROG_VERIFY = --verify
 PROG_OPT =
 
+ifeq ($(RX_DEF),SIG_RX110)
+  RX_CPU = RX110
+  RX_CHOOSE = -mcpu=rx100
+  AS_OPT	+=	--defsym NO_FLOAT=1
+  LDSCRIPT	= ../../RX110/$(DEVICE).ld
+endif
+
 ifeq ($(RX_DEF),SIG_RX111)
   RX_CPU = RX111
   RX_CHOOSE = -mcpu=rx100
@@ -103,14 +110,14 @@ ifeq ($(RX_DEF),SIG_RX230)
   RX_CPU = RX230
   RX_CHOOSE = -mcpu=rx230
   LDSCRIPT	= ../../RX231/$(DEVICE).ld
-  PROG_OPT = --write-page-wait=15000 --erase-page-wait=5000
+  PROG_OPT = --write-page-wait=30000 --erase-page-wait=10000
 endif
 
 ifeq ($(RX_DEF),SIG_RX231)
   RX_CPU = RX231
   RX_CHOOSE = -mcpu=rx230
   LDSCRIPT	= ../../RX231/$(DEVICE).ld
-  PROG_OPT = --write-page-wait=15000 --erase-page-wait=5000
+  PROG_OPT = --write-page-wait=30000 --erase-page-wait=10000
 endif
 
 ifeq ($(RX_DEF),SIG_RX23W)

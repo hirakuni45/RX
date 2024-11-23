@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX111 グループ・電力制御クラス
+	@brief	RX110/RX111 グループ・電力制御クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -70,8 +70,10 @@ namespace device {
 			case peripheral::MTU0:
 			case peripheral::MTU1:
 			case peripheral::MTU2:
+#if defined(SIG_RX111)
 			case peripheral::MTU3:
 			case peripheral::MTU4:
+#endif
 			case peripheral::MTU5:
 				sr_(ena, pad_.mtu_, peripheral::MTU0, per);
 				SYSTEM::MSTPCRA.MSTPA9 = (pad_.mtu_ == 0);
@@ -79,7 +81,6 @@ namespace device {
 
 			case peripheral::CMT0:
 			case peripheral::CMT1:
-				// CMT0, CMT1 のストップ状態設定
 				sr_(ena, pad_.cmt_, peripheral::CMT0, per);
 				SYSTEM::MSTPCRA.MSTPA15 = ((pad_.cmt_ & 0b0011) == 0);
 				break;
@@ -87,11 +88,11 @@ namespace device {
 			case peripheral::S12AD:
 				SYSTEM::MSTPCRA.MSTPA17 = f;
 				break;
-
+#if defined(SIG_RX111)
 			case peripheral::DA:
 				SYSTEM::MSTPCRA.MSTPA19 = f;
 				break;
-
+#endif
 			case peripheral::DTC:
 				SYSTEM::MSTPCRA.MSTPA28 = f;
 				break;
@@ -104,14 +105,14 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB6 = f;
 				break;
 
-			case peripheral::ELC:
-				SYSTEM::MSTPCRB.MSTPB9 = f;
-				break;
-
 			case peripheral::RSPI0:
 				SYSTEM::MSTPCRB.MSTPB17 = f;
 				break;
-
+#if defined(SIG_RX111)
+			case peripheral::USB0:
+				SYSTEM::MSTPCRB.MSTPB19 = f;
+				break;
+#endif
 			case peripheral::RIIC0:
 				SYSTEM::MSTPCRB.MSTPB21 = f;
 				break;
