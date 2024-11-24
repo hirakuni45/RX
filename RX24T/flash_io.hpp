@@ -38,7 +38,23 @@ namespace device {
 		static constexpr auto DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データブロックサイズ
 		static constexpr auto DATA_BLOCK_NUM  = FLASH::DATA_SIZE / FLASH::DATA_BLOCK_SIZE;	///< データブロック数
 
+		enum class ERROR : uint8_t {
+			NONE,		///< エラー無し
+			START,		///< 開始不良
+			CLOCK,		///< クロック設定不良
+			ADDRESS,	///< アドレス不良
+			LENGTH,		///< 長さ不良
+			BANK,		///< バンク数不良
+			TIMEOUT,	///< タイムアウト
+			WRITE,		///< 書き込みエラー
+			ST_ILGL,	///< ILGL ステータス検出
+			ST_ERS,		///< ERS ステータス検出
+			ST_PRG,		///< PRG ステータス検出
+		};
+
 	private:
+
+		ERROR		error_;
 
 		static inline uint32_t	uid_[4];
 
@@ -119,7 +135,16 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io() noexcept { }
+		flash_io() noexcept : error_(ERROR::NONE) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	最終エラー型を取得
+			@return 最終エラー型
+		 */
+		//-----------------------------------------------------------------//
+		auto get_last_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -128,8 +153,10 @@ namespace device {
 			@return エラー無ければ「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start() const noexcept
+		bool start() noexcept
 		{
+			error_ = ERROR::NONE;
+
 #if defined(SIG_RX110)
 #else
 			FLASH::DFLCTL.DFLEN = 1;
@@ -148,9 +175,14 @@ namespace device {
 			@return データ
 		*/
 		//-----------------------------------------------------------------//
-		uint8_t read(uint16_t org) const noexcept
+		uint8_t read(uint16_t org) noexcept
 		{
-			if(org >= DATA_SIZE) return 0;
+			error_ = ERROR::NONE;
+
+			if(org >= DATA_SIZE) {
+				error_ = ERROR::ADDRESS;
+				return 0;
+			}
 			turn_rd_();
 			return rd8_(0x0010'0000 + org);
 		}
@@ -162,17 +194,25 @@ namespace device {
 			@param[in]	org	開始アドレス
 			@param[in]	len	バイト数
 			@param[out]	dst	先
+			@return 読出しサイズ
 		*/
 		//-----------------------------------------------------------------//
-		void read(uint16_t org, uint16_t len, void* dst) const noexcept
+		uint32_t read(uint16_t org, uint16_t len, void* dst) noexcept
 		{
-			if(org >= DATA_SIZE) return;
+			error_ = ERROR::NONE;
+
+			if(org >= DATA_SIZE) {
+				error_ = ERROR::ADDRESS;
+				return 0;
+			}
 			if((org + len) > DATA_SIZE) {
 				len = DATA_SIZE - org;
 			}
 			turn_rd_();
 			const void* src = reinterpret_cast<const void*>(0x0010'0000 + org);
 			std::memcpy(dst, src, len);
+
+			return len;
 		}
 
 
@@ -183,8 +223,10 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_check(uint32_t bank) const noexcept
+		bool erase_check(uint32_t bank) noexcept
 		{
+			error_ = ERROR::NONE;
+
 			if(bank >= DATA_BLOCK_NUM) {
 				return false;
 			}
@@ -220,9 +262,12 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase(uint32_t bank) const noexcept
+		bool erase(uint32_t bank) noexcept
 		{
+			error_ = ERROR::NONE;
+
 			if(bank >= DATA_BLOCK_NUM) {
+				error_ = ERROR::BANK;
 				return false;
 			}
 
@@ -242,7 +287,11 @@ namespace device {
 			while(FLASH::FSTATR1.FRDY() != 0) ;
 
 			bool ret = true;
-			if(FLASH::FSTATR0.ILGLERR() != 0 || FLASH::FSTATR0.ERERR() != 0) {
+			if(FLASH::FSTATR0.ILGLERR() != 0) {
+				error_ = ERROR::ST_ILGL;
+				ret = false;
+			} else if(FLASH::FSTATR0.ERERR() != 0) {
+				error_ = ERROR::ST_ERS;
 				ret = false;
 			} else {
 				FLASH::FRESETR.FRESET = 1;
@@ -261,9 +310,14 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool write(uint32_t org, const void* src, uint32_t len) const noexcept
+		bool write(uint32_t org, const void* src, uint32_t len) noexcept
 		{
-			if(org >= DATA_SIZE) return false;
+			error_ = ERROR::NONE;
+
+			if(org >= DATA_SIZE) {
+				error_ = ERROR::ADDRESS;
+				return false;
+			}
 
 			if((org + len) > DATA_SIZE) {
 				len = DATA_SIZE - org;
@@ -288,7 +342,12 @@ namespace device {
 				while(FLASH::FSTATR1.FRDY() == 0) ;
 				FLASH::FCR = 0x00;
 				while(FLASH::FSTATR1.FRDY() != 0) ;
-				if(FLASH::FSTATR0.ILGLERR() != 0 || FLASH::FSTATR0.ERERR() != 0) {
+				if(FLASH::FSTATR0.ILGLERR() != 0) {
+					error_ = ERROR::ST_ILGL;
+					ret = false;
+					break;
+				} else if(FLASH::FSTATR0.ERERR() != 0) {
+					error_ = ERROR::ST_ERS;
 					ret = false;
 					break;
 				}
