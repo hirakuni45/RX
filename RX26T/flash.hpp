@@ -27,8 +27,9 @@ namespace device {
 
 		static constexpr uint8_t DATA_PROG_CMD_2ND = 0x02;
 
-		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
-		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
+		static constexpr uint32_t FACI_CMD_ORG = 0x007E'0000;	///< FACI コマンド発行領域
+		static inline rw8_t<FACI_CMD_ORG> FCU_DATA_CMD8;
+		static inline rw16_t<FACI_CMD_ORG> FCU_DATA_CMD16;
 
 
 		//-----------------------------------------------------------------//
