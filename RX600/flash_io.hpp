@@ -52,7 +52,7 @@ namespace device {
 			@brief  エラー型
 		*/
 		//-----------------------------------------------------------------//
-		enum class error : uint8_t {
+		enum class ERROR : uint8_t {
 			NONE,		///< エラー無し
 			INIT,		///< 初期化エラー
 			BANK,		///< バンクエラー
@@ -83,7 +83,7 @@ namespace device {
 			CHECK_BLANK2 = 0xD0,	///< 2nd ブランクチェック
 		};
 
-		error	error_;
+		ERROR	error_;
 		mode	mode_;
 
 		bool	trans_farm_;
@@ -261,19 +261,19 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
-				error_ = error::TIMEOUT;
+				error_ = ERROR::TIMEOUT;
 				debug_format("FACI 'write32_' timeout\n");
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() != 0) {
 				turn_break_();
-				error_ = error::LOCK;
+				error_ = ERROR::LOCK;
 				debug_format("FACI 'write32_' write error: 0x%04X\n") % org;
 				return false;
 			}
 
-			error_ = error::NONE;
+			error_ = ERROR::NONE;
 			return true;
 		}
 
@@ -283,7 +283,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io() noexcept : error_(error::NONE), mode_(mode::NONE), trans_farm_(false) { }
+		flash_io() noexcept : error_(ERROR::NONE), mode_(mode::NONE), trans_farm_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -292,16 +292,7 @@ namespace device {
 			@return エラー・ステータス
 		 */
 		//-----------------------------------------------------------------//
-		error get_last_error() const noexcept { return error_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	エラー・ステータスを取得
-			@return エラー・ステータス
-		 */
-		//-----------------------------------------------------------------//
-		void reset_last_error() noexcept { error_ = error::NONE; }
+		auto get_last_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -312,6 +303,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start() noexcept
 		{
+			error_ = ERROR::NONE;
+
 			if(trans_farm_) return false;  // ファームが既に転送済み
 
 			device::FLASH::FWEPROR = 0b01;  // プロテクトを解除
@@ -326,7 +319,7 @@ namespace device {
 
 			auto state = init_fcu_();
 			if(!state) {
-				error_ = error::INIT;
+				error_ = ERROR::INIT;
 				debug_format("'init_fcu_' fail\n");
 			}
 
@@ -343,8 +336,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint8_t read(uint32_t org) noexcept
 		{
+			error_ = ERROR::NONE;
+
 			if(org >= DATA_SIZE) {
-				error_ = error::ADDRESS;
+				error_ = ERROR::ADDRESS;
 				return 0;
 			}
 
@@ -367,8 +362,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool read(uint32_t org, void* dst, uint32_t len) noexcept
 		{
+			error_ = ERROR::NONE;
+
 			if(org >= DATA_SIZE) {
-				error_ = error::ADDRESS;
+				error_ = ERROR::ADDRESS;
 				return false;
 			}
 			if((org + len) > DATA_SIZE) {
@@ -394,8 +391,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase_check(uint32_t bank) noexcept
 		{
+			error_ = ERROR::NONE;
+
 			if(bank >= DATA_BLOCK_NUM) {
-				error_ = error::BANK;
+				error_ = ERROR::BANK;
 				return false;
 			}
 
@@ -421,7 +420,7 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
-				error_ = error::TIMEOUT;
+				error_ = ERROR::TIMEOUT;
 				debug_format("FACI 'erase_check' timeout\n");
 				return false;
 			}
@@ -430,7 +429,7 @@ namespace device {
 				return device::FLASH::FBCSTAT.BCST() == 0;
 			} else {
 				turn_break_();
-				error_ = error::LOCK;
+				error_ = ERROR::LOCK;
 				debug_format("FACI 'erase_check' lock fail\n");
 				return false;
 			}
@@ -446,8 +445,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase(uint32_t bank) noexcept
 		{
+			error_ = ERROR::NONE;
+
 			if(bank >= DATA_BLOCK_NUM) {
-				error_ = error::BANK;
+				error_ = ERROR::BANK;
 				return false;
 			}
 
@@ -476,7 +477,7 @@ namespace device {
 
 			if(cnt == 0) {  // time out
 				turn_break_();
-				error_ = error::TIMEOUT;
+				error_ = ERROR::TIMEOUT;
 				debug_format("FACI 'erase' timeout\n");
 				return false;
 			}
@@ -485,7 +486,7 @@ namespace device {
 				return true;
 			} else {
 				turn_break_();
-				error_ = error::LOCK;
+				error_ = ERROR::LOCK;
 				debug_format("FACI 'erase' lock fail\n");
 				return false;
 			}
@@ -525,8 +526,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool write(uint32_t org, const void* src, uint32_t len) noexcept
 		{
+			error_ = ERROR::NONE;
+
 			if(org >= DATA_SIZE || (org & 0x03) != 0) {
-				error_ = error::ADDRESS;
+				error_ = ERROR::ADDRESS;
 				return false;
 			}
 
