@@ -28,6 +28,10 @@ namespace device {
 
 		static constexpr auto ID_NUM = 0;					///< 個別識別子数
 
+		static constexpr uint8_t DATA_PROG_CMD_2ND = 0x01;
+
+		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
+		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -265,7 +269,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>  SUSRDY;
 			bit_rw_t<io_, bitpos::B4>  PRGERR;
 			bit_rw_t<io_, bitpos::B5>  ERSERR;
-			bit_rw_t<io_, bitpos::B6>  ILGERR;
+			bit_rw_t<io_, bitpos::B6>  ILGLERR;
 			bit_rw_t<io_, bitpos::B7>  FRDY;
 		};
 		static inline fstatr0_t<0x007F'FFB0> FSTATR0;
@@ -460,6 +464,16 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8> PCKA;
 		};
 		static inline pckar_t<0x007F'FFE8> PCKAR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ファームの転送
+		*/
+		//-----------------------------------------------------------------//
+		static void transfer_farm() noexcept
+		{
+		}
 
 
 		//-----------------------------------------------------------------//
