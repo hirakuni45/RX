@@ -10,6 +10,7 @@
 */
 //=========================================================================//
 #include "common/io_utils.hpp"
+#include "common/delay.hpp"
 
 namespace device {
 
@@ -20,6 +21,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t {
 
+		static constexpr uint32_t CODE_ORG = 0xFFFF'FFF0;	///< コード領域コマンド開始アドレス
 		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
 		static constexpr uint32_t DATA_SIZE = 32768;		///< データ・フラッシュ、サイズ
 		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
@@ -35,29 +37,10 @@ namespace device {
 		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
 		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ファームの転送
-		*/
-		//-----------------------------------------------------------------//
-		static void transfer_farm() noexcept
-		{
-			// ファームの転送は、RX621/RX62N/RX631/RX63N
-			if(FENTRYR() != 0) {
-				FENTRYR = 0x0000;  // FCU 停止
-			}
-			utils::delay::micro_second(10);  // 念の為・・
-			FCURAME = 0xC401;
-
-			auto src = reinterpret_cast<const uint8_t*>(0xFEFF'E000);
-			auto dst = reinterpret_cast<uint8_t*>(0x007F'8000);
-			if(src != nullptr && dst != nullptr) {
-				for(uint32_t i = 0; i < 0x2000; ++i) {
-					*dst++ = *src++;
-				}
-			}
-		}
+		static constexpr uint32_t WRITE_WORD_TIME  = 2000;		///< 2mS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 4000 * 64;	///< 4mS(32) x 64 (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 30;		///< 30uS (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 30*1024;	///< 30 x 1024 (DATA_BLOCK_SIZE)
 
 
 		//-----------------------------------------------------------------//
@@ -514,6 +497,74 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8> PCKA;
 		};
 		static inline pckar_t<0x007F'FFE8> PCKAR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ファームの転送
+		*/
+		//-----------------------------------------------------------------//
+		static void transfer_farm() noexcept
+		{
+			// ファームの転送は、RX621/RX62N/RX631/RX63N
+			if(FENTRYR() != 0) {
+				FENTRYR = 0x0000;  // FCU 停止
+			}
+			utils::delay::micro_second(10);  // 念の為・・
+			FCURAME = 0xC401;
+
+			auto src = reinterpret_cast<const uint8_t*>(0xFEFF'E000);
+			auto dst = reinterpret_cast<uint8_t*>(0x007F'8000);
+			if(src != nullptr && dst != nullptr) {
+				for(uint32_t i = 0; i < 0x2000; ++i) {
+					*dst++ = *src++;
+				}
+			}
+		}
+
+
+		static bool FSTATR_FRDY() noexcept { return FSTATR0.FRDY(); }
+		static bool FSTATR_ILGLERR() noexcept { return FSTATR0.ILGLERR(); }
+		static bool FSTATR_ERSERR() noexcept { return FSTATR0.ERSERR(); }
+		static bool FSTATR_PRGERR() noexcept { return FSTATR0.PRGERR(); }
+		static bool ERASE_STATE() noexcept { return DFLBCSTAT.BCST() == 0; }
+
+
+		static void enable_read(uint32_t org, uint32_t len, bool ena = true) noexcept
+		{
+			uint16_t mask = ena ? 0x00ff : 0x0000;
+			DFLRE0 = DFLRE0.KEY.b(0x2D) | mask;
+			DFLRE1 = DFLRE0.KEY.b(0xD2) | mask;
+		}
+
+
+		static void enable_write(uint32_t org, uint32_t len, bool ena = true) noexcept
+		{
+			uint16_t mask = ena ? 0x00ff : 0x0000;
+			DFLWE0 = DFLWE0.KEY.b(0x1E) | mask;
+			DFLWE1 = DFLWE0.KEY.b(0xE1) | mask;
+		}
+
+
+		static void reset_fcu() noexcept
+		{
+			// FCU 初期化
+			FRESETR = FRESETR.KEY.b(0xCC) | FRESETR.FRESET.b(1);
+			utils::delay::micro_second(35 * 2);  // Min: 35uS
+			FRESETR = FRESETR.KEY.b(0xCC) | FRESETR.FRESET.b(0);
+		}
+
+
+		static void set_clock(uint32_t fclk) noexcept
+		{
+			PCKAR = fclk;
+			FCU_DATA_CMD8  = 0xE9;
+			FCU_DATA_CMD8  = 0x03;
+			FCU_DATA_CMD16 = 0x0F0F;
+			FCU_DATA_CMD16 = 0x0F0F;
+			FCU_DATA_CMD16 = 0x0F0F;
+			FCU_DATA_CMD8  = 0xD0;
+		}
 
 
 		//-----------------------------------------------------------------//

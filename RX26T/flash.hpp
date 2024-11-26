@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include "common/io_utils.hpp"
+#include "common/delay.hpp"
 
 namespace device {
 
@@ -19,16 +20,23 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t {
 
+		static constexpr uint32_t CODE_ORG = 0xFFFF'FFF0;	///< コード領域コマンド開始アドレス
 		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
-		static constexpr uint32_t DATA_SIZE = 16384;
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;
-		static constexpr uint32_t DATA_WORD_SIZE = 4;
-		static constexpr uint32_t ID_NUM = 3;
+		static constexpr uint32_t DATA_SIZE = 16384;		///< データ・フラッシュ、サイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;		///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 4;		///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t ID_NUM = 3;				///< 個別識別子数
 
 		static constexpr uint8_t DATA_PROG_CMD_2ND = 0x02;
 
-		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
-		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
+		static constexpr uint32_t FACI_CMD_ORG = 0x007E'0000;	///< FACI コマンド発行領域
+		static inline rw8_t<FACI_CMD_ORG> FCU_DATA_CMD8;
+		static inline rw16_t<FACI_CMD_ORG> FCU_DATA_CMD16;
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 1700;	///< 1.7mS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 10000;	///< 10mS (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME = 30;		///< 30 uS (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 100;	///< 100 uS (DATA_BLOCK_SIZE)
 
 
 		//-----------------------------------------------------------------//
@@ -362,6 +370,13 @@ namespace device {
 		static inline fsuacr_t<0x007F'E0E8> FSUACR;
 
 
+		static bool FSTATR_FRDY() noexcept { return FSTATR.FRDY(); }
+		static bool FSTATR_ILGLERR() noexcept { return FSTATR.ILGLERR(); }
+		static bool FSTATR_ERSERR() noexcept { return FSTATR.ERSERR(); }
+		static bool FSTATR_PRGERR() noexcept { return FSTATR.PRGERR(); }
+		static bool ERASE_STATE() noexcept { return FBCSTAT.BCST() == 0; }
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ファームの転送 @n
@@ -370,6 +385,35 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void transfer_farm() noexcept
 		{
+		}
+
+
+		static void enable_read(uint32_t org, uint32_t len, bool ena = true) noexcept
+		{
+		}
+
+
+		static void enable_write(uint32_t org, uint32_t len, bool ena = true) noexcept
+		{
+			if(ena) {
+				FSADDR = org;
+				FEADDR = org + len - DATA_WORD_SIZE;
+			}
+		}
+
+
+		static bool set_clock(uint32_t fclk) noexcept
+		{
+			FPCKAR = FPCKAR.KEY.b(0x1E) | FPCKAR.PCKA.b(fclk);
+			return true;
+		}
+
+
+		static void reset_fcu() noexcept
+		{
+			FSUINITR = FSUINITR.KEY.b(0x2D) | FSUINITR.SUINIT.b(1);
+			utils::delay::micro_second(20 * 2);  // 20uS 以上 (32MHz)
+			FSUINITR = FSUINITR.KEY.b(0x2D);
 		}
 
 

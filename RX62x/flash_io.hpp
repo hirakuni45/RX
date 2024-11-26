@@ -2,8 +2,8 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX220/RX26T/RX62x/RX63x グループ FLASH 制御 @n
-			・RX220 @n
-			・RX26T @n
+			・RX220（動作不良、デバッグ中）@n
+			・RX26T (他と構成が異なるものの、同じ部分も多いので共有している) @n
 			・RX621/RX62N @n
 			・RX631/RX63N @n
 			このファイルは、「renesas.hpp」でインクルードされる前提なので、 @n
@@ -15,10 +15,15 @@
 */
 //=========================================================================//
 #include <cstring>
+#include "RX600/flash_io_base.hpp"
 #include "common/delay.hpp"
-#include "common/format.hpp"
 
+// デバッグメッセージを表示するには、以下の定義を有効にする
 #define FIO_DEBUG
+
+#ifdef FIO_DEBUG
+#include "common/format.hpp"
+#endif
 
 namespace device {
 
@@ -27,137 +32,40 @@ namespace device {
 		@brief  FLASH 制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class flash_io {
+	class flash_io : public flash_io_base {
 
 #ifdef FIO_DEBUG
 		typedef utils::format debug_format;
 #else
 		typedef utils::null_format debug_format;
 #endif
-	public:
-		enum class ERROR : uint8_t {
-			NONE,		///< エラー無し
-			START,		///< 開始不良
-			CLOCK,		///< クロック設定不良
-			ADDRESS,	///< アドレス不良
-			LENGTH,		///< 長さ不良
-			BANK,		///< バンク数不良
-			TIMEOUT,	///< タイムアウト
-			WRITE,		///< 書き込みエラー
-			ST_ILGL,	///< ILGL ステータス検出
-			ST_ERS,		///< ERS ステータス検出
-			ST_PRG,		///< PRG ステータス検出
-		};
 
+	public:
 		static constexpr uint32_t DATA_SIZE = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
 		static constexpr uint32_t DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
 		static constexpr uint32_t DATA_BLOCK_NUM  = FLASH::DATA_SIZE / DATA_BLOCK_SIZE;	///< データ・フラッシュのバンク数
 
 	private:
-
-#if defined(SIG_RX26T)
-		bool FSTATR_FRDY() noexcept { return FLASH::FSTATR.FRDY(); }
-		bool FSTATR_ILGLERR() noexcept { return FLASH::FSTATR.ILGLERR(); }
-		bool FSTATR_ERSERR() noexcept { return FLASH::FSTATR.ERSERR(); }
-		bool FSTATR_PRGERR() noexcept { return FLASH::FSTATR.PRGERR(); }
-		bool ERASE_STATE() noexcept { return FLASH::FBCSTAT.BCST() == 0; }
-
-		void enable_read_(uint32_t org, uint32_t len, bool ena = true) noexcept
-		{
-		}
-
-		void enable_write_(uint32_t org, uint32_t len, bool ena = true) noexcept
-		{
-			FLASH::FSADDR = org;
-			FLASH::FEADDR = org + len - 1;
-		}
-#else
-		bool FSTATR_FRDY() noexcept { return FLASH::FSTATR0.FRDY(); }
-		bool FSTATR_ILGLERR() noexcept { return FLASH::FSTATR0.ILGLERR(); }
-		bool FSTATR_ERSERR() noexcept { return FLASH::FSTATR0.ERSERR(); }
-		bool FSTATR_PRGERR() noexcept { return FLASH::FSTATR0.PRGERR(); }
-		bool ERASE_STATE() noexcept { return FLASH::DFLBCSTAT.BCST() == 0; }
-#if defined(SIG_RX220)
-		void enable_read_(uint32_t org, uint32_t len, bool ena = true) noexcept
-		{
-			FLASH::DFLRE0 = 0x2D0F;
-		}
-
-		void enable_write_(uint32_t org, uint32_t len, bool ena = true) noexcept
-		{
-			FLASH::DFLWE0 = 0x2D0F;
-		}
-#else
-		void enable_read_(uint32_t org, uint32_t len, bool ena = true) noexcept
-		{
-			FLASH::DFLRE0 = 0x2DFF;
-			FLASH::DFLRE1 = 0xD2FF;
-		}
-
-		void enable_write_(uint32_t org, uint32_t len, bool ena = true) noexcept
-		{
-			FLASH::DFLWE0 = 0x2DFF;
-			FLASH::DFLWE1 = 0xD2FF;
-		}
-#endif
-#endif
-
-		ERROR	error_;
-
 		enum class MODE : uint8_t {
 			NONE,
 			RD,
 			PE,
 		};
-
 		MODE	mode_;
-
+		ERROR	error_;
 		bool	trans_farm_;
 
 		bool step_frdy_(uint32_t timeout_micro_sec) noexcept
 		{
-			while(FSTATR_FRDY() == 0) {
+			while(FLASH::FSTATR_FRDY() == 0) {
 				utils::delay::micro_second(1);
 				--timeout_micro_sec;
 				if(timeout_micro_sec == 0) {
-#if defined(SIG_RX26T)
-					FLASH::FSUINITR = FLASH::FSUINITR.KEY.b(0x2D) | FLASH::FSUINITR.SUINIT.b(1);
-#else
-					// FCU 初期化
-					FLASH::FRESETR.FRESET = 1;
-					utils::delay::micro_second(35 * 2);  // Min: 35uS
-					FLASH::FRESETR.FRESET = 0;
-#endif
+					FLASH::reset_fcu();
 					return false;
 				}
 			}
 			return true;
-		}
-
-
-		bool set_clock_() noexcept
-		{
-#if defined(SIG_RX26T)
-			auto hz = clock_profile::FCLK / 1'000'000;
-			if((clock_profile::FCLK % 1'000'000) != 0) ++hz;
-			FLASH::FPCKAR = FLASH::FPCKAR.KEY.b(0x1E) | FLASH::FPCKAR.PCKA.b(hz);
-			return true;
-#else
-			auto n = clock_profile::FCLK / 1'000'000;
-			if((clock_profile::FCLK % 1'000'000) != 0) ++n;
-			FLASH::PCKAR = n;
-			FLASH::FCU_DATA_CMD8  = 0xE9;
-			FLASH::FCU_DATA_CMD8  = 0x03;
-			FLASH::FCU_DATA_CMD16 = 0x0F0F;
-			FLASH::FCU_DATA_CMD16 = 0x0F0F;
-			FLASH::FCU_DATA_CMD16 = 0x0F0F;
-			FLASH::FCU_DATA_CMD8  = 0xD0;
-			auto ret = step_frdy_(n / 10 + n);
-			if(!ret) {
-				debug_format("set_clock: timeout...\n");
-			}
-			return ret;
-#endif
 		}
 
 		void turn_rd_() noexcept
@@ -168,14 +76,19 @@ namespace device {
 
 			if(!step_frdy_(20000)) {  // 20[ms]
 				// timeout...
-				debug_format("turn_rd_: timeout...\n");
+				debug_format("turn_rd_(): FRDY timeout...\n");
 				return;
 			}
 
 			FLASH::FENTRYR = 0xAA00;
-			while(1) {
-				auto tmp = FLASH::FENTRYR();
-				if(tmp == 0x0000) break;
+			uint32_t n = 1000;
+			while(n > 0) {
+				utils::delay::micro_second(1);
+				if(FLASH::FENTRYR() == 0x0000) break;
+				--n;
+			}
+			if(n == 0) {
+				debug_format("turn_rd_(): check timeout...\n");
 			}
 			FLASH::FWEPROR = 0b10;
 
@@ -189,9 +102,15 @@ namespace device {
 			}
 
 			FLASH::FENTRYR = 0xAA80;
-#if defined(SIG_RX26T)
-			while(FLASH::FENTRYR() != 0x0080) ;
-#endif
+			uint32_t n = 1000;
+			while(n > 0) {
+				utils::delay::micro_second(1);
+				if(FLASH::FENTRYR() == 0x0080) break;
+				--n;
+			}
+			if(n == 0) {
+				debug_format("turn_pe_(): check timeout...\n");
+			}
 			FLASH::FWEPROR = 0b01;
 
 			mode_ = MODE::PE;
@@ -200,7 +119,7 @@ namespace device {
 		bool check_error_() noexcept
 		{
 			bool ret = false;
-			if(FSTATR_ILGLERR() != 0) {
+			if(FLASH::FSTATR_ILGLERR() != 0) {
 				error_ = ERROR::ST_ILGL;
 				debug_format("ILGLERR..., STAT: %02X\n") % static_cast<uint16_t>(FLASH::FASTAT());
 				if(FLASH::FASTAT() != 0x10) {
@@ -208,18 +127,19 @@ namespace device {
 				}
 				ret = true;
 			}
-			if(FSTATR_ERSERR() != 0) {
+			if(FLASH::FSTATR_ERSERR() != 0) {
 				error_ = ERROR::ST_ERS;
 				debug_format("ERSERR...\n");
 				ret = true;
 			}
-			if(FSTATR_PRGERR() != 0) {
+			if(FLASH::FSTATR_PRGERR() != 0) {
 				error_ = ERROR::ST_PRG;
 				debug_format("PRGERR...\n");
 				ret = true;
 			}
-			if(ret) {
-				wr8_(FLASH::DATA_ORG, 0x50);
+			if(FLASH::FASTAT.CMDLK()) {
+				debug_format("CMDLK, reset status clear...\n");
+				wr8_(FLASH::CODE_ORG, 0x50);
 			}
 			return ret;
 		}
@@ -230,7 +150,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io() noexcept : error_(ERROR::NONE), mode_(MODE::NONE), trans_farm_(false)
+		flash_io() noexcept : mode_(MODE::NONE), error_(ERROR::NONE), trans_farm_(false)
 		{ }
 
 
@@ -258,19 +178,30 @@ namespace device {
 				trans_farm_ = true;
 			}
 
+			FLASH::reset_fcu();
+
 			turn_pe_();
+
 			if(check_error_()) {
 				error_ = ERROR::START;
 				debug_format("start: turn_pe_()...\n");
 				return false;
 			}
 
-			auto ret = set_clock_();
+			auto n = clock_profile::FCLK / 1'000'000;
+			if((clock_profile::FCLK % 1'000'000) != 0) ++n;
+			FLASH::set_clock(n);
+			auto ret = step_frdy_(n / 10 + n);
 			if(ret) {
 				turn_rd_();
 			} else {
 				error_ = ERROR::CLOCK;
-				debug_format("start: set_clock_()...\n");
+				debug_format("start: set_clock()...\n");
+			}
+			if(check_error_()) {
+				error_ = ERROR::CLOCK;
+				debug_format("start: set_clock() status...\n");
+				return false;
 			}
 			return ret;
 		}
@@ -289,14 +220,16 @@ namespace device {
 
 			if(org >= DATA_SIZE) {
 				error_ = ERROR::ADDRESS;
+				debug_format("read: Out of address...\n");
 				return 0;
 			}
 
 			turn_rd_();
 	
-			enable_read_(org, 1);
-
-			return rd8_(FLASH::DATA_ORG + org);
+			FLASH::enable_read(org, 1);
+			auto data = rd8_(FLASH::DATA_ORG + org);
+			FLASH::enable_read(org, 1, false);
+			return data;
 		}
 
 
@@ -315,6 +248,7 @@ namespace device {
 
 			if(org >= DATA_SIZE) {
 				error_ = ERROR::ADDRESS;
+				debug_format("read: Out of address...\n");
 				return 0;
 			}
 			if((org + len) > DATA_SIZE) {
@@ -323,17 +257,17 @@ namespace device {
 
 			turn_rd_();
 
-			enable_read_(org, len);
-
+			FLASH::enable_read(org, len);
 			const void* src = reinterpret_cast<const void*>(FLASH::DATA_ORG + org);
 			std::memcpy(dst, src, len);
+			FLASH::enable_read(org, len, false);
 			return len;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  消去チェック
+			@brief  消去チェック（バンク単位）
 			@param[in]	bank	バンク
 			@return エラーがあれば「false」
 		*/
@@ -350,16 +284,21 @@ namespace device {
 
 			turn_pe_();
 
-			auto cmd = FLASH::DATA_ORG + bank * FLASH::DATA_BLOCK_SIZE;
-			enable_write_(cmd, FLASH::DATA_BLOCK_SIZE);
+			auto adr = FLASH::DATA_ORG + bank * FLASH::DATA_BLOCK_SIZE;
 #if defined(SIG_RX26T)
+			FLASH::FSADDR = bank * FLASH::DATA_BLOCK_SIZE;
+			FLASH::FEADDR = (bank + 1) * FLASH::DATA_BLOCK_SIZE - FLASH::DATA_WORD_SIZE;
+			auto cmd = FLASH::FACI_CMD_ORG;
 #else
+			FLASH::enable_read(adr, FLASH::DATA_BLOCK_SIZE);
+			FLASH::enable_write(adr, FLASH::DATA_BLOCK_SIZE);
 			FLASH::FMODR.FRDMD = FLASH::FMODR.FRDMD.b(1);
-			FLASH::DFLBCCNT.BCSIZE = 1;  // setup 2K block
+			FLASH::DFLBCCNT.BCSIZE = 1;  // setup block check
+			auto cmd = adr;
 #endif
 			wr8_(cmd, 0x71);
 			wr8_(cmd, 0xD0);
-			if(!step_frdy_(33 * FLASH::DATA_BLOCK_SIZE / 2)) {  // 2 bytes / 30 us x 1.1
+			if(!step_frdy_(FLASH::CHECK_BLOCK_TIME + FLASH::CHECK_BLOCK_TIME / 10)) {
 				error_ = ERROR::TIMEOUT;
 				debug_format("erase_check: time out...\n");
 				return false;
@@ -368,13 +307,15 @@ namespace device {
 				debug_format("erase_check: status error...\n");
 				return false;
 			}
-			return ERASE_STATE();
+			FLASH::enable_read(adr, FLASH::DATA_BLOCK_SIZE, false);
+			FLASH::enable_write(adr, FLASH::DATA_BLOCK_SIZE, false);
+			return FLASH::ERASE_STATE();
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  消去
+			@brief  消去（バンク単位）
 			@param[in]	bank	バンク
 			@return エラーがあれば「false」
 		*/
@@ -391,12 +332,18 @@ namespace device {
 
 			turn_pe_();
 
-			auto cmd = FLASH::DATA_ORG + bank * FLASH::DATA_BLOCK_SIZE;
-			enable_write_(cmd, FLASH::DATA_BLOCK_SIZE);
-
+			auto adr = FLASH::DATA_ORG + bank * FLASH::DATA_BLOCK_SIZE;
+#if defined(SIG_RX26T)
+			FLASH::FSADDR = bank * FLASH::DATA_BLOCK_SIZE;
+			auto cmd = FLASH::FACI_CMD_ORG;
+#else
+			FLASH::enable_read(adr, FLASH::DATA_BLOCK_SIZE);
+			FLASH::enable_write(adr, FLASH::DATA_BLOCK_SIZE);
+			auto cmd = adr;
+#endif
 			wr8_(cmd, 0x20);
 			wr8_(cmd, 0xD0);
-			if(!step_frdy_(220000)) {  // 20 ms: 32 bytes erase 時間 x 1.1
+			if(!step_frdy_(FLASH::ERASE_BLOCK_TIME + FLASH::ERASE_BLOCK_TIME / 10)) {
 				error_ = ERROR::TIMEOUT;
 				debug_format("erase: time out...\n");
 				return false;
@@ -406,6 +353,8 @@ namespace device {
 				debug_format("erase: status error...\n");
 				return false;
 			}
+			FLASH::enable_read(adr, FLASH::DATA_BLOCK_SIZE, false);
+			FLASH::enable_write(adr, FLASH::DATA_BLOCK_SIZE, false);
 			return !ret;
 		}
 
@@ -440,14 +389,19 @@ namespace device {
 			}
 
 			turn_pe_();
-
-			enable_write_(org, len);
-
+#if defined(SIG_RX26T)
+#else
+			FLASH::enable_read(org, len);
+			FLASH::enable_write(org, len);
+#endif
 			const uint8_t* p = static_cast<const uint8_t*>(src);
 			uint32_t n = 0;
-			uint8_t d[8];
+			uint8_t d[FLASH::DATA_WORD_SIZE];
 			uint32_t i = 0;
 			while(i < len) {
+#if defined(SIG_RX26T)
+				FLASH::FSADDR = org + i;
+#endif
 				d[n] = *p++;
 				++n;
 				if(n >= FLASH::DATA_WORD_SIZE) {
@@ -455,12 +409,16 @@ namespace device {
 					FLASH::FCU_DATA_CMD8 = FLASH::DATA_PROG_CMD_2ND;
 					uint32_t j = 0;
 					while(j < n) {
+#if defined(SIG_RX26T)
+						wr16_(FLASH::FACI_CMD_ORG, (d[j + 1] << 8) | d[j]);
+#else
 						wr16_(FLASH::DATA_ORG + org + i, (d[j + 1] << 8) | d[j]);
+#endif
 						j += 2;
 						i += 2;
 					}
 					FLASH::FCU_DATA_CMD8 = 0xD0;
-					if(!step_frdy_(20000)) {  // 2[ms]
+					if(!step_frdy_(FLASH::WRITE_WORD_TIME + FLASH::WRITE_WORD_TIME / 10)) {
 						error_ = ERROR::TIMEOUT;
 						debug_format("write: time out...\n");
 						return false;
@@ -474,6 +432,8 @@ namespace device {
 				debug_format("write: status error...\n");
 				return false;
 			}
+			FLASH::enable_read(org, len, false);
+			FLASH::enable_write(org, len, false);
 			return !ret;
 		}
 

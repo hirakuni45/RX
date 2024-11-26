@@ -486,7 +486,7 @@
 #include "RX63T/flash.hpp"
 
 #include "RX63T/system_io.hpp"
-#include "RX24T/flash_io.hpp"
+#include "RX62x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 // #include "RX63T/dac_out.hpp"
 

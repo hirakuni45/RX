@@ -14,10 +14,10 @@ Renesas RX マイコン Data Flash 操作サンプル
 |---|---|:-:|
 |[main.cpp](main.cpp)|-|-|
 |[RX140/Makefile](RX140/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
-|[RX220/Makefile](RX220/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)||
+|[RX220/Makefile](RX220/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX231/Makefile](RX231/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
 |[RX24T/Makefile](RX24T/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
-|[RX26T/Makefile](RX26T/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)||
+|[RX26T/Makefile](RX26T/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX62N/Makefile](RX62N/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX631/Makefile](RX631/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX64M/Makefile](RX64M/Makefile)|[RX600/flash_io.hpp](../RX600/flash_io.hpp)|〇|
@@ -71,21 +71,21 @@ Renesas RX マイコン Data Flash 操作サンプル
 
 各マイコンにおけるデータフラッシュの仕様など：
 
-|CPU|容量|バンクサイズ|書き込み単位|ユニークＩＤ数|
-|---|:--:|:-:|:-:|:-:|
-|RX140|4K|256|1|4|
-|RX220|8K|128|2|4|
-|RX231|8K|1024|1|4|
-|RX24T|8K|1024|1|4|
-|RX26T|16K|64|4|3|
-|RX62N|32K|2048|8|0|
-|RX631|32K|2048|4|4|
-|RX64M|64K|64|4|3|
-|RX71M|64K|64|4|3|
-|RX65N|32K|64|4|4|
-|RX72N|32K|64|4|4|
-|RX66T|32K|64|4|3|
-|RX72T|32K|64|4|3|
+|CPU|容量|バンクサイズ|書き込み単位|消去後の値|ユニークＩＤ数|
+|---|:--:|:-:|:-:|:-:|:-:|
+|RX140|4K|256|1|0xFF|4|
+|RX220|8K|2048|2|0x??|4|
+|RX231|8K|1024|1|0xFF|4|
+|RX24T|8K|1024|1|0xFF|4|
+|RX26T|16K|64|4|0x??|3|
+|RX62N|32K|2048|8|0x??|0|
+|RX631|32K|2048|4|0x??|4|
+|RX64M|64K|64|4|0x??|3|
+|RX71M|64K|64|4|0x??|3|
+|RX65N|32K|64|4|0x??|4|
+|RX72N|32K|64|4|0x??|4|
+|RX66T|32K|64|4|0x??|3|
+|RX72T|32K|64|4|0x??|3|
 
 -----
    
