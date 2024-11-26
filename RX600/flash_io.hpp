@@ -13,6 +13,7 @@
 */
 //=========================================================================//
 #include <cstring>
+#include "RX600/flash_io_base.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
@@ -25,7 +26,7 @@ namespace device {
 		@brief  FLASH 制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class flash_io {
+	class flash_io : public flash_io_base {
 
 #ifdef FIO_DEBUG
 		typedef utils::format debug_format;
@@ -46,20 +47,6 @@ namespace device {
 		static constexpr uint32_t DATA_SIZE  = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
 		static constexpr uint32_t DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
 		static constexpr uint32_t DATA_BLOCK_NUM  = FLASH::DATA_SIZE / DATA_BLOCK_SIZE;	///< データ・フラッシュのバンク数
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  エラー型
-		*/
-		//-----------------------------------------------------------------//
-		enum class ERROR : uint8_t {
-			NONE,		///< エラー無し
-			INIT,		///< 初期化エラー
-			BANK,		///< バンクエラー
-			ADDRESS,	///< アドレス・エラー
-			TIMEOUT,	///< タイム・アウト・エラー
-			LOCK,		///< ロック・エラー
-		};
 
 	private:
 
@@ -319,7 +306,7 @@ namespace device {
 
 			auto state = init_fcu_();
 			if(!state) {
-				error_ = ERROR::INIT;
+				error_ = ERROR::START;
 				debug_format("'init_fcu_' fail\n");
 			}
 

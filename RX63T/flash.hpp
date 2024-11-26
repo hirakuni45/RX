@@ -260,17 +260,17 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr0_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B0>  PRGSPD;
-			bit_rw_t<io_, bitpos::B1>  ERSSPD;
+			bit_ro_t<in_, bitpos::B0>  PRGSPD;
+			bit_ro_t<in_, bitpos::B1>  ERSSPD;
 
-			bit_rw_t<io_, bitpos::B3>  SUSRDY;
-			bit_rw_t<io_, bitpos::B4>  PRGERR;
-			bit_rw_t<io_, bitpos::B5>  ERSERR;
-			bit_rw_t<io_, bitpos::B6>  ILGLERR;
-			bit_rw_t<io_, bitpos::B7>  FRDY;
+			bit_ro_t<in_, bitpos::B3>  SUSRDY;
+			bit_ro_t<in_, bitpos::B4>  PRGERR;
+			bit_ro_t<in_, bitpos::B5>  ERSERR;
+			bit_ro_t<in_, bitpos::B6>  ILGLERR;
+			bit_ro_t<in_, bitpos::B7>  FRDY;
 		};
 		static inline fstatr0_t<0x007F'FFB0> FSTATR0;
 
@@ -283,12 +283,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr1_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B4>  FLOCKST;
+			bit_ro_t<in_, bitpos::B4>  FLOCKST;
 
-			bit_rw_t<io_, bitpos::B7>  FCUERR;
+			bit_ro_t<in_, bitpos::B7>  FCUERR;
 		};
 		static inline fstatr1_t<0x007F'FFB1> FSTATR1;
 
@@ -365,12 +365,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fcmdr_t : public ro16_t<base> {
-			typedef ro16_t<base> io_;
-			using io_::operator ();
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bits_rw_t<io_, bitpos::B0, 8> PCMDR;
+			bits_ro_t<in_, bitpos::B0, 8> PCMDR;
 
-			bits_rw_t<io_, bitpos::B8, 8> CMDR;
+			bits_ro_t<in_, bitpos::B8, 8> CMDR;
 		};
 		static inline fcmdr_t<0x007F'FFBA> FCMDR;
 
@@ -408,9 +408,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>    BCSIZE;
+			bits_rw_t<io_, bitpos::B0, 11> BCADR;
 
-			bits_rw_t<io_, bitpos::B3, 8> BCADR;
+			bit_rw_t <io_, bitpos::B15>    BCSIZE;
 		};
 		static inline dflbccnt_t<0x007F'FFCA> DFLBCCNT;
 

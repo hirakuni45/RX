@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include "common/io_utils.hpp"
+#include "common/delay.hpp"
 
 namespace device {
 
@@ -19,16 +20,24 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t {
 
+		static constexpr uint32_t CODE_ORG = 0xFFFF'FFF0;	///< コード領域コマンド開始アドレス
 		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
 		static constexpr uint32_t DATA_SIZE = 8192;
 		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;
 		static constexpr uint32_t DATA_WORD_SIZE = 2;
 		static constexpr uint32_t ID_NUM = 4;
 
+		static inline rw8_t<CODE_ORG> FCU_CODE_CMD8;
+		static inline rw16_t<CODE_ORG> FCU_CODE_CMD16;
 		static inline rw8_t<DATA_ORG> FCU_DATA_CMD8;
 		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
 
 		static constexpr uint8_t DATA_PROG_CMD_2ND = 0x01;
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 2000;		///< 2mS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 12000*16;	///< 12mS(128) x 16 (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 35;		///< 35uS (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 35*1024;	///< 35 x 1024 (DATA_BLOCK_SIZE)
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -197,7 +206,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>    FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8> FEKEY;
 		};
-		static inline fentryr_t<0x007F'C4B2> FENTRYR;
+		static inline fentryr_t<0x007F'FFB2> FENTRYR;
 
 
 		//-----------------------------------------------------------------//
@@ -392,12 +401,19 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct dflbcstat_t : public ro16_t<base> {
-			typedef ro16_t<base> io_;
-			using io_::operator ();
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t <io_, bitpos::B0>    BCST;
+			bit_ro_t <in_, bitpos::B0>    BCST;
 		};
 		static inline dflbcstat_t<0x007F'FFCE> DFLBCSTAT;
+
+
+		static bool FSTATR_FRDY() noexcept { return FSTATR0.FRDY(); }
+		static bool FSTATR_ILGLERR() noexcept { return FSTATR0.ILGLERR(); }
+		static bool FSTATR_ERSERR() noexcept { return FSTATR0.ERSERR(); }
+		static bool FSTATR_PRGERR() noexcept { return FSTATR0.PRGERR(); }
+		static bool ERASE_STATE() noexcept { return DFLBCSTAT.BCST() == 0; }
 
 
 		//-----------------------------------------------------------------//
@@ -407,6 +423,41 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void transfer_farm() noexcept
 		{
+		}
+
+
+		static void enable_read(uint32_t org, uint32_t len, bool ena = true) noexcept
+		{
+			uint8_t mask = ena ? 0x0F : 0x00;
+			DFLRE0 = DFLRE0.KEY.b(0x2D) | mask;
+		}
+
+
+		static void enable_write(uint32_t org, uint32_t len, bool ena = true) noexcept
+		{
+			uint8_t mask = ena ? 0x0F : 0x00;
+			DFLWE0 = DFLWE0.KEY.b(0x1E) | mask;
+		}
+
+
+		static void reset_fcu() noexcept
+		{
+			FRESETR = 0xCC01;
+			utils::delay::micro_second(20 * 2);  // 20uS 以上 (32MHz)
+			FRESETR = 0xCC00;
+			FCPSR = 0x0001;  // 書き込み・消去優先
+		}
+
+
+		static void set_clock(uint32_t fclk) noexcept
+		{
+			PCKAR = fclk;
+			FCU_CODE_CMD8  = 0xE9;
+			FCU_CODE_CMD8  = 0x03;
+			FCU_CODE_CMD16 = 0x0F0F;
+			FCU_CODE_CMD16 = 0x0F0F;
+			FCU_CODE_CMD16 = 0x0F0F;
+			FCU_CODE_CMD8  = 0xD0;
 		}
 
 

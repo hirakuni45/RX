@@ -16,6 +16,7 @@
 */
 //=========================================================================//
 #include <cstring>
+#include "RX600/flash_io_base.hpp"
 #include "common/delay.hpp"
 
 #include "common/format.hpp"
@@ -27,7 +28,7 @@ namespace device {
 		@brief  FLASH 制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct flash_io {
+	struct flash_io : public flash_io_base {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -37,20 +38,6 @@ namespace device {
 		static constexpr auto DATA_SIZE       = FLASH::DATA_SIZE;  ///< データ容量
 		static constexpr auto DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データブロックサイズ
 		static constexpr auto DATA_BLOCK_NUM  = FLASH::DATA_SIZE / FLASH::DATA_BLOCK_SIZE;	///< データブロック数
-
-		enum class ERROR : uint8_t {
-			NONE,		///< エラー無し
-			START,		///< 開始不良
-			CLOCK,		///< クロック設定不良
-			ADDRESS,	///< アドレス不良
-			LENGTH,		///< 長さ不良
-			BANK,		///< バンク数不良
-			TIMEOUT,	///< タイムアウト
-			WRITE,		///< 書き込みエラー
-			ST_ILGL,	///< ILGL ステータス検出
-			ST_ERS,		///< ERS ステータス検出
-			ST_PRG,		///< PRG ステータス検出
-		};
 
 	private:
 

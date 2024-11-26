@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include "common/io_utils.hpp"
+#include "common/delay.hpp"
 
 namespace device {
 
@@ -481,6 +482,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t : public flash_base_t {
 
+		static constexpr uint32_t CODE_ORG = 0xFFFF'FFF0;	///< コード領域コマンド開始アドレス
 		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
 		static constexpr uint32_t DATA_SIZE = 32768;		///< データ・フラッシュ、サイズ
 		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
@@ -491,6 +493,11 @@ namespace device {
 		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
 
 		static constexpr uint8_t DATA_PROG_CMD_2ND = 0x04;
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 2000;		///< 2mS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 250000;	///< 250mS (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 30;		///< 30uS (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 700;		///< 0.7mS (DATA_BLOCK_SIZE)
 
 
 		//-----------------------------------------------------------------//
@@ -514,6 +521,49 @@ namespace device {
 					*dst++ = *src++;
 				}
 			}
+		}
+
+
+		static bool FSTATR_FRDY() noexcept { return FSTATR0.FRDY(); }
+		static bool FSTATR_ILGLERR() noexcept { return FSTATR0.ILGLERR(); }
+		static bool FSTATR_ERSERR() noexcept { return FSTATR0.ERSERR(); }
+		static bool FSTATR_PRGERR() noexcept { return FSTATR0.PRGERR(); }
+		static bool ERASE_STATE() noexcept { return DFLBCSTAT.BCST() == 0; }
+
+		static void enable_read(uint32_t org, uint32_t len, bool ena = true) noexcept
+		{
+			uint16_t mask = ena ? 0x00ff : 0x0000;
+			DFLRE0 = DFLRE0.KEY.b(0x2D) | mask;
+			DFLRE1 = DFLRE0.KEY.b(0xD2) | mask;
+		}
+
+
+		static void enable_write(uint32_t org, uint32_t len, bool ena = true) noexcept
+		{
+			uint16_t mask = ena ? 0x00ff : 0x0000;
+			DFLWE0 = DFLWE0.KEY.b(0x1E) | mask;
+			DFLWE1 = DFLWE0.KEY.b(0xE1) | mask;
+		}
+
+
+		static void reset_fcu() noexcept
+		{
+			// FCU 初期化
+			FRESETR = FRESETR.KEY.b(0xCC) | FRESETR.FRESET.b(1);
+			utils::delay::micro_second(35 * 2);  // Min: 35uS
+			FRESETR = FRESETR.KEY.b(0xCC) | FRESETR.FRESET.b(0);
+		}
+
+
+		static void set_clock(uint32_t fclk) noexcept
+		{
+			PCKAR = fclk;
+			FCU_DATA_CMD8  = 0xE9;
+			FCU_DATA_CMD8  = 0x03;
+			FCU_DATA_CMD16 = 0x0F0F;
+			FCU_DATA_CMD16 = 0x0F0F;
+			FCU_DATA_CMD16 = 0x0F0F;
+			FCU_DATA_CMD8  = 0xD0;
 		}
 
 
