@@ -43,7 +43,9 @@
 #include "RX130/flash.hpp"
 
 #include "RX140/system_io.hpp"
+#if defined(SIG_RX111)
 #include "RX24T/flash_io.hpp"
+#endif
 #include "RX24T/adc_in.hpp"
 #if defined(SIG_RX111)
 #include "RX600/dac_out.hpp"

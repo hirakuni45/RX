@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140 グループ・フラッシュ 定義
+	@brief	RX140/RX260/RX261 グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -98,10 +98,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fpsr_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t<io_, bitpos::B0> PERR;
+			bit_ro_t<in_, bitpos::B0> PERR;
 		};
 		static inline fpsr_t<0x007F'C184> FPSR;
 
@@ -280,15 +280,15 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr0_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t<io_, bitpos::B0>  ERERR;
-			bit_ro_t<io_, bitpos::B1>  PRGERR;
+			bit_ro_t<in_, bitpos::B0>  ERERR;
+			bit_ro_t<in_, bitpos::B1>  PRGERR;
 
-			bit_ro_t<io_, bitpos::B3>  BCERR;
-			bit_ro_t<io_, bitpos::B4>  ILGLERR;
-			bit_ro_t<io_, bitpos::B5>  EILGLERR;
+			bit_ro_t<in_, bitpos::B3>  BCERR;
+			bit_ro_t<in_, bitpos::B4>  ILGLERR;
+			bit_ro_t<in_, bitpos::B5>  EILGLERR;
 		};
 		static inline fstatr0_t<0x007F'C128> FSTATR0;
 
@@ -301,11 +301,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr1_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t<io_, bitpos::B6>  FRDY;
-			bit_ro_t<io_, bitpos::B7>  EXRDY;
+			bit_ro_t<in_, bitpos::B6>  FRDY;
+			bit_ro_t<in_, bitpos::B7>  EXRDY;
 		};
 		static inline fstatr1_t<0x007F'C12C> FSTATR1;
 

@@ -34,8 +34,8 @@ namespace device {
 		static inline rw16_t<FACI_CMD_ORG> FCU_DATA_CMD16;
 
 		static constexpr uint32_t WRITE_WORD_TIME  = 1700;	///< 1.7mS (DATA_WORD_SIZE)
-		static constexpr uint32_t ERASE_BLOCK_TIME = 10000;	///< 10mS (DATA_BLOCK_SIZE)
-		static constexpr uint32_t CHECK_WORD_TIME = 30;		///< 30 uS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 10000;	///< 10mS(64) (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 30;	///< 30 uS (DATA_WORD_SIZE)
 		static constexpr uint32_t CHECK_BLOCK_TIME = 100;	///< 100 uS (DATA_BLOCK_SIZE)
 
 
@@ -397,7 +397,7 @@ namespace device {
 		{
 			if(ena) {
 				FSADDR = org;
-				FEADDR = org + len - DATA_WORD_SIZE;
+				FEADDR = org + len;
 			}
 		}
 

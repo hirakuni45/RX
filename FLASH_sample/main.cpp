@@ -148,7 +148,23 @@ namespace {
 				}
 			}
 			if(!f) {
-				utils::format("Erase param error: '%s'\n") % buff;
+				utils::format("Erase check param error: '%s'\n") % buff;
+			}
+		} else if(command_.cmp_word(0, "checkw") && n >= 2) {
+			bool f = false;
+			char buff[16];
+			if(command_.get_word(1, buff, sizeof(buff))) {
+				uint32_t adrs = 0;
+				if((utils::input("%x", buff) % adrs).status()) {
+					if(adrs < FLASH_IO::DATA_SIZE) {
+						f = flash_io_.erase_check_w(adrs);
+						utils::format("Erase check word: 0x%04X %s\n") % adrs % (f ? "OK" : "NG");
+						f = true;
+					}
+				}
+			}
+			if(!f) {
+				utils::format("Erase check word param error: '%s'\n") % buff;
 			}
 		} else if((command_.cmp_word(0, "r") || command_.cmp_word(0, "read")) && n >= 2) {
 			bool f = false;
@@ -220,6 +236,7 @@ namespace {
 				% FLASH_IO::DATA_SIZE % FLASH_IO::DATA_BLOCK_NUM % FLASH_IO::DATA_BLOCK_SIZE % device::FLASH::DATA_WORD_SIZE;
 			utils::format("erase [bank] (erase 0 to %d)\n") % (FLASH_IO::DATA_BLOCK_NUM - 1);
 			utils::format("check [bank] (erase check 0 to %d)\n") % (FLASH_IO::DATA_BLOCK_NUM - 1);
+			utils::format("checkw org (erase check word data)\n");
 			utils::format("r[ead] org [end] (read)\n");
 			utils::format("write org data... (write)\n");
 			utils::format("uid (unique ID list)\n");
