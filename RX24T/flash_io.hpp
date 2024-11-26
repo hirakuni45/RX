@@ -5,9 +5,10 @@
 			RX110 (UID: extra area) (DataFlash: 0) @n
 			RX111 (UID: extra area) @n
 			RX130 (UID: extra area) @n
-			RX13T (UID: extra area) (DataFlash: 0) @n
+			RX13T (UID: extra area) @n
 			RX140 @n
 			RX231 @n
+			RX23T (DataFlash: 0) @n
 			RX24T/RX24U
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
@@ -42,8 +43,15 @@ namespace device {
 	private:
 
 		ERROR		error_;
-
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
 		static inline uint32_t	uid_[4];
+#endif
+		void reset_fcu_() noexcept
+		{
+			FLASH::FRESETR.FRESET = 1;
+			utils::delay::micro_second(10);
+			FLASH::FRESETR.FRESET = 0;
+		}
 
 		static void turn_rd_() noexcept
 		{
@@ -82,6 +90,28 @@ namespace device {
 			FLASH::FISR.PCKA = frq - 1;
 		}
 
+		bool erase_check_(uint32_t ofs, uint32_t len) noexcept
+		{
+			turn_pe_();
+
+			FLASH::FASR.EXS = 0;
+
+			FLASH::FSARH = FLASH::DF_VA_H;
+			FLASH::FSARL = FLASH::DF_VA_L + ofs;
+			FLASH::FEARH = FLASH::DF_VA_H;
+			FLASH::FEARL = FLASH::DF_VA_L + ofs + len;
+
+			FLASH::FCR = 0x83;
+			while(FLASH::FSTATR1.FRDY() == 0) ;
+			FLASH::FCR = 0x00;
+			while(FLASH::FSTATR1.FRDY() != 0) ;
+
+			if(FLASH::FSTATR0.ILGLERR() != 0 || FLASH::FSTATR0.ERERR() != 0) {
+				reset_fcu_();
+			}
+			return FLASH::FSTATR0.BCERR() == 0;
+		}
+
 #if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
 		static void read_unique_id_() noexcept
 		{
@@ -103,6 +133,7 @@ namespace device {
 					tmp <<= 16;
 					tmp |= FLASH::FRBL();
 					uid_[i] = tmp;
+					FLASH::FCR = 0x95;
 					while(FLASH::FSTATR1.DRRDY() != 0) ;
 					FLASH::FCR = 0x85;
 					while(1) {
@@ -205,7 +236,27 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  消去チェック
+			@brief  消去チェック（ワード単位）
+			@param[in]	adrs	アドレス
+			@return エラーがあれば「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool erase_check_w(uint32_t adrs) noexcept
+		{
+			error_ = ERROR::NONE;
+
+			if(adrs >= DATA_SIZE) {
+				error_ = ERROR::ADDRESS;
+				return false;
+			}
+
+			return erase_check_(adrs, FLASH::DATA_WORD_SIZE);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  消去チェック（バンク単位）
 			@param[in]	bank	バンク
 			@return エラーがあれば「false」
 		*/
@@ -215,36 +266,17 @@ namespace device {
 			error_ = ERROR::NONE;
 
 			if(bank >= DATA_BLOCK_NUM) {
+				error_ = ERROR::BANK;
 				return false;
 			}
 
-			turn_pe_();
-
-			FLASH::FASR.EXS = 0;
-
-			uint32_t org = bank * DATA_BLOCK_SIZE;
-
-			FLASH::FSARH = FLASH::DF_VA_H;
-			FLASH::FSARL = FLASH::DF_VA_L + org;
-			FLASH::FEARH = FLASH::DF_VA_H;
-			FLASH::FEARL = FLASH::DF_VA_L + (org + DATA_BLOCK_SIZE - 1);
-
-			FLASH::FCR = 0x83;
-			while(FLASH::FSTATR1.FRDY() == 0) ;
-			FLASH::FCR = 0x00;
-			while(FLASH::FSTATR1.FRDY() != 0) ;
-
-			if(FLASH::FSTATR0.ILGLERR() != 0 || FLASH::FSTATR0.ERERR() != 0) {
-				FLASH::FRESETR.FRESET = 1;
-				FLASH::FRESETR.FRESET = 0;
-			}
-			return FLASH::FSTATR0.BCERR() == 0;
+			return erase_check_(bank * DATA_BLOCK_SIZE, DATA_BLOCK_SIZE);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  消去
+			@brief  消去（バンク単位）
 			@param[in]	bank	バンク
 			@return エラーがあれば「false」
 		*/
@@ -329,6 +361,7 @@ namespace device {
 				while(FLASH::FSTATR1.FRDY() == 0) ;
 				FLASH::FCR = 0x00;
 				while(FLASH::FSTATR1.FRDY() != 0) ;
+
 				if(FLASH::FSTATR0.ILGLERR() != 0) {
 					error_ = ERROR::ST_ILGL;
 					ret = false;
@@ -363,8 +396,9 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ユニーク ID の取得 @no
-					RX64M などユニーク ID をサポートしない場合、特定の ROM 領域を返す。 
+			@brief  ユニーク ID の取得 @n
+					RX64M などユニーク ID をサポートしない場合、特定の ROM 領域を返す。 @n
+					RX100 系では、ユニークＩＤ読出しプロトコルで対応
 			@param[in]	idx		ID 番号（０～３）
 			@return ID 値
 		*/

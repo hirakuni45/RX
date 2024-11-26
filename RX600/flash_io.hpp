@@ -209,7 +209,6 @@ namespace device {
 			return trans_farm_;
 		}
 
-
 		// 4 バイト書き込み
 		// org: align 4 bytes
 		bool write32_(const void* src, uint32_t org) noexcept
@@ -262,6 +261,45 @@ namespace device {
 
 			error_ = ERROR::NONE;
 			return true;
+		}
+
+		bool erase_check_(uint32_t ofs, uint32_t len) noexcept
+		{
+			if(mode_ != mode::PE) {
+				turn_pe_();
+			}
+
+			device::FLASH::FBCCNT = 0x00;  // address increment
+			device::FLASH::FSADDR = ofs;
+			device::FLASH::FEADDR = ofs + len;
+
+			faci_cmd_(FACI::CHECK_BLANK1, FACI::CHECK_BLANK2);
+
+			// erase cheak (4 bytes): FCLK 20MHz to 60MHz max 30us
+			//                        FCLK 4MHz max 84us
+			// * 1.1
+			uint32_t cnt = 33 * 64 / 4;
+			if(clock_profile::FCLK < 20000000) cnt = 93 * 64 / 4;
+			while(device::FLASH::FSTATR.FRDY() == 0) {
+				utils::delay::micro_second(1);
+				--cnt;
+				if(cnt == 0) break;
+			}
+			if(cnt == 0) {  // time out
+				turn_break_();
+				error_ = ERROR::TIMEOUT;
+				debug_format("FACI 'erase_check' timeout\n");
+				return false;
+			}
+
+			if(device::FLASH::FASTAT.CMDLK() != 0) {
+				turn_break_();
+				error_ = ERROR::LOCK;
+				debug_format("FACI 'erase_check' lock fail\n");
+				return false;
+			}
+
+			return device::FLASH::FBCSTAT.BCST() == 0;
 		}
 
 	public:
@@ -371,8 +409,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  消去チェック
-			@param[in]	org		開始アドレス
+			@brief  消去チェック（ワード単位）
+			@param[in]	adrs	アドレス
+			@return 消去されていれば「true」（エラーは「false」）
+		*/
+		//-----------------------------------------------------------------//
+		bool erase_check_w(uint32_t adrs) noexcept
+		{
+			error_ = ERROR::NONE;
+
+			if(adrs >= DATA_SIZE) {
+				error_ = ERROR::ADDRESS;
+				return false;
+			}
+
+			return erase_check_(adrs, FLASH::DATA_WORD_SIZE);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  消去チェック（バンク単位）
+			@param[in]	bank	バンク
 			@return 消去されていれば「true」（エラーは「false」）
 		*/
 		//-----------------------------------------------------------------//
@@ -385,41 +443,7 @@ namespace device {
 				return false;
 			}
 
-			if(mode_ != mode::PE) {
-				turn_pe_();
-			}
-
-			device::FLASH::FBCCNT = 0x00;  // address increment
-			device::FLASH::FSADDR = bank * DATA_BLOCK_SIZE;
-			device::FLASH::FEADDR = (bank + 1) * DATA_BLOCK_SIZE - 1;
-
-			faci_cmd_(FACI::CHECK_BLANK1, FACI::CHECK_BLANK2);
-
-			// erase cheak (4 bytes): FCLK 20MHz to 60MHz max 30us
-			//                        FCLK 4MHz max 84us
-			// * 1.1
-			uint32_t cnt = 33 * 64 / 4;
-			if(clock_profile::FCLK < 20000000) cnt = 93 * 64 / 4;
-			while(device::FLASH::FSTATR.FRDY() == 0) {
-				utils::delay::micro_second(1);
-				--cnt;
-				if(cnt == 0) break;
-			}
-			if(cnt == 0) {  // time out
-				turn_break_();
-				error_ = ERROR::TIMEOUT;
-				debug_format("FACI 'erase_check' timeout\n");
-				return false;
-			}
-
-			if(device::FLASH::FASTAT.CMDLK() == 0) {
-				return device::FLASH::FBCSTAT.BCST() == 0;
-			} else {
-				turn_break_();
-				error_ = ERROR::LOCK;
-				debug_format("FACI 'erase_check' lock fail\n");
-				return false;
-			}
+			return erase_check_(bank * DATA_BLOCK_SIZE, DATA_BLOCK_SIZE);
 		}
 
 

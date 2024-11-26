@@ -10,13 +10,17 @@ Renesas RX microcontroller Data Flash サンプル
 ---
    
 ## Project list
-|File|flash_io|Operation check|
+|File/Group|flash_io|Operation check|
 |---|---|:-:|
 |[main.cpp](main.cpp)|-|-|
+|RX111|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)||
+|RX113|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)||
+|RX130|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)||
 |[RX140/Makefile](RX140/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
 |[RX220/Makefile](RX220/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX231/Makefile](RX231/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
 |[RX24T/Makefile](RX24T/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
+|RX261|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)||
 |[RX26T/Makefile](RX26T/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX62N/Makefile](RX62N/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX631/Makefile](RX631/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
@@ -72,12 +76,16 @@ Renesas RX microcontroller Data Flash サンプル
 
 Data flash specifications for each microcontroller:
 
-|CPU|Capacity|Bank size|Write unit|Value after elimination|Number of unique IDs|
+|CPU|Capacity|Bank size|Write unit|Value after elimination|Number of unique IDs (32bits)|
 |---|:--:|:-:|:-:|:-:|:-:|
+|RX111|8K|1024|1|0xFF|4|
+|RX113|8K|1024|1|0xFF|4|
+|RX130|8K|1024|1|0xFF|4|
 |RX140|4K|256|1|0xFF|4|
 |RX220|8K|2048|2|0x??|4|
 |RX231|8K|1024|1|0xFF|4|
 |RX24T|8K|1024|1|0xFF|4|
+|RX261|8K|256|1|0xFF|4|
 |RX26T|16K|64|4|0x??|3|
 |RX62N|32K|2048|8|0x??|0|
 |RX631|32K|2048|4|0x??|4|

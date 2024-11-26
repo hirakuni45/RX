@@ -269,15 +269,15 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr0_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t<io_, bitpos::B0>  ERERR;
-			bit_ro_t<io_, bitpos::B1>  PRGERR;
+			bit_ro_t<in_, bitpos::B0>  ERERR;
+			bit_ro_t<in_, bitpos::B1>  PRGERR;
 
-			bit_ro_t<io_, bitpos::B3>  BCERR;
-			bit_ro_t<io_, bitpos::B4>  ILGLERR;
-			bit_ro_t<io_, bitpos::B5>  EILGLERR;
+			bit_ro_t<in_, bitpos::B3>  BCERR;
+			bit_ro_t<in_, bitpos::B4>  ILGLERR;
+			bit_ro_t<in_, bitpos::B5>  EILGLERR;
 		};
 		static inline fstatr0_t<0x007F'FF8A> FSTATR0;
 
@@ -290,13 +290,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr1_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t<io_, bitpos::B1>  DRRDY;
+			bit_ro_t<in_, bitpos::B1>  DRRDY;
 
-			bit_ro_t<io_, bitpos::B6>  FRDY;
-			bit_ro_t<io_, bitpos::B7>  EXRDY;
+			bit_ro_t<in_, bitpos::B6>  FRDY;
+			bit_ro_t<in_, bitpos::B7>  EXRDY;
 		};
 		static inline fstatr1_t<0x007F'FF8B> FSTATR1;
 
@@ -350,18 +350,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw16_t<0x007F'C0B4> FAWEMR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
-					※エクストラ領域
-		*/
-		//-----------------------------------------------------------------//
-		static inline ro32_t<0x0000'0850> UIDR0;
-		static inline ro32_t<0x0000'0854> UIDR1;
-		static inline ro32_t<0x0000'0858> UIDR2;
-		static inline ro32_t<0x0000'085C> UIDR3;
 	};
 
 #if defined(SIG_RX110)
@@ -399,7 +387,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
+			@brief  E2 データフラッシュ制御レジスタ (DFLCTL) @n
+					RX111/RX113/RX130
 			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//

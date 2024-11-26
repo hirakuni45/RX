@@ -15,41 +15,13 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  フラッシュ・メモリー制御クラス
-		@param[in]	DSZ		データサイズ
+		@brief  フラッシュ・メモリー・ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t DSZ>
-	struct flash_t {
+	struct flash_base_t {
 
-		static constexpr auto DATA_SIZE = DSZ;
-		static constexpr auto DATA_BLOCK_SIZE = 1024;
-		static constexpr uint32_t DATA_WORD_SIZE = 1;
-		static constexpr auto ID_NUM = 4;
-
-		static constexpr uint16_t DF_VA_H = 0xFE00;  // E2 データフラッシュアドレス（0xFE00'0000）
+		static constexpr uint16_t DF_VA_H = 0xFE00;  // E2 データフラッシュコマンドアドレス（0xFE00'0000）
 		static constexpr uint16_t DF_VA_L = 0x0000;
-
-#if defined(SIG_RX23T)
-#else
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct dflctl_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> DFLEN;
-		};
-		static inline dflctl_t<0x007F'C090> DFLCTL;
-#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -365,9 +337,63 @@ namespace device {
 		static inline ro32_t<0x007F'C354> UIDR1;
 		static inline ro32_t<0x007F'C358> UIDR2;
 		static inline ro32_t<0x007F'C35C> UIDR3;
+	};
 
+#if defined(SIG_RX13T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX23T フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
 
-#if defined (SIG_RX24T) || defined(SIG_RX24U)
+		static constexpr uint32_t DATA_SIZE = 4096;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 1024;
+		static constexpr uint32_t DATA_WORD_SIZE = 1;
+		static constexpr uint32_t ID_NUM = 4;
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 374;		///< 374uS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 228000;	///< 228mS (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 16;		///< 15.9uS  (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 127;		///< 0.127mS (DATA_BLOCK_SIZE)
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct dflctl_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> DFLEN;
+		};
+		static inline dflctl_t<0x007F'C090> DFLCTL;
+	};
+
+#elif defined(SIG_RX23T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX23T フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_SIZE = 0;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 0;
+		static constexpr uint32_t DATA_WORD_SIZE = 0;
+		static constexpr uint32_t ID_NUM = 4;
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 0;		///< 375.5uS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 0;		///< 229.4mS (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 0;		///< 16.1uS  (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 0;		///< 10.7uS  (DATA_BLOCK_SIZE)
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ (ROMCE)
@@ -404,14 +430,82 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  ROMCIV;
 		};
 		static inline romciv_t<0x0008'1004> ROMCIV;
-#endif
 	};
 
-#if defined(SIG_RX13T)
-	typedef flash_t<4096> FLASH;
-#elif defined(SIG_RX23T)
-	typedef flash_t<0> FLASH;
 #elif defined(SIG_RX24T) || defined(SIG_RX24U)
-	typedef flash_t<8192> FLASH;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX24T/RX24U フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_SIZE = 8192;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 1024;
+		static constexpr uint32_t DATA_WORD_SIZE = 1;
+		static constexpr uint32_t ID_NUM = 4;
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 376;		///< 375.5uS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 229400;	///< 229.4mS (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 17;		///< 16.1uS  (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 496;		///< 495.7uS (DATA_BLOCK_SIZE)
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct dflctl_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> DFLEN;
+		};
+		static inline dflctl_t<0x007F'C090> DFLCTL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ROM キャッシュ許可レジスタ (ROMCE)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct romce_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  ROMCEN;
+		};
+		static inline romce_t<0x0008'1000> ROMCE;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ROM キャッシュ無効化レジスタ (ROMCIV)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct romciv_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  ROMCIV;
+		};
+		static inline romciv_t<0x0008'1004> ROMCIV;
+	};
 #endif
+	typedef flash_t FLASH;
 }

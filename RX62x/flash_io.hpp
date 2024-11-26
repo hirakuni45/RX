@@ -1,13 +1,14 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220/RX26T/RX62x/RX63x グループ FLASH 制御 @n
-			・RX220（動作不良、デバッグ中）@n
+	@brief	RX220/RX26T/RX62x/RX63x/RX63T グループ FLASH 制御 @n
+			・RX220 @n
 			・RX26T (他と構成が異なるものの、同じ部分も多いので共有している) @n
 			・RX621/RX62N @n
 			・RX631/RX63N @n
+			・RX63T（実装中） @n
 			このファイルは、「renesas.hpp」でインクルードされる前提なので、 @n
-			個別にインクルードしない事。
+			個別にインクルードしない事
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -41,7 +42,7 @@ namespace device {
 #endif
 
 	public:
-		static constexpr uint32_t DATA_SIZE = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
+		static constexpr uint32_t DATA_SIZE = FLASH::DATA_SIZE;				///< データ・フラッシュの容量
 		static constexpr uint32_t DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
 		static constexpr uint32_t DATA_BLOCK_NUM  = FLASH::DATA_SIZE / DATA_BLOCK_SIZE;	///< データ・フラッシュのバンク数
 
@@ -144,6 +145,73 @@ namespace device {
 			return ret;
 		}
 
+		bool erase_check_(uint32_t ofs, uint32_t len) noexcept
+		{
+			turn_pe_();
+
+#if defined(SIG_RX26T)
+			FLASH::FSADDR = ofs;
+			FLASH::FEADDR = ofs + len;
+			auto cmd = FLASH::FACI_CMD_ORG;
+#else
+			FLASH::enable_read(ofs, len);
+			FLASH::enable_write(ofs, len);
+			FLASH::FMODR.FRDMD = FLASH::FMODR.FRDMD.b(1);
+			if(len <= FLASH::DATA_WORD_SIZE) {
+				FLASH::DFLBCCNT = FLASH::DFLBCCNT.BCADR.b(ofs);  // setup word check
+			} else {
+				FLASH::DFLBCCNT = FLASH::DFLBCCNT.BCSIZE.b(1);  // setup block check
+			}
+			auto cmd = FLASH::DATA_ORG + ofs;
+#endif
+
+			wr8_(cmd, 0x71);
+			wr8_(cmd, 0xD0);
+			auto wait = (len <= FLASH::DATA_WORD_SIZE) ? FLASH::CHECK_WORD_TIME : FLASH::CHECK_BLOCK_TIME; 
+			if(!step_frdy_(wait + wait / 10)) {  // wait x 1.1
+				error_ = ERROR::TIMEOUT;
+				debug_format("erase_check: time out...\n");
+				return false;
+			}
+			if(check_error_()) {
+				debug_format("erase_check: status error...\n");
+				return false;
+			}
+			FLASH::enable_read(ofs, len, false);
+			FLASH::enable_write(ofs, len, false);
+			return FLASH::ERASE_STATE();
+		}
+
+		bool erase_(uint32_t ofs, uint32_t len) noexcept
+		{
+			turn_pe_();
+
+#if defined(SIG_RX26T)
+			FLASH::FSADDR = ofs;
+			auto cmd = FLASH::FACI_CMD_ORG;
+#else
+			FLASH::enable_read(ofs, FLASH::DATA_BLOCK_SIZE);
+			FLASH::enable_write(ofs, FLASH::DATA_BLOCK_SIZE);
+			auto cmd = FLASH::DATA_ORG + ofs;
+#endif
+			wr8_(cmd, 0x20);
+			wr8_(cmd, 0xD0);
+			auto wait = FLASH::ERASE_BLOCK_TIME;
+			if(!step_frdy_(wait + wait / 10)) {  // wait x 1.1
+				error_ = ERROR::TIMEOUT;
+				debug_format("erase: time out...\n");
+				return false;
+			}
+			bool ret = check_error_();
+			if(ret) {
+				debug_format("erase: status error...\n");
+				return false;
+			}
+			FLASH::enable_read(ofs, len, false);
+			FLASH::enable_write(ofs, len, false);
+			return !ret;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -184,7 +252,7 @@ namespace device {
 
 			if(check_error_()) {
 				error_ = ERROR::START;
-				debug_format("start: turn_pe_()...\n");
+				debug_format("start(): turn_pe_()...\n");
 				return false;
 			}
 
@@ -196,11 +264,11 @@ namespace device {
 				turn_rd_();
 			} else {
 				error_ = ERROR::CLOCK;
-				debug_format("start: set_clock()...\n");
+				debug_format("start(): set_clock()...\n");
 			}
 			if(check_error_()) {
 				error_ = ERROR::CLOCK;
-				debug_format("start: set_clock() status...\n");
+				debug_format("start(): set_clock() status...\n");
 				return false;
 			}
 			return ret;
@@ -220,7 +288,7 @@ namespace device {
 
 			if(org >= DATA_SIZE) {
 				error_ = ERROR::ADDRESS;
-				debug_format("read: Out of address...\n");
+				debug_format("read(): Out of address...\n");
 				return 0;
 			}
 
@@ -248,7 +316,7 @@ namespace device {
 
 			if(org >= DATA_SIZE) {
 				error_ = ERROR::ADDRESS;
-				debug_format("read: Out of address...\n");
+				debug_format("read(): Out of address...\n");
 				return 0;
 			}
 			if((org + len) > DATA_SIZE) {
@@ -267,6 +335,31 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  消去チェック（ワード単位）
+			@param[in]	adrs	アドレス
+			@return エラーがあれば「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool erase_check_w(uint32_t adrs) noexcept
+		{
+			error_ = ERROR::NONE;
+
+			if(adrs >= FLASH::DATA_SIZE) {
+				error_ = ERROR::ADDRESS;
+				debug_format("erase_check_w(): Out of address...\n");
+				return false;
+			}
+			if((adrs & (FLASH::DATA_WORD_SIZE - 1)) != 0) {
+				error_ = ERROR::ADDRESS;
+				debug_format("erase_check_w(): Word mod address...\n");
+				return false;
+			}
+			return erase_check_(adrs, FLASH::DATA_WORD_SIZE);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  消去チェック（バンク単位）
 			@param[in]	bank	バンク
 			@return エラーがあれば「false」
@@ -278,38 +371,11 @@ namespace device {
 
 			if(bank >= DATA_BLOCK_NUM) {
 				error_ = ERROR::BANK;
-				debug_format("erase_check: Out of bank...\n");
+				debug_format("erase_check(): Out of bank...\n");
 				return false;
 			}
-
-			turn_pe_();
-
-			auto adr = FLASH::DATA_ORG + bank * FLASH::DATA_BLOCK_SIZE;
-#if defined(SIG_RX26T)
-			FLASH::FSADDR = bank * FLASH::DATA_BLOCK_SIZE;
-			FLASH::FEADDR = (bank + 1) * FLASH::DATA_BLOCK_SIZE - FLASH::DATA_WORD_SIZE;
-			auto cmd = FLASH::FACI_CMD_ORG;
-#else
-			FLASH::enable_read(adr, FLASH::DATA_BLOCK_SIZE);
-			FLASH::enable_write(adr, FLASH::DATA_BLOCK_SIZE);
-			FLASH::FMODR.FRDMD = FLASH::FMODR.FRDMD.b(1);
-			FLASH::DFLBCCNT.BCSIZE = 1;  // setup block check
-			auto cmd = adr;
-#endif
-			wr8_(cmd, 0x71);
-			wr8_(cmd, 0xD0);
-			if(!step_frdy_(FLASH::CHECK_BLOCK_TIME + FLASH::CHECK_BLOCK_TIME / 10)) {
-				error_ = ERROR::TIMEOUT;
-				debug_format("erase_check: time out...\n");
-				return false;
-			}
-			if(check_error_()) {
-				debug_format("erase_check: status error...\n");
-				return false;
-			}
-			FLASH::enable_read(adr, FLASH::DATA_BLOCK_SIZE, false);
-			FLASH::enable_write(adr, FLASH::DATA_BLOCK_SIZE, false);
-			return FLASH::ERASE_STATE();
+			auto ofs = bank * FLASH::DATA_BLOCK_SIZE;
+			return erase_check_(ofs, FLASH::DATA_BLOCK_SIZE);
 		}
 
 
@@ -326,36 +392,11 @@ namespace device {
 
 			if(bank >= DATA_BLOCK_NUM) {
 				error_ = ERROR::BANK;
-				debug_format("erase: Out of bank...\n");
+				debug_format("erase(): Out of bank...\n");
 				return false;
 			}
-
-			turn_pe_();
-
-			auto adr = FLASH::DATA_ORG + bank * FLASH::DATA_BLOCK_SIZE;
-#if defined(SIG_RX26T)
-			FLASH::FSADDR = bank * FLASH::DATA_BLOCK_SIZE;
-			auto cmd = FLASH::FACI_CMD_ORG;
-#else
-			FLASH::enable_read(adr, FLASH::DATA_BLOCK_SIZE);
-			FLASH::enable_write(adr, FLASH::DATA_BLOCK_SIZE);
-			auto cmd = adr;
-#endif
-			wr8_(cmd, 0x20);
-			wr8_(cmd, 0xD0);
-			if(!step_frdy_(FLASH::ERASE_BLOCK_TIME + FLASH::ERASE_BLOCK_TIME / 10)) {
-				error_ = ERROR::TIMEOUT;
-				debug_format("erase: time out...\n");
-				return false;
-			}
-			bool ret = check_error_();
-			if(ret) {
-				debug_format("erase: status error...\n");
-				return false;
-			}
-			FLASH::enable_read(adr, FLASH::DATA_BLOCK_SIZE, false);
-			FLASH::enable_write(adr, FLASH::DATA_BLOCK_SIZE, false);
-			return !ret;
+			auto ofs = bank * FLASH::DATA_BLOCK_SIZE;
+			return erase_(ofs, FLASH::DATA_BLOCK_SIZE);
 		}
 
 
