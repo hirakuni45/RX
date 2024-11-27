@@ -15,11 +15,15 @@
 #include <cstring>
 #include "RX600/flash_io_base.hpp"
 #include "common/delay.hpp"
+
+// デバッグ・メッセージを表示する場合有効にする
+#define FIO_DEBUG
+
+#ifdef FIO_DEBUG
 #include "common/format.hpp"
+#endif
 
 namespace device {
-
-#define FIO_DEBUG
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -37,11 +41,7 @@ namespace device {
 	public:
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  データ・フラッシュ構成 @n
-					RX64M/RX71M: ６４Ｋバイト、６４バイト、１０２４ブロック @n
-					RX651/RX65N: ３２Ｋバイト、６４バイト、５１２ブロック @n
-					RX66T/RX72T: ３２Ｋバイト、６４バイト、５１２ブロック @n
-					RX72N/RX72M: ３２Ｋバイト、６４バイト、５１２ブロック
+			@brief  データ・フラッシュ構成
 		*/
 		//-----------------------------------------------------------------//
 		static constexpr uint32_t DATA_SIZE  = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
@@ -72,7 +72,6 @@ namespace device {
 
 		ERROR	error_;
 		mode	mode_;
-
 		bool	trans_farm_;
 
 		inline void faci_cmd_(FACI cmd) const noexcept
@@ -95,14 +94,16 @@ namespace device {
 			// break (4 bytes): FCLK 20MHz to 60MHz max 20us
 			//                  FCLK 4MHz max 32us
 			// * 1.1
-			uint32_t cnt = 22;
-			if(clock_profile::FCLK < 20000000) cnt = 36;
+			uint32_t loop = 22;
+			if(clock_profile::FCLK < 20'000'000) {
+				loop += loop;
+			}
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
-				--cnt;
-				if(cnt == 0) break;
+				--loop;
+				if(loop == 0) break;
 			}
-			if(cnt == 0) {
+			if(loop == 0) {
 				debug_format("FACI 'turn_break_' timeout\n");
 				return false;
 			}
@@ -115,16 +116,15 @@ namespace device {
 			}
 		}
 
-
 		void turn_rd_() noexcept
 		{
-			uint32_t n = 5;
+			uint32_t loop = 15;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
-				--n;
-				if(n == 0) break;
+				--loop;
+				if(loop == 0) break;
 			} 
-			if(n == 0 || device::FLASH::FASTAT.CMDLK() != 0) {
+			if(loop == 0 || device::FLASH::FASTAT.CMDLK() != 0) {
 				turn_break_();
 			}
 		
@@ -135,7 +135,6 @@ namespace device {
 			}
 			mode_ = mode::RD;
 		}
-
 
 		bool turn_pe_() noexcept
 		{
@@ -160,7 +159,6 @@ namespace device {
 			}
 		}
 
-
 		bool init_fcu_() noexcept
 		{
 			if(trans_farm_) return true;
@@ -175,6 +173,7 @@ namespace device {
 
 				uint32_t wait = 4;
 				while(device::FLASH::FENTRYR() != 0) {
+					utils::delay::micro_second(1);
 					if(wait > 0) {
 						--wait;
 					} else {
@@ -186,8 +185,8 @@ namespace device {
 
 			device::FLASH::FCURAME = 0xC403;  // Write only
 
-			const uint32_t* src = reinterpret_cast<const uint32_t*>(0xFEFFF000);  // Farm master
-			uint32_t* dst = reinterpret_cast<uint32_t*>(0x007F8000);  // Farm section
+			const uint32_t* src = reinterpret_cast<const uint32_t*>(0xFEFF'F000);  // Farm master
+			uint32_t* dst = reinterpret_cast<uint32_t*>(0x007F'8000);  // Farm section
 			for(uint32_t i = 0; i < (4096 / 4); ++i) {
 				*dst++ = *src++;
 			}
@@ -235,17 +234,17 @@ namespace device {
 			}
 			faci_cmd_(FACI::WRITE_FIN);
 
-			// write (4 bytes): FCLK 20MHz to 60MHz max 1.7ms
-			//                  FCLK 4MHz max 3.8ms
-			// * 1.1
-			uint32_t cnt = 1870;
-			if(clock_profile::FCLK < 20000000) cnt = 4180;
+			auto loop = FLASH::WRITE_WORD_TIME;
+			if(clock_profile::FCLK < 20'000'000) {
+				loop += loop;
+			}
+			loop += loop / 10;  // x 1.1
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
-				--cnt;
-				if(cnt == 0) break;
+				--loop;
+				if(loop == 0) break;
 			}
-			if(cnt == 0) {  // time out
+			if(loop == 0) {  // time out
 				turn_break_();
 				error_ = ERROR::TIMEOUT;
 				debug_format("FACI 'write32_' timeout\n");
@@ -271,21 +270,21 @@ namespace device {
 
 			device::FLASH::FBCCNT = 0x00;  // address increment
 			device::FLASH::FSADDR = ofs;
-			device::FLASH::FEADDR = ofs + len;
+			device::FLASH::FEADDR = ofs + len - FLASH::DATA_WORD_SIZE;
 
 			faci_cmd_(FACI::CHECK_BLANK1, FACI::CHECK_BLANK2);
 
-			// erase cheak (4 bytes): FCLK 20MHz to 60MHz max 30us
-			//                        FCLK 4MHz max 84us
-			// * 1.1
-			uint32_t cnt = 33 * 64 / 4;
-			if(clock_profile::FCLK < 20000000) cnt = 93 * 64 / 4;
+			auto loop = FLASH::CHECK_WORD_TIME * len / FLASH::DATA_WORD_SIZE;
+			if(clock_profile::FCLK < 20'000'000) {
+				loop += loop;
+			}
+			loop += loop / 10;  // x 1.1
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
-				--cnt;
-				if(cnt == 0) break;
+				--loop;
+				if(loop == 0) break;
 			}
-			if(cnt == 0) {  // time out
+			if(loop == 0) {  // time out
 				turn_break_();
 				error_ = ERROR::TIMEOUT;
 				debug_format("FACI 'erase_check' timeout\n");
@@ -475,18 +474,18 @@ namespace device {
 
 			faci_cmd_(FACI::ERASE1, FACI::ERASE2);
 
-			// 64 bytes erase: FCLK 20MHz to 60MHz max 10ms
-			//                 FCLK 4MHz max 18ms
-			// * 1.1
-			uint32_t cnt = 1100;
-			if(device::clock_profile::FCLK < 20'000'000) cnt = 1980;
+			auto loop = FLASH::ERASE_BLOCK_TIME;
+			if(device::clock_profile::FCLK < 20'000'000) {
+				loop += loop;
+			}
+			loop += loop / 10;  // x 1.1
 			while(device::FLASH::FSTATR.FRDY() == 0) {
-				utils::delay::micro_second(10);
-				--cnt;
-				if(cnt == 0) break;
+				utils::delay::micro_second(1);
+				--loop;
+				if(loop == 0) break;
 			}
 
-			if(cnt == 0) {  // time out
+			if(loop == 0) {  // time out
 				turn_break_();
 				error_ = ERROR::TIMEOUT;
 				debug_format("FACI 'erase' timeout\n");
