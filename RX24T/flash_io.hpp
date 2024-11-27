@@ -99,7 +99,7 @@ namespace device {
 			FLASH::FSARH = FLASH::DF_VA_H;
 			FLASH::FSARL = FLASH::DF_VA_L + ofs;
 			FLASH::FEARH = FLASH::DF_VA_H;
-			FLASH::FEARL = FLASH::DF_VA_L + ofs + len;
+			FLASH::FEARL = FLASH::DF_VA_L + ofs + len - FLASH::DATA_WORD_SIZE;
 
 			FLASH::FCR = 0x83;
 			while(FLASH::FSTATR1.FRDY() == 0) ;

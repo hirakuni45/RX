@@ -151,7 +151,7 @@ namespace device {
 
 #if defined(SIG_RX26T)
 			FLASH::FSADDR = ofs;
-			FLASH::FEADDR = ofs + len;
+			FLASH::FEADDR = ofs + len - FLASH::DATA_WORD_SIZE;
 			auto cmd = FLASH::FACI_CMD_ORG;
 #else
 			FLASH::enable_read(ofs, len);
@@ -168,6 +168,9 @@ namespace device {
 			wr8_(cmd, 0x71);
 			wr8_(cmd, 0xD0);
 			auto wait = (len <= FLASH::DATA_WORD_SIZE) ? FLASH::CHECK_WORD_TIME : FLASH::CHECK_BLOCK_TIME; 
+			if(clock_profile::FCLK < 20'000'000) {
+				wait += wait;
+			}
 			if(!step_frdy_(wait + wait / 10)) {  // wait x 1.1
 				error_ = ERROR::TIMEOUT;
 				debug_format("erase_check: time out...\n");
@@ -197,6 +200,9 @@ namespace device {
 			wr8_(cmd, 0x20);
 			wr8_(cmd, 0xD0);
 			auto wait = FLASH::ERASE_BLOCK_TIME;
+			if(clock_profile::FCLK < 20'000'000) {
+				wait += wait;
+			}
 			if(!step_frdy_(wait + wait / 10)) {  // wait x 1.1
 				error_ = ERROR::TIMEOUT;
 				debug_format("erase: time out...\n");
@@ -459,7 +465,11 @@ namespace device {
 						i += 2;
 					}
 					FLASH::FCU_DATA_CMD8 = 0xD0;
-					if(!step_frdy_(FLASH::WRITE_WORD_TIME + FLASH::WRITE_WORD_TIME / 10)) {
+					auto wait = FLASH::WRITE_WORD_TIME;
+					if(clock_profile::FCLK < 20'000'000) {
+						wait += wait;
+					}
+					if(!step_frdy_(wait + wait / 10)) {
 						error_ = ERROR::TIMEOUT;
 						debug_format("write: time out...\n");
 						return false;

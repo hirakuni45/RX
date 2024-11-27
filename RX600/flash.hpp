@@ -20,18 +20,10 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  フラッシュ・メモリー制御クラス
-		@param[in]	dsize	データフラッシュ容量
-		@param[in]	idnum	ユニーク ID 数
+		@brief  フラッシュ・メモリー・ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t dsize, uint32_t idnum>
-	struct flash_t {
-
-		static constexpr auto DATA_SIZE = dsize;		///< データ領域のサイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
-		static constexpr auto ID_NUM = idnum;			///< ユニーク ID 数
+	struct flash_base_t {
 
 #if defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -70,6 +62,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>  ROMCIV;
 		};
 		static inline romciv_t<0x0008'1004> ROMCIV;
+
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX660)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -548,24 +541,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) 
-		*/
-		//-----------------------------------------------------------------//
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX660) || defined(SIG_RX66T) || defined(SIG_RX72T)
-		static inline ro32_t<0x007F'B174> UIDR0;
-		static inline ro32_t<0x007F'B1E4> UIDR1;
-		static inline ro32_t<0x007F'B1E8> UIDR2;
-		static inline ro32_t<0xFFFF'FFF4> UIDR3;  ///< in VECTOR 
-#elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N) || defined(SIG_RX72M)
-		static inline ro32_t<0xFE7F'7D90> UIDR0;
-		static inline ro32_t<0xFE7F'7D94> UIDR1;
-		static inline ro32_t<0xFE7F7'D98> UIDR2;
-		static inline ro32_t<0xFE7F7'D9C> UIDR3;
-#endif
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  EEPFCLK レジスタの設定 @n
 					RX671, RX72N, RX72M にあるレジスタで、クロックジェネレーターの @n
 					FCLK を変更する前に設定する必要がある。 @n
@@ -588,12 +563,125 @@ namespace device {
 	};
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef flash_t<65536, 3> FLASH;
-#elif defined(SIG_RX66T) || defined(SIG_RX72T)
-	typedef flash_t<32768, 3> FLASH;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX64M/RX71M フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_SIZE = 65536;	///< データ領域のサイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
+		static constexpr uint32_t ID_NUM = 3;			///< ユニーク ID 数
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 113;		///< 7.2mS(256) (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 1125;		///< 144mS(8K)  (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 30;		///< 30uS       (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 30*64;		///< 30 x 64    (DATA_BLOCK_SIZE)
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) 
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro32_t<0x007F'B174> UIDR0;
+		static inline ro32_t<0x007F'B1E4> UIDR1;
+		static inline ro32_t<0x007F'B1E8> UIDR2;
+		static inline ro32_t<0xFFFF'FFF4> UIDR3;  ///< in Dummy (Code area)
+	};
+
 #elif defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX660) || defined(SIG_RX72N) || defined(SIG_RX72M)
-	typedef flash_t<32768, 4> FLASH;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX65N/RX651/RX66N/RX660/RX72N/RX72M フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_SIZE = 32768;	///< データ領域のサイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
+		static constexpr uint32_t ID_NUM = 4;			///< ユニーク ID 数
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 225;		///< 7.2mS(128) (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 1125;		///< 144mS(8K)  (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 30;		///< 30uS       (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 30*64;		///< 30 x 64    (DATA_BLOCK_SIZE)
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) 
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro32_t<0xFE7F'7D90> UIDR0;
+		static inline ro32_t<0xFE7F'7D94> UIDR1;
+		static inline ro32_t<0xFE7F7'D98> UIDR2;
+		static inline ro32_t<0xFE7F7'D9C> UIDR3;
+	};
+
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX66T/RX72T フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_SIZE = 32768;	///< データ領域のサイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
+		static constexpr uint32_t ID_NUM = 3;			///< ユニーク ID 数
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 113;		///< 7.2mS(256) (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 1125;		///< 144mS(8K) (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 30;		///< 30uS      (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 30*64;		///< 30 x 64   (DATA_BLOCK_SIZE)
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) 
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro32_t<0x007F'B174> UIDR0;
+		static inline ro32_t<0x007F'B1E4> UIDR1;
+		static inline ro32_t<0x007F'B1E8> UIDR2;
+		static inline ro32_t<0xFFFF'FFF4> UIDR3;  ///< in Dummy (Code area)
+	};
+
 #elif defined(SIG_RX671)
-	typedef flash_t<8192, 4> FLASH;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX671 フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_SIZE = 8192;		///< データ領域のサイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
+		static constexpr uint32_t ID_NUM = 4;			///< ユニーク ID 数
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 113;		///< 7.2mS(256) (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 1125;		///< 144mS(8K)  (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 30;		///< 30uS       (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 30*64;		///< 30 x 64    (DATA_BLOCK_SIZE)
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) 
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro32_t<0xFE7F'7D90> UIDR0;
+		static inline ro32_t<0xFE7F'7D94> UIDR1;
+		static inline ro32_t<0xFE7F7'D98> UIDR2;
+		static inline ro32_t<0xFE7F7'D9C> UIDR3;
+	};
+
 #endif
+	typedef flash_t FLASH;
 }
