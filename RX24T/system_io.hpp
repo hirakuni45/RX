@@ -9,14 +9,17 @@
 */
 //=========================================================================//
 #include "RX24T/system.hpp"
-#include "RX24T/flash.hpp"
 #if defined(SIG_RX13T)
+#include "RX130/flash.hpp"
 #include "RX13T/clock_profile.hpp"
 #elif defined(SIG_RX23T)
+#include "RX24T/flash.hpp"
 #include "RX23T/clock_profile.hpp"
 #elif defined(SIG_RX24T)
+#include "RX24T/flash.hpp"
 #include "RX24T/clock_profile.hpp"
 #elif defined(SIG_RX24U)
+#include "RX24T/flash.hpp"
 #include "RX24U/clock_profile.hpp"
 #endif
 

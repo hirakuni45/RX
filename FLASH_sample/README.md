@@ -31,6 +31,7 @@ Renesas RX microcontroller Data Flash サンプル
 |RX66N|[RX600/flash_io.hpp](../RX600/flash_io.hpp)||
 |RX671|[RX600/flash_io.hpp](../RX600/flash_io.hpp)||
 |[RX72N/Makefile](RX72N/Makefile)|[RX600/flash_io.hpp](../RX600/flash_io.hpp)|〇|
+|RX72M|[RX600/flash_io.hpp](../RX600/flash_io.hpp)||
 |[RX66T/Makefile](RX66T/Makefile)|[RX600/flash_io.hpp](../RX600/flash_io.hpp)|〇|
 |[RX72T/Makefile](RX72T/Makefile)|[RX600/flash_io.hpp](../RX600/flash_io.hpp)|〇|
 
@@ -81,12 +82,14 @@ Data flash specifications for each microcontroller:
 
 |CPU|Capacity|Bank size|Write unit|Value after elimination|Number of unique IDs (32bits)|
 |---|:--:|:-:|:-:|:-:|:-:|
+|RX110|0K|-|-|-|4|
 |RX111|8K|1024|1|0xFF|4|
 |RX113|8K|1024|1|0xFF|4|
 |RX130|8K|1024|1|0xFF|4|
 |RX140|4K|256|1|0xFF|4|
 |RX220|8K|2048|2|0x??|4|
 |RX23[01]|8K|1024|1|0xFF|4|
+|RX23T|0K|-|-|-|4|
 |RX24T|8K|1024|1|0xFF|4|
 |RX26[01]|8K|256|1|0xFF|4|
 |RX26T|16K|64|4|0x??|3|
@@ -99,6 +102,7 @@ Data flash specifications for each microcontroller:
 |RX66N|32K|64|4|0x??|4|
 |RX671|8K|64|4|0x??|4|
 |RX72N|32K|64|4|0x??|4|
+|RX72M|32K|64|4|0x??|4|
 |RX66T|32K|64|4|0x??|3|
 |RX72T|32K|64|4|0x??|3|
 
