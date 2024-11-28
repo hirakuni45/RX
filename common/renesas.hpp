@@ -101,7 +101,7 @@
 #include "RX13T/s12ad.hpp"
 #include "RX13T/da.hpp"
 #include "RX600/cmpc.hpp"
-#include "RX24T/flash.hpp"
+#include "RX130/flash.hpp"
 #include "RX600/crc.hpp"
 #include "RX600/doc.hpp"
 
@@ -267,6 +267,7 @@
 #include "RX600/doc.hpp"
 
 #include "RX24T/system_io.hpp"
+#include "RX24T/flash_io.hpp"
 #include "RX24T/adc_in.hpp"
 #include "RX24T/dac_out.hpp"
 

@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX23T/RX24T/RX24U グループ・フラッシュ 定義 @n
+	@brief	RX23T/RX24T/RX24U グループ・フラッシュ 定義 @n
 			RX23T はデータフラッシュが無
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
@@ -247,15 +247,15 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr0_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t<io_, bitpos::B0>  ERERR;
-			bit_ro_t<io_, bitpos::B1>  PRGERR;
+			bit_ro_t<in_, bitpos::B0>  ERERR;
+			bit_ro_t<in_, bitpos::B1>  PRGERR;
 
-			bit_ro_t<io_, bitpos::B3>  BCERR;
-			bit_ro_t<io_, bitpos::B4>  ILGLERR;
-			bit_ro_t<io_, bitpos::B5>  EILGLERR;
+			bit_ro_t<in_, bitpos::B3>  BCERR;
+			bit_ro_t<in_, bitpos::B4>  ILGLERR;
+			bit_ro_t<in_, bitpos::B5>  EILGLERR;
 		};
 		static inline fstatr0_t<0x007F'C1F0> FSTATR0;
 
@@ -268,11 +268,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct fstatr1_t : public ro8_t<base> {
-			typedef ro8_t<base> io_;
-			using io_::operator ();
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_ro_t<io_, bitpos::B6>  FRDY;
-			bit_ro_t<io_, bitpos::B7>  EXRDY;
+			bit_ro_t<in_, bitpos::B6>  FRDY;
+			bit_ro_t<in_, bitpos::B7>  EXRDY;
 		};
 		static inline fstatr1_t<0x007F'C12C> FSTATR1;
 
@@ -326,6 +326,20 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw16_t<0x007F'C1D0> FAWEMR;
+	};
+
+#if defined(SIG_RX23T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX23T フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_SIZE = 0;			///< データ・フラュシュ無し
+		static constexpr uint32_t DATA_BLOCK_SIZE = 1;		///< 互換性の為「１」を設定
+		static constexpr uint32_t DATA_WORD_SIZE = 0;		///< データ・フラュシュ無し
+		static constexpr uint32_t ID_NUM = 4;
 
 
 		//-----------------------------------------------------------------//
@@ -337,99 +351,6 @@ namespace device {
 		static inline ro32_t<0x007F'C354> UIDR1;
 		static inline ro32_t<0x007F'C358> UIDR2;
 		static inline ro32_t<0x007F'C35C> UIDR3;
-	};
-
-#if defined(SIG_RX13T)
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  RX23T フラッシュ・メモリー・クラス
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct flash_t : public flash_base_t {
-
-		static constexpr uint32_t DATA_SIZE = 4096;
-		static constexpr uint32_t DATA_BLOCK_SIZE = 1024;
-		static constexpr uint32_t DATA_WORD_SIZE = 1;
-		static constexpr uint32_t ID_NUM = 4;
-
-		static constexpr uint32_t WRITE_WORD_TIME  = 374;		///< 374uS (DATA_WORD_SIZE)
-		static constexpr uint32_t ERASE_BLOCK_TIME = 228000;	///< 228mS (DATA_BLOCK_SIZE)
-		static constexpr uint32_t CHECK_WORD_TIME  = 16;		///< 15.9uS  (DATA_WORD_SIZE)
-		static constexpr uint32_t CHECK_BLOCK_TIME = 127;		///< 0.127mS (DATA_BLOCK_SIZE)
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct dflctl_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> DFLEN;
-		};
-		static inline dflctl_t<0x007F'C090> DFLCTL;
-	};
-
-#elif defined(SIG_RX23T)
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  RX23T フラッシュ・メモリー・クラス
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct flash_t : public flash_base_t {
-
-		static constexpr uint32_t DATA_SIZE = 0;
-		static constexpr uint32_t DATA_BLOCK_SIZE = 0;
-		static constexpr uint32_t DATA_WORD_SIZE = 0;
-		static constexpr uint32_t ID_NUM = 4;
-
-		static constexpr uint32_t WRITE_WORD_TIME  = 0;		///< 375.5uS (DATA_WORD_SIZE)
-		static constexpr uint32_t ERASE_BLOCK_TIME = 0;		///< 229.4mS (DATA_BLOCK_SIZE)
-		static constexpr uint32_t CHECK_WORD_TIME  = 0;		///< 16.1uS  (DATA_WORD_SIZE)
-		static constexpr uint32_t CHECK_BLOCK_TIME = 0;		///< 10.7uS  (DATA_BLOCK_SIZE)
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ROM キャッシュ許可レジスタ (ROMCE)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct romce_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  ROMCEN;
-		};
-		static inline romce_t<0x0008'1000> ROMCE;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ROM キャッシュ無効化レジスタ (ROMCIV)
-			@param[in]	base	ベース
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct romciv_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  ROMCIV;
-		};
-		static inline romciv_t<0x0008'1004> ROMCIV;
 	};
 
 #elif defined(SIG_RX24T) || defined(SIG_RX24U)
@@ -505,6 +426,17 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  ROMCIV;
 		};
 		static inline romciv_t<0x0008'1004> ROMCIV;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3)
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro32_t<0x007F'C350> UIDR0;
+		static inline ro32_t<0x007F'C354> UIDR1;
+		static inline ro32_t<0x007F'C358> UIDR2;
+		static inline ro32_t<0x007F'C35C> UIDR3;
 	};
 #endif
 	typedef flash_t FLASH;

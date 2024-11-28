@@ -5,7 +5,7 @@
 			RX110 (UID: extra area) (DataFlash: 0) @n
 			RX111 (UID: extra area) @n
 			RX130 (UID: extra area) @n
-			RX13T (UID: extra area) @n
+			RX13T (UID: extra area) (DataFlash: 0) @n
 			RX140 @n
 			RX231 @n
 			RX23T (DataFlash: 0) @n
@@ -43,7 +43,7 @@ namespace device {
 	private:
 
 		ERROR		error_;
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX13T)
 		static inline uint32_t	uid_[4];
 #endif
 		void reset_fcu_() noexcept
@@ -112,7 +112,7 @@ namespace device {
 			return FLASH::FSTATR0.BCERR() == 0;
 		}
 
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX13T) 
 		static void read_unique_id_() noexcept
 		{
 			// Entry P/E mode
@@ -175,7 +175,7 @@ namespace device {
 		{
 			error_ = ERROR::NONE;
 
-#if defined(SIG_RX110)
+#if defined(SIG_RX110) || defined(SIG_RX23T)
 #else
 			FLASH::DFLCTL.DFLEN = 1;
 #endif
@@ -196,6 +196,11 @@ namespace device {
 		uint8_t read(uint16_t org) noexcept
 		{
 			error_ = ERROR::NONE;
+
+			if(DATA_SIZE == 0) {
+				error_ = ERROR::NOS;
+				return 0;
+			}
 
 			if(org >= DATA_SIZE) {
 				error_ = ERROR::ADDRESS;
@@ -218,6 +223,11 @@ namespace device {
 		uint32_t read(uint16_t org, uint16_t len, void* dst) noexcept
 		{
 			error_ = ERROR::NONE;
+
+			if(DATA_SIZE == 0) {
+				error_ = ERROR::NOS;
+				return 0;
+			}
 
 			if(org >= DATA_SIZE) {
 				error_ = ERROR::ADDRESS;
@@ -245,6 +255,11 @@ namespace device {
 		{
 			error_ = ERROR::NONE;
 
+			if(DATA_SIZE == 0) {
+				error_ = ERROR::NOS;
+				return false;
+			}
+
 			if(adrs >= DATA_SIZE) {
 				error_ = ERROR::ADDRESS;
 				return false;
@@ -265,6 +280,11 @@ namespace device {
 		{
 			error_ = ERROR::NONE;
 
+			if(DATA_SIZE == 0) {
+				error_ = ERROR::NOS;
+				return false;
+			}
+
 			if(bank >= DATA_BLOCK_NUM) {
 				error_ = ERROR::BANK;
 				return false;
@@ -284,6 +304,11 @@ namespace device {
 		bool erase(uint32_t bank) noexcept
 		{
 			error_ = ERROR::NONE;
+
+			if(DATA_SIZE == 0) {
+				error_ = ERROR::NOS;
+				return false;
+			}
 
 			if(bank >= DATA_BLOCK_NUM) {
 				error_ = ERROR::BANK;
@@ -333,6 +358,11 @@ namespace device {
 		{
 			error_ = ERROR::NONE;
 
+			if(DATA_SIZE == 0) {
+				error_ = ERROR::NOS;
+				return false;
+			}
+
 			if(org >= DATA_SIZE) {
 				error_ = ERROR::ADDRESS;
 				return false;
@@ -352,7 +382,7 @@ namespace device {
 			FLASH::FSARH = FLASH::DF_VA_H;  // データ・フラッシュ仮想アドレスＨ
 			FLASH::FSARL = FLASH::DF_VA_L + org;
 			for(uint16_t i = 0; i < len; ++i) {
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX13T)
 				FLASH::FWBL = *p++;
 #else
 				FLASH::FWB0 = *p++;
@@ -405,7 +435,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static uint32_t get_uid(uint32_t idx) noexcept
 		{
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX13T)
 			turn_pe_();
 			read_unique_id_();
 			return uid_[idx & 3];

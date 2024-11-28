@@ -5,7 +5,8 @@
 			RX110 @n
 			RX111 @n
 			RX113 @n
-			RX130 
+			RX130 @n
+			RX13T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -367,6 +368,42 @@ namespace device {
 
 		static constexpr uint8_t  DF_VA_H = 0x0F;  ///< E2 データフラッシュアドレス（0x0F'1000）
 		static constexpr uint16_t DF_VA_L = 0x1000;
+	};
+
+#elif defined(SIG_RX13T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX13T フラッシュ・メモリー制御クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr auto DATA_SIZE = 0;
+		static constexpr uint32_t DATA_BLOCK_SIZE = 1;
+		static constexpr uint32_t DATA_WORD_SIZE = 0;
+		static constexpr auto ID_NUM = 4;
+
+		static constexpr uint8_t  DF_VA_H = 0x0F;  ///< E2 データフラッシュアドレス（0x0F'1000）
+		static constexpr uint16_t DF_VA_L = 0x1000;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  E2 データフラッシュ制御レジスタ (DFLCTL) @n
+					RX111/RX113/RX130
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct dflctl_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> DFLEN;
+		};
+		static inline dflctl_t<0x007F'C090> DFLCTL;
 	};
 
 #else

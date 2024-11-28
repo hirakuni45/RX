@@ -28,6 +28,7 @@ namespace device {
 			NONE,		///< エラー無し
 			START,		///< 開始不良
 			CLOCK,		///< クロック設定不良
+			NOS,		///< 未サポート
 			ADDRESS,	///< アドレス不良
 			LENGTH,		///< 長さ不良
 			BANK,		///< バンク数不良

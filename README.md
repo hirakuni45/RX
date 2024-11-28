@@ -16,6 +16,7 @@ Development is now possible in multiple environments.
 Currently supported and tested devices:   
 |Series|MinV|MaxV|MHz|Core|FPU|TFU|DFPU|Operation check|rx_prog|Linker file|
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|---|
+|[RX110](RX110)|1.8|3.6|32|RXv1|－|－|－|||R5F51103/4/5|
 |[RX111](RX111)|1.8|3.6|32|RXv1|－|－|－|||R5F51115/6/7|
 |[RX113](RX113)|1.8|3.6|32|RXv1|－|－|－|||R5F51136/8|
 |[RX130](RX130)|1.8|5.5|32|RXv1|－|－|－|||R5F51305/6|
@@ -118,6 +119,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |directory|contents|
 |---|---|
 |[all_project_build.sh](./all_project_build.sh)|build all projects (shell script) |
+|[/RX110](./RX110)|RX110 specific device definition class, linker script|
 |[/RX111](./RX111)|RX111 specific device definition class, linker script|
 |[/RX130](./RX130)|RX130 specific device definition class, linker script|
 |[/RX13T](./RX13T)|RX13T specific device definition class, linker script|
