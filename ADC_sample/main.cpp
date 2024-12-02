@@ -2,7 +2,7 @@
 /*! @file
     @brief  A/D 入力サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,7 +12,6 @@
 #include "common/cmt_mgr.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
-#include "RX600/adc_in.hpp"
 
 namespace {
 
@@ -84,20 +83,32 @@ int main(int argc, char** argv)
 
 	{  // SCI の開始
 		constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
-		static_assert(SCI_IO::probe_baud(baud), "Failed baud rate accuracy test");  // 許容誤差（3%）を超える場合、コンパイルエラー
+		static_assert(SCI_IO::probe_baud(baud), "Failed baud rate accuracy test");
 		auto intr = device::ICU::LEVEL::_2;		// 割り込みレベル（NONE を指定すると、ポーリング動作になる）
 		sci_io_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
-// 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
-// sci_io.hpp PROTOCOL enum class のタイプを参照
-//		sci_.start(baud, intr, SCI::PROTOCOL::B8_E_1S);
 	}
 
-	// A/D 変換設定
-	{
+	{  // A/D 変換設定
 		auto intr_level = device::ICU::LEVEL::_3;
-		if(!adc_in_.start(ADC::ANALOG::AN000, intr_level)) {
-			utils::format("A/D start fail AN000\n");
-		}
+		adc_in_.start(ADC_IN::SCAN_MODE::SINGLE, intr_level);
+		adc_in_.enable(ADC::ANALOG::AN000);
+	}
+
+	{
+		auto clk = device::clock_profile::ICLK / 1'000'000;
+		utils::format("\nStart A/D sample for '%s' %d[MHz]\n") % system_str_ % clk;
+	}
+
+	if(0) {  // SCI/CMT の設定レポート表示
+		utils::format("SCI PCLK: %u [Hz]\n") % SCI_IO::sci_type::PCLK;
+		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_io_.get_baud_rate();
+		float rate = 1.0f - static_cast<float>(sci_io_.get_baud_rate()) / sci_io_.get_baud_rate(true);
+		rate *= 100.0f;
+		utils::format("  Baud rate (real): %u (%3.2f [%%])\n") % sci_io_.get_baud_rate(true) % rate;
+		utils::format("CMT Timer (set):  %d [Hz]\n") % cmt_mgr_.get_rate();
+		rate = 1.0f - static_cast<float>(cmt_mgr_.get_rate()) / cmt_mgr_.get_rate(true);
+		rate *= 100.0f;
+		utils::format("  Timer (real): %d [Hz] (%3.2f [%%])\n") % cmt_mgr_.get_rate(true) % rate;
 	}
 
 	LED::OUTPUT();
