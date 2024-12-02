@@ -77,12 +77,9 @@ int main(int argc, char** argv)
 	// A/D 設定
 	{
 		auto intr_level = device::ICU::LEVEL::_1;
-		if(!adc_in_.start(ADC::ANALOG::AN000, intr_level)) {
-			utils::format("A/D start fail AIN000\n");
-		}
-		if(!adc_in_.start(ADC::ANALOG::AN001, intr_level)) {
-			utils::format("A/D start fail AIN001\n");
-		}
+		adc_in_.start(ADC_IN::SCAN_MODE::SINGLE, intr_level);
+		adc_in_.enable(ADC::ANALOG::AN000);
+		adc_in_.enable(ADC::ANALOG::AN001);
 	}
 
 	uint32_t cnt = 0;
