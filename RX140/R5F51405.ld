@@ -19,9 +19,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX1405 chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00007C00 /* 32K - stack_size (0x400) */
-	USTACK (w) : ORIGIN = 0x00007F00, LENGTH = 4 /* ustack 768 bytes */
-	ISTACK (w) : ORIGIN = 0x00008000, LENGTH = 4 /* istack 256 bytes  */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00007800 /* 32K - stack_size (0x800) */
+	USTACK (w) : ORIGIN = 0x00007E00, LENGTH = 4 /* ustack 1536 bytes */
+	ISTACK (w) : ORIGIN = 0x00008000, LENGTH = 4 /* istack 512 bytes  */
 	ROM (w)    : ORIGIN = 0xFFFE0000, LENGTH = 0x0002FFD0 /* 128K */
 }
 

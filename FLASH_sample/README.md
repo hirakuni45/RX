@@ -24,6 +24,7 @@ Renesas RX microcontroller Data Flash サンプル
 |[RX26T/Makefile](RX26T/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX62N/Makefile](RX62N/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX631/Makefile](RX631/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
+|RX63T|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)||
 |[RX64M/Makefile](RX64M/Makefile)|[RX600/flash_io.hpp](../RX600/flash_io.hpp)|〇|
 |[RX71M/Makefile](RX71M/Makefile)|[RX600/flash_io.hpp](../RX600/flash_io.hpp)|〇|
 |[RX65N/Makefile](RX65N/Makefile)|[RX600/flash_io.hpp](../RX600/flash_io.hpp)|〇|
@@ -64,6 +65,9 @@ Renesas RX microcontroller Data Flash サンプル
 ### check [bank]
 - Erase data flash erase check (per bank).
 
+### checkw [org]
+- Erase data flash erase check (per word).
+
 ### r org [len] (read)
 - read (per bank)
 
@@ -80,33 +84,49 @@ Renesas RX microcontroller Data Flash サンプル
 
 Data flash specifications for each microcontroller:
 
-|CPU|Capacity|Bank size|Write unit|Value after elimination|Number of unique IDs (32bits)|
-|---|:--:|:-:|:-:|:-:|:-:|
-|RX110|0K|-|-|-|4|
-|RX111|8K|1024|1|0xFF|4|
-|RX113|8K|1024|1|0xFF|4|
-|RX130|8K|1024|1|0xFF|4|
-|RX140|4K|256|1|0xFF|4|
-|RX220|8K|2048|2|0x??|4|
-|RX23[01]|8K|1024|1|0xFF|4|
-|RX23T|0K|-|-|-|4|
-|RX24T|8K|1024|1|0xFF|4|
-|RX26[01]|8K|256|1|0xFF|4|
-|RX26T|16K|64|4|0x??|3|
-|RX62[1N]|32K|2048|8|0x??|0|
-|RX63[1N]|32K|2048|4|0x??|4|
-|RX64M|64K|64|4|0x??|3|
-|RX71M|64K|64|4|0x??|3|
-|RX65[1N]|32K|64|4|0x??|4|
-|RX660|32K|64|4|0x??|4|
-|RX66N|32K|64|4|0x??|4|
-|RX671|8K|64|4|0x??|4|
-|RX72N|32K|64|4|0x??|4|
-|RX72M|32K|64|4|0x??|4|
-|RX66T|32K|64|4|0x??|3|
-|RX72T|32K|64|4|0x??|3|
+|Serise|Group|Capacity|Bank size|Write unit|Value after elimination|Number of unique IDs (32bits)|
+|---|:--:|:-:|:-:|:-:|:-:|:-:|
+|RX110|A|0K|-|-|-|4|
+|RX111|A|8K|1024|1|0xFF|4|
+|RX113|A|8K|1024|1|0xFF|4|
+|RX130|A|8K|1024|1|0xFF|4|
+|RX13T|A|0K|-|-|-|4|
+|RX140|A|4K|256|1|0xFF|4|
+|RX220|B|8K|2048|2|0x??|4|
+|RX23[01]|A|8K|1024|1|0xFF|4|
+|RX23T|A|0K|-|-|-|4|
+|RX24T|A|8K|1024|1|0xFF|4|
+|RX26[01]|A|8K|256|1|0xFF|4|
+|RX26T|B|16K|64|4|0x??|3|
+|RX62[1N]|B|32K|2048|8|0x??|0|
+|RX63[1N]|B|32K|2048|4|0x??|4|
+|RX63T|B|8K/32K|32|2|0x??|0|
+|RX64M|C|64K|64|4|0x??|3|
+|RX71M|C|64K|64|4|0x??|3|
+|RX65[1N]|C|32K|64|4|0x??|4|
+|RX660|C|32K|64|4|0x??|4|
+|RX66N|C|32K|64|4|0x??|4|
+|RX671|C|8K|64|4|0x??|4|
+|RX72N|C|32K|64|4|0x??|4|
+|RX66T|C|32K|64|4|0x??|3|
+|RX72T|C|32K|64|4|0x??|3|
 
------
+---
+
+Characteristics of each system, data flash memory, etc：
+
+|Group|Program [uS]|Erase [mS]|Blank check [uS]|
+|:-:|:-:|:-:|:-:|
+|A|375.5 (1)|229.4 (1K)|16.1 (1)|
+|B (RX62x)|2000 (8)|250 (2K)|30 (8)|
+|B (RX63x)|2000 (2)|20 (32)|30 (2)|
+|C|1700 (4)|10 (64)|30 (4)|
+
+- FCLK Max.
+- Worst case.
+- More than 100 writes and erases.
+
+---
    
 License
 ----

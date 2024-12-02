@@ -1294,7 +1294,7 @@ namespace device {
 		static constexpr auto CMPBI		 = ICU::VECTOR::NONE;		///< コンペアＢ割り込みベクター
 
 		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
-		static constexpr uint32_t CONV_TIME_NS = 880;				///< A/D 変換時間 (ADCCR.CCS=0) 0.83uS、単位「ns」
+		static constexpr uint32_t CONV_TIME_NS  = 880;				///< A/D 変換時間 (ADCCR.CCS=0) 0.83uS、単位「ns」
 		static constexpr uint32_t CONV_TIME2_NS = 670;				///< A/D 変換時間 (ADCCR.CCS=1) 0.67uS、単位「ns」
 
 		static constexpr uint32_t ANALOG_NUM = 17;	///< アナログ入力数
@@ -1305,28 +1305,28 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,	///< AN000 入力
-			AN001,
-			AN002,
-			AN003,
-			AN004,
-			AN005,
-			AN006,
-			AN007,
+			AN000,		///< AN000 入力
+			AN001,		///< AN001 入力
+			AN002,		///< AN002 入力
+			AN003,		///< AN003 入力
+			AN004,		///< AN004 入力
+			AN005,		///< AN005 入力
+			AN006,		///< AN006 入力
+			AN007,		///< AN007 入力
 
-			AN016 = 16,
-			AN017,
-			AN018,
-			AN019,
-			AN020,
-			AN021,
+			AN016 = 16,	///< AN016 入力
+			AN017,		///< AN017 入力
+			AN018,		///< AN018 入力
+			AN019,		///< AN019 入力
+			AN020,		///< AN020 入力
+			AN021,		///< AN021 入力
 
-			AN024 = 24,
-			AN025,
-			AN026,
+			AN024 = 24,	///< AN024 入力
+			AN025,		///< AN025 入力
+			AN026,		///< AN026 入力
 
-			TEMP,	///< 温度センサ
-			REF,	///< 内部基準電圧
+			TEMP,		///< 温度センサ
+			REF,		///< 内部基準電圧
 		};
 
 	
@@ -1609,7 +1609,7 @@ namespace device {
 			@brief  A/D データ格納バッファレジスタ (ADBUF) (idx = 0 ～ 15)
 		*/
 		//-----------------------------------------------------------------//
-		static inline ad_utils::adbuf_t<BASE::ADBUF_::address, 15> ADBUF;
+		static inline ad_utils::adbuf_t<BASE::ADBUF0_::address, 15> ADBUF;
 
 
 		//-----------------------------------------------------------------//
@@ -2029,7 +2029,7 @@ namespace device {
 			@brief  A/D データ格納バッファレジスタ (ADBUF) (idx = 0 ～ 15)
 		*/
 		//-----------------------------------------------------------------//
-		static inline ad_utils::adbuf_t<BASE::ADBUF_::address, 15> ADBUF;
+		static inline ad_utils::adbuf_t<BASE::ADBUF0_::address, 15> ADBUF;
 	};
 #endif
 
