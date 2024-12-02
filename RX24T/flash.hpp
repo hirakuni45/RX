@@ -339,7 +339,7 @@ namespace device {
 		static constexpr uint32_t DATA_SIZE = 0;			///< データ・フラュシュ無し
 		static constexpr uint32_t DATA_BLOCK_SIZE = 1;		///< 互換性の為「１」を設定
 		static constexpr uint32_t DATA_WORD_SIZE = 0;		///< データ・フラュシュ無し
-		static constexpr uint32_t ID_NUM = 4;
+		static constexpr uint32_t ID_NUM = 4;				///< ユニーク ID 数
 
 
 		//-----------------------------------------------------------------//
@@ -361,10 +361,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct flash_t : public flash_base_t {
 
-		static constexpr uint32_t DATA_SIZE = 8192;
-		static constexpr uint32_t DATA_BLOCK_SIZE = 1024;
-		static constexpr uint32_t DATA_WORD_SIZE = 1;
-		static constexpr uint32_t ID_NUM = 4;
+		static constexpr uint32_t DATA_SIZE = 8192;				///< データフラッシュサイズ
+		static constexpr uint32_t DATA_BLOCK_SIZE = 1024;		///< ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 1;			///< データワードサイズ
+		static constexpr uint32_t ID_NUM = 4;					///< ユニーク ID 数
 
 		static constexpr uint32_t WRITE_WORD_TIME  = 376;		///< 375.5uS (DATA_WORD_SIZE)
 		static constexpr uint32_t ERASE_BLOCK_TIME = 229400;	///< 229.4mS (DATA_BLOCK_SIZE)

@@ -774,6 +774,7 @@
 #include "RX600/dmac_mgr.hpp"
 #include "RX600/dac_out.hpp"
 #include "RX600/flash_io.hpp"
+#include "RX600/adc_in.hpp"
 
 #if defined(SIG_RX66T)
 #include "RX66T/board_profile.hpp"

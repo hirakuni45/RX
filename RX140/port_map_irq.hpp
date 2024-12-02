@@ -25,9 +25,9 @@ namespace device {
 		static bool irq0_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
-			// P30
-			// PD0
-			// PH1
+			// IRQ0: P30
+			// IRQ0: PD0
+			// IRQ0: PH1
 			case ORDER::FIRST:
 				PORT3::PMR.B0 = 0;
 				MPC::P30PFS.PSEL = 0;
@@ -52,9 +52,9 @@ namespace device {
 		static bool irq1_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
-			// P31
-			// PD1
-			// PH2
+			// IRQ1: P31
+			// IRQ1: PD1
+			// IRQ1: PH2
 			case ORDER::FIRST:
 				PORT3::PMR.B1 = 0;
 				MPC::P31PFS.PSEL = 0;
@@ -79,10 +79,10 @@ namespace device {
 		static bool irq2_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
-			// P12
-			// P32
-			// P36
-			// PD2
+			// IRQ2: P12
+			// IRQ2: P32
+			// IRQ2: P36
+			// IRQ2: PD2
 			case ORDER::FIRST:
 				PORT1::PMR.B2 = 0;
 				MPC::P12PFS.PSEL = 0;
@@ -112,7 +112,7 @@ namespace device {
 		static bool irq3_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
-			// P13
+			// IRQ3: P13
 			case ORDER::FIRST:
 				PORT1::PMR.B3 = 0;
 				MPC::P13PFS.PSEL = 0;
@@ -127,10 +127,10 @@ namespace device {
 		static bool irq4_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
-			// P14
-			// P34
-			// P37
-			// PB1
+			// IRQ4: P14
+			// IRQ4: P34
+			// IRQ4: P37
+			// IRQ4: PB1
 			case ORDER::FIRST:
 				PORT1::PMR.B4 = 0;
 				MPC::P14PFS.PSEL = 0;
@@ -160,9 +160,9 @@ namespace device {
 		static bool irq5_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
-			// P15
-			// PA4
-			// PE5
+			// IRQ5: P15
+			// IRQ5: PA4
+			// IRQ5: PE5
 			case ORDER::FIRST:
 				PORT1::PMR.B5 = 0;
 				MPC::P15PFS.PSEL = 0;
@@ -187,8 +187,8 @@ namespace device {
 		static bool irq6_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
-			// P16
-			// PA3
+			// IRQ6: P16
+			// IRQ6: PA3
 			case ORDER::FIRST:
 				PORT1::PMR.B6 = 0;
 				MPC::P16PFS.PSEL = 0;
@@ -208,8 +208,8 @@ namespace device {
 		static bool irq7_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {
-			// P17
-			// PE2
+			// IRQ7: P17
+			// IRQ7: PE2
 			case ORDER::FIRST:
 				PORT1::PMR.B7 = 0;
 				MPC::P17PFS.PSEL = 0;
