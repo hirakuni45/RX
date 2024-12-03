@@ -38,6 +38,7 @@ namespace device {
 			ST_ILGL,	///< ILGL ステータス検出
 			ST_ERS,		///< ERS ステータス検出
 			ST_PRG,		///< PRG ステータス検出
+			ST_BC,		///< BC ステータス検出
 		};
 	};
 }
