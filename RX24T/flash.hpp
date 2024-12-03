@@ -337,7 +337,8 @@ namespace device {
 	struct flash_t : public flash_base_t {
 
 		static constexpr uint32_t DATA_SIZE = 0;			///< データ・フラュシュ無し
-		static constexpr uint32_t DATA_BLOCK_SIZE = 1;		///< 互換性の為「１」を設定
+		static constexpr uint32_t DATA_BLANK_SIZE = 1;		///< 互換性の為「１」を設定
+		static constexpr uint32_t DATA_ERASE_SIZE = 1;		///< 互換性の為「１」を設定
 		static constexpr uint32_t DATA_WORD_SIZE = 0;		///< データ・フラュシュ無し
 		static constexpr uint32_t ID_NUM = 4;				///< ユニーク ID 数
 
@@ -362,7 +363,8 @@ namespace device {
 	struct flash_t : public flash_base_t {
 
 		static constexpr uint32_t DATA_SIZE = 8192;				///< データフラッシュサイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 1024;		///< ブロックサイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 1024;		///< ブロックサイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 1024;		///< ブロックサイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 1;			///< データワードサイズ
 		static constexpr uint32_t ID_NUM = 4;					///< ユニーク ID 数
 

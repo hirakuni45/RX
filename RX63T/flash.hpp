@@ -25,7 +25,8 @@ namespace device {
 		static constexpr uint32_t CODE_ORG = 0xFFFF'FFF0;	///< コード領域コマンド開始アドレス
 		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス 
 		static constexpr uint32_t DATA_SIZE  = 8192;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 32;		///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 32;		///< データ・フラッシュ、ブランク・サイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 32;		///< データ・フラッシュ、イレース・サイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 2;		///< データ・フラッシュ最小書き込みサイズ
 
 		static constexpr auto ID_NUM = 0;					///< 個別識別子数

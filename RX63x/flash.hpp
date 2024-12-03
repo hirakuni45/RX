@@ -24,8 +24,9 @@ namespace device {
 		static constexpr uint32_t CODE_ORG = 0xFFFF'FFF0;	///< コード領域コマンド開始アドレス
 		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
 		static constexpr uint32_t DATA_SIZE = 32768;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
-		static constexpr uint32_t DATA_WORD_SIZE = 2;		///< データ・フラッシュ最小書き込みサイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 2048;	///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 32;		///< データ・フラッシュ、イレースサイズ
+		static constexpr uint32_t DATA_WORD_SIZE  = 2;		///< データ・フラッシュ最小書き込みサイズ
 
 #ifdef G_VERSION
 		static constexpr auto ID_NUM = 4;					///< 個別識別子数（Gバージョン）
@@ -38,9 +39,9 @@ namespace device {
 		static inline rw16_t<DATA_ORG> FCU_DATA_CMD16;
 
 		static constexpr uint32_t WRITE_WORD_TIME  = 2000;		///< 2mS (DATA_WORD_SIZE)
-		static constexpr uint32_t ERASE_BLOCK_TIME = 4000 * 64;	///< 4mS(32) x 64 (DATA_BLOCK_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 4000;		///< 4mS(32) (DATA_ERASE_SIZE)
 		static constexpr uint32_t CHECK_WORD_TIME  = 30;		///< 30uS (DATA_WORD_SIZE)
-		static constexpr uint32_t CHECK_BLOCK_TIME = 30*1024;	///< 30 x 1024 (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 30*1024;	///< 30(2) x 1024 (DATA_BLANK_SIZE)
 
 
 		//-----------------------------------------------------------------//
