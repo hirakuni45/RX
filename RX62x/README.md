@@ -36,6 +36,12 @@
 |R5F562y7xxxx|384K|64K|32K|
 |R5F562y6xxxx|256K|64K|32K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|32K|2048|8/2048|8|0x??|0|
+
 ---
 
 ## RX621/RX62N Linker file / リンカーファイル

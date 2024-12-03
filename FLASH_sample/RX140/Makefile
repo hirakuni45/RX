@@ -51,7 +51,7 @@ endif
 ifeq ($(BUILD),release)
     CC_OPT += -DNDEBUG
     CP_OPT += -DNDEBUG
-	OPTIMIZE = -O2
+	OPTIMIZE = -Os
 endif
 
 -include ../../common/makefile

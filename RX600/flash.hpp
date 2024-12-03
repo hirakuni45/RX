@@ -571,7 +571,8 @@ namespace device {
 	struct flash_t : public flash_base_t {
 
 		static constexpr uint32_t DATA_SIZE = 65536;	///< データ領域のサイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 64;	///< データ・ブランク・サイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 64;	///< データ・イレース・サイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
 		static constexpr uint32_t ID_NUM = 3;			///< ユニーク ID 数
 
@@ -601,7 +602,8 @@ namespace device {
 	struct flash_t : public flash_base_t {
 
 		static constexpr uint32_t DATA_SIZE = 32768;	///< データ領域のサイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 64;	///< データ・ブランク・サイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 64;	///< データ・イレース・サイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
 		static constexpr uint32_t ID_NUM = 4;			///< ユニーク ID 数
 
@@ -631,7 +633,8 @@ namespace device {
 	struct flash_t : public flash_base_t {
 
 		static constexpr uint32_t DATA_SIZE = 32768;	///< データ領域のサイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 64;	///< データ・ブランク・サイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 64;	///< データ・イレース・サイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
 		static constexpr uint32_t ID_NUM = 3;			///< ユニーク ID 数
 
@@ -661,7 +664,8 @@ namespace device {
 	struct flash_t : public flash_base_t {
 
 		static constexpr uint32_t DATA_SIZE = 8192;		///< データ領域のサイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;	///< データブロックのサイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 64;	///< データ・ブランク・サイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 64;	///< データ・イレース・サイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 4;	///< 書き込み時のワードサイズ
 		static constexpr uint32_t ID_NUM = 4;			///< ユニーク ID 数
 

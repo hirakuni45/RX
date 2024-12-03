@@ -45,6 +45,12 @@
 |R5F5671Cxxxx|1.5M|384K|8K|
 |R5F5671Exxxx|2M|384K|8K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|8K|64|4/64|4|0x??|4|
+
 ---
 
 ## RX671 Linker file / リンカーファイル

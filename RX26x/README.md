@@ -47,6 +47,12 @@
 |R5F526y7xxxx|384K|128K|8K|
 |R5F526y6xxxx|256K|128K|8K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|8K|256|1/256|1|0xFF|4|
+
 ---
 
 ## RX260/RX261 Linker file / リンカーファイル

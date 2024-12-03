@@ -48,6 +48,12 @@
 |R5F566TExxxx|512K|64K|32K|
 |R5F566TAxxxx|256K|64K|32K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|32K|64|4/64|4|0x??|3|
+
 ---
 
 ## RX66T Linker file / リンカーファイル

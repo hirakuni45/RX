@@ -45,9 +45,11 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static constexpr uint32_t DATA_SIZE  = FLASH::DATA_SIZE;	///< データ・フラッシュの容量
-		static constexpr uint32_t DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
-		static constexpr uint32_t DATA_BLOCK_NUM  = FLASH::DATA_SIZE / DATA_BLOCK_SIZE;	///< データ・フラッシュのバンク数
-
+		static constexpr uint32_t DATA_BLANK_SIZE = FLASH::DATA_BLANK_SIZE;	///< データ・フラッシュのブロックサイズ
+		static constexpr uint32_t DATA_BLANK_NUM  = FLASH::DATA_SIZE / DATA_BLANK_SIZE;	///< データ・フラッシュのバンク数
+		static constexpr uint32_t DATA_ERASE_SIZE = FLASH::DATA_ERASE_SIZE;	///< データ・フラッシュのブロックサイズ
+		static constexpr uint32_t DATA_ERASE_NUM  = FLASH::DATA_SIZE / DATA_ERASE_SIZE;	///< データ・フラッシュのバンク数
+	
 	private:
 
 		static constexpr uint32_t MODE_CHANGE_DELAY = 10;	///< モード変更における遅延
@@ -437,12 +439,12 @@ namespace device {
 		{
 			error_ = ERROR::NONE;
 
-			if(bank >= DATA_BLOCK_NUM) {
+			if(bank >= DATA_BLANK_NUM) {
 				error_ = ERROR::BANK;
 				return false;
 			}
 
-			return erase_check_(bank * DATA_BLOCK_SIZE, DATA_BLOCK_SIZE);
+			return erase_check_(bank * DATA_BLANK_SIZE, DATA_BLANK_SIZE);
 		}
 
 
@@ -457,7 +459,7 @@ namespace device {
 		{
 			error_ = ERROR::NONE;
 
-			if(bank >= DATA_BLOCK_NUM) {
+			if(bank >= DATA_ERASE_NUM) {
 				error_ = ERROR::BANK;
 				return false;
 			}
@@ -470,7 +472,7 @@ namespace device {
 			device::FLASH::FPROTR = 0x5501;  // ロックビットプロテクト無効
 #endif
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
-			device::FLASH::FSADDR = bank * DATA_BLOCK_SIZE;
+			device::FLASH::FSADDR = bank * DATA_ERASE_SIZE;
 
 			faci_cmd_(FACI::ERASE1, FACI::ERASE2);
 
@@ -511,7 +513,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase_all() noexcept
 		{
-			for(uint32_t pos = 0; pos < DATA_SIZE; pos += DATA_BLOCK_SIZE) {
+			for(uint32_t pos = 0; pos < DATA_SIZE; pos += DATA_BLANK_SIZE) {
 				if(!erase_check(pos)) {
 					auto ret = erase(pos);
 					if(!ret) {

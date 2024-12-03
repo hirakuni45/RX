@@ -49,6 +49,12 @@
 |R5F564MGxxxx|2.5M|512K+32K|64K|
 |R5F564MFxxxx|2M|512K+32K|64K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|64K|64|4/64|4|0x??|4|
+
 ---
 
 ## RX64M Linker file / リンカーファイル

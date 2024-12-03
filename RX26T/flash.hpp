@@ -22,8 +22,9 @@ namespace device {
 
 		static constexpr uint32_t CODE_ORG = 0xFFFF'FFF0;	///< コード領域コマンド開始アドレス
 		static constexpr uint32_t DATA_ORG = 0x0010'0000;	///< データ・フラッシュ開始アドレス
-		static constexpr uint32_t DATA_SIZE = 16384;		///< データ・フラッシュ、サイズ
-		static constexpr uint32_t DATA_BLOCK_SIZE = 64;		///< データ・フラッシュ、ブロックサイズ
+		static constexpr uint32_t DATA_SIZE = 16384;		///< データ・フラッシュ・サイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 64;		///< データ・フラッシュ・ブランク・サイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 64;		///< データ・フラッシュ・イレース・サイズ
 		static constexpr uint32_t DATA_WORD_SIZE = 4;		///< データ・フラッシュ最小書き込みサイズ
 		static constexpr uint32_t ID_NUM = 3;				///< 個別識別子数
 
@@ -35,8 +36,8 @@ namespace device {
 
 		static constexpr uint32_t WRITE_WORD_TIME  = 1700;	///< 1.7mS (DATA_WORD_SIZE)
 		static constexpr uint32_t ERASE_BLOCK_TIME = 10000;	///< 10mS(64) (DATA_BLOCK_SIZE)
-		static constexpr uint32_t CHECK_WORD_TIME  = 30;	///< 30 uS (DATA_WORD_SIZE)
-		static constexpr uint32_t CHECK_BLOCK_TIME = 100;	///< 100 uS (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 30;	///< 30uS (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 100;	///< 100uS(64) (DATA_BLOCK_SIZE)
 
 
 		//-----------------------------------------------------------------//

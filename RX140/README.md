@@ -42,6 +42,12 @@
 |R5F51405xxxx|128K|32K|8K|
 |R5F51403xxxx|64K|16K|4K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|4K/8K|256|1/256|1|0xFF|4|
+
 ---
 
 ## RX140 Linker file / リンカーファイル

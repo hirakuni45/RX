@@ -42,6 +42,12 @@
 |R5F572TKxxxx|1M|128K|32K|
 |R5F572TFxxxx|512K|128K|32K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|32K|64|4/64|4|0x??|3|
+
 ---
 
 ## RX72T Linker file / リンカーファイル
