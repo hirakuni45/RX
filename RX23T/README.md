@@ -30,6 +30,12 @@
 |R5F523T5xxxx|128K|12K|0|
 |R5F523T3xxxx|64K|12K|0|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|0K|-|-|-|-|0|
+
 ---
 
 ## RX23T Linker file / リンカーファイル

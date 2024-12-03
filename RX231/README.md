@@ -51,6 +51,12 @@
 |R5F523y6xxxx|256K|32K|8K|
 |R5F523y5xxxx|128K|32K|8K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|8K|1024|1/1024|1|0xFF|4|
+
 ---
 
 ## RX230/RX231 Linker file / リンカーファイル

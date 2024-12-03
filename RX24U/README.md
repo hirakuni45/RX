@@ -29,6 +29,12 @@
 |R5F524UCxxxx|384K|32K|8K|
 |R5F524UBxxxx|256K|32K|8K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|8K|1024|1/1024|1|0xFF|4|
+
 ---
 
 ## RX24U Linker file / リンカーファイル

@@ -36,6 +36,12 @@
 |R5F5110Jxxxx|16K|8K|0K|
 |R5F5110Hxxxx|8K|8K|0K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|0K|-|-|-|-|4|
+
 ---
 
 ## RX110 Linker file / リンカーファイル

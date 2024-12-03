@@ -45,6 +45,12 @@
 |R5F56609xxxx|1M|128K|32K|
 |R5F56604xxxx|512K|128K|32K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|32K|64|4/64|4|0x??|4|
+
 ---
 
 ## RX660 Linker file / リンカーファイル

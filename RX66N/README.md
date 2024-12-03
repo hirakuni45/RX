@@ -47,6 +47,12 @@
 |R5F566NNxxxx|4M|1M|32K|
 |R5F566NDxxxx|2M|1M|32K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|32K|64|4/64|4|0x??|4|
+
 ---
 
 ## RX66N Linker file / リンカーファイル

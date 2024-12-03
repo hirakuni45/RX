@@ -31,6 +31,12 @@
 |R5F513T5xxxx|128K|12K|0K|
 |R5F513T3xxxx|64K|12K|0K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|0K|-|-|-|-|0|
+
 ---
 
 ## RX13T Linker file / リンカーファイル

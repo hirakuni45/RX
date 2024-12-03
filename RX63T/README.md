@@ -46,6 +46,12 @@
 |R5F563T5xxxx|48K|8K|8K|
 |R5F563T4xxxx|32K|8K|8K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|8K/32K|32|2/32|2|0x??|0|
+
 ---
 
 ## RX63T Linker file / リンカーファイル

@@ -33,6 +33,12 @@
 |R5F524TAxxxx|256K|16K|8K|A|
 |R5F524T8xxxx|128K|16K|8K|A|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|8K|1024|1/1024|1|0xFF|4|
+
 ---
 
 ## RX24T Linker file / リンカーファイル

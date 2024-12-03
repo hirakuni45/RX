@@ -32,6 +32,12 @@
 |R5F52203xxxx|64K|8K|8K|
 |R5F52201xxxx|32K|4K|8K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|8K|128|2/2048|2|0x??|4|
+
 ---
 
 ## RX220 Linker file / リンカーファイル

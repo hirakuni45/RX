@@ -47,6 +47,12 @@
 |R5F526T9xxxx|128K|64K|16K|
 |R5F526T8xxxx|128K|48K|16K|
 
+### Data Flash/データ・フラッシュ
+
+|Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|16K|64|4/64|4|0x??|3|
+
 ---
 
 ## RX26T Linker file / リンカーファイル
