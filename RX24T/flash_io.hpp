@@ -37,9 +37,11 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static constexpr auto DATA_SIZE       = FLASH::DATA_SIZE;  ///< データ容量
-		static constexpr auto DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データブロックサイズ
-		static constexpr auto DATA_BLOCK_NUM  = FLASH::DATA_SIZE / FLASH::DATA_BLOCK_SIZE;	///< データブロック数
-
+		static constexpr auto DATA_BLANK_SIZE = FLASH::DATA_BLANK_SIZE;	///< データ・ブランク・サイズ
+		static constexpr auto DATA_BLANK_NUM  = FLASH::DATA_SIZE / FLASH::DATA_BLANK_SIZE;	///< データ・ブランク数
+		static constexpr auto DATA_ERASE_SIZE = FLASH::DATA_ERASE_SIZE;	///< データ・イレース・サイズ
+		static constexpr auto DATA_ERASE_NUM  = FLASH::DATA_SIZE / FLASH::DATA_ERASE_SIZE;	///< データ・イレース数
+	
 	private:
 
 		ERROR		error_;
@@ -106,10 +108,19 @@ namespace device {
 			FLASH::FCR = 0x00;
 			while(FLASH::FSTATR1.FRDY() != 0) ;
 
-			if(FLASH::FSTATR0.ILGLERR() != 0 || FLASH::FSTATR0.ERERR() != 0) {
+			bool ret = true;
+			if(FLASH::FSTATR0.ILGLERR() != 0) {
+				error_ = ERROR::ST_ILGL;
+				ret = false;
+			}
+			if(FLASH::FSTATR0.BCERR() != 0) {
+				error_ = ERROR::ST_BC;
+				ret = false;
+			}
+			if(!ret) {
 				reset_fcu_();
 			}
-			return FLASH::FSTATR0.BCERR() == 0;
+			return ret;
 		}
 
 #if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX13T) 
@@ -285,12 +296,12 @@ namespace device {
 				return false;
 			}
 
-			if(bank >= DATA_BLOCK_NUM) {
+			if(bank >= DATA_BLANK_NUM) {
 				error_ = ERROR::BANK;
 				return false;
 			}
 
-			return erase_check_(bank * DATA_BLOCK_SIZE, DATA_BLOCK_SIZE);
+			return erase_check_(bank * DATA_BLANK_SIZE, DATA_BLANK_SIZE);
 		}
 
 
@@ -310,7 +321,7 @@ namespace device {
 				return false;
 			}
 
-			if(bank >= DATA_BLOCK_NUM) {
+			if(bank >= DATA_ERASE_NUM) {
 				error_ = ERROR::BANK;
 				return false;
 			}
@@ -319,11 +330,11 @@ namespace device {
 
 			FLASH::FASR.EXS = 0;
 
-			uint16_t org = bank * DATA_BLOCK_SIZE;
+			uint16_t org = bank * DATA_ERASE_SIZE;
 			FLASH::FSARH = FLASH::DF_VA_H;
 			FLASH::FSARL = FLASH::DF_VA_L + org;
 			FLASH::FEARH = FLASH::DF_VA_H;
-			FLASH::FEARL = FLASH::DF_VA_L + org + DATA_BLOCK_SIZE - 1;
+			FLASH::FEARL = FLASH::DF_VA_L + org + DATA_ERASE_SIZE - 1;
 
 			FLASH::FCR = 0x84;
 			while(FLASH::FSTATR1.FRDY() == 0) ;
@@ -334,12 +345,13 @@ namespace device {
 			if(FLASH::FSTATR0.ILGLERR() != 0) {
 				error_ = ERROR::ST_ILGL;
 				ret = false;
-			} else if(FLASH::FSTATR0.ERERR() != 0) {
+			}
+			if(FLASH::FSTATR0.ERERR() != 0) {
 				error_ = ERROR::ST_ERS;
 				ret = false;
-			} else {
-				FLASH::FRESETR.FRESET = 1;
-				FLASH::FRESETR.FRESET = 0;
+			}
+			if(!ret) {
+				reset_fcu_();
 			}
 			return ret;
 		}
@@ -396,16 +408,15 @@ namespace device {
 					error_ = ERROR::ST_ILGL;
 					ret = false;
 					break;
-				} else if(FLASH::FSTATR0.ERERR() != 0) {
-					error_ = ERROR::ST_ERS;
+				} else if(FLASH::FSTATR0.PRGERR() != 0) {
+					error_ = ERROR::ST_PRG;
 					ret = false;
 					break;
 				}
 				++org;
 			}
 			if(!ret) {
-				FLASH::FRESETR.FRESET = 1;
-				FLASH::FRESETR.FRESET = 0;
+				reset_fcu_();
 			}
 			return ret;
 		}

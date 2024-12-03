@@ -42,9 +42,11 @@ namespace device {
 #endif
 
 	public:
-		static constexpr uint32_t DATA_SIZE = FLASH::DATA_SIZE;				///< データ・フラッシュの容量
-		static constexpr uint32_t DATA_BLOCK_SIZE = FLASH::DATA_BLOCK_SIZE;	///< データ・フラッシュのブロックサイズ
-		static constexpr uint32_t DATA_BLOCK_NUM  = FLASH::DATA_SIZE / DATA_BLOCK_SIZE;	///< データ・フラッシュのバンク数
+		static constexpr uint32_t DATA_SIZE = FLASH::DATA_SIZE;					///< データ・フラッシュの容量
+		static constexpr uint32_t DATA_BLANK_SIZE = FLASH::DATA_BLANK_SIZE;		///< データ・フラッシュのブランク・サイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = FLASH::DATA_ERASE_SIZE;		///< データ・フラッシュのイレース・サイズ
+		static constexpr uint32_t DATA_BLANK_NUM  = FLASH::DATA_SIZE / DATA_BLANK_SIZE;	///< データ・フラッシュ・ブランク・ブロック数
+		static constexpr uint32_t DATA_ERASE_NUM  = FLASH::DATA_SIZE / DATA_ERASE_SIZE;	///< データ・フラッシュ・イレース・ブロック数
 
 	private:
 		enum class MODE : uint8_t {
@@ -140,7 +142,7 @@ namespace device {
 			}
 			if(FLASH::FASTAT.CMDLK()) {
 				debug_format("CMDLK, reset status clear...\n");
-				wr8_(FLASH::CODE_ORG, 0x50);
+				wr8_(FLASH::DATA_ORG, 0x50);
 			}
 			return ret;
 		}
@@ -193,8 +195,8 @@ namespace device {
 			FLASH::FSADDR = ofs;
 			auto cmd = FLASH::FACI_CMD_ORG;
 #else
-			FLASH::enable_read(ofs, FLASH::DATA_BLOCK_SIZE);
-			FLASH::enable_write(ofs, FLASH::DATA_BLOCK_SIZE);
+			FLASH::enable_read(ofs, FLASH::DATA_ERASE_SIZE);
+			FLASH::enable_write(ofs, FLASH::DATA_ERASE_SIZE);
 			auto cmd = FLASH::DATA_ORG + ofs;
 #endif
 			wr8_(cmd, 0x20);
@@ -375,13 +377,13 @@ namespace device {
 		{
 			error_ = ERROR::NONE;
 
-			if(bank >= DATA_BLOCK_NUM) {
+			if(bank >= DATA_BLANK_NUM) {
 				error_ = ERROR::BANK;
 				debug_format("erase_check(): Out of bank...\n");
 				return false;
 			}
-			auto ofs = bank * FLASH::DATA_BLOCK_SIZE;
-			return erase_check_(ofs, FLASH::DATA_BLOCK_SIZE);
+			auto ofs = bank * FLASH::DATA_BLANK_SIZE;
+			return erase_check_(ofs, FLASH::DATA_BLANK_SIZE);
 		}
 
 
@@ -396,13 +398,13 @@ namespace device {
 		{
 			error_ = ERROR::NONE;
 
-			if(bank >= DATA_BLOCK_NUM) {
+			if(bank >= DATA_ERASE_NUM) {
 				error_ = ERROR::BANK;
 				debug_format("erase(): Out of bank...\n");
 				return false;
 			}
-			auto ofs = bank * FLASH::DATA_BLOCK_SIZE;
-			return erase_(ofs, FLASH::DATA_BLOCK_SIZE);
+			auto ofs = bank * FLASH::DATA_ERASE_SIZE;
+			return erase_(ofs, FLASH::DATA_ERASE_SIZE);
 		}
 
 
