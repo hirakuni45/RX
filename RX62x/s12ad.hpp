@@ -330,7 +330,7 @@ namespace device {
 			//-------------------------------------------------------------//
 			void set(ANALOG an, bool ena = true) noexcept
 			{
-				auto n = static_cast<uint32_t>(an);
+				auto n = static_cast<uint8_t>(an);
 				if(ena) {
 					wr16_(ofs, rd16_(ofs) |  (static_cast<uint16_t>(1) << n));
 				} else {

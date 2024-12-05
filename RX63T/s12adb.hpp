@@ -734,7 +734,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ（ADSSTR）
 		*/
 		//-----------------------------------------------------------------//
-		static inline ad_utils::adsstr1i_t<ANALOG, BASE::ADSSTR0::address, BASE::ADSSTR1::address> ADSSTR;
+		static inline ad_utils::adsstr1i_t<ANALOG, BASE::ADSSTR0_::address, BASE::ADSSTR1_::address> ADSSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -933,7 +933,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ（ADSSTR）
 		*/
 		//-----------------------------------------------------------------//
-		static inline ad_utils::adsstr1i_t<ANALOG, BASE::ADSSTR0::address, BASE::ADSSTR1::address> ADSSTR;
+		static inline ad_utils::adsstr1i_t<ANALOG, BASE::ADSSTR0_::address, BASE::ADSSTR1_::address> ADSSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -961,7 +961,7 @@ namespace device {
 #if defined(SIG_RX63T_S)
 	typedef s12ad_t<0x0008'9000> S12AD;
 #else
-	typedef s12ad0_t<0x0008'9000> S12AD0;
+	typedef s12ad0_t<0x0008'9000> S12AD;
 	typedef s12ad1_t<0x0008'9100> S12AD1;
 #endif
 }
