@@ -76,14 +76,17 @@
 |Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp?ts=4)||
 |Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp?ts=4)||
 |Port Mapping MTU/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp?ts=4)||
-|A/D Definition/A/D 定義|[s12ad.hpp](s12ad.hpp?ts=4)||
+|A/D Definition/A/D 定義|[RX231/s12ade.hpp](../RX231/s12ade.hpp?ts=4)||
 |D/A Definition/D/A 定義|[da.hpp](da.hpp?ts=4)||
 |BUS Definition/BUS 定義|[bus.hpp](bus.hpp?ts=4)||
 |ELC Definition/ELC 定義|[elc.hpp](elc.hpp?ts=4)||
 |RTC Definition/RTC 定義|[rtc.hpp](rtc.hpp?ts=4)||
 |FLASH Definition/FLASH 定義|[flash.hpp](flash.hpp?ts=4)||
+|FLASH I/O Definition/FLASH I/O 定義|[RX24T/flash_io.hpp](../RX24T/flash.hpp?ts=4)||
 |System Definition/システム定義|[system.hpp](system.hpp?ts=4)||
 |System I/O Definition/システム I/O 定義|[system_io.hpp](system_io.hpp?ts=4)||
+|A/D I/O Definition/A/D I/O 定義|[RX24T/adc_io.hpp](../RX24T/adc_io.hpp?ts=4)||
+|D/A out Definition/D/A out 定義|[RX600/dac_out.hpp](../RX600/adc_io.hpp?ts=4)||
 
 ---
 

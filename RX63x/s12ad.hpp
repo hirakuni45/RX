@@ -216,7 +216,8 @@ namespace device {
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<base + 0x1A>  ADTSDR;
+		typedef rw16_t<base + 0x1A>	ADTSDR_;
+		static inline ADTSDR_ ADTSDR;
 
 
 		//-----------------------------------------------------------------//
@@ -225,7 +226,8 @@ namespace device {
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<base + 0x1C>  ADOCDR;
+		typedef rw16_t<base + 0x1C>	ADOCDR_;
+		static inline ADOCDR_ ADOCDR;
 
 
 		//-----------------------------------------------------------------//
@@ -646,7 +648,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D 変換値加算モード選択レジスタ（ADADS）
+			@brief  A/D サンプリングステートレジスタ（ADSSTR）
 		*/
 		//-----------------------------------------------------------------//
 		struct adsstr_t {

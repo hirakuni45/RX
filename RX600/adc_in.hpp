@@ -10,33 +10,21 @@
 //=========================================================================//
 #include "common/renesas.hpp"
 #include "common/intr_utils.hpp"
-#include "common/vect.h"
+#include "RX600/adc_in_base.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  A/D 変換制御クラス
+		@brief  A/D 変換制御クラス（adc_in）
 		@param[in]	ADCU	A/D チャネル・ユニット
 		@param[in]	TASK	割り込みタスク・ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ADCU, class TASK = utils::null_task>
-	struct adc_in {
+	struct adc_in : public adc_in_base {
 
 		typedef ADCU value_type;
-
-		enum class SCAN_MODE : uint8_t {
-			SINGLE     = 0b00,	///< シングルスキャンモード
-			GROUP      = 0b01,	///< グループスキャンモード
-			CONTINUOUS = 0b10,	///< 連続スキャンモード
-		};
-
-		enum class GROUP : uint8_t {
-			A,		///< グループＡ
-			B,		///< グループＢ
-			C,		///< グループＣ
-		};
 
 	private:
 
@@ -94,13 +82,11 @@ namespace device {
 			ADCU::ADCSR.ADCS = static_cast<uint8_t>(scmd);
 
 			if(level != device::ICU::LEVEL::NONE) {
-				icu_mgr::set_task(ADCU::ADI, adi_task_);
-				icu_mgr::set_level(ADCU::ADI, level);
+				icu_mgr::set_interrupt(ADCU::ADI, adi_task_, level);
 				ADCU::ADCSR.ADIE = 1;
 			} else {
 				ADCU::ADCSR.ADIE = 0;
-				icu_mgr::set_level(ADCU::ADI, ICU::LEVEL::NONE);
-				icu_mgr::set_task(ADCU::ADI, nullptr);
+				icu_mgr::set_interrupt(ADCU::ADI, nullptr, ICU::LEVEL::NONE);
 			}
 
 			return true;
@@ -122,6 +108,10 @@ namespace device {
 				return;
 			}
 
+#if defined(SIG_RX631) || defined(SIG_RX63N)
+			// スキャン・グループが無い
+			ADCU::ADANS.set(ana);
+#else
 			if(ADCU::ADCSR.ADCS() != 0b01) {  // グループスキャン以外
 				grp = GROUP::A;
 			}
@@ -137,6 +127,7 @@ namespace device {
 				ADCU::ADANSB.set(ana);
 				break;
 			}
+#endif
 
 			// サンプリングステート値
 			uint32_t n = ADCU::PCLK * 1000 / 1'000'000;

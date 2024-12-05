@@ -15,6 +15,7 @@
 //=========================================================================//
 #include "common/device.hpp"
 #include "common/intr_utils.hpp"
+#include "RX600/adc_in_base.hpp"
 
 namespace device {
 
@@ -26,20 +27,10 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ADCU, class TASK = utils::null_task>
-	struct adc_in {
+	struct adc_in : public adc_in_base {
 
 		typedef ADCU value_type;
 
-		enum class SCAN_MODE : uint8_t {
-			SINGLE     = 0b00,	///< シングルスキャンモード
-			GROUP      = 0b01,	///< グループスキャンモード
-			CONTINUOUS = 0b10,	///< 連続スキャンモード
-		};
-
-		enum class GROUP : uint8_t {
-			A,		///< グループＡ
-			B,		///< グループＢ
-		};
 #if defined(SIG_RX140)
 		enum class CONV_CYCLE : uint8_t {
 			_32,	///< 32 サイクル/bit（標準）
@@ -85,8 +76,8 @@ namespace device {
 			scmd_(SCAN_MODE::SINGLE)
 #if defined(SIG_RX140)
 			, conv_cycle_(CONV_CYCLE::_32),
-			vrefl_(VREFL_SEL::VREFL0),
-			vrefh_(VREFH_SEL::VREFH0)
+			vrefl_(VREFL_SEL::AVSS0),
+			vrefh_(VREFH_SEL::AVCC0)
 #endif
 		{ }
 
@@ -148,13 +139,11 @@ namespace device {
 			ADCU::ADCSR.ADCS = static_cast<uint8_t>(scmd);
 
 			if(level != device::ICU::LEVEL::NONE) {
-				icu_mgr::set_task(ADCU::ADI, adi_task_);
-				icu_mgr::set_level(ADCU::ADI, level);
+				icu_mgr::set_interrupt(ADCU::ADI, adi_task_, level);
 				ADCU::ADCSR.ADIE = 1;
 			} else {
 				ADCU::ADCSR.ADIE = 0;
-				icu_mgr::set_level(ADCU::ADI, ICU::LEVEL::NONE);
-				icu_mgr::set_task(ADCU::ADI, nullptr);
+				icu_mgr::set_interrupt(ADCU::ADI, nullptr, ICU::LEVEL::NONE);
 			}
 
 			return true;
