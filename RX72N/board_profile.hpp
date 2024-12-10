@@ -48,6 +48,11 @@ namespace board_profile {
 	// QSPI ポートの定義
 	static constexpr auto QSPI_PORT = device::port_map_order::RX72N_ENVISION_KIT::_;
 
+	// MTU ポートの定義
+	// Pmod2 (8): PD1_RESET (MTIOC4B)
+	typedef device::MTU4 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIFTH;
+
 	// SDHI 定義
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
 	typedef device::NULL_PORT SDC_WP;	///< カード書き込み禁止ポート設定

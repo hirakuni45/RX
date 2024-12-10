@@ -39,7 +39,12 @@ namespace board_profile {
 
 	// RIIC ポートの定義
 	typedef device::RIIC0 RIIC_CH;
+
 	// ソフト制御 I2C ポートの定義
 	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
 	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
+
+	// MTU ポートの定義
+	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 }

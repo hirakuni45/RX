@@ -47,6 +47,11 @@ namespace board_profile {
 	// QSPI ポートの定義
 	static constexpr auto QSPI_PORT = device::port_map_order::RX65N_ENVISION_KIT::_;
 
+	// MTU ポートの定義
+	// CN13 (1): PD1_AN109_IRQ1 (MTIOC4B)
+	typedef device::MTU4 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIFTH;
+
 	// SDHI 定義
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
     typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない

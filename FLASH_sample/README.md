@@ -92,7 +92,7 @@ Data flash specifications for each microcontroller:
 |RX130|A|8K|1024|1|0xFF|4|
 |RX13T|A|0K|-|-|-|4|
 |RX140|A|4K|256|1|0xFF|4|
-|RX220|B|8K|2048|2|0x??|4|
+|RX220|B|8K|128|2|0x??|4|
 |RX23[01]|A|8K|1024|1|0xFF|4|
 |RX23T|A|0K|-|-|-|4|
 |RX24T|A|8K|1024|1|0xFF|4|
