@@ -5,7 +5,7 @@
 			・PA5/MTIOC1A (36) パルス出力 @n
 			・P00 (4) に赤色LED+1000オーム（VF:1.9V）を吸い込みで接続する（インジケーター）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 	// MTU1 設定
 	{
 		uint32_t frq = 1000;
-		if(!mtu1_io_.start_normal(MTU1::CHANNEL::A, frq, MTU1_IO::OUTPUT::TOGGLE)) {
+		if(!mtu1_io_.start_normal(MTU1::CHANNEL::A, frq, MTU1_IO::OUTPUT::L_TOGGLE)) {
 			utils::format("MTU1 output start fail...\n");
 		}
 	}

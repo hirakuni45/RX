@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include "common/device.hpp"
+#include "RX600/mtu_base.hpp"
 
 namespace device {
 
@@ -17,43 +18,11 @@ namespace device {
 		@brief  MTU ベース・クラス（各 MTU 共通）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct mtu_base_t {
+	struct mtux_base_t {
 
 		static constexpr auto PCLK = clock_profile::PCLK;	///< MTU master clock
 
 		static constexpr bool TGR32 = false;	///< 32 ビットカウンタ機能（全チャネル利用不可）
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  クロック分周器型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CLOCK_DIVIDER : uint8_t {
-			MTU2,		///< MTU2 標準型 (1/1, 1/4, 1/16, 1/64)
-			MTU2_EXT1,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/256) 
-			MTU2_EXT2,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/1024)
-			MTU2_EXT3,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/256, 1/1024)  
-			MTU3,		///< MTU3 型 (1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/256, 1/1024)
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  クロックソース型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CLOCK_SOURCE : uint8_t {
-			PCLK,
-
-			MTIOCA,
-			MTIOCB,
-
-			MTCLKA,
-			MTCLKB,
-			MTCLKC,
-			MTCLKD
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -873,7 +842,7 @@ namespace device {
 			}
 		};
 	};
-	typedef mtu_base_t MTU;
+	typedef mtux_base_t MTU;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1218,7 +1187,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu0_t : public MTU, MTUA {
+	struct mtu0_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA0;	///< 割り込み genr-A
@@ -1233,7 +1202,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV1;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T0;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1451,7 +1420,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu1_t : public MTU, MTUA {
+	struct mtu1_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA1;	///< 割り込み genr-A
@@ -1466,7 +1435,7 @@ namespace device {
 		static constexpr auto TCIU = INT::TCIU1;	///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV1;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT1;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T1;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1622,7 +1591,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu2_t : public MTU, MTUA {
+	struct mtu2_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA2;	///< 割り込み genr-A
@@ -1637,7 +1606,7 @@ namespace device {
 		static constexpr auto TCIU = INT::TCIU2;	///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV2;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT2;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T2;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1786,7 +1755,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu3_t : public MTU, MTUA {
+	struct mtu3_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA3;	///< 割り込み genr-A
@@ -1801,7 +1770,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV3;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T3;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1988,7 +1957,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu4_t : public MTU, MTUA {
+	struct mtu4_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA4;	///< 割り込み genr-A
@@ -2003,7 +1972,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV4;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T3;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2219,7 +2188,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu5_t : MTU, MTUA {
+	struct mtu5_t : mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::NONE;		///< 割り込み genr-A
@@ -2234,7 +2203,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
 		static constexpr auto TCIV = INT::NONE;		///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T0;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2419,7 +2388,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu6_t : public MTU, MTUB {
+	struct mtu6_t : public mtu_base_t, MTU, MTUB {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA6;	///< 割り込み genr-A
@@ -2434,7 +2403,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV6;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T0;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2645,7 +2614,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu7_t : public MTU, MTUB {
+	struct mtu7_t : public mtu_base_t, MTU, MTUB {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA7;	///< 割り込み genr-A
@@ -2660,7 +2629,7 @@ namespace device {
 		static constexpr auto TCIU = INT::TCIU7;	///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV7;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT1;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T1;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2818,7 +2787,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu8_t : public MTU, MTUB {
+	struct mtu8_t : public mtu_base_t, MTU, MTUB {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA8;	///< 割り込み genr-A
@@ -2833,7 +2802,7 @@ namespace device {
 		static constexpr auto TCIU = INT::TCIU8;	///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV8;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT2;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T2;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2983,7 +2952,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu9_t : public MTU, MTUB {
+	struct mtu9_t : public mtu_base_t, MTU, MTUB {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA9;	///< 割り込み genr-A
@@ -2998,7 +2967,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV9;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T3;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3187,7 +3156,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu10_t : public MTU, MTUB {
+	struct mtu10_t : public mtu_base_t, MTU, MTUB {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA10;	///< 割り込み genr-A
@@ -3202,7 +3171,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
 		static constexpr auto TCIV = INT::TCIV10;	///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T3;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3417,7 +3386,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu11_t : MTU, MTUB {
+	struct mtu11_t : mtu_base_t, MTU, MTUB {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::NONE;		///< 割り込み genr-A
@@ -3432,7 +3401,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;		///< 割り込み undf-U
 		static constexpr auto TCIV = INT::NONE;		///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T0;	///< クロック分周能力
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

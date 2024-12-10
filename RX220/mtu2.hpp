@@ -13,6 +13,7 @@
 */
 //=========================================================================//
 #include "common/device.hpp"
+#include "RX600/mtu_base.hpp"
 
 namespace device {
 
@@ -21,47 +22,14 @@ namespace device {
 		@brief  MTU ベース・クラス（各 MTU 共通）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct mtu_base_t {
+	struct mtux_base_t {
 
 #if defined(SIG_RX231)
 		static constexpr auto PCLK = clock_profile::PCLKA;	///< MTU master clock
 #else
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< MTU master clock
 #endif
-
 		static constexpr bool TGR32 = false;	///< 32 ビットカウンタ機能（全チャネル利用不可）
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  クロック分周器型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CLOCK_DIVIDER : uint8_t {
-			MTU2,		///< MTU2 標準型 (1/1, 1/4, 1/16, 1/64)
-			MTU2_EXT1,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/256) 
-			MTU2_EXT2,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/1024)
-			MTU2_EXT3,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/256, 1/1024)  
-			MTU3,		///< MTU3 型 (1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/256, 1/1024)
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  クロックソース型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CLOCK_SOURCE : uint8_t {
-			PCLK,
-
-			MTIOCA,
-			MTIOCB,
-
-			MTCLKA,
-			MTCLKB,
-			MTCLKC,
-			MTCLKD
-		};
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -852,7 +820,7 @@ namespace device {
 			}
 		};
 	};
-	typedef mtu_base_t MTU;
+	typedef mtux_base_t MTU;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1184,6 +1152,50 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>  CCE;
 		};
 		static inline twcr_t<base + 0x60> TWCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ノイズフィルタコントロールレジスタ (NFCR)
+			@param[in]	ofs		オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct nfcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>    NFAEN;
+			bit_rw_t <io_, bitpos::B1>    NFBEN;
+			bit_rw_t <io_, bitpos::B2>    NFCEN;
+			bit_rw_t <io_, bitpos::B3>    NFDEN;
+			bits_rw_t<io_, bitpos::B4, 2> NFCS;
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ノイズフィルタコントロールレジスタ (MTU5.NFCR)
+			@param[in]	ofs		オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct mtu5_nfcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>    NFUEN;
+			bit_rw_t <io_, bitpos::B1>    NFVEN;
+			bit_rw_t <io_, bitpos::B2>    NFWEN;
+
+			bits_rw_t<io_, bitpos::B4, 2> NFCS;
+		};
 	};
 #if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef mtu_ab_t<0x0008'8680> MTUA;
@@ -1195,12 +1207,13 @@ namespace device {
 	/*!
 		@brief  MTU0 定義クラス
 		@param[in]	base	ベースアドレス
+		@param[in]	base2	ベース２アドレス
 		@param[in]	INTN	割り込み型 N
 		@param[in]	INTM	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, typename INTN, typename INTM>
-	struct mtu0_t : public MTU, MTUA {
+	template <uint32_t base, uint32_t base2, typename INTN, typename INTM>
+	struct mtu0_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = peripheral::MTU0;	///< ペリフェラル型
 		static constexpr auto TGIA = INTN::TGIA0;				///< 割り込み genr-A
@@ -1215,8 +1228,13 @@ namespace device {
 		static constexpr auto TCIU = INTN::NONE;				///< 割り込み undf-U
 		static constexpr auto TCIV = INTM::TCIV0;				///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2;	///< クロック分周能力
-
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T0;	///< 分周能力
+		static constexpr bool CMP_MATCH_OUT = true;		///< コンペアマッチ出力
+		static constexpr bool INP_CAPTURE   = true;		///< インプットキャプチャ機能
+		static constexpr bool PWM_MODE1     = true;		///< PWM モード１
+		static constexpr bool PWM_MODE2     = true;		///< PWM モード２
+//		static constexpr bool PWM_COMPL
+		static constexpr bool BUFFERED      = true;		///< バッファ動作
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1422,6 +1440,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline tgr_abcdef_t<TGRA_, TGRB_, TGRC_, TGRD_, TGRE_, TGRF_, CHANNEL> TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタコントロールレジスタ (NFCR)
+		*/
+		//-----------------------------------------------------------------//
+		static inline nfcr_t<base2> NFCR;
 	};
 
 
@@ -1429,12 +1455,13 @@ namespace device {
 	/*!
 		@brief  MTU1 定義クラス
 		@param[in]	base	ベースアドレス
+		@param[in]	base2	ベース２アドレス
 		@param[in]	INTN	割り込み型 N
 		@param[in]	INTM	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, typename INTN, typename INTM>
-	struct mtu1_t : public MTU, MTUA {
+	template <uint32_t base, uint32_t base2, typename INTN, typename INTM>
+	struct mtu1_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = peripheral::MTU1;	///< ペリフェラル型
 		static constexpr auto TGIA = INTN::TGIA1;				///< 割り込み genr-A
@@ -1449,8 +1476,7 @@ namespace device {
 		static constexpr auto TCIU = INTM::TCIU1;				///< 割り込み undf-U
 		static constexpr auto TCIV = INTM::TCIV1;				///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT1;	///< クロック分周能力
-
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T1;	///< 分周能力
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1595,6 +1621,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline tgr_ab_t<TGRA_, TGRB_, CHANNEL> TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタコントロールレジスタ (NFCR)
+		*/
+		//-----------------------------------------------------------------//
+		static inline nfcr_t<base2> NFCR;
 	};
 
 
@@ -1602,12 +1636,13 @@ namespace device {
 	/*!
 		@brief  MTU2 定義クラス
 		@param[in]	base	ベースアドレス
+		@param[in]	base2	ベース２アドレス
 		@param[in]	INTN	割り込み型 N
 		@param[in]	INTM	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, typename INTN, typename INTM>
-	struct mtu2_t : public MTU, MTUA {
+	template <uint32_t base, uint32_t base2, typename INTN, typename INTM>
+	struct mtu2_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = peripheral::MTU2;	///< ペリフェラル型
 		static constexpr auto TGIA = INTN::TGIA2;				///< 割り込み genr-A
@@ -1622,8 +1657,7 @@ namespace device {
 		static constexpr auto TCIU = INTM::TCIU2;				///< 割り込み undf-U
 		static constexpr auto TCIV = INTM::TCIV2;				///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT2;	///< クロック分周能力
-
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T2;	///< 分周能力
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1760,6 +1794,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline tgr_ab_t<TGRA_, TGRB_, CHANNEL> TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタコントロールレジスタ (NFCR)
+		*/
+		//-----------------------------------------------------------------//
+		static inline nfcr_t<base2> NFCR;
 	};
 
 #if defined(SIG_RX110)
@@ -1768,12 +1810,13 @@ namespace device {
 	/*!
 		@brief  MTU3 定義クラス
 		@param[in]	base	ベースアドレス
+		@param[in]	base2	ベース２アドレス
 		@param[in]	INTN	割り込み型 N
 		@param[in]	INTM	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, typename INTN, typename INTM>
-	struct mtu3_t : public MTU, MTUA {
+	template <uint32_t base, uint32_t base2, typename INTN, typename INTM>
+	struct mtu3_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = peripheral::MTU3;	///< ペリフェラル型
 		static constexpr auto TGIA = INTN::TGIA3;				///< 割り込み genr-A
@@ -1788,8 +1831,7 @@ namespace device {
 		static constexpr auto TCIU = INTN::NONE;				///< 割り込み undf-U
 		static constexpr auto TCIV = INTM::TCIV3;				///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT3;	///< クロック分周能力
-
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T3;	///< 分周能力
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1964,6 +2006,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline tgr_abcd_t<TGRA_, TGRB_, TGRC_, TGRD_, CHANNEL> TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタコントロールレジスタ (NFCR)
+		*/
+		//-----------------------------------------------------------------//
+		static inline nfcr_t<base2> NFCR;
 	};
 
 
@@ -1971,12 +2021,13 @@ namespace device {
 	/*!
 		@brief  MTU4 定義クラス
 		@param[in]	base	ベースアドレス
+		@param[in]	base2	ベース２アドレス
 		@param[in]	INTN	割り込み型 N
 		@param[in]	INTN	割り込み型 M
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, typename INTN, typename INTM>
-	struct mtu4_t : public MTU, MTUA {
+	template <uint32_t base, uint32_t base2, typename INTN, typename INTM>
+	struct mtu4_t : public mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = peripheral::MTU4;	///< ペリフェラル型
 		static constexpr auto TGIA = INTN::TGIA4;				///< 割り込み genr-A
@@ -1991,8 +2042,7 @@ namespace device {
 		static constexpr auto TCIU = INTN::NONE;				///< 割り込み undf-U
 		static constexpr auto TCIV = INTM::TCIV4;				///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2_EXT3;	///< クロック分周能力
-
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T3;	///< 分周能力
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2196,6 +2246,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline tgr_abcd_t<TGRA_, TGRB_, TGRC_, TGRD_, CHANNEL> TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタコントロールレジスタ (NFCR)
+		*/
+		//-----------------------------------------------------------------//
+		static inline nfcr_t<base2> NFCR;
 	};
 #endif
 
@@ -2203,11 +2261,12 @@ namespace device {
 	/*!
 		@brief  MTU5 定義クラス
 		@param[in]	base	ベースアドレス
+		@param[in]	base2	ベース２アドレス
 		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, typename INT>
-	struct mtu5_t : MTU, MTUA {
+	template <uint32_t base, uint32_t base2, typename INT>
+	struct mtu5_t : mtu_base_t, MTU, MTUA {
 
 		static constexpr auto PERIPHERAL = peripheral::MTU5;	///< ペリフェラル型
 		static constexpr auto TGIA = INT::NONE;					///< 割り込み genr-A
@@ -2222,8 +2281,7 @@ namespace device {
 		static constexpr auto TCIU = INT::NONE;					///< 割り込み undf-U
 		static constexpr auto TCIV = INT::NONE;					///< 割り込み ovef-V
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU2;	///< クロック分周能力
-
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T0;	///< 分周能力
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2256,13 +2314,45 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  有効にする (MTU5)
-			@param[in]	ena	無効にする場合「false」
+			@brief	タイマスタートレジスタ（TSTR）
+			@param[in]	ofs		オフセット
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(bool ena = true)
+		template <uint32_t ofs>
+		struct tstr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> CSTW5;
+			bit_rw_t<io_, bitpos::B1> CSTV5;
+			bit_rw_t<io_, bitpos::B2> CSTU5;
+		};
+		static inline tstr_t<base + 0xB4 - 0x80> TSTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  有効にする (MTU5)
+			@param[in]	ch		チャネル型
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(CHANNEL ch, bool ena = true)
 		{
-			// TSTR.CSTW5 = ena;
+			switch(ch) {
+			case CHANNEL::U:
+				TSTR.CSTU5 = ena;
+				break;
+			case CHANNEL::V:
+				TSTR.CSTV5 = ena;
+				break;
+			case CHANNEL::W:
+				TSTR.CSTW5 = ena;
+				break; 
+			}
 		}
 
 
@@ -2398,33 +2488,41 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline tgr_uvw_t<TGRU_, TGRV_, TGRW_, CHANNEL> TGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタコントロールレジスタ (NFCR)
+		*/
+		//-----------------------------------------------------------------//
+		static inline mtu5_nfcr_t<base2> NFCR;
 	};
 
 #if defined(SIG_RX110)
-	typedef mtu0_t<0x0008'8700, ICU::VECTOR, ICU::VECTOR> MTU0;
-	typedef mtu1_t<0x0008'8780, ICU::VECTOR, ICU::VECTOR> MTU1;
-	typedef mtu2_t<0x0008'8800, ICU::VECTOR, ICU::VECTOR> MTU2;
-	typedef mtu5_t<0x0008'8880, ICU::VECTOR> MTU5;
+	typedef mtu0_t<0x0008'8700, 0x0008'8690, ICU::VECTOR, ICU::VECTOR> MTU0;
+	typedef mtu1_t<0x0008'8780, 0x0008'8691, ICU::VECTOR, ICU::VECTOR> MTU1;
+	typedef mtu2_t<0x0008'8800, 0x0008'8692, ICU::VECTOR, ICU::VECTOR> MTU2;
+	typedef mtu5_t<0x0008'8880, 0x0008'8695, ICU::VECTOR> MTU5;
 #elif defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220)
-	typedef mtu0_t<0x0008'8700, ICU::VECTOR, ICU::VECTOR> MTU0;
-	typedef mtu1_t<0x0008'8780, ICU::VECTOR, ICU::VECTOR> MTU1;
-	typedef mtu2_t<0x0008'8800, ICU::VECTOR, ICU::VECTOR> MTU2;
-	typedef mtu3_t<0x0008'8600, ICU::VECTOR, ICU::VECTOR> MTU3;
-	typedef mtu4_t<0x0008'8601, ICU::VECTOR, ICU::VECTOR> MTU4;
-	typedef mtu5_t<0x0008'8880, ICU::VECTOR> MTU5;
+	typedef mtu0_t<0x0008'8700, 0x0008'8690, ICU::VECTOR, ICU::VECTOR> MTU0;
+	typedef mtu1_t<0x0008'8780, 0x0008'8691, ICU::VECTOR, ICU::VECTOR> MTU1;
+	typedef mtu2_t<0x0008'8800, 0x0008'8692, ICU::VECTOR, ICU::VECTOR> MTU2;
+	typedef mtu3_t<0x0008'8600, 0x0008'8693, ICU::VECTOR, ICU::VECTOR> MTU3;
+	typedef mtu4_t<0x0008'8601, 0x0008'8694, ICU::VECTOR, ICU::VECTOR> MTU4;
+	typedef mtu5_t<0x0008'8880, 0x0008'8695, ICU::VECTOR> MTU5;
 #elif defined(SIG_RX231)
-	typedef mtu0_t<0x000D'0B00, ICU::VECTOR, ICU::VECTOR> MTU0;
-	typedef mtu1_t<0x000D'0B80, ICU::VECTOR, ICU::VECTOR> MTU1;
-	typedef mtu2_t<0x000D'0C00, ICU::VECTOR, ICU::VECTOR> MTU2;
-	typedef mtu3_t<0x000D'0A00, ICU::VECTOR, ICU::VECTOR> MTU3;
-	typedef mtu4_t<0x000D'0A01, ICU::VECTOR, ICU::VECTOR> MTU4;
-	typedef mtu5_t<0x000D'0C80, ICU::VECTOR> MTU5;
+	typedef mtu0_t<0x000D'0B00, 0x000D'0A90, ICU::VECTOR, ICU::VECTOR> MTU0;
+	typedef mtu1_t<0x000D'0B80, 0x000D'0A91, ICU::VECTOR, ICU::VECTOR> MTU1;
+	typedef mtu2_t<0x000D'0C00, 0x000D'0A92, ICU::VECTOR, ICU::VECTOR> MTU2;
+	typedef mtu3_t<0x000D'0A00, 0x000D'0A93, ICU::VECTOR, ICU::VECTOR> MTU3;
+	typedef mtu4_t<0x000D'0A01, 0x000D'0A94, ICU::VECTOR, ICU::VECTOR> MTU4;
+	typedef mtu5_t<0x000D'0C80, 0x000D'0A95, ICU::VECTOR> MTU5;
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
-	typedef mtu0_t<0x0008'8700, ICU::VECTOR, ICU::GROUP1> MTU0;
-	typedef mtu1_t<0x0008'8780, ICU::VECTOR, ICU::GROUP1> MTU1;
-	typedef mtu2_t<0x0008'8800, ICU::VECTOR, ICU::GROUP2> MTU2;
-	typedef mtu3_t<0x0008'8600, ICU::VECTOR, ICU::GROUP2> MTU3;
-	typedef mtu4_t<0x0008'8601, ICU::VECTOR, ICU::VECTOR> MTU4;
-	typedef mtu5_t<0x0008'8880, ICU::VECTOR> MTU5;
+	typedef mtu0_t<0x0008'8700, 0x0008'8690, ICU::VECTOR, ICU::GROUP1> MTU0;
+	typedef mtu1_t<0x0008'8780, 0x0008'8691, ICU::VECTOR, ICU::GROUP1> MTU1;
+	typedef mtu2_t<0x0008'8800, 0x0008'8692, ICU::VECTOR, ICU::GROUP2> MTU2;
+	typedef mtu3_t<0x0008'8600, 0x0008'8693, ICU::VECTOR, ICU::GROUP2> MTU3;
+	typedef mtu4_t<0x0008'8601, 0x0008'8694, ICU::VECTOR, ICU::VECTOR> MTU4;
+	typedef mtu5_t<0x0008'8880, 0x0008'8695, ICU::VECTOR> MTU5;
 #endif
 }

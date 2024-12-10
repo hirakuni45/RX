@@ -39,4 +39,8 @@ namespace board_profile {
 
 	// RIIC ポートの定義
 	typedef device::RIIC0 RIIC_CH;
+
+	// MTU ポートの定義 MTIOC0A: PB3 (LFQFP64: 36)
+	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::SECOND;
 }

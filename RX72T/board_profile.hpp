@@ -43,4 +43,8 @@ namespace board_profile {
 	// CAN ポートの定義
 	typedef device::CAN0 CAN0_CH;
 	static constexpr auto CAN0_PORT = device::port_map::ORDER::FIRST;
+
+	// MTU ポートの定義
+	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
 }

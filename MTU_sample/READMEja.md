@@ -1,4 +1,4 @@
-Renesas RX62N, RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N MTU サンプル
+Renesas RX MTU サンプル
 =========
 
 [英語版](README.md)
@@ -14,6 +14,7 @@ RX マイコンを使った MTU のサンプルプログラム
 ## プロジェクト・リスト
 
 - main.cpp
+- RX140/Makefile
 - RX62N/Makefile
 - RX24T/Makefile
 - RX64M/Makefile
@@ -37,53 +38,6 @@ RX マイコンを使った MTU のサンプルプログラム
 - RX72N の SCI 標準ポートは、「RX72N/port_map.hpp」参照。
 - RX66T の SCI 標準ポートは、「RX66T/port_map.hpp」参照。
 - RX72T の SCI 標準ポートは、「RX72T/port_map.hpp」参照。
-
-```C++
-#if defined(SIG_RX62N)
-  #if defined(CQ_FRK)
-    // FRK-RX62N(CQ 出版社)
-	static const char* system_str_ = { "RX62N FRK-RX62N" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT1, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI0 SCI_CH;
-  #else
-    // BlueBoard-RX62N_100pin
-	static const char* system_str_ = { "RX62N BlueBoard-RX62N_100pin" };
-	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B5, LED_ACTIVE> LED;
-	typedef device::SCI0 SCI_CH;
-  #endif
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B7, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX65N)
-	static const char* system_str_ = { "RX65N Envision Kit" };
-	typedef device::PORT<device::PORT7, device::bitpos::B0, false> LED;
-	typedef device::SCI9 SCI_CH;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B0, false> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N Envision Kit" };
-	typedef device::PORT<device::PORT4, device::bitpos::B0, false> LED;
-	typedef device::SCI2 SCI_CH;
-#elif defined(SIG_RX72T)
-	static const char* system_str_ = { "RX72T DIY" };
-	typedef device::PORT<device::PORT0, device::bitpos::B1, false> LED;
-	typedef device::SCI1 SCI_CH;
-#endif
-```
-
 - BlueBoard-RX62N_100pin の場合、ボード上の D2 LED を利用する。（赤色） 
 - FRK-RX62N の場合、ボード上の LED1 を利用する。（黄色） 
 - RX65N Envision kit の場合、インジケーター LED はボード上の青色を利用する。

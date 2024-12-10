@@ -21,6 +21,7 @@
 */
 //=========================================================================//
 #include "common/device.hpp"
+#include "RX600/mtu_base.hpp"
 
 namespace device {
 
@@ -29,53 +30,7 @@ namespace device {
 		@brief  MTU ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct mtu_base_t {
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  TYPE 型（全体の種別なので、チャネルとは異なる）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class TYPE : uint8_t {
-			MTU2,	///< MTU2:  RX621 / RX62N
-			MTU3,	///< MTU3:  RX63T
-			MTU3a,	///< MTU3a: RX64M / RX71M / RX65N / RX651 / RX66N / RX671 / RX72N / RX72M
-			MTU3c,	///< MTU3c: RX13T
-			MTU3d,	///< MTU3d: RX24T / RX26T / RX66T / RX72T
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  クロック分周器型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CLOCK_DIVIDER : uint8_t {
-			MTU2,		///< MTU2 標準型 (1/1, 1/4, 1/16, 1/64)
-			MTU2_EXT1,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/256) 
-			MTU2_EXT2,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/1024)
-			MTU2_EXT3,	///< MTU2 拡張型１(1/1, 1/4, 1/16, 1/64, 1/256, 1/1024)  
-			MTU3,		///< MTU3 型 (1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/256, 1/1024)
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  クロックソース型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CLOCK_SOURCE : uint8_t {
-			PCLK,
-
-			MTIOCA,
-			MTIOCB,
-
-			MTCLKA,
-			MTCLKB,
-			MTCLKC,
-			MTCLKD
-		};
-
+	struct mtux_base_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1740,7 +1695,7 @@ namespace device {
 		};
 		static inline tadstrgr1_t<0x000C'1D32> TADSTRGR1;
 	};
-	typedef mtu_base_t MTU;
+	typedef mtux_base_t MTU;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1752,7 +1707,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu0_t : public MTU {
+	struct mtu0_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA0;	///< 割り込み genr-A
@@ -1769,7 +1724,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
@@ -2004,7 +1959,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu1_t : public MTU {
+	struct mtu1_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA1;	///< 割り込み genr-A
@@ -2021,7 +1976,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
@@ -2253,7 +2208,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu2_t : public MTU {
+	struct mtu2_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA2;	///< 割り込み genr-A
@@ -2270,7 +2225,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
@@ -2436,7 +2391,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu3_t : public MTU {
+	struct mtu3_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA3;	///< 割り込み genr-A
@@ -2453,7 +2408,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
@@ -2668,7 +2623,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu4_t : public MTU {
+	struct mtu4_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA4;	///< 割り込み genr-A
@@ -2685,7 +2640,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
@@ -2970,7 +2925,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu5_t : MTU {
+	struct mtu5_t : mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::NONE;		///< 割り込み genr-A
@@ -2987,7 +2942,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
@@ -3307,7 +3262,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu6_t : public MTU {
+	struct mtu6_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA6;	///< 割り込み genr-A
@@ -3324,7 +3279,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
@@ -3565,7 +3520,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu7_t : public MTU {
+	struct mtu7_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA7;	///< 割り込み genr-A
@@ -3582,7 +3537,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 
@@ -3867,7 +3822,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu8_t : public MTU {
+	struct mtu8_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA8;	///< 割り込み genr-A
@@ -3884,7 +3839,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = true;		///< TGR register 32 bits word
 
@@ -4073,7 +4028,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT, uint32_t pclk>
-	struct mtu9_t : public MTU {
+	struct mtu9_t : public mtu_base_t, MTU {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
 		static constexpr auto TGIA = INT::TGIA9;	///< 割り込み genr-A
@@ -4090,7 +4045,7 @@ namespace device {
 
 		static constexpr auto PCLK = pclk;			///< マスタークロック周期
 
-		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::MTU3;	///< クロック分周能力
+		static constexpr auto DIVIDE_AVILITY = CLOCK_DIVIDER::T4;	///< クロック分周能力
 
 		static constexpr bool TGR32 = false;		///< TGR register 32 bits word
 

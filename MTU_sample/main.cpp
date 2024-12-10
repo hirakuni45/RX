@@ -20,35 +20,6 @@
 
 namespace {
 
-#if defined(SIG_RX62N)
-	// See 'RX62x/port_map_mtu.hpp' J6_6
-	typedef device::MTU0 MTU_CH;
-	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
-#elif defined(SIG_RX24T)
-	typedef device::MTU0 MTU_CH;
-	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
-#elif defined(SIG_RX64M)
-	typedef device::MTU0 MTU_CH;
-	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
-#elif defined(SIG_RX71M)
-	typedef device::MTU0 MTU_CH;
-	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
-#elif defined(SIG_RX65N)
-	// CN13 (1): PD1_AN109_IRQ1 (MTIOC4B)
-	typedef device::MTU4 MTU_CH;
-	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIFTH;
-#elif defined(SIG_RX66T)
-	typedef device::MTU0 MTU_CH;
-	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
-#elif defined(SIG_RX72N)
-	// Pmod2 (8): PD1_RESET (MTIOC4B)
-	typedef device::MTU4 MTU_CH;
-	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIFTH;
-#elif defined(SIG_RX72T)
-	typedef device::MTU0 MTU_CH;
-	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
-#endif
-
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, board_profile::SCI_ORDER> SCI;
@@ -57,12 +28,12 @@ namespace {
 	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT		cmt_;
 
-	typedef device::mtu_io<MTU_CH, utils::null_task, utils::null_task, MTU_ORDER> MTU;
+	typedef device::mtu_io<board_profile::MTU_CH, utils::null_task, utils::null_task, board_profile::MTU_ORDER> MTU;
+	typedef device::port_map_mtu::ORDER MTU_ORDER;
 	MTU		mtu_;
 
 	typedef utils::command<256> CMD;
 	CMD 	cmd_;
-
 
 	enum class COMMAND : uint8_t {
 		NONE,
@@ -196,14 +167,21 @@ int main(int argc, char** argv)
 
 	{  // MTU の開始
 		freq_ = 10'000;  // 10KHz
-//		if(!mtu_.start_normal(MTU::CHANNEL::A, MTU::OUTPUT::TOGGLE, freq)) {
-
-		// PWM2 C(H->L), D(L->H) 出力
-		static constexpr MTU::pwm_port_t pwmout[2] = {
-			{ MTU::CHANNEL::C, MTU::OUTPUT::HIGH_TO_LOW },
-			{ MTU::CHANNEL::D, MTU::OUTPUT::LOW_TO_HIGH }
+#if 0
+		// PWM2 2 output C(H->L), D(L->H) 出力
+		static constexpr MTU::port_t out[2] = {
+			{ MTU::CHANNEL::B, MTU::OUTPUT::H_TO_L, MTU_ORDER::FIRST },
+			{ MTU::CHANNEL::C, MTU::OUTPUT::L_TO_H, MTU_ORDER::FIRST }
 		};
-		if(!mtu_.start_pwm2(MTU::CHANNEL::A, freq_, pwmout[0], pwmout[1])) {
+#else
+		// PWM2 3 output B(H->L), C(L->H), D(H->L) 出力
+		static constexpr MTU::port_t out[3] = {
+			{ MTU::CHANNEL::B, MTU::OUTPUT::H_TO_L, MTU_ORDER::FIRST },
+			{ MTU::CHANNEL::C, MTU::OUTPUT::L_TO_H, MTU_ORDER::FIRST },
+			{ MTU::CHANNEL::D, MTU::OUTPUT::H_TO_L, MTU_ORDER::FIRST }
+		};
+#endif
+		if(!mtu_.start_pwm2(MTU::CHANNEL::A, freq_, out)) {
 			utils::format("MTU can't start...\n");
 		}
 	}

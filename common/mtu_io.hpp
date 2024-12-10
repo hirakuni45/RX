@@ -1,16 +1,35 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ MTU2/MTU3x 制御
+	@brief	RX グループ MTU2x/MTU3x 制御クラス @n
+			MTU2a: (RX220/mtu2.hpp) @n
+			  RX110/RX111/RX113 @n
+			  RX130/RX140 @n
+			  RX220/RX231 @n
+			  RX631/RX63N @n
+			MTU2: (RX62x/mtu2.hpp) @n
+			  RX621/RX62N @n
+			MTU3x: (RX600/mtu3.hpp) @n
+			  RX13T @n
+			  RX23T @n
+			  RX24T/RX24U @n
+			  RX26T @n
+			  RX63T @n
+			  RX64M/RX71M @n
+			  RX65N/RX651 @n
+			  RX66N @n
+			  RX660/RX671 @n
+			  RX66T/RX72T @n
+			  RX72N @n
+			  RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "renesas.hpp"
 #include "common/intr_utils.hpp"
-#include "common/vect.h"
 
 namespace device {
 
@@ -19,8 +38,27 @@ namespace device {
 		@brief  MTU 基本クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class mtu_io_base {
-	public:
+	struct mtu_io_base {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  モード型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class MODE : uint8_t {
+			NORMAL  = 0b0000,	///< 基本動作（コンペアマッチタイマー、インプットキャプチャー）
+			PWM1    = 0b0010,	///< PWM モード 1
+			PWM2    = 0b0011,	///< PWM モード 2
+			PH_CNT1 = 0b0100,	///< 位相計数モード 1（Ａ相、Ｂ相入力）
+			PH_CNT2 = 0b0101,	///< 位相計数モード 2（Ａ相、Ｂ相入力）
+			PH_CNT3 = 0b0110,	///< 位相計数モード 3（Ａ相、Ｂ相入力）
+			PH_CNT4 = 0b0111,	///< 位相計数モード 4（Ａ相、Ｂ相入力）
+			C_PWM1  = 0b1101,	///< 相補 PWM モード 1
+			C_PWM2  = 0b1110,	///< 相補 PWM モード 2
+			C_PWM3  = 0b1111,	///< 相補 PWM モード 3
+		};
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  アウトプット型
@@ -28,9 +66,10 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class OUTPUT : uint8_t {
 			NONE,					///< 出力しない
-			LOW_TO_HIGH = 0b0010,	///< 初期０で、マッチで１
-			HIGH_TO_LOW = 0b0101,	///< 初期１で、マッチで０
-			TOGGLE = 0b0011,		///< トグル出力
+			L_TO_H    = 0b0010,	///< 初期０(L)で、マッチで１(H)
+			H_TO_L    = 0b0101,	///< 初期１(H)で、マッチで０(L)
+			L_TOGGLE  = 0b0011,	///< 初期０(L)で、トグル出力
+			H_TOGGLE  = 0b0111,	///< 初期１(H)で、トグル出力
 		};
 
 
@@ -43,7 +82,6 @@ namespace device {
 			POSITIVE,	///< 立ち上がり
 			NEGATIVE,	///< 立下り
 			DUAL,		///< 両エッジ
-			
 		};
 
 
@@ -58,7 +96,7 @@ namespace device {
 			volatile uint16_t	ovfw_count_;
 
 			capture_t() : all_count_(0),
-				ovfw_limit_(0),   // タイムアウト１秒
+				ovfw_limit_(0),
 				ovfw_count_(0)
 			{ }
 
@@ -76,7 +114,8 @@ namespace device {
 		@param[in]	MTUX	MTU ユニット
 		@param[in]	MTASK	メイン割り込みタスク
 		@param[in]	OTASK	オーバーフロー割り込みタスク
-		@param[in]	PSEL	入出力ポートオーダー
+		@param[in]	PSEL	入出力ポートオーダー @n
+							コンペアマッチ、インプットキャプチャ時ポートオーダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class MTUX, class MTASK = utils::null_task, class OTASK = utils::null_task,
@@ -89,26 +128,21 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  PWM 出力設定構造体
+			@brief  ポート設定構造体
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct pwm_port_t {
-			CHANNEL		pwm;
+		struct port_t {
+			CHANNEL		ch;
 			OUTPUT		out;
 			port_map_mtu::ORDER	order;
-			pwm_port_t() noexcept :
-				pwm(), out(OUTPUT::NONE), order(port_map_mtu::ORDER::FIRST)
+			constexpr port_t() noexcept :
+				ch(), out(OUTPUT::NONE), order(port_map_mtu::ORDER::FIRST)
 			{ }
-			constexpr pwm_port_t(CHANNEL ch, OUTPUT o, port_map_mtu::ORDER odr = port_map_mtu::ORDER::FIRST) noexcept :
-				pwm(ch), out(o), order(odr) { }
+			constexpr port_t(CHANNEL c, OUTPUT o, port_map_mtu::ORDER odr) noexcept :
+				ch(c), out(o), order(odr) { }
 		};
 
 	private:
-
-		enum class MODE : uint8_t {
-			NORMAL = 0b0000,
-			PWM2   = 0b0011,
-		};
 
 		uint32_t	clk_base_;
 
@@ -131,10 +165,10 @@ namespace device {
 			{ }
 		};
 
-		static task_t	tt_;
+		static inline task_t	tt_;
 
-		static MTASK	mtask_;
-		static OTASK	otask_;
+		static inline MTASK	mtask_;
+		static inline OTASK	otask_;
 
 		CHANNEL			channel_;
 
@@ -172,19 +206,19 @@ namespace device {
 		static bool set_TCR_(typename MTUX::CHANNEL ch) noexcept
 		{
 			uint8_t tpsc = 0b1111;
-			if(MTUX::DIVIDE_AVILITY == MTUX::CLOCK_DIVIDER::MTU3) {
+			if(MTUX::DIVIDE_AVILITY == MTUX::CLOCK_DIVIDER::T4) {
 				static constexpr uint8_t ckt[] = {
-					0b000000,  // (0)  1/1
-					0b001000,  // (1)  1/2
-					0b000001,  // (2)  1/4
-					0b010000,  // (3)  1/8
-					0b000010,  // (4)  1/16
-					0b011000,  // (5)  1/32
-					0b000011,  // (6)  1/64
-					0b100000,  // (7)  1/128(NG: 1/256)
-					0b100000,  // (8)  1/256
-					0b101000,  // (9)  1/512(NG: 1/1024)
-					0b101000,  // (10) 1/1024
+					0b000'000,  // (shift:  0) 1/1
+					0b001'000,  // (shift:  1) 1/2
+					0b000'001,  // (shift:  2) 1/4
+					0b010'000,  // (shift:  3) 1/8
+					0b000'010,  // (shift:  4) 1/16
+					0b011'000,  // (shift:  5) 1/32
+					0b000'011,  // (shift:  6) 1/64
+					0b100'000,  // (shift:  7) 1/128 (NG: 1/256)
+					0b100'000,  // (shift:  8) 1/256
+					0b101'000,  // (shift:  9) 1/512 (NG: 1/1024)
+					0b101'000,  // (shift: 10) 1/1024
 				};
 				tpsc = ckt[tt_.shift_] & 0b111;
 				MTUX::TCR2.TPSC2 = ckt[tt_.shift_] >> 3;
@@ -193,11 +227,11 @@ namespace device {
 				else if(tt_.shift_ == 2) tpsc = 0b001;  // 1/4
 				else if(tt_.shift_ == 4) tpsc = 0b010;  // 1/16
 				else if(tt_.shift_ == 6) tpsc = 0b011;  // 1/64
-				if(MTUX::DIVIDE_AVILITY == MTUX::CLOCK_DIVIDER::MTU2_EXT1) {
+				if(MTUX::DIVIDE_AVILITY == MTUX::CLOCK_DIVIDER::T1) {
 					if(tt_.shift_ == 8) tpsc = 0b110;
-				} else if(MTUX::DIVIDE_AVILITY == MTUX::CLOCK_DIVIDER::MTU2_EXT2) {
+				} else if(MTUX::DIVIDE_AVILITY == MTUX::CLOCK_DIVIDER::T2) {
 					if(tt_.shift_ == 10) tpsc = 0b111;
-				} else if(MTUX::DIVIDE_AVILITY == MTUX::CLOCK_DIVIDER::MTU2_EXT3) {
+				} else if(MTUX::DIVIDE_AVILITY == MTUX::CLOCK_DIVIDER::T3) {
 					if(tt_.shift_ == 8) tpsc = 0b100;
 					else if(tt_.shift_ == 10) tpsc = 0b101;
 				}
@@ -212,125 +246,119 @@ namespace device {
 			return true;
 		}
 
-
-		static bool make_clock2_(uint32_t freq, uint32_t& match) noexcept
+		static constexpr bool make_clock2_(uint32_t freq, uint8_t& shift, uint32_t& match) noexcept
 		{
-			tt_.rate_ = freq;
-			tt_.shift_ = 0;
+			shift = 0;
 			match = MTUX::PCLK / freq;
 			while(match > 65535) {
-				++tt_.shift_;
+				++shift;
 				match /= 2;
-				if(tt_.shift_ > 6) {  // 1/64 まで
+				if(shift > 6) {  // 1/64 まで
 					return false;
 				}
 			}
-			while(tt_.shift_ == 1 || tt_.shift_ == 3 || tt_.shift_ == 5) {  // 1/2, 1/8, 1/32 を除外
-				++tt_.shift_;
+			while(shift == 1 || shift == 3 || shift == 5) {  // 1/2, 1/8, 1/32 を除外
+				++shift;
 				match /= 2;
 			}
 			return true;
 		}
 
-		static bool make_clock2e1_(uint32_t freq, uint32_t& match) noexcept
+		static constexpr bool make_clock2e1_(uint32_t freq, uint8_t& shift, uint32_t& match) noexcept
 		{
-			tt_.rate_ = freq;
-			tt_.shift_ = 0;
+			shift = 0;
 			match = MTUX::PCLK / freq;
 			while(match > 65535) {
-				++tt_.shift_;
+				++shift;
 				match /= 2;
-				if(tt_.shift_ > 8) {  // 1/256 まで
+				if(shift > 8) {  // 1/256 まで
 					return false;
 				}
 			}
-			while(tt_.shift_ == 1 || tt_.shift_ == 3 || tt_.shift_ == 5 || tt_.shift_ == 7) {  // 1/2, 1/8, 1/32, 1/128 を除外
-				++tt_.shift_;
+			while(shift == 1 || shift == 3 || shift == 5 || shift == 7) {  // 1/2, 1/8, 1/32, 1/128 を除外
+				++shift;
 				match /= 2;
 			}
 			return true;
 		}
 
-		static bool make_clock2e2_(uint32_t freq, uint32_t& match) noexcept
+		static constexpr bool make_clock2e2_(uint32_t freq, uint8_t& shift, uint32_t& match) noexcept
 		{
-			tt_.rate_ = freq;
-			tt_.shift_ = 0;
+			shift = 0;
 			match = MTUX::PCLK / freq;
 			while(match > 65535) {
-				++tt_.shift_;
+				++shift;
 				match /= 2;
-				if(tt_.shift_ > 10) {  // 1/1024 まで
+				if(shift > 10) {  // 1/1024 まで
 					return false;
 				}
 			}
-			while(tt_.shift_ == 1 || tt_.shift_ == 3 || tt_.shift_ == 5 || tt_.shift_ == 7 || tt_.shift_ == 8 ||  tt_.shift_ == 9) {  // 1/2, 1/8, 1/32, 1/128、1/256, 1/512 を除外
-				++tt_.shift_;
+			while(shift == 1 || shift == 3 || shift == 5 || shift == 7 || shift == 8 ||  shift == 9) {  // 1/2, 1/8, 1/32, 1/128、1/256, 1/512 を除外
+				++shift;
 				match /= 2;
 			}
 			return true;
 		}
 
-		static bool make_clock2e3_(uint32_t freq, uint32_t& match) noexcept
+		static constexpr bool make_clock2e3_(uint32_t freq, uint8_t& shift, uint32_t& match) noexcept
 		{
-			tt_.rate_ = freq;
-			tt_.shift_ = 0;
+			shift = 0;
 			match = MTUX::PCLK / freq;
 			while(match > 65535) {
-				++tt_.shift_;
+				++shift;
 				match /= 2;
-				if(tt_.shift_ > 10) {  // 1/1024 まで
+				if(shift > 10) {  // 1/1024 まで
 					return false;
 				}
 			}
-			while(tt_.shift_ == 1 || tt_.shift_ == 3 || tt_.shift_ == 5 || tt_.shift_ == 7 || tt_.shift_ == 9) {  // 1/2, 1/8, 1/32, 1/128、1/512 を除外
-				++tt_.shift_;
+			while(shift == 1 || shift == 3 || shift == 5 || shift == 7 || shift == 9) {  // 1/2, 1/8, 1/32, 1/128、1/512 を除外
+				++shift;
 				match /= 2;
 			}
 			return true;
 		}
 
-		static bool make_clock3_(uint32_t freq, uint32_t& match) noexcept
+		static constexpr bool make_clock3_(uint32_t freq, uint8_t& shift, uint32_t& match) noexcept
 		{
-			tt_.rate_ = freq;
-			tt_.shift_ = 0;
+			shift = 0;
 			match = MTUX::PCLK / freq;
 			if(MTUX::TGR32) {
 				return true;
 			}
 
 			while(match > 65535) {
-				++tt_.shift_;
+				++shift;
 				match /= 2;
-				if(tt_.shift_ > 10) {  // 1/1024 まで
+				if(shift > 10) {  // 1/1024 まで
 					return false;
 				}
 			}
-			while(tt_.shift_ == 7 || tt_.shift_ == 9) {  // 1/128, 1/512 を除外
-				++tt_.shift_;
+			while(shift == 7 || shift == 9) {  // 1/128, 1/512 を除外
+				++shift;
 				match /= 2;
 			}
 			return true;
 		}
 
 
-		static bool make_clock_(uint32_t freq, uint32_t& match) noexcept
+		static constexpr bool make_clock_(uint32_t freq, uint8_t& shift, uint32_t& match) noexcept
 		{
 			bool ret = false;
 			switch(MTUX::DIVIDE_AVILITY) {
-			case MTUX::CLOCK_DIVIDER::MTU2:
-				ret = make_clock2_(freq, match);
+			case MTUX::CLOCK_DIVIDER::T0:
+				ret = make_clock2_(freq, shift, match);
 				break;
-			case MTUX::CLOCK_DIVIDER::MTU2_EXT1:
-				ret = make_clock2e1_(freq, match);
+			case MTUX::CLOCK_DIVIDER::T1:
+				ret = make_clock2e1_(freq, shift, match);
 				break;
-			case MTUX::CLOCK_DIVIDER::MTU2_EXT2:
-				ret = make_clock2e2_(freq, match);
+			case MTUX::CLOCK_DIVIDER::T2:
+				ret = make_clock2e2_(freq, shift, match);
 				break;
-			case MTUX::CLOCK_DIVIDER::MTU2_EXT3:
-				ret = make_clock2e3_(freq, match);
+			case MTUX::CLOCK_DIVIDER::T3:
+				ret = make_clock2e3_(freq, shift, match);
 				break;
-			case MTUX::CLOCK_DIVIDER::MTU3:
-				ret = make_clock3_(freq, match);
+			case MTUX::CLOCK_DIVIDER::T4:
+				ret = make_clock3_(freq, shift, match);
 				break;
 			}
 			return ret;
@@ -340,7 +368,7 @@ namespace device {
 		bool set_output_type_(typename MTUX::CHANNEL ch, OUTPUT out) noexcept
 		{
 			MTUX::TIOR.set(ch, static_cast<uint8_t>(out));
-			return out == OUTPUT::TOGGLE;
+			return (out == OUTPUT::L_TOGGLE || out == OUTPUT::H_TOGGLE);
 		}
 
 
@@ -373,11 +401,14 @@ namespace device {
 				port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL);
 			}
 
+			uint8_t shift;
 			uint32_t match;
-			if(!make_clock_(freq, match)) {
+			if(!make_clock_(freq, shift, match)) {
 				power_mgr::turn(MTUX::PERIPHERAL, false);
 				return false;
 			}
+			tt_.rate_ = freq;
+			tt_.shift_ = shift;
 
 			if(set_output_type_(ch, out)) {
 				bool mod = match & 1;
@@ -422,20 +453,20 @@ namespace device {
 			@param[in]	freq	周波数
 			@param[in]	thper	許容誤差（通常 1.0%） @n
 								百分率を 10 倍した値を設定
+			@param[in]	toggle	トグル出力の場合「true」にする
 			@return 誤差範囲なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		static constexpr bool probe_freq(uint32_t freq, uint32_t thper = 10) noexcept
+		static constexpr bool probe_freq(uint32_t freq, uint32_t thper = 10, bool toggle = false) noexcept
 		{
-#if 0
-			uint8_t cks = 0;
-			uint32_t cmcor = 0;
-			if(!calc_freq_(freq, cks, cmcor)) {
+			uint8_t shift;
+			uint32_t match;
+			if(!make_clock_(freq, shift, match)) {
 				return false;
 			}
-#endif
-			auto rate = freq;
-//			auto rate = get_real_freq_(cks, cmcor);
+			if(toggle) { match /= 2; }
+
+			auto rate = (MTUX::PCLK >> shift) / match;
 			auto d = freq * thper;
 			if((rate * 1000) < (freq * 1000 - d) || (freq * 1000 + d) < (rate * 1000)) {
 				return false;
@@ -447,7 +478,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ノーマル・モード（コンペア・マッチ・タイマー）
+			@brief  ノーマル・モード（コンペア・マッチ・タイマー） @n
+					出力ポートオーダーは、PSEL を使う
 			@param[in]	ch		出力チャネル
 			@param[in]	freq	出力周波数
 			@param[in]	out		出力タイプ
@@ -491,14 +523,17 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static bool set_freq(CHANNEL ch, uint32_t freq) noexcept
 		{
+			uint8_t shift;
 			uint32_t match;
-			if(!make_clock_(freq, match)) {
+			if(!make_clock_(freq, shift, match)) {
 				return false;
 			}
+			tt_.rate_ = freq;
+			tt_.shift_ = shift;
 
 			set_TCR_(ch);
 
-			if(tt_.out_ == OUTPUT::TOGGLE) {
+			if(tt_.out_ == OUTPUT::L_TOGGLE || tt_.out_ == OUTPUT::H_TOGGLE) {
 				bool mod = match & 1;
 				match /= 2;
 				if(mod) ++match;
@@ -519,21 +554,22 @@ namespace device {
 			@brief  PWM2 開始（１出力）
 			@param[in]	mch		PWM 周期チャネル
 			@param[in]	freq	PWM 周波数
-			@param[in]	po		PWM 出力設定
+			@param[in]	po		１出力ポート設定
 			@param[in]	lvl		割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t& po, ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
+		bool start_pwm2(CHANNEL mch, uint32_t freq, const port_t& po, ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);
 			if(ret) {
 				if(po.out != OUTPUT::NONE) {
 					bool pena = true;
-					port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(po.pwm), pena, po.order);
+					port_map_mtu::turn(MTUX::PERIPHERAL,
+						MTUX::get_port_map_channel(po.ch), pena, po.order);
 				}
-				MTUX::TIOR.set(po.pwm, static_cast<uint8_t>(po.out));
-				set_pwm_duty(po.pwm, 0);
+				MTUX::TIOR.set(po.ch, static_cast<uint8_t>(po.out));
+				set_pwm_duty(po.ch, 0);
 				MTUX::enable();
 			}
 			return ret;
@@ -545,28 +581,24 @@ namespace device {
 			@brief  PWM2 開始（２出力）
 			@param[in]	mch		PWM 周期チャネル
 			@param[in]	freq	PWM 周波数
-			@param[in]	po1		PWM1 出力設定
-			@param[in]	po2		PWM2 出力設定
+			@param[in]	po		２出力ポート設定
 			@param[in]	lvl		割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t& po1, const pwm_port_t& po2, ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
+		bool start_pwm2(CHANNEL mch, uint32_t freq, const port_t (&po)[2], ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);  // PWM2 mode
 			if(ret) {
 				bool pena = true;
-				if(po1.out != OUTPUT::NONE) {
-					port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(po1.pwm), pena, po1.order);
+				for(uint32_t i = 0; i < 2; ++i) {
+					if(po[i].out != OUTPUT::NONE) {
+						port_map_mtu::turn(MTUX::PERIPHERAL,
+							MTUX::get_port_map_channel(po[i].ch), pena, po[i].order);
+					}
+					MTUX::TIOR.set(po[i].ch, static_cast<uint8_t>(po[i].out));
+					set_pwm_duty(po[i].ch, 0);
 				}
-				MTUX::TIOR.set(po1.pwm, static_cast<uint8_t>(po1.out));
-				set_pwm_duty(po1.pwm, 0);
-
-				if(po2.out != OUTPUT::NONE) {
-					port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(po2.pwm), pena, po2.order);
-				}
-				MTUX::TIOR.set(po2.pwm, static_cast<uint8_t>(po2.out));
-				set_pwm_duty(po2.pwm, 0);
 				MTUX::enable();
 			}
 			return ret;
@@ -578,22 +610,23 @@ namespace device {
 			@brief  PWM2 開始（３出力）
 			@param[in]	mch		PWM 周期チャネル
 			@param[in]	freq	PWM 周波数
-			@param[in]	po		PWM 出力設定
+			@param[in]	po		３出力ポート設定
 			@param[in]	lvl		割り込みレベル
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm2(CHANNEL mch, uint32_t freq, const pwm_port_t po[3], ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
+		bool start_pwm2(CHANNEL mch, uint32_t freq, const port_t (&po)[3], ICU::LEVEL lvl = ICU::LEVEL::NONE) noexcept
 		{
 			auto ret = start_(mch, freq, OUTPUT::NONE, lvl, MODE::PWM2);
 			if(ret) {
 				for(uint32_t i = 0; i < 3; ++i) {
 					if(po[i].out != OUTPUT::NONE) {
 						bool pena = true;
-						port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(po[i].pwm), pena, po[i].order);
+						port_map_mtu::turn(MTUX::PERIPHERAL,
+							MTUX::get_port_map_channel(po[i].ch), pena, po[i].order);
 					}
-					MTUX::TIOR.set(po[i].pwm, static_cast<uint8_t>(po[i].out));
-					set_pwm_duty(po[i].pwm, 0);
+					MTUX::TIOR.set(po[i].ch, static_cast<uint8_t>(po[i].out));
+					set_pwm_duty(po[i].ch, 0);
 				}
 			}
 			return ret;
@@ -625,7 +658,8 @@ namespace device {
 			@param[in]	clk	ベース・クロック
 		*/
 		//-----------------------------------------------------------------//
-		void set_base_clock(uint32_t clk) noexcept {
+		void set_base_clock(uint32_t clk) noexcept
+		{
 			uint32_t a = MTUX::PCLK;
 			while(a < clk) {
 				a <<= 1;
@@ -796,7 +830,7 @@ namespace device {
 		{
 			if(real) {
 				uint32_t rate = (MTUX::PCLK >> tt_.shift_) / tt_.tgr_;
-				if(tt_.out_ == OUTPUT::TOGGLE) {
+				if(tt_.out_ == OUTPUT::L_TOGGLE || tt_.out_ == OUTPUT::H_TOGGLE) {
 					rate >>= 1;
 				}
 				return rate;
@@ -868,10 +902,4 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static OTASK& at_ovfl_task() noexcept { return otask_; }
 	};
-	template <class MTUX, class MTASK, class OTASK, port_map_mtu::ORDER PSEL>
-		typename mtu_io<MTUX, MTASK, OTASK, PSEL>::task_t mtu_io<MTUX, MTASK, OTASK, PSEL>::tt_;
-	template <class MTUX, class MTASK, class OTASK, port_map_mtu::ORDER PSEL>
-		MTASK mtu_io<MTUX, MTASK, OTASK, PSEL>::mtask_;
-	template <class MTUX, class MTASK, class OTASK, port_map_mtu::ORDER PSEL>
-		OTASK mtu_io<MTUX, MTASK, OTASK, PSEL>::otask_;
 }

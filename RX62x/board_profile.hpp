@@ -36,6 +36,11 @@ namespace board_profile {
 	// SCI ポートの定義
 	typedef device::SCI1 SCI_CH;
 	static constexpr auto SCI_ORDER = device::port_map::ORDER::FIRST;
+
+	// MTU ポートの定義
+	// See 'RX62x/port_map_mtu.hpp' J6_6
+	typedef device::MTU0 MTU_CH;
+	static constexpr auto MTU_ORDER = device::port_map_mtu::ORDER::FIRST;
   #else
     // BlueBoard-RX62N_100pin 基板シグネチュア
 	static const char system_str_[] = "RX62N BlueBoard-RX62N_100pin";
