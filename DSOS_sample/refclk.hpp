@@ -63,7 +63,7 @@ namespace dsos {
 		{
 #ifndef GLFW_SIM
 			uint32_t freq = 1'000;
-			auto ret = mtu_io_.start_normal(MTU::CHANNEL::B, freq, MTU_IO::OUTPUT::TOGGLE);
+			auto ret = mtu_io_.start_normal(MTU::CHANNEL::B, freq, MTU_IO::OUTPUT::L_TOGGLE);
 			return ret;
 #else
 			return true;
