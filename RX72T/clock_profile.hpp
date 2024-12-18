@@ -56,8 +56,8 @@ namespace device {
 		static constexpr uint32_t	PCLKA		=  96'000'000;		///< PCLKA 周波数（最大120MHz）
 		static constexpr uint32_t	PCLKB		=  48'000'000;		///< PCLKB 周波数（最大60MHz）
 		static constexpr uint32_t	PCLKC		= 192'000'000;		///< PCLKC 周波数（最大200MHz）
-		static constexpr uint32_t	PCLKD		=  48'000'000;		///< PCLKD 周波数（最大60MHz）
-		static constexpr uint32_t	FCLK		=  48'000'000;		///< FCLK 周波数（最大60MHz）
+		static constexpr uint32_t	PCLKD		=  48'000'000;		///< PCLKD 周波数（8MHz ～ 最大60MHz）
+		static constexpr uint32_t	FCLK		=  48'000'000;		///< FCLK 周波数（4MHz ～ 最大60MHz）
 		static constexpr uint32_t	BCLK		=  48'000'000;		///< BCLK 周波数（最大60MHz）
 #else
 		static constexpr bool       TURN_USB    = false;			///< USB を利用しない場合「false」

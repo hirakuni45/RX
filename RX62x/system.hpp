@@ -20,6 +20,90 @@ namespace device {
 	namespace SYSTEM {
 
 		//
+		//===== 動作モード
+		//
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  モードモニタレジスタ（MDMONR）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct mdmonr_t : public ro16_t<base> {
+			typedef ro16_t<base> in_;
+			using in_::operator ();
+
+			bit_ro_t<in_, bitpos::B0> MD0;
+			bit_ro_t<in_, bitpos::B1> MD1;
+
+			bit_ro_t<in_, bitpos::B7> MDE;
+		};
+		static inline mdmonr_t<0x0008'0000> MDMONR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  モードステータスレジスタ（MDSR）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct mdsr_t : public ro16_t<base> {
+			typedef ro16_t<base> in_;
+			using in_::operator ();
+
+			bit_ro_t <in_, bitpos::B0>    IROM;
+			bit_ro_t <in_, bitpos::B1>    EXB;
+			bits_ro_t<in_, bitpos::B2, 2> BSW;
+			bit_ro_t <in_, bitpos::B4>    BOTS;
+
+			bit_ro_t <in_, bitpos::B6>    UBTS;
+		};
+		static inline mdsr_t<0x0008'0002> MDSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  システムコントロールレジスタ 0（SYSCR0）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct syscr0_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>    ROME;
+			bit_rw_t <io_, bitpos::B1>    EXBE;
+
+			bits_rw_t<io_, bitpos::B8, 8> KEY;
+		};
+		static inline syscr0_t<0x0008'0006> SYSCR0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  システムコントロールレジスタ 1（SYSCR1）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct syscr1_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>    RAME;
+		};
+		static inline syscr1_t<0x0008'0008> SYSCR1;
+
+		//
 		//===== クロック発生回路
 		//
 

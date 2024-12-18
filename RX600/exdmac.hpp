@@ -1,13 +1,14 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	EXDMAC 定義 (EXDMACa) @n
-			RX621/RX62N @n
-			RX64M/RX71M @n
-			RX651/RX65N @n
-			RX66N @n
-			RX671 @n
-			RX72N/RX72M 
+	@brief	EXDMAC/EXDMACa 定義 @n
+			EXDMAC:  RX621/RX62N @n
+			EXDMACa: RX631/RX63N @n
+			EXDMACa: RX64M/RX71M @n
+			EXDMACa: RX651/RX65N @n
+			EXDMACa: RX66N @n
+			EXDMACa: RX671 @n
+			EXDMACa: RX72N/RX72M 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -20,7 +21,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  exdmac core 定義
+		@brief  EXDMAC core 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 	*/
@@ -76,36 +77,14 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 2>  DCTG;
+			bits_rw_t<io_, bitpos::B0,  2> DCTG;
 
-			bits_rw_t<io_, bitpos::B8, 2>  SZ;
+			bits_rw_t<io_, bitpos::B8,  2> SZ;
 
 			bits_rw_t<io_, bitpos::B12, 2> DTS;
 			bits_rw_t<io_, bitpos::B14, 2> MD;
 		};
 		static inline edmtmd_t<base + 0x10> EDMTMD;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  EXDMA 出力設定レジスタ（EDMOMD）
-			@param[in]	ofs	オフセット
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t ofs>
-		struct edmomd_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> DACKSEL;
-			bit_rw_t<io_, bitpos::B1> DACKW;
-			bit_rw_t<io_, bitpos::B2> DACKE;
-			bit_rw_t<io_, bitpos::B3> DACKS;
-		};
-		static inline edmomd_t<base + 0x12> EDMOMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -191,6 +170,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> SWREQ;
+
 			bit_rw_t<io_, bitpos::B4> CLRS;
 		};
 		static inline edmreq_t<base + 0x1D> EDMREQ;
@@ -279,7 +259,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  exdmac 定義（EXDMAC0、EXDMAC1 共通クラス）
+		@brief  EXDMAC 定義（EXDMAC0、EXDMAC1 共通クラス）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct exdmac_t {
@@ -315,14 +295,54 @@ namespace device {
 		static inline rw32_t<0x0008'2BF0> CLSBR4;
 		static inline rw32_t<0x0008'2BF4> CLSBR5;
 		static inline rw32_t<0x0008'2BF8> CLSBR6;
-		static inline rw32_t<0x0008'2BFC> CLSBR7;
 	};
-	typedef exdmac_t EXDMAC;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  edmac 定義
+		@brief  EXDMACa 定義（EXDMAC0、EXDMAC1 共通クラス）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct exdmaca_t {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  EXDMA モジュール起動レジスタ（EDMAST）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct edmast_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> DMST;
+		};
+		static inline edmast_t<0x0008'2A00> EDMAST;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  クラスタバッファレジスタ y（CLSBRy）（y = 0 ～ 7）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline rw32_t<0x0008'2BE0> CLSBR0;
+		static inline rw32_t<0x0008'2BE4> CLSBR1;
+		static inline rw32_t<0x0008'2BE8> CLSBR2;
+		static inline rw32_t<0x0008'2BEC> CLSBR3;
+		static inline rw32_t<0x0008'2BF0> CLSBR4;
+		static inline rw32_t<0x0008'2BF4> CLSBR5;
+		static inline rw32_t<0x0008'2BF8> CLSBR6;
+		static inline rw32_t<0x0008'2BFC> CLSBR7;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  EXDMAC0 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	ivec	割り込みベクター
@@ -332,6 +352,27 @@ namespace device {
 	struct exdmac0_t : public exdmac_core_t<base, per> {
 
 		static constexpr auto IVEC = ivec;
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  EXDMA 出力設定レジスタ（EDMOMD）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct edmomd_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B1> DACKW;
+			bit_rw_t<io_, bitpos::B2> DACKE;
+			bit_rw_t<io_, bitpos::B3> DACKS;
+		};
+		static inline edmomd_t<base + 0x12> EDMOMD;
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -345,7 +386,52 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  edmac 定義
+		@brief  EXDMACa0 定義
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	ivec	割り込みベクター
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+	struct exdmaca0_t : public exdmac_core_t<base, per> {
+
+		static constexpr auto IVEC = ivec;
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  EXDMA 出力設定レジスタ（EDMOMD）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct edmomd_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> DACKSEL;
+			bit_rw_t<io_, bitpos::B1> DACKW;
+			bit_rw_t<io_, bitpos::B2> DACKE;
+			bit_rw_t<io_, bitpos::B3> DACKS;
+		};
+		static inline edmomd_t<base + 0x12> EDMOMD;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  EXDMA オフセットレジスタ（EDMOFR）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline rw32_t<base + 0x18> EDMOFR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  EXDMAC1 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	ivec	割り込みベクター
@@ -356,13 +442,70 @@ namespace device {
 
 		static constexpr auto IVEC = ivec;
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  EXDMA 出力設定レジスタ（EDMOMD）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct edmomd_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B1> DACKW;
+			bit_rw_t<io_, bitpos::B2> DACKE;
+			bit_rw_t<io_, bitpos::B3> DACKS;
+		};
+		static inline edmomd_t<base + 0x12> EDMOMD;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  EXDMACa1 定義
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	ivec	割り込みベクター
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+	struct exdmaca1_t : public exdmac_core_t<base, per> {
+
+		static constexpr auto IVEC = ivec;
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  EXDMA 出力設定レジスタ（EDMOMD）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct edmomd_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> DACKSEL;
+			bit_rw_t<io_, bitpos::B1> DACKW;
+			bit_rw_t<io_, bitpos::B2> DACKE;
+			bit_rw_t<io_, bitpos::B3> DACKS;
+		};
+		static inline edmomd_t<base + 0x12> EDMOMD;
 	};
 
 #if defined(SIG_RX621) || defined(SIG_RX62N)
+	typedef exdmac_t EXDMAC;
 	typedef exdmac0_t<0x0008'2800, peripheral::EXDMAC0, ICU::VECTOR::EXDMACI0> EXDMAC0;
 	typedef exdmac1_t<0x0008'2840, peripheral::EXDMAC1, ICU::VECTOR::EXDMACI1> EXDMAC1;
 #else
-	typedef exdmac0_t<0x0008'2800, peripheral::EXDMAC0, ICU::VECTOR::EXDMAC0I> EXDMAC0;
-	typedef exdmac1_t<0x0008'2840, peripheral::EXDMAC1, ICU::VECTOR::EXDMAC1I> EXDMAC1;
+	typedef exdmaca_t EXDMAC;
+	typedef exdmaca0_t<0x0008'2800, peripheral::EXDMAC0, ICU::VECTOR::EXDMAC0I> EXDMAC0;
+	typedef exdmaca1_t<0x0008'2840, peripheral::EXDMAC1, ICU::VECTOR::EXDMAC1I> EXDMAC1;
 #endif
 }
