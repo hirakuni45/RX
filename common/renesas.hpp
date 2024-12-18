@@ -399,7 +399,7 @@
 
 #elif defined(SIG_RX62N) || defined(SIG_RX621)
 #include "RX62x/lvd.hpp"
-#include "RX62x/bus.hpp"
+#include "RX600/bus.hpp"
 #include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/exdmac.hpp"

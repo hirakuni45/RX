@@ -1,28 +1,24 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M グループ・バス・マネージャー
+	@brief	RX グループ・バス・マネージャー @n
+			CS 空間の定義と設定
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX600/bus.hpp"
+#include "common/renesas.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  バス制御クラス
-		@param[in]	CSA		CS 空間クラス
+		@brief  バス・マネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class CSA>
-	class bus_mgr {
-	public:
-
-
+	struct bus_mgr {
 
 	};
 }

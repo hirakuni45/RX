@@ -26,7 +26,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct system_base_t {
 
+		//
 		//----  オプション設定メモリ  -------------------------------------------//
+		//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -84,12 +86,12 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
 		struct ofs1_t : public ro32_t<base> {
-			typedef ro32_t<base> io_;
-			using io_::operator ();
+			typedef ro32_t<base> in_;
+			using in_::operator ();
 
-			bits_ro_t<io_, bitpos::B0, 2>  VDSEL;
-			bit_ro_t <io_, bitpos::B2>     LVDAS;
-			bit_ro_t <io_, bitpos::B8>     HOCOEN;
+			bits_ro_t<in_, bitpos::B0, 2>  VDSEL;
+			bit_ro_t <in_, bitpos::B2>     LVDAS;
+			bit_ro_t <in_, bitpos::B8>     HOCOEN;
 		};
 
 
@@ -101,10 +103,10 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
 		struct mde_t : public ro32_t<base> {
-			typedef ro32_t<base> io_;
-			using io_::operator ();
+			typedef ro32_t<base> in_;
+			using in_::operator ();
 
-			bits_ro_t<io_, bitpos::B0, 3> MDE;
+			bits_ro_t<in_, bitpos::B0, 3> MDE;
 		};
 
 
@@ -115,14 +117,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
-		struct mdmonr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
+		struct mdmonr_t : public ro16_t<base> {
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t <io_, bitpos::B0>  MD;
+			bit_ro_t<in_, bitpos::B0>  MD;
 		};
 		static inline mdmonr_t<0x0008'0000> MDMONR;
 
@@ -134,16 +133,12 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
-		struct mdsr_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
+		struct mdsr_t : public ro16_t<base> {
+			typedef ro16_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t <io_, bitpos::B5>  UBTS;
+			bit_ro_t<in_, bitpos::B5>  UBTS;
 		};
-		static inline mdsr_t<0x0008'0002> MDSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -162,6 +157,7 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>     ROME;
 			bit_rw_t <io_, bitpos::B1>     EXBE;
+
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
 		static inline syscr0_t<0x0008'0006> SYSCR0;
@@ -189,7 +185,9 @@ namespace device {
 		};
 		static inline syscr1_t<0x0008'0008> SYSCR1;
 
+		//
 		//----  クロック発生回路  -----------------------------------------------//
+		//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -590,22 +588,19 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct oscovfsr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
+		struct oscovfsr_t : public ro8_t<base> {
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B0> MOOVF;
+			bit_ro_t<in_, bitpos::B0> MOOVF;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72N)
-			bit_rw_t<io_, bitpos::B1> SOOVF;
+			bit_ro_t<in_, bitpos::B1> SOOVF;
 #endif
-			bit_rw_t<io_, bitpos::B2> PLOVF;
-			bit_rw_t<io_, bitpos::B3> HCOVF;
-			bit_rw_t<io_, bitpos::B4> ILCOVF;
+			bit_ro_t<in_, bitpos::B2> PLOVF;
+			bit_ro_t<in_, bitpos::B3> HCOVF;
+			bit_ro_t<in_, bitpos::B4> ILCOVF;
 #if defined(SIG_RX66N) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
-			bit_rw_t<io_, bitpos::B5> PPLOVF;
+			bit_ro_t<in_, bitpos::B5> PPLOVF;
 #endif
 		};
 		static inline oscovfsr_t<0x0008'003C> OSCOVFSR;
@@ -915,7 +910,9 @@ namespace device {
 		static inline hocotrr_t<0x007F'B0E8> HOCOTRR2;
 #endif
 
+		//
 		//----  消費電力低減機能  ----------------------------------------------//
+		//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1238,7 +1235,9 @@ namespace device {
 		static inline ro32_t<0xFE7F'7D7C> TSCDR;
 #endif
 
+		//
 		//----  リセット  ------------------------------------------------------//
+		//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1551,6 +1550,8 @@ namespace device {
 		static inline ofs1_t<0x0012'006C> OFS1;
 		static inline mde_t <0x0012'0064> MDE;
 
+		static inline mdsr_t<0x0008'0002> MDSR;
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1701,6 +1702,8 @@ namespace device {
 		static inline ofs1_t<0x0012'006C> OFS1;
 		static inline mde_t <0x0012'0064> MDE;
 
+		static inline mdsr_t<0x0008'0002> MDSR;
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1800,6 +1803,8 @@ namespace device {
 		static inline ofs0_t<0x0012'0068> OFS0;
 		static inline ofs1_t<0x0012'006C> OFS1;
 		static inline mde_t <0x0012'0064> MDE;
+
+		static inline mdsr_t<0x0008'0002> MDSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1901,6 +1906,8 @@ namespace device {
 		static inline ofs0_t<0x0012'0068> OFS0;
 		static inline ofs1_t<0x0012'006C> OFS1;
 		static inline mde_t <0x0012'0064> MDE;
+
+		static inline mdsr_t<0x0008'0002> MDSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
