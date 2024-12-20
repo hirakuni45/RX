@@ -6,7 +6,7 @@
 			RX13T/RX23T（ベースレジスタのみ） @n
 			RX260/RX261（ベースレジスタのみ） @n
 			RX26T (CSx レジスタ 0 ～ 3, SDRAM 制御無し) @n
-			RX62N/RX621 @n
+			RX62N/RX621 (BUSPRI レジスタ無し) @n
 			RX63N/RX631 @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
@@ -111,7 +111,8 @@ namespace device {
 		};
 		static inline bersr2_t<0x0008'130A> BERSR2;
 
-
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+#else
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  バスプライオリティ制御レジスタ（BUSPRI）
@@ -135,6 +136,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> BPEB;
 		};
 		static inline buspri_t<0x0008'1310> BUSPRI;
+#endif
 	};
 
 
@@ -196,7 +198,8 @@ namespace device {
 		static inline csncr_t<0x0008'382A> CS2REC;
 		static inline csncr_t<0x0008'383A> CS3REC;
 
-
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+#else
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CS リカバリサイクル挿入許可レジスタ（CSRECEN）
@@ -229,7 +232,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B15> RCVENM7;
 		};
 		static inline csrecen_t<0x0008'3880> CSRECEN;
-
+#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -280,7 +283,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 5> CSWWAIT;
 
-			bits_rw_t<io_, bitpos::B24, 5> CSRWWAIT;
+			bits_rw_t<io_, bitpos::B24, 5> CSRWAIT;
 		};
 		static inline csnwcr1_t<0x0008'3004> CS0WCR1;
 		static inline csnwcr1_t<0x0008'3014> CS1WCR1;
@@ -326,7 +329,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CS 空間クラス（CSn）（n = 0 ～ 3）
+			@brief  CS 空間クラス（CSn）（n = 0 ～ x）
 			@param[in]	base	レジスタ・ベース・アドレス
 			@param[in]	org		CS 空間開始アドレス
 			@param[in]	end		CS 空間終了アドレス
@@ -338,7 +341,6 @@ namespace device {
 			static constexpr auto ORG = org;			///< CS 空間開始アドレス
 			static constexpr auto END = end;			///< CS 空間終了アドレス
 			static constexpr auto LEN = end - org + 1;	///< CS 空間長さ
-
 
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 			/*!
@@ -357,14 +359,16 @@ namespace device {
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 			static inline csnrec_t<base + 0x080A> CSREC;			
 
-
+#if defined(SIG_RX621) || defined(SIG_RX62N)
+#else
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 			/*!
 				@brief  CS セパレートバスリカバリサイクル挿入許可
 				@param[in]	ena		不許可なら「false」
 			*/
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-			static void enable_sep_CSREC(bool ena = true) {
+			static void enable_sep_CSREC(bool ena = true) noexcept
+			{
 				if(ena) CSRECEN |= 1 << ((base & 0x70) >> 4);
 				else CSRECEN &= ~(1 << ((base & 0x70) >> 4));
 			}
@@ -376,11 +380,12 @@ namespace device {
 				@param[in]	ena		不許可なら「false」
 			*/
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-			static void enable_mux_CSREC(bool ena = true) {
+			static void enable_mux_CSREC(bool ena = true) noexcept
+			{
 				if(ena) CSRECEN |= 0x80 << ((base & 0x70) >> 4);
 				else CSRECEN &= ~(0x80 << ((base & 0x70) >> 4));
 			}
-
+#endif
 
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 			/*!
@@ -406,12 +411,12 @@ namespace device {
 				@param[in]	base	レジスタ・ベース・アドレス
 			*/
 			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-			static inline csnwcr1_t<base + 0x0008> CSWCR2;
+			static inline csnwcr2_t<base + 0x0008> CSWCR2;
 		};
-		static inline cs_t<0x0008'3000, 0xFF00'0000, 0xFFFF'FFFF> CS0;
-		static inline cs_t<0x0008'3010, 0x0700'0000, 0x07FF'FFFF> CS1;
-		static inline cs_t<0x0008'3020, 0x0600'0000, 0x06FF'FFFF> CS2;
-		static inline cs_t<0x0008'3030, 0x0500'0000, 0x05FF'FFFF> CS3;
+		static inline cs_t<0x0008'3000, 0xFF00'0000, 0xFFFF'FFFF> CS0;  // 16MB
+		static inline cs_t<0x0008'3010, 0x0700'0000, 0x07FF'FFFF> CS1;	// 16MB
+		static inline cs_t<0x0008'3020, 0x0600'0000, 0x06FF'FFFF> CS2;  // 16MB
+		static inline cs_t<0x0008'3030, 0x0500'0000, 0x05FF'FFFF> CS3;  // 16MB
 	};
 
 
@@ -649,17 +654,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
-		struct sdsr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
+		struct sdsr_t : public ro8_t<base> {
+			typedef ro8_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B0> MRSST;
+			bit_ro_t<in_, bitpos::B0> MRSST;
 
-			bit_rw_t<io_, bitpos::B3> INIST;
-			bit_rw_t<io_, bitpos::B4> SRFST;
+			bit_ro_t<in_, bitpos::B3> INIST;
+			bit_ro_t<in_, bitpos::B4> SRFST;
 		};
 		static inline sdsr_t<0x0008'3C50> SDSR;
 	};
@@ -750,10 +752,10 @@ namespace device {
 			@brief  CS 空間クラス（CSn）（n = 4 ～ 7）
 		*/
 		//---------------------------------------------------------------------//
-		static inline cs_t<0x0008'3040, 0x0400'0000, 0x04FF'FFFF> CS4;
-		static inline cs_t<0x0008'3050, 0x0300'0000, 0x03FF'FFFF> CS5;
-		static inline cs_t<0x0008'3060, 0x0200'0000, 0x02FF'FFFF> CS6;
-		static inline cs_t<0x0008'3070, 0x0100'0000, 0x01FF'FFFF> CS7;
+		static inline cs_t<0x0008'3040, 0x0400'0000, 0x04FF'FFFF> CS4;  // 16MB
+		static inline cs_t<0x0008'3050, 0x0300'0000, 0x03FF'FFFF> CS5;  // 16MB
+		static inline cs_t<0x0008'3060, 0x0200'0000, 0x02FF'FFFF> CS6;  // 16MB
+		static inline cs_t<0x0008'3070, 0x0100'0000, 0x01FF'FFFF> CS7;  // 16MB
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
