@@ -199,6 +199,7 @@
 #elif defined(SIG_RX230) || defined(SIG_RX231)
 #include "RX231/lvda.hpp"
 #include "RX600/cac.hpp"
+#include "RX600/vbatt.hpp"
 #include "RX231/bus.hpp"
 #include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
@@ -641,6 +642,7 @@
 #elif defined(SIG_RX671)
 #include "RX600/lvda.hpp"
 #include "RX600/cac.hpp"
+#include "RX600/vbatt.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/mpu.hpp"
 #include "RX600/dmac.hpp"
@@ -707,6 +709,9 @@
 #include "RX600/eptpc.hpp"
 #include "RX600/edmac.hpp"
 #include "RX600/pmgi.hpp"
+#if defined(SIG_RX72M)
+#include "RX600/esc.hpp"
+#endif
 #include "RX600/usb.hpp"
 #include "RX600/sci_j.hpp"
 #include "RX600/sci_i.hpp"

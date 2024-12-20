@@ -1912,6 +1912,28 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  電圧レベル設定レジスタ (VOLSR)
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct volsr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B2>     USBVON;
+
+			bit_rw_t <io_, bitpos::B6>     PGAVLS;
+			bit_rw_t <io_, bitpos::B7>     RICVLS;
+		};
+		static inline volsr_t<0x0008'C295> VOLSR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  メモリウェイトサイクル設定レジスタ 8（MEMWAIT）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

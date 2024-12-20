@@ -21,6 +21,8 @@ namespace device {
 
 		CAC,	///< クロック周波数精度測定回路
 
+		VBATT,	///< バッテリバックアップ機能
+
 		DMAC0,	///< DMA コントローラー０
 		DMAC1,	///< DMA コントローラー１
 		DMAC2,	///< DMA コントローラー２
