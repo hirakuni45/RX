@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX700 グループ　PMGI 定義 @n
+	@brief	PHY Management Interface / PHY マネジメントインタフェース @n
 			RX66N (1 channel) @n
 			RX72N @n
 			RX72M
@@ -17,7 +17,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  PMGI 定義
+		@brief  PMGI class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	pmgii	アクセス終了割り込みベクタ

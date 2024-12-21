@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・IWDT 定義
+	@brief	Independent Watchdog Timer / 独立ウォッチドッグタイマ
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  独立ウォッチドッグタイマクラス
+		@brief  IWDT class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	ivec	割り込み要因

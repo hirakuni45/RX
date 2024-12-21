@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ PPG 定義 @n
+	@brief	Programmable Pulse Generator / プログラマブルパルスジェネレータ @n
 			RX631/RX63N @n
 			RX64M/RX71M @n
 			RX651/RX65N @n
@@ -19,7 +19,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	プログラマブルパルスジェネレータ（PPG）
+		@brief	PPG class
 		@param[in]	per		ペリフェラル型
 		@param[in]	ch		チャネル
 	*/

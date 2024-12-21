@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ CMTW 定義 @n
+	@brief	Compare Match Timer W / コンペアマッチタイマ W @n
 			RX26T @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
@@ -20,7 +20,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  コンペアマッチタイマ W クラス
+		@brief  CMPW class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
 		@param[in]	cmwi	コンペア・マッチ割り込みベクタ

@@ -58,12 +58,12 @@ namespace device {
 			SSIRXI0      = 47,  // SSIE0 シリアルサウンドインタフェース
 			SSIRTI1      = 48,  // SSIE1 シリアルサウンドインタフェース
 
-			ICRXI1    = 50,  // RIIC1 RXI
-			ICTXI1    = 51,	// RIIC1 TXI
-			ICRXI0    = 52,  // RIIC0 RXI
-			ICTXI0    = 53,	// RIIC0 TXI
-			ICRXI2    = 54,  // RIIC2 RXI
-			ICTXI2    = 55,	// RIIC2 TXI
+			ICRXI1		 = 50,	// RIIC1 RXI
+			ICTXI1		 = 51,	// RIIC1 TXI
+			ICRXI0		 = 52,	// RIIC0 RXI
+			ICTXI0		 = 53,	// RIIC0 TXI
+			ICRXI2		 = 54,	// RIIC2 RXI
+			ICTXI2		 = 55,	// RIIC2 TXI
 
 			RXI0         = 58,  // SCI0
 			TXI0         = 59,
@@ -541,10 +541,10 @@ namespace device {
 
 			IPLS = 86,	///< EPTPC (タイマ割り込み)
 
-			SYNC0 = 92,	///< ESC
+			SYNC0 = 92,	///< ESC (EtherCAT)
 			SYNC1,
 			SOF,
-			EOF,
+			_EOF,		///< EOF(End Of File)の定義と被るので・・
 			WDT,
 			RESET,
 

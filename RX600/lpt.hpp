@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	ローパワータイマ（LPT/LPTa）
+	@brief	Low-Power Timer / ローパワータイマ @n
+			LPT/LPTa
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ローパワータイマ・コア
+		@brief  LPT core class
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct lpt_core_t {

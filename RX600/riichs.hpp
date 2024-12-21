@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	ハイスピード I2C バスインタフェース (RIICHS) @n
+	@brief	High-speed I2C-bus Interface / ハイスピード I2C バスインタフェース @n
 			RX671
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RIICHS コア 定義
+		@brief  RIICHS core class
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

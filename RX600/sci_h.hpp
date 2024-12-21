@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ SCIh 定義
+	@brief	Serial Communications Interface h / シリアルコミュニケーションインタフェース h
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 #if defined(SIG_RX13T) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCIh 定義クラス（通常ベクター版）
+		@brief  SCIh class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	txi		送信割り込みベクター

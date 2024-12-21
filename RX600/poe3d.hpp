@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX26T ポートアウトプットイネーブル 3 (POE3D)
+	@brief	Port Output Enable 3 / ポートアウトプットイネーブル 3 @n
+			RX26T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ポートアウトプットイネーブル 3 (POE3D) ベース・クラス
+		@brief  POE3D base class
 		@param[in]	base	モジュール先頭アドレス
 		@param[in]	per	ペリフェラル型
 	*/

@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・USBA 定義 @n
+	@brief	USB 2.0 Full-Speed Host/Function Module / USB 2.0 Full-Speed ホスト / ファンクションモジュール @n
 			RX64M/RX71M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  USB 2.0 High-Speed ホスト / ファンクションモジュール (USBAa)
+		@brief  USBAa class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	rvec	R 割り込み Vector

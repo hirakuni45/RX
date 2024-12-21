@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ DRW2D 定義 @n
+	@brief	2D Drawing Engine / 2D 描画エンジン @n
 			RX65N/RX651 @n
 			RX66N @n
 			RX72N/RX72M
@@ -17,7 +17,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  DRW2D 定義
+		@brief  DRW2D class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 	*/

@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ・CMPCa 定義 @n
+	@brief	Comparator C / コンパレータ C @n
 			・RX13T @n
 			・RX23T @n
 			・RX24T/RX24U @n
@@ -20,7 +20,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  コンパレータ C（CMPC）
+		@brief  CMPC class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	IVT		割り込み型

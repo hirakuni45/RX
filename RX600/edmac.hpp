@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ・イーサネットコントローラ用 DMA コントローラ (EDMACa, PTPEDMAC) @n
+	@brief	DMA Controller for the Ethernet Controller / イーサネットコントローラ用 DMA コントローラ @n
 			RX62N @n
 			RX63N @n
 			RX64M/RX71M @n
@@ -20,7 +20,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  edmac core 定義
+		@brief  EDMAC core class
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

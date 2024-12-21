@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・SSI 定義
+	@brief	Serial Sound Interface / シリアルサウンドインタフェース
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	シリアルサウンドインタフェース（SSI）
+		@brief	SSI class
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	STT		ステータス割り込み型

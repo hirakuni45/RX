@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600 グループ・SDSI 定義
+	@brief	SD Slave interface / SD スレーブインタフェース
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SDSI 定義基底クラス
+		@brief  SDSI class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	cdeti	カード検出割り込み・ベクタ
@@ -26,12 +26,9 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::GROUPBL2 sdioi>
 	struct sdsi_t {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-//		static constexpr auto CDET_VEC = cdeti;	///< カード検出割り込み・ベクタ
-//		static constexpr auto CAC_VEC  = caci;	///< カードアクセス割り込み・ベクタ
-//		static constexpr auto SDAC_VEC = sdaci;	///< SDIO アクセス割り込み・ベクタ
-//		static constexpr auto SBFA_VEC = sdfai;	///< バッファアクセス割り込み・ベクタ
-
+		static constexpr auto PERIPHERAL = per;				///< ペリフェラル型
+		static constexpr auto SDSI = sdioi;					///< SDSI 割り込み・ベクタ
+		static constexpr auto PCLK = clock_profile::PCLKB;	///< クロック元
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -375,11 +372,203 @@ namespace device {
 		static inline dmacr2_t<base + 0x110> DMACR2;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CIS データレジスタ i (CISDATAR[i]) (i = 0 ～ 26)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct ctsdatar_t : public rw32_index_t<ofs> {
+			typedef rw32_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j < 27) { io_::index = j * 4; } }
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		static inline ctsdatar_t<base + 0x200> CTSDATAR;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FBR 設定レジスタ 1 (FBR1)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct fbr1_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>   FBR1L;
+
+			bits_rw_t<io_, bitpos::B8, 8>   FBR1U;
+		};
+		static inline fbr1_t<base + 0x270> FBR1;
 
 
-// under constructions...
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FBR 設定レジスタ 2 (FBR2)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct fbr2_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>   FBR2;
+		};
+		static inline fbr2_t<base + 0x274> FBR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FBR 設定レジスタ 3 (FBR3)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct fbr3_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16> FBR3;
+		};
+		static inline fbr3_t<base + 0x278> FBR3;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FBR 設定レジスタ 4 (FBR4)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct fbr4_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16> FBR4;
+		};
+		static inline fbr4_t<base + 0x27C> FBR4;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FBR 設定レジスタ 5 (FBR5)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct fbr5_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  FBR5;
+		};
+		static inline fbr5_t<base + 0x280> FBR5;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FN1 データレジスタ 1/2/3i (FN1DATAR1/2/3[i]) (i = 0 ～ 63)
+			@param[in]	ofs	オフセット
+			@param[in]	lim	リミット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs, uint32_t lim>
+		struct fn1datar_t : public rw32_index_t<ofs> {
+			typedef rw32_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j < lim) { io_::index = j * 4; } }
+
+			bits_rw_t<io_, bitpos::B0,  8>  LL;
+			bits_rw_t<io_, bitpos::B8,  8>  LH;
+			bits_rw_t<io_, bitpos::B16, 8>  HL;
+			bits_rw_t<io_, bitpos::B24, 8>  HH;
+
+			auto& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+		};
+		static inline fn1datar_t<base + 0x800, 64> FN1DATAR1;
+		static inline fn1datar_t<base + 0x900, 64> FN1DATAR2;
+		static inline fn1datar_t<base + 0xA00, 64> FN1DATAR3;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FN1 割り込みベクタレジスタ (FN1INTVECR)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct fn1intvecr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  INTVEC;
+		};
+		static inline fn1intvecr_t<base + 0xB00> FN1INTVECR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FN1 割り込みクリアレジスタ (FN1INTCLRR)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct fn1intclrr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  INTCTR;
+		};
+		static inline fn1intclrr_t<base + 0xB01> FN1INTCLRR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  FN1 データレジスタ 5i (FN1DATAR5[i]) (i = 0 ～ 255)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline fn1datar_t<base + 0xC00, 256> FN1DATAR5;
 	};
 
 	typedef sdsi_t<0x0009'5000, peripheral::SDSI, ICU::GROUPBL2::SDIOI> SDSI;

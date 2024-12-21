@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ CAC 定義 @n
+	@brief	Clock Frequency Accuracy Measurement Circuit / クロック周波数精度測定回路 @n
 			・RX111/RX113/RX130/RX140 @n
 			・RX220 @n
 			・RX231 @n
@@ -27,7 +27,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  クロック周波数精度測定回路（CAC）クラス
+		@brief  CAC class
 		@param[in]	INT		割り込みベクタ型
 		@param[in]	ferr	周波数エラー割り込みベクタ
 		@param[in]	mend	測定終了割り込みベクタ

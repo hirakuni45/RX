@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ・汎用 PWM タイマ定義 @n
+	@brief	General PWM Timer W / 汎用 PWM タイマ W @n
 			RX260/RX261 (GPTWa):      GPTW0 - GPTW7 @n
 			RX26T (GPTW):             GPTW0 - GPTW7 @n
 			RX66N/RX72N/RX72M (GPTW): GPTW0 - GPTW3 @n
@@ -18,7 +18,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  汎用 PWM タイマ・クラス
+		@brief  GPTW class
 		@param[in]	base	ベースアドレス
 		@param[in]	peri	ペリフェラル型
 		@param[in]	VECT	割り込みベクタ型

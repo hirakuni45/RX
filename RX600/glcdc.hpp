@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ　GLCDC 定義
+	@brief	Graphic LCD Controller / グラフィック LCD コントローラ
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GLCDC 定義
+		@brief  GLCDC class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 	*/
