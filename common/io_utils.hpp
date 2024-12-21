@@ -89,6 +89,30 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  ６４ビット書き込み
+		@param[in]	adr		書き込みアドレス
+		@param[in]	data	書き込みデータ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	inline void wr64_(address_type adr, uint32_t data) noexcept {
+		*reinterpret_cast<volatile uint64_t*>(adr) = data;
+	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ６４ビット読み込み
+		@param[in]	adr		読み込みアドレス
+		@param[in]	data	読み込みデータ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	inline uint32_t rd64_(address_type adr) noexcept {
+		return *reinterpret_cast<volatile uint64_t*>(adr);
+	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  Read/Write 8 bits アクセス・テンプレート
 		@param[in]	adr	アドレス
 	*/
@@ -940,6 +964,147 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static void write(value_type data) noexcept { wr32_(adr, data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief = オペレーター
+			@return 書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (value_type data) noexcept { write(data); }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  Read/Write 64 bits アクセス・テンプレート
+		@param[in]	adr	アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <address_type adr>
+	struct rw64_t {
+
+		typedef uint64_t value_type;
+
+		static constexpr auto address = adr;	///< アドレス定義
+		static constexpr uint8_t bus = 64;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  書き込み
+			@param[in]	data	書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		static void write(value_type data) noexcept { wr64_(adr, data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief 読み出し
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		static value_type read() noexcept { return rd64_(adr); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief = オペレーター
+			@return 書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (value_type data) noexcept { write(data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief () オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		value_type operator () () noexcept { return read(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief |= オペレーター
+			@return 論理和値
+		*/
+		//-----------------------------------------------------------------//
+		void operator |= (value_type data) noexcept { write(read() | data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief &= オペレーター
+			@return 論理積値
+		*/
+		//-----------------------------------------------------------------//
+		void operator &= (value_type data) noexcept { write(read() & data); }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  Read Only 64 bits アクセス・テンプレート
+		@param[in]	adr	アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <address_type adr>
+	struct ro64_t {
+
+		typedef uint64_t value_type;
+
+		static constexpr auto address = adr;	///< アドレス定義
+		static constexpr uint8_t bus = 64;		///< バス幅
+		static constexpr bool rd = true;		///< 読出し
+		static constexpr bool wr = false;		///< 書き込み
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief 読み出し
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		static value_type read() noexcept { return rd64_(adr); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief () オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		value_type operator () () noexcept { return read(); }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  Write Only 64 bits アクセス・テンプレート
+		@param[in]	adr	アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <address_type adr>
+	struct wo64_t {
+
+		typedef uint64_t value_type;
+
+		static constexpr auto address = adr;	///< アドレス定義
+		static constexpr uint8_t bus = 64;		///< バス幅
+		static constexpr bool rd = false;		///< 読出し
+		static constexpr bool wr = true;		///< 書き込み
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  書き込み
+			@param[in]	data	書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		static void write(value_type data) noexcept { wr64_(adr, data); }
 
 
 		//-----------------------------------------------------------------//
