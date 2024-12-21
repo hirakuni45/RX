@@ -1,7 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX26T/RX66T/RX72T グループ・HRPWM 定義
+	@brief	High Resolution PWM Waveform Generation Circuit / 高分解能 PWM 波形生成回路 @n
+			RX26T @n
+			RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +16,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief   高分解能 PWM 波形生成回路 クラス
+		@brief   HRPWM class
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct hrpwm_t {

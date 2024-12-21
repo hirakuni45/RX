@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX700 グループ Δ-Σモジュレータインタフェース定義 @n
+	@brief	Delta-Sigma Modulator Interface / Δ-Σ モジュレータインタフェース @n
 			・RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  DSMIFn 定義
+		@brief  DSMIFn class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	ocdi	過電流検出割り込み

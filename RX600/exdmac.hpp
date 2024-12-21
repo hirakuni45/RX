@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	EXDMAC/EXDMACa 定義 @n
+	@brief	EXDMA Controller / EXDMA コントローラ @n
 			EXDMAC:  RX621/RX62N @n
 			EXDMACa: RX631/RX63N @n
 			EXDMACa: RX64M/RX71M @n
@@ -21,7 +21,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  EXDMAC core 定義
+		@brief  EXDMAC core class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 	*/

@@ -168,7 +168,7 @@ Each device module is referred to in this framework as a “peripheral.”
 |[flash.hpp](flash.hpp?ts=4)|Flash Memory|FLASH|
 |[glcdc.hpp](glcdc.hpp?ts=4)|Graphic LCD Controller|GLCDC|
 |[gpt.hpp](gpt.hpp?ts=4)|General PWM Timer|GPT|
-|[gptw.hpp](gptw.hpp?ts=4)|General PWM Timer|GPTW|
+|[gptw.hpp](gptw.hpp?ts=4)|General PWM Timer W|GPTW|
 |[hrpwm.hpp](hrpwm.hpp?ts=4)|High Resolution PWM Waveform Generation Circuit|HRPWM|
 |[iwdt.hpp](iwdt.hpp?ts=4)|Independent Watchdog Timer|IWDT|
 |[lcdc.hpp](lcdc.hpp?ts=4)|LCD Controller / Driver|LCDC|
@@ -179,7 +179,7 @@ Each device module is referred to in this framework as a “peripheral.”
 |[mtu3.hpp](mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 3|MTU3|
 |[pdc.hpp](pdc.hpp?ts=4)|Parallel Data Capture Unit|PDC|
 |[pmgi.hpp](pmgi.hpp?ts=4)|PHY Management Interface|PMGI|
-|[poe3d.hpp](poe3d.hpp?ts=4)|Port Output Enable 3 |POE3|
+|[poe3d.hpp](poe3d.hpp?ts=4)|Port Output Enable 3|POE3|
 |[poeg.hpp](poeg.hpp?ts=4)|Port Output Enable for GPTW|POEG|
 |[ppg.hpp](ppg.hpp?ts=4)|Programmable Pulse Generator|PPG|
 |[qspi.hpp](qspi.hpp?ts=4)|Quad Serial Peripheral Interface|QSPI|

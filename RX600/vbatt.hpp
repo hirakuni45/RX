@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	バッテリバックアップ機能定義 @n
+	@brief	Battery Backup Function / バッテリバックアップ機能 @n
 			・RX231 (VBATT) @n
 			・RX671 (VBATTB)
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -17,7 +17,7 @@ namespace device {
 #if defined(SIG_RX231)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  バッテリバックアップ機能
+		@brief  VBATT class
 		@param[in]	per		ペリフェラル型
 		@param[in]	IVT		割り込み型
 		@param[in]	ivec	割り込みベクタ型

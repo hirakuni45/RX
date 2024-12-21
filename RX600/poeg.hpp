@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	GPTW 用ポートアウトプットイネーブル (POEG)
+	@brief	Port Output Enable for GPTW / GPTW 用ポートアウトプットイネーブル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GPTW 用ポートアウトプットイネーブル (POEG)
+		@brief  POEG class
 		@param[in]	base	モジュール先頭アドレス
 		@param[in]	per	ペリフェラル型
 	*/

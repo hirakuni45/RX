@@ -1,7 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140/RX231/RX24T/RX24U グループ・RSCAN 定義
+	@brief	RSCAN Module / RSCAN モジュール @n
+			RX140 @n
+			RX231 @n
+			RX24T/RX24U
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +17,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	RSCAN ベース・モジュール（RSCAN）
+		@brief	RSCAN base class
 		@param[in]	base	ベースアドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

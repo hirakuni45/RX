@@ -1,8 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ CMT 定義 @n
-			RX110/RX111/RX130/RX140 (CMT0/CMT1 のみ) @n
+	@brief	Compare Match Timer / コンペアマッチタイマ @n
+			RX110/RX111/RX130/RX140 (Only CMT0/CMT1) @n
 			RX113 @n
 			RX220 @n
 			RX231 @n
@@ -30,8 +30,8 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CMT 定義基底クラス
-		@param[in]	base	ベース・アドレス
+		@brief  CMT core class
+		@param[in]	base	base address
 		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

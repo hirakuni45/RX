@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ・CRCA 定義 @n
+	@brief	CRC Calculator A / CRC 演算 A @n
 			RX65N/RX651 @n
 			RX66N @n
 			RX660/RX671 @n
@@ -19,7 +19,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CRCA 演算器クラス
+		@brief  CRCA class
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
 	*/

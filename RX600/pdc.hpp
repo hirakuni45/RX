@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX600/RX700 グループ・PDC 定義 @n
+	@brief	Parallel Data Capture Unit / パラレルデータキャプチャユニット @n
 			RX631/RX63N @n
 			RX64M/RX71M @n
 			RX65N/RX65N @n
@@ -20,7 +20,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	パラレルデータキャプチャユニット（PDC）
+		@brief	PDC class
 		@param[in]	per	ペリフェラル
 		@param[in]	GPT	グループ割り込み型
 	*/
@@ -32,7 +32,6 @@ namespace device {
 		static constexpr auto PCDFI = ICU::VECTOR::PCDFI;	///< 受信データレディ割り込み
 		static constexpr auto PCFEI = GPT::PCFEI;			///< フレームエンド割り込み
 		static constexpr auto PCERI = GPT::PCERI;			///< エラー割り込み
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -117,11 +116,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
 		struct pcmonr_t : public ro32_t<base> {
-			typedef ro32_t<base> io_;
-			using io_::operator ();
+			typedef ro32_t<base> in_;
+			using in_::operator ();
 
-			bit_rw_t<io_, bitpos::B0>  VSYNC;
-			bit_rw_t<io_, bitpos::B1>  HSYNC;
+			bit_ro_t<in_, bitpos::B0>  VSYNC;
+			bit_ro_t<in_, bitpos::B1>  HSYNC;
 		};
 		static inline pcmonr_t<0x000A'050C>  PCMONR;
 
@@ -131,7 +130,7 @@ namespace device {
 			@brief  PDC 受信データレジスタ（ PCDR ）
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw32_t<0x000A'0510>  PCDR;
+		static inline ro32_t<0x000A'0510>  PCDR;
 
 
 		//-----------------------------------------------------------------//

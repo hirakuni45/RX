@@ -1,8 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ EPTPC 定義 @n
-			RX72M/RX72N グループ EPTPCb
+	@brief	PTP Module for the Ethernet Controller / イーサネットコントローラ用 PTP コントローラ @n	
+			RX64M/RX71M (EPTPC) @n
+			RX72M/RX72N (EPTPCb)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +16,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	イーサネットコントローラ用 PTP コントローラ (EPTPC)
+		@brief	EPTPC class
 		@param[in]	per	ペリフェラル
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

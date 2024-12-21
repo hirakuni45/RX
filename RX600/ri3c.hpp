@@ -1,7 +1,8 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX26T RI3C
+	@brief	I3C-bus Interface / I3C バスインタフェース @n
+			RX26T
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  I3C バスインタフェースコア・クラス
+		@brief  RI3C core class
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

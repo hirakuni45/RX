@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX700 グループ・SSIE 定義
+	@brief	Extension Serial Sound Interface / 拡張シリアルサウンドインタフェース
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	シリアルサウンドインタフェース（SSIE）
+		@brief	SSIE class
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	txi		送信データエンプティ割り込みベクタ

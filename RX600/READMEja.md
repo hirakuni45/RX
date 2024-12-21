@@ -168,7 +168,7 @@ C++ の機能を使い、構造的なアクセス、参照アクセスなどに�
 |[flash.hpp](flash.hpp?ts=4)|フラッシュメモリ|FLASH|
 |[glcdc.hpp](glcdc.hpp?ts=4)|グラフィック LCD コントローラ|GLCDC|
 |[gpt.hpp](gpt.hpp?ts=4)|汎用 PWM タイマ|GPT|
-|[gptw.hpp](gptw.hpp?ts=4)|汎用 PWM タイマ|GPTW|
+|[gptw.hpp](gptw.hpp?ts=4)|汎用 PWM タイマ W|GPTW|
 |[hrpwm.hpp](hrpwm.hpp?ts=4)|高分解能 PWM 波形生成回路|HRPWM|
 |[iwdt.hpp](iwdt.hpp?ts=4)|独立ウォッチドッグタイマ|IWDT|
 |[lcdc.hpp](lcdc.hpp?ts=4)|LCD コントローラ / ドライバ|LCDC|
@@ -189,10 +189,10 @@ C++ の機能を使い、構造的なアクセス、参照アクセスなどに�
 |[ri3c.hpp](ri3c.hpp?ts=4)|I3C バスインタフェース|RI3C|
 |[riic.hpp](riic.hpp?ts=4)|I2C バスインタフェース|RIIC|
 |[riichs.hpp](riichs.hpp?ts=4)|ハイスピード I2C バスインタフェース|RIICHS|
-|[rscan.hpp](rscan.hpp?ts=4)|CAN モジュール|RSCAN|
+|[rscan.hpp](rscan.hpp?ts=4)|RSCAN モジュール|RSCAN|
 |[rsci.hpp](rsci.hpp?ts=4)|シリアルコミュニケーションインタフェース|RSCI|
 |[rspi.hpp](rspi.hpp?ts=4)|シリアルペリフェラルインタフェース|RSPI|
-|[rspia.hpp](rspia.hpp?ts=4)|シリアルペリフェラルインタフェース|RSPIA|
+|[rspia.hpp](rspia.hpp?ts=4)|シリアルペリフェラルインタフェース A|RSPIA|
 |[rtc.hpp](rtc.hpp?ts=4)|リアルタイムクロック|RTC|
 |[s12adf.hpp](s12adf.hpp?ts=4)|12 ビット A/D コンバータ|S12ADC|
 |[sci_a.hpp](sci_a.hpp?ts=4)|シリアルコミュニケーションインタフェース a|SCIa|
@@ -212,7 +212,7 @@ C++ の機能を使い、構造的なアクセス、参照アクセスなどに�
 |[src.hpp](src.hpp?ts=4)|サンプリングレートコンバータ|SRC|
 |[ssi.hpp](ssi.hpp?ts=4)|シリアルサウンドインタフェース|SSI|
 |[ssie.hpp](ssie.hpp?ts=4)|拡張シリアルサウンドインタフェース|SSIE|
-|[system.hpp](system.hpp?ts=4)|クロック発生回路|SYSTEM|
+|[system.hpp](system.hpp?ts=4)|クロック発生回路/システム制御|SYSTEM|
 |[tfu.hpp](tfu.hpp?ts=4)|三角関数演算器|TFU|
 |[tmr.hpp](tmr.hpp?ts=4)|8 ビットタイマ|TMR|
 |[tpu.hpp](tpu.hpp?ts=4)|16 ビットタイマパルスユニット|TPU|
