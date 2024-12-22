@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72M グループ・ペリフェラル
+	@brief	Peripheral Type / ペリフェラル種別 (RX72M)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ペリフェラル種別
+		@brief  peripheral enum class
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class peripheral : uint16_t {

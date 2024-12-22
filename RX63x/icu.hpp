@@ -1,9 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX631/RX63N グループ・ICUb 定義 @n
-			・RIIC の割り込み名は、SCI の割り込み名と重複する為、変更している。 @n
-			・Ex: RIIC0 (RXI0  --->  ICRXI0) 
+	@brief	Interrupt Controller / 割り込みコントローラ (RX631/RX63N)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -17,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX631/RX63N 割り込みコントローラ・テンプレート・クラス（ICUb）
+		@brief  ICU class (ICUb)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP {

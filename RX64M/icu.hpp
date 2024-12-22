@@ -1,9 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ・ICUA 定義 @n
-			・RIIC の割り込み名は、SCI の割り込み名と重複する為、変更している。 @n
-			・Ex: RIIC0 (RXI0  --->  ICRXI0) 
+	@brief	Interrupt Controller / 割り込みコントローラ (RX64M/RX71M)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -17,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX64M/RX71M 割り込みコントローラ・テンプレート・クラス（ICUA）
+		@brief  ICU class (ICUA)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icu_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {

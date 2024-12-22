@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX26T グループ・S12ADHa 定義 @n
+	@brief	12-Bit A/D Converter / 12 ビット A/D コンバータ (RX26T)
 			※RAM 容量 48K バイト品には対応していない。（ポート選択などが異なる）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
@@ -16,7 +16,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  S12ADHa 共通定義
+		@brief  S12ADHa base class
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
