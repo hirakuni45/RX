@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX63T グループ MPC 定義
+	@brief	Multi-Function Pin Controller / マルチファンクションピンコントローラ (RX63T)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  マルチファンクションピンコントローラークラス
+		@brief  MPC class
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct mpc_t {
