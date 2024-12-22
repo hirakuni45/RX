@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX231 グループ・ICUb 定義
+	@brief	Interrupt Controller / 割り込みコントローラ (RX230/RX231)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX231 割り込みコントローラ・テンプレート・クラス（ICUb）
+		@brief  ICU class (ICUb)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icu_t : public ICU_BASE, ICU_IRQ8 {
