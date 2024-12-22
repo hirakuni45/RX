@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX26T グループ・ICUG 定義
+	@brief	Interrupt Controller / 割り込みコントローラ (RX26T)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX26T 割り込みコントローラ・テンプレート・クラス（ICUG）
+		@brief  ICU clas (ICUc)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icuc_t : public ICU_BASE, ICU_IRQ16, ICU_GROUP, ICU_SELECT {
