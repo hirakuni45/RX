@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX マイコン・ポート・ベース定義
+	@brief	I/O Ports Base / I/O ポートベース
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//=====================================================================//
 	/*!
-		@brief  ポート・ベース・クラス
+		@brief	PORT_BASE class
 	*/
 	//=====================================================================//
 	struct PORT_BASE {
