@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX621/RX62N グループ・ICUa 定義
+	@brief	Interrupt Controller / 割り込みコントローラ (RX621/RX62N)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX621/RX62N 割り込みコントローラ・テンプレート・クラス（ICUa）
+		@brief  ICU class (ICUa)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icu_t : public ICU_BASE {

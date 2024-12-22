@@ -2,8 +2,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX621/RX62N グループ・ポートファンクション・レジスター定義 @n
-			RX62x では、MPC が無いが、互換性を考えて、MPC クラスとしている。
+	@brief	Multi-Function Pin Controller / マルチファンクションピンコントローラ @n
+			Port-Function Register (RX621/RX62N)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@
 namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  MPC クラス（ポート・ファンクション）
+		@brief  MPC class (Port function register class)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct mpc_t {
