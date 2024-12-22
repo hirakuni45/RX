@@ -1,8 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 S12ADb 定義 @n
-			  16 channel A/D input 
+	@brief	12-Bit A/D Converter / 12 ビット A/D コンバータ (RX220) @n
+			16 channel A/D input
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,7 +16,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  S12ADb ベース定義
+		@brief  S12ADb base class
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
