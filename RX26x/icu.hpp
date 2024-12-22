@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX260/RX261 グループ・ICUb 定義
+	@brief	Interrupt Controller / 割り込みコントローラ (RX260/RX261)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  割り込みコントローラ・テンプレート・クラス（ICUb）
+		@brief  ICU class (ICUb)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icub_t : public ICU_BASE, ICU_IRQ8, ICU_GROUP, ICU_SELECT {
