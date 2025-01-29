@@ -2,7 +2,8 @@
 //=========================================================================//
 /*!	@file
 	@brief	Battery Backup Function / バッテリバックアップ機能 @n
-			・RX231 (VBATT) @n
+			・RX230/RX231 (VBATT) @n
+			・RX23W (VBATT) @n
 			・RX671 (VBATTB)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
@@ -14,7 +15,7 @@
 
 namespace device {
 
-#if defined(SIG_RX231)
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  VBATT class

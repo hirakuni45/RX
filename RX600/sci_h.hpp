@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Serial Communications Interface h / シリアルコミュニケーションインタフェース h
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,7 +12,7 @@
 
 namespace device {
 
-#if defined(SIG_RX13T) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
+#if defined(SIG_RX13T) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX260) || defined(SIG_RX261)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCIh class

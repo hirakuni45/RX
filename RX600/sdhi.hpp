@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	SD Host interface / SD ホストインタフェース
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -483,7 +483,7 @@ namespace device {
 		static inline sdswap_t SDSWAP;
 	};
 
-#if defined(SIG_RX231)
+#if defined(SIG_RX231) || defined(SIG_RX23W)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SDHI 通常割り込み・クラス

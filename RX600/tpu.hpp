@@ -2,7 +2,8 @@
 //=========================================================================//
 /*!	@file
 	@brief	16-Bit Timer plus unit / 16 ビットタイマパルスユニット @n
-			RX231 @n
+			RX230/RX231 @n
+			RX23W @n
 			RX631/RX63N @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
@@ -10,7 +11,7 @@
 			RX671 @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -422,8 +423,7 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX231)
-	// グループベクターには無効表現が無い為、割り込みが無い場合「NUM_」としている。（I/O ドライバーのケアが必要）
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
 		ICU::VECTOR, ICU::VECTOR::TGI0A, ICU::VECTOR::TGI0B, ICU::VECTOR::TGI0C, ICU::VECTOR::TGI0D,
 		ICU::VECTOR, ICU::VECTOR::TCI0V, ICU::VECTOR::NONE>  TPU0;

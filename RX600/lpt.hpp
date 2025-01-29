@@ -4,7 +4,7 @@
 	@brief	Low-Power Timer / ローパワータイマ @n
 			LPT/LPTa
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -214,7 +214,7 @@ namespace device {
 
 #if defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261)
 	typedef lpta_t<ICU::VECTOR::LPTCMI1> LPT;
-#elif defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX231)
+#elif defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 	typedef lpt_t<ICU::VECTOR::NONE> LPT;
 #endif
 }

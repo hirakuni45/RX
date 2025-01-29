@@ -7,7 +7,8 @@
 			・RX13T @n
 			・RX140 @n
 			・RX220 @n
-			・RX231 @n
+			・RX230/RX231 @n
+			・RX23W @n
 			・RX23T @n
 			・RX24T/RX24U @n
 			・RX260/RX261 @n
@@ -21,7 +22,7 @@
 			・RX660/RX671 @n
 			・RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */

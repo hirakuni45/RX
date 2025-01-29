@@ -4,9 +4,10 @@
 	@brief	RSCAN Module / RSCAN モジュール @n
 			RX140 @n
 			RX231 @n
+			RX23W @n
 			RX24T/RX24U
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -1996,7 +1997,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	RSCAN モジュール（RX140/RX231/RX24T）
+		@brief	RSCAN モジュール（RX140/RX231/RX23W/RX24T）
 		@param[in]	base	ベースアドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

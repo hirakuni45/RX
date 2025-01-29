@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	DMA Controller / DMA コントローラ
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -279,7 +279,7 @@ namespace device {
 
 	};
 
-#if defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX220) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef dmac_t<0x0008'2000, peripheral::DMAC0, ICU::VECTOR::DMACI0>   DMAC0;
 	typedef dmac_t<0x0008'2040, peripheral::DMAC1, ICU::VECTOR::DMACI1>   DMAC1;
 	typedef dmac_t<0x0008'2080, peripheral::DMAC2, ICU::VECTOR::DMACI2>   DMAC2;
