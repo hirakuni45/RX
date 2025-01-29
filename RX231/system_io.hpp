@@ -1,16 +1,20 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX231 システム制御 @n
+	@brief	RX230/RX231/RX23W システム制御 @n
 			・クロックのブースト
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "RX231/system.hpp"
+#if defined(SIG_RX230) || defined(SIG_RX231)
 #include "RX231/clock_profile.hpp"
+#elif defined(SIG_RX23W)
+#include "RX23W/clock_profile.hpp"
+#endif
 
 namespace device {
 

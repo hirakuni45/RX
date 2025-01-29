@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Watchdog Timer / ウォッチドッグタイマ
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -101,7 +101,7 @@ namespace device {
 		static inline wdtrcr_t<base + 0x06> WDTRCR;
 	};
 
-#if defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX631) || defined(SIG_RX63N)
 	// WUNI for NMI
 	typedef wdta_t<0x0008'8020, peripheral::WDTA, ICU::VECTOR::NONE, clock_profile::PCLKB> WDT;
 #else

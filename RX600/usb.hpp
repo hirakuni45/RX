@@ -5,6 +5,7 @@
 			USB[abcd] @n
 			RX111/RX113 @n
 			RX231 @n
+			RX23W @n
 			RX261 @n
 			RX63T @n
 			RX66T/RX72T @n
@@ -14,7 +15,7 @@
 			RX671 @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -1425,7 +1426,7 @@ namespace device {
 #if defined(SIG_RX111) || defined(SIG_RX113)
 	typedef usb_a_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX231) || defined(SIG_RX23W)
 	typedef usb_a_t<0x000A'0000, peripheral::USB0, ICU::VECTOR,
 		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 #elif defined(SIG_RX261)

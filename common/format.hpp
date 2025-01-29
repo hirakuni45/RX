@@ -2,6 +2,7 @@
 //=============================================================================//
 /*! @file
     @brief  utils::format クラス @n
+			・C++17 以降のコンパイラが必須 @n
 			・安全性を考慮した、[s]printf 表示に準じたクラス @n
 			・二進表記として、「%b」をサポート @n
 			・固定小数点表示「%N.M:Ly」形式をサポート @n
@@ -11,8 +12,6 @@
 			と表示される。 @n
             ・NO_FLOAT_FORM を有効にすると、float 関係の機能を無効にでき @n
             メモリを節約出来る。 @n
-			・組み込みマイコンでは、64 ビット整数、倍精度浮動小数点など、リソースを @n
-			多く消費する為、サポートしていません。（オプションでサポートを追加する予定） @n
 			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
 			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
 			+ 2017/06/12 14:50- memory_chaoutと、専用コンストラクター実装 @n
@@ -43,7 +42,9 @@
 			! 2022/08/05 06:51- 出力ファンクタに対するフラッシュ要求 API (V101) @n
 			! 2023/03/03 22:44- ポインター値の１６進表示を大文字にする。 @n
 			! 2024/08/20 10:00- %0s の挙動を 'printf' に合わせる @n
-			! 2024/09/01 22:00- %q など、仕様外の文字に対する挙動
+			! 2024/09/01 22:00- %q など、仕様外の文字に対する挙動 @n
+			+ 2024/12/27 13:35- (v120) 64 bits 整数の変換をサポート（２進、８進、１０進、１６進）
+			+ 2025/01/02 13:17- (v121) cleanup
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -67,9 +68,6 @@
 
 // ８進表示をサポートしない場合（メモリの節約）
 // #define NO_OCTAL_FORM
-
-// 64 ビットの整数をサポートする場合（工事中）
-#define USE_INT64
 
 /* 
   e, E
@@ -403,7 +401,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct base_format {
 
-		static constexpr uint16_t VERSION = 112;		///< バージョン番号（整数）
+		static constexpr uint16_t VERSION = 121;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -454,7 +452,7 @@ namespace utils {
 
 		const char*	form_;
 
-		char		buff_[34];  // uint32_t 型で二進表示に必要な大きさ
+		char		buff_[64 + 2];  // uint64_t 型で二進表示に必要な大きさ
 
 		uint16_t	num_;
 
@@ -649,7 +647,8 @@ namespace utils {
 		}
 
 #ifndef NO_BIN_FORM
-		void out_bin_(uint32_t v) noexcept {
+		template <typename T>
+		void out_bin_(T v) noexcept {
 			char* p = &buff_[sizeof(buff_) - 1];
 			*p = 0;
 			uint8_t n = 0;
@@ -664,7 +663,8 @@ namespace utils {
 #endif
 
 #ifndef NO_OCTAL_FORM
-		void out_oct_(uint32_t v) noexcept {
+		template <typename T>
+		void out_oct_(T v) noexcept {
 			char* p = &buff_[sizeof(buff_) - 1];
 			*p = 0;
 			uint8_t n = 0;
@@ -678,7 +678,8 @@ namespace utils {
 		}
 #endif
 
-		char* build_udec_(uint32_t v) noexcept {
+		template <typename T>
+		char* build_udec_(T v) noexcept {
 			char* p = &buff_[sizeof(buff_) - 1];
 			*p = 0;
 			udec_num_ = 0;
@@ -692,16 +693,19 @@ namespace utils {
 		}
 
 
-		void out_dec_(int32_t v) noexcept {
+		template <typename T>
+		void out_dec_(T v) noexcept {
 			char sign = 0;
 			if(v < 0) { v = -v; sign = '-'; }
 			else if(sign_) { sign = '+'; }
-			char* tmp = build_udec_(v);
+			char* tmp;
+			tmp = build_udec_<typename std::make_unsigned<T>::type>(v);
 			out_str_(tmp, sign, udec_num_);
 		}
 
 
-		void out_hex_(uint32_t v, char top) noexcept {
+		template <typename T>
+		void out_hex_(T v, char top) noexcept {
 			char* p = &buff_[sizeof(buff_) - 1];
 			*p = 0;
 			uint8_t n = 0;
@@ -718,32 +722,35 @@ namespace utils {
 		}
 
 
-		void decimal_(int32_t val, bool sign) noexcept {
+		template <typename T>
+		void decimal_(T val, bool sign) noexcept {
 			switch(mode_) {
 #ifndef NO_BIN_FORM
 			case mode::BINARY:
-				out_bin_(val);
+				out_bin_<typename std::make_unsigned<T>::type>(val);
 				break;
 #endif
 #ifndef NO_OCTAL_FORM
 			case mode::OCTAL:
-				out_oct_(val);
+				out_oct_<typename std::make_unsigned<T>::type>(val);
 				break;
 #endif
 			case mode::DECIMAL:
-				out_dec_(val);
+				out_dec_<typename std::make_signed<T>::type>(val);
 				break;
 			case mode::U_DECIMAL:
 				{
-					auto tmp = build_udec_(val);
+					auto tmp = build_udec_<typename std::make_unsigned<T>::type>(val);
 					out_str_(tmp, sign_ ? '+' : 0, udec_num_);
 				}
 				break;
 			case mode::HEX:
-				out_hex_(static_cast<uint32_t>(val), 'a');
-				break;
 			case mode::HEX_CAPS:
-				out_hex_(static_cast<uint32_t>(val), 'A');
+				{
+					char ch = 'a';
+					if(mode_ == mode::HEX_CAPS) ch = 'A';
+					out_hex_<typename std::make_unsigned<T>::type>(val, ch);
+				}
 				break;
 			case mode::FIXED_REAL:
 				if(num_ == 0) num_ = 6;
@@ -1019,16 +1026,16 @@ namespace utils {
 		void pointer_(const void* val) noexcept
 		{
 			zerosupp_ = true;
-			num_ = 8;
 			if(sizeof(void*) > 4) {
+				num_ = sizeof(size_t) * 2;
 				auto v = reinterpret_cast<size_t>(val);
-				out_hex_(v >> (sizeof(size_t) << 2), 'A');
-				out_hex_(v, 'A');
+				out_hex_<size_t>(v, 'A');
 			} else {
+				num_ = 8;
 				if(sizeof(void*) < 4) {  // 8/16 ビットマイコンの場合
 					num_ = 4;
 				}
-				out_hex_(reinterpret_cast<size_t>(val), 'A');
+				out_hex_<uint32_t>(reinterpret_cast<size_t>(val), 'A');
 			}
 		}
 
@@ -1268,7 +1275,7 @@ namespace utils {
 				return *this;
 			}
 
-			if(std::is_integral<T>::value) {
+			if constexpr (std::is_integral<T>::value) {
 				if(mode_ == mode::CHA) {
 					auto chn = static_cast<int32_t>(val);
 					if(chn > -128 && chn < 128) {
@@ -1277,10 +1284,11 @@ namespace utils {
 						error_ = error::over;
 					}
 				} else {
-					decimal_(val, std::is_signed<T>::value);
+					typedef typename std::make_signed<T>::type S;
+					decimal_<S>(val, std::is_signed<T>::value);
 				}
 #ifndef NO_FLOAT_FORM
-			} else if(std::is_floating_point<T>::value) {
+			} else if constexpr (std::is_floating_point<T>::value) {
 				if(!set_poi_) point_ = 6;
 				switch(mode_) {
 				case mode::REAL:

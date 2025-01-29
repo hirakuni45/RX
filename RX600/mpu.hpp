@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Memory-Protection Unit / メモリプロテクションユニット
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -260,7 +260,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 8>  HITD;
 		};
-		static inline mhitd_t<0x0008'6528> MHITD;
+		static inline mhitd_t<0x0008'652C> MHITD;
 	};
 	static inline mpu_t MPU;
 }

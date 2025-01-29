@@ -8,7 +8,7 @@
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
-### Package/パッケージ
+### Package / パッケージ
 
 |R5F513T---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
 |---|:-:|:-:|:-:|
@@ -17,21 +17,21 @@
 |R5F513TxxxNE|HWQFN|48|0.50|
 |R5F513TxxxNH|HWQFN|32|0.50|
 
-### Ambient operating temperature/動作周囲温度
+### Ambient operating temperature / 動作周囲温度
 
 |R5F513T--X--|degree Celsius|
 |---|:-:|
 |R5F513TxxDxx|-40 ～ +85℃|
 |R5F513TxxGxx|-40 ～ +105℃|
 
-### Memoey size/メモリ容量
+### Memoey size / メモリ容量
 
 |R5F513TX----|CodeFlash|RAM|DataFlash|
 |---|:-:|:-:|:-:|
 |R5F513T5xxxx|128K|12K|0K|
 |R5F513T3xxxx|64K|12K|0K|
 
-### Data Flash/データ・フラッシュ
+### Data Flash / データ・フラッシュ
 
 |Capacity|Erase Size|Blank Check Size|Write Size|Erase Value|ID|
 |:-:|:-:|:-:|:-:|:-:|:-:|

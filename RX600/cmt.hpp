@@ -5,7 +5,8 @@
 			RX110/RX111/RX130/RX140 (Only CMT0/CMT1) @n
 			RX113 @n
 			RX220 @n
-			RX231 @n
+			RX230/RX231 @n
+			RX23W @n
 			RX24T @n
 			RX260/RX261 @n
 			RX26T @n
@@ -19,7 +20,7 @@
 			RX66T/RX72T @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -215,7 +216,7 @@ namespace device {
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLK> CMT1;
 	typedef cmt_nom_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR::CMI2, clock_profile::PCLK> CMT2;
 	typedef cmt_nom_t<0x0008'8018, peripheral::CMT3, ICU::VECTOR::CMI3, clock_profile::PCLK> CMT3;
-#elif defined(SIG_RX13T) || defined(SIG_RX113) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX13T) || defined(SIG_RX113) || defined(SIG_RX220) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef cmt_nom_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
 	typedef cmt_nom_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR::CMI2, clock_profile::PCLKB> CMT2;

@@ -38,7 +38,7 @@ namespace {
 		bool adr = true;
 		for(uint32_t i = 0; i < len; i += device::FLASH::DATA_WORD_SIZE) {
 			if(adr) {
-				utils::format("0x%04X:") % static_cast<uint32_t>(org);
+				utils::format("0x%04X:") % org;
 				adr = false;
 			}
 			for(uint32_t j = 0; j < device::FLASH::DATA_WORD_SIZE; ++j) {
@@ -80,15 +80,13 @@ namespace {
 		}
 		char ch;
 		while((ch = *inp++) != 0) {
+			if(ch >= 'a') ch -= 0x20;
 			if(ch >= '0' && ch <= '9') {
 				shift4_(out);
 				out[device::FLASH::DATA_WORD_SIZE - 1] |= ch - '0';
 			} else if(ch >= 'A' && ch <= 'F') {
 				shift4_(out);
 				out[device::FLASH::DATA_WORD_SIZE - 1] |= ch - 'A' + 10;
-			} else if(ch >= 'a' && ch <= 'f') {
-				shift4_(out);
-				out[device::FLASH::DATA_WORD_SIZE - 1] |= ch - 'a' + 10;
 			} else {
 				return false;
 			}

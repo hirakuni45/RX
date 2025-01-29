@@ -3,14 +3,15 @@
 /*!	@file
 	@brief	12-Bit D/A Converter / 12 ビット D/A コンバータ @n
 			RX113 @n
-			RX231 @n
+			RX230/RX231 @n
+			RX23W @n
 			RX64M/RX71M @n
 			RX65N/RX651 @n
 			RX660 @n
 			RX72N/RX72M @n
 			RX26T/RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -354,7 +355,7 @@ namespace device {
 	};
 	typedef r12da_A_t<peripheral::R12DA> R12DA;
 
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	12 ビット D/A コンバータ（R12DAA）

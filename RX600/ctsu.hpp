@@ -4,10 +4,11 @@
 	@brief	Capacitive Touch Sensing Unit / 静電容量式タッチセンサ @n
 			・RX113 @n
 			・RX130 @n
-			・RX231 @n
+			・RX230/RX231 @n
+			・RX23W @n
 			・RX671
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -870,7 +871,7 @@ namespace device {
 		static inline rw8_t<0x007F'FFBE> CTSUTRMR;
 	};
 
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX230) || defined(SIG_RX231)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  RX231 静電容量式タッチセンサ CTSU クラス
@@ -1051,6 +1052,156 @@ namespace device {
 				PORTC::PMR.B1 = 0;
 				MPC::PC1PFS.PSEL = sel;
 				PORTC::PMR.B1 = ena;
+				break;
+			case PORT::TS35:
+				PORTC::PMR.B0 = 0;
+				MPC::PC0PFS.PSEL = sel;
+				PORTC::PMR.B0 = ena;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル有効制御レジスタ n (CTSUCHACn) (n = 0 ～ 4)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ctsu_utils::ctsuchacn_t<base + 0x06> CTSUCHAC0_;
+		static inline CTSUCHAC0_ CTSUCHAC0;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x07> CTSUCHAC1;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x08> CTSUCHAC2;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x09> CTSUCHAC3;
+		static inline ctsu_utils::ctsuchacn_t<base + 0x0A> CTSUCHAC4;
+		static inline ctsu_utils::ctsuchctrl_t<base + 0x06, PORT> CTSUCHAC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU チャネル送受信制御レジスタ n (CTSUCHTRCn) (n = 0 ～ 4)
+		*/
+		//-----------------------------------------------------------------//
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0B> CTSUCHTRC0_;
+		static inline CTSUCHTRC0_ CTSUCHTRC0;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0C> CTSUCHTRC1;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0D> CTSUCHTRC2;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0E> CTSUCHTRC3;
+		typedef ctsu_utils::ctsuchtrcn_t<base + 0x0F> CTSUCHTRC4;
+		static inline ctsu_utils::ctsuchctrl_t<base + 0x08, PORT> CTSUCHTRC;
+	};
+
+#elif defined(SIG_RX23W)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX231 静電容量式タッチセンサ CTSU クラス
+		@param[in]	base	ベース・アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct ctsu_t : public ctsu_base_t<base> {
+
+		static constexpr auto PERIPHERAL = peripheral::CTSU;	///< ペリフェラル型
+		static constexpr auto WRI = ICU::VECTOR::CTSUWR;		///< チャネル毎の設定レジスタ書き込み要求割り込み
+		static constexpr auto RDI = ICU::VECTOR::CTSURD;		///< 測定データ転送要求割り込み
+		static constexpr auto FNI = ICU::VECTOR::CTSUFN;		///< 測定終了割り込み
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CTSU ポート型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class PORT : uint8_t {
+			TSCAP = 36,	///< PC4
+			TS2 = 2,	///< P27
+			TS3,		///< P26
+			TS4,		///< P25
+			TS7 = 7,	///< P22
+			TS8,		///< P21
+			TS12 = 12,	///< P15
+			TS13,		///< P14
+			TS22 = 22,	///< PC6
+			TS23,		///< PC5
+			TS27 = 27,	///< PC3
+			TS30 = 30,	///< PC2
+			TS35 = 35,	///< PC0
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CTSU ポートを有効にする
+			@param[in]	port	CTSU ポート
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(PORT port, bool ena = true) noexcept
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+			uint8_t sel = ena ? 0b1'1001 : 0;
+			switch(port) {
+			case PORT::TSCAP:
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = sel;
+				PORTC::PMR.B4 = ena;
+				break;
+			case PORT::TS2:
+				PORT2::PMR.B7 = 0;
+				MPC::P27PFS.PSEL = sel;
+				PORT2::PMR.B7 = ena;
+				break;
+			case PORT::TS3:
+				PORT2::PMR.B6 = 0;
+				MPC::P26PFS.PSEL = sel;
+				PORT2::PMR.B6 = ena;
+				break;
+			case PORT::TS4:
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = sel;
+				PORT2::PMR.B5 = ena;
+				break;
+			case PORT::TS7:
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;
+				PORT2::PMR.B2 = ena;
+				break;
+			case PORT::TS8:
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = sel;
+				PORT2::PMR.B1 = ena;
+				break;
+			case PORT::TS12:
+				PORT1::PMR.B5 = 0;
+				MPC::P15PFS.PSEL = sel;
+				PORT1::PMR.B5 = ena;
+				break;
+			case PORT::TS13:
+				PORT1::PMR.B4 = 0;
+				MPC::P14PFS.PSEL = sel;
+				PORT1::PMR.B4 = ena;
+				break;
+			case PORT::TS22:
+				PORTC::PMR.B6 = 0;
+				MPC::PC6PFS.PSEL = sel;
+				PORTC::PMR.B6 = ena;
+				break;
+			case PORT::TS23:
+				PORTC::PMR.B5 = 0;
+				MPC::PC5PFS.PSEL = sel;
+				PORTC::PMR.B5 = ena;
+				break;
+			case PORT::TS27:
+				PORTC::PMR.B3 = 0;
+				MPC::PC3PFS.PSEL = sel;
+				PORTC::PMR.B3 = ena;
+				break;
+			case PORT::TS30:
+				PORTC::PMR.B2 = 0;
+				MPC::PC2PFS.PSEL = sel;
+				PORTC::PMR.B2 = ena;
 				break;
 			case PORT::TS35:
 				PORTC::PMR.B0 = 0;

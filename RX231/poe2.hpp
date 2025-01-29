@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX231 ポートアウトプットイネーブル POE2a 定義
+	@brief	RX230/RX231/RX23W ポートアウトプットイネーブル POE2a 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,13 +42,17 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  POE0M;
 			bits_rw_t<io_, bitpos::B2, 2>  POE1M;
+#if defined(SIG_RX230) || defined(SIG_RX231)
 			bits_rw_t<io_, bitpos::B4, 2>  POE2M;
+#endif
 			bits_rw_t<io_, bitpos::B6, 2>  POE3M;
 			bit_rw_t <io_, bitpos::B8>     PIE1;
 
 			bit_rw_t <io_, bitpos::B12>    POE0F;
 			bit_rw_t <io_, bitpos::B13>    POE1F;
+#if defined(SIG_RX230) || defined(SIG_RX231)
 			bit_rw_t <io_, bitpos::B14>    POE2F;
+#endif
 			bit_rw_t <io_, bitpos::B15>    POE3F;
 		};
 		static inline icsr1_t<0x0008'8900> ICSR1;
@@ -90,7 +94,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 2>  POE4M;
+			bits_rw_t<io_, bitpos::B0, 2>  POE8M;
 
 			bit_rw_t <io_, bitpos::B8>     PIE2;
 			bit_rw_t <io_, bitpos::B9>     POE8E;
@@ -137,7 +141,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  PE0ZE;
 			bit_rw_t<io_, bitpos::B1>  PE1ZE;
 			bit_rw_t<io_, bitpos::B2>  PE2ZE;
+#if defined(SIG_RX230) || defined(SIG_RX231)
 			bit_rw_t<io_, bitpos::B3>  PE3ZE;
+#endif
 		};
 		static inline poecr1_t<0x0008'890B> POECR1;
 

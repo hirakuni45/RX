@@ -1,18 +1,18 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX230/RX231 グループ・ポート・マッピング (TPUa) @n
+	@brief	RX23W グループ・ポート・マッピング (TPUa) @n
 			・TPU 型に従って、タイマー用ポートを設定 @n
 			TPU0, TPU1, TPU2, TPU3, TPU4, TPU5
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX231/peripheral.hpp"
-#include "RX231/port.hpp"
-#include "RX231/mpc.hpp"
+#include "RX23W/peripheral.hpp"
+#include "RX23W/port.hpp"
+#include "RX23W/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -29,64 +29,13 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000011 : 0;
 			switch(ch) {
-			// PA0
-			case CHANNEL::A:
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTA::PMR.B0 = 0;
-					MPC::PA0PFS.PSEL = sel;
-					PORTA::PMR.B0 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
+			case CHANNEL::B:  // TIOCB0
 			// P17
-			// PA1
-			case CHANNEL::B:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
 					MPC::P17PFS.PSEL = sel;
 					PORT1::PMR.B7 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTA::PMR.B1 = 0;
-					MPC::PA1PFS.PSEL = sel;
-					PORTA::PMR.B1 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			// P32
-			case CHANNEL::C:
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT3::PMR.B2 = 0;
-					MPC::P32PFS.PSEL = sel;
-					PORT3::PMR.B2 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
-			// P33
-			// PA3
-			case CHANNEL::D:
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT3::PMR.B3 = 0;
-					MPC::P33PFS.PSEL = sel;
-					PORT3::PMR.B3 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = sel;
-					PORTA::PMR.B3 = ena;
 					break;
 				default:
 					ret = false;
@@ -106,32 +55,13 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000011 : 0;
 			switch(ch) {
-			// PA4
-			case CHANNEL::A:
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTA::PMR.B4 = 0;
-					MPC::PA4PFS.PSEL = sel;
-					PORTA::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
+			case CHANNEL::B:  // TIOCB1
 			// P16
-			// PA5
-			case CHANNEL::B:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
 					MPC::P16PFS.PSEL = sel;
 					PORT1::PMR.B6 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTA::PMR.B5 = 0;
-					MPC::PA5PFS.PSEL = sel;
-					PORTA::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
@@ -151,32 +81,13 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000011 : 0;
 			switch(ch) {
-			// PA6
-			case CHANNEL::A:
-				switch(odr) {
-				case ORDER::FIRST:
-					PORTA::PMR.B6 = 0;
-					MPC::PA6PFS.PSEL = sel;
-					PORTA::PMR.B6 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
+			case CHANNEL::B:  // TIOCB2
 			// P15
-			// PA7
-			case CHANNEL::B:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
 					MPC::P15PFS.PSEL = sel;
 					PORT1::PMR.B5 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTA::PMR.B7 = 0;
-					MPC::PA7PFS.PSEL = sel;
-					PORTA::PMR.B7 = ena;
 					break;
 				default:
 					ret = false;
@@ -196,9 +107,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000011 : 0;
 			switch(ch) {
+			case CHANNEL::A:  // TIOCA3
 			// P21
 			// PB0
-			case CHANNEL::A:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -215,16 +126,10 @@ namespace device {
 					break;
 				}
 				break;
-			// P20
+			case CHANNEL::B:  // TIOCB3
 			// PB1
-			case CHANNEL::B:
 				switch(odr) {
 				case ORDER::FIRST:
-					PORT2::PMR.B0 = 0;
-					MPC::P20PFS.PSEL = sel;
-					PORT2::PMR.B0 = ena;
-					break;
-				case ORDER::SECOND:
 					PORTB::PMR.B1 = 0;
 					MPC::PB1PFS.PSEL = sel;
 					PORTB::PMR.B1 = ena;
@@ -234,35 +139,23 @@ namespace device {
 					break;
 				}
 				break;
+			case CHANNEL::C:  // TIOCC3
 			// P22
-			// PB2
-			case CHANNEL::C:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B2 = 0;
 					MPC::P22PFS.PSEL = sel;
 					PORT2::PMR.B2 = ena;
 					break;
-				case ORDER::SECOND:
-					PORTB::PMR.B2 = 0;
-					MPC::PB2PFS.PSEL = sel;
-					PORTB::PMR.B2 = ena;
-					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			// P23
+			case CHANNEL::D:  // TIOCD3
 			// PB3
-			case CHANNEL::D:
 				switch(odr) {
 				case ORDER::FIRST:
-					PORT2::PMR.B3 = 0;
-					MPC::P23PFS.PSEL = sel;
-					PORT2::PMR.B3 = ena;
-					break;
-				case ORDER::SECOND:
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;
 					PORTB::PMR.B3 = ena;
@@ -285,35 +178,23 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000011 : 0;
 			switch(ch) {
+			case CHANNEL::A:  // TIOCA4
 			// P25
-			// PB4
-			case CHANNEL::A:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B5 = 0;
 					MPC::P25PFS.PSEL = sel;
 					PORT2::PMR.B5 = ena;
 					break;
-				case ORDER::SECOND:
-					PORTB::PMR.B4 = 0;
-					MPC::PB4PFS.PSEL = sel;
-					PORTB::PMR.B4 = ena;
-					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			// P24
+			case CHANNEL::B:  // TIOCB4
 			// PB5
-			case CHANNEL::B:
 				switch(odr) {
 				case ORDER::FIRST:
-					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = sel;
-					PORT2::PMR.B4 = ena;
-					break;
-				case ORDER::SECOND:
 					PORTB::PMR.B5 = 0;
 					MPC::PB5PFS.PSEL = sel;
 					PORTB::PMR.B5 = ena;
@@ -336,28 +217,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000011 : 0;
 			switch(ch) {
-			// P13
-			// PB6
-			case CHANNEL::A:
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT1::PMR.B3 = 0;
-					MPC::P13PFS.PSEL = sel;
-					PORT1::PMR.B3 = ena;
-					break;
-				case ORDER::SECOND:
-					PORTB::PMR.B6 = 0;
-					MPC::PB6PFS.PSEL = sel;
-					PORTB::PMR.B6 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
-				break;
+			case CHANNEL::B:  // TIOCB5
 			// P14
 			// PB7
-			case CHANNEL::B:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -447,18 +309,18 @@ namespace device {
 
 			bool ret = true;
 			switch(clk) {
+			case CHANNEL::CLK_A:  // TCLKA
 			// P14
 			// PC2
-			case CHANNEL::CLK_A:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::P14PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORT1::PMR.B4 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTC::PMR.B2 = 0;
-					MPC::PC2PFS.PSEL = ena ? 0b000011 : 0;
+					MPC::PC2PFS.PSEL = ena ? 0b00'0011 : 0;
 					PORTC::PMR.B2 = ena;
 					break;
 				default:
@@ -466,24 +328,18 @@ namespace device {
 					break;
 				}
 				break;
+			case CHANNEL::CLK_B:  // TCLKB
 			// P15
-			// PA3
 			// PC3
-			case CHANNEL::CLK_B:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
-					MPC::P15PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::P15PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORT1::PMR.B5 = ena;
 					break;
 				case ORDER::SECOND:
-					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = ena ? 0b000100 : 0;
-					PORTA::PMR.B3 = ena;
-					break;
-				case ORDER::THIRD:
 					PORTC::PMR.B3 = 0;
-					MPC::PC3PFS.PSEL = ena ? 0b000011 : 0;
+					MPC::PC3PFS.PSEL = ena ? 0b00'0011 : 0;
 					PORTC::PMR.B3 = ena;
 					break;
 				default:
@@ -491,24 +347,18 @@ namespace device {
 					break;
 				}
 				break;
+			case CHANNEL::CLK_C:  // TCLKC
 			// P16
-			// PB2
 			// PC0
-			case CHANNEL::CLK_C:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
-					PORTB::PMR.B2 = 0;
-					MPC::PB2PFS.PSEL = ena ? 0b000100 : 0;
-					PORTB::PMR.B2 = ena;
-					break;
-				case ORDER::THIRD:
 					PORTC::PMR.B0 = 0;
-					MPC::PC0PFS.PSEL = ena ? 0b000011 : 0;
+					MPC::PC0PFS.PSEL = ena ? 0b00'0011 : 0;
 					PORTC::PMR.B0 = ena;
 					break;
 				default:
@@ -516,25 +366,19 @@ namespace device {
 					break;
 				}
 				break;
+			case CHANNEL::CLK_D:  // TCLKD
 			// P17
 			// PB3
-			// PC1
-			case CHANNEL::CLK_D:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
-					MPC::P17PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::P17PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORT1::PMR.B7 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B3 = 0;
-					MPC::PB3PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::PB3PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORTB::PMR.B3 = ena;
-					break;
-				case ORDER::THIRD:
-					PORTC::PMR.B1 = 0;
-					MPC::PC1PFS.PSEL = ena ? 0b000011 : 0;
-					PORTC::PMR.B1 = ena;
 					break;
 				default:
 					ret = false;

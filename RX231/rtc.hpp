@@ -1,9 +1,11 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX230/RX231/RX260/RX261 グループ・RTCe/RTCBa 定義
+	@brief	RTC 定義 @n
+			RX230/RX231/RX23W (RTCe) @n
+			RX260/RX261 (RTCBa)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -505,7 +507,7 @@ namespace device {
 		static inline rcr2_t<0x0008'C424> RCR2;
 
 
-#if defined(SIG_RX230) || defined(SIG_RX231)
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  RTC コントロールレジスタ 3（RCR3）

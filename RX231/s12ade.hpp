@@ -6,9 +6,10 @@
 			RX130:       8+16 input single A/D @n
 			RX140:       8+9  input single A/D @n
 			RX230/RX231: 8+16 input single A/D @n
+			RX23W:       8+16 input single A/D @n
 			RX260/RX261: 8+1+16 input single A/D
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -1631,7 +1632,7 @@ namespace device {
 		static inline adccr_t<base + 0x7E>  ADCCR;
 	};
 
-#elif defined(SIG_RX130) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
+#elif defined(SIG_RX130) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX260) || defined(SIG_RX261)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  RX130/RX230/RX231/RX260/RX261 S12ADE 定義
@@ -1651,16 +1652,19 @@ namespace device {
 		static constexpr auto CMPBI		 = ICU::VECTOR::NONE;		///< コンペアＢ割り込みベクター
 
 		static constexpr auto PCLK = clock_profile::PCLKB;			///< A/D 変換クロック元
-#if defined(SIG_RX230) || defined(SIG_RX231)
-		static constexpr uint32_t CONV_TIME_NS = 830;				///< A/D 変換時間 0.83uS、単位「ns」
-		static constexpr uint32_t ANALOG_NUM = 24;	///< アナログ入力数
-#elif defined(SIG_RX130)
+#if defined(SIG_RX130)
 		static constexpr uint32_t CONV_TIME_NS = 1400;				///< A/D 変換時間 0.83uS、単位「ns」
-		static constexpr uint32_t ANALOG_NUM = 24;	///< アナログ入力数
+		static constexpr uint32_t ANALOG_NUM = 24;					///< アナログ入力数
+#elif defined(SIG_RX230) || defined(SIG_RX231)
+		static constexpr uint32_t CONV_TIME_NS = 830;				///< A/D 変換時間 0.83uS、単位「ns」
+		static constexpr uint32_t ANALOG_NUM = 24;					///< アナログ入力数
+#elif defined(SIG_RX23W)
+		static constexpr uint32_t CONV_TIME_NS = 830;				///< A/D 変換時間 0.83uS、単位「ns」
+		static constexpr uint32_t ANALOG_NUM = 14;					///< アナログ入力数
 #else
 		static constexpr uint32_t CONV_TIME_NS  = 700;				///< A/D 変換時間 (ADCCR.CCS=0) 0.7uS、単位「ns」
 		static constexpr uint32_t CONV_TIME2_NS = 500;				///< A/D 変換時間 (ADCCR.CCS=1) 0.5uS、単位「ns」
-		static constexpr uint32_t ANALOG_NUM = 25;	///< アナログ入力数
+		static constexpr uint32_t ANALOG_NUM = 25;					///< アナログ入力数
 #endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1669,34 +1673,37 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,	///< AN000 入力
-			AN001,	///< AN001 入力
-			AN002,	///< AN002 入力
-			AN003,	///< AN003 入力
-			AN004,	///< AN004 入力
-			AN005,	///< AN005 入力
-			AN006,	///< AN006 入力
-			AN007,	///< AN007 入力
+			AN000,		///< AN000 入力
+			AN001,		///< AN001 入力
+			AN002,		///< AN002 入力
+			AN003,		///< AN003 入力
+			AN004,		///< AN004 入力
+			AN005,		///< AN005 入力
+			AN006,		///< AN006 入力
+			AN007,		///< AN007 入力
 #if defined(SIG_RX260) || defined(SIG_RX261)
-			AN008,	///< AN008, CTSU input
+			AN008,		///< AN008, CTSU input
 #endif
 			AN016 = 16,	///< AN016 入力
 			AN017,		///< AN017 入力
 			AN018,		///< AN018 入力
 			AN019,		///< AN019 入力
 			AN020,		///< AN020 入力
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
 			AN021,		///< AN021 入力
 			AN022,		///< AN022 入力
 			AN023,		///< AN023 入力
 			AN024,		///< AN024 入力
 			AN025,		///< AN025 入力
 			AN026,		///< AN026 入力
+#endif
 			AN027,		///< AN027 入力
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
 			AN028,		///< AN028 入力
 			AN029,		///< AN029 入力
 			AN030,		///< AN030 入力
 			AN031,		///< AN031 入力
-
+#endif
 			TEMP,	///< 温度センサ
 			REF,	///< 内部基準電圧
 		};
@@ -1806,6 +1813,7 @@ namespace device {
 				}
 				MPC::PE4PFS.ASEL = ena;
 				break;
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
 			case ANALOG::AN021:
 				if(ena) {
 					PORTE::PDR.B5 = 0;
@@ -1848,6 +1856,7 @@ namespace device {
 				}
 				MPC::PD2PFS.ASEL = ena;
 				break;
+#endif
 			case ANALOG::AN027:
 				if(ena) {
 					PORTD::PDR.B3 = 0;
@@ -1855,6 +1864,7 @@ namespace device {
 				}
 				MPC::PD3PFS.ASEL = ena;
 				break;
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
 			case ANALOG::AN028:
 				if(ena) {
 					PORTD::PDR.B4 = 0;
@@ -1883,6 +1893,7 @@ namespace device {
 				}
 				MPC::PD7PFS.ASEL = ena;
 				break;
+#endif
 			default:
 				break;
 			}

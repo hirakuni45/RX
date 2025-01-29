@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Serial Sound Interface / シリアルサウンドインタフェース
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -190,7 +190,7 @@ namespace device {
 		static inline ssitdmr_t<base + 0x20> SSITDMR;
 	};
 
-#if defined(SIG_RX113) || defined(SIG_RX231)
+#if defined(SIG_RX113) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 	typedef ssi_t<0x0008'A500, peripheral::SSI0,
 		ICU::VECTOR, ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSIF0> SSI0;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)

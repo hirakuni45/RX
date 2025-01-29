@@ -38,7 +38,7 @@ Currently supported and tested devices:
 |[RX71M](RX71M)|2.7|3.6|240|RXv2|Yes|－|－|〇|〇|R5F571MF/G/J/L|
 |[RX651](RX65x)|2.7|3.6|120|RXv2|Yes|－|－|〇|〇|R5F5651E|
 |[RX65N](RX65x)|2.7|3.6|120|RXv2|Yes|－|－|〇|〇|R5F565NE|
-|[RX66N](RX66N)|2.7|3.6|120|RXv3|Yes|V1|－|||R5F566ND/N|
+|[RX66N](RX66N)|2.7|3.6|120|RXv3|Yes|V1|Yes|||R5F566ND/N|
 |[RX660](RX660)|2.7|5.5|120|RXv3|Yes|－|－|||R5F56609|
 |[RX671](RX671)|2.7|5.5|120|RXv3|Yes|－|－|||R5F5671C/E|
 |[RX72N](RX72N)|2.7|3.6|240|RXv3|Yes|V1|Yes|〇|△|R5F572ND/N|
@@ -71,8 +71,9 @@ Currently supported and tested devices:
 Space Invaders Emulator, NES Emulator, for RX65N/RX72N Envision kit   
 <img src="docs/AudioPlayer.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
 WAV/MP3 Audio Player, File selector, for RX65N/RX72N Envision kit   
-<img src="docs/calc_sample.jpg" width="40%"> <img src="docs/SYNTH_sample.jpg" width="40%">   
-functional calculator, DX7 Emulator   
+<img src="docs/calc_gui0.jpg" width="40%"> <img src="docs/SYNTH_sample.jpg" width="40%">   
+functional calculator, DX7 Emulator
+
 <a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'"></a>   
 YouTube: NES Emulator for RX65N Envision kit
    

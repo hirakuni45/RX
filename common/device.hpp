@@ -25,7 +25,7 @@
 			RX72M @n
 			RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -133,7 +133,10 @@
 #include "RX23W/icu.hpp"
 #include "RX231/icu_mgr.hpp"
 #include "RX23W/port_map.hpp"
-
+#include "RX23W/port_map_mtu.hpp"
+#include "RX23W/port_map_tpu.hpp"
+#include "RX23W/port_map_tmr.hpp"
+#include "RX23W/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX23T)
