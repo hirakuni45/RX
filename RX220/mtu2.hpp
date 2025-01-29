@@ -4,10 +4,11 @@
 	@brief	RX グループ・MTU2a 定義 @n
 			RX110/RX111/RX113 @n
 			RX130/RX140 @n
-			RX220/RX231 @n
+			RX220/RX230/RX231 @n
+			RX23W @n
 			RX631/RX63N 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,7 +25,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct mtux_base_t {
 
-#if defined(SIG_RX231)
+#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 		static constexpr auto PCLK = clock_profile::PCLKA;	///< MTU master clock
 #else
 		static constexpr auto PCLK = clock_profile::PCLKB;	///< MTU master clock
@@ -1199,7 +1200,7 @@ namespace device {
 	};
 #if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef mtu_ab_t<0x0008'8680> MTUA;
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 	typedef mtu_ab_t<0x000D'0A80> MTUA;
 #endif
 
@@ -2258,6 +2259,8 @@ namespace device {
 	};
 #endif
 
+#if defined(SIG_RX23W)
+#else
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU5 定義クラス
@@ -2498,6 +2501,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static inline mtu5_nfcr_t<base2> NFCR;
 	};
+#endif
 
 #if defined(SIG_RX110)
 	typedef mtu0_t<0x0008'8700, 0x0008'8690, ICU::VECTOR, ICU::VECTOR> MTU0;
@@ -2511,13 +2515,19 @@ namespace device {
 	typedef mtu3_t<0x0008'8600, 0x0008'8693, ICU::VECTOR, ICU::VECTOR> MTU3;
 	typedef mtu4_t<0x0008'8601, 0x0008'8694, ICU::VECTOR, ICU::VECTOR> MTU4;
 	typedef mtu5_t<0x0008'8880, 0x0008'8695, ICU::VECTOR> MTU5;
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX230) || defined(SIG_RX231)
 	typedef mtu0_t<0x000D'0B00, 0x000D'0A90, ICU::VECTOR, ICU::VECTOR> MTU0;
 	typedef mtu1_t<0x000D'0B80, 0x000D'0A91, ICU::VECTOR, ICU::VECTOR> MTU1;
 	typedef mtu2_t<0x000D'0C00, 0x000D'0A92, ICU::VECTOR, ICU::VECTOR> MTU2;
 	typedef mtu3_t<0x000D'0A00, 0x000D'0A93, ICU::VECTOR, ICU::VECTOR> MTU3;
 	typedef mtu4_t<0x000D'0A01, 0x000D'0A94, ICU::VECTOR, ICU::VECTOR> MTU4;
 	typedef mtu5_t<0x000D'0C80, 0x000D'0A95, ICU::VECTOR> MTU5;
+#elif defined(SIG_RX23W)
+	typedef mtu0_t<0x000D'0B00, 0x000D'0A90, ICU::VECTOR, ICU::VECTOR> MTU0;
+	typedef mtu1_t<0x000D'0B80, 0x000D'0A91, ICU::VECTOR, ICU::VECTOR> MTU1;
+	typedef mtu2_t<0x000D'0C00, 0x000D'0A92, ICU::VECTOR, ICU::VECTOR> MTU2;
+	typedef mtu3_t<0x000D'0A00, 0x000D'0A93, ICU::VECTOR, ICU::VECTOR> MTU3;
+	typedef mtu4_t<0x000D'0A01, 0x000D'0A94, ICU::VECTOR, ICU::VECTOR> MTU4;
 #elif defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef mtu0_t<0x0008'8700, 0x0008'8690, ICU::VECTOR, ICU::GROUP1> MTU0;
 	typedef mtu1_t<0x0008'8780, 0x0008'8691, ICU::VECTOR, ICU::GROUP1> MTU1;

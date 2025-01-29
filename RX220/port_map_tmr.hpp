@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220/RX231 グループ・ポート・マッピング (TMR)
+	@brief	RX220/RX230/RX231 グループ・ポート・マッピング (TMR)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,7 +12,7 @@
 #include "RX220/peripheral.hpp"
 #include "RX220/port.hpp"
 #include "RX220/mpc.hpp"
-#elif defined(SIG_RX231)
+#elif defined(SIG_RX230) || defined(SIG_RX231)
 #include "RX231/peripheral.hpp"
 #include "RX231/port.hpp"
 #include "RX231/mpc.hpp"
@@ -98,7 +98,7 @@ namespace device {
 					MPC::PA4PFS.PSEL = sel;
 					PORTA::PMR.B4 = ena;
 					break;
-  				case ORDER::THIRD:
+				case ORDER::THIRD:
 					PORTH::PMR.B2 = 0;
 					MPC::PH2PFS.PSEL = sel;
 					PORTH::PMR.B2 = ena;

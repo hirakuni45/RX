@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Interrupt Controller / 割り込みコントローラ (RX23W)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -378,31 +378,17 @@ namespace device {
 				case VECTOR::TGID3:
 					idx = static_cast<uint32_t>(VECTOR::TGIA3);
 					break;
-				case VECTOR::TCIV3:
-					idx = static_cast<uint32_t>(VECTOR::TCIV3);
-					break;
 				case VECTOR::TGIA4:
 				case VECTOR::TGIB4:
 				case VECTOR::TGIC4:
 				case VECTOR::TGID4:
 					idx = static_cast<uint32_t>(VECTOR::TGIA4);
 					break;
-				case VECTOR::TCIV4:
-					idx = static_cast<uint32_t>(VECTOR::TCIV4);
-					break;
-				case VECTOR::TGIU5:
-				case VECTOR::TGIV5:
-				case VECTOR::TGIW5:
-					idx = static_cast<uint32_t>(VECTOR::TGIU5);
-					break;
 				case VECTOR::TGI0A:
 				case VECTOR::TGI0B:
 				case VECTOR::TGI0C:
 				case VECTOR::TGI0D:
 					idx = static_cast<uint32_t>(VECTOR::TGI0A);
-					break;
-				case VECTOR::TCI0V:
-					idx = static_cast<uint32_t>(VECTOR::TCI0V);
 					break;
 				case VECTOR::TGI1A:
 				case VECTOR::TGI1B:
@@ -425,9 +411,6 @@ namespace device {
 				case VECTOR::TGI3C:
 				case VECTOR::TGI3D:
 					idx = static_cast<uint32_t>(VECTOR::TGI3A);
-					break;
-				case VECTOR::TCI3V:
-					idx = static_cast<uint32_t>(VECTOR::TCI3V);
 					break;
 				case VECTOR::TGI4A:
 				case VECTOR::TGI4B:
