@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX111/RX113/RX130/RX140/RX231/RX260/RX261 グループ LVDAa 定義
+	@brief	RX230/RX231 グループ LVDAb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -57,46 +57,6 @@ namespace device {
 			bit_ro_t <io_, bitpos::B1>   LVD1MON;
 		};
 		static inline lvd1sr_t<0x0008'00E1>  LVD1SR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  電圧監視 2 回路制御レジスタ 1（LVD2CR1）
-			@param[in]	base	ベース・アドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct lvd2cr1_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 2>  LVD2IDTSEL;
-			bit_rw_t <io_, bitpos::B2>     LVD2IRQSEL;
-		};
-		static inline lvd2cr1_t<0x0008'00E2>  LVD2CR1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  電圧監視 2 回路ステータスレジスタ（LVD2SR）
-			@param[in]	base	ベース・アドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct lvd2sr_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>   LVD2DET;
-			bit_ro_t <io_, bitpos::B1>   LVD2MON;
-		};
-		static inline lvd2sr_t<0x0008'00E3>  LVD2SR;
 
 
 		//-----------------------------------------------------------------//
@@ -163,30 +123,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>     LVD1RN;
 		};
 		static inline lvd1cr0_t<0x0008'C29A>  LVD1CR0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  電圧監視 2 回路制御レジスタ 0（LVD2CR0）
-			@param[in]	base	ベース・アドレス
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct lvd2cr0_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t <io_, bitpos::B0>     LVD2RIE;
-
-			bit_rw_t <io_, bitpos::B2>     LVD2CMPE;
-
-			bit_rw_t <io_, bitpos::B6>     LVD2RI;
-			bit_rw_t <io_, bitpos::B7>     LVD2RN;
-		};
-		static inline lvd2cr0_t<0x0008'C29B>  LVD2CR0;
 	};
 	typedef lvda_t LVDA;
 }
