@@ -1,10 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX23T/RX24T/RX24U グループ・フラッシュ 定義 @n
+	@brief	RX23T/RX24T/RX24U/RX23W グループ・フラッシュ 定義 @n
 			RX23T はデータフラッシュが無
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -428,6 +428,54 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  ROMCIV;
 		};
 		static inline romciv_t<0x0008'1004> ROMCIV;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3)
+		*/
+		//-----------------------------------------------------------------//
+		static inline ro32_t<0x007F'C350> UIDR0;
+		static inline ro32_t<0x007F'C354> UIDR1;
+		static inline ro32_t<0x007F'C358> UIDR2;
+		static inline ro32_t<0x007F'C35C> UIDR3;
+	};
+#elif defined(SIG_RX23W)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  RX24T/RX24U フラッシュ・メモリー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr uint32_t DATA_SIZE = 8192;				///< データフラッシュサイズ
+		static constexpr uint32_t DATA_BLANK_SIZE = 1024;		///< ブロックサイズ
+		static constexpr uint32_t DATA_ERASE_SIZE = 1024;		///< ブロックサイズ
+		static constexpr uint32_t DATA_WORD_SIZE = 1;			///< データワードサイズ
+		static constexpr uint32_t ID_NUM = 4;					///< ユニーク ID 数
+
+		static constexpr uint32_t WRITE_WORD_TIME  = 376;		///< 375.5uS (DATA_WORD_SIZE)
+		static constexpr uint32_t ERASE_BLOCK_TIME = 229400;	///< 229.4mS (DATA_BLOCK_SIZE)
+		static constexpr uint32_t CHECK_WORD_TIME  = 17;		///< 16.1uS  (DATA_WORD_SIZE)
+		static constexpr uint32_t CHECK_BLOCK_TIME = 496;		///< 495.7uS (DATA_BLOCK_SIZE)
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct dflctl_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> DFLEN;
+		};
+		static inline dflctl_t<0x007F'C090> DFLCTL;
 
 
 		//-----------------------------------------------------------------//

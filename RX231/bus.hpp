@@ -1,9 +1,9 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX231 バス定義
+	@brief	RX230/RX231/RX23W バス定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,6 +19,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct BUS {
 
+#if defined(SIG_RX230) || defined(SIG_RX231)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CSn 制御レジスタ（CSnCR）（n = 0 ～ 3）
@@ -190,7 +191,7 @@ namespace device {
 		static inline csnwcr2_t<0x0008'3018> CS1WCR2;
 		static inline csnwcr2_t<0x0008'3028> CS2WCR2;
 		static inline csnwcr2_t<0x0008'3038> CS3WCR2;
-
+#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -281,7 +282,9 @@ namespace device {
 			bits_rw_t<io_, bitpos::B6,  2>  BPGB;
 			bits_rw_t<io_, bitpos::B8,  2>  BPHB;
 			bits_rw_t<io_, bitpos::B10, 2>  BPFB;
+#if defined(SIG_RX230) || defined(SIG_RX231)
 			bits_rw_t<io_, bitpos::B12, 2>  BPEB;
+#endif
 		};
 		static inline buspri_t<0x0008'1310> BUSPRI;
 	};
