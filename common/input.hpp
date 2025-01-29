@@ -6,11 +6,11 @@
 			%b ---> ２進の数値 @n
 			%o ---> ８進の数値 @n
 			%d ---> １０進の数値 @n
-			%u ---> 符号無し１０進 @n
+			%u ---> 符号無し１０進（v111 で廃止、%d で自動対応） @n
 			%x ---> １６進の数値 @n
 			%f ---> 浮動小数点数（float、double） @n
 			%c ---> １文字のキャラクター @n
-			%a ---> 自動、２進(bnnn)、８進(onnn)、１０進、１６進(xnnn)、を判別 @n
+			%a ---> 自動、２進(bnnn)、８進(onnn)、１０進、１６進(xnnn)、浮動小数点を判別 @n
 			Exsample: @n
 				int v; @n
 				if(!(input("%d", parse_text) % v).status()) { @n
@@ -19,19 +19,27 @@
 					// Parse OK! @n
 					format("%d\n") % v; @n
 				} @n
+			・変換時、オーバーフローした場合は、直前の値が出力される。 @n
+			・それ以外のエラーの場合、値は出力されない。 @n
+			・C++17 以降のコンパイラが必須 @n
+			・リトルエンディアン専用 @n
 			+ 2019/12/26 15:30- 数値のオート入力機能追加 @n
-			! 2020/01/05 02:52- 変換が失敗した場合に、引数の値を変保持する @n
+			! 2020/01/05 02:52- 変換が失敗した場合に、引数の値を保持する @n
 			! 2020/01/05 03:22- %c の変換で、変換数カウントが変化しない不具合修正 @n
-			! 2020/01/05 06:16- %u 符号無し整数機能を追加 @n
+			! 2020/01/05 06:16- %u 符号無し整数機能を追加（v111 で廃止） @n
 			+ 2020/01/15 10:03- std::string 型を定義 @n
 			+ 2020/01/24 15:15- 浮動小数点オーバーフローした場合のリミッター追加 @n
 			+ 2020/01/24 15:50- 整数変換でオーバーフローが発生したらエラーとする @n
 			+ 2020/01/25 17:33- 特殊制御文字を除外する「\」（バックスラッシュ）機能 @n
 			+ 2020/02/02 19:47- enum error など共有定義を継承 @n
 			! 2022/06/13 15:15- static const を static constexpr へ変更 @n
-			+ 2024/08/14 08:57- add header file (cstdint)
+			+ 2024/08/14 08:57- add header file (cstdint) @n
+			+ 2024/12/29 10:40+ cleanup @n
+			+ 2024/12/29 17:15+ Support 64 bits integer conversion (v110) @n
+			! 2024/12/30 23:50+ '%u' を廃止、エラーステートも一部廃止 (v111) @n
+			+ 2024/12/31 14:00+ '%a' における、浮動小数点を受け付け機能 (v112)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -56,6 +64,7 @@ namespace utils {
 		const char* str_;
 		char		last_;
 		bool		unget_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -109,11 +118,8 @@ namespace utils {
 		@brief  汎用入力クラス・ベースクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class base_input {
+	class input_base {
 	public:
-
-		static constexpr uint16_t VERSION = 102;
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  エラー種別
@@ -125,14 +131,12 @@ namespace utils {
 			partition,		///< 分離キャラクターの不一致
 			input_type,		///< 無効な入力タイプ
 			not_integer,	///< 整数型の不一致
-			different_sign,	///< 符号の不一致
 			sign_type,		///< 符号無し整数にマイナス符号
 			not_float,		///< 浮動小数点型の不一致
 			terminate,		///< 終端文字の不一致
 			overflow,		///< オーバーフロー
 		};
 	};
-
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -141,22 +145,24 @@ namespace utils {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class INP>
-	class basic_input : public base_input {
+	struct basic_input : public input_base {
 
+		static constexpr uint16_t VERSION = 112;	///< クラス・バージョン
+
+	private:
 		const char*	form_;
 
 		INP			inp_;
 
 		enum class mode : uint8_t {
 			NONE,
+			CHA,
 			BIN,
 			OCT,
 			DEC,
-			UDEC,
 			HEX,
 			REAL,
-			CHA,
-			AUTO_NUM,
+			AUTO,
 		};
 		mode	mode_;
 		error	error_;
@@ -164,15 +170,17 @@ namespace utils {
 		bool	ovf_;
 		int		num_;
 
-
-		uint32_t bin_() {
-			uint32_t a = 0;
+		template <typename T>
+		T bin_() noexcept {
+			T a = 0;
+			constexpr auto lim = static_cast<T>(1) << (sizeof(T) * 8 - 1);
 			char ch;
 			while((ch = inp_()) != 0) {
 				if(ch >= '0' && ch <= '1') {
-					if(a & 0x80000000) {
+					if((a & lim) != 0) {
 						ovf_ = true;
-					} else {
+					}
+					if(!ovf_) {
 						a <<= 1;
 						a += ch - '0';
 					}
@@ -189,15 +197,17 @@ namespace utils {
 			return a;
 		}
 
-
-		uint32_t oct_() {
-			uint32_t a = 0;
+		template <typename T>
+		T oct_() noexcept {
+			T a = 0;
+			constexpr auto lim = static_cast<T>(0b111) << (sizeof(T) * 8 - 4);
 			char ch;
 			while((ch = inp_()) != 0) {
 				if(ch >= '0' && ch <= '7') {
-					if(a & 0xe0000000) {
+					if((a & lim) != 0) {
 						ovf_ = true;
-					} else {
+					}
+					if(!ovf_) {
 						a <<= 3;
 						a += ch - '0';
 					}
@@ -214,17 +224,25 @@ namespace utils {
 			return a;
 		}
 
-
-		uint32_t dec_() {
-			uint32_t a = 0;
+		template <typename T>
+		T dec_() noexcept {
+			T a = 0;
 			char ch;
 			while((ch = inp_()) != 0) {
-				if(ch >= '0' && ch <= '9') {
-					if(a >= (0xffffffff / 10)) {
-						ovf_ = true;
-					} else {
+				if(!ovf_ && ch >= '0' && ch <= '9') {
+					if constexpr (std::is_signed<T>::value) {
 						a *= 10;
 						a += ch - '0';
+						if(a < 0) {
+							ovf_ = true;
+						}
+					} else {
+						auto b = a;
+						a *= 10;
+						a += ch - '0';
+						if(b > a) {
+							ovf_ = true;
+						}
 					}
 				} else if(nbc_ != 0 && ch == ' ') {
 					// 文字数指定がある場合「スペース」は '0' と同等に扱う
@@ -239,28 +257,25 @@ namespace utils {
 			return a;
 		}
 
-
-		uint32_t hex_() {
-			uint32_t a = 0;
+		template <typename T>
+		T hex_() noexcept {
+			T a = 0;
+			constexpr auto lim = static_cast<T>(0b1111) << (sizeof(T) * 8 - 4);
 			char ch;
 			while((ch = inp_()) != 0) {
-				if(a & 0xf0000000) {
-					ovf_ = true;
-				}
+				auto ovf = (a & lim) != 0;
+				if(ch >= 'a') { ch -= 0x20; }
 				if(ch >= '0' && ch <= '9') {
+					if(ovf) { ovf_ = true; }
 					if(!ovf_) {
 						a <<= 4;
 						a += ch - '0';
 					}
 				} else if(ch >= 'A' && ch <= 'F') {
+					if(ovf) { ovf_ = true; }
 					if(!ovf_) {
 						a <<= 4;
 						a += ch - 'A' + 10;
-					}
-				} else if(ch >= 'a' && ch <= 'f') {
-					if(!ovf_) {
-						a <<= 4;
-						a += ch - 'a' + 10;
 					}
 				} else if(nbc_ != 0 && ch == ' ') {
 					// 文字数指定がある場合「スペース」は '0' と同等に扱う
@@ -275,15 +290,17 @@ namespace utils {
 			return a;
 		}
 
-
-		uint32_t auto_num_()
+		template <typename T>
+		T auto_num_() noexcept
 		{
-			enum class TYPE {
+			enum class TYPE : uint8_t {
 				dec,
 				bin,
 				oct,
 				hex,
 			};
+
+			typedef typename std::make_unsigned<T>::type U;
 
 			char ch = inp_();
 			if(ch != '0') {  // 最初に０がある場合無視
@@ -291,7 +308,7 @@ namespace utils {
 			}
 			ch = inp_();
 			if(ch >= 0x60) { ch -= 0x20; }
-			uint32_t v = 0;
+			T v = 0;
 			TYPE t(TYPE::dec);
 			if(ch == 'B') {
 				t = TYPE::bin;
@@ -304,25 +321,24 @@ namespace utils {
 			}
 			switch(t) {
 			case TYPE::bin:
-				v = bin_();
+				v = bin_<U>();
 				break;
 			case TYPE::oct:
-				v = oct_();
+				v = oct_<U>();
 				break;
 			case TYPE::hex:
-				v = hex_();
+				v = hex_<U>();
 				break;
 			default:
-				v = dec_();
+				v = dec_<T>();
 				break;
 			}
 			return v;
 		}
 
-
 		template<typename T>
-		T real_() {
-
+		T real_() noexcept
+		{
 			struct real_t {
 				uint32_t	a;
 				uint32_t	b;
@@ -339,7 +355,7 @@ namespace utils {
 
 				void add(char ch)
 				{
-					if(c >= (0xffffffff / 10)) {
+					if(c >= (0xffff'ffff / 10)) {
 						if(!p) ovf = true;
 					} else {
 						a *= 10;
@@ -422,8 +438,7 @@ namespace utils {
 			}
 		}
 
-
-		void next_()
+		void next_() noexcept
 		{
 			enum class fmm : uint8_t {
 				none,
@@ -482,9 +497,6 @@ namespace utils {
 					} else if(ch == 'D') {
 						mode_ = mode::DEC;
 						return;
-					} else if(ch == 'U') {
-						mode_ = mode::UDEC;
-						return;
 					} else if(ch == 'X') {
 						mode_ = mode::HEX;
 						return;
@@ -495,7 +507,7 @@ namespace utils {
 						mode_ = mode::CHA;
 						return;
 					} else if(ch == 'A') {
-						mode_ = mode::AUTO_NUM;
+						mode_ = mode::AUTO;
 						return;
 					} else {
 						error_ = error::input_type;
@@ -510,8 +522,7 @@ namespace utils {
 			}
 		}
 
-
-		bool neg_() {
+		bool neg_() noexcept {
 			bool neg = false;
 			auto s = inp_();
 			if(s == '-') {
@@ -526,9 +537,12 @@ namespace utils {
 			return neg;
 		}
 
-
-		int32_t nb_int_(bool sign)
+		template <typename T>
+		T nb_dec_() noexcept
 		{
+			typedef typename std::make_unsigned<T>::type U;
+			typedef typename std::make_signed<T>::type S;
+
 			auto nbc = nbc_;
 			auto neg = neg_();
 			if(nbc > 0 && nbc_ == 0) {
@@ -536,36 +550,29 @@ namespace utils {
 				return 0;
 			}
 
-			uint32_t v = 0;
+			auto sign = std::is_signed<T>::value;
+			T v = 0;
 			switch(mode_) {
 			case mode::BIN:
-				v = bin_();
+				v = bin_<U>();
 				break;
 			case mode::OCT:
-				v = oct_();
-				break;
-			case mode::UDEC:
-				if(sign) {   // 符号無しで符号付きの場合
-					error_ = error::different_sign;
-					return 0;
-				} else if(neg) {
-					error_ = error::sign_type;
-					return 0;
-				}
-				v = dec_();
+				v = oct_<U>();
 				break;
 			case mode::DEC:
-				if(!sign) {  // 符号付きで符号無しの場合
-					error_ = error::different_sign;
-					return 0;
+				if(!sign) {
+					if(neg) {  // 符号無しにマイナス符号を付けた場合
+						error_ = error::sign_type;
+						return 0;
+					}
 				}
-				v = dec_();
+				v = dec_<T>();
 				break;
 			case mode::HEX:
-				v = hex_();
+				v = hex_<U>();
 				break;
-			case mode::AUTO_NUM:
-				v = auto_num_();
+			case mode::AUTO:
+				v = auto_num_<T>();
 				break;
 			default:
 				error_ = error::not_integer;
@@ -578,21 +585,21 @@ namespace utils {
 				next_();
 			}
 			if(neg) {
-				return -static_cast<int32_t>(v);
+				return -static_cast<S>(v);
 			} else {
-				return static_cast<int32_t>(v);
+				return static_cast<S>(v);
 			}
 		}
 
-
 		template <typename T>
-		T nb_real_()
+		T nb_real_() noexcept
 		{
 			bool neg = neg_();
 
 			T v = 0.0f;
 			switch(mode_) {
 			case mode::REAL:
+			case mode::AUTO:
 				v = real_<T>();
 				break;
 			default:
@@ -686,22 +693,26 @@ namespace utils {
 		{
 			if(error_ != error::none) return *this;
 
-			if(std::is_floating_point<T>::value) {
+			if constexpr(std::is_floating_point<T>::value) {
 				auto tmp = nb_real_<T>();
 				if(error_ == error::none) {
 					++num_;
 					val = tmp;
 				}
 			} else {
-				if(mode_ == mode::CHA) {
-					auto tmp = inp_();
-					if(error_ == error::none) {
-						++num_;
-						val = tmp;
+				if constexpr(sizeof(T) == 1) {
+					if(mode_ == mode::CHA) {
+						auto tmp = inp_(); 
+						if(error_ == error::none) {
+							++num_;
+							val = tmp;
+						}
+						next_();
+					} else {
+						error_ = error::input_type;
 					}
-					next_();
 				} else {
-					auto tmp = nb_int_(std::is_signed<T>::value);
+					T tmp = nb_dec_<T>();
 					if(error_ == error::none) {
 						++num_;
 						val = tmp;
