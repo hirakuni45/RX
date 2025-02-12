@@ -24,6 +24,7 @@ Currently supported and tested devices:
 |[RX13T](RX13T)|2.7|5.5|32|RXv1|Yes|－|－|||R5F513T3/5|
 |[RX220](RX220)|1.62|5.5|32|RXv1|－|－|－|〇|〇|R5F52206|
 |[RX231](RX231)|1.8|5.5|54|RXv2|Yes|－|－|〇|〇|R5F52316/7/8|
+|[RX23W](RX23W)|1.8|5.5|54|RXv2|Yes|－|－|〇|〇|R5F523W7/8|
 |[RX23T](RX23T)|2.7|5.5|40|RXv2|Yes|－|－|||R5F523T5|
 |[RX24T](RX24T)|2.7|5.5|80|RXv2|Yes|－|－|〇|〇|R5F524T8/A|
 |[RX24U](RX24U)|2.7|5.5|80|RXv2|Yes|－|－|||R5F524UB/E|
@@ -127,6 +128,7 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 |[/RX140](./RX140)|RX140 specific device definition class, linker script|
 |[/RX220](./RX220)|RX220 specific device definition class, linker script|
 |[/RX231](./RX231)|RX231 specific device definition class, linker script|
+|[/RX23W](./RX23W)|RX23W specific device definition class, linker script|
 |[/RX23T](./RX23T)|RX23T specific device definition class, linker script|
 |[/RX24T](./RX24T)|RX24T specific device definition class, linker script|
 |[/RX24U](./RX24U)|RX24U specific device definition class, linker script|

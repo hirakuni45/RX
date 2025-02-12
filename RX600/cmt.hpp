@@ -4,6 +4,7 @@
 	@brief	Compare Match Timer / コンペアマッチタイマ @n
 			RX110/RX111/RX130/RX140 (Only CMT0/CMT1) @n
 			RX113 @n
+			RX210 @n
 			RX220 @n
 			RX230/RX231 @n
 			RX23W @n
@@ -216,7 +217,7 @@ namespace device {
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLK> CMT1;
 	typedef cmt_nom_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR::CMI2, clock_profile::PCLK> CMT2;
 	typedef cmt_nom_t<0x0008'8018, peripheral::CMT3, ICU::VECTOR::CMI3, clock_profile::PCLK> CMT3;
-#elif defined(SIG_RX13T) || defined(SIG_RX113) || defined(SIG_RX220) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX13T) || defined(SIG_RX113) || defined(SIG_RX210) || defined(SIG_RX220) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S) || defined(SIG_RX631) || defined(SIG_RX63N) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef cmt_nom_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
 	typedef cmt_nom_t<0x0008'8012, peripheral::CMT2, ICU::VECTOR::CMI2, clock_profile::PCLKB> CMT2;

@@ -169,6 +169,15 @@
 
 #include "RX140/board_profile.hpp"
 
+#elif defined(SIG_RX210)
+
+#include "RX600/sci_c.hpp"
+#include "RX600/sci_d.hpp"
+
+#include "RX210/system_io.hpp"
+
+#include "RX210/board_profile.hpp"
+
 #elif defined(SIG_RX220)
 #include "RX220/lvda.hpp"
 #include "RX600/cac.hpp"
