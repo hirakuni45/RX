@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Serial Communications Interface c / シリアルコミュニケーションインタフェース c
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -53,7 +53,33 @@ namespace device {
 		static constexpr bool FIFO_FUNC  = false;	///< FIFO バッファ機能が有効な場合「true」
 	};
 
-#if defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX210)
+typedef scic_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0, ICU::VECTOR::TEI0,
+ICU::VECTOR, ICU::VECTOR::ERI0> SCI0;
+typedef scic_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1, 
+ICU::VECTOR, ICU::VECTOR::ERI1> SCI1;
+typedef scic_t<0x0008'A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2, ICU::VECTOR::TEI2,
+ICU::VECTOR, ICU::VECTOR::ERI2> SCI2;
+typedef scic_t<0x0008'A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3, ICU::VECTOR::TEI3,
+ICU::VECTOR, ICU::VECTOR::ERI3> SCI3;
+typedef scic_t<0x0008'A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4, ICU::VECTOR::TEI4,
+ICU::VECTOR, ICU::VECTOR::ERI4> SCI4;
+typedef scic_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5, ICU::VECTOR::TEI5, 
+ICU::VECTOR, ICU::VECTOR::ERI5> SCI5;
+typedef scic_t<0x0008'A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6, ICU::VECTOR::TEI6,
+ICU::VECTOR, ICU::VECTOR::ERI6> SCI6;
+typedef scic_t<0x0008'A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7, ICU::VECTOR::TEI7,
+ICU::VECTOR, ICU::VECTOR::ERI7> SCI7;
+typedef scic_t<0x0008'A100, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8, ICU::VECTOR::TEI8,
+ICU::VECTOR, ICU::VECTOR::ERI8> SCI8;
+typedef scic_t<0x0008'A120, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9, ICU::VECTOR::TEI9, 
+ICU::VECTOR, ICU::VECTOR::ERI9> SCI9;
+typedef scic_t<0x0008'A140, peripheral::SCI10, ICU::VECTOR::TXI10, ICU::VECTOR::RXI10, ICU::VECTOR::TEI10,
+ICU::VECTOR, ICU::VECTOR::ERI10> SCI10;
+typedef scic_t<0x0008'A160, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11, ICU::VECTOR::TEI11,
+ICU::VECTOR, ICU::VECTOR::ERI11> SCI11;
+
+#elif defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef scic_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0, ICU::VECTOR::TEI0,
 		ICU::GROUP12, ICU::GROUP12::ERI0> SCI0;
 	typedef scic_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1, 

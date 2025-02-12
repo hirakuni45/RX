@@ -3,6 +3,7 @@
 /*!	@file
 	@brief	Serial Peripheral Interface / シリアルペリフェラルインタフェース @n
 			RX110/RX111/RX113/RX130/RX140 @n
+			RX210 @n
 			RX220 @n
 			RX231 @n
 			RX23T @n
@@ -18,7 +19,7 @@
 			RX66T/RX72T @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -567,10 +568,10 @@ namespace device {
 #if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140)
 	typedef rspi_c_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR, ICU::VECTOR,
 		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
-#elif defined(SIG_RX220)
+#elif defined(SIG_RX210) || defined(SIG_RX220)
 	typedef rspi_t  <0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR,
 		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
-#elif defined(SIG_RX231) || defined(SIG_RX23T)
+#elif defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23T)
 	typedef rspi_a_t<0x0008'8380, peripheral::RSPI0, clock_profile::PCLKB, ICU::VECTOR, ICU::VECTOR,
 		ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPEI0, ICU::VECTOR::SPII0> RSPI0;
 #elif defined(SIG_RX24T) || defined(SIG_RX24U)
