@@ -6,6 +6,7 @@
 			RX13T @n
 			EX130 @n
 			RX140 @n
+			RX210 @n
 			RX220 @n
 			RX230/RX231 @n
 			RX23W @n
@@ -96,6 +97,19 @@
 #include "RX140/port_map_mtu.hpp"
 #include "RX140/port_map_tmr.hpp"
 #include "RX140/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
+#elif defined(SIG_RX210)
+#include "RX210/clock_profile.hpp"
+#include "RX210/peripheral.hpp"
+#include "RX210/system.hpp"
+#include "RX210/power_mgr.hpp"
+#include "RX210/icu.hpp"
+#include "RX220/icu_mgr.hpp"
+#include "RX210/port_map.hpp"
+//#include "RX210/port_map_mtu.hpp"
+//#include "RX210/port_map_tmr.hpp"
+//#include "RX210/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX220)
