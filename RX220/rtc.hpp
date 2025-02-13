@@ -1,9 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 グループ・RTCc 定義
+	@brief	RX210 グループ・RTCb 定義 @n
+			RX220 グループ・RTCc 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,7 +15,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RTCc 定義基底クラス
+		@brief  RTCb/RTCc 定義基底クラス
 		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -68,14 +69,14 @@ namespace device {
 		};
 		static inline rseccnt_t<0x0008'C402> RSECCNT;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 0（BCNT0）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C402> BCNT0;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -96,14 +97,14 @@ namespace device {
 		};
 		static inline rmincnt_t<0x0008'C404> RMINCNT;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 1（BCNT1）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C404> BCNT1;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -125,14 +126,14 @@ namespace device {
 		};
 		static inline rhrcnt_t<0x0008'C406> RHRCNT;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2（BCNT2）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C406> BCNT2;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -152,14 +153,14 @@ namespace device {
 		};
 		static inline rwkcnt_t<0x0008'C408> RWKCNT;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3（BCNT3）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C408> BCNT3;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -241,14 +242,14 @@ namespace device {
 		};
 		static inline rsecar_t<0x0008'C410> RSECAR;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 0 アラームレジスタ（BCNT0AR）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C410> BCNT0AR;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -270,14 +271,14 @@ namespace device {
 		};
 		static inline rminar_t<0x0008'C412> RMINAR;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 1 アラームレジスタ（BCNT1AR）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C412> BCNT1AR;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -300,14 +301,14 @@ namespace device {
 		};
 		static inline rhrar_t<0x0008'C414> RHRAR;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2 アラームレジスタ（BCNT2AR）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C414> BCNT2AR;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -329,14 +330,14 @@ namespace device {
 		};
 		static inline rwkar_t<0x0008'C416> RWKAR;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3 アラームレジスタ（BCNT3AR）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C416> BCNT3AR;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -359,14 +360,14 @@ namespace device {
 		};
 		static inline rdayar_t<0x0008'C418> RDAYAR;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 0 アラーム許可レジスタ（BCNT0AER）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C418> BCNT0AER;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -389,14 +390,14 @@ namespace device {
 		};
 		static inline rmonar_t<0x0008'C41A> RMONAR;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 1 アラーム許可レジスタ（BCNT1AER）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C41A> BCNT1AER;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -417,14 +418,14 @@ namespace device {
 		};
 		static inline ryrar_t<0x0008'C41C> RYRAR;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2 アラーム許可レジスタ（BCNT2AER）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw16_t<0x0008'C41C> BCNT2AER;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -444,14 +445,14 @@ namespace device {
 		};
 		static inline ryraren_t<0x0008'C41E> RYRAREN;
 
-
+#if defined(SIG_RX220)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3 アラーム許可レジスタ（BCNT3AER）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<0x0008'C41E> BCNT3AER;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -497,7 +498,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  AADJE;
 			bit_rw_t<io_, bitpos::B5>  AADJP;
 			bit_rw_t<io_, bitpos::B6>  HR24;
+#if defined(SIG_RX220)
 			bit_rw_t<io_, bitpos::B7>  CNTMD;
+#endif
 		};
 		static inline rcr2_t<0x0008'C424> RCR2;
 
@@ -540,6 +543,143 @@ namespace device {
 			bits_rw_t<io_, bitpos::B6, 2> PMADJ;
 		};
 		static inline radj_t<0x0008'C42E> RADJ;
+
+#if defined(SIG_RX210)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  時間キャプチャ制御レジスタ y（RTCCRy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rtccr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> TCCT;
+			bit_rw_t <io_, bitpos::B2>    TCST;
+
+			bits_rw_t<io_, bitpos::B4, 2> TCNF;
+			bit_rw_t <io_, bitpos::B7>    TCEN;
+		};
+		static inline rtccr_t<0x0008'C440> RTCCR0;
+		static inline rtccr_t<0x0008'C442> RTCCR1;
+		static inline rtccr_t<0x0008'C444> RTCCR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  秒キャプチャレジスタ y（RSECCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rseccp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> SEC1;
+			bits_rw_t<io_, bitpos::B4, 3> SEC10;
+		};
+		static inline rseccp_t<0x0008'C452> RSECCP0;
+		static inline rseccp_t<0x0008'C462> RSECCP1;
+		static inline rseccp_t<0x0008'C472> RSECCP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  分キャプチャレジスタ y（RMINCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rmincp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> MIN1;
+			bits_rw_t<io_, bitpos::B4, 3> MIN10;
+		};
+		static inline rmincp_t<0x0008'C454> RMINCP0;
+		static inline rmincp_t<0x0008'C464> RMINCP1;
+		static inline rmincp_t<0x0008'C474> RMINCP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  時キャプチャレジスタ y（RHRCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rhrcp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> HR1;
+			bits_rw_t<io_, bitpos::B4, 2> HR10;
+			bit_rw_t <io_, bitpos::B6>    PM;
+		};
+		static inline rhrcp_t<0x0008'C456> RHRCP0;
+		static inline rhrcp_t<0x0008'C466> RHRCP1;
+		static inline rhrcp_t<0x0008'C476> RHRCP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  日キャプチャレジスタ y（RDAYCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rdaycp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> DATE1;
+			bits_rw_t<io_, bitpos::B4, 2> DATE10;
+		};
+		static inline rdaycp_t<0x0008'C45A> RDAYCP0;
+		static inline rdaycp_t<0x0008'C46A> RDAYCP1;
+		static inline rdaycp_t<0x0008'C47A> RDAYCP2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  月キャプチャレジスタ y（RMONCPy）（y=0 ～ 2）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct rmoncp_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4> MON1;
+			bit_rw_t <io_, bitpos::B4>    MON10;
+		};
+		static inline rmoncp_t<0x0008'C45C> RMONCP0;
+		static inline rmoncp_t<0x0008'C46C> RMONCP1;
+		static inline rmoncp_t<0x0008'C47C> RMONCP2;
+#endif
 	};
 	typedef rtc_t<peripheral::RTC> RTC;
 }

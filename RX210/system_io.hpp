@@ -83,6 +83,13 @@ namespace device {
 			return true;
 		}
 
+		static constexpr bool check_pll_multiply_() noexcept
+		{
+			auto n = clock_profile::PLL_BASE * 2 / clock_profile::BASE;
+			if(n == 8 || n == 10 || n == 12 || n == 16 || n == 20 || n == 24 || n == 25) return true;
+			else return false;
+		}
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
@@ -99,8 +106,11 @@ namespace device {
 			static_assert(check_clock_div_(clock_profile::FCLK),  "FCLK can't divided.");
 
 			// クロック関係書き込み許可
-			SYSTEM::PRCR = SYSTEM::PRCR.PRKEY.b(0xA5) | SYSTEM::PRCR.PRC0.b(1);
-#if 0
+			SYSTEM::PRCR = SYSTEM::PRCR.PRKEY.b(0xA5) | SYSTEM::PRCR.PRC0.b(1) | SYSTEM::PRCR.PRC2.b(1);
+
+			// 電圧レギュレータ制御レジスタの設定（クロックソースを変更する前に設定）
+			SYSTEM::VRCR = 0x00;
+
 			switch(OSCT) {
 			case clock_profile::OSC_TYPE::XTAL:
 				{
@@ -156,9 +166,22 @@ namespace device {
 						  | SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD))
 						  | SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK));
 
+			// Master PLL settings
+			static_assert(check_pll_multiply_(), "PLL_BASE multplyer rate");
+			device::SYSTEM::PLLCR.STC = (clock_profile::PLL_BASE * 2 / clock_profile::BASE) - 1;
+			device::SYSTEM::PLLCR2.PLLEN = 0;  // PLL 動作
+			{  // dummy read register
+				volatile auto tmp = device::SYSTEM::PLLCR2();
+			}
+
+			device::SYSTEM::SCKCR3.CKSEL = 0b100;   // PLL 選択
+			{  // dummy read register
+				volatile auto tmp = device::SYSTEM::SCKCR3();
+			}
+
 			device::SYSTEM::SOSCWTCR = 0b01011;
 			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
-#endif
+
 			SYSTEM::PRCR = SYSTEM::PRCR.PRKEY.b(0xA5);
 
 			return true;

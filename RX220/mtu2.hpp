@@ -4,7 +4,7 @@
 	@brief	RX グループ・MTU2a 定義 @n
 			RX110/RX111/RX113 @n
 			RX130/RX140 @n
-			RX220/RX230/RX231 @n
+			RX210/RX220/RX230/RX231 @n
 			RX23W @n
 			RX631/RX63N 
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -1198,7 +1198,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> NFCS;
 		};
 	};
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX210) || defined(SIG_RX220) || defined(SIG_RX631) || defined(SIG_RX63N)
 	typedef mtu_ab_t<0x0008'8680> MTUA;
 #elif defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 	typedef mtu_ab_t<0x000D'0A80> MTUA;
@@ -2508,7 +2508,7 @@ namespace device {
 	typedef mtu1_t<0x0008'8780, 0x0008'8691, ICU::VECTOR, ICU::VECTOR> MTU1;
 	typedef mtu2_t<0x0008'8800, 0x0008'8692, ICU::VECTOR, ICU::VECTOR> MTU2;
 	typedef mtu5_t<0x0008'8880, 0x0008'8695, ICU::VECTOR> MTU5;
-#elif defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX220)
+#elif defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX210) || defined(SIG_RX220)
 	typedef mtu0_t<0x0008'8700, 0x0008'8690, ICU::VECTOR, ICU::VECTOR> MTU0;
 	typedef mtu1_t<0x0008'8780, 0x0008'8691, ICU::VECTOR, ICU::VECTOR> MTU1;
 	typedef mtu2_t<0x0008'8800, 0x0008'8692, ICU::VECTOR, ICU::VECTOR> MTU2;

@@ -116,33 +116,33 @@ namespace device {
 			TGI0B   = 143,	///< TPU0 
 			TGI0C   = 144,	///< TPU0 
 			TGI0D   = 145,	///< TPU0 
-			TGI0V   = 146,	///< TPU0 
+			TCI0V   = 146,	///< TPU0 
 
 			TGI1A   = 147,	///< TPU1
 			TGI1B   = 148,	///< TPU1 
-			TGI1V   = 149,	///< TPU1 
-			TGI1U   = 150,	///< TPU1
+			TCI1V   = 149,	///< TPU1 
+			TCI1U   = 150,	///< TPU1
 
 			TGI2A   = 151,	///< TPU2
 			TGI2B   = 152,	///< TPU2 
-			TGI2V   = 153,	///< TPU2 
-			TGI2U   = 154,	///< TPU2
+			TCI2V   = 153,	///< TPU2 
+			TCI2U   = 154,	///< TPU2
 
 			TGI3A   = 155,	///< TPU3
 			TGI3B   = 156,	///< TPU3
 			TGI3C   = 157,	///< TPU3
 			TGI3D   = 158,	///< TPU3
-			TGI3V   = 159,	///< TPU3
+			TCI3V   = 159,	///< TPU3
 
 			TGI4A   = 160,	///< TPU4
 			TGI4B   = 161,	///< TPU4 
-			TGI4V   = 162,	///< TPU4 
-			TGI4U   = 163,	///< TPU4
+			TCI4V   = 162,	///< TPU4 
+			TCI4U   = 163,	///< TPU4
 
 			TGI5A   = 164,	///< TPU5
 			TGI5B   = 165,	///< TPU5 
-			TGI5V   = 166,	///< TPU5 
-			TGI5U   = 167,	///< TPU5
+			TCI5V   = 166,	///< TPU5 
+			TCI5U   = 167,	///< TPU5
 
 			OEI1	= 170,	///< POE
 			OEI2	= 171,	///< POE
@@ -407,17 +407,17 @@ namespace device {
 				case VECTOR::TGI1B:
 					idx = static_cast<uint32_t>(VECTOR::TGI1A);
 					break;
-				case VECTOR::TGI1V:
-				case VECTOR::TGI1U:
-					idx = static_cast<uint32_t>(VECTOR::TGI1V);
+				case VECTOR::TCI1V:
+				case VECTOR::TCI1U:
+					idx = static_cast<uint32_t>(VECTOR::TCI1V);
 					break;
 				case VECTOR::TGI2A:
 				case VECTOR::TGI2B:
 					idx = static_cast<uint32_t>(VECTOR::TGI2A);
 					break;
-				case VECTOR::TGI2V:
-				case VECTOR::TGI2U:
-					idx = static_cast<uint32_t>(VECTOR::TGI2V);
+				case VECTOR::TCI2V:
+				case VECTOR::TCI2U:
+					idx = static_cast<uint32_t>(VECTOR::TCI2V);
 					break;
 				case VECTOR::TGI3A:
 				case VECTOR::TGI3B:
@@ -429,17 +429,17 @@ namespace device {
 				case VECTOR::TGI4B:
 					idx = static_cast<uint32_t>(VECTOR::TGI4A);
 					break;
-				case VECTOR::TGI4V:
-				case VECTOR::TGI4U:
-					idx = static_cast<uint32_t>(VECTOR::TGI4V);
+				case VECTOR::TCI4V:
+				case VECTOR::TCI4U:
+					idx = static_cast<uint32_t>(VECTOR::TCI4V);
 					break;
 				case VECTOR::TGI5A:
 				case VECTOR::TGI5B:
 					idx = static_cast<uint32_t>(VECTOR::TGI5A);
 					break;
-				case VECTOR::TGI5V:
-				case VECTOR::TGI5U:
-					idx = static_cast<uint32_t>(VECTOR::TGI5V);
+				case VECTOR::TCI5V:
+				case VECTOR::TCI5U:
+					idx = static_cast<uint32_t>(VECTOR::TCI5V);
 					break;
 
 				case VECTOR::CMIA0:

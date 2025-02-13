@@ -28,7 +28,7 @@ namespace device {
 			bool spi = false;
 			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
 			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
-			uint8_t sel = enable ? 0b0'1010 : 0;
+			uint8_t sel = enable ? 0b1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				// RXD0: P21
@@ -54,15 +54,15 @@ namespace device {
 				// SCK0: P34
 				PORT3::PMR.B3 = 0;
 				PORT3::ODR.B3 = i2c;
-				MPC::P33PFS.PSEL = sel;
+				MPC::P33PFS.PSEL = sel;  // ok
 				PORT3::PMR.B3 = enable;
 				PORT3::PMR.B2 = 0;
 				PORT3::ODR.B2 = i2c;
-				MPC::P32PFS.PSEL = sel;
+				MPC::P32PFS.PSEL = sel;  // ok
 				PORT3::PMR.B2 = enable;
 				if(spi) {
 					PORT3::PMR.B4 = 0;
-					MPC::P34PFS.PSEL = sel;
+					MPC::P34PFS.PSEL = sel;  // ok
 					PORT3::PMR.B4 = enable;
 				}
 				break;
@@ -78,7 +78,7 @@ namespace device {
 			bool spi = false;
 			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
 			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
-			uint8_t sel = enable ? 0b0'1010 : 0;
+			uint8_t sel = enable ? 0b1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				// RXD1: P15 (LQFP64:19)
@@ -122,12 +122,156 @@ namespace device {
 			return true;
 		}
 
+		static bool sci2_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			uint8_t i2c = 0;
+			bool spi = false;
+			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
+			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
+			uint8_t sel = enable ? 0b1010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// RXD2: P12
+				// TXD2: P13
+				// SCK2: P51
+				PORT1::PMR.B2 = 0;
+				PORT1::ODR.B2 = i2c;
+				MPC::P12PFS.PSEL = sel;  // ok
+				PORT1::PMR.B2 = enable;
+				PORT1::PMR.B3 = 0;
+				PORT1::ODR.B3 = i2c;
+				MPC::P13PFS.PSEL = sel;  // ok
+				PORT1::PMR.B3 = enable;
+				if(spi) {
+					PORT5::PMR.B1 = 0;
+					MPC::P51PFS.PSEL = sel;  // ok
+					PORT5::PMR.B1 = enable;
+				}
+				break;
+			case ORDER::SECOND:
+				// RXD2: P52
+				// TXD2: P50
+				// SCK2: P51
+				PORT5::PMR.B2 = 0;
+				PORT5::ODR.B2 = i2c;
+				MPC::P52PFS.PSEL = sel;  // ok
+				PORT5::PMR.B2 = enable;
+				PORT5::PMR.B0 = 0;
+				PORT5::ODR.B0 = i2c;
+				MPC::P50PFS.PSEL = sel;  // ok
+				PORT5::PMR.B0 = enable;
+				if(spi) {
+					PORT5::PMR.B1 = 0;
+					MPC::P51PFS.PSEL = sel;  // ok
+					PORT5::PMR.B1 = enable;
+				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
 
+		static bool sci3_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			uint8_t i2c = 0;
+			bool spi = false;
+			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
+			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
+			uint8_t sel = enable ? 0b1011 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// RXD3: P16
+				// TXD3: P17
+				// SCK3: P15
+				PORT1::PMR.B6 = 0;
+				PORT1::ODR.B6 = i2c;
+				MPC::P16PFS.PSEL = sel;  // ok
+				PORT1::PMR.B6 = enable;
+				PORT1::PMR.B7 = 0;
+				PORT1::ODR.B7 = i2c;
+				MPC::P17PFS.PSEL = sel;  // ok
+				PORT1::PMR.B7 = enable;
+				if(spi) {
+					PORT1::PMR.B5 = 0;
+					MPC::P15PFS.PSEL = sel;  // ok
+					PORT1::PMR.B5 = enable;
+				}
+				break;
+			case ORDER::SECOND:
+				// RXD3: P25
+				// TXD3: P23
+				// SCK3: P24
+				sel = enable ? 0b1010 : 0;
+				PORT2::PMR.B5 = 0;
+				PORT2::ODR.B5 = i2c;
+				MPC::P25PFS.PSEL = sel;  // ok
+				PORT2::PMR.B5 = enable;
+				PORT2::PMR.B3 = 0;
+				PORT2::ODR.B3 = i2c;
+				MPC::P23PFS.PSEL = sel;  // ok
+				PORT2::PMR.B3 = enable;
+				if(spi) {
+					PORT2::PMR.B4 = 0;
+					MPC::P24PFS.PSEL = sel;  // ok
+					PORT2::PMR.B4 = enable;
+				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
 
-
-
-
-
+		static bool sci4_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			uint8_t i2c = 0;
+			bool spi = false;
+			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
+			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
+			uint8_t sel = enable ? 0b1010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// RXD4: PB0
+				// TXD4: PB1
+				// SCK4: PB3
+				PORTB::PMR.B0 = 0;
+				PORTB::ODR.B0 = i2c;
+				MPC::PB0PFS.PSEL = sel;  // ok
+				PORTB::PMR.B0 = enable;
+				PORTB::PMR.B1 = 0;
+				PORTB::ODR.B1 = i2c;
+				MPC::PB1PFS.PSEL = sel;  // ok
+				PORTB::PMR.B1 = enable;
+				if(spi) {
+					PORTB::PMR.B3 = 0;
+					MPC::PB3PFS.PSEL = sel;  // ok
+					PORTB::PMR.B3 = enable;
+				}
+				break;
+			case ORDER::SECOND:
+				// RXD4: PK4
+				// TXD4: PK5
+				// SCK4: P70
+				PORTK::PMR.B4 = 0;
+				PORTK::ODR.B4 = i2c;
+				MPC::PK4PFS.PSEL = sel;  // ok
+				PORTK::PMR.B4 = enable;
+				PORTK::PMR.B5 = 0;
+				PORTK::ODR.B5 = i2c;
+				MPC::PK5PFS.PSEL = sel;  // ok
+				PORTK::PMR.B5 = enable;
+				if(spi) {
+					PORT7::PMR.B0 = 0;
+					MPC::P70PFS.PSEL = sel;  // ok
+					PORT7::PMR.B0 = enable;
+				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
 
 		static bool sci5_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
@@ -135,7 +279,7 @@ namespace device {
 			bool spi = false;
 			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
 			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
-			uint8_t sel = enable ? 0b0'1010 : 0;
+			uint8_t sel = enable ? 0b1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				// RXD5: PA2
@@ -191,6 +335,24 @@ namespace device {
 					PORTC::PMR.B1 = enable;
 				}
 				break;
+			case ORDER::FOURTH:
+				// RXD5: PC2
+				// TXD5: PC3
+				// SCK5: PC4
+				PORTC::PMR.B2 = 0;
+				PORTC::ODR.B2 = i2c;
+				MPC::PC2PFS.PSEL = sel;  // ok
+				PORTC::PMR.B2 = enable;
+				PORTC::PMR.B3 = 0;
+				PORTC::ODR.B3 = i2c;
+				MPC::PC3PFS.PSEL = sel;  // ok
+				PORTC::PMR.B3 = enable;
+				if(spi) {
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = sel;  // ok
+					PORTC::PMR.B4 = enable;
+				}
+				break;
 			default:
 				return false;
 			}
@@ -203,12 +365,31 @@ namespace device {
 			bool spi = false;
 			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
 			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
-			uint8_t sel = enable ? 0b0'1011 : 0;
+			uint8_t sel = enable ? 0b1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
+				// RXD6: P01
+				// TXD6: P00
+				// SCK6: P02
+				PORT0::PMR.B1 = 0;
+				PORT0::ODR.B1 = i2c;
+				MPC::P01PFS.PSEL = sel;  // ok
+				PORT0::PMR.B1 = enable;
+				PORT0::PMR.B0 = 0;
+				PORT0::ODR.B0 = i2c;
+				MPC::P00PFS.PSEL = sel;  // ok
+				PORT0::PMR.B0 = enable;
+				if(spi) {
+					PORT0::PMR.B2 = 0;
+					MPC::P02PFS.PSEL = sel;  // ok
+					PORT0::PMR.B2 = enable;
+				}
+				break;
+			case ORDER::SECOND:
 				// RXD6: P33
 				// TXD6: P32
 				// SCK6: P34
+				sel = enable ? 0b1011 : 0;
 				PORT3::PMR.B3 = 0;
 				PORT3::ODR.B3 = i2c;
 				MPC::P33PFS.PSEL = sel;  // ok
@@ -223,10 +404,11 @@ namespace device {
 					PORT3::PMR.B4 = enable;
 				}
 				break;
-			case ORDER::SECOND:
+			case ORDER::THIRD:
 				// RXD6: PB0
 				// TXD6: PB1
 				// SCK6: PB3
+				sel = enable ? 0b1011 : 0;
 				PORTB::PMR.B0 = 0;
 				PORTB::ODR.B0 = i2c;
 				MPC::PB0PFS.PSEL = sel;  // ok
@@ -247,13 +429,45 @@ namespace device {
 			return true;
 		}
 
+		static bool sci7_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			uint8_t i2c = 0;
+			bool spi = false;
+			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
+			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
+			uint8_t sel = enable ? 0b1010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// RXD7: P92
+				// TXD7: P90
+				// SCK7: P91
+				PORT9::PMR.B2 = 0;
+				PORT9::ODR.B2 = i2c;
+				MPC::P92PFS.PSEL = sel;  // ok
+				PORT9::PMR.B2 = enable;
+				PORT9::PMR.B0 = 0;
+				PORT9::ODR.B0 = i2c;
+				MPC::P90PFS.PSEL = sel;  // ok
+				PORT9::PMR.B0 = enable;
+				if(spi) {
+					PORT9::PMR.B1 = 0;
+					MPC::P91PFS.PSEL = sel;  // ok
+					PORT9::PMR.B1 = enable;
+				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
 		static bool sci8_(ORDER odr, bool enable, OPTIONAL opt) noexcept
 		{
 			uint8_t i2c = 0;
 			bool spi = false;
 			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
 			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
-			uint8_t sel = enable ? 0b0'1010 : 0;
+			uint8_t sel = enable ? 0b1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				// RXD8: PC6
@@ -285,7 +499,7 @@ namespace device {
 			bool spi = false;
 			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
 			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
-			uint8_t sel = enable ? 0b0'1010 : 0;
+			uint8_t sel = enable ? 0b1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				// RXD9: PB6
@@ -303,6 +517,88 @@ namespace device {
 					PORTB::PMR.B5 = 0;
 					MPC::PB5PFS.PSEL = sel;  // ok
 					PORTB::PMR.B5 = enable;
+				}
+				break;
+			case ORDER::SECOND:
+				// RXD9: PK3
+				// TXD9: PK2
+				// SCK9: P60
+				PORTK::PMR.B3 = 0;
+				PORTK::ODR.B3 = i2c;
+				MPC::PK3PFS.PSEL = sel;  // ok
+				PORTK::PMR.B3 = enable;
+				PORTK::PMR.B2 = 0;
+				PORTK::ODR.B2 = i2c;
+				MPC::PK2PFS.PSEL = sel;  // ok
+				PORTK::PMR.B2 = enable;
+				if(spi) {
+					PORT6::PMR.B0 = 0;
+					MPC::P60PFS.PSEL = sel;  // ok
+					PORT6::PMR.B0 = enable;
+				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool sci10_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			uint8_t i2c = 0;
+			bool spi = false;
+			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
+			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
+			uint8_t sel = enable ? 0b1010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// RXD10: P81
+				// TXD10: P82
+				// SCK10: P80
+				PORT8::PMR.B1 = 0;
+				PORT8::ODR.B1 = i2c;
+				MPC::P81PFS.PSEL = sel;  // ok
+				PORT8::PMR.B1 = enable;
+				PORT8::PMR.B1 = 0;
+				PORT8::ODR.B1 = i2c;
+				MPC::P81PFS.PSEL = sel;  // ok
+				PORT8::PMR.B1 = enable;
+				if(spi) {
+					PORT8::PMR.B0 = 0;
+					MPC::P80PFS.PSEL = sel;  // ok
+					PORT8::PMR.B0 = enable;
+				}
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool sci11_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		{
+			uint8_t i2c = 0;
+			bool spi = false;
+			if(opt == OPTIONAL::SCI_I2C) { i2c = 1; }
+			else if(opt == OPTIONAL::SCI_SPI) { spi = true; }
+			uint8_t sel = enable ? 0b1010 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// RXD11: P76
+				// TXD11: P77
+				// SCK11: P75
+				PORT7::PMR.B6 = 0;
+				PORT7::ODR.B6 = i2c;
+				MPC::P76PFS.PSEL = sel;  // ok
+				PORT7::PMR.B6 = enable;
+				PORT7::PMR.B7 = 0;
+				PORT7::ODR.B7 = i2c;
+				MPC::P77PFS.PSEL = sel;  // ok
+				PORT7::PMR.B7 = enable;
+				if(spi) {
+					PORT7::PMR.B5 = 0;
+					MPC::P75PFS.PSEL = sel;  // ok
+					PORT7::PMR.B5 = enable;
 				}
 				break;
 			default:
@@ -465,17 +761,35 @@ namespace device {
 				case peripheral::SCI1:
 					ret = sci1_(odr, ena, opt);
 					break;
+				case peripheral::SCI2:
+					ret = sci2_(odr, ena, opt);
+					break;
+				case peripheral::SCI3:
+					ret = sci3_(odr, ena, opt);
+					break;
+				case peripheral::SCI4:
+					ret = sci4_(odr, ena, opt);
+					break;
 				case peripheral::SCI5:
 					ret = sci5_(odr, ena, opt);
 					break;
 				case peripheral::SCI6:
 					ret = sci6_(odr, ena, opt);
 					break;
+				case peripheral::SCI7:
+					ret = sci7_(odr, ena, opt);
+					break;
 				case peripheral::SCI8:
 					ret = sci8_(odr, ena, opt);
 					break;
 				case peripheral::SCI9:
 					ret = sci9_(odr, ena, opt);
+					break;
+				case peripheral::SCI10:
+					ret = sci10_(odr, ena, opt);
+					break;
+				case peripheral::SCI11:
+					ret = sci11_(odr, ena, opt);
 					break;
 				case peripheral::SCI12:
 					ret = sci12_(odr, ena, opt);

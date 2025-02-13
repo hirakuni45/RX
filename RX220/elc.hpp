@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 グループ・ELC 定義
+	@brief	RX210/RX220 グループ・ELC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -46,29 +46,45 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  イベントリンク設定レジスタ n（ELSRn） @n
-					（n= 1 ～ 4、10、12、15、18、20、22、24、25）
+					RX210:（n= 1 ～ 4、7、10、12、15、16、18 ～ 29） @n
+					RX220:（n= 1 ～ 4、   10、12、15、   18、20、22、24、25）
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw8_t<base + 0x02>  ELSR1;
 		static inline rw8_t<base + 0x03>  ELSR2;
 		static inline rw8_t<base + 0x04>  ELSR3;
 		static inline rw8_t<base + 0x05>  ELSR4;
-	
+#if defined(SIG_RX210)
+		static inline rw8_t<base + 0x07>  ELSR7;
+#endif
 		static inline rw8_t<base + 0x0B>  ELSR10;
 
 		static inline rw8_t<base + 0x0D>  ELSR12;
 
 		static inline rw8_t<base + 0x10>  ELSR15;
-
+#if defined(SIG_RX210)
+		static inline rw8_t<base + 0x11>  ELSR16;
+#endif
 		static inline rw8_t<base + 0x13>  ELSR18;
-
+#if defined(SIG_RX210)
+		static inline rw8_t<base + 0x14>  ELSR19;
+#endif
 		static inline rw8_t<base + 0x15>  ELSR20;
-
+#if defined(SIG_RX210)
+		static inline rw8_t<base + 0x16>  ELSR21;
+#endif
 		static inline rw8_t<base + 0x17>  ELSR22;
-
+#if defined(SIG_RX210)
+		static inline rw8_t<base + 0x18>  ELSR23;
+#endif
 		static inline rw8_t<base + 0x19>  ELSR24;
 		static inline rw8_t<base + 0x1A>  ELSR25;
-
+#if defined(SIG_RX210)
+		static inline rw8_t<base + 0x1B>  ELSR26;
+		static inline rw8_t<base + 0x1C>  ELSR27;
+		static inline rw8_t<base + 0x1D>  ELSR28;
+		static inline rw8_t<base + 0x1E>  ELSR29;
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -109,6 +125,25 @@ namespace device {
 		};
 		static inline elopb_t<base + 0x20> ELOPB;
 
+#if defined(SIG_RX210)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	イベントリンクオプション設定レジスタ C（ELOPC）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct elopc_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B2, 2>  CMT1MD;
+		};
+		static inline elopc_t<base + 0x21> ELOPC;
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -155,7 +190,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  PGR7;
 		};
 		static inline pgr1_t<base + 0x23> PGR1;
-
+#if defined(SIG_RX210)
+		static inline pgr1_t<base + 0x24> PGR2;
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -177,7 +214,9 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3>  PGCO;
 		};
 		static inline pgc1_t<base + 0x25> PGC1;
-
+#if defined(SIG_RX210)
+		static inline pgc1_t<base + 0x26> PGC2;
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -203,7 +242,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  PDBF7;
 		};
 		static inline pdbf1_t<base + 0x27> PDBF1;
-
+#if defined(SIG_RX210)
+		static inline pdbf1_t<base + 0x28> PDBF2;
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -225,7 +266,10 @@ namespace device {
 		};
 		static inline peln_t<base + 0x29> PEL0;
 		static inline peln_t<base + 0x2A> PEL1;
-
+#if defined(SIG_RX210)
+		static inline peln_t<base + 0x2B> PEL2;
+		static inline peln_t<base + 0x2C> PEL3;
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!

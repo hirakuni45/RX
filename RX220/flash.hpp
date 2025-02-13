@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220 グループ・フラッシュ 定義
+	@brief	RX210/RX220 グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -127,6 +127,27 @@ namespace device {
 		};
 		static inline faeint_t<0x007F'C411> FAEINT;
 
+#if defined(SIG_RX210)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  FCU RAM イネーブルレジスタ（FCURAME）
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct fcurame_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>    FCRAME;
+
+			bits_rw_t<io_, bitpos::B8, 8> KEY;
+		};
+		static inline fcurame_t<0x007F'C454> FCURAME;
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -424,6 +445,21 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void transfer_farm() noexcept
 		{
+#if defined(SIG_RX210)
+			if(FENTRYR() != 0) {
+				FENTRYR = 0x0000;  // FCU 停止
+			}
+			utils::delay::micro_second(10);  // 念の為・・
+			FCURAME = 0xC401;
+
+			auto src = reinterpret_cast<const uint8_t*>(0xFEFF'E000);
+			auto dst = reinterpret_cast<uint8_t*>(0x007F'8000);
+			if(src != nullptr && dst != nullptr) {
+				for(uint32_t i = 0; i < 0x2000; ++i) {
+					*dst++ = *src++;
+				}
+			}
+#endif
 		}
 
 
