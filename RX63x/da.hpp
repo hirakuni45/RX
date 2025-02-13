@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX631/RX63N グループ D/A コンバータ（DAa）定義
+	@brief	RX210/RX631/RX63N グループ D/A コンバータ（DAa）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,7 +21,11 @@ namespace device {
 	template <peripheral per>
 	struct da_t {
 
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr uint32_t RESOLUTION = 10;	///< D/A 変換分解能
+		static constexpr uint32_t CHANNEL = 2;		///< チャネル数
+
+		static constexpr bool DACR_DAE = true;		///< DACR.DAE フラグの有無
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -124,7 +128,8 @@ namespace device {
 		};
 		static inline dadpr_t<0x0008'80C5> DADPR;
 
-
+#if defined(SIG_RX210)
+#else
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  D/A A/D 同期スタート制御レジスタ（DAADSCR）
@@ -142,6 +147,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7> DAADST;
 		};
 		static inline daadscr_t<0x0008'80C6> DAADSCR;
+#endif
 	};
 	typedef da_t<peripheral::DA> DA;
 }

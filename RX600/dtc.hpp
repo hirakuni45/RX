@@ -6,6 +6,7 @@
 			・RX130 @n
 			・RX13T @n
 			・RX140 @n
+			・RX210 @n
 			・RX220 @n
 			・RX230/RX231 @n
 			・RX23W @n
