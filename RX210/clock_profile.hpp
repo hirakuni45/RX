@@ -39,6 +39,9 @@ namespace device {
 		};
 
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
+
+		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
+
 		static constexpr uint32_t   BASE		= 10'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）
 
 		static constexpr uint32_t   PLL_BASE	= 100'000'000;		///< PLL ベースクロック（最大 100MHz）

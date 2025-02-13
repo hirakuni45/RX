@@ -2,6 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	16-Bit Timer plus unit / 16 ビットタイマパルスユニット @n
+			RX210 @n
 			RX230/RX231 @n
 			RX23W @n
 			RX631/RX63N @n
@@ -423,7 +424,7 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
+#if defined(SIG_RX210) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W)
 	typedef tpu_x_t<0x0008'8110, peripheral::TPU0,
 		ICU::VECTOR, ICU::VECTOR::TGI0A, ICU::VECTOR::TGI0B, ICU::VECTOR::TGI0C, ICU::VECTOR::TGI0D,
 		ICU::VECTOR, ICU::VECTOR::TCI0V, ICU::VECTOR::NONE>  TPU0;

@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*!	@file
-	@brief	RX230/RX231/RX23W バス定義
+	@brief	RX210/RX230/RX231/RX23W バス定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -19,7 +19,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct BUS {
 
-#if defined(SIG_RX230) || defined(SIG_RX231)
+#if defined(SIG_RX210) || defined(SIG_RX230) || defined(SIG_RX231)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CSn 制御レジスタ（CSnCR）（n = 0 ～ 3）
@@ -282,7 +282,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B6,  2>  BPGB;
 			bits_rw_t<io_, bitpos::B8,  2>  BPHB;
 			bits_rw_t<io_, bitpos::B10, 2>  BPFB;
-#if defined(SIG_RX230) || defined(SIG_RX231)
+#if defined(SIG_RX210) || defined(SIG_RX230) || defined(SIG_RX231)
 			bits_rw_t<io_, bitpos::B12, 2>  BPEB;
 #endif
 		};

@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	12-Bit A/D Converter / 12 ビット A/D コンバータ (RX220) @n
+	@brief	RX210/RX220 12-Bit A/D Converter / 12 ビット A/D コンバータ @n
 			16 channel A/D input
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n

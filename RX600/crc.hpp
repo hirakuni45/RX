@@ -3,6 +3,7 @@
 /*!	@file
 	@brief	CRC Calculator / CRC 演算 @n
 			・RX111/RX113/RX130/RX140 @n
+			・RX210 @n
 			・RX220 @n
 			・RX230/RX231 @n
 			・RX23W @n

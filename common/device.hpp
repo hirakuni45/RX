@@ -107,9 +107,10 @@
 #include "RX210/icu.hpp"
 #include "RX220/icu_mgr.hpp"
 #include "RX210/port_map.hpp"
-//#include "RX210/port_map_mtu.hpp"
-//#include "RX210/port_map_tmr.hpp"
-//#include "RX210/port_map_irq.hpp"
+#include "RX210/port_map_mtu.hpp"
+#include "RX210/port_map_tpu.hpp"
+#include "RX210/port_map_tmr.hpp"
+#include "RX210/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
 #elif defined(SIG_RX220)
