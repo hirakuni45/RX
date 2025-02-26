@@ -66,6 +66,7 @@
 |Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
 |R5F5210B|1024K|96K|8K|[R5F5210B.ld](R5F5210B.ld?ts=4)|3072|1024|
+|R5F52108|512K|64K|8K|[R5F52108.ld](R5F52108.ld?ts=4)|3072|1024|
 
 ---
 
