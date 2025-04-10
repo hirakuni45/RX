@@ -41,7 +41,8 @@ _start:
 # 初期値付き変数の初期化
 		mov	#__datastart, r1
 		mov	#__romdatastart, r2
-		mov	#__romdatacopysize, r3
+#		mov	#__romdatacopysize, r3
+		mov	#__dataend - __datastart, r3
 #ifdef __RX_ALLOW_STRING_INSNS__
 		smovf		/* block copy R3 bytes from R2 to R1 */
 #else
