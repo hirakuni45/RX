@@ -92,6 +92,7 @@ SECTIONS
     PROVIDE(__romdatastart = .);
   } > ROM
 
+/*
   .init :
   {
    KEEP (*(.init))
@@ -107,6 +108,7 @@ SECTIONS
    KEEP (*(SORT(.fini_array.*)))
    __fini_array_end = .;
    } > ROM
+*/
 
   .fini :
   {
@@ -116,6 +118,19 @@ SECTIONS
   .data : {
     . = ALIGN(4);
     PROVIDE (__datastart = .); /* IF_ROROM */
+
+    PROVIDE (__preinit_array_start = .);
+    KEEP (*(.preinit_array))
+    PROVIDE (__preinit_array_end = .);
+    PROVIDE (__init_array_start = (. + 3) & ~ 3);
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array))
+    PROVIDE (__init_array_end = .);
+    PROVIDE (__fini_array_start = .);
+    KEEP (*(.fini_array))
+    KEEP (*(SORT(.fini_array.*)))
+    PROVIDE (__fini_array_end = .);
+
     LONG(0); /* Sentinel.  */
 
     /* gcc uses crtbegin.o to find the start of the constructors, so

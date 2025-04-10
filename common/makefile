@@ -69,6 +69,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX111)
   RX_CPU = RX111
   RX_CHOOSE = -mcpu=rx100
+  TFU_DEF	= -nofpu
   AS_OPT	+=	--defsym NO_FLOAT=1
   LDSCRIPT	= ../../RX111/$(DEVICE).ld
 endif
@@ -76,6 +77,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX113)
   RX_CPU = RX113
   RX_CHOOSE = -mcpu=rx100
+  TFU_DEF	= -nofpu
   AS_OPT	+=	--defsym NO_FLOAT=1
   LDSCRIPT	= ../../RX113/$(DEVICE).ld
 endif
@@ -89,6 +91,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX130)
   RX_CPU = RX130
   RX_CHOOSE = -mcpu=rx100
+  TFU_DEF	= -nofpu
   AS_OPT	+=	--defsym NO_FLOAT=1
   LDSCRIPT	= ../../RX130/$(DEVICE).ld
 endif
@@ -102,6 +105,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX210)
   RX_CPU = RX210
   RX_CHOOSE = -mcpu=rx200
+  TFU_DEF	= -nofpu
   AS_OPT	+=	--defsym NO_FLOAT=1
   LDSCRIPT	= ../../RX210/$(DEVICE).ld
 endif
@@ -109,6 +113,8 @@ endif
 ifeq ($(RX_DEF),SIG_RX220)
   RX_CPU = RX220
   RX_CHOOSE = -mcpu=rx200
+  TFU_DEF	= -nofpu
+  MCU_TARGET = -nofpu
   AS_OPT	+=	--defsym NO_FLOAT=1
   LDSCRIPT	= ../../RX220/$(DEVICE).ld
 endif

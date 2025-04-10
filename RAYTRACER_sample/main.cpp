@@ -40,13 +40,26 @@ namespace {
 	// RX140 DIY ボード
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
-	typedef device::PORT<device::PORTE, device::bitpos::B4> RD;
-	typedef device::PORT<device::PORTE, device::bitpos::B3> WR;
-	typedef device::PORT<device::PORTE, device::bitpos::B2> RS;
-	typedef device::PORT<device::PORTE, device::bitpos::B1> CS;
-	typedef device::PORT_BYTE<device::PORTB> DA;
+	typedef device::PORT<device::PORTB, device::bitpos::B0> RD;
+	typedef device::PORT<device::PORTB, device::bitpos::B1> WR;
+	typedef device::PORT<device::PORTB, device::bitpos::B2> RS;
+	typedef device::PORT<device::PORTB, device::bitpos::B3> CS;
+	typedef device::PORT_BYTE<device::PORTC> DA;
 	typedef device::bus_rw8<CS, RS, RD, WR, DA> BUS;
-	typedef device::PORT<device::PORTE, device::bitpos::B0> RES;
+	typedef device::PORT<device::PORTB, device::bitpos::B4> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT         tft_;
+#elif defined(SIG_RX220)
+	// RX220 DIY ボード
+	static const uint16_t LCD_X = 320;
+	static const uint16_t LCD_Y = 240;
+	typedef device::PORT<device::PORTB, device::bitpos::B0> RD;
+	typedef device::PORT<device::PORTB, device::bitpos::B1> WR;
+	typedef device::PORT<device::PORTB, device::bitpos::B2> RS;
+	typedef device::PORT<device::PORTB, device::bitpos::B3> CS;
+	typedef device::PORT_BYTE<device::PORTC> DA;
+	typedef device::bus_rw8<CS, RS, RD, WR, DA> BUS;
+	typedef device::PORT<device::PORTB, device::bitpos::B4> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
 #elif defined(SIG_RX231)
@@ -226,7 +239,7 @@ namespace {
 	int			sampling_ = 1;
 	int			render_width_  = 320;
 	int			render_height_ = 240;
-
+	
 	typedef utils::command<256> CMD;
 	CMD 		cmd_;
 
@@ -366,6 +379,7 @@ int main(int argc, char** argv)
 		auto intr_lvl = device::ICU::LEVEL::_4;
 		cmt_.start(1000, intr_lvl);
 	}
+
 
 	utils::format("\r%s Start for Ray Trace: %u, %u\n") % system_str_ % LCD_X % LCD_Y;
 
