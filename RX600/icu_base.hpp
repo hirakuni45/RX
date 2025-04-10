@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・ICU ベース定義（共通部分）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX グループ割り込みコントローラ、ベースクラス
+		@brief  RX グループ割り込みコントローラ、ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icu_base_t {

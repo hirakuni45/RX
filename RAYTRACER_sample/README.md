@@ -17,10 +17,13 @@ Ray tracing rendering program using RX microcontroller
 ## Project list
 - main.cpp
 - raytracer.hpp
-- RX62N/Makefile
-- RX631/Makefile
+- RX140/Makefile
+- RX220/Makefile
+- RX231/Makefile
 - RX24T/Makefile
 - RX26T/Makefile
+- RX62N/Makefile
+- RX631/Makefile
 - RX64M/Makefile
 - RX71M/Makefile
 - RX65N/Makefile
@@ -31,6 +34,8 @@ Ray tracing rendering program using RX microcontroller
 ## Hardware preparation (general)
 - If the base crystal is different, change the typedef parameter.
 - Makefile declares the set frequency for each module.
+- RX140:  48MHz (12MHz)
+- RX220:  32MHz (Internal-OSC)
 - RX231:  54MHz (12MHz)
 - RX62N:  96MHz (12MHz)
 - RX631:  96MHz (12MHz)
@@ -77,6 +82,8 @@ Ray tracing rendering program using RX microcontroller
    
 |Microcontroller|Core|FPU|fsqrt|Frequency [MHz]|Drawing method|Time [ms]|
 |-------|:---:|:---:|:---:|:---:|---|:---:|
+|RX140  |RXv2|O|O|48  |8 bits, port-bus |1893|
+|RX220  |RXv1|X|X|32  |8 bits, port-bus |291320|
 |RX231  |RXv2|O|O|54  |8 bits, port-bus |1736|
 |RX62N  |RXv1|O|X|96  |8 bits, port-bus |1860|
 |RX631  |RXv1|O|X|96  |8 bits, port-bus |1868|
