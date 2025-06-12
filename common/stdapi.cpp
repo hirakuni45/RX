@@ -3,7 +3,7 @@
 	@brief	stdc++ ライブラリの補助 @n
 			libsupc++ ランタイムが最低限必要な関数、定義など
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/glfw_app/blob/master/LICENSE
 */
@@ -34,8 +34,14 @@ namespace std {
 		abort();
 	}
 
+	void __throw_logic_error(char const* e)
+	{
+		sci_puts("logic_error\n");
+        abort();
+	}
+
 #if 0
-	void __throw_length_error(char const*e)
+void __throw_length_error(char const* e)
 	{
 		Serial.print("Length Error :");
 		Serial.println(e);

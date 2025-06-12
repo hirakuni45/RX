@@ -5,7 +5,7 @@
 			256 バイト毎に、データ管理を行うので、どのようなロケーションに配置 @n
 			されたデータ列であっても、効率良くデータを保持出来る。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -119,126 +119,126 @@ namespace utils {
 					break;
 				}
 
-			   	if(ch == ' ') {
-			   	} else if(ch == 0x0d || ch == 0x0a) {
-				   	if(toend) break;
-			   	} else if(mode == 0 && ch == 'S') {
-			   		mode = 1;
-			   		value = vcnt = 0;
-			   	} else if(ch >= '0' && ch <= '9') {
-			   		value <<= 4;
-			   		value |= ch - '0';
-			   		++vcnt;
-			   	} else if(ch >= 'A' && ch <= 'F') {
-			   		value <<= 4;
-			   		value |= ch - 'A' + 10;
-			   		++vcnt;
-			   	} else {
+				if(ch == ' ') {
+				} else if(ch == 0x0d || ch == 0x0a) {
+					if(toend) break;
+				} else if(mode == 0 && ch == 'S') {
+					mode = 1;
+					value = vcnt = 0;
+				} else if(ch >= '0' && ch <= '9') {
+					value <<= 4;
+					value |= ch - '0';
+					++vcnt;
+				} else if(ch >= 'A' && ch <= 'F') {
+					value <<= 4;
+					value |= ch - 'A' + 10;
+					++vcnt;
+				} else {
 					std::cerr << "S format illegual character: '";
-			   		if(ch >= 0x20 && ch <= 0x7f) {
+					if(ch >= 0x20 && ch <= 0x7f) {
 						std::cerr << ch;
-			   		} else {
+					} else {
 						std::cerr << boost::format("0x%02X") % static_cast<int>(ch);
-			   		}
+					}
 					std::cerr << "'" << std::endl;
-			   		return false;
-			   	}
+					return false;
+				}
 
 			   	if(mode == 1) {		// タイプ取得(16bits)
-			   		if(vcnt == 1) {
-			   			type = value;
-			   			mode = 2;
-			   			value = vcnt = 0;
-			   		}
+					if(vcnt == 1) {
+						type = value;
+						mode = 2;
+						value = vcnt = 0;
+					}
 			   	} else if(mode == 2) {	// レングス取得(24bits)
-			   		if(vcnt == 2) {
-			   			length = value;
-			   			sum = value;
-			   			mode = 3;
-			   			value = vcnt = 0;
-			   		}
+					if(vcnt == 2) {
+						length = value;
+						sum = value;
+						mode = 3;
+						value = vcnt = 0;
+					}
 			   	} else if(mode == 3) {	// アドレス取得(32bits)
-			   		int alen = 0;
-			   		if(type == 0) {
-			   			alen = 4;
-			   		} else if(type == 1) {
-			   			alen = 4;
-			   		} else if(type == 2) {
-			   			alen = 6;
-			   		} else if(type == 3) {
-			   			alen = 8;
-			   		} else if(type == 5) {
-			   			alen = 4;
-			   		} else if(type == 7) {
-			   			alen = 8;
-			   		} else if(type == 8) {
-			   			alen = 6;
-			   		} else if(type == 9) {
-			   			alen = 4;
-			   		} else {
-			   			return false;
-			   		}
+					int alen = 0;
+					if(type == 0) {
+						alen = 4;
+					} else if(type == 1) {
+						alen = 4;
+					} else if(type == 2) {
+						alen = 6;
+					} else if(type == 3) {
+						alen = 8;
+					} else if(type == 5) {
+						alen = 4;
+					} else if(type == 7) {
+						alen = 8;
+					} else if(type == 8) {
+						alen = 6;
+					} else if(type == 9) {
+						alen = 4;
+					} else {
+						return false;
+					}
 
-			   		if(vcnt == alen) {
-			   			address = value;
-			   			if(type >= 1 && type <= 3) {
-			   				if(area_.min_ > address) area_.min_ = address;
-			   			}
-			   			alen >>= 1;
-			   			length -= alen;
+					if(vcnt == alen) {
+						address = value;
+						if(type >= 1 && type <= 3) {
+							if(area_.min_ > address) area_.min_ = address;
+						}
+						alen >>= 1;
+						length -= alen;
 			   			length -= 1;	// SUM の分サイズを引く
-			   			while(alen > 0) {
-			   				sum += value;
-			   				value >>= 8;
-			   				--alen;
-			   			}
-				   		if(type >= 1 && type <= 3) {
-				   			mode = 4;
-				   		} else if(type >= 7 && type <= 9) {
+						while(alen > 0) {
+							sum += value;
+							value >>= 8;
+							--alen;
+						}
+						if(type >= 1 && type <= 3) {
+							mode = 4;
+						} else if(type >= 7 && type <= 9) {
 							exec_ = value;
-				   			mode = 5;
-				   		} else {
-				   			mode = 4;
-				   		}
-				   		value = vcnt = 0;
-				   	}
+							mode = 5;
+						} else {
+							mode = 4;
+						}
+						value = vcnt = 0;
+					}
 			   	} else if(mode == 4) {	// データ・レコード
-			   		if(vcnt >= 2) {
-			   			if(type >= 1 && type <= 3) {
-			   				write_byte_(address, value);
-			   				if(area_.max_ < address) area_.max_ = address;
-			   				++address;
-			   			}
-			   			sum += value;
-			   			value = vcnt = 0;
-			   			--length;
-			   			if(length == 0) {
-			   				mode = 5;
-			   			}
-			   		}
+					if(vcnt >= 2) {
+						if(type >= 1 && type <= 3) {
+							write_byte_(address, value);
+							if(area_.max_ < address) area_.max_ = address;
+							++address;
+						}
+						sum += value;
+						value = vcnt = 0;
+						--length;
+						if(length == 0) {
+							mode = 5;
+						}
+					}
 			   	} else if(mode == 5) {	// SUM
-			   		if(vcnt >= 2) {
-			   			value &= 0xff;
-			   			sum ^= 0xff;
-			   			sum &= 0xff;
+					if(vcnt >= 2) {
+						value &= 0xff;
+						sum ^= 0xff;
+						sum &= 0xff;
 			   			if(sum != value) {	// SUM エラー
 							std::cerr << "S format SUM error: ";
 							std::cerr << boost::format("0x%02X -> %02X")
-							    % static_cast<int>(value)
+								% static_cast<int>(value)
 								% static_cast<int>(sum)
 								<< std::endl;
-			   				return false;
-			   			} else {
-			   				if(type >= 7 && type <= 9) {
-			   					toend = true;
-			   				}
-			   				mode = 0;
-			   				value = vcnt = 0;
-			   			}
-			   		}
-			   	}
-		   	}
-		   	return true;
+							return false;
+						} else {
+							if(type >= 7 && type <= 9) {
+								toend = true;
+							}
+							mode = 0;
+							value = vcnt = 0;
+						}
+					}
+				}
+			}
+			return true;
 		}
 
 

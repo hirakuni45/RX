@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX マイコン、プロトコル・ベース・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -334,9 +334,11 @@ namespace rx {
 				return false;
 			}
 			if(!rs232c_.enable_RTS(false)) {
+				std::cerr << boost::format("Can't enable RTS") << std::endl;
 				return false;
 			}
 			if(!rs232c_.enable_DTR(false)) {
+				std::cerr << boost::format("Can't enable DTR") << std::endl;
 				return false;
 			}
 			return true;
@@ -346,7 +348,7 @@ namespace rx {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コネクションの確立（start が成功したら呼ぶ）
-			@param[in]	id	コネクション確率 ID
+			@param[in]	id	コネクション確立 ID
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
@@ -386,6 +388,48 @@ namespace rx {
 			connection_ = true;
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ID コードチェック @n
+					・プロトコルは RX140 の仕様
+			@param[in]	id	制御コード + IDコード1～IDコード15
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool check_id_code(uint8_t id[16]) noexcept
+		{
+			uint8_t tmp[2+16+1];
+
+			tmp[0] = 0x60;
+			tmp[1] = 16;
+			for(int i = 0; i < 16; ++i) tmp[2+i] = id[i];
+			tmp[2+16] = sum_(tmp, 2 + 16);
+			if(!write_(tmp, 2 + 16 + 1)) {
+				return false;
+			}
+
+			if(!read_(tmp, 1)) {
+				return false;
+			}
+			if(tmp[0] == 0x06) {
+				return true;
+			} else if(tmp[0] == 0xE0) {
+				if(!read_(tmp, 1)) {
+					return false;
+				}
+				if(tmp[0] == 0x11) {
+					// sum error
+				} else if(tmp[0] == 0x61) {
+					// ID コード不一致
+				} else if(tmp[0] == 63) {
+					// ID コード不一致かつイレーズエラー
+				}
+				return false;
+			}
+			return false;
 		}
 
 

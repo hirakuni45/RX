@@ -43,7 +43,7 @@ PSOURCES	=	AUDIO_sample/main.cpp \
 				graphics/kfont16.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ mad png z m
+USER_LIBS	=	supc++ mad faad mp4ff png z m
 
 USER_DEFS	=	FAT_FS FAT_FS_NUM=16 RTOS
 

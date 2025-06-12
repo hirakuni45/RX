@@ -271,10 +271,10 @@ namespace device {
 			}
 
 			// サブクロック発信器制御
-			// サブクロックが RX66T/RX72T では、ダミーアクセスとなる。
-			device::SYSTEM::SOSCWTCR = 0b0'1010;
-			device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
-
+			if constexpr(clock_profile::UNIT_SBC) {
+				device::SYSTEM::SOSCWTCR = 0b0'1010;
+				device::SYSTEM::SOSCCR = device::SYSTEM::SOSCCR.SOSTP.b(!clock_profile::TURN_SBC);
+			}
 			device::SYSTEM::PRCR = 0xA500;	// クロック関係書き込み不許可
 
 			// ROM キャッシュを有効（標準設定）

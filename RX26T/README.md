@@ -59,6 +59,7 @@
 
 |Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
+|R5F526T8|128K|48K|16K|[R5F526T8.ld](R5F526T8.ld?ts=4)|1536|512|
 |R5F526TF|512K|64K|16K|[R5F526TF.ld](R5F526TF.ld?ts=4)|2048|1024|
 
 ---

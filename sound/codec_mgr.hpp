@@ -1,19 +1,20 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	オーディオ・コーデック・マネージャー @n
 			複数のオーディオ・コーデックを扱う。@n
-			・wav（wav_in.hpp）@n
-			・mp3（mp3_in.hpp）
+			・wav (wav_in.hpp) @n
+			・mp3 (mp3_in.hpp) @n
+			・m4a (aac_in.hpp)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "sound/wav_in.hpp"
 #include "sound/mp3_in.hpp"
-// #include "sound/aac_in.hpp"
+#include "sound/aac_in.hpp"
 #include "sound/sound_out.hpp"
 #include "common/dir_list.hpp"
 #include "common/format.hpp"
@@ -25,11 +26,11 @@ extern "C" {
 
 namespace sound {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	コンソール版、LIST_CTRL クラス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class def_list_ctrl {
 	public:
 		//-----------------------------------------------------------------//
@@ -113,7 +114,7 @@ namespace sound {
 
 		wav_in		wav_in_;
 		mp3_in		mp3_in_;
-//		aac_in		aac_in_;
+		aac_in		aac_in_;
 
 		enum class CODEC : uint8_t {
 			NONE,
@@ -204,8 +205,34 @@ namespace sound {
 
 		bool play_aac_(const char* fname) noexcept
 		{
+			utils::file_io fin;
+			if(!fin.open(fname, "rb")) {
+				return false;
+			}
+			codec_ = CODEC::AAC;
+			aac_in_.set_ctrl_task([=]() {
+					auto c = list_ctrl_.ctrl();
+					if(c == sound::af_play::CTRL::STOP) {
+						dlist_.stop();
+						stop_ = true;
+					}
+					return c;
+				} );
+			aac_in_.set_tag_task([=](utils::file_io& fin, const sound::tag_t& tag) {
+				list_ctrl_.tag(fin, tag); }
+			);
 
-			return true;
+			// 情報取得
+			bool ret = false;
+			if(aac_in_.info(fin, info_)) {
+				aac_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
+				list_ctrl_.start(fname);
+				stop_ = false;
+				ret = aac_in_.decode(fin, sound_out_);
+			}
+			list_ctrl_.close();
+			fin.close();
+			return ret;
 		}
 
 
@@ -242,8 +269,8 @@ namespace sound {
 						ret = play_wav_(name);
 					} else if(utils::str::strcmp_no_caps(ext, ".mp3") == 0) {
 						ret = play_mp3_(name);
-///					} else if(utils::str::strcmp_no_caps(ext, ".aac") == 0) {
-///						ret = play_aac_(name);
+					} else if(utils::str::strcmp_no_caps(ext, ".m4a") == 0) {
+						ret = play_aac_(name);
 					}
 					if(!ret && !stop_) {
 						utils::format("Can't open audio file: '%s'\n") % name;
@@ -263,7 +290,7 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		codec_mgr(LIST_CTRL& list_ctrl, SOUND_OUT& sound_out) noexcept :
 			list_ctrl_(list_ctrl), sound_out_(sound_out),
-			info_(), wav_in_(), mp3_in_(),
+			info_(), wav_in_(), mp3_in_(), aac_in_(),
 			dlist_(), loop_t_(), stop_(false), codec_(CODEC::NONE)
 		{ }
 
@@ -301,10 +328,12 @@ namespace sound {
 		auto get_state() const noexcept
 		{
 			switch(codec_) {
-			case CODEC::MP3:
-				return mp3_in_.get_state();
 			case CODEC::WAV:
 				return wav_in_.get_state();
+			case CODEC::MP3:
+				return mp3_in_.get_state();
+			case CODEC::AAC:
+				return aac_in_.get_state();
 			default:
 				return af_play::STATE::IDLE;
 			}

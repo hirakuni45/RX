@@ -50,8 +50,8 @@ namespace rx {
 			bind_visitor(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) :
 				path_(path), brate_(brate), rx_(rx) { }
 
-    		template <class T>
-    		bool operator()(T& x) {
+			template <class T>
+			bool operator()(T& x) {
 				return x.bind(path_, brate_, rx_);
 			}
 		};
@@ -89,8 +89,8 @@ namespace rx {
 			uint8_t* dst_;
 			read_page_visitor(uint32_t adr, uint8_t* dst) : adr_(adr), dst_(dst) { }
 
-    		template <class T>
-    		bool operator()(T& x) {
+			template <class T>
+			bool operator()(T& x) {
 				return x.read_page(adr_, dst_);
 			}
 		};
@@ -102,8 +102,8 @@ namespace rx {
 			bool	data_;
 			select_write_visitor(bool data) : data_(data) { }
 
-    		template <class T>
-    		bool operator()(T& x) {
+			template <class T>
+			bool operator()(T& x) {
 				return x.select_write_area(data_);
 			}
 		};
@@ -116,8 +116,8 @@ namespace rx {
 			const uint8_t* src_;
 			write_visitor(uint32_t adr, const uint8_t* src) : adr_(adr), src_(src) { }
 
-    		template <class T>
-    		bool operator()(T& x) {
+			template <class T>
+			bool operator()(T& x) {
 				return x.write_page(adr_, src_);
 			}
 		};
@@ -127,8 +127,8 @@ namespace rx {
 			using result_type = void;
 			protocol::areas areas_;
 
-    		template <class T>
-    		void operator()(T& x) {
+			template <class T>
+			void operator()(T& x) {
 				areas_ = x.get_area();
 			}
 		};
@@ -137,8 +137,8 @@ namespace rx {
 		struct end_visitor {
 			using result_type = void;
 
-    		template <class T>
-    		void operator()(T& x) {
+			template <class T>
+			void operator()(T& x) {
 				x.end();
 			}
 		};
@@ -188,7 +188,7 @@ namespace rx {
 
 			{  // 開始
 				bind_visitor vis(path, brate, rx);
-            	if(!boost::apply_visitor(vis, protocol_)) {
+				if(!boost::apply_visitor(vis, protocol_)) {
 					end();
 					return false;
 				}
@@ -222,7 +222,7 @@ namespace rx {
 		{
 			erase_page_visitor vis(adr);
 			auto st = boost::apply_visitor(vis, protocol_);
-           	if(st == rx::protocol::erase_state::ERROR) {
+			if(st == rx::protocol::erase_state::ERROR) {
 				end();
 				std::cerr << std::endl << boost::format("Erase page error: %08X") % adr << std::endl;
 			}
@@ -241,7 +241,7 @@ namespace rx {
 		bool read_page(uint32_t adr, uint8_t* dst) noexcept
 		{
 			read_page_visitor vis(adr, dst);
-           	if(!boost::apply_visitor(vis, protocol_)) {
+			if(!boost::apply_visitor(vis, protocol_)) {
 				end();
 				std::cerr << boost::format("Read page error: %08X") % adr << std::endl;
 				return false;
@@ -294,7 +294,7 @@ namespace rx {
 		bool start_write(bool data) noexcept
 		{
 			select_write_visitor vis(data);
-           	if(!boost::apply_visitor(vis, protocol_)) {
+			if(!boost::apply_visitor(vis, protocol_)) {
 				end();
 				std::cerr << "Write start error.(first)" << std::endl;
 				return false;
@@ -314,7 +314,7 @@ namespace rx {
 		bool write(uint32_t adr, const uint8_t* src) noexcept
 		{
 			write_visitor vis(adr, src);
-           	if(!boost::apply_visitor(vis, protocol_)) {
+			if(!boost::apply_visitor(vis, protocol_)) {
 				end();
 				std::cerr << boost::format("Write body error: %08X") % adr << std::endl;
 				return false;
@@ -332,7 +332,7 @@ namespace rx {
 		bool final_write() noexcept
 		{
 			write_visitor vis(0xffff'ffff, nullptr);
-           	if(!boost::apply_visitor(vis, protocol_)) {
+			if(!boost::apply_visitor(vis, protocol_)) {
 				end();
 				std::cerr << "Write final error. (fin)" << std::endl;
 				return false;
@@ -362,7 +362,7 @@ namespace rx {
 		void end() noexcept
 		{
 			end_visitor vis;
-           	boost::apply_visitor(vis, protocol_);
+			boost::apply_visitor(vis, protocol_);
 		}
 	};
 }
