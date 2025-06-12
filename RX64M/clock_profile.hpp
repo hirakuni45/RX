@@ -44,6 +44,7 @@ namespace device {
 
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
 
+		static constexpr bool		UNIT_SBC	= true;				///< サブクロック発信器がある場合「true」
 #ifdef EFO_CLOCK_DEF
 		static constexpr bool		TURN_SBC	= true;				///< サブクロックを利用する場合「true」
 		static constexpr bool       TURN_USB    = false;			///< USB を使う場合「true」

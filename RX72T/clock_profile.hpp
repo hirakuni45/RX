@@ -44,7 +44,8 @@ namespace device {
 
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
 
-		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
+		static constexpr bool		UNIT_SBC	= false;			///< RX66T はサブクロック発信器が無いので「false」
+		static constexpr bool		TURN_SBC	= false;			///< RX72T はサブクロックは無いので常に「false」
 #if 1
 #ifdef USE_USB
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」

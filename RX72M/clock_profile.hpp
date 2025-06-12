@@ -44,6 +44,7 @@ namespace device {
 
 		static constexpr OSC_TYPE	OSCT        = OSC_TYPE::XTAL;	///< 発信器種別型
 
+		static constexpr bool		UNIT_SBC	= true;				///< サブクロック発信器があるので「true」
 		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
 		static constexpr bool       TURN_USB    = true;				///< USB を使う場合「true」
 
