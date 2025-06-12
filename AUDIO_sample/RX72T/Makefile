@@ -41,7 +41,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	AUDIO_sample/main.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ mad m
+USER_LIBS	=	supc++ mad faad mp4ff m
 
 USER_DEFS	=	FAT_FS FAT_FS_NUM=16 RTOS
 
