@@ -1,15 +1,15 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	サウンド・マネージャー @n
 			登録した PCM 波形データの発音制御 @n
 			非常にシンプルな構成で、基本的な動作のみ実装
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <memory>
 #include "sound/wav_in.hpp"
 
