@@ -133,7 +133,9 @@
 
 ## port map order / ポートマップ候補
 
-|Peripheral|FIRST (LFQFP176)|SECOND (LQFP176)|THIRD (LQFP176)|FOURTH (LFQFP176)|
+### LFQFP176
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
 |---|---|---|---|---|
 |SCI0 / RXD|P21 (44)|P33 (28)|-|-|
 |SCI0 / TXD|P20 (45)|P32 (29)|-|-|

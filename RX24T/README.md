@@ -104,6 +104,31 @@
 
 ---
 
+## port map order / ポートマップ候補
+
+### LFQFP100
+
+|Peripheral|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|SCI1 / RXD|PD5 (20)|-|-|
+|SCI1 / TXD|PD3 (22)|-|-|
+|SCI1 / SCK|PD4 (21)|-|-|
+|SCI5 / RXD|PB6 (27)|PE0 (17)|-|
+|SCI5 / TXD|PB5 (28)|PD7 (18)|-|
+|SCI5 / SCK|PB7 (26)|PD2 (23)|-|
+|SCI6 / RXD|P80 (98)|PA5 (36)|PB1 (34)|
+|SCI6 / TXD|P81 (97)|PB0 (35)|PB2 (33)|
+|SCI6 / SCK|P82 (96)|PA4 (37)|PB3 (32)|
+|RIIC0 / SCL|PB1 (34)|-|-|
+|RIIC0 / SDA|PB2 (33)|-|-|
+|RSCAN / CRX|PA0 (41)|-|-|
+|RSCAN / CTX|PA1 (40)|-|-|
+|RSPI0 / RSPCK|P24 (64)|PB3 (32)|PD0 (25)|
+|RSPI0 / MOSI|P23 (65)|PB0 (35)|PD2 (23)|
+|RSPI0 / MISO|P22 (66)|PA5 (36)|PD1 (24)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

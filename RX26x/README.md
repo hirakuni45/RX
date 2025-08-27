@@ -118,6 +118,47 @@
 
 ---
 
+## port map order / ポートマップ候補
+
+### LFQFP100
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|SCI1 / RXD|P15 (31)|P30 (20)|-|-|-|
+|SCI1 / TXD|P16 (30)|P26 (22)|-|-|-|
+|SCI1 / SCK|P17 (29)|P27 (21)|-|-|-|
+|SCI5 / RXD|PA2 (68)|PA3 (67)|PC2 (50)|PC2 (50)|-|
+|SCI5 / TXD|PA4 (66)|PA4 (66)|PC3 (49)|PC3 (49)|-|
+|SCI5 / SCK|PA1 (69)|PA1 (69)|PC1 (51)|PC4 (48)|-|
+|SCI6 / RXD|P33 (17)|PB0 (61)|PD1 (85)|-|-|
+|SCI6 / TXD|P32 (18)|PB1 (59)|PD0 (86)|-|-|
+|SCI6 / SCK|P34 (16)|PB3 (57)|PD2 (84)|-|-|
+|RSCI0 / RXD|P21 (27)|-|-|-|-|
+|RSCI0 / TXD|P20 (28)|-|-|-|-|
+|RSCI0 / SCK|P22 (26)|-|-|-|-|
+|RSCI0 / DE|P23 (25)|-|-|-|-|
+|RSCI8 / RXD|PC6 (46)|-|-|-|-|
+|RSCI8 / TXD|PC7 (45)|-|-|-|-|
+|RSCI8 / SCK|PC5 (47)|-|-|-|-|
+|RSCI8 / DE|PC4 (48)|-|-|-|-|
+|RSCI9 / RXD|PB6 (54)|-|-|-|-|
+|RSCI9 / TXD|PB7 (53)|-|-|-|-|
+|RSCI9 / SCK|PB5 (55)|-|-|-|-|
+|RSCI9 / DE|PB4 (56)|-|-|-|-|
+|SCI12 / RXD|PE2 (76)|-|-|-|-|
+|SCI12 / TXD|PE1 (77)|-|-|-|-|
+|SCI12 / SCK|PE0 (78)|-|-|-|-|
+|RIIC0 / SCL|P12 (34)|P16 (30)|-|-|-|
+|RIIC0 / SDA|P13 (33)|P17 (29)|-|-|-|
+|CANFD0 / CRX|P14 (32)|P32 (18)|P54 (40)|PD1 (85)|-|
+|CANFD0 / CTX|P15 (31)|P33 (17)|P55 (39)|PD2 (84)|-|
+|RSPI0 / RSPCK|PA5 (65)|PA5 (65)|PB0 (61)|PB0 (61)|PC5 (47)|
+|RSPI0 / MOSI|P16 (31)|PA6 (64)|P16 (30)|PA6 (64)|PC6 (46)|
+|RSPI0 / MISO|P17 (29)|PA7 (63)|P17 (29)|PA7 (63)|PC7 (45)|
+|LPT / LPTO|P26 (22)|PB3 (57)|PC7 (45)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
