@@ -4,7 +4,7 @@
 	@brief	ポート・マッピング・オーダー型 @n
             ポート指定において、どのピンを利用するかを、選択する「型」
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -98,6 +98,21 @@ namespace device {
 			ETH_MII,	///< EtherNET/MII
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RSPI 型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class RSPI : uint8_t {
+			NONE,	///< 無効なチャネル
+			SSL0,		///< SSL0 制御
+			SSL1,		///< SSL1 制御
+			SSL2,		///< SSL2 制御
+			SSL3,		///< SSL3 制御
+		};
+
+
 		/// ポート・マッピング・ユーザー設定関数型
 		typedef std::function<bool (peripheral per, bool ena)> USER_FUNC_TYPE;
 
@@ -130,6 +145,7 @@ namespace device {
 			TMRI,	///< TMRIx (TMR)
 		};
 
+#if 0
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  RSPI ポート・チャネル型
@@ -144,7 +160,7 @@ namespace device {
 			SSL2,		///< SSL2
 			SSL3,		///< SSL3
 		};
-
+#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

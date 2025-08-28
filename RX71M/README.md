@@ -173,9 +173,17 @@
 |RSPI0 / RSPCK|PA5 (108)|PC5 (78)|-|-|
 |RSPI0 / MOSI|PA6 (107)|PC6 (77)|-|-|
 |RSPI0 / MISO|PA7 (106)|PC& (76)|-|-|
+|RSPI0 / SSL0|PA4 (109)|PC4 (82)|-|-|
+|RSPI0 / SSL1|PA0 (118)|PC0 (91)|-|-|
+|RSPI0 / SSL2|PA1 (114)|PC1 (89)|-|-|
+|RSPI0 / SSL3|PA2 (112)|PC2 (86)|-|-|
 |RSPI1 / RSPCK|P27 (36)|PC5 (78)|-|-|
 |RSPI1 / MOSI|P26 (37)|PC6 (77)|-|-|
 |RSPI1 / MISO|P30 (33)|PC& (76)|-|-|
+|RSPI1 / SSL0|P31 (32)|PE4 (131)|-|-|
+|RSPI1 / SSL1|P50 (72)|PE0 (135)|-|-|
+|RSPI1 / SSL2|P51 (71)|PE1 (134)|-|-|
+|RSPI1 / SSL3|P52 (70)|PE2 (133)|-|-|
 
 ---
 

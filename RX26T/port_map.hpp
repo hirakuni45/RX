@@ -516,6 +516,118 @@ namespace device {
 			return true;
 		}
 
+		static bool rspi0_ssl_(RSPI ssl, ORDER odr, bool enable) noexcept
+		{
+			bool ret = true;
+			uint8_t sel = enable ? 0b00'1101 : 0;  // ok
+			switch(ssl) {
+			case RSPI::SSL0:
+				// SSLA0: P30 (LFQFP100:  63)
+				// SSLA0: P70 (LFQFP100:  57)
+				// SSLA0: P94 (LFQFP100:  46)
+				// SSLA0: PA3 (LFQFP100:  38)
+				// SSLA0: PD6 (LFQFP100:  19)
+				if(odr == ORDER::FIRST) {
+					PORT3::PMR.B0 = 0;
+					MPC::P30PFS.PSEL = sel;
+					PORT3::PMR.B0 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORT7::PMR.B0 = 0;
+					MPC::P70PFS.PSEL = sel;
+					PORT7::PMR.B0 = enable;
+				} else if(odr == ORDER::THIRD) {
+					PORT9::PMR.B4 = 0;
+					MPC::P94PFS.PSEL = sel;
+					PORT9::PMR.B4 = enable;
+				} else if(odr == ORDER::FOURTH) {
+					PORTA::PMR.B3 = 0;
+					MPC::PA3PFS.PSEL = sel;
+					PORTA::PMR.B3 = enable;
+				} else if(odr == ORDER::FIFTH) {
+					PORTD::PMR.B6 = 0;
+					MPC::PD6PFS.PSEL = sel;
+					PORTD::PMR.B6 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL1:
+				// SSLA1: P31 (LFQFP100:  61)
+				// SSLA1: PA2 (LFQFP100:  39)
+				// SSLA1: PD7 (LFQFP100:  18)
+				if(odr == ORDER::FIRST) {
+					PORT3::PMR.B1 = 0;
+					MPC::P31PFS.PSEL = sel;
+					PORT3::PMR.B1 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORTA::PMR.B2 = 0;
+					MPC::PA2PFS.PSEL = sel;
+					PORTA::PMR.B2 = enable;
+				} else if(odr == ORDER::THIRD) {
+					PORTD::PMR.B7 = 0;
+					MPC::PD7PFS.PSEL = sel;
+					PORTD::PMR.B7 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL2:
+				// SSLA2: P32 (LFQFP100:  59)
+				// SSLA2: P93 (LFQFP100:  47)
+				// SSLA2: PA1 (LFQFP100:  40)
+				// SSLA2: PE0 (LFQFP100:  17)
+				if(odr == ORDER::FIRST) {
+					PORT3::PMR.B2 = 0;
+					MPC::P32PFS.PSEL = sel;
+					PORT3::PMR.B2 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORT9::PMR.B3 = 0;
+					MPC::P93PFS.PSEL = sel;
+					PORT9::PMR.B3 = enable;
+				} else if(odr == ORDER::THIRD) {
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = sel;
+					PORTA::PMR.B1 = enable;
+				} else if(odr == ORDER::FOURTH) {
+					PORTE::PMR.B0 = 0;
+					MPC::PE0PFS.PSEL = sel;
+					PORTE::PMR.B0 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL3:
+				// SSLA3: P33 (LFQFP100:  58)
+				// SSLA3: P92 (LFQFP100:  48)
+				// SSLA3: PA0 (LFQFP100:  41)
+				// SSLA3: PE1 (LFQFP100:  16)
+				if(odr == ORDER::FIRST) {
+					PORT3::PMR.B3 = 0;
+					MPC::P33PFS.PSEL = sel;
+					PORT3::PMR.B3 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORT9::PMR.B2 = 0;
+					MPC::P92PFS.PSEL = sel;
+					PORT9::PMR.B2 = enable;
+				} else if(odr == ORDER::THIRD) {
+					PORTA::PMR.B0 = 0;
+					MPC::PA0PFS.PSEL = sel;
+					PORTA::PMR.B0 = enable;
+				} else if(odr == ORDER::FOURTH) {
+					PORTE::PMR.B1 = 0;
+					MPC::PE1PFS.PSEL = sel;
+					PORTE::PMR.B1 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
 		static bool rspia0_(ORDER odr, bool enable) noexcept
 		{
 			uint8_t sel = enable ? 0b00'1110 : 0;
@@ -666,6 +778,167 @@ namespace device {
 			return true;
 		}
 
+		static bool rspia0_ssl_(RSPI ssl, ORDER odr, bool enable) noexcept
+		{
+			bool ret = true;
+			uint8_t sel = enable ? 0b00'1110 : 0;  // ok
+			switch(ssl) {
+			case RSPI::SSL0:
+				// SSL00: P30 (LFQFP100:  63)
+				// SSL00: P73 (LFQFP100:  54)
+				// SSL00: P94 (LFQFP100:  46)
+				// SSL00: PA3 (LFQFP100:  38)
+				// SSL00: PD5 (LFQFP100:  20)
+				// SSL00: PD6 (LFQFP100:  19)
+				if(odr == ORDER::FIRST) {
+					PORT3::PMR.B0 = 0;
+					MPC::P30PFS.PSEL = sel;
+					PORT3::PMR.B0 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORT7::PMR.B3 = 0;
+					MPC::P73PFS.PSEL = sel;
+					PORT7::PMR.B3 = enable;
+				} else if(odr == ORDER::THIRD) {
+					PORT9::PMR.B4 = 0;
+					MPC::P94PFS.PSEL = sel;
+					PORT9::PMR.B4 = enable;
+				} else if(odr == ORDER::FOURTH) {
+					PORTA::PMR.B3 = 0;
+					MPC::PA3PFS.PSEL = sel;
+					PORTA::PMR.B3 = enable;
+				} else if(odr == ORDER::FIFTH) {
+					PORTD::PMR.B5 = 0;
+					MPC::PD5PFS.PSEL = sel;
+					PORTD::PMR.B5 = enable;
+				} else if(odr == ORDER::SIXTH) {
+					PORTD::PMR.B6 = 0;
+					MPC::PD6PFS.PSEL = sel;
+					PORTD::PMR.B6 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL1:
+				// SSL01: P31 (LFQFP100:  61)
+				// SSL01: P74 (LFQFP100:  53)
+				// SSL01: P90 (LFQFP100:  50)
+				// SSL01: PA2 (LFQFP100:  39)
+				// SSL01: PB4 (LFQFP100:  30)
+				// SSL01: PD7 (LFQFP100:  18)
+				if(odr == ORDER::FIRST) {
+					PORT3::PMR.B1 = 0;
+					MPC::P31PFS.PSEL = sel;
+					PORT3::PMR.B1 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORT7::PMR.B7 = 0;
+					MPC::P74PFS.PSEL = sel;
+					PORT7::PMR.B4 = enable;
+				} else if(odr == ORDER::THIRD) {
+					PORT9::PMR.B0 = 0;
+					MPC::P90PFS.PSEL = sel;
+					PORT9::PMR.B0 = enable;
+				} else if(odr == ORDER::FOURTH) {
+					PORTA::PMR.B2 = 0;
+					MPC::PA2PFS.PSEL = sel;
+					PORTA::PMR.B2 = enable;
+				} else if(odr == ORDER::FIFTH) {
+					PORTB::PMR.B4 = 0;
+					MPC::PB4PFS.PSEL = sel;
+					PORTB::PMR.B4 = enable;
+				} else if(odr == ORDER::SIXTH) {
+					PORTD::PMR.B7 = 0;
+					MPC::PD7PFS.PSEL = sel;
+					PORTD::PMR.B7 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL2:
+				// SSL02: P32 (LFQFP100:  59)
+				// SSL02: P75 (LFQFP100:  52)
+				// SSL02: P93 (LFQFP100:  47)
+				// SSL02: P95 (LFQFP100:  45)
+				// SSL02: PA1 (LFQFP100:  40)
+				// SSL02: PD4 (LFQFP100:  21)
+				// SSL02: PE0 (LFQFP100:  17)
+				if(odr == ORDER::FIRST) {
+					PORT3::PMR.B2 = 0;
+					MPC::P32PFS.PSEL = sel;
+					PORT3::PMR.B2 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORT7::PMR.B5 = 0;
+					MPC::P75PFS.PSEL = sel;
+					PORT7::PMR.B5 = enable;
+				} else if(odr == ORDER::THIRD) {
+					PORT9::PMR.B3 = 0;
+					MPC::P93PFS.PSEL = sel;
+					PORT9::PMR.B3 = enable;
+				} else if(odr == ORDER::FOURTH) {
+					PORT9::PMR.B5 = 0;
+					MPC::P95PFS.PSEL = sel;
+					PORT9::PMR.B5 = enable;
+				} else if(odr == ORDER::FIFTH) {
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = sel;
+					PORTA::PMR.B1 = enable;
+				} else if(odr == ORDER::SIXTH) {
+					PORTD::PMR.B4 = 0;
+					MPC::PD4PFS.PSEL = sel;
+					PORTD::PMR.B4 = enable;
+				} else if(odr == ORDER::SEVENTH) {
+					PORTE::PMR.B0 = 0;
+					MPC::PE0PFS.PSEL = sel;
+					PORTE::PMR.B0 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL3:
+				// SSL03: P33 (LFQFP100:  58)
+				// SSL03: P76 (LFQFP100:  51)
+				// SSL03: P92 (LFQFP100:  48)
+				// SSL03: P96 (LFQFP100:  43)
+				// SSL03: PA0 (LFQFP100:  41)
+				// SSL03: PB7 (LFQFP100:  26)
+				// SSL03: PE1 (LFQFP100:  16)
+				if(odr == ORDER::FIRST) {
+					PORT3::PMR.B3 = 0;
+					MPC::P33PFS.PSEL = sel;
+					PORT3::PMR.B3 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORT7::PMR.B6 = 0;
+					MPC::P76PFS.PSEL = sel;
+					PORT7::PMR.B6 = enable;
+				} else if(odr == ORDER::THIRD) {
+					PORT9::PMR.B2 = 0;
+					MPC::P92PFS.PSEL = sel;
+					PORT9::PMR.B2 = enable;
+				} else if(odr == ORDER::FOURTH) {
+					PORT9::PMR.B6 = 0;
+					MPC::P96PFS.PSEL = sel;
+					PORT9::PMR.B6 = enable;
+				} else if(odr == ORDER::FIFTH) {
+					PORTA::PMR.B0 = 0;
+					MPC::PA0PFS.PSEL = sel;
+					PORTA::PMR.B0 = enable;
+				} else if(odr == ORDER::SIXTH) {
+					PORTB::PMR.B7 = 0;
+					MPC::PB7PFS.PSEL = sel;
+					PORTB::PMR.B7 = enable;
+				} else if(odr == ORDER::SEVENTH) {
+					PORTE::PMR.B1 = 0;
+					MPC::PE1PFS.PSEL = sel;
+					PORTE::PMR.B1 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
 
 		/// RIIC0 ポート候補（順番は、MPC の解説に準拠）
 		static bool riic0_(ORDER odr, bool enable) noexcept
@@ -908,6 +1181,36 @@ namespace device {
 				break;
 			default:
 				break;
+			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  RSPIx/SSL ポート有効／無効
+			@param[in]	per		周辺機器タイプ
+			@param[in]	ssl		SSLx 選択
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	odr		候補を選択する場合
+			@return 無効な周辺機器の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn(peripheral per, RSPI ssl, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
+		{
+			if(odr == ORDER::BYPASS) return true;
+
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = false;
+			if(per == peripheral::RSPI0) {
+				ret = rspi0_ssl_(ssl, odr, ena);
+			} else if(per == peripheral::RSPIA0) {
+				ret = rspia0_ssl_(ssl, odr, ena);
 			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();

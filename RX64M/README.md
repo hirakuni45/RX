@@ -188,7 +188,11 @@
 |CAN2 / CTX|P66 (122)|-|-|-|
 |RSPI0 / RSPCK|PA5 (108)|PC5 (78)|-|-|
 |RSPI0 / MOSI|PA6 (107)|PC6 (77)|-|-|
-|RSPI0 / MISO|PA7 (106)|PC& (76)|-|-|
+|RSPI0 / MISO|PA7 (106)|PC7 (76)|-|-|
+|RSPI0 / SSL0|PA4 (109)|PC4 (82)|-|-|
+|RSPI0 / SSL1|PA0 (118)|PC0 (91)|-|-|
+|RSPI0 / SSL2|PA1 (114)|PC1 (89)|-|-|
+|RSPI0 / SSL3|PA2 (112)|PC2 (86)|-|-|
 
 ---
 
