@@ -81,7 +81,7 @@
 ## Basic Pin Assignments / 基本ピンアサイン
 
 |Terminal/端子|LFQFP 100|
-|---|---|---|
+|---|---|
 |VCL|VCL(5)|
 |Reset Input/リセット入力|RES#(10)|
 |Mode Controle/モード制御|MD/FINED(6)|
@@ -126,6 +126,10 @@
 |RSPI0 / RSPCK|P24 (64)|PB3 (32)|PD0 (25)|
 |RSPI0 / MOSI|P23 (65)|PB0 (35)|PD2 (23)|
 |RSPI0 / MISO|P22 (66)|PA5 (36)|PD1 (24)|
+|RSPI0 / SSL0|P30 (63)|PA3 (38)|PD6 (19)|
+|RSPI0 / SSL1|P31 (61)|PA2 (39)|PD7 (18)|
+|RSPI0 / SSL2|P32 (59)|PA1 (40)|PE0 (17)|
+|RSPI0 / SSL3|P33 (58)|PA0 (41)|PE1 (16)|
 
 ---
 
