@@ -119,6 +119,44 @@
 
 ---
 
+## port map order / ポートマップ候補
+
+### LFQFP64
+
+|Peripheral|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|SCI1 / RXD|P15 (19)|P30 (14)|-|
+|SCI1 / TXD|P16 (18)|P26 (16)|-|
+|SCI1 / SCK|P17 (17)|P27 (15)|-|
+|SCI5 / RXD|PA2 (--)|PA3 (43)|PC2 (32)|
+|SCI5 / TXD|PA4 (42)|PA4 (42)|PC3 (31)|
+|SCI5 / SCK|PA1 (44)|PA1 (44)|PC4 (30)|
+|SCI6 / RXD|PB0 (39)|PD1 (--)|-|
+|SCI6 / TXD|PB1 (37)|PD0 (--)|-|
+|SCI6 / SCK|PB3 (36)|PD2 (--)|-|
+|SCI8 / RXD|PC6 (28)|-|-|
+|SCI8 / TXD|PC7 (27)|-|-|
+|SCI8 / SCK|PC5 (29)|-|-|
+|SCI9 / RXD|PB6 (34)|-|-|
+|SCI9 / TXD|PB7 (33)|-|-|
+|SCI9 / SCK|PB5 (35)|-|-|
+|SCI12 / RXD|PE2 (49)|-|-|
+|SCI12 / TXD|PE1 (50)|-|-|
+|SCI12 / SCK|PE0 (51)|-|-|
+|RIIC0 / SCL|P16 (18)|P12 (--)|-|
+|RIIC0 / SDA|P17 (17)|P13 (--)|-|
+|RSCAN / CRX|P15 (19)|P55 (--)|-|
+|RSCAN / CTX|P14 (20)|P54 (--)|-|
+|RSPI0 / RSPCK|PA5 (--)|PB0 (39)|PC5 (29)|
+|RSPI0 / MOSI|PA6 (41)|P16 (18)|PC6 (28)|
+|RSPI0 / MISO|PA7 (--)|P17 (17)|PC7 (27)|
+|RSPI0 / SSL0|PA4 (42)|PC4 (30)|-|
+|RSPI0 / SSL1|PA0 (45)|PC0 (--)|-|
+|RSPI0 / SSL2|PA1 (44)|PC1 (--)|-|
+|RSPI0 / SSL3|PA2 (--)|PC2 (32)|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

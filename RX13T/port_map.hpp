@@ -4,7 +4,7 @@
 	@brief	RX13T グループ・ポート・マッピング @n
 			コメントのピン番号は、LQFP100 パッケージの場合
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,7 +18,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX24T ポート・マッピング・ユーティリティー
+		@brief  RX13T ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
@@ -32,17 +32,17 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// RXD1: PD5
+			// RXD1: PD5 (LFQFP48: 10)
 				PORTD::PMR.B5 = 0;
 				PORTD::ODR.B5 = i2c;
 				MPC::PD5PFS.PSEL = sel;  // ok
 				PORTD::PMR.B5 = enable;
-			// TXD1: PD3
+			// TXD1: PD3 (LFQFP48: 12)
 				PORTD::PMR.B3 = 0;
 				PORTD::ODR.B3 = i2c;
 				MPC::PD3PFS.PSEL = sel;  // ok
 				PORTD::PMR.B3 = enable;
-			// SCK1: PD4
+			// SCK1: PD4 (LFQFP48: 11)
 				if(spi) {
 					PORTD::PMR.B4 = 0;
 					MPC::PD4PFS.PSEL = sel;  // ok
@@ -50,18 +50,18 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:  // for Serial BOOT interface
-			// RXD1: PB7
+			// RXD1: PB7 (LFQFP48: 13)
 				sel = enable ? 0b0'1011 : 0;
 				PORTB::PMR.B7 = 0;
 				PORTB::ODR.B7 = i2c;
 				MPC::PB7PFS.PSEL = sel;  // ok
 				PORTB::PMR.B7 = enable;
-			// TXD1: PB6
+			// TXD1: PB6 (LFQFP48: 14)
 				PORTB::PMR.B6 = 0;
 				PORTB::ODR.B6 = i2c;
 				MPC::PB6PFS.PSEL = sel;  // ok
 				PORTB::PMR.B6 = enable;
-			// SCK1: PD4
+			// SCK1: PD4 (LFQFP48: 11)
 				if(spi) {
 					PORTD::PMR.B4 = 0;
 					MPC::PD4PFS.PSEL = enable ? 0b0'1010 : 0;  // ok
@@ -83,17 +83,17 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// RXD5: PB1
+			// RXD5: PB1 (LFQFP48: 19)
 				PORTB::PMR.B1 = 0;
 				PORTB::ODR.B1 = i2c;
 				MPC::PB1PFS.PSEL = sel;  // ok
 				PORTB::PMR.B1 = enable;
-			// TXD5: PB2
+			// TXD5: PB2 (LFQFP48: 18)
 				PORTB::PMR.B2 = 0;
 				PORTB::ODR.B2 = i2c;
 				MPC::PB2PFS.PSEL = sel;  // ok
 				PORTB::PMR.B2 = enable;
-			// SCK5: PB3
+			// SCK5: PB3 (LFQFP48: 17)
 				if(spi) {
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;  // ok
@@ -101,17 +101,17 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:
-			// RXD5: PB7
+			// RXD5: PB7 (LFQFP48: 13)
 				PORTB::PMR.B7 = 0;
 				PORTB::ODR.B7 = i2c;
 				MPC::PB7PFS.PSEL = sel;  // ok
 				PORTB::PMR.B7 = enable;
-			// TXD5: PB6
+			// TXD5: PB6 (LFQFP48: 14)
 				PORTB::PMR.B6 = 0;
 				PORTB::ODR.B6 = i2c;
 				MPC::PB6PFS.PSEL = sel;  // ok
 				PORTB::PMR.B6 = enable;
-			// SCK5: PB3
+			// SCK5: PB3 (LFQFP48: 17)
 				if(spi) {
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;  // ok
@@ -119,17 +119,17 @@ namespace device {
 				}
 				break;
 			case ORDER::THIRD:
-			// RXD5: P24
+			// RXD5: P24 (LFQFP48: 34)
 				PORT2::PMR.B4 = 0;
 				PORT2::ODR.B4 = i2c;
 				MPC::P24PFS.PSEL = sel;  // ok
 				PORT2::PMR.B4 = enable;
-			// TXD5: P23
+			// TXD5: P23 (LFQFP48: 35)
 				PORT2::PMR.B3 = 0;
 				PORT2::ODR.B3 = i2c;
 				MPC::P23PFS.PSEL = sel;  // ok
 				PORT2::PMR.B3 = enable;
-			// SCK5: PB3
+			// SCK5: PB3 (LFQFP48: 17)
 				if(spi) {
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;  // ok
@@ -151,17 +151,17 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1100 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// RXD12: P94
+			// RXD12: P94 (LFQFP48: 23)
 				PORT9::PMR.B4 = 0;
 				PORT9::ODR.B4 = i2c;
 				MPC::P94PFS.PSEL = sel;  // ok
 				PORT9::PMR.B4 = enable;
-			// TXD12: PB0
+			// TXD12: PB0 (LFQFP48: 20)
 				PORTB::PMR.B0 = 0;
 				PORTB::ODR.B0 = i2c;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
-			// SCK12: PB3
+			// SCK12: PB3 (LFQFP48: 17)
 				if(spi) {
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;  // ok
@@ -169,17 +169,17 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:
-			// RXD12: P94
+			// RXD12: P94 (LFQFP48: 23)
 				PORT9::PMR.B4 = 0;
 				PORT9::ODR.B4 = i2c;
 				MPC::P94PFS.PSEL = sel;  // ok
 				PORT9::PMR.B4 = enable;
-			// TXD12: PB0
+			// TXD12: PB0 (LFQFP48: 20)
 				PORTB::PMR.B0 = 0;
 				PORTB::ODR.B0 = i2c;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
-			// SCK12: P93
+			// SCK12: P93 (LFQFP48: 24)
 				if(spi) {
 					PORT9::PMR.B3 = 0;
 					MPC::P93PFS.PSEL = sel;  // ok
@@ -197,11 +197,11 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1111 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// SCL0: PB1
+			// SCL0: PB1 (LFQFP48: 19)
 				PORTB::PMR.B1 = 0;
 				MPC::PB1PFS.PSEL = sel;  // ok
 				PORTB::PMR.B1 = enable;
-			// SDA0: PB2
+			// SDA0: PB2 (LFQFP48: 18)
 				PORTB::PMR.B2 = 0;
 				MPC::PB2PFS.PSEL = sel;  // ok
 				PORTB::PMR.B2 = enable;

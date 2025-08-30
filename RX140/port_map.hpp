@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX140 グループ・ポート・マッピング
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -291,6 +291,16 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1111 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
+				// SCL0: P16 (LFQFP64: 18)
+				// SDA0: P17 (LFQFP64: 17)
+				PORT1::PMR.B6 = 0;
+				MPC::P16PFS.PSEL = sel;  // ok
+				PORT1::PMR.B6 = enable;
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = sel;  // ok
+				PORT1::PMR.B7 = enable;
+				break;
+			case ORDER::SECOND:
 				// SCL0: P12 (LFQFP64: --)
 				// SDA0: P13 (LFQFP64: --)
 				PORT1::PMR.B2 = 0;
@@ -299,16 +309,6 @@ namespace device {
 				PORT1::PMR.B3 = 0;
 				MPC::P13PFS.PSEL = sel;  // ok
 				PORT1::PMR.B3 = enable;
-				break;
-			case ORDER::SECOND:
-				// SCL0: P16 (LFQFP64:18)
-				// SDA0: P17 (LFQFP64:17)
-				PORT1::PMR.B6 = 0;
-				MPC::P16PFS.PSEL = sel;  // ok
-				PORT1::PMR.B6 = enable;
-				PORT1::PMR.B7 = 0;
-				MPC::P17PFS.PSEL = sel;  // ok
-				PORT1::PMR.B7 = enable;
 				break;
 			default:
 				return false;
@@ -368,6 +368,68 @@ namespace device {
 			return true;
 		}
 
+		static bool rspi0_ssl_(RSPI ssl, ORDER odr, bool enable) noexcept
+		{
+			bool ret = true;
+			uint8_t sel = enable ? 0b0'1101 : 0;  // ok
+			switch(ssl) {
+			case RSPI::SSL0:
+				// SSLA0: PA4 (LFQFP64: 42)
+				// SSLA0: PC4 (LFQFP64: 30)
+				if(odr == ORDER::FIRST) {
+					PORTA::PMR.B4 = 0;
+					MPC::PA4PFS.PSEL = sel;
+					PORTA::PMR.B4 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = sel;
+					PORTC::PMR.B4 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL1:
+				// SSLA1: PA0 (LFQFP64: 45)
+				if(odr == ORDER::FIRST) {
+					PORTA::PMR.B0 = 0;
+					MPC::PA0PFS.PSEL = sel;
+					PORTA::PMR.B0 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL2:
+				// SSLA2: PA1 (LFQFP64: 44)
+				if(odr == ORDER::FIRST) {
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = sel;
+					PORTA::PMR.B1 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			case RSPI::SSL3:
+				// SSLA3: PA2 (LFQFP64: --)
+				// SSLA3: PC2 (LFQFP64: 32)
+				if(odr == ORDER::FIRST) {
+					PORTA::PMR.B2 = 0;
+					MPC::PA2PFS.PSEL = sel;
+					PORTA::PMR.B2 = enable;
+				} else if(odr == ORDER::SECOND) {
+					PORTC::PMR.B2 = 0;
+					MPC::PC2PFS.PSEL = sel;
+					PORTC::PMR.B2 = enable;
+				} else {
+					ret = false;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
 		static bool lpt_(ORDER odr, bool enable) noexcept
 		{
 			switch(odr) {
@@ -400,91 +462,29 @@ namespace device {
 			uint8_t sel = enable ? 0b1'0000 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// CTXD0: P14 (LFQFP64: 20)
 				// CRXD0: P15 (LFQFP64: 19)
-				PORT1::PMR.B4 = 0;
-				MPC::P14PFS.PSEL = sel;  // ok
-				PORT1::PMR.B4 = enable;
+				// CTXD0: P14 (LFQFP64: 20)
 				PORT1::PMR.B5 = 0;
 				MPC::P15PFS.PSEL = sel;  // ok
 				PORT1::PMR.B5 = enable;
+				PORT1::PMR.B4 = 0;
+				MPC::P14PFS.PSEL = sel;  // ok
+				PORT1::PMR.B4 = enable;
 				break;
 			case ORDER::SECOND:
-				// CTXD0: P54 (LFQFP64: --)
 				// CRXD0: P55 (LFQFP64: --)
-				PORT5::PMR.B4 = 0;
-				MPC::P54PFS.PSEL = sel;  // ok
-				PORT5::PMR.B4 = enable;
+				// CTXD0: P54 (LFQFP64: --)
 				PORT5::PMR.B5 = 0;
 				MPC::P55PFS.PSEL = sel;  // ok
 				PORT5::PMR.B5 = enable;
+				PORT5::PMR.B4 = 0;
+				MPC::P54PFS.PSEL = sel;  // ok
+				PORT5::PMR.B4 = enable;
 				break;
 			default:
 				return false;
 			}
 			return true;
-		}
-
-		static bool rspi_ssl_(ORDER odr, bool enable, OPTIONAL opt) noexcept
-		{
-			bool ret = true;
-			uint8_t sel = enable ? 0b0'1101 : 0;  // ok
-			switch(opt) {
-			case OPTIONAL::RSPI_SSL0:
-				// SSLA0: PA4 (LFQFP64: 42)
-				// SSLA0: PC4 (LFQFP64: 30)
-				if(odr == ORDER::FIRST) {
-					PORTA::PMR.B4 = 0;
-					MPC::PA4PFS.PSEL = sel;
-					PORTA::PMR.B4 = enable;
-				} else if(odr == ORDER::SECOND) {
-					PORTC::PMR.B4 = 0;
-					MPC::PC4PFS.PSEL = sel;
-					PORTC::PMR.B4 = enable;
-				} else {
-					ret = false;
-				}
-				break;
-			case OPTIONAL::RSPI_SSL1:
-				// SSLA1: PA0 (LFQFP64: 45)
-				if(odr == ORDER::FIRST) {
-					PORTA::PMR.B0 = 0;
-					MPC::PA0PFS.PSEL = sel;
-					PORTA::PMR.B0 = enable;
-				} else {
-					ret = false;
-				}
-				break;
-			case OPTIONAL::RSPI_SSL2:
-				// SSLA2: PA1 (LFQFP64: 44)
-				if(odr == ORDER::FIRST) {
-					PORTA::PMR.B1 = 0;
-					MPC::PA1PFS.PSEL = sel;
-					PORTA::PMR.B1 = enable;
-				} else {
-					ret = false;
-				}
-				break;
-			case OPTIONAL::RSPI_SSL3:
-				// SSLA3: PA2 (LFQFP64: --)
-				// SSLA3: PC2 (LFQFP64: 32)
-				if(odr == ORDER::FIRST) {
-					PORTA::PMR.B2 = 0;
-					MPC::PA2PFS.PSEL = sel;
-					PORTA::PMR.B2 = enable;
-				} else if(odr == ORDER::SECOND) {
-					PORTC::PMR.B2 = 0;
-					MPC::PC2PFS.PSEL = sel;
-					PORTC::PMR.B2 = enable;
-				} else {
-					ret = false;
-				}
-				break;
-			default:
-				ret = false;
-				break;
-			}
-			return ret;
 		}
 
 		static inline USER_FUNC_TYPE	user_func_;
@@ -501,21 +501,25 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  RSPI/SSL ポート切り替え
+			@brief  RSPIx/SSL ポート有効／無効
+			@param[in]	per		周辺機器タイプ
+			@param[in]	ssl		SSLx 選択
 			@param[in]	ena		無効にする場合「false」
 			@param[in]	odr		候補を選択する場合
-			@param[in]	opt		オプショナル設定を行う場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn_rspi_ssl(bool ena = true, ORDER odr = ORDER::FIRST, OPTIONAL opt = OPTIONAL::NONE) noexcept
+		static bool turn(peripheral per, RSPI ssl, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
 			if(odr == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			auto ret = rspi_ssl_(odr, ena, opt);
+			bool ret = false;
+			if(per == peripheral::RSPI0) {
+				ret = rspi0_ssl_(ssl, odr, ena);
+			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 

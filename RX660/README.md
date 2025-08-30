@@ -113,6 +113,75 @@
 
 ---
 
+## port map order / ポートマップ候補
+
+### LFQFP144
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI0 / RXD|P21 (36)|P33 (26)|-|-|
+|SCI0 / TXD|P20 (37)|P32 (27)|-|-|
+|SCI0 / SCK|P22 (35)|P34 (25)|-|-|
+|SCI1 / RXD|P15 (42)|P30 (29)|-|-|
+|SCI1 / TXD|P16 (40)|P26 (31)|-|-|
+|SCI1 / SCK|P17 (38)|P27 (30)|-|-|
+|SCI2 / RXD|P12 (45)|P52 (54)|-|-|
+|SCI2 / TXD|P13 (44)|P50 (56)|-|-|
+|SCI2 / SCK|P51 (55)|P51 (55)|-|-|
+|SCI3 / RXD|P16 (40)|P25 (32)|-|-|
+|SCI3 / TXD|P17 (38)|P23 (34)|-|-|
+|SCI3 / SCK|P15 (42)|P24 (33)|-|-|
+|SCI4 / RXD|PB0 (87)|-|-|-|
+|SCI4 / TXD|PB1 (84)|-|-|-|
+|SCI4 / SCK|PB3 (82)|-|-|-|
+|SCI5 / RXD|PA2 (95)|PA3 (94)|PC2 (70)|PC2 (70)|
+|SCI5 / TXD|PA4 (92)|PA4 (92)|PC3 (67)|PC3 (67)|
+|SCI5 / SCK|PA1 (96)|PA1 (96)|PC1 (73)|PC4 (66)|
+|SCI6 / RXD|P01 (7)|P33 (26)|PB0 (87)|-|
+|SCI6 / TXD|P00 (8)|P32 (27)|PB1 (84)|-|
+|SCI6 / SCK|P02 (6)|P34 (25)|PB3 (82)|-|
+|SCI7 / RXD|P92 (128)|P92 (128)|-|-|
+|SCI7 / TXD|P90 (131)|P55 ( 51)|-|-|
+|SCI7 / SCK|P91 (129)|P56 ( 50)|-|-|
+|SCI8 / RXD|PC6 (61)|-|-|-|
+|SCI8 / TXD|PC7 (60)|-|-|-|
+|SCI8 / SCK|PC5 (62)|-|-|-|
+|SCI9 / RXD|PB6 (79)|-|-|-|
+|SCI9 / TXD|PB7 (78)|-|-|-|
+|SCI9 / SCK|PB5 (80)|-|-|-|
+|SCI10 / RXD|P81 (64)|P86 (41)|PC6 (61)|-|
+|SCI10 / TXD|P82 (63)|P87 (39)|PC7 (60)|-|
+|SCI10 / SCK|P80 (65)|P83 (58)|PC5 (62)|-|
+|SCI11 / RXD|P76 (69)|PB6 (79)|-|-|
+|SCI11 / TXD|P77 (68)|PB7 (78)|-|-|
+|SCI11 / SCK|P75 (71)|PB5 (80)|-|-|
+|SCI12 / RXD|PE2 (109)|PA2 (95)|-|-|
+|SCI12 / TXD|PE1 (110)|PA4 (92)|-|-|
+|SCI12 / SCK|PE0 (111)|PA1 (96)|-|-|
+|RSCI10 / RXD|PB6 (79)|P86 (41)|PC6 (61)|-|
+|RSCI10 / TXD|PB7 (78)|P87 (39)|PC7 (60)|-|
+|RSCI10 / SCK|PB5 (80)|P83 (58)|PC5 (62)|-|
+|RSCI10 / DE|P80 (65)|-|-|-|
+|RSCI11 / RXD|P76 (69)|PB6 (79)|PC0 (75)|-|
+|RSCI11 / TXD|P77 (68)|PB7 (78)|PC1 (73)|-|
+|RSCI11 / SCK|P75 (71)|PB5 (80)|PB5 (80)|-|
+|RSCI11 / DE|P75 (71)|-|-|-|
+|RIIC0 / SCL|P12 (45)|-|-|-|
+|RIIC0 / SDA|P13 (44)|-|-|-|
+|RIIC2 / SCL|P16 (40)|-|-|-|
+|RIIC2 / SDA|P17 (38)|-|-|-|
+|CANFD0 / CRX|P15 (42)|P33 (26)|P55 (51)|PD2 (124)|
+|CANFD0 / CTX|P14 (43)|P32 (27)|P54 (52)|PD1 (125)|
+|RSPI0 / RSPCK|PA5 (90)|PC5 (62)|-|-|
+|RSPI0 / MOSI|PA6 (89)|PC6 (61)|-|-|
+|RSPI0 / MISO|PA7 (88)|PC7 (60)|-|-|
+|RSPI0 / SSL0|PA4 (92)|PC4 (66)|-|-|
+|RSPI0 / SSL1|PA0 (97)|PC0 (75)|-|-|
+|RSPI0 / SSL2|PA1 (96)|PC1 (73)|-|-|
+|RSPI0 / SSL3|PA2 (95)|PC2 (70)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
