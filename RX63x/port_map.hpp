@@ -1155,38 +1155,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  RSPIx/SSL ポート有効／無効
-			@param[in]	per		周辺機器タイプ
-			@param[in]	ssl		SSLx 選択
-			@param[in]	ena		無効にする場合「false」
-			@param[in]	odr		候補を選択する場合
-			@return 無効な周辺機器の場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static bool turn(peripheral per, RSPI ssl, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
-		{
-			if(odr == ORDER::BYPASS) return true;
-
-			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			bool ret = false;
-			if(per == peripheral::RSPI0) {
-				ret = rspi0_ssl_(ssl, odr, ena);
-			} else if(per == peripheral::RSPI1) {
-				ret = rspi1_ssl_(ssl, odr, ena);
-			} else if(per == peripheral::RSPI2) {
-				ret = rspi2_ssl_(ssl, odr, ena);
-			}
-
-			MPC::PWPR = device::MPC::PWPR.B0WI.b();
-
-			return ret;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  周辺機器別ポート切り替え
 			@param[in]	per		周辺機器タイプ
 			@param[in]	ena		無効にする場合「false」

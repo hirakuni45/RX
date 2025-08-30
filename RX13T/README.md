@@ -126,6 +126,26 @@ namespace board_profile {
 
 ---
 
+## port map order / ポートマップ候補
+
+### LFQFP48
+
+|Peripheral|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|SCI1 / RXD|PD5 (10)|PB7 (13)|-|
+|SCI1 / TXD|PD3 (12)|PB6 (14)|-|
+|SCI1 / SCK|PD4 (11)|PD4 (11)|-|
+|SCI5 / RXD|PB1 (19)|PB7 (13)|P24 (34)|
+|SCI5 / TXD|PB2 (18)|PB6 (14)|P23 (35)|
+|SCI5 / SCK|PB3 (17)|PB3 (27)|PB3 (17)|
+|SCI12 / RXD|P94 (23)|P94 (23)|-|
+|SCI12 / TXD|PB0 (20)|PB0 (20)|-|
+|SCI12 / SCK|PB3 (17)|P93 (24)|-|
+|RIIC0 / SCL|PB1 (19)|-|-|
+|RIIC0 / SDA|PB2 (18)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

@@ -169,6 +169,45 @@
 |RSPI0 / RSPCK|PA5 (--)|PB0 (39)|PC5 (29)|
 |RSPI0 / MOSI|PA6 (41)|P16 (18)|PC6 (28)|
 |RSPI0 / MISO|PA7 (--)|P17 (17)|PC7 (27)|
+|RSPI0 / SSL0|PA4 (42)|PC4 (30)|-|
+|RSPI0 / SSL1|PA0 (45)|PC0 (--)|-|
+|RSPI0 / SSL2|PA1 (44)|PC1 (--)|-|
+|RSPI0 / SSL3|PA2 (--)|PC2 (32)|-|
+
+### LFQFP100
+
+|Peripheral|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|SCI0 / RXD|P21 (27)|-|-|
+|SCI0 / TXD|P20 (28)|-|-|
+|SCI0 / SCK|P22 (26)|-|-|
+|SCI1 / RXD|P15 (31)|P30 (20)|-|
+|SCI1 / TXD|P16 (30)|P26 (22)|-|
+|SCI1 / SCK|P17 (29)|P27 (21)|-|
+|SCI5 / RXD|PA2 (68)|PA3 (67)|PC2 (50)|
+|SCI5 / TXD|PA4 (66)|PA4 (66)|PC3 (49)|
+|SCI5 / SCK|PA1 (69)|PA1 (69)|PC1 (51)|
+|SCI6 / RXD|P33 (17)|PB0 (61)|-|
+|SCI6 / TXD|P32 (18)|PB1 (59)|-|
+|SCI6 / SCK|P34 (16)|PB3 (57)|-|
+|SCI8 / RXD|PC6 (46)|-|-|
+|SCI8 / TXD|PC7 (45)|-|-|
+|SCI8 / SCK|PC5 (47)|-|-|
+|SCI9 / RXD|PB6 (54)|-|-|
+|SCI9 / TXD|PB7 (53)|-|-|
+|SCI9 / SCK|PB5 (55)|-|-|
+|SCI12 / RXD|PE2 (76)|-|-|
+|SCI12 / TXD|PE1 (77)|-|-|
+|SCI12 / SCK|PE0 (78)|-|-|
+|RIIC0 / SCL|P16 (30)|P12 (34)|-|
+|RIIC0 / SDA|P17 (29)|P13 (33)|-|
+|RSPI0 / RSPCK|PA5 (65)|PB0 (61)|PC5 (47)|
+|RSPI0 / MOSI|PA6 (64)|P16 (30)|PC6 (46)|
+|RSPI0 / MISO|PA7 (63)|P17 (29)|PC7 (45)|
+|RSPI0 / SSL0|PA4 (66)|PC4 (48)|-|
+|RSPI0 / SSL1|PA0 (70)|PC0 (52)|-|
+|RSPI0 / SSL2|PA1 (69)|PC1 (51)|-|
+|RSPI0 / SSL3|PA2 (68)|PC2 (50)|-|
 
 ---
 
