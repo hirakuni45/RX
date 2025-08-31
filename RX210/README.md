@@ -123,6 +123,116 @@
 
 ---
 
+## port map order / ポートマップ候補
+
+### LQFP64
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI0 / RXD|P21 (--)|P33 (--)|-|-|
+|SCI0 / TXD|P20 (--)|P32 (12)|-|-|
+|SCI0 / SCK|P22 (--)|P34 (--)|-|-|
+|SCI1 / RXD|P15 (19)|P30 (14)|-|-|
+|SCI1 / TXD|P16 (18)|P26 (16)|-|-|
+|SCI1 / SCK|P17 (17)|P27 (15)|-|-|
+|SCI2 / RXD|P12 (--)|P52 (--)|-|-|
+|SCI2 / TXD|P13 (--)|P50 (--)|-|-|
+|SCI2 / SCK|P51 (--)|P51 (--)|-|-|
+|SCI3 / RXD|P16 (18)|P25 (--)|-|-|
+|SCI3 / TXD|P17 (17)|P23 (--)|-|-|
+|SCI3 / SCK|P55 (19)|P24 (--)|-|-|
+|SCI4 / RXD|PB0 (39)|PK4 (--)|-|-|
+|SCI4 / TXD|PB1 (37)|PK5 (--)|-|-|
+|SCI4 / SCK|PB3 (36)|P70 (--)|-|-|
+|SCI5 / RXD|PA2 (--)|PA3 (43)|PC2 (32)|PC2 (32)|
+|SCI5 / TXD|PA4 (42)|PA4 (42)|PC3 (31)|PC3 (31)|
+|SCI5 / SCK|PA1 (44)|PA1 (44)|PC4 (30)|PC1 (--)|
+|SCI6 / RXD|P01 (--)|P33 (--)|PB0 (39)|-|
+|SCI6 / TXD|P00 (--)|P32 (12)|PB1 (37)|-|
+|SCI6 / SCK|P02 (--)|P34 (--)|PB3 (36)|-|
+|SCI7 / RXD|P92 (--)|-|-|-|
+|SCI7 / TXD|P90 (--)|-|-|-|
+|SCI7 / SCK|P91 (--)|-|-|-|
+|SCI8 / RXD|PC6 (28)|-|-|-|
+|SCI8 / TXD|PC7 (27)|-|-|-|
+|SCI8 / SCK|PC5 (29)|-|-|-|
+|SCI9 / RXD|PB6 (34)|PK3 (--)|-|-|
+|SCI9 / TXD|PB7 (33)|PK2 (--)|-|-|
+|SCI9 / SCK|PB5 (35)|P60 (--)|-|-|
+|SCI10 / RXD|P81 (--)|-|-|-|
+|SCI10 / TXD|P82 (--)|-|-|-|
+|SCI10 / SCK|P80 (--)|-|-|-|
+|SCI11 / RXD|P76 (--)|-|-|-|
+|SCI11 / TXD|P77 (--)|-|-|-|
+|SCI11 / SCK|P75 (--)|-|-|-|
+|SCI12 / RXD|PE2 (49)|-|-|-|
+|SCI12 / TXD|PE1 (50)|-|-|-|
+|SCI12 / SCK|PE0 (51)|-|-|-|
+|RIIC0 / SCL|P16 (18)|P12 (--)|-|-|
+|RIIC0 / SDA|P17 (17)|P13 (--)|-|-|
+|RSPI0 / RSPCK|PA5 (--)|PB0 (39)|PC5 (29)|-|
+|RSPI0 / MOSI|PA6 (41)|P16 (18)|PC6 (28)|-|
+|RSPI0 / MISO|PA7 (--)|P17 (17)|PC7 (27)|-|
+|RSPI0 / SSL0|PA4 (42)|PC4 (30)|-|-|
+|RSPI0 / SSL1|PA0 (45)|PC0 (--)|-|-|
+|RSPI0 / SSL2|PA1 (44)|PC1 (--)|-|-|
+|RSPI0 / SSL3|PA2 (--)|PC2 (32)|-|-|
+
+### LQFP100
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI0 / RXD|P21 (27)|P33 (17)|-|-|
+|SCI0 / TXD|P20 (28)|P32 (18)|-|-|
+|SCI0 / SCK|P22 (26)|P34 (16)|-|-|
+|SCI1 / RXD|P15 (31)|P30 (20)|-|-|
+|SCI1 / TXD|P16 (30)|P26 (22)|-|-|
+|SCI1 / SCK|P17 (29)|P27 (21)|-|-|
+|SCI2 / RXD|P12 (34)|P52 (42)|-|-|
+|SCI2 / TXD|P13 (33)|P50 (44)|-|-|
+|SCI2 / SCK|P51 (43)|P51 (43)|-|-|
+|SCI3 / RXD|P16 (30)|P25 (23)|-|-|
+|SCI3 / TXD|P17 (29)|P23 (25)|-|-|
+|SCI3 / SCK|P55 (31)|P24 (24)|-|-|
+|SCI4 / RXD|PB0 (61)|PK4 (--)|-|-|
+|SCI4 / TXD|PB1 (59)|PK5 (--)|-|-|
+|SCI4 / SCK|PB3 (57)|P70 (--)|-|-|
+|SCI5 / RXD|PA2 (68)|PA3 (67)|PC2 (50)|PC2 (50)|
+|SCI5 / TXD|PA4 (66)|PA4 (66)|PC3 (49)|PC3 (49)|
+|SCI5 / SCK|PA1 (69)|PA1 (69)|PC4 (48)|PC1 (51)|
+|SCI6 / RXD|P01 (--)|P33 (17)|PB0 (61)|-|
+|SCI6 / TXD|P00 (--)|P32 (18)|PB1 (59)|-|
+|SCI6 / SCK|P02 (--)|P34 (16)|PB3 (57)|-|
+|SCI7 / RXD|P92 (--)|-|-|-|
+|SCI7 / TXD|P90 (--)|-|-|-|
+|SCI7 / SCK|P91 (--)|-|-|-|
+|SCI8 / RXD|PC6 (46)|-|-|-|
+|SCI8 / TXD|PC7 (45)|-|-|-|
+|SCI8 / SCK|PC5 (47)|-|-|-|
+|SCI9 / RXD|PB6 (54)|PK3 (--)|-|-|
+|SCI9 / TXD|PB7 (53)|PK2 (--)|-|-|
+|SCI9 / SCK|PB5 (55)|P60 (--)|-|-|
+|SCI10 / RXD|P81 (--)|-|-|-|
+|SCI10 / TXD|P82 (--)|-|-|-|
+|SCI10 / SCK|P80 (--)|-|-|-|
+|SCI11 / RXD|P76 (--)|-|-|-|
+|SCI11 / TXD|P77 (--)|-|-|-|
+|SCI11 / SCK|P75 (--)|-|-|-|
+|SCI12 / RXD|PE2 (76)|-|-|-|
+|SCI12 / TXD|PE1 (77)|-|-|-|
+|SCI12 / SCK|PE0 (78)|-|-|-|
+|RIIC0 / SCL|P16 (30)|P12 (34)|-|-|
+|RIIC0 / SDA|P17 (29)|P13 (33)|-|-|
+|RSPI0 / RSPCK|PA5 (65)|PB0 (61)|PC5 (47)|-|
+|RSPI0 / MOSI|PA6 (64)|P16 (30)|PC6 (46)|-|
+|RSPI0 / MISO|PA7 (63)|P17 (29)|PC7 (45)|-|
+|RSPI0 / SSL0|PA4 (66)|PC4 (48)|-|-|
+|RSPI0 / SSL1|PA0 (70)|PC0 (52)|-|-|
+|RSPI0 / SSL2|PA1 (69)|PC1 (51)|-|-|
+|RSPI0 / SSL3|PA2 (68)|PC2 (50)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

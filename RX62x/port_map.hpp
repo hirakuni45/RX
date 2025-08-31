@@ -419,17 +419,12 @@ namespace device {
 		{
 			if(odr == ORDER::BYPASS) return true;
 
-			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
 			bool ret = false;
 			if(per == peripheral::RSPI0) {
 				ret = rspi0_ssl_(ssl, odr, ena);
 			} else if(per == peripheral::RSPI1) {
 				ret = rspi1_ssl_(ssl, odr, ena);
 			}
-
-			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 
 			return ret;
 		}

@@ -120,6 +120,50 @@
 
 ---
 
+## port map order / ポートマップ候補
+
+### LFQFP64
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI0 / RXD|P22 (48)|P24 (46)|PA5 (63)|PB1 (25)|
+|SCI0 / TXD|P23 (47)|P30 (45)|PA4 (64)|PB2 (24)|
+|SCI0 / SCK|P30 (45)|P23 (47)|PA3 (27)|PB3 (23)|
+|SCI1 / RXD|P93 (30)|P96 (--)|PD5 (14)|PF2 (--)|
+|SCI1 / TXD|P94 (29)|P95 (--)|PD3 (16)|PF3 (--)|
+|SCI1 / SCK|P92 (31)|P92 (--)|PD4 (15)|PG6 (--)|
+|SCI2 / RXD|P03 (--)|PA2 (28)|PG1 (--)|-|
+|SCI2 / TXD|P02 (--)|PA1 (--)|PG0 (--)|-|
+|SCI2 / SCK|P14 (--)|PA0 (--)|PG2 (--)|-|
+|SCI3 / RXD|P34 (--)|PG4 (--)|-|-|
+|SCI3 / TXD|P35 (--)|PG3 (--)|-|-|
+|SCI3 / SCK|PG5 (--)|PG5 (--)|-|-|
+|SCI12 / RXD|P80 (--)|PB6 (18)|-|-|
+|SCI12 / TXD|P81 (--)|PB5 (19)|-|-|
+|SCI12 / SCK|P82 (--)|PB7 (17)|-|-|
+|RIIC0 / SCL|PB1 (25)|-|-|
+|RIIC0 / SDA|PB2 (24)|-|-|
+|RIIC1 / SCL|P25 (--)|-|-|
+|RIIC1 / SDA|P26 (--)|-|-|
+|CAN1 / CRX|P22 (48)|PB6 (18)|PE0 (--)|-|
+|CAN1 / CTX|P23 (47)|PB5 (19)|PD7 (12)|-|
+|RSPI0 / RSPCK|P24 (46)|PA4 (64)|PD0 (--)|-|
+|RSPI0 / MOSI|P23 (47)|PB0 (26)|PD2 (--)|-|
+|RSPI0 / MISO|P22 (48)|PA5 (63)|PD1 (--)|-|
+|RSPI0 / SSL0|P30 (45)|PA3 (27)|PD6 (13)|
+|RSPI0 / SSL1|P31 (43)|PA2 (28)|PD7 (12)|
+|RSPI0 / SSL2|P32 (41)|PA1 (--)|PE0 (--)|
+|RSPI0 / SSL3|P33 (40)|PA0 (--)|PE1 (--)|
+|RSPI1 / RSPCK|P24 (46)|PA4 (64)|PD0 (--)|-|
+|RSPI1 / MOSI|P23 (47)|PB0 (26)|PD2 (--)|-|
+|RSPI1 / MISO|P22 (48)|PA5 (63)|PD1 (--)|-|
+|RSPI1 / SSL0|P30 (45)|PA3 (27)|PD6 (13)|
+|RSPI1 / SSL1|P31 (43)|PA2 (28)|PD7 (12)|
+|RSPI1 / SSL2|P32 (41)|PA1 (--)|PE0 (--)|
+|RSPI1 / SSL3|P33 (40)|PA0 (--)|PE1 (--)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

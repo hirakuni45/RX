@@ -151,6 +151,24 @@ namespace device {
 			case ORDER::THIRD:
 				// RXD5: PC2 (LFQFP64: 32) (LFQFP100:  50)
 				// TXD5: PC3 (LFQFP64: 31) (LFQFP100:  49)
+				// SCK5: PC4 (LFQFP64: 30) (LFQFP100:  48)
+				PORTC::PMR.B2 = 0;
+				PORTC::ODR.B2 = i2c;
+				MPC::PC2PFS.PSEL = sel;  // ok
+				PORTC::PMR.B2 = enable;
+				PORTC::PMR.B3 = 0;
+				PORTC::ODR.B3 = i2c;
+				MPC::PC3PFS.PSEL = sel;  // ok
+				PORTC::PMR.B3 = enable;
+				if(spi) {
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = sel;  // ok
+					PORTC::PMR.B4 = enable;
+				}
+				break;
+			case ORDER::FOURTH:
+				// RXD5: PC2 (LFQFP64: 32) (LFQFP100:  50)
+				// TXD5: PC3 (LFQFP64: 31) (LFQFP100:  49)
 				// SCK5: PC1 (LFQFP64: --) (LFQFP100:  51)
 				PORTC::PMR.B2 = 0;
 				PORTC::ODR.B2 = i2c;
