@@ -107,6 +107,33 @@
 
 ---
 
+## port map order / ポートマップ候補
+
+### LFQFP64
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI1 / RXD|P15 (19)|P30 (4)|PC6 (28)|-|
+|SCI1 / TXD|P16 (18)|P26 (3)|PC7 (27)|-|
+|SCI1 / SCK|P17 (17)|P27 (2)|PC5 (29)|-|
+|SCI5 / RXD|PA3 (43)|PC2 (32)|-|-|
+|SCI5 / TXD|PA4 (42)|PC3 (31)|-|-|
+|SCI5 / SCK|PA1 (44)|PC4 (30)|-|-|
+|SCI12 / RXD|PE2 (49)|P17 (17)|-|-|
+|SCI12 / TXD|PE1 (50)|P14 (20)|-|-|
+|SCI12 / SCK|PE0 (51)|P27 (2)|-|-|
+|RIIC0 / SCL|P16 (18)|PB0 (39)|-|-|
+|RIIC0 / SDA|P17 (17)|PA6 (41)|-|-|
+|RSPI0 / RSPCK|P15 (19)|PB0 (39)|PC5 (29)|PE3 (48)|
+|RSPI0 / MOSI|P16 (18)|PA6 (41)|PC6 (28)|PE4 (47)|
+|RSPI0 / MISO|P17 (17)|PA3 (43)|PC7 (27)|PA3 (43)|
+|RSPI0 / SSL0|P14 (20)|PA4 (42)|PC4 (30)|-|
+|RSPI0 / SSL1|PA0 (45)|-|-|-|
+|RSPI0 / SSL2|PA1 (44)|-|-|-|
+|RSPI0 / SSL3|PC2 (32)|-|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

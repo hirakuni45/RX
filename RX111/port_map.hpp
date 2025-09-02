@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX110/RX111 グループ・ポート・マッピング
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX130 ポート・マッピング・ユーティリティー
+		@brief  RX110/RX111 ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map : public port_map_order {
@@ -31,9 +31,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:  // for BOOT serial port
-				// RXD1: P15
-				// TXD1: P16
-				// SCK1: P17
+				// RXD1: P15 (LFQFP64: 19)
+				// TXD1: P16 (LFQFP64: 18)
+				// SCK1: P17 (LFQFP64: 17)
 				PORT1::PMR.B5 = 0;
 				PORT1::ODR.B5 = i2c;
 				MPC::P15PFS.PSEL = sel;  // ok
@@ -49,9 +49,9 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:
-				// RXD1: P30 (LFQFP64:14)
-				// TXD1: P26 (LFQFP64:16)
-				// SCK1: P27
+				// RXD1: P30 (LFQFP64:  4)
+				// TXD1: P26 (LFQFP64:  3)
+				// SCK1: P27 (LFQFP64:  2)
 				PORT3::PMR.B0 = 0;
 				PORT3::ODR.B0 = i2c;
 				MPC::P30PFS.PSEL = sel;  // ok
@@ -67,9 +67,9 @@ namespace device {
 				}
 				break;
 			case ORDER::THIRD:
-				// RXD1: PC6
-				// TXD1: PC7
-				// SCK1: PC5
+				// RXD1: PC6 (LFQFP64: 28)
+				// TXD1: PC7 (LFQFP64: 27)
+				// SCK1: PC5 (LFQFP64: 29)
 				sel = enable ? 0b0'1011 : 0;
 				PORTC::PMR.B6 = 0;
 				PORTC::ODR.B6 = i2c;
@@ -101,9 +101,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// RXD5: PA3
-				// TXD5: PA4
-				// SCK5: PA1
+				// RXD5: PA3 (LFQFP64: 43)
+				// TXD5: PA4 (LFQFP64: 42)
+				// SCK5: PA1 (LFQFP64: 44)
 				PORTA::PMR.B3 = 0;
 				PORTA::ODR.B3 = i2c;
 				MPC::PA3PFS.PSEL = sel;  // ok
@@ -119,9 +119,9 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:
-				// RXD5: PC2
-				// TXD5: PC3
-				// SCK5: PC4
+				// RXD5: PC2 (LFQFP64: 32)
+				// TXD5: PC3 (LFQFP64: 31)
+				// SCK5: PC4 (LFQFP64: 30)
 				PORTC::PMR.B2 = 0;
 				PORTC::ODR.B2 = i2c;
 				MPC::PC2PFS.PSEL = sel;  // ok
@@ -151,9 +151,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1100 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// RXD12: PE2
-				// TXD12: PE1
-				// SCK12: PE0
+				// RXD12: PE2 (LFQFP64: 49)
+				// TXD12: PE1 (LFQFP64: 50)
+				// SCK12: PE0 (LFQFP64: 51)
 				PORTE::PMR.B2 = 0;
 				PORTE::ODR.B2 = i2c;
 				MPC::PE2PFS.PSEL = sel;  // ok
@@ -169,9 +169,9 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:
-				// RXD12: P17
-				// TXD12: P14
-				// SCK12: P27
+				// RXD12: P17 (LFQFP64: 17)
+				// TXD12: P14 (LFQFP64: 20)
+				// SCK12: P27 (LFQFP64: 2)
 				PORT1::PMR.B7 = 0;
 				PORT1::ODR.B7 = i2c;
 				MPC::P17PFS.PSEL = sel;  // ok
@@ -198,8 +198,8 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1111 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// SCL0: P16 (LFQFP64:18)
-				// SDA0: P17 (LFQFP64:17)
+				// SCL0: P16 (LFQFP64: 18)
+				// SDA0: P17 (LFQFP64: 17)
 				PORT1::PMR.B6 = 0;
 				MPC::P16PFS.PSEL = sel;  // ok
 				PORT1::PMR.B6 = enable;
@@ -208,8 +208,8 @@ namespace device {
 				PORT1::PMR.B7 = enable;
 				break;
 			case ORDER::SECOND:
-				// SCL0: PB0
-				// SDA0: PA6
+				// SCL0: PB0 (LFQFP64: 39)
+				// SDA0: PA6 (LFQFP64: 41)
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
@@ -228,9 +228,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1101 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// RSPCKA: P15
-				// MOSIA:  P16
-				// MISOA:  P17				
+				// RSPCKA: P15 (LFQFP64: 19)
+				// MOSIA:  P16 (LFQFP64: 18)
+				// MISOA:  P17 (LFQFP64: 17)
 				PORT1::PMR.B5 = 0;
 				MPC::P15PFS.PSEL = sel;  // ok
 				PORT1::PMR.B5 = enable;
@@ -242,9 +242,9 @@ namespace device {
 				PORT1::PMR.B7 = enable;
 				break;
 			case ORDER::SECOND:
-				// RSPCKA: PB0
-				// MOSIA:  PA6
-				// MISOA:  PA3
+				// RSPCKA: PB0 (LFQFP64: 39)
+				// MOSIA:  PA6 (LFQFP64: 41)
+				// MISOA:  PA3 (LFQFP64: 43)
 				PORTB::PMR.B0 = 0;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
@@ -256,9 +256,9 @@ namespace device {
 				PORTA::PMR.B3 = enable;
 				break;
 			case ORDER::THIRD:
-				// RSPCKA: PC5
-				// MOSIA:  PC6
-				// MISOA:  PC7
+				// RSPCKA: PC5 (LFQFP64: 29)
+				// MOSIA:  PC6 (LFQFP64: 28)
+				// MISOA:  PC7 (LFQFP64: 27)
 				PORTC::PMR.B5 = 0;
 				MPC::PC5PFS.PSEL = sel;  // ok
 				PORTC::PMR.B5 = enable;
@@ -270,9 +270,9 @@ namespace device {
 				PORTC::PMR.B7 = enable;
 				break;
 			case ORDER::FOURTH:
-				// RSPCKA: PE3
-				// MOSIA:  PE4
-				// MISOA:  PA3
+				// RSPCKA: PE3 (LFQFP64: 48)
+				// MOSIA:  PE4 (LFQFP64: 47)
+				// MISOA:  PA3 (LFQFP64: 43)
 				PORTE::PMR.B3 = 0;
 				MPC::PE3PFS.PSEL = sel;  // ok
 				PORTE::PMR.B3 = enable;
@@ -289,14 +289,15 @@ namespace device {
 			return true;
 		}
 
-		static void rspi_ssl_(ORDER odr, bool enable, OPTIONAL opt) noexcept
+		static bool rspi0_ssl_(RSPI ssl, ORDER odr, bool enable) noexcept
 		{
 			uint8_t sel = enable ? 0b0'1101 : 0;  // ok
-			switch(opt) {
-			case OPTIONAL::RSPI_SSL0:
-				// SSLA0: P14
-				// SSLA0: PA4
-				// SSLA0: PC4
+			bool ret = true;
+			switch(ssl) {
+			case RSPI::SSL0:
+				// SSLA0: P14 (LFQFP64: 20)
+				// SSLA0: PA4 (LFQFP64: 42)
+				// SSLA0: PC4 (LFQFP64: 30)
 				if(odr == ORDER::FIRST) {
 					PORT1::PMR.B4 = 0;
 					MPC::P14PFS.PSEL = sel;
@@ -309,31 +310,44 @@ namespace device {
 					PORTC::PMR.B4 = 0;
 					MPC::PC4PFS.PSEL = sel;
 					PORTC::PMR.B4 = enable;
+				} else {
+					ret = false;
 				}
 				break;
-			case OPTIONAL::RSPI_SSL1:
-				// SSLA1: PA0
-				PORTA::PMR.B0 = 0;
-				MPC::PA0PFS.PSEL = sel;
-				PORTA::PMR.B0 = enable;
+			case RSPI::SSL1:
+				// SSLA1: PA0 (LFQFP64: 45)
+				if(odr == ORDER::FIRST) {
+					PORTA::PMR.B0 = 0;
+					MPC::PA0PFS.PSEL = sel;
+					PORTA::PMR.B0 = enable;
+				} else {
+					ret = false;
+				}
 				break;
-			case OPTIONAL::RSPI_SSL2:
-				// SSLA2: PA1
-				PORTA::PMR.B1 = 0;
-				MPC::PA1PFS.PSEL = sel;
-				PORTA::PMR.B1 = enable;
+			case RSPI::SSL2:
+				// SSLA2: PA1 (LFQFP64: 44)
+				if(odr == ORDER::FIRST) {
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = sel;
+					PORTA::PMR.B1 = enable;
+				} else {
+					ret = false;
+				}
 				break;
-			case OPTIONAL::RSPI_SSL3:
-				// SSLA3: PC2
+			case RSPI::SSL3:
+				// SSLA3: PC2 (LFQFP64: 32)
 				if(odr == ORDER::FIRST) {
 					PORTC::PMR.B2 = 0;
 					MPC::PC2PFS.PSEL = sel;
 					PORTC::PMR.B2 = enable;
+				} else {
+					ret = false;
 				}
 				break;
 			default:
 				break;
 			}
+			return ret;
 		}
 
 		static inline USER_FUNC_TYPE	user_func_;
@@ -346,6 +360,34 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static void set_user_func(USER_FUNC_TYPE func) noexcept { user_func_ = func; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  RSPIx/SSL ポート有効／無効
+			@param[in]	per		周辺機器タイプ
+			@param[in]	ssl		SSLx 選択
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	odr		候補を選択する場合
+			@return 無効な周辺機器の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn(peripheral per, RSPI ssl, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
+		{
+			if(odr == ORDER::BYPASS) return true;
+
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = false;
+			if(per == peripheral::RSPI0) {
+				ret = rspi0_ssl_(ssl, odr, ena);
+			}
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
 
 
 		//-----------------------------------------------------------------//
