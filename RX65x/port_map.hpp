@@ -100,7 +100,7 @@ namespace device {
 					PORT1::PMR.B7 = enable;
 				}
 				break;
-			case ORDER::SECOND:
+			case ORDER::SECOND:  // Serial Boot Mode (145/144/100 pin)
 			// RXD1: P30 (LFQFP100:  20) (LFQFP144:  29) (LFQFP176:  33)
 			// TXD1: P26 (LFQFP100:  22) (LFQFP144:  31) (LFQFP176:  37)
 			// SCK1: P27 (LFQFP100:  21) (LFQFP144:  30) (LFQFP176:  36)
@@ -118,7 +118,7 @@ namespace device {
 					PORT2::PMR.B7 = enable;
 				}
 				break;
-			case ORDER::THIRD:
+			case ORDER::THIRD:  // Serial Boot Mode (177/176 pin)
 			// RXD1: PF2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176:  31)
 			// TXD1: PF0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176:  35)
 			// SCK1: PF1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176:  34)
@@ -406,18 +406,18 @@ namespace device {
 				}
 				break;
 			case ORDER::THIRD:
-			// RXD6: PB0 (LFQFP100:  61) (LFQFP144:  87) (LFQFP176: 100)
-			// TXD6: PB1 (LFQFP100:  59) (LFQFP144:  84) (LFQFP176: 104)
+			// RXD6: PB0 (LFQFP100:  61) (LFQFP144:  87) (LFQFP176: 104)
+			// TXD6: PB1 (LFQFP100:  59) (LFQFP144:  84) (LFQFP176: 100)
 			// SCK6: PB3 (LFQFP100:  57) (LFQFP144:  82) (LFQFP176:  98)
 				sel = enable ? 0b00'1011 : 0;  // ok
-				PORTB::PMR.B1 = 0;
-				PORTB::ODR.B1 = i2c;
-				MPC::PB1PFS.PSEL = sel;  // ok
-				PORTB::PMR.B1 = enable;
 				PORTB::PMR.B0 = 0;
 				PORTB::ODR.B0 = i2c;
 				MPC::PB0PFS.PSEL = sel;  // ok
 				PORTB::PMR.B0 = enable;
+				PORTB::PMR.B1 = 0;
+				PORTB::ODR.B1 = i2c;
+				MPC::PB1PFS.PSEL = sel;  // ok
+				PORTB::PMR.B1 = enable;
 				if(spi) {
 					PORTB::PMR.B3 = 0;
 					MPC::PB3PFS.PSEL = sel;  // ok
