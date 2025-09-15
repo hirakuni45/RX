@@ -1444,17 +1444,61 @@ namespace device {
 			uint8_t sel = enable ? 0b01'0111 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-				// AUDIO_CLK: P00
-				// SSIBCK0:   P01
-				// SSILRCK0:  P21
-				// SSIRXD0:   P20
-				// SSITXD0:   P17		
+				// AUDIO_CLK: P00 (LFQFP100: ---) (LFQFP144:   8) (LFQFP176:   8)
+				// SSIBCK0:   P01 (LFQFP100: ---) (LFQFP144:   7) (LFQFP176:   7)
+				// SSILRCK0:  P21 (LFQFP100:  27) (LFQFP144:  36) (LFQFP176:  44)
+				// SSIRXD0:   P20 (LFQFP100:  28) (LFQFP144:  37) (LFQFP176:  45)
+				// SSITXD0:   P17 (LFQFP100:  29) (LFQFP144:  38) (LFQFP176:  46)
 				PORT0::PMR.B0 = 0;
 				MPC::P00PFS.PSEL = sel;  // ok
 				PORT0::PMR.B0 = enable;
 				PORT0::PMR.B1 = 0;
 				MPC::P01PFS.PSEL = sel;  // ok
 				PORT0::PMR.B1 = enable;
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = sel;  // ok
+				PORT2::PMR.B1 = enable;
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = sel;  // ok
+				PORT2::PMR.B0 = enable;
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = sel;  // ok
+				PORT1::PMR.B7 = enable;
+				break;
+			case ORDER::SECOND:
+				// AUDIO_CLK: P22 (LFQFP100:  26) (LFQFP144:  35) (LFQFP176:  43)
+				// SSIBCK0:   P23 (LFQFP100:  25) (LFQFP144:  34) (LFQFP176:  42)
+				// SSILRCK0:  PF5 (LFQFP100: ---) (LFQFP144:   9) (LFQFP176:   9)
+				// SSIRXD0:   PJ5 (LFQFP100: ---) (LFQFP144:  11) (LFQFP176:  11)
+				// SSITXD0:   PJ3 (LFQFP100:   4) (LFQFP144:  13) (LFQFP176:  13)
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // ok
+				PORT2::PMR.B2 = enable;
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;  // ok
+				PORT2::PMR.B3 = enable;
+				PORTF::PMR.B5 = 0;
+				MPC::PF5PFS.PSEL = sel;  // ok
+				PORTF::PMR.B5 = enable;
+				PORTJ::PMR.B5 = 0;
+				MPC::PJ5PFS.PSEL = sel;  // ok
+				PORTJ::PMR.B5 = enable;
+				PORTJ::PMR.B3 = 0;
+				MPC::PJ3PFS.PSEL = sel;  // ok
+				PORTJ::PMR.B3 = enable;
+				break;
+			case ORDER::THIRD:
+				// AUDIO_CLK: P22 (LFQFP100:  26) (LFQFP144:  35) (LFQFP176:  43)
+				// SSIBCK0:   P23 (LFQFP100:  25) (LFQFP144:  34) (LFQFP176:  42)
+				// SSILRCK0:  P21 (LFQFP100:  27) (LFQFP144:  36) (LFQFP176:  44)
+				// SSIRXD0:   P20 (LFQFP100:  28) (LFQFP144:  37) (LFQFP176:  45)
+				// SSITXD0:   P17 (LFQFP100:  29) (LFQFP144:  38) (LFQFP176:  46)
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // ok
+				PORT2::PMR.B2 = enable;
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;  // ok
+				PORT2::PMR.B3 = enable;
 				PORT2::PMR.B1 = 0;
 				MPC::P21PFS.PSEL = sel;  // ok
 				PORT2::PMR.B1 = enable;
@@ -1475,12 +1519,11 @@ namespace device {
 		{
 			uint8_t sel = enable ? 0b01'0111 : 0;
 			switch(odr) {
-			case ORDER::FIRST:
-				// RX72N Envision Kit Assign
-				// AUDIO_CLK: P00
-				// SSIBCK1:   P02
-				// SSILRCK1:  P05
-				// SSIDATA1:  P03
+			case ORDER::FIRST:  // RX72N Envision Kit Assign
+				// AUDIO_CLK: P00 (LFQFP100: ---) (LFQFP144:   8) (LFQFP176:   8)
+				// SSIBCK1:   P02 (LFQFP100: ---) (LFQFP144:   6) (LFQFP176:   6)
+				// SSILRCK1:  P05 (LFQFP100: 100) (LFQFP144:   2) (LFQFP176:   2)
+				// SSIDATA1:  P03 (LFQFP100: ---) (LFQFP144:   4) (LFQFP176:   4)
 				PORT0::PMR.B0 = 0;
 				MPC::P00PFS.PSEL = sel;  // ok
 				PORT0::PMR.B0 = enable;
@@ -1494,6 +1537,24 @@ namespace device {
 				MPC::P03PFS.PSEL = sel;  // ok
 				PORT0::PMR.B3 = enable;
 				break;
+			case ORDER::SECOND:
+				// AUDIO_CLK: P22 (LFQFP100:  26) (LFQFP144:  35) (LFQFP176:  43)
+				// SSIBCK1:   P24 (LFQFP100:  24) (LFQFP144:  33) (LFQFP176:  40)
+				// SSILRCK1:  P15 (LFQFP100:  31) (LFQFP144:  42) (LFQFP176:  50)
+				// SSIDATA1:  P25 (LFQFP100:  23) (LFQFP144:  32) (LFQFP176:  38)
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // ok
+				PORT2::PMR.B2 = enable;
+				PORT2::PMR.B4 = 0;
+				MPC::P24PFS.PSEL = sel;  // ok
+				PORT2::PMR.B4 = enable;
+				PORT1::PMR.B5 = 0;
+				MPC::P15PFS.PSEL = sel;  // ok
+				PORT1::PMR.B5 = enable;
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = sel;  // ok
+				PORT2::PMR.B5 = enable;
+				break;
 			default:
 				return false;
 			}
@@ -1505,22 +1566,22 @@ namespace device {
 			switch(odr) {
 			case ORDER::FIRST:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// PC7
+					// TOC0: PC7
 					PORTC::PMR.B7 = 0;
 					MPC::PC7PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTC::PMR.B7 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// PC6
+					// TIC0: PC6
 					PORTC::PMR.B6 = 0;
 					MPC::PC6PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTC::PMR.B6 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// PE7
+					// TOC1: PE7
 					PORTE::PMR.B7 = 0;
 					MPC::PE7PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTE::PMR.B7 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// PE6
+					// TIC1: PE6
 					PORTE::PMR.B6 = 0;
 					MPC::PE6PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTE::PMR.B6 = enable;
@@ -1530,22 +1591,22 @@ namespace device {
 				break;
 			case ORDER::SECOND:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// PH1
+					// TOC0: PH1
 					PORTH::PMR.B1 = 0;
 					MPC::PH1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTH::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// PH0
+					// TIC0: PH0
 					PORTH::PMR.B0 = 0;
 					MPC::PH0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTH::PMR.B0 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// PK1
+					// TOC1: PK1
 					PORTK::PMR.B1 = 0;
 					MPC::PK1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTK::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// PK0
+					// TIC1: PK0
 					PORTK::PMR.B0 = 0;
 					MPC::PK0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTK::PMR.B0 = enable;
@@ -1564,22 +1625,22 @@ namespace device {
 			switch(odr) {
 			case ORDER::FIRST:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// PD3
+					// TOC0: PD3
 					PORTD::PMR.B3 = 0;
 					MPC::PD3PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTD::PMR.B3 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// PD2
+					// TIC0: PD2
 					PORTD::PMR.B2 = 0;
 					MPC::PD2PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTD::PMR.B2 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// PE3
+					// TOC1: PE3
 					PORTE::PMR.B3 = 0;
 					MPC::PE3PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTE::PMR.B3 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// PE2
+					// TIC1: PE2
 					PORTE::PMR.B2 = 0;
 					MPC::PE2PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTE::PMR.B2 = enable;
@@ -1589,22 +1650,22 @@ namespace device {
 				break;
 			case ORDER::SECOND:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// PL1
+					// TOC0: PL1
 					PORTL::PMR.B1 = 0;
 					MPC::PL1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTL::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// PL0
+					// TIC0: PL0
 					PORTL::PMR.B0 = 0;
 					MPC::PL0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTL::PMR.B0 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// PM1
+					// TOC1: PM1
 					PORTH::PMR.B1 = 0;
 					MPC::PH1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTH::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// PM0
+					// TIC1: PM0
 					PORTH::PMR.B0 = 0;
 					MPC::PH0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTH::PMR.B0 = enable;
