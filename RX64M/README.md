@@ -193,6 +193,15 @@
 |RSPI0 / SSL1|PA0 (70)|PC0 (52)|-|-|
 |RSPI0 / SSL2|PA1 (69)|PC1 (51)|-|-|
 |RSPI0 / SSL3|PA2 (68)|PC2 (50)|-|-|
+|SSI0 / AUDIO_CLK|P22 (26)|-|-|-|
+|SSI0 / SSISCK0|P23 (25)|-|-|-|
+|SSI0 / SSIWS0|P21 (27)|-|-|-|
+|SSI0 / SSIRXD0|P20 (28)|-|-|-|
+|SSI0 / SSITXD0|P17 (29)|-|-|-|
+|SSI1 / AUDIO_CLK|P22 (26)|-|-|-|
+|SSI1 / SSISCK1|P24 (25)|-|-|-|
+|SSI1 / SSIWS1|P15 (31)|-|-|-|
+|SSI1 / SSIDATA1|P25 (23)|-|-|-|
 
 ### LFQFP144
 
@@ -254,6 +263,15 @@
 |RSPI0 / SSL1|PA0 (97)|PC0 (75)|-|-|
 |RSPI0 / SSL2|PA1 (96)|PC1 (73)|-|-|
 |RSPI0 / SSL3|PA2 (95)|PC2 (70)|-|-|
+|SSI0 / AUDIO_CLK|P22 (35)|-|-|-|
+|SSI0 / SSISCK0|P23 (34)|-|-|-|
+|SSI0 / SSIWS0|P21 (36)|-|-|-|
+|SSI0 / SSIRXD0|P20 (37)|-|-|-|
+|SSI0 / SSITXD0|P17 (38)|-|-|-|
+|SSI1 / AUDIO_CLK|P22 (35)|-|-|-|
+|SSI1 / SSISCK1|P24 (33)|-|-|-|
+|SSI1 / SSIWS1|P15 (42)|-|-|-|
+|SSI1 / SSIDATA1|P25 (32)|-|-|-|
 
 ### LFQFP176
 
@@ -315,6 +333,15 @@
 |RSPI0 / SSL1|PA0 (118)|PC0 (91)|-|-|
 |RSPI0 / SSL2|PA1 (114)|PC1 (89)|-|-|
 |RSPI0 / SSL3|PA2 (112)|PC2 (86)|-|-|
+|SSI0 / AUDIO_CLK|P22 (43)|-|-|-|
+|SSI0 / SSISCK0|P23 (42)|-|-|-|
+|SSI0 / SSIWS0|P21 (44)|-|-|-|
+|SSI0 / SSIRXD0|P20 (45)|-|-|-|
+|SSI0 / SSITXD0|P17 (46)|-|-|-|
+|SSI1 / AUDIO_CLK|P22 (43)|-|-|-|
+|SSI1 / SSISCK1|P24 (40)|-|-|-|
+|SSI1 / SSIWS1|P15 (50)|-|-|-|
+|SSI1 / SSIDATA1|P25 (38)|-|-|-|
 
 ---
 

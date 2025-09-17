@@ -115,6 +115,71 @@
 
 ## port map order / ポートマップ候補
 
+### LFQFP100
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI0 / RXD|P21 (27)|P33 (17)|-|-|
+|SCI0 / TXD|P20 (28)|P32 (18)|-|-|
+|SCI0 / SCK|P22 (26)|P34 (16)|-|-|
+|SCI1 / RXD|P15 (31)|P30 (20)|-|-|
+|SCI1 / TXD|P16 (30)|P26 (22)|-|-|
+|SCI1 / SCK|P17 (29)|P27 (21)|-|-|
+|SCI2 / RXD|P12 (34)|P52 (42)|-|-|
+|SCI2 / TXD|P13 (33)|P50 (44)|-|-|
+|SCI2 / SCK|P51 (43)|P51 (43)|-|-|
+|SCI3 / RXD|P16 (30)|P25 (23)|-|-|
+|SCI3 / TXD|P17 (29)|P23 (25)|-|-|
+|SCI3 / SCK|P15 (31)|P24 (24)|-|-|
+|SCI4 / RXD|PB0 (61)|-|-|-|
+|SCI4 / TXD|PB1 (59)|-|-|-|
+|SCI4 / SCK|PB3 (57)|-|-|-|
+|SCI5 / RXD|PA2 (68)|PA3 (67)|PC2 (50)|PC2 (50)|
+|SCI5 / TXD|PA4 (66)|PA4 (66)|PC3 (49)|PC3 (49)|
+|SCI5 / SCK|PA1 (69)|PA1 (69)|PC1 (51)|PC4 (48)|
+|SCI6 / RXD|P01 (---)|P33 (17)|PB0 (61)|-|
+|SCI6 / TXD|P00 (---)|P32 (18)|PB1 (59)|-|
+|SCI6 / SCK|P02 (---)|P34 (16)|PB3 (57)|-|
+|SCI7 / RXD|P92 (---)|P92 (---)|-|-|
+|SCI7 / TXD|P90 (---)|P55 (39)|-|-|
+|SCI7 / SCK|P91 (---)|P56 (---)|-|-|
+|SCI8 / RXD|PC6 (46)|-|-|-|
+|SCI8 / TXD|PC7 (45)|-|-|-|
+|SCI8 / SCK|PC5 (47)|-|-|-|
+|SCI9 / RXD|PB6 (54)|-|-|-|
+|SCI9 / TXD|PB7 (53)|-|-|-|
+|SCI9 / SCK|PB5 (55)|-|-|-|
+|SCI10 / RXD|P81 (---)|P86 (---)|PC6 (46)|-|
+|SCI10 / TXD|P82 (---)|P87 (---)|PC7 (45)|-|
+|SCI10 / SCK|P80 (---)|P83 (---)|PC5 (47)|-|
+|SCI11 / RXD|P76 (---)|PB6 (54)|-|-|
+|SCI11 / TXD|P77 (---)|PB7 (53)|-|-|
+|SCI11 / SCK|P75 (---)|PB5 (55)|-|-|
+|SCI12 / RXD|PE2 (76)|PA2 (68)|-|-|
+|SCI12 / TXD|PE1 (77)|PA4 (66)|-|-|
+|SCI12 / SCK|PE0 (78)|PA1 (69)|-|-|
+|RSCI10 / RXD|P81 (---)|P86 (---)|PC6 (46)|-|
+|RSCI10 / TXD|P82 (---)|P87 (---)|PC7 (45)|-|
+|RSCI10 / SCK|P80 (---)|P83 (---)|PC5 (47)|-|
+|RSCI10 / DE|P80 (---)|-|-|-|
+|RSCI11 / RXD|P76 (---)|PB6 (54)|PC0 (52)|-|
+|RSCI11 / TXD|P77 (---)|PB7 (53)|PC1 (51)|-|
+|RSCI11 / SCK|P75 (---)|PB5 (55)|PB5 (55)|-|
+|RSCI11 / DE|P75 (---)|-|-|-|
+|RIIC0 / SCL|P12 (34)|-|-|-|
+|RIIC0 / SDA|P13 (33)|-|-|-|
+|RIIC2 / SCL|P16 (30)|-|-|-|
+|RIIC2 / SDA|P17 (29)|-|-|-|
+|CANFD0 / CRX|P15 (31)|P33 (17)|P55 (39)|PD2 (84)|
+|CANFD0 / CTX|P14 (32)|P32 (18)|P54 (40)|PD1 (85)|
+|RSPI0 / RSPCK|PA5 (65)|PC5 (47)|-|-|
+|RSPI0 / MOSI|PA6 (64)|PC6 (46)|-|-|
+|RSPI0 / MISO|PA7 (63)|PC7 (45)|-|-|
+|RSPI0 / SSL0|PA4 (66)|PC4 (48)|-|-|
+|RSPI0 / SSL1|PA0 (70)|PC0 (52)|-|-|
+|RSPI0 / SSL2|PA1 (69)|PC1 (51)|-|-|
+|RSPI0 / SSL3|PA2 (68)|PC2 (50)|-|-|
+
 ### LFQFP144
 
 |Peripheral|FIRST|SECOND|THIRD|FOURTH|

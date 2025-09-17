@@ -1532,7 +1532,7 @@ namespace device {
 				// SSILRCK0:  P21 (LFQFP100:  27) (LFQFP144:  36)
 				// SSIRXD0:   P20 (LFQFP100:  28) (LFQFP144:  37)
 				// SSITXD0:   P17 (LFQFP100:  29) (LFQFP144:  38)
-				PORT2::PMR.B0 = 2;
+				PORT2::PMR.B0 = 0;
 				MPC::P22PFS.PSEL = sel;  // ok
 				PORT2::PMR.B2 = enable;
 				PORT2::PMR.B3 = 0;
