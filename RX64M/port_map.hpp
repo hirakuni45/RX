@@ -1070,6 +1070,66 @@ namespace device {
 			return true;
 		}
 
+		static bool ssi0_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b01'0111 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// AUDIO_CLK: P22 (LFQFP100:  26) (LFQFP144:  35) (LFQFP176:  43)
+				// SSISCK0:   P23 (LFQFP100:  25) (LFQFP144:  34) (LFQFP176:  42)
+				// SSIWS0:    P21 (LFQFP100:  27) (LFQFP144:  36) (LFQFP176:  44)
+				// SSIRXD0:   P20 (LFQFP100:  28) (LFQFP144:  37) (LFQFP176:  45)
+				// SSITXD0:   P17 (LFQFP100:  29) (LFQFP144:  38) (LFQFP176:  46)
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // ok
+				PORT2::PMR.B2 = enable;
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;  // ok
+				PORT2::PMR.B3 = enable;
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = sel;  // ok
+				PORT2::PMR.B1 = enable;
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = sel;  // ok
+				PORT2::PMR.B0 = enable;
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = sel;  // ok
+				PORT1::PMR.B7 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool ssi1_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b01'0111 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// AUDIO_CLK: P22 (LFQFP100:  26) (LFQFP144:  35) (LFQFP176:  43)
+				// SSISCK1:   P24 (LFQFP100:  24) (LFQFP144:  33) (LFQFP176:  40)
+				// SSIWS1:    P15 (LFQFP100:  31) (LFQFP144:  42) (LFQFP176:  50)
+				// SSIDATA1:  P25 (LFQFP100:  23) (LFQFP144:  32) (LFQFP176:  38)
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // ok
+				PORT2::PMR.B2 = enable;
+				PORT2::PMR.B4 = 0;
+				MPC::P24PFS.PSEL = sel;  // ok
+				PORT2::PMR.B4 = enable;
+				PORT1::PMR.B5 = 0;
+				MPC::P15PFS.PSEL = sel;  // ok
+				PORT1::PMR.B5 = enable;
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = sel;  // ok
+				PORT2::PMR.B5 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
 		static bool sdhi_1st_(SDHI_STATE state) noexcept
 		{
 			bool ret = true;
@@ -1653,6 +1713,12 @@ namespace device {
 					break;
 				case peripheral::CMTW1:
 					ret = cmtw1_(odr, ena, opt);
+					break;
+				case peripheral::SSI0:
+					ret = ssi0_(odr, ena);
+					break;
+				case peripheral::SSI1:
+					ret = ssi1_(odr, ena);
 					break;
 				default:
 					break;

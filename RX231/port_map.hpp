@@ -490,6 +490,82 @@ namespace device {
 			return ret;
 		}
 
+		static bool ssi0_(ORDER odr, bool enable) noexcept
+		{
+			uint8_t sel = enable ? 0b01'0111 : 0;
+			switch(odr) {
+			case ORDER::FIRST:
+				// AUDIO_MCLK: P22 (LFQFP64: --) (LFQFP100:  26)
+				// SSISCK0:    P23 (LFQFP64: --) (LFQFP100:  25)
+				// SSIWS00:    P21 (LFQFP64: --) (LFQFP100:  27)
+				// SSIRXD0:    P20 (LFQFP64: --) (LFQFP100:  28)
+				// SSITXD0:    P17 (LFQFP64: 17) (LFQFP100:  29)
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = sel;  // ok
+				PORT2::PMR.B2 = enable;
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = sel;  // ok
+				PORT2::PMR.B3 = enable;
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = sel;  // ok
+				PORT2::PMR.B1 = enable;
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = sel;  // ok
+				PORT2::PMR.B0 = enable;
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = sel;  // ok
+				PORT1::PMR.B7 = enable;
+				break;
+			case ORDER::SECOND:
+				// AUDIO_MCLK: P30 (LFQFP64: 14) (LFQFP100:  20)
+				// SSISCK0:    P31 (LFQFP64: 13) (LFQFP100:  19)
+				// SSIWS0:     P27 (LFQFP64: 15) (LFQFP100:  21)
+				// SSIRXD0:    P26 (LFQFP64: 16) (LFQFP100:  22)
+				// SSITXD0:    P17 (LFQFP64: 17) (LFQFP100:  29)
+				PORT3::PMR.B0 = 0;
+				MPC::P30PFS.PSEL = sel;  // ok
+				PORT3::PMR.B0 = enable;
+				PORT3::PMR.B1 = 0;
+				MPC::P31PFS.PSEL = sel;  // ok
+				PORT3::PMR.B1 = enable;
+				PORT2::PMR.B7 = 0;
+				MPC::P27PFS.PSEL = sel;  // ok
+				PORT2::PMR.B7 = enable;
+				PORT2::PMR.B6 = 0;
+				MPC::P26PFS.PSEL = sel;  // ok
+				PORT2::PMR.B6 = enable;
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = sel;  // ok
+				PORT1::PMR.B7 = enable;
+				break;
+			case ORDER::THIRD:
+				// AUDIO_MCLK: PE3 (LFQFP64: 48) (LFQFP100:  75)
+				// SSISCK0:    PA1 (LFQFP64: 44) (LFQFP100:  69)
+				// SSIWS0:     PA6 (LFQFP64: 41) (LFQFP100:  64)
+				// SSIRXD0:    PA3 (LFQFP64: 43) (LFQFP100:  67)
+				// SSITXD0:    PA4 (LFQFP64: 42) (LFQFP100:  66)
+				PORTE::PMR.B3 = 0;
+				MPC::PE3PFS.PSEL = sel;  // ok
+				PORTE::PMR.B3 = enable;
+				PORTA::PMR.B1 = 0;
+				MPC::PA1PFS.PSEL = sel;  // ok
+				PORTA::PMR.B1 = enable;
+				PORTA::PMR.B6 = 0;
+				MPC::PA6PFS.PSEL = sel;  // ok
+				PORTA::PMR.B6 = enable;
+				PORTA::PMR.B3 = 0;
+				MPC::PA3PFS.PSEL = sel;  // ok
+				PORTA::PMR.B3 = enable;
+				PORTA::PMR.B4 = 0;
+				MPC::PA4PFS.PSEL = sel;  // ok
+				PORTA::PMR.B4 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
 		static bool sdhi_1st_(SDHI_STATE state, bool wp) noexcept
 		{
 			// CLK: PB1
@@ -741,6 +817,9 @@ namespace device {
 					break;
 				case peripheral::RSPI0:
 					ret = rspi0_(odr, ena);
+					break;
+				case peripheral::SSI0:
+					ret = ssi0_(odr, ena);
 					break;
 				default:
 					break;

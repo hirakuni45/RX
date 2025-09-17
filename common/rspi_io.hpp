@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・RSPI I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,11 +16,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  RSPI 制御クラス
-		@param[in]	RSPI	RSPI 定義クラス
-		@param[in]	PSEL	ポート候補
+		@param[in]	RSPI		RSPI 定義クラス
+		@param[in]	RSPI_ODR	RSPI ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RSPI, port_map::ORDER PSEL = port_map::ORDER::FIRST>
+	template <class RSPI, port_map::ORDER RSPI_ODR = port_map::ORDER::FIRST>
 	class rspi_io {
 	public:
 
@@ -29,17 +29,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  データ、クロック位相タイプ型
-					TYPE1(MODE0): CPOL:0 CPHA:0 @n
-					TYPE2(MODE1): CPOL:0 CPHA:1 @n
-					TYPE3(MODE2): CPOL:1 CPHA:0 @n
-					TYPE4(MODE3): CPOL:1 CPHA:1
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PHASE : uint8_t {
-			TYPE1,  ///< タイプ１
-			TYPE2,  ///< タイプ２
-			TYPE3,  ///< タイプ３
-			TYPE4,  ///< タイプ４ (SD カードアクセス）
+			TYPE1,  ///< タイプ１ (MODE0): CPOL:0 CPHA:0
+			TYPE2,  ///< タイプ２ (MODE1): CPOL:0 CPHA:1
+			TYPE3,  ///< タイプ３ (MODE2): CPOL:1 CPHA:0
+			TYPE4,  ///< タイプ４ (MODE3): CPOL:1 CPHA:1 (SD カードアクセス）
 		};
 
 
@@ -149,14 +145,13 @@ namespace device {
 
 			power_mgr::turn(RSPI::PERIPHERAL);
 
+			port_map::turn(RSPI::PERIPHERAL, true, RSPI_ODR);
+
 			// デバイスを不許可
 			RSPI::SPCR = 0x00;
 
-			// ポートを有効にする
-			port_map::turn(RSPI::PERIPHERAL, true, PSEL);
-
 			// 設定
-		    RSPI::SPBR = spbr;
+			RSPI::SPBR = spbr;
 
 			RSPI::SPPCR = 0x00;	// Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	// disable sequence control
@@ -213,15 +208,15 @@ namespace device {
 
 			power_mgr::turn(RSPI::PERIPHERAL);
 
-			RSPI::SPCR = 0x00;
+			port_map::turn(RSPI::PERIPHERAL, true, RSPI_ODR);
 
-			port_map::turn(RSPI::PERIPHERAL, true, PSEL);
+			RSPI::SPCR = 0x00;
 #if 0
 			utils::format("RSPI Request Speed: %u [Hz]\n") % speed;
 			utils::format("RSPI SPBR: %d\n") % static_cast<uint32_t>(spbr);
 			utils::format("RSPI BRDV: %d\n") % static_cast<uint32_t>(brdv);
 #endif
-		    RSPI::SPBR = spbr;
+			RSPI::SPBR = spbr;
 
 			RSPI::SPPCR = 0x00;	 // Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	 // sequence length: 1 
@@ -246,6 +241,34 @@ namespace device {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SSL ポートを有効にする
+			@param[in]	odr		SSL ポート候補
+			@param[in]	ssl		SSL ポート名
+			@param[in]	ena		無効にする場合「false」
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool enable_ssl(port_map_order::ORDER odr, port_map_order::RSPI ssl, bool ena = true) noexcept
+		{
+			switch(ssl) {
+			case port_map_order::RSPI::SSL0:
+				break;
+			case port_map_order::RSPI::SSL1:
+				break;
+			case port_map_order::RSPI::SSL2:
+				break;
+			case port_map_order::RSPI::SSL3:
+				break;
+			default:
+				return true;
+			}
+
+			return true;
+		}
+
+
 		//----------------------------------------------------------------//
 		/*!
 			@brief	リード・ライト
@@ -262,7 +285,7 @@ namespace device {
 				if(cnt > 40000) break;
 			}
 			auto val = RSPI::SPDR.HH();
-		    return val;
+			return val;
 		}
 
 
@@ -289,7 +312,7 @@ namespace device {
 		inline uint32_t xchg32_sync() noexcept
 		{
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
-		    return RSPI::SPDR();
+			return RSPI::SPDR();
 		}
 
 
