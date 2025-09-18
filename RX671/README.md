@@ -213,6 +213,8 @@
 |DOC|Data Operation Circuit|データ演算回路|
 |STBRAM|Standby RAM|スタンバイ RAM|
 
+---
+
 ## port map order / ポートマップ候補
 
 ### LFQFP100

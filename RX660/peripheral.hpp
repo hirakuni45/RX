@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Peripheral Type / ペリフェラル種別 (RX660)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,94 +14,94 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  peripheral enum class
+		@brief  ペリフェラル型（種別）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class peripheral : uint16_t {
 
-		CAC,		///< クロック周波数精度測定回路
+		CAC,		///< Clock Frequency Accuracy Measurement Circuit / クロック周波数精度測定回路
 
-		DMAC0,		///< DMA コントローラ・チャネル０
-		DMAC1,		///< DMA コントローラ・チャネル１
-		DMAC2,		///< DMA コントローラ・チャネル２
-		DMAC3,		///< DMA コントローラ・チャネル３
-		DMAC4,		///< DMA コントローラ・チャネル４
-		DMAC5,		///< DMA コントローラ・チャネル５
-		DMAC6,		///< DMA コントローラ・チャネル６
-		DMAC7,		///< DMA コントローラ・チャネル７
-		DTC,		///< データトランスファコントローラ
+		DMAC0,		///< DMA Controller channel 0 / DMA コントローラ・チャネル０
+		DMAC1,		///< DMA Controller channel 1 / DMA コントローラ・チャネル１
+		DMAC2,		///< DMA Controller channel 2 / DMA コントローラ・チャネル２
+		DMAC3,		///< DMA Controller channel 3 / DMA コントローラ・チャネル３
+		DMAC4,		///< DMA Controller channel 4 / DMA コントローラ・チャネル４
+		DMAC5,		///< DMA Controller channel 5 / DMA コントローラ・チャネル５
+		DMAC6,		///< DMA Controller channel 6 / DMA コントローラ・チャネル６
+		DMAC7,		///< DMA Controller channel 7 / DMA コントローラ・チャネル７
+		DTC,		///< Data Transfer Controller / データトランスファコントローラ
 
-		ELC,		///< イベントリンクコントローラ
+		ELC,		///< Event Link Controller / イベントリンクコントローラ
 
-		MTU0,		///< マルチファンクションタイマパルスユニット０
-		MTU1,		///< マルチファンクションタイマパルスユニット１
-		MTU2,		///< マルチファンクションタイマパルスユニット２
-		MTU3,		///< マルチファンクションタイマパルスユニット３
-		MTU4,		///< マルチファンクションタイマパルスユニット４
-		MTU5,		///< マルチファンクションタイマパルスユニット５
-		MTU6,		///< マルチファンクションタイマパルスユニット６
-		MTU7,		///< マルチファンクションタイマパルスユニット７
-		MTU8,		///< マルチファンクションタイマパルスユニット８
+		MTU0,		///< Multi-Function Timer Pulse Unit 0 / マルチファンクションタイマパルスユニット０
+		MTU1,		///< Multi-Function Timer Pulse Unit 1 / マルチファンクションタイマパルスユニット１
+		MTU2,		///< Multi-Function Timer Pulse Unit 2 / マルチファンクションタイマパルスユニット２
+		MTU3,		///< Multi-Function Timer Pulse Unit 3 / マルチファンクションタイマパルスユニット３
+		MTU4,		///< Multi-Function Timer Pulse Unit 4 / マルチファンクションタイマパルスユニット４
+		MTU5,		///< Multi-Function Timer Pulse Unit 5 / マルチファンクションタイマパルスユニット５
+		MTU6,		///< Multi-Function Timer Pulse Unit 6 / マルチファンクションタイマパルスユニット６
+		MTU7,		///< Multi-Function Timer Pulse Unit 7 / マルチファンクションタイマパルスユニット７
+		MTU8,		///< Multi-Function Timer Pulse Unit 8 / マルチファンクションタイマパルスユニット８
 
-		POE3,		///< ポートアウトプットイネーブル
+		POE3,		///< Port Output Enable 3 / ポートアウトプットイネーブル３
 
-		TMR0,		///< 8 ビットタイマ０
-		TMR1,		///< 8 ビットタイマ１
-		TMR2,		///< 8 ビットタイマ２
-		TMR3,		///< 8 ビットタイマ３
+		TMR0,		///< 8-Bit Timer 0 / 8 ビットタイマ０
+		TMR1,		///< 8-Bit Timer 1 / 8 ビットタイマ１
+		TMR2,		///< 8-Bit Timer 2 / 8 ビットタイマ２
+		TMR3,		///< 8-Bit Timer 3 / 8 ビットタイマ３
 
-		CMT0,		///< コンペアマッチタイマ０（CMT）
-		CMT1,		///< コンペアマッチタイマ１（CMT）
-		CMT2,		///< コンペアマッチタイマ２（CMT）
-		CMT3,		///< コンペアマッチタイマ３（CMT）
+		CMT0,		///< Compare Match Timer 0 / コンペアマッチタイマ０
+		CMT1,		///< Compare Match Timer 1 / コンペアマッチタイマ１
+		CMT2,		///< Compare Match Timer 2 / コンペアマッチタイマ２
+		CMT3,		///< Compare Match Timer 3 / コンペアマッチタイマ３
 
-		CMTW0,		///< コンペアマッチタイマＷ０（CMTW）
-		CMTW1,		///< コンペアマッチタイマＷ１（CMTW）
+		CMTW0,		///< Compare Match Timer W 0 / コンペアマッチタイマＷ０
+		CMTW1,		///< Compare Match Timer W 1 / コンペアマッチタイマＷ１
 
-		RTC,		///< リアルタイムクロック (RTCC)
+		RTC,		///< Realtime Clock / リアルタイムクロック
 
-		WDTA,		///< ウォッチドッグタイマ (WDTA)
-		IWDT,		///< 独立ウォッチドッグタイマ (IWDTa)
+		WDTA,		///< Watchdog Timer / ウォッチドッグタイマ
+		IWDT,		///< Independent Watchdog Timer / 独立ウォッチドッグタイマ
 
-		SCI0,		///< シリアルコミュニケーションインタフェース (P20:TXD0, P21:RXD0)
-		SCI1,		///< シリアルコミュニケーションインタフェース (PF0:TXD1, PF2:RXD1)
-		SCI2,		///< シリアルコミュニケーションインタフェース (P13:TXD2, P12:RXD2)
-		SCI3,		///< シリアルコミュニケーションインタフェース (P23:TXD3, P25:RXD3)
-		SCI4,		///< シリアルコミュニケーションインタフェース (PB1:TXD4, PB0:RXD4)
-		SCI5,		///< シリアルコミュニケーションインタフェース (PA4:TXD5, PA2:RXD5)
-		SCI6,		///< シリアルコミュニケーションインタフェース (P00:TXD6, P01:RXD6)
-		SCI7,		///< シリアルコミュニケーションインタフェース (P90:TXD7, P92:RXD7)
-		SCI8,		///< シリアルコミュニケーションインタフェース
-		SCI9,		///< シリアルコミュニケーションインタフェース
-		SCI10,		///< シリアルコミュニケーションインタフェース
-		SCI11,		///< シリアルコミュニケーションインタフェース
-		SCI12,		///< シリアルコミュニケーションインタフェース
+		SCI0,		///< Serial Communications Interface 0 / シリアルコミュニケーションインタフェース０
+		SCI1,		///< Serial Communications Interface 1 / シリアルコミュニケーションインタフェース１
+		SCI2,		///< Serial Communications Interface 2 / シリアルコミュニケーションインタフェース２
+		SCI3,		///< Serial Communications Interface 3 / シリアルコミュニケーションインタフェース３
+		SCI4,		///< Serial Communications Interface 4 / シリアルコミュニケーションインタフェース４
+		SCI5,		///< Serial Communications Interface 5 / シリアルコミュニケーションインタフェース５
+		SCI6,		///< Serial Communications Interface 6 / シリアルコミュニケーションインタフェース６
+		SCI7,		///< Serial Communications Interface 7 / シリアルコミュニケーションインタフェース７
+		SCI8,		///< Serial Communications Interface 8 / シリアルコミュニケーションインタフェース８
+		SCI9,		///< Serial Communications Interface 9 / シリアルコミュニケーションインタフェース９
+		SCI10,		///< Serial Communications Interface 10 / シリアルコミュニケーションインタフェース１０
+		SCI11,		///< Serial Communications Interface 11 / シリアルコミュニケーションインタフェース１１
+		SCI12,		///< Serial Communications Interface 12 / シリアルコミュニケーションインタフェース１２
 
-		RSCI10,		///< シリアルコミュニケーションインタフェース (RSCI10)
-		RSCI11,		///< シリアルコミュニケーションインタフェース (RSCI11)
+		RSCI10,		///< (R)Serial Communications Interface 0 / Ｒシリアルコミュニケーションインタフェース１０
+		RSCI11,		///< (R)Serial Communications Interface 1 / Ｒシリアルコミュニケーションインタフェース１１
 
-		RIIC0,		///< I 2 C バスインタフェース０（RIIC0a）
-		RIIC2,		///< I 2 C バスインタフェース１（RIIC2a）
+		RIIC0,		///< I2C-bus Interface 0 / I2C バスインタフェース０
+		RIIC2,		///< I2C-bus Interface 2 / I2C バスインタフェース２
 
-		CANFD0,		///< CANFD-Lite インタフェース（CANFD）
+		CANFD0,		///< CAN FD Module 0 / CANFD-Lite インタフェース０
 
-		RSPI0,		///< シリアルペリフェラルインタフェース（RSPI0）
+		RSPI0,		///< Serial Peripheral Interface 0 / シリアルペリフェラルインタフェース０
 
-		CRC,		///< CRC 演算器（CRCA）
+		CRC,		///< CRC Calculator / CRC 演算器
 
-		REMC0,		///< リモコン信号受信機能 (REMCa)
+		REMC0,		///< Remote Control Signal Receiver / リモコン信号受信機能
 
-		S12AD,		///< 12 ビット A/D コンバータ（S12ADH）
+		S12AD,		///< 12-Bit A/D Converter / 12 ビット A/D コンバータ
 
-		R12DA,		///< 12 ビット D/A コンバータ（R12DAb）
+		R12DA,		///< 12-Bit D/A Converter / 12 ビット D/A コンバータ
 
-		TEMPS,		///< 温度センサ（TEMPS）
+		TEMPS,		///< Temperature Sensor / 温度センサ
 
-		CMPC0,		///< コンパレータＣ０
-		CMPC1,		///< コンパレータＣ１
-		CMPC2,		///< コンパレータＣ２
-		CMPC3,		///< コンパレータＣ３
+		CMPC0,		///< Comparator C0 / コンパレータＣ０
+		CMPC1,		///< Comparator C1 / コンパレータＣ１
+		CMPC2,		///< Comparator C2 / コンパレータＣ２
+		CMPC3,		///< Comparator C3 / コンパレータＣ３
 
-		DOC,		///< データ演算回路 (DOCA)
+		DOC,		///< Data Operation Circuit / データ演算回路
 	};
 }
