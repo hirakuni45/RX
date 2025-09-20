@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Peripheral Type / ペリフェラル種別 (RX72M)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,152 +14,148 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  peripheral enum class
+		@brief  Peripheral Type / ペリフェラル型（種別）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class peripheral : uint16_t {
 
-		CAC,		///< クロック周波数精度測定回路
+		CAC,		///< Clock Frequency Accuracy Measurement Circuit / クロック周波数精度測定回路
 
-		DTC,		///< データトランスファコントローラ
+		ELC,		///< Event Link Controller / イベントリンクコントローラ
 
-		ELC,		///< イベントリンクコントローラ
+		DMAC0,		///< DMA Controller channel 0 / DMA コントローラ・チャネル０
+		DMAC1,		///< DMA Controller channel 1 / DMA コントローラ・チャネル１
+		DMAC2,		///< DMA Controller channel 2 / DMA コントローラ・チャネル２
+		DMAC3,		///< DMA Controller channel 3 / DMA コントローラ・チャネル３
+		DMAC4,		///< DMA Controller channel 4 / DMA コントローラ・チャネル４
+		DMAC5,		///< DMA Controller channel 5 / DMA コントローラ・チャネル５
+		DMAC6,		///< DMA Controller channel 6 / DMA コントローラ・チャネル６
+		DMAC7,		///< DMA Controller channel 7 / DMA コントローラ・チャネル７
+		DTC,		///< Data Transfer Controller / データトランスファコントローラ
 
-		DMAC0,		///< DMA コントローラ・チャネル０
-		DMAC1,		///< DMA コントローラ・チャネル１
-		DMAC2,		///< DMA コントローラ・チャネル２
-		DMAC3,		///< DMA コントローラ・チャネル３
-		DMAC4,		///< DMA コントローラ・チャネル４
-		DMAC5,		///< DMA コントローラ・チャネル５
-		DMAC6,		///< DMA コントローラ・チャネル６
-		DMAC7,		///< DMA コントローラ・チャネル７
+		EXDMAC0,	///< EXDMA Controller channel 0 / EXDMA コントローラ・チャネル０
+		EXDMAC1,	///< EXDMA Controller channel 1 / EXDMA コントローラ・チャネル１
 
-		EXDMAC0,	///< EXDMA コントローラ・チャネル０
-		EXDMAC1,	///< EXDMA コントローラ・チャネル１
+		MTU0,		///< Multi-Function Timer Pulse Unit 0 / マルチファンクションタイマパルスユニット０
+		MTU1,		///< Multi-Function Timer Pulse Unit 1 / マルチファンクションタイマパルスユニット１
+		MTU2,		///< Multi-Function Timer Pulse Unit 2 / マルチファンクションタイマパルスユニット２
+		MTU3,		///< Multi-Function Timer Pulse Unit 3 / マルチファンクションタイマパルスユニット３
+		MTU4,		///< Multi-Function Timer Pulse Unit 4 / マルチファンクションタイマパルスユニット４
+		MTU5,		///< Multi-Function Timer Pulse Unit 5 / マルチファンクションタイマパルスユニット５
+		MTU6,		///< Multi-Function Timer Pulse Unit 6 / マルチファンクションタイマパルスユニット６
+		MTU7,		///< Multi-Function Timer Pulse Unit 7 / マルチファンクションタイマパルスユニット７
+		MTU8,		///< Multi-Function Timer Pulse Unit 8 / マルチファンクションタイマパルスユニット８
 
-		MTU0,		///< マルチファンクションタイマパルスユニット０
-		MTU1,		///< マルチファンクションタイマパルスユニット１
-		MTU2,		///< マルチファンクションタイマパルスユニット２
-		MTU3,		///< マルチファンクションタイマパルスユニット３
-		MTU4,		///< マルチファンクションタイマパルスユニット４
-		MTU5,		///< マルチファンクションタイマパルスユニット５
-		MTU6,		///< マルチファンクションタイマパルスユニット６
-		MTU7,		///< マルチファンクションタイマパルスユニット７
-		MTU8,		///< マルチファンクションタイマパルスユニット８
+		POE3,		///< Port Output Enable 3 / ポートアウトプットイネーブル
+		GPTW0,		///< General PWM Timer 0 / 汎用 PWM タイマ０
+		GPTW1,		///< General PWM Timer 1 / 汎用 PWM タイマ１
+		GPTW2,		///< General PWM Timer 2 / 汎用 PWM タイマ２
+		GPTW3,		///< General PWM Timer 3 / 汎用 PWM タイマ３
 
-		POE3,		///< ポートアウトプットイネーブル
+		TPU0,		///< 16-Bit Timer Pulse Unit 0 / 16 ビットタイマパルスユニット０
+		TPU1,		///< 16-Bit Timer Pulse Unit 1 / 16 ビットタイマパルスユニット１
+		TPU2,		///< 16-Bit Timer Pulse Unit 2 / 16 ビットタイマパルスユニット２
+		TPU3,		///< 16-Bit Timer Pulse Unit 3 / 16 ビットタイマパルスユニット３
+		TPU4,		///< 16-Bit Timer Pulse Unit 4 / 16 ビットタイマパルスユニット４
+		TPU5,		///< 16-Bit Timer Pulse Unit 5 / 16 ビットタイマパルスユニット５
 
-		GPTW0,		///< 汎用 PWM タイマ０
-		GPTW1,		///< 汎用 PWM タイマ１
-		GPTW2,		///< 汎用 PWM タイマ２
-		GPTW3,		///< 汎用 PWM タイマ３
+		PPG0,		///< Programmable Pulse Generator 0 / プログラマブルパルスジェネレータ０
+		PPG1,		///< Programmable Pulse Generator 1 / プログラマブルパルスジェネレータ１
 
-		TPU0,		///< 16 ビットタイマパルスユニット０
-		TPU1,		///< 16 ビットタイマパルスユニット１
-		TPU2,		///< 16 ビットタイマパルスユニット２
-		TPU3,		///< 16 ビットタイマパルスユニット３
-		TPU4,		///< 16 ビットタイマパルスユニット４
-		TPU5,		///< 16 ビットタイマパルスユニット５
+		TMR0,		///< 8-Bit Timer 0 / 8 ビットタイマ０
+		TMR1,		///< 8-Bit Timer 1 / 8 ビットタイマ１
+		TMR2,		///< 8-Bit Timer 2 / 8 ビットタイマ２
+		TMR3,		///< 8-Bit Timer 3 / 8 ビットタイマ３
 
-		PPG0,		///< プログラマブルパルスジェネレータ０
-		PPG1,		///< プログラマブルパルスジェネレータ１
+		CMT0,		///< Compare Match Timer 0 / コンペアマッチタイマ０
+		CMT1,		///< Compare Match Timer 1 / コンペアマッチタイマ１
+		CMT2,		///< Compare Match Timer 2 / コンペアマッチタイマ２
+		CMT3,		///< Compare Match Timer 3 / コンペアマッチタイマ３
 
-		TMR0,		///< 8 ビットタイマ０
-		TMR1,		///< 8 ビットタイマ１
-		TMR2,		///< 8 ビットタイマ２
-		TMR3,		///< 8 ビットタイマ３
+		CMTW0,		///< Compare Match Timer W 0 / コンペアマッチタイマＷ０
+		CMTW1,		///< Compare Match Timer W 1 / コンペアマッチタイマＷ１
 
-		CMT0,		///< コンペアマッチタイマ０（CMT）
-		CMT1,		///< コンペアマッチタイマ１（CMT）
-		CMT2,		///< コンペアマッチタイマ２（CMT）
-		CMT3,		///< コンペアマッチタイマ３（CMT）
+		RTC,		///< Realtime Clock / リアルタイムクロック
 
-		CMTW0,		///< コンペアマッチタイマＷ０（CMTW）
-		CMTW1,		///< コンペアマッチタイマＷ１（CMTW）
+		WDTA,		///< Watchdog Timer / ウォッチドッグタイマ
+		IWDT,		///< Independent Watchdog Timer / 独立ウォッチドッグタイマ
 
-		RTC,		///< リアルタイムクロック
+		ETHERC0,	///< Ethernet Controller 0 / イーサネットコントローラ０
+		ETHERC1,	///< Ethernet Controller 1 / イーサネットコントローラ１
+		EPTPC,		///< PTP Module for the Ethernet Controller / イーサネットコントローラ用 PTP コントローラ
+		EPTPC0,		///< PTP Module for the Ethernet Controller 0 / イーサネットコントローラ用 PTP コントローラ０
+		EPTPC1,		///< PTP Module for the Ethernet Controller 1 / イーサネットコントローラ用 PTP コントローラ１
 
-		WDTA,		///< ウォッチドッグタイマ
-		IWDT,		///< 独立ウォッチドッグタイマ
+		EDMAC0,		///< DMA Controller for the Ethernet Controller 0 / イーサネットコントローラ用 DMA コントローラ０
+		EDMAC1,		///< DMA Controller for the Ethernet Controller 1 / イーサネットコントローラ用 DMA コントローラ１
+		PTPEDMAC,	///< PTP Ethernet DMA / PTP イーサネット DMA
 
-		ETHERC0,	///< イーサネットコントローラ 0
-		ETHERC1,	///< イーサネットコントローラ 1
-		EPTPC,		///< イーサネットコントローラ用 PTP コントローラ
-		EPTPC0,		///< イーサネットコントローラ用 PTP コントローラ 0
-		EPTPC1,		///< イーサネットコントローラ用 PTP コントローラ 1
+		PMGI0,		///< PHY Management Interface 0 / PHY マネジメントインタフェース０
+		PMGI1,		///< PHY Management Interface 1 / PHY マネジメントインタフェース１
 
-		ETHERCA,	///< Ethernet 0 (PHY RMII)カスタムポート接続
+		ESC,		///< EtherCAT Slave Controller / EtherCAT スレーブコントローラ
 
-		EDMAC0,		///< Ethernet DMA 0
-		EDMAC1,		///< Ethernet DMA 1
-		PTPEDMAC,	///< PTP Ethernet DMA
+		USB0,		///< USB 2.0 FS Host/Function Module 0 / USB 2.0 FS ホスト/ファンクションモジュール
 
-		PMGI0,		///< PHY マネジメントインタフェース 0
-		PMGI1,		///< PHY マネジメントインタフェース 1
+		SCI0,		///< Serial Communications Interface 0 / シリアルコミュニケーションインタフェース０
+		SCI1,		///< Serial Communications Interface 1 / シリアルコミュニケーションインタフェース１
+		SCI2,		///< Serial Communications Interface 2 / シリアルコミュニケーションインタフェース２
+		SCI3,		///< Serial Communications Interface 3 / シリアルコミュニケーションインタフェース３
+		SCI4,		///< Serial Communications Interface 4 / シリアルコミュニケーションインタフェース４
+		SCI5,		///< Serial Communications Interface 5 / シリアルコミュニケーションインタフェース５
+		SCI6,		///< Serial Communications Interface 6 / シリアルコミュニケーションインタフェース６
+		SCI7,		///< Serial Communications Interface 7 / シリアルコミュニケーションインタフェース７
+		SCI8,		///< Serial Communications Interface 8 / シリアルコミュニケーションインタフェース８
+		SCI9,		///< Serial Communications Interface 9 / シリアルコミュニケーションインタフェース９
+		SCI10,		///< Serial Communications Interface 10 / シリアルコミュニケーションインタフェース１０
+		SCI11,		///< Serial Communications Interface 11 / シリアルコミュニケーションインタフェース１１
+		SCI12,		///< Serial Communications Interface 12 / シリアルコミュニケーションインタフェース１２
 
-		ESC,		///< EtherCAT スレーブコントローラ
+		RIIC0,		///< I2C-bus Interface 0 / I2C バスインタフェース０
+		RIIC1,		///< I2C-bus Interface 1 / I2C バスインタフェース１
+		RIIC2,		///< I2C-bus Interface 2 / I2C バスインタフェース２
 
-		USB0,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
+		CAN0,		///< CAN Module 0 / CAN インタフェース０
+		CAN1,		///< CAN Module 1 / CAN インタフェース１
+		CAN2,		///< CAN Module 2 / CAN インタフェース２
 
-		SCI0,		///< シリアルコミュニケーションインタフェース (P20:TXD0, P21:RXD0)
-		SCI1,		///< シリアルコミュニケーションインタフェース (PF0:TXD1, PF2:RXD1)
-		SCI2,		///< シリアルコミュニケーションインタフェース (P13:TXD2, P12:RXD2)
-		SCI3,		///< シリアルコミュニケーションインタフェース (P23:TXD3, P25:RXD3)
-		SCI4,		///< シリアルコミュニケーションインタフェース (PB1:TXD4, PB0:RXD4)
-		SCI5,		///< シリアルコミュニケーションインタフェース (PA4:TXD5, PA2:RXD5)
-		SCI6,		///< シリアルコミュニケーションインタフェース (P00:TXD6, P01:RXD6)
-		SCI7,		///< シリアルコミュニケーションインタフェース (P90:TXD7, P92:RXD7)
-		SCI8,		///< シリアルコミュニケーションインタフェース
-		SCI9,		///< シリアルコミュニケーションインタフェース
-		SCI10,		///< シリアルコミュニケーションインタフェース
-		SCI11,		///< シリアルコミュニケーションインタフェース
-		SCI12,		///< シリアルコミュニケーションインタフェース
+		RSPI0,		///< Serial Peripheral Interface 0 / シリアルペリフェラルインタフェース０
+		RSPI1,		///< Serial Peripheral Interface 1 / シリアルペリフェラルインタフェース１
+		RSPI2,		///< Serial Peripheral Interface 2 / シリアルペリフェラルインタフェース２
 
-		RIIC0,		///< I 2 C バスインタフェース０（RIICa）
-		RIIC1,		///< I 2 C バスインタフェース１（RIICa）
-		RIIC2,		///< I 2 C バスインタフェース２（RIICa）
+		QSPI,		///< Quad-SPI Memory Interface / クワッドシリアルペリフェラルインタフェース
 
-		CAN0,		///< CAN インタフェース（CAN0）
-		CAN1,		///< CAN インタフェース（CAN1）
-		CAN2,		///< CAN インタフェース（CAN2）
+		CRC,		///< CRC Calculator / CRC 演算器
 
-		RSPI0,		///< シリアルペリフェラルインタフェース（RSPIc）
-		RSPI1,		///< シリアルペリフェラルインタフェース（RSPIc）
-		RSPI2,		///< シリアルペリフェラルインタフェース（RSPIc）
+		SSIE0,		///< Serial Sound Interface 0 / シリアルサウンドインタフェース０
+		SSIE1,		///< Serial Sound Interface 1 / シリアルサウンドインタフェース１
 
-		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
+		SDHI,		///< SD Host Interface / SD ホストインタフェース
 
-		CRC,		///< CRC 演算器
+		MMCIF,		///< MultiMediaCard Interface / マルチメディアカードインタフェース
 
-		SSIE0,		///< シリアルサウンドインタフェース（SSIE）
-		SSIE1,		///< シリアルサウンドインタフェース（SSIE）
+		PDC,		///< Parallel Data Capture Unit / パラレルデータキャプチャユニット
 
-		SDHI,		///< SD ホストインタフェース（SDHI）
+		GLCDC,		///< Graphic LCD Controller / グラフィックスＬＣＤコントローラ
+		DRW2D,		///< 2D Drawing Engine / ２Ｄ描画エンジン
 
-		MMCIF,		///< マルチメディアカードインタフェース（MMCIF）
+		TSIP,		///< Trusted Secure IP / Trusted Secure IP
 
-		PDC,		///< パラレルデータキャプチャユニット
+		DSMIF0,		///< ΔΣ Modulator Interface 0 / ΔΣモジュレータインターフェース０
+		DSMIF1,		///< ΔΣ Modulator Interface 1 / ΔΣモジュレータインターフェース１
 
-		GLCDC,		///< グラフィックスＬＣＤコントローラ
-		DRW2D,		///< ２Ｄ描画エンジン
+		S12AD,		///< 12-Bit A/D Converter / 12 ビット A/D コンバータ
+		S12AD1,		///< 12-Bit A/D Converter 1 / 12 ビット A/D コンバータ１
 
-		TSIP,		///< Trusted Secure IP
+		R12DA,		///< 12-Bit D/A Converter / 12 ビット D/A コンバータ
 
-		DSMIF0,		///< ΔΣモジュレータインターフェース 0
-		DSMIF1,		///< ΔΣモジュレータインターフェース 1
+		TEMPS,		///< Temperature Sensor / 温度センサ
 
-		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
-		S12AD1,		///< 12 ビット A/D コンバータ（S12ADC）
+		DOC,		///< Data Operation Circuit / データ演算回路
 
-		R12DA,		///< 12 ビット D/A コンバータ（R12DA）
-
-		TEMPS,		///< 温度センサ
-
-		DOC,		///< データ演算回路
-
-		RAM,		///< RAM (512K)
-		EXTRAM,		///< 拡張 RAM (512K)
-		ECCRAM,		///< ECC RAM (32K)
-		STBRAM,		///< Standby RAM (8K)
+		RAM,		///< RAM (512K) / RAM (512K)
+		EXTRAM,		///< Expansion RAM (512K) / 拡張 RAM (512K)
+		ECCRAM,		///< ECC RAM (32K) / ECC RAM (32K)
+		STBRAM,		///< Standby RAM (8K) / スタンバイ RAM (8K)
 	};
 }

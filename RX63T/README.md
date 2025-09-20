@@ -120,6 +120,64 @@
 
 ---
 
+## peripheral / ペリフェラル
+
+|Peripheral|Function|機能|
+|---|---|---|
+|CAC|Clock Frequency Accuracy Measurement Circuit|クロック周波数精度測定回路|
+|DMAC0|DMA Controller channel 0|DMA コントローラ・チャネル０|
+|DMAC1|DMA Controller channel 1|DMA コントローラ・チャネル１|
+|DMAC2|DMA Controller channel 2|DMA コントローラ・チャネル２|
+|DMAC3|DMA Controller channel 3|DMA コントローラ・チャネル３|
+|DTC|Data Transfer Controller|データトランスファコントローラ|
+|MTU0|Multi-Function Timer Pulse Unit 0|マルチファンクションタイマパルスユニット０|
+|MTU1|Multi-Function Timer Pulse Unit 1|マルチファンクションタイマパルスユニット１|
+|MTU2|Multi-Function Timer Pulse Unit 2|マルチファンクションタイマパルスユニット２|
+|MTU3|Multi-Function Timer Pulse Unit 3|マルチファンクションタイマパルスユニット３|
+|MTU4|Multi-Function Timer Pulse Unit 4|マルチファンクションタイマパルスユニット４|
+|MTU5|Multi-Function Timer Pulse Unit 5|マルチファンクションタイマパルスユニット５|
+|MTU6|Multi-Function Timer Pulse Unit 6|マルチファンクションタイマパルスユニット６|
+|MTU7|Multi-Function Timer Pulse Unit 7|マルチファンクションタイマパルスユニット７|
+|POE3|Port Output Enable 3|ポートアウトプットイネーブル３|
+|GPT0|General PWM Timer 0|汎用 PWM タイマ０|
+|GPT1|General PWM Timer 1|汎用 PWM タイマ１|
+|GPT2|General PWM Timer 2|汎用 PWM タイマ２|
+|GPT3|General PWM Timer 3|汎用 PWM タイマ３|
+|GPT4|General PWM Timer 4|汎用 PWM タイマ４|
+|GPT5|General PWM Timer 5|汎用 PWM タイマ５|
+|GPT6|General PWM Timer 6|汎用 PWM タイマ６|
+|GPT7|General PWM Timer 7|汎用 PWM タイマ７|
+|CMT0|Compare Match Timer 0|コンペアマッチタイマ０|
+|CMT1|Compare Match Timer 1|コンペアマッチタイマ１|
+|CMT2|Compare Match Timer 2|コンペアマッチタイマ２|
+|CMT3|Compare Match Timer 3|コンペアマッチタイマ３|
+|WDTA|Watchdog Timer|ウォッチドッグタイマ|
+|IWDT|Independent Watchdog Timer|独立ウォッチドッグタイマ|
+|USB0|USB 2.0 Host/Function Module 0|USB 2.0 ホスト/ファンクションモジュール０|
+|SCI0|Serial Communications Interface 0|シリアルコミュニケーションインタフェース０|
+|SCI1|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
+|SCI2|Serial Communications Interface 2|シリアルコミュニケーションインタフェース２|
+|SCI3|Serial Communications Interface 3|シリアルコミュニケーションインタフェース３|
+|SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
+|RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
+|RIIC1|I2C-bus Interface 1|I2C バスインタフェース１|
+|CAN1|CAN Module 1|CAN インタフェース１|
+|RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
+|RSPI1|Serial Peripheral Interface 1|シリアルペリフェラルインタフェース１|
+|CRC|CRC Calculator|CRC 演算器|
+|S12AD|12-Bit A/D Converter|12 ビット A/D コンバータ|
+|S12AD1|12-Bit A/D Converter 1|12 ビット A/D コンバータ１|
+|S12AD2|12-Bit A/D Converter 2|12 ビット A/D コンバータ２|
+|AD|10-Bit A/D Converter|10 ビット A/D コンバータ|
+|DA|10-Bit D/A Converter|10 ビット D/A コンバータ|
+|DOC|Data Operation Circuit|データ演算回路|
+|DPC0|Digital Power Supply Controller 0|デジタル電源制御演算器０|
+|DPC1|Digital Power Supply Controller 1|デジタル電源制御演算器１|
+|DPC2|Digital Power Supply Controller 2|デジタル電源制御演算器２|
+|DPC3|Digital Power Supply Controller 3|デジタル電源制御演算器３|
+
+---
+
 ## port map order / ポートマップ候補
 
 ### LFQFP64

@@ -171,6 +171,7 @@
 |CMT2|Compare Match Timer 2|コンペアマッチタイマ２|
 |CMT3|Compare Match Timer 3|コンペアマッチタイマ３|
 |RTC|Realtime Clock|リアルタイムクロック|
+|LPT|Low Power Timer|ローパワータイマ|
 |WDTA|Watchdog Timer|ウォッチドッグタイマ|
 |IWDT|Independent Watchdog Timer|独立ウォッチドッグタイマ|
 |USB0|USB 2.0 FS Host/Function Module 0|USB 2.0 FS ホスト/ファンクションモジュール０|

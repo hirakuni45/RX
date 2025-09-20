@@ -107,6 +107,33 @@
 
 ---
 
+## peripheral / ペリフェラル
+
+|Peripheral|Function|機能|
+|---|---|---|
+|CAC|Clock Frequency Accuracy Measurement Circuit|クロック周波数精度測定回路|
+|DTC|Data Transfer Controller|データトランスファコントローラ|
+|ELC|Event Link Controller|イベントリンクコントローラ|
+|MTU0|Multi-Function Timer Pulse Unit 0|マルチファンクションタイマパルスユニット０|
+|MTU1|Multi-Function Timer Pulse Unit 1|マルチファンクションタイマパルスユニット１|
+|MTU2|Multi-Function Timer Pulse Unit 2|マルチファンクションタイマパルスユニット２|
+|MTU5|Multi-Function Timer Pulse Unit 5|マルチファンクションタイマパルスユニット５|
+|CMT0|Compare Match Timer 0|コンペアマッチタイマ０|
+|CMT1|Compare Match Timer 1|コンペアマッチタイマ１|
+|RTC|Realtime Clock|リアルタイムクロック|
+|IWDT|Independent Watchdog Timer|独立ウォッチドッグタイマ|
+|SCI1|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
+|SCI5|Serial Communications Interface 5|シリアルコミュニケーションインタフェース５|
+|SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
+|RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
+|RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
+|CRC|CRC Calculator|CRC 演算器|
+|S12AD|12-Bit A/D Converter|12 ビット A/D コンバータ|
+|DA|8-Bit D/A Converter|8 ビット D/A コンバータ|
+|DOC|Data Operation Circuit|データ演算回路|
+
+---
+
 ## port map order / ポートマップ候補
 
 ### LFQFP64
