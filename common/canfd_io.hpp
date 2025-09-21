@@ -27,7 +27,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CAN スピード型
+			@brief  CAN スピード型（CAN FD 公称ビットレート）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class SPEED {
@@ -41,6 +41,17 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CAN FD フレーム・データ ビット レート
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class DATA {
+			_2M = 2'000'000,	///< 2Mbps
+			_4M = 4'000'000,	///< 4Mbps
+			_5M = 5'000'000,	///< 5Mbps
+			_8M = 8'000'000		///< 8Mbps
+		};
 	};
 
 
@@ -65,7 +76,6 @@ namespace device {
 		typedef utils::format		format;
 #endif
 
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -78,11 +88,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  通信速度が設定可能か検査
-			@param[in]	speed	通信速度型
+			@param[in]	speed	公称通信速度型
+			@param[in]	data	データ通信速度型
 			@return 可能なら「true」を返す。
 		*/
 		//-----------------------------------------------------------------//
-		static constexpr bool probe_speed(SPEED speed) noexcept
+		static constexpr bool probe_speed(SPEED speed, DATA data) noexcept
 		{
 #if 0
 			if(get_tq_(false, speed) >= 8) return true;  // PCLKB 選択

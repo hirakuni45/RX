@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Peripheral Type / ペリフェラル種別 (RX260/RX261)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,81 +14,81 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  peripheral enum class
+		@brief  Peripheral Type / ペリフェラル型（種別）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class peripheral : uint8_t {
 
-		CAC,		///< クロック周波数精度測定回路
+		CAC,		///< Clock Frequency Accuracy Measurement Circuit / クロック周波数精度測定回路
 
-		DMAC0,		///< DMA コントローラ・チャネル０
-		DMAC1,		///< DMA コントローラ・チャネル１
-		DMAC2,		///< DMA コントローラ・チャネル２
-		DMAC3,		///< DMA コントローラ・チャネル３
-		DTC,		///< データトランスファコントローラ (DTCb)
+		DMAC0,		///< DMA Controller channel 0 / DMA コントローラ・チャネル０
+		DMAC1,		///< DMA Controller channel 1 / DMA コントローラ・チャネル１
+		DMAC2,		///< DMA Controller channel 2 / DMA コントローラ・チャネル２
+		DMAC3,		///< DMA Controller channel 3 / DMA コントローラ・チャネル３
+		DTC,		///< Data Transfer Controller / データトランスファコントローラ
 
-		ELC,		///< イベントリンクコントローラ (ELC)
+		ELC,		///< Event Link Controller / イベントリンクコントローラ (ELC)
 
-		GPTW0,		///< 汎用 PWM タイマ (GPTWa) 0
-		GPTW1,		///< 汎用 PWM タイマ (GPTWa) 1
-		GPTW2,		///< 汎用 PWM タイマ (GPTWa) 2
-		GPTW3,		///< 汎用 PWM タイマ (GPTWa) 3
-		GPTW4,		///< 汎用 PWM タイマ (GPTWa) 4
-		GPTW5,		///< 汎用 PWM タイマ (GPTWa) 5
-		GPTW6,		///< 汎用 PWM タイマ (GPTWa) 6
-		GPTW7,		///< 汎用 PWM タイマ (GPTWa) 7
+		GPTW0,		///< General PWM Timer 0 / 汎用 PWM タイマ０
+		GPTW1,		///< General PWM Timer 1 / 汎用 PWM タイマ１
+		GPTW2,		///< General PWM Timer 2 / 汎用 PWM タイマ２
+		GPTW3,		///< General PWM Timer 3 / 汎用 PWM タイマ３
+		GPTW4,		///< General PWM Timer 4 / 汎用 PWM タイマ４
+		GPTW5,		///< General PWM Timer 5 / 汎用 PWM タイマ５
+		GPTW6,		///< General PWM Timer 6 / 汎用 PWM タイマ６
+		GPTW7,		///< General PWM Timer 7 / 汎用 PWM タイマ７
 
-		POEG,		///< GPTW 用ポートアウトプットイネーブル (POEG)
+		POEG,		///< GPTW Port Output Enable / GPTW 用ポートアウトプットイネーブル
 
-		TMR0,		///< 8 ビットタイマ０
-		TMR1,		///< 8 ビットタイマ１
-		TMR2,		///< 8 ビットタイマ２
-		TMR3,		///< 8 ビットタイマ３
+		TMR0,		///< 8-Bit Timer 0 / 8 ビットタイマ０
+		TMR1,		///< 8-Bit Timer 1 / 8 ビットタイマ１
+		TMR2,		///< 8-Bit Timer 2 / 8 ビットタイマ２
+		TMR3,		///< 8-Bit Timer 3 / 8 ビットタイマ３
 
-		CMT0,		///< コンペアマッチタイマ０（CMT）
-		CMT1,		///< コンペアマッチタイマ１（CMT）
-		CMT2,		///< コンペアマッチタイマ２（CMT）
-		CMT3,		///< コンペアマッチタイマ３（CMT）
+		CMT0,		///< Compare Match Timer 0 / コンペアマッチタイマ０
+		CMT1,		///< Compare Match Timer 1 / コンペアマッチタイマ１
+		CMT2,		///< Compare Match Timer 2 / コンペアマッチタイマ２
+		CMT3,		///< Compare Match Timer 3 / コンペアマッチタイマ３
 
-		RTC,		///< リアルタイムクロック (RTCBa)
+		RTC,		///< Realtime Clock / リアルタイムクロック
 
-		LPT,		///< ローパワータイマ (LPTa)
+		LPT,		///< Low Power Timer / ローパワータイマ
 
-		WDTA,		///< ウォッチドッグタイマ (WDTA)
-		IWDT,		///< 独立ウォッチドッグタイマ (IWDTa)
+		WDTA,		///< Watchdog Timer / ウォッチドッグタイマ
+		IWDT,		///< Independent Watchdog Timer / 独立ウォッチドッグタイマ
 
-		USB0,		///< USB2.0FS ホスト / ファンクションモジュール (USBe)
+		USB0,		///< USB 2.0 Host/Function Module 0 / USB 2.0 FS ホスト/ファンクションモジュール
 
-		SCI1,		///< シリアルコミュニケーションインタフェース (SCIk) 1
-		SCI5,		///< シリアルコミュニケーションインタフェース (SCIk) 5
-		SCI6,		///< シリアルコミュニケーションインタフェース (SCIk) 6
-		RSCI0,		///< シリアルコミュニケーションインタフェース (RSCI) 0
-		RSCI8,		///< シリアルコミュニケーションインタフェース (RSCI) 8
-		RSCI9,		///< シリアルコミュニケーションインタフェース (RSCI) 9
-		SCI12,		///< シリアルコミュニケーションインタフェース (SCIh) 12
+		SCI1,		///< Serial Communications Interface 1 / シリアルコミュニケーションインタフェース１
+		SCI5,		///< Serial Communications Interface 5 / シリアルコミュニケーションインタフェース５
+		SCI6,		///< Serial Communications Interface 6 / シリアルコミュニケーションインタフェース６
+		SCI12,		///< Serial Communications Interface 12 / シリアルコミュニケーションインタフェース１２
+		RSCI0,		///< (R)Serial Communications Interface 0 / Ｒシリアルコミュニケーションインタフェース０
+		RSCI8,		///< (R)Serial Communications Interface 8 / Ｒシリアルコミュニケーションインタフェース８
+		RSCI9,		///< (R)Serial Communications Interface 9 / Ｒシリアルコミュニケーションインタフェース９
 
-		RIIC0,		///< I2C バスインタフェース (RIICa)
+		RIIC0,		///< I2C-bus Interface 0 / I2C バスインタフェース０
 
-		CANFD0,		///< CAN FD モジュール (CANFD)
+		CANFD0,		///< CANFD Module / CANFD モジュール
 
-		RSPI0,		///< シリアルペリフェラルインタフェース (RSPId)
+		RSPI0,		///< Serial Peripheral Interface 0 / シリアルペリフェラルインタフェース０
 
-		CRC,		///< CRC 演算器 (CRCA)
+		CRC,		///< CRC Calculator / CRC 演算器
 
-		REMC0,		///< リモコン信号受信機能 (REMCa)
+		REMC0,		///< Remote Control Signal Receiver / リモコン信号受信機能
 
-		RSIP,		///< Renesas Secure IP (RSIP-E11A)
+		RSIP,		///< Renesas Secure IP (RSIP-E11A) / Renesas Secure IP (RSIP-E11A)
 
-		CTSU,		///< 静電容量式タッチセンサ (CTSU2SLa)
+		CTSU,		///< Capacitive Touch Sensing Unit / 静電容量式タッチセンサ
 
-		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
+		S12AD,		///< 12-Bit A/D Converter / 12 ビット A/D コンバータ
 
-		DA,			///< 8 ビット D/A コンバータ（DAa）
+		DA,			///< 8-Bit D/A Converter / 8 ビット D/A コンバータ
 
-		TEMPS,		///< 温度センサ（TEMPS）
+		TEMPS,		///< Temperature Sensor / 温度センサ
 
-		CMPB,		///< コンパレーターＢ
+		CMPB,		///< Comparator B / コンパレーターＢ
 
-		DOC,		///< データ演算回路 (DOC)
+		DOC,		///< Data Operation Circuit / データ演算回路
 	};
 }
