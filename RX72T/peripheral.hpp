@@ -57,7 +57,7 @@ namespace device {
 		GPTW9,		///< General PWM Timer 9 / 汎用 PWM タイマ９
 		HRPWM,		///< High Resolution PWM Waveform Generation Circuit / 高分解能 PWM 波形生成回路
 
-		POEG,		///< GPTW Port Output Enable / GPTW 用ポートアウトプットイネーブル (POEG)
+		POEG,		///< GPTW Port Output Enable / GPTW 用ポートアウトプットイネーブル
 
 		TMR0,		///< 8-Bit Timer 0 / 8 ビットタイマ０
 		TMR1,		///< 8-Bit Timer 1 / 8 ビットタイマ１

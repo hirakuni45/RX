@@ -178,8 +178,8 @@
 |CMT1|Compare Match Timer 1|コンペアマッチタイマ１|
 |CMT2|Compare Match Timer 2|コンペアマッチタイマ２|
 |CMT3|Compare Match Timer 3|コンペアマッチタイマ３|
-|CMTW0|Compare Match Timer W 0|コンペアマッチタイマＷ０|
-|CMTW1|Compare Match Timer W 1|コンペアマッチタイマＷ１|
+|CMTW0|Compare Match Timer W0|コンペアマッチタイマＷ０|
+|CMTW1|Compare Match Timer W1|コンペアマッチタイマＷ１|
 |RTC|Realtime Clock|リアルタイムクロック|
 |WDTA|Watchdog Timer|ウォッチドッグタイマ|
 |IWDT|Independent Watchdog Timer|独立ウォッチドッグタイマ|
