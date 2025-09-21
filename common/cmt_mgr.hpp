@@ -4,12 +4,12 @@
 	@brief	RX マイコン・CMT I/O 制御 @n
 			コンパイル時、設定周波数を検査して、範囲を超えたらコンパイルを止める事が出来ます。 @n
 			Ex: 標準では、1% @n 
-			  constexpr uint32_t freq = 1000; @n
-			  static_assert(CMT_MGR::probe_freq(freq), "Failed rate accuracy test"); @n
-			  ・0.5% にする場合 @n
-			  static_assert(CMT_MGR::probe_freq(freq, 5), "Failed rate accuracy test");
+				constexpr uint32_t freq = 1000; @n
+				static_assert(CMT_MGR::probe_freq(freq), "Failed rate accuracy test"); @n
+				・0.5% にする場合 @n
+				static_assert(CMT_MGR::probe_freq(freq, 5), "Failed rate accuracy test");
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -154,7 +154,7 @@ namespace device {
 			CMT::enable(false);
 
 			CMT::CMCNT = 0;
-		    CMT::CMCOR = static_cast<uint16_t>(direct);
+			CMT::CMCOR = static_cast<uint16_t>(direct);
 
 			counter_ = 0;
 
@@ -164,10 +164,10 @@ namespace device {
 				} else {
 					icu_mgr::set_interrupt(CMT::CMI, i_task_, level);
 				}
-			    CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks)) | CMT::CMCR.CMIE.b();
+				CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks)) | CMT::CMCR.CMIE.b();
 			} else {
 				icu_mgr::set_interrupt(CMT::CMI, nullptr, ICU::LEVEL::NONE);
-			    CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks));
+				CMT::CMCR = CMT::CMCR.CKS.b(static_cast<uint8_t>(cks));
 			}
 			CMT::enable();
 
@@ -222,7 +222,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void destroy(bool power = false) noexcept
 		{
-		    CMT::CMCR.CMIE = 0;
+			CMT::CMCR.CMIE = 0;
 			CMT::enable(false);
 			power_mgr::turn(CMT::PERIPHERAL, power);
 		}

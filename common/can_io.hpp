@@ -360,7 +360,7 @@ namespace device {
 					icu_mgr::set_level(gvec, intr.error_level);
 				}
 				icu_mgr::install_group_task(CAN::ERS, ers_task_);
-			    CAN::EIER = CAN::EIER.ORIE.b(1);
+				CAN::EIER = CAN::EIER.ORIE.b(1);
 			}
 			if(intr.rxm_level != ICU::LEVEL::NONE) {  // 受信割り込み設定
 				icu_mgr::set_interrupt(CAN::RXM, rxm_task_, intr.rxm_level);
