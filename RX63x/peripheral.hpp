@@ -99,9 +99,9 @@ namespace device {
 		RIIC2,		///< I2C-bus Interface 2 / I2C バスインタフェース２
 		RIIC3,		///< I2C-bus Interface 3 / I2C バスインタフェース３
 
-		CAN0,		///< CAN Module 0 / CAN インタフェース０
-		CAN1,		///< CAN Module 1 / CAN インタフェース１
-		CAN2,		///< CAN Module 2 / CAN インタフェース２
+		CAN0,		///< CAN Module 0 / CAN モジュール０
+		CAN1,		///< CAN Module 1 / CAN モジュール１
+		CAN2,		///< CAN Module 2 / CAN モジュール２
 
 		RSPI0,		///< Serial Peripheral Interface 0 / シリアルペリフェラルインタフェース０
 		RSPI1,		///< Serial Peripheral Interface 1 / シリアルペリフェラルインタフェース１

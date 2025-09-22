@@ -177,7 +177,7 @@
 |SCI6|Serial Communications Interface 6|シリアルコミュニケーションインタフェース６|
 |RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
 |RIIC1|I2C-bus Interface 1|I2C バスインタフェース１|
-|CAN|CAN Module|CAN インタフェース|
+|CAN0|CAN Module 0|CAN モジュール０|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
 |RSPI1|Serial Peripheral Interface 1|シリアルペリフェラルインタフェース１|
 |CRC|CRC Calculator|CRC 演算器|

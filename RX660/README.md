@@ -170,7 +170,7 @@
 |RSCI11|(R)Serial Communications Interface 11|Ｒシリアルコミュニケーションインタフェース１１|
 |RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
 |RIIC2|I2C-bus Interface 2|I2C バスインタフェース２|
-|CANFD0|CANFD Module 0|CANFD-Lite インタフェース０
+|CANFD0|CANFD-Lite Module 0|CANFD-Lite モジュール０|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
 |CRC|CRC Calculator|CRC 演算器|
 |REMC0|Remote Control Signal Receiver|リモコン信号受信機能|

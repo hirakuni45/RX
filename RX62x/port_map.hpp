@@ -479,7 +479,7 @@ namespace device {
 				case peripheral::RSPI1:
 					ret = rspi1_(odr, ena);
 					break;
-				case peripheral::CAN:
+				case peripheral::CAN0:
 					ret = can0_(odr, ena);
 					break;
 				case peripheral::ETHERC:

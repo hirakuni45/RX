@@ -154,7 +154,7 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA29 = (pad_.exdmac_ == 0);
 				break;
 
-			case peripheral::CAN:
+			case peripheral::CAN0:
 				SYSTEM::MSTPCRB.MSTPB0 = f;
 				break;
 

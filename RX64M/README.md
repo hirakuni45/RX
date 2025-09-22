@@ -208,9 +208,9 @@
 |SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
 |RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
 |RIIC2|I2C-bus Interface 2|I2C バスインタフェース２|
-|CAN0|CAN Module 0|CAN インタフェース０|
-|CAN1|CAN Module 1|CAN インタフェース１|
-|CAN2|CAN Module 2|CAN インタフェース２|
+|CAN0|CAN Module 0|CAN モジュール０|
+|CAN1|CAN Module 1|CAN モジュール１|
+|CAN2|CAN Module 2|CAN モジュール２|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
 |QSPI|Quad-SPI Memory Interface|クワッド SPI メモリインタフェース|
 |CRC|CRC Calculator|CRC 演算器|

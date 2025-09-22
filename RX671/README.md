@@ -194,8 +194,8 @@
 |RIIC1|I2C-bus Interface 1|I2C バスインタフェース１|
 |RIIC2|I2C-bus Interface 2|I2C バスインタフェース２|
 |RIICHS0|High-Speed I2C-bus Interface|ハイスピード I2C バスインタフェース|
-|CAN0|CAN Module 0|CAN インタフェース０|
-|CAN1|CAN Module 1|CAN インタフェース１|
+|CAN0|CAN Module 0|CAN モジュール０|
+|CAN1|CAN Module 1|CAN モジュール１|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
 |RSPI1|Serial Peripheral Interface 1|シリアルペリフェラルインタフェース１|
 |RSPI2|Serial Peripheral Interface 2|シリアルペリフェラルインタフェース２|

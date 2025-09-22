@@ -104,8 +104,8 @@ namespace device {
 
 		RIICHS0,	///< High-Speed I2C-bus Interface / ハイスピード I2C バスインタフェース
 
-		CAN0,		///< CAN Module 0 / CAN インタフェース０
-		CAN1,		///< CAN Module 1 / CAN インタフェース１
+		CAN0,		///< CAN Module 0 / CAN モジュール０
+		CAN1,		///< CAN Module 1 / CAN モジュール１
 
 		RSPI0,		///< Serial Peripheral Interface 0 / シリアルペリフェラルインタフェース０
 		RSPI1,		///< Serial Peripheral Interface 1 / シリアルペリフェラルインタフェース１

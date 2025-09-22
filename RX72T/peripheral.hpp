@@ -88,7 +88,7 @@ namespace device {
 
 		RIIC0,		///< I2C-bus Interface 0 / I2C バスインタフェース０
 
-		CAN0,		///< CAN Module 0 / CAN インタフェース０
+		CAN0,		///< CAN Module 0 / CAN モジュール０
 
 		RSPI0,		///< Serial Peripheral Interface 0 / シリアルペリフェラルインタフェース
 
