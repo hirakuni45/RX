@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	I/O Ports / I/O ポート (RX24T/RX24U)
+	@brief	RX24T I/O Ports / I/O ポート
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -27,13 +27,6 @@ namespace device {
 	typedef portx_t<0x0008'C009, odr_oo_t<0x0008'C092> > PORT9;
 	typedef portx_t<0x0008'C00A, odr_oo_t<0x0008'C094> > PORTA;
 	typedef portx_t<0x0008'C00B, odr_oo_t<0x0008'C096> > PORTB;
-#if defined(SIG_RX24U)
-	typedef portx_t<0x0008'C00C, odr_oo_t<0x0008'C098> > PORTC;
-#endif
 	typedef portx_t<0x0008'C00D, odr_oo_t<0x0008'C09A> > PORTD;
 	typedef portx_t<0x0008'C00E, odr_oo_t<0x0008'C09C> > PORTE;
-#if defined(SIG_RX24U)
-	typedef portx_t<0x0008'C00F, odr_oo_t<0x0008'C09E> > PORTF;
-	typedef portx_t<0x0008'C010, odr_ox_t<0x0008'C0A0> > PORTG;
-#endif
 }

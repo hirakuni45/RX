@@ -1,21 +1,17 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T/RX24U グループ・ポート・マッピング (MTU3d) @n
+	@brief	RX24T グループ・ポート・マッピング (MTU3d) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			・A、B バージョンの違いに注意 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#if defined(SIG_RX24T)
 #include "RX24T/peripheral.hpp"
-#elif defined(SIG_RX24U)
-#include "RX24U/peripheral.hpp"
-#endif
 #include "RX24T/port.hpp"
 #include "RX24T/mpc.hpp"
 #include "RX600/port_map_order.hpp"
