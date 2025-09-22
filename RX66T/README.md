@@ -173,7 +173,7 @@ RAM: 16K(With ECC)
 |SCI11|Serial Communications Interface 11|シリアルコミュニケーションインタフェース１１|
 |SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
 |RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
-|CAN0|CAN Module 0|CAN インタフェース０|
+|CAN0|CAN Module 0|CAN モジュール０|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
 |S12AD|12-Bit A/D Converter|12 ビット A/D コンバータ|
 |S12AD1|12-Bit A/D Converter 1|12 ビット A/D コンバータ１|

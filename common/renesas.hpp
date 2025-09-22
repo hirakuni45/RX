@@ -361,7 +361,7 @@
 #include "RX600/cac.hpp"
 #include "RX600/bus.hpp"
 #include "RX600/mpu.hpp"
-#include "RX24T/port.hpp"
+#include "RX24U/port.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX24T/poe3.hpp"
 #include "RX600/tmr.hpp"

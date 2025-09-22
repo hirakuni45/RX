@@ -12,7 +12,11 @@
 */
 //=========================================================================//
 #include "common/device.hpp"
+#if defined(SIG_RX24T)
 #include "RX24T/mpc.hpp"
+#elif defined(SIG_RX24U)
+#include "RX24U/mpc.hpp"
+#endif
 
 namespace device {
 

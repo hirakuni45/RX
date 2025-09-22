@@ -11,12 +11,14 @@
 #if defined(SIG_RX24T)
 #include "RX24T/peripheral.hpp"
 #include "RX24T/icu.hpp"
+#include "RX24T/port.hpp"
+#include "RX24T/mpc.hpp"
 #elif defined(SIG_RX24U)
 #include "RX24U/peripheral.hpp"
 #include "RX24U/icu.hpp"
+#include "RX24U/port.hpp"
+#include "RX24U/mpc.hpp"
 #endif
-#include "RX24T/port.hpp"
-#include "RX24T/mpc.hpp"
 #include "RX600/ad_utils.hpp"
 
 namespace device {

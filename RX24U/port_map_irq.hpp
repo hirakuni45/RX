@@ -1,23 +1,23 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・ポート・マッピング (IRQ)
+	@brief	RX24U グループ・ポート・マッピング (IRQ)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX24T/port.hpp"
-#include "RX24T/mpc.hpp"
-#include "RX24T/icu.hpp"
+#include "RX24U/port.hpp"
+#include "RX24U/mpc.hpp"
+#include "RX24U/icu.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX24T/IRQ ポート・マッピング・ユーティリティー
+		@brief  IRQ ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_irq : public port_map_order {
@@ -115,6 +115,7 @@ namespace device {
 			// P55
 			// PB4
 			// PD5
+			// PE6
 			case ORDER::FIRST:
 				MPC::P55PFS.ISEL = ena;
 				break;
@@ -127,6 +128,11 @@ namespace device {
 				PORTD::PMR.B5 = 0;
 				MPC::PD5PFS.PSEL = 0;
 				MPC::PD5PFS.ISEL = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTE::PMR.B6 = 0;
+				MPC::PE6PFS.PSEL = 0;
+				MPC::PE6PFS.ISEL = ena;
 				break;
 			default:
 				return false;

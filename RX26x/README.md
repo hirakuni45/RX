@@ -159,7 +159,7 @@
 |RSCI8|(R)Serial Communications Interface 8|Ｒシリアルコミュニケーションインタフェース８|
 |RSCI9|(R)Serial Communications Interface 9|Ｒシリアルコミュニケーションインタフェース９|
 |RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
-|CANFD|CANFD Module|CANFD インタフェース|
+|CANFD0|CANFD Module 0|CANFD モジュール０|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
 |CRC|CRC Calculator|CRC 演算器|
 |REMC0|Remote Control Signal Receiver|リモコン信号受信機能|

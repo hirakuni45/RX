@@ -1,15 +1,15 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	Multi-Function Pin Controller / マルチファンクションピンコントローラ (RX24T)
+	@brief	RX24U Multi-Function Pin Controller / マルチファンクションピンコントローラ
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "common/io_utils.hpp"
-#include "RX24T/peripheral.hpp"
+#include "RX24U/peripheral.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -141,16 +141,22 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P1n 端子機能制御レジスタ（P1nPFS）（n = 0, 1）
+			@brief  P1n 端子機能制御レジスタ（P1nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_ip_t<0x0008'C148> P10PFS;
 		static inline pfs_ip_t<0x0008'C149> P11PFS;
+		static inline pfs_ip_t<0x0008'C14A> P12PFS;
+		static inline pfs_ip_t<0x0008'C14B> P13PFS;
+		static inline pfs_ip_t<0x0008'C14C> P14PFS;
+		static inline pfs_ip_t<0x0008'C14D> P15PFS;
+		static inline pfs_ip_t<0x0008'C14E> P16PFS;
+		static inline pfs_ip_t<0x0008'C14F> P17PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P2n 端子機能制御レジスタ（P2nPFS）（n = 0 ～ 4）
+			@brief  P2n 端子機能制御レジスタ（P2nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_aip_t<0x0008'C150> P20PFS;
@@ -158,17 +164,22 @@ namespace device {
 		static inline pfs_aip_t<0x0008'C152> P22PFS;
 		static inline pfs_aip_t<0x0008'C153> P23PFS;
 		static inline pfs_aip_t<0x0008'C154> P24PFS;
+		static inline pfs_aip_t<0x0008'C155> P25PFS;
+		static inline pfs_aip_t<0x0008'C156> P26PFS;
+		static inline pfs_aip_t<0x0008'C157> P27PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P3n 端子機能制御レジスタ（P3nPFS）（n = 0 ～ 3）
+			@brief  P3n 端子機能制御レジスタ（P3nPFS）（n = 0 ～ 5）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_ip_t<0x0008'C158> P30PFS;
 		static inline pfs_ip_t<0x0008'C159> P31PFS;
 		static inline pfs_ip_t<0x0008'C15A> P32PFS;
 		static inline pfs_ip_t<0x0008'C15B> P33PFS;
+		static inline pfs_ip_t<0x0008'C15C> P34PFS;
+		static inline pfs_ip_t<0x0008'C15D> P35PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -228,12 +239,14 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P8n 端子機能制御レジスタ（P8nPFS）（n = 0 ～ 2）
+			@brief  P8n 端子機能制御レジスタ（P8nPFS）（n = 0 ～ 4）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_p_t<0x0008'C180> P80PFS;
 		static inline pfs_p_t<0x0008'C181> P81PFS;
 		static inline pfs_p_t<0x0008'C182> P82PFS;
+		static inline pfs_p_t<0x0008'C183> P83PFS;
+		static inline pfs_p_t<0x0008'C184> P84PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -252,7 +265,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  PAn 端子機能制御レジスタ（PAnPFS）（n = 0 ～ 5）
+			@brief  PAn 端子機能制御レジスタ（PAnPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_ip_t<0x0008'C190> PA0PFS;
@@ -261,6 +274,8 @@ namespace device {
 		static inline pfs_ip_t<0x0008'C193> PA3PFS;
 		static inline pfs_ip_t<0x0008'C194> PA4PFS;
 		static inline pfs_ip_t<0x0008'C195> PA5PFS;
+		static inline pfs_ip_t<0x0008'C196> PA6PFS;
+		static inline pfs_ip_t<0x0008'C197> PA7PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -280,6 +295,20 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  PCn 端子機能制御レジスタ（PCnPFS）（n = 0 ～ 6）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static inline pfs_p_t<0x0008'C1A0> PC0PFS;
+		static inline pfs_p_t<0x0008'C1A1> PC1PFS;
+		static inline pfs_p_t<0x0008'C1A2> PC2PFS;
+		static inline pfs_p_t<0x0008'C1A3> PC3PFS;
+		static inline pfs_p_t<0x0008'C1A4> PC4PFS;
+		static inline pfs_p_t<0x0008'C1A5> PC5PFS;
+		static inline pfs_p_t<0x0008'C1A6> PC6PFS;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  PDn 端子機能制御レジスタ（PDnPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -295,7 +324,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  PEn 端子機能制御レジスタ（PEnPFS）（n = 0 ～ 5）
+			@brief  PEn 端子機能制御レジスタ（PEnPFS）（n = 0 ～ 6）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_ip_t<0x0008'C1B0> PE0PFS;
@@ -304,6 +333,7 @@ namespace device {
 		static inline pfs_ip_t<0x0008'C1B3> PE3PFS;
 		static inline pfs_ip_t<0x0008'C1B4> PE4PFS;
 		static inline pfs_ip_t<0x0008'C1B5> PE5PFS;
+		static inline pfs_ip_t<0x0008'C1B6> PE6PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -1,16 +1,16 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX24T グループ・ポート・マッピング (GPTB)
+	@brief	RX24U グループ・ポート・マッピング (GPTB)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX24T/peripheral.hpp"
-#include "RX24T/port.hpp"
-#include "RX24T/mpc.hpp"
+#include "RX24U/peripheral.hpp"
+#include "RX24U/port.hpp"
+#include "RX24U/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -25,18 +25,24 @@ namespace device {
 		static bool gpt0_(CHANNEL ch, bool ena, ORDER odr, bool neg) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b10110 : 0b10100) : 0;
+			uint8_t sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC0A
+			// P12
 			// P71
 			// PD7
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT1::PMR.B2 = 0;
+					MPC::P12PFS.PSEL = sel;  // ok
+					PORT1::PMR.B2 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT7::PMR.B1 = 0;
 					MPC::P71PFS.PSEL = sel;  // ok
 					PORT7::PMR.B1 = ena;
 					break;
-				case ORDER::SECOND:
+				case ORDER::THIRD:
 					PORTD::PMR.B7 = 0;
 					MPC::PD7PFS.PSEL = sel;  // ok
 					PORTD::PMR.B7 = ena;
@@ -47,15 +53,21 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC0B
+			// P15
 			// P74
 			// PD1
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT1::PMR.B5 = 0;
+					MPC::P15PFS.PSEL = sel;  // ok
+					PORT1::PMR.B5 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT7::PMR.B4 = 0;
 					MPC::P74PFS.PSEL = sel;  // ok
 					PORT7::PMR.B4 = ena;
 					break;
-				case ORDER::SECOND:
+				case ORDER::THIRD:
 					PORTD::PMR.B1 = 0;
 					MPC::PD1PFS.PSEL = sel;  // ok
 					PORTD::PMR.B1 = ena;
@@ -76,18 +88,24 @@ namespace device {
 		static bool gpt1_(CHANNEL ch, bool ena, ORDER odr, bool neg) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b10110 : 0b10100) : 0;
+			uint8_t sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC1A
+			// P13
 			// P72
 			// PD0
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT1::PMR.B3 = 0;
+					MPC::P13PFS.PSEL = sel;  // ok
+					PORT1::PMR.B3 = ena;
+					break;
+				case ORDER::SECOND:	
 					PORT7::PMR.B2 = 0;
 					MPC::P72PFS.PSEL = sel;  // ok
 					PORT7::PMR.B2 = ena;
 					break;
-				case ORDER::SECOND:
+				case ORDER::THIRD:
 					PORTD::PMR.B0 = 0;
 					MPC::PD0PFS.PSEL = sel;  // ok
 					PORTD::PMR.B0 = ena;
@@ -98,15 +116,21 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC1B
+			// P16
 			// P75
 			// PB7
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT1::PMR.B6 = 0;
+					MPC::P16PFS.PSEL = sel;  // ok
+					PORT1::PMR.B6 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT7::PMR.B5 = 0;
 					MPC::P75PFS.PSEL = sel;  // ok
 					PORT7::PMR.B5 = ena;
 					break;
-				case ORDER::SECOND:
+				case ORDER::THIRD:
 					PORTB::PMR.B7 = 0;
 					MPC::PB7PFS.PSEL = sel;  // ok
 					PORTB::PMR.B7 = ena;
@@ -127,18 +151,24 @@ namespace device {
 		static bool gpt2_(CHANNEL ch, bool ena, ORDER odr, bool neg) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b10110 : 0b10100) : 0;
+			uint8_t sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC2A
+			// P14
 			// P73
 			// PB6
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT1::PMR.B4 = 0;
+					MPC::P14PFS.PSEL = sel;  // ok
+					PORT1::PMR.B4 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT7::PMR.B3 = 0;
 					MPC::P73PFS.PSEL = sel;  // ok
 					PORT7::PMR.B3 = ena;
 					break;
-				case ORDER::SECOND:
+				case ORDER::THIRD:
 					PORTB::PMR.B6 = 0;
 					MPC::PB6PFS.PSEL = sel;  // ok
 					PORTB::PMR.B6 = ena;
@@ -149,15 +179,21 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC2B
+			// P17
 			// P76
 			// PB5
 				switch(odr) {
 				case ORDER::FIRST:
+					PORT1::PMR.B7 = 0;
+					MPC::P17PFS.PSEL = sel;  // ok
+					PORT1::PMR.B7 = ena;
+					break;
+				case ORDER::SECOND:
 					PORT7::PMR.B6 = 0;
 					MPC::P76PFS.PSEL = sel;  // ok
 					PORT7::PMR.B6 = ena;
 					break;
-				case ORDER::SECOND:
+				case ORDER::THIRD:
 					PORTB::PMR.B5 = 0;
 					MPC::PB5PFS.PSEL = sel;  // ok
 					PORTB::PMR.B5 = ena;
@@ -178,7 +214,7 @@ namespace device {
 		static bool gpt3_(CHANNEL ch, bool ena, ORDER odr, bool neg) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b10110 : 0b10100) : 0;
+			uint8_t sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC3A
 			// PD7

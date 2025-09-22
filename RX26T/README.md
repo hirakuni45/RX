@@ -173,7 +173,7 @@
 |RSCI9|(R)Serial Communications Interface 9|Ｒシリアルコミュニケーションインタフェース９|
 |RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
 |RI3C0|I3C-bus Interface 0|I3C バスインタフェース０|
-|CANFD|CANFD Module|CANFD インタフェース|
+|CANFD0|CANFD Module 0|CANFD モジュール０|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
 |RSPIA0|Serial Peripheral Interface A0|シリアルペリフェラルインタフェースＡ０|
 |CRC|CRC Calculator|CRC 演算器|
