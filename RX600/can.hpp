@@ -12,7 +12,7 @@
 			RX671 (CAN0/CAN1) @n
 			RX72N/RX72M (CAN0/CAN1/CAN2)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -659,7 +659,7 @@ namespace device {
 		static constexpr auto TXM = txm;	///< TXM 割り込みベクター
 		static constexpr auto ERS = ers;	///< ERS 割り込みベクター
 	};
-	typedef can_norm_t<0x0009'0200, peripheral::CAN,
+	typedef can_norm_t<0x0009'0200, peripheral::CAN0,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
 		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::VECTOR::ERS0> CAN;
 
