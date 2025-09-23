@@ -68,6 +68,8 @@ namespace device {
 			EIGHTH,			///< 第８候補
 			NINTH,			///< 第９候補
 			TENTH,			///< 第１０候補
+			ELEVENTH,		///< 第１１候補
+			TWELVETH,		///< 第１２候補
 
 			USER,			///< ユーザー設定
 
@@ -122,27 +124,34 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CHANNEL : uint8_t {
-			NONE,	///< 無効なチャネル
-			A,		///< MTIOCxA(MTUx), TIOCAx(TPUx), GPTWx A (GTIOCxA)
-			B,		///< MTIOCxB(MTUx), TIOCBx(TPUx), GPTWx B (GTIOCxB)
-			C,		///< MTIOCxC(MTUx), TIOCCx(TPUx)
-			D,		///< MTIOCxD(MTUx), TIOCDx(TPUx)
-			U,		///< MTICyU(MTUx)
-			V,		///< MTICyV(MTUx)
-			W,		///< MTICyW(MTUx)
-			CLK_A,	///< MTCLKA(MTUx), TCLKA(TPUx), GPTWx (GTETRGA)
-			CLK_B,	///< MTCLKB(MTUx), TCLKB(TPUx), GPTWx (GTETRGB)
-			CLK_C,	///< MTCLKC(MTUx), TCLKC(TPUx), GPTWx (GTETRGC)
-			CLK_D,	///< MTCLKD(MTUx), TCLKD(TPUx), GPTWx (GTETRGD)
-			CLK_E,	///< MTCLKE (MTU2, TPU 系)
-			CLK_F,	///< MTCLKF (MTU2, TPU 系)
-			CLK_G,	///< MTCLKG (MTU2, TPU 系)
-			CLK_H,	///< MTCLKH (MTU2, TPU 系)
-			OUT_0,	///< GPTWx (GTADSM0)
-			OUT_1,	///< GPTWx (GTADSM1)
-			TMO,	///< TMOx  (TMR)
-			TMCI,	///< TMCIx (TMR)
-			TMRI,	///< TMRIx (TMR)
+			NONE,		///< 無効なチャネル
+			A,			///< MTIOCxA (MTUx), TIOCAx (TPUx), GTIOCxA (GPTW)
+			B,			///< MTIOCxB (MTUx), TIOCBx (TPUx), GTIOCxB (GPTW)
+			C,			///< MTIOCxC (MTUx), TIOCCx (TPUx)
+			D,			///< MTIOCxD (MTUx), TIOCDx (TPUx)
+			U,			///< MTICyU (MTUx), GTIV (GPTWx)
+			V,			///< MTICyV (MTUx), GTIV (GPTWx)
+			W,			///< MTICyW (MTUx), GTIV (GPTWx)
+			CLKA,		///< MTCLKA (MTUx), TCLKA(TPUx)
+			CLKB,		///< MTCLKB (MTUx), TCLKB(TPUx)
+			CLKC,		///< MTCLKC (MTUx), TCLKC(TPUx)
+			CLKD,		///< MTCLKD (MTUx), TCLKD(TPUx)
+			CLKE,		///< MTCLKE (MTU2, TPU 系)
+			CLKF,		///< MTCLKF (MTU2, TPU 系)
+			CLKG,		///< MTCLKG (MTU2, TPU 系)
+			CLKH,		///< MTCLKH (MTU2, TPU 系)
+			TRG,		///< GTETRG (GPTx)
+			TRGA,		///< GTETRGA (GPTWx)
+			TRGB,		///< GTETRGB (GPTWx)
+			TRGC,		///< GTETRGC (GPTWx)
+			TRGD,		///< GTETRGD (GPTWx)
+			DSM0,		///< GTADSM0 (GPTWx)
+			DSM1,		///< GTADSM1 (GPTWx)
+			PPO0,		///< GTCPPO0 (GPTWx)
+			PPO4,		///< GTCPPO4 (GPTWx)
+			TMO,		///< TMOx  (TMR)
+			TMCI,		///< TMCIx (TMR)
+			TMRI,		///< TMRIx (TMR)
 		};
 
 #if 0

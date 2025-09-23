@@ -356,7 +356,7 @@ namespace device {
 		static inline pfs_p_t<0x0008'C1C1> PG1PFS;
 		static inline pfs_p_t<0x0008'C1C2> PG2PFS;
 
-
+#if 0
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PSEL の値を取得
@@ -418,6 +418,7 @@ namespace device {
 			}
 			return val;
 		}
+#endif
 	};
 	typedef mpc_t MPC;
 }
