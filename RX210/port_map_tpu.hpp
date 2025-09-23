@@ -461,7 +461,7 @@ namespace device {
 
 			bool ret = true;
 			switch(clk) {
-			case CHANNEL::CLK_A:  // TCLKA
+			case CHANNEL::CLKA:  // TCLKA
 				// P14
 				// PC2
 				switch(odr) {
@@ -480,7 +480,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_B:  // TCLKB
+			case CHANNEL::CLKB:  // TCLKB
 				// P15
 				// PA3
 				// PC3
@@ -505,7 +505,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_C:  // TCLKC
+			case CHANNEL::CLKC:  // TCLKC
 				// P16
 				// PB2
 				// PC0
@@ -530,7 +530,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_D:  // TCLKD
+			case CHANNEL::CLKD:  // TCLKD
 				// P17
 				// PB3
 				// PC1

@@ -5,7 +5,7 @@
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -95,7 +95,7 @@ namespace device {
 					MPC::PB0PFS.PSEL = sel;  // ok
 					PORTB::PMR.B0 = ena;
 					break;
-  				case ORDER::SECOND:
+				case ORDER::SECOND:
 					PORTD::PMR.B6 = 0;
 					MPC::PD6PFS.PSEL = sel;  // ok
 					PORTD::PMR.B6 = ena;
@@ -127,7 +127,7 @@ namespace device {
 					MPC::P93PFS.PSEL = sel;
 					PORT9::PMR.B3 = ena;
 					break;
-  				case ORDER::SECOND:
+				case ORDER::SECOND:
 					PORTA::PMR.B2 = 0;
 					MPC::PA2PFS.PSEL = sel;
 					PORTA::PMR.B2 = ena;
@@ -146,7 +146,7 @@ namespace device {
 					MPC::PA3PFS.PSEL = sel;
 					PORTA::PMR.B3 = ena;
 					break;
-  				case ORDER::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B6 = 0;
 					MPC::PB6PFS.PSEL = sel;
 					PORTB::PMR.B6 = ena;
@@ -178,7 +178,7 @@ namespace device {
 					MPC::PA3PFS.PSEL = sel;  // ok
 					PORTA::PMR.B3 = ena;
 					break;
-  				case ORDER::SECOND:
+				case ORDER::SECOND:
 					PORTB::PMR.B0 = 0;
 					MPC::PB0PFS.PSEL = sel;
 					PORTB::PMR.B0 = ena;
@@ -197,7 +197,7 @@ namespace device {
 					MPC::PA2PFS.PSEL = sel;  // ok
 					PORTA::PMR.B2 = ena;
 					break;
-  				case ORDER::SECOND:
+				case ORDER::SECOND:
 					PORT9::PMR.B4 = 0;
 					MPC::P94PFS.PSEL = ena ? 0b0'0001 : 0;
 					PORT9::PMR.B4 = ena;
@@ -586,16 +586,16 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			switch(ch) {
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 				ret = clk_a_(odr, ena);
 				break;
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 				ret = clk_b_(odr, ena);
 				break;
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 				ret = clk_c_(odr, ena);
 				break;
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 				ret = clk_d_(odr, ena);
 				break;
 			default:

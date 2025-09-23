@@ -326,7 +326,7 @@ namespace device {
 		static inline pfs_p_t<0x0008'C1C1> PG1PFS;
 		static inline pfs_p_t<0x0008'C1C2> PG2PFS;
 
-
+#if 0
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PSEL の値を取得
@@ -356,10 +356,10 @@ namespace device {
 					if(neg) val = 0b00011;
 					else val = 0b00001;
 					break;
-				case port_map_order::CHANNEL::CLK_A:
-				case port_map_order::CHANNEL::CLK_B:
-				case port_map_order::CHANNEL::CLK_C:
-				case port_map_order::CHANNEL::CLK_D:
+				case port_map_order::CHANNEL::CLKA:
+				case port_map_order::CHANNEL::CLKB:
+				case port_map_order::CHANNEL::CLKC:
+				case port_map_order::CHANNEL::CLKD:
 					if(neg) val = 0b00100;
 					else val = 0b00010;
 					break;				
@@ -388,6 +388,7 @@ namespace device {
 			}
 			return val;
 		}
+#endif
 	};
 	typedef mpc_t MPC;
 }

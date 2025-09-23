@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX621/RX62N グループ・ポート・マッピング (MTU2 系)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -443,28 +443,28 @@ namespace device {
 			bool ret = true;
 
 			switch(ch) {
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 				ret = clk_a_(odr, ena);
 				break;
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 				ret = clk_b_(odr, ena);
 				break;
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 				ret = clk_c_(odr, ena);
 				break;
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 				ret = clk_d_(odr, ena);
 				break;
-			case CHANNEL::CLK_E:
+			case CHANNEL::CLKE:
 				ret = clk_e_(odr, ena);
 				break;
-			case CHANNEL::CLK_F:
+			case CHANNEL::CLKF:
 				ret = clk_f_(odr, ena);
 				break;
-			case CHANNEL::CLK_G:
+			case CHANNEL::CLKG:
 				ret = clk_g_(odr, ena);
 				break;
-			case CHANNEL::CLK_H:
+			case CHANNEL::CLKH:
 				ret = clk_h_(odr, ena);
 				break;
 			default:

@@ -5,7 +5,7 @@
 			・TPU 型に従って、タイマー用ポートを設定 @n
 			TPU0, TPU1, TPU2, TPU3, TPU4, TPU5
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -512,7 +512,7 @@ namespace device {
 
 			bool ret = true;
 			switch(clk) {
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 				/// TCLKA (入力)
 				///      224 176 144 100
 				/// P14   o   o   o   o
@@ -533,7 +533,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 				/// TCLKB (入力)
 				///      224 176 144 100
 				/// P15   o   o   o   o
@@ -560,7 +560,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 				/// TCLKC (入力)
 				///      224 176 144 100
 				/// P16   o   o   o   o
@@ -587,7 +587,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 				/// TCLKD (入力)
 				///      224 176 144 100
 				/// P17   o   o   o   o

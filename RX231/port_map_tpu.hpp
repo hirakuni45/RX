@@ -27,7 +27,7 @@ namespace device {
 		static bool tpu0_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			// PA0
 			case CHANNEL::A:
@@ -104,7 +104,7 @@ namespace device {
 		static bool tpu1_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			// PA4
 			case CHANNEL::A:
@@ -149,7 +149,7 @@ namespace device {
 		static bool tpu2_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			// PA6
 			case CHANNEL::A:
@@ -194,7 +194,7 @@ namespace device {
 		static bool tpu3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			// P21
 			// PB0
@@ -283,7 +283,7 @@ namespace device {
 		static bool tpu4_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			// P25
 			// PB4
@@ -334,7 +334,7 @@ namespace device {
 		static bool tpu5_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			// P13
 			// PB6
@@ -449,7 +449,7 @@ namespace device {
 			switch(clk) {
 			// P14
 			// PC2
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -469,7 +469,7 @@ namespace device {
 			// P15
 			// PA3
 			// PC3
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
@@ -494,7 +494,7 @@ namespace device {
 			// P16
 			// PB2
 			// PC0
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
@@ -519,7 +519,7 @@ namespace device {
 			// P17
 			// PB3
 			// PC1
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
