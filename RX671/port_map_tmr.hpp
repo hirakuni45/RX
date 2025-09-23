@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX660/RX671 グループ・ポート・マッピング (TMR)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -107,12 +107,12 @@ namespace device {
 					MPC::P20PFS.PSEL = sel;
 					PORT2::PMR.B0 = ena;
 					break;
-  				case ORDER::THIRD:
+				case ORDER::THIRD:
 					PORTA::PMR.B4 = 0;
 					MPC::PA4PFS.PSEL = sel;
 					PORTA::PMR.B4 = ena;
 					break;
-  				case ORDER::FOURTH:
+				case ORDER::FOURTH:
 					PORTH::PMR.B2 = 0;
 					MPC::PH2PFS.PSEL = sel;
 					PORTH::PMR.B2 = ena;
@@ -368,7 +368,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 	public:
 		//-----------------------------------------------------------------//

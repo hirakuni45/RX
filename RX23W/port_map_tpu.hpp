@@ -27,7 +27,7 @@ namespace device {
 		static bool tpu0_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			case CHANNEL::B:  // TIOCB0
 			// P17
@@ -53,7 +53,7 @@ namespace device {
 		static bool tpu1_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			case CHANNEL::B:  // TIOCB1
 			// P16
@@ -79,7 +79,7 @@ namespace device {
 		static bool tpu2_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			case CHANNEL::B:  // TIOCB2
 			// P15
@@ -105,7 +105,7 @@ namespace device {
 		static bool tpu3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // TIOCA3
 			// P21
@@ -176,7 +176,7 @@ namespace device {
 		static bool tpu4_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // TIOCA4
 			// P25
@@ -215,7 +215,7 @@ namespace device {
 		static bool tpu5_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b000011 : 0;
+			uint8_t sel = ena ? 0b00'0011 : 0;
 			switch(ch) {
 			case CHANNEL::B:  // TIOCB5
 			// P14
@@ -309,7 +309,7 @@ namespace device {
 
 			bool ret = true;
 			switch(clk) {
-			case CHANNEL::CLK_A:  // TCLKA
+			case CHANNEL::CLKA:  // TCLKA
 			// P14
 			// PC2
 				switch(odr) {
@@ -328,7 +328,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_B:  // TCLKB
+			case CHANNEL::CLKB:  // TCLKB
 			// P15
 			// PC3
 				switch(odr) {
@@ -347,7 +347,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_C:  // TCLKC
+			case CHANNEL::CLKC:  // TCLKC
 			// P16
 			// PC0
 				switch(odr) {
@@ -366,7 +366,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_D:  // TCLKD
+			case CHANNEL::CLKD:  // TCLKD
 			// P17
 			// PB3
 				switch(odr) {

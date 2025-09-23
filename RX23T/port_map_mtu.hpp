@@ -5,7 +5,7 @@
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -538,16 +538,16 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			switch(ch) {
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 				ret = clk_a_(odr, ena);
 				break;
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 				ret = clk_b_(odr, ena);
 				break;
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 				ret = clk_c_(odr, ena);
 				break;
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 				ret = clk_d_(odr, ena);
 				break;
 			default:

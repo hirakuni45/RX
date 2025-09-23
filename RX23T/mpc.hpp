@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Multi-Function Pin Controller / マルチファンクションピンコントローラ (RX23T)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -256,7 +256,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static inline pfs_ip_t<0x0008'C1B2> PE2PFS;
 
-
+#if 0
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PSEL の値を取得
@@ -305,6 +305,7 @@ namespace device {
 			}
 			return val;
 		}
+#endif
 	};
 	typedef mpc_t MPC;
 }

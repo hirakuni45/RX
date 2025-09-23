@@ -466,7 +466,7 @@ namespace device {
 			switch(clk) {
 			// P14
 			// PC2
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -486,7 +486,7 @@ namespace device {
 			// P15
 			// PA3
 			// PC3
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
@@ -511,7 +511,7 @@ namespace device {
 			// P16
 			// PB2
 			// PC0
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
@@ -536,7 +536,7 @@ namespace device {
 			// P17
 			// PB3
 			// PC1
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;

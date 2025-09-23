@@ -5,7 +5,7 @@
 			・TPU 型に従って、タイマー用ポートを設定 @n
 			TPU0, TPU1, TPU2, TPU3, TPU4, TPU5
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -480,19 +480,19 @@ namespace device {
 
 			bool ret = true;
 			switch(clk) {
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 			// TCLKA:
 				switch(odr) {
 				// P14
 				// PC2
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::P14PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORT1::PMR.B4 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTC::PMR.B2 = 0;
-					MPC::PC2PFS.PSEL = ena ? 0b000011 : 0;
+					MPC::PC2PFS.PSEL = ena ? 0b00'0011 : 0;
 					PORTC::PMR.B2 = ena;
 					break;
 				default:
@@ -500,7 +500,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 			// TCLKB:
 				switch(odr) {
 				// P15
@@ -508,17 +508,17 @@ namespace device {
 				// PC3
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
-					MPC::P15PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::P15PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORT1::PMR.B5 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::PA3PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORTA::PMR.B3 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTC::PMR.B3 = 0;
-					MPC::PC3PFS.PSEL = ena ? 0b000011 : 0;
+					MPC::PC3PFS.PSEL = ena ? 0b00'0011 : 0;
 					PORTC::PMR.B3 = ena;
 					break;
 				default:
@@ -526,7 +526,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 			// TCLKC:
 				switch(odr) {
 				// P16
@@ -534,17 +534,17 @@ namespace device {
 				// PC0
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B2 = 0;
-					MPC::PB2PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::PB2PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORTB::PMR.B2 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTC::PMR.B0 = 0;
-					MPC::PC0PFS.PSEL = ena ? 0b000011 : 0;
+					MPC::PC0PFS.PSEL = ena ? 0b00'0011 : 0;
 					PORTC::PMR.B0 = ena;
 					break;
 				default:
@@ -552,7 +552,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 			// TCLKD:
 				switch(odr) {
 				// P17
@@ -560,17 +560,17 @@ namespace device {
 				// PC1
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
-					MPC::P17PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::P17PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORT1::PMR.B7 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B3 = 0;
-					MPC::PB3PFS.PSEL = ena ? 0b000100 : 0;
+					MPC::PB3PFS.PSEL = ena ? 0b00'0100 : 0;
 					PORTB::PMR.B3 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTC::PMR.B1 = 0;
-					MPC::PC1PFS.PSEL = ena ? 0b000011 : 0;
+					MPC::PC1PFS.PSEL = ena ? 0b00'0011 : 0;
 					PORTC::PMR.B1 = ena;
 					break;
 				default:

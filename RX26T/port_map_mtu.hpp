@@ -5,7 +5,7 @@
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8, MTU9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -27,7 +27,7 @@ namespace device {
 		static bool mtu0_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // MTIOC0A[#]
 			// P31
@@ -79,7 +79,7 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B7 = 0;
-					MPC::P27PFS.PSEL = ena ? (neg ? 0b000100 : 0b000010) : 0;  // ok
+					MPC::P27PFS.PSEL = ena ? (neg ? 0b00'0100 : 0b00'0010) : 0;  // ok
 					PORT2::PMR.B7 = ena;
 					break;
 				case ORDER::SECOND:
@@ -116,7 +116,7 @@ namespace device {
 		static bool mtu1_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // MTIOC1A[#]
 			// P27 ( 64/100), ( 92/144)
@@ -167,7 +167,7 @@ namespace device {
 		static bool mtu2_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // MTIOC2A[#]
 			// P94
@@ -212,7 +212,7 @@ namespace device {
 		static bool mtu3_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // MTIOC3A[#]
 			// P11 ( 99/100), (140/144)
@@ -283,7 +283,7 @@ namespace device {
 		static bool mtu4_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // MTIOC4A[#]
 			// P72 ( 55/100), ( 77/144)
@@ -348,7 +348,7 @@ namespace device {
 		static bool mtu5_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::U:  // MTIC5U[#]
 			// P24 ( 65/100), ( 95/144)
@@ -418,7 +418,7 @@ namespace device {
 		static bool mtu6_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // MTIOC6A[#]
 			// P93
@@ -495,7 +495,7 @@ namespace device {
 		static bool mtu7_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:
 			// P94 ( 46/100), ( 68/144)
@@ -560,7 +560,7 @@ namespace device {
 		static bool mtu9_(CHANNEL ch, bool ena, bool neg, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? (neg ? 0b000011 : 0b000001) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0011 : 0b00'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // MTIOC9A[#]
 			// P00 (  4/100), (  9/144)
@@ -598,7 +598,7 @@ namespace device {
 						break;
 					}
 					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = ena ? 0b001000 : 0;  // ok
+					MPC::P22PFS.PSEL = ena ? 0b00'1000 : 0;  // ok
 					PORT2::PMR.B2 = ena;
 					break;
 				case ORDER::SECOND:
@@ -653,7 +653,7 @@ namespace device {
 						break;
 					}
 					PORT1::PMR.B1 = 0;
-					MPC::P11PFS.PSEL = ena ? 0b001000 : 0;  // ok
+					MPC::P11PFS.PSEL = ena ? 0b00'1000 : 0;  // ok
 					PORT1::PMR.B1 = ena;
 					break;
 				case ORDER::SECOND:
@@ -688,7 +688,7 @@ namespace device {
 		{
 			// P21 ( 68/100), (100/144)
 			// P33 ( 58/100), ( 86/144)
-			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0100 : 0b00'0010) : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT2::PMR.B1 = 0;
@@ -712,7 +712,7 @@ namespace device {
 		{
 			// P20 ( 69/100), (101/144)
 			// P32 ( 59/100), ( 87/144)
-			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0100 : 0b00'0010) : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT2::PMR.B0 = 0;
@@ -738,7 +738,7 @@ namespace device {
 			// P31 ( 61/100), ( 89/144)
 			// P70
 			// PE4 (  8/100), ( 13/144)
-			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0100 : 0b00'0010) : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT1::PMR.B1 = 0;
@@ -774,7 +774,7 @@ namespace device {
 			// P22 ( 67/100), ( 97/144)
 			// P30 ( 63/100), ( 91/144)
 			// PE3 (  9/100), ( 14/144)
-			uint8_t sel = ena ? (neg ? 0b000100 : 0b000010) : 0;
+			uint8_t sel = ena ? (neg ? 0b00'0100 : 0b00'0010) : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT1::PMR.B0 = 0;
@@ -883,16 +883,16 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			switch(ch) {
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 				ret = clk_a_(odr, ena, neg);
 				break;
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 				ret = clk_b_(odr, ena, neg);
 				break;
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 				ret = clk_c_(odr, ena, neg);
 				break;
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 				ret = clk_d_(odr, ena, neg);
 				break;
 			default:

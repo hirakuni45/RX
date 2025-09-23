@@ -393,7 +393,7 @@ namespace device {
 		{
 			// P14
 			// PC6
-			uint8_t sel = ena ? 0b00010 : 0;
+			uint8_t sel = ena ? 0b0'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT1::PMR.B4 = 0;
@@ -418,7 +418,7 @@ namespace device {
 			// P15
 			// P25
 			// PC7
-			uint8_t sel = ena ? 0b00010 : 0;
+			uint8_t sel = ena ? 0b0'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT1::PMR.B5 = 0;
@@ -447,7 +447,7 @@ namespace device {
 		{
 			// P22
 			// PC4
-			uint8_t sel = ena ? 0b00010 : 0;
+			uint8_t sel = ena ? 0b0'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORT2::PMR.B2 = 0;
@@ -470,7 +470,7 @@ namespace device {
 		static bool clk_d_(ORDER odr, bool ena) noexcept
 		{
 			// PC5
-			uint8_t sel = ena ? 0b00010 : 0;
+			uint8_t sel = ena ? 0b0'0010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
 				PORTC::PMR.B5 = 0;
@@ -556,16 +556,16 @@ namespace device {
 			bool ret = true;
 
 			switch(ch) {
-			case CHANNEL::CLK_A:
+			case CHANNEL::CLKA:
 				ret = clk_a_(odr, ena);
 				break;
-			case CHANNEL::CLK_B:
+			case CHANNEL::CLKB:
 				ret = clk_b_(odr, ena);
 				break;
-			case CHANNEL::CLK_C:
+			case CHANNEL::CLKC:
 				ret = clk_c_(odr, ena);
 				break;
-			case CHANNEL::CLK_D:
+			case CHANNEL::CLKD:
 				ret = clk_d_(odr, ena);
 				break;
 			default:
