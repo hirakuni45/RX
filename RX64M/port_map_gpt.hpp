@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M グループ・ポート・マッピング (GPT)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -365,33 +365,47 @@ namespace device {
 			return ret;
 		}
 
-#if 0
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GPT 系、トリガーポート切り替え
-			@param[in]	ch	チャネル
+			@brief  GPT トリガー入力切り替え
+			@param[in]	clk	クロック型
 			@param[in]	ena	無効にする場合場合「false」
-			@param[in]	odr	候補選択
-			@param[in]	neg	反転入出力の場合「true」（サポートしない）
+			@param[in]	odr	候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_trigger(CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
+		static bool turn_clock(CHANNEL clk, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			bool ret = true;
-
-			if(odr == ORDER::BYPASS) return true;
-			if(neg) return false;
-
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			switch(ch) {
-			case CHANNEL::CLK_A:
-//				ret = trg0_(odr, ena);
-				break;
-			case CHANNEL::CLK_B:
-//				ret = trg1_(odr, ena);
+			bool ret = true;
+			switch(clk) {
+			case CHANNEL::TRG:  // GTETRG
+				// P15
+				// PA6
+				// PC4
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B5 = 0;
+					MPC::P15PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+					PORT1::PMR.B5 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTA::PMR.B6 = 0;
+					MPC::PA6PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+					PORTA::PMR.B6 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+					PORTC::PMR.B4 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
 				break;
 			default:
 				ret = false;
@@ -402,6 +416,5 @@ namespace device {
 
 			return ret;
 		}
-#endif
 	};
 }
