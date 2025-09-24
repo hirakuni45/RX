@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX63T グループ・ポート・マッピング (GPT)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,8 +28,8 @@ namespace device {
 			uint8_t sel = ena ? 0b00110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC0A
-			// P71
-			// PD7
+			// P71 (LFQFP64: 38)
+			// PD7 (LFQFP64: 12)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B1 = 0;
@@ -47,8 +47,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC0B
-			// P74
-			// PD6
+			// P74 (LFQFP64: 35)
+			// PD6 (LFQFP64: 13)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B4 = 0;
@@ -79,8 +79,8 @@ namespace device {
 			uint8_t sel = ena ? 0b00110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC1A
-			// P72
-			// PD5
+			// P72 (LFQFP64: 37)
+			// PD5 (LFQFP64: 14)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B2 = 0;
@@ -98,8 +98,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC1B
-			// P75
-			// PD4
+			// P75 (LFQFP64: 34)
+			// PD4 (LFQFP64: 15)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B5 = 0;
@@ -130,8 +130,8 @@ namespace device {
 			uint8_t sel = ena ? 0b00110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC2A
-			// P73
-			// PD3
+			// P73 (LFQFP64: 36)
+			// PD3 (LFQFP64: 16)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B3 = 0;
@@ -149,10 +149,10 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC2B
-			// P76
-			// PB6
-			// PB7
-			// PD2
+			// P76 (LFQFP64: 33)
+			// PB6 (LFQFP64: 18)
+			// PB7 (LFQFP64: 17)
+			// PD2 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B6 = 0;
@@ -193,8 +193,8 @@ namespace device {
 			uint8_t sel = ena ? 0b00110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC3A
-			// P00
-			// PD1
+			// P00 (LFQFP64:  2)
+			// PD1 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT0::PMR.B0 = 0;
@@ -212,8 +212,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC3B
-			// P01
-			// PD0
+			// P01 (LFQFP64:  4)
+			// PD0 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT0::PMR.B1 = 0;
@@ -244,7 +244,7 @@ namespace device {
 			uint8_t sel = ena ? 0b00110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC4A
-			// P95
+			// P95 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B5 = 0;
@@ -257,7 +257,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC4B
-			// P92
+			// P92 (LFQFP64: 31)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B2 = 0;
@@ -283,7 +283,7 @@ namespace device {
 			uint8_t sel = ena ? 0b00110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC5A
-			// P94
+			// P94 (LFQFP64: 29)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B4 = 0;
@@ -296,7 +296,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC5B
-			// P91
+			// P91 (LFQFP64: 32)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B1 = 0;
@@ -322,8 +322,8 @@ namespace device {
 			uint8_t sel = ena ? 0b00110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC6A
-			// P93
-			// PG3
+			// P93 (LFQFP64: 30)
+			// PG3 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B3 = 0;
@@ -341,8 +341,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC6B
-			// P90
-			// PG4
+			// P90 (LFQFP64: --)
+			// PG4 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B0 = 0;
@@ -373,7 +373,7 @@ namespace device {
 			uint8_t sel = ena ? 0b00110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC7A
-			// PG0
+			// PG0 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTG::PMR.B0 = 0;
@@ -386,7 +386,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC7B
-			// PG1
+			// PG1 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTG::PMR.B1 = 0;
@@ -461,34 +461,48 @@ namespace device {
 			return ret;
 		}
 
-#if 0
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  GPT 系、トリガーポート切り替え
-			@param[in]	ch	チャネル
+			@brief  GPTW クロック入出力切り替え
+			@param[in]	clk	クロック型
 			@param[in]	ena	無効にする場合場合「false」
-			@param[in]	odr	候補選択
-			@param[in]	neg	反転入出力の場合「true」（サポートしない）
+			@param[in]	odr	候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn_trigger(CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
+		static bool turn_clock(CHANNEL clk, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			bool ret = true;
-
-			if(odr == ORDER::BYPASS) return true;
-			if(neg) return false;
-
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			switch(ch) {
-			case CHANNEL::CLK_A:
-//				ret = trg0_(odr, ena);
-				break;
-			case CHANNEL::CLK_B:
-//				ret = trg1_(odr, ena);
-				break;
+			bool ret = true;
+			switch(clk) {
+			case CHANNEL::TRG:  // GTETRG
+			case CHANNEL::TRG0:  // GTETRG0
+				// PB4 (LFQFP64: 21)
+				switch(odr) {
+				case ORDER::FIRST:
+					PORTB::PMR.B4 = 0;
+					MPC::PB4PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
+					PORTB::PMR.B4 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+			case CHANNEL::DSM0:  // GTETRG1
+				// P34 (LFQFP64: --)
+				switch(odr) {
+				case ORDER::FIRST:
+					PORTA::PMR.B3 = 0;
+					MPC::PA3PFS.PSEL = ena ? 0b0'0110 : 0;  // ok
+					PORTA::PMR.B3 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
 			default:
 				ret = false;
 				break;
@@ -498,6 +512,5 @@ namespace device {
 
 			return ret;
 		}
-#endif
 	};
 }

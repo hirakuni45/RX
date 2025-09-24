@@ -28,15 +28,15 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC0A / GTIOC0A#:
+			case CHANNEL::A:  // GTIOC0A(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P17
-				// P22
-				// PA0
-				// PA1
-				// PB7
-				// PC5
-				// PH0
+				// P17 (LFQFP100:  29)
+				// P22 (LFQFP100:  26)
+				// PA0 (LFQFP100:  70)
+				// PA1 (LFQFP100:  69)
+				// PB7 (LFQFP100:  53)
+				// PC5 (LFQFP100:  47)
+				// PH0 (LFQFP100:  38)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
@@ -78,16 +78,16 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC0B / GTIOC0B#:
-				// P16
-				// P17
-				// P23
-				// PA1
-				// PA6
-				// PB0
-				// PB6
-				// PC4
-				// PH1
+			case CHANNEL::B:  // GTIOC0B(#):
+				// P16 (LFQFP100:  30)
+				// P17 (LFQFP100:  29)
+				// P23 (LFQFP100:  25)
+				// PA1 (LFQFP100:  69)
+				// PA6 (LFQFP100:  64)
+				// PB0 (LFQFP100:  61)
+				// PB6 (LFQFP100:  54)
+				// PC4 (LFQFP100:  48)
+				// PH1 (LFQFP100:  37)
 				switch(order) {
 				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
@@ -160,15 +160,15 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC1A / GTIOC1A#:
+			case CHANNEL::A:  // GTIOC1A(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P24
-				// P32
-				// P55
-				// PA0
-				// PB3
-				// PE2
-				// PE4
+				// P24 (LFQFP100:  24)
+				// P32 (LFQFP100:  18)
+				// P55 (LFQFP100:  39)
+				// PA0 (LFQFP100:  70)
+				// PB3 (LFQFP100:  57)
+				// PE2 (LFQFP100:  76)
+				// PE4 (LFQFP100:  74)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT2::PMR.B4 = 0;
@@ -211,16 +211,16 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC1B / GTIOC1B#:
+			case CHANNEL::B:  // GTIOC1B(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P25
-				// P33
-				// PA3
-				// PA4
-				// PB1
-				// PE1
-				// PE5
-				// PH2
+				// P25 (LFQFP100:  23)
+				// P33 (LFQFP100:  17)
+				// PA3 (LFQFP100:  67)
+				// PA4 (LFQFP100:  66)
+				// PB1 (LFQFP100:  59)
+				// PE1 (LFQFP100:  77)
+				// PE5 (LFQFP100:  73)
+				// PH2 (LFQFP100:  36)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT2::PMR.B5 = 0;
@@ -279,15 +279,15 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC2A / GTIOC2A#:
+			case CHANNEL::A:  // GTIOC2A(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P21
-				// P30
-				// P54
-				// PB0
-				// PC2
-				// PD1
-				// PE3
+				// P21 (LFQFP100:  27)
+				// P30 (LFQFP100:  20)
+				// P54 (LFQFP100:  40)
+				// PB0 (LFQFP100:  61)
+				// PC2 (LFQFP100:  50)
+				// PD1 (LFQFP100:  85)
+				// PE3 (LFQFP100:  75)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -330,17 +330,17 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC2B / GTIOC2B#:
+			case CHANNEL::B:  // GTIOC2B(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P20
-				// P31
-				// P55
-				// PA3
-				// PB1
-				// PC3
-				// PD2
-				// PE4
-				// PH3
+				// P20 (LFQFP100:  28)
+				// P31 (LFQFP100:  19)
+				// P55 (LFQFP100:  39)
+				// PA3 (LFQFP100:  67)
+				// PB1 (LFQFP100:  59)
+				// PC3 (LFQFP100:  49)
+				// PD2 (LFQFP100:  84)
+				// PE4 (LFQFP100:  74)
+				// PH3 (LFQFP100:  35)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -408,13 +408,13 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC3A / GTIOC3A#:
+			case CHANNEL::A:  // GTIOC3A(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P22
-				// P34
-				// PB2
-				// PB3
-				// PC4
+				// P22 (LFQFP100:  26)
+				// P34 (LFQFP100:  16)
+				// PB2 (LFQFP100:  58)
+				// PB3 (LFQFP100:  57)
+				// PC4 (LFQFP100:  48)
 				switch(order) {
 				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b1'0111 : 0b1'0101) : 0;
@@ -449,13 +449,13 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC3B / GTIOC3B#:
+			case CHANNEL::B:  // GTIOC3B(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P13
-				// P15
-				// P23
-				// PA1
-				// PB3
+				// P13 (LFQFP100:  33)
+				// P15 (LFQFP100:  31)
+				// P23 (LFQFP100:  25)
+				// PA1 (LFQFP100:  69)
+				// PB3 (LFQFP100:  57)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT1::PMR.B3 = 0;
@@ -504,11 +504,11 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC4A / GTIOC4A#:
+			case CHANNEL::A:  // GTIOC4A(#):
 				sel = ena ? (neg ? 0b1'0111 : 0b1'0101) : 0;
-				// P20
-				// PA4
-				// PE4
+				// P20 (LFQFP100:  28)
+				// PA4 (LFQFP100:  66)
+				// PE4 (LFQFP100:  74)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -532,13 +532,13 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC4B / GTIOC4B#:
+			case CHANNEL::B:  // GTIOC4B(#):
 				sel = ena ? (neg ? 0b1'0111 : 0b1'0101) : 0;
-				// P16
-				// P21
-				// PA5
-				// PB5
-				// PE3
+				// P16 (LFQFP100:  30)
+				// P21 (LFQFP100:  27)
+				// PA5 (LFQFP100:  65)
+				// PB5 (LFQFP100:  55)
+				// PE3 (LFQFP100:  75)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
@@ -584,11 +584,11 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC5A / GTIOC5A#:
+			case CHANNEL::A:  // GTIOC5A(#):
 				sel = ena ? (neg ? 0b1'0111 : 0b1'0101) : 0;
-				// P26
-				// PA6
-				// PB5
+				// P26 (LFQFP100:  22)
+				// PA6 (LFQFP100:  64)
+				// PB5 (LFQFP100:  55)
 				switch(order) {
 				case ORDER::FIRST:
 					sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
@@ -611,12 +611,12 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC5B / GTIOC5B#:
+			case CHANNEL::B:  // GTIOC5B(#):
 				sel = ena ? (neg ? 0b1'0111 : 0b1'0101) : 0;
-				// P15
-				// P27
-				// PA7
-				// PE5
+				// P15 (LFQFP100:  31)
+				// P27 (LFQFP100:  21)
+				// PA7 (LFQFP100:  63)
+				// PE5 (LFQFP100:  73)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
@@ -657,15 +657,15 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC6A / GTIOC6A#:
+			case CHANNEL::A:  // GTIOC6A(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P14
-				// P17
-				// P25
-				// PB4
-				// PC1
-				// PC7
-				// PJ1
+				// P14 (LFQFP100:  32)
+				// P17 (LFQFP100:  29)
+				// P25 (LFQFP100:  23)
+				// PB4 (LFQFP100:  56)
+				// PC1 (LFQFP100:  51)
+				// PC7 (LFQFP100:  45)
+				// PJ1 (LFQFP100:   6)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -710,14 +710,14 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC6B / GTIOC6B#:
+			case CHANNEL::B:  // GTIOC6B(#):
 				sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
-				// P16
-				// P24
-				// PB5
-				// PC0
-				// PC6
-				// PJ3
+				// P16 (LFQFP100:  30)
+				// P24 (LFQFP100:  24)
+				// PB5 (LFQFP100:  55)
+				// PC0 (LFQFP100:  52)
+				// PC6 (LFQFP100:  46)
+				// PJ3 (LFQFP100:   4)
 				switch(order) {
 				case ORDER::FIRST:
 					if(neg) return false;
@@ -771,13 +771,13 @@ namespace device {
 			bool ret = true;
 			uint8_t sel;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC7A / GTIOC7A#:
+			case CHANNEL::A:  // GTIOC7A(#):
 				sel = ena ? (neg ? 0b1'0111 : 0b1'0101) : 0;
-				// P13
-				// P32
-				// PB1
-				// PB6
-				// PC5
+				// P13 (LFQFP100:  33)
+				// P32 (LFQFP100:  18)
+				// PB1 (LFQFP100:  59)
+				// PB6 (LFQFP100:  54)
+				// PC5 (LFQFP100:  47)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT1::PMR.B3 = 0;
@@ -811,12 +811,12 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC7B / GTIOC7B#:
+			case CHANNEL::B:  // GTIOC7B(#):
 				sel = ena ? (neg ? 0b1'0111 : 0b1'0101) : 0;
-				// P14
-				// P33
-				// PA3
-				// PB7
+				// P14 (LFQFP100:  32)
+				// P33 (LFQFP100:  17)
+				// PA3 (LFQFP100:  67)
+				// PB7 (LFQFP100:  53)
 				switch(order) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -844,6 +844,234 @@ namespace device {
 					ret = false;
 					break;
 				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool trg_a_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTETRGA:
+			// P14 (LFQFP100:  32)
+			// P24 (LFQFP100:  24)
+			// PA4 (LFQFP100:  66)
+			// PC2 (LFQFP100:  50)
+			// PC6 (LFQFP100:  46)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B4 = 0;
+				MPC::P14PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT1::PMR.B4 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B4 = 0;
+				MPC::P24PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT2::PMR.B4 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B4 = 0;
+				MPC::PA4PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTA::PMR.B4 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTC::PMR.B2 = 0;
+				MPC::PC2PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTC::PMR.B2 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTC::PMR.B6 = 0;
+				MPC::PC6PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTC::PMR.B6 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool trg_b_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTETRGB:
+			// P15 (LFQFP100:  31)
+			// P25 (LFQFP100:  23)
+			// PA3 (LFQFP100:  67)
+			// PA6 (LFQFP100:  64)
+			// PC3 (LFQFP100:  49)
+			// PC7 (LFQFP100:  45)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B5 = 0;
+				MPC::P15PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT1::PMR.B5 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B5 = 0;
+				MPC::P25PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT2::PMR.B5 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B3 = 0;
+				MPC::PA3PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
+				PORTA::PMR.B3 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTA::PMR.B6 = 0;
+				MPC::PA6PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTA::PMR.B6 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTC::PMR.B3 = 0;
+				MPC::PC3PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTC::PMR.B3 = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTC::PMR.B7 = 0;
+				MPC::PC7PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTC::PMR.B7 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool trg_c_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTETRGC:
+			// P16 (LFQFP100:  30)
+			// P22 (LFQFP100:  26)
+			// PA1 (LFQFP100:  69)
+			// PB2 (LFQFP100:  58)
+			// PC0 (LFQFP100:  52)
+			// PC4 (LFQFP100:  48)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B6 = 0;
+				MPC::P16PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
+				PORT1::PMR.B6 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT2::PMR.B2 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B1 = 0;
+				MPC::PA1PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
+				PORTA::PMR.B1 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTB::PMR.B2 = 0;
+				MPC::PB2PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTB::PMR.B2 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTC::PMR.B0 = 0;
+				MPC::PC0PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTC::PMR.B0 = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTC::PMR.B4 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool trg_d_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTETRGD
+			// P17 (LFQFP100:  29)
+			// P23 (LFQFP100:  25)
+			// PA3 (LFQFP100:  67)
+			// PB3 (LFQFP100:  57)
+			// PC1 (LFQFP100:  51)
+			// PC5 (LFQFP100:  47)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
+				PORT1::PMR.B7 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B3 = 0;
+				MPC::P23PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT2::PMR.B3 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTA::PMR.B3 = 0;
+				MPC::PA3PFS.PSEL = ena ? 0b00'0011 : 0;  // ok
+				PORTA::PMR.B3 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTB::PMR.B3 = 0;
+				MPC::PB3PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
+				PORTB::PMR.B3 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTC::PMR.B1 = 0;
+				MPC::PC1PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTC::PMR.B1 = ena;
+				break;
+			case ORDER::SIXTH:
+				PORTC::PMR.B5 = 0;
+				MPC::PC5PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTC::PMR.B5 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool ppo_0_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTCPPO0
+			// P14 (LFQFP100:  32)
+			// P17 (LFQFP100:  29)
+			// PC1 (LFQFP100:  51)
+			// PC7 (LFQFP100:  45)
+			// PJ1 (LFQFP100:   6)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B4 = 0;
+				MPC::P14PFS.PSEL = ena ? 0b00'0001 : 0;  // ok
+				PORT1::PMR.B4 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT1::PMR.B7 = 0;
+				MPC::P17PFS.PSEL = ena ? 0b00'0011 : 0;  // ok
+				PORT1::PMR.B7 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTC::PMR.B1 = 0;
+				MPC::PC1PFS.PSEL = ena ? 0b00'0001 : 0;  // ok
+				PORTC::PMR.B1 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTC::PMR.B7 = 0;
+				MPC::PC7PFS.PSEL = ena ? 0b00'0001 : 0;  // ok
+				PORTC::PMR.B7 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTJ::PMR.B1 = 0;
+				MPC::PJ1PFS.PSEL = ena ? 0b00'0001 : 0;  // ok
+				PORTJ::PMR.B1 = ena;
 				break;
 			default:
 				ret = false;
@@ -922,216 +1150,29 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn_clock(CHANNEL clk, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
+			if(odr == ORDER::BYPASS) return true;
+
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(clk) {
-			case CHANNEL::TRGA:  // GTETRGA
-				// P14
-				// P24
-				// PA4
-				// PC2
-				// PC6
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORT1::PMR.B4 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORT2::PMR.B4 = ena;
-					break;
-				case ORDER::THIRD:
-					PORTA::PMR.B4 = 0;
-					MPC::PA4PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTA::PMR.B4 = ena;
-					break;
-				case ORDER::FOURTH:
-					PORTC::PMR.B2 = 0;
-					MPC::PC2PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTC::PMR.B2 = ena;
-					break;
-				case ORDER::FIFTH:
-					PORTC::PMR.B6 = 0;
-					MPC::PC6PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTC::PMR.B6 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			case CHANNEL::TRGA:
+				ret = trg_a_(odr, ena);
 				break;
-			case CHANNEL::TRGB:  // GTETRGB
-				// P15
-				// P25
-				// PA3
-				// PA6
-				// PC3
-				// PC7
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT1::PMR.B5 = 0;
-					MPC::P15PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORT1::PMR.B5 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT2::PMR.B5 = 0;
-					MPC::P25PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORT2::PMR.B5 = ena;
-					break;
-				case ORDER::THIRD:
-					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
-					PORTA::PMR.B3 = ena;
-					break;
-				case ORDER::FOURTH:
-					PORTA::PMR.B6 = 0;
-					MPC::PA6PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTA::PMR.B6 = ena;
-					break;
-				case ORDER::FIFTH:
-					PORTC::PMR.B3 = 0;
-					MPC::PC3PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTC::PMR.B3 = ena;
-					break;
-				case ORDER::SIXTH:
-					PORTC::PMR.B7 = 0;
-					MPC::PC7PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTC::PMR.B7 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			case CHANNEL::TRGB:
+				ret = trg_b_(odr, ena);
 				break;
-			case CHANNEL::TRGC:  // GTETRGC
-				// P16
-				// P22
-				// PA1
-				// PB2
-				// PC0
-				// PC4
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
-					PORT1::PMR.B6 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORT2::PMR.B2 = ena;
-					break;
-				case ORDER::THIRD:
-					PORTA::PMR.B1 = 0;
-					MPC::PA1PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
-					PORTA::PMR.B1 = ena;
-					break;
-				case ORDER::FOURTH:
-					PORTB::PMR.B2 = 0;
-					MPC::PB2PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTB::PMR.B2 = ena;
-					break;
-				case ORDER::FIFTH:
-					PORTC::PMR.B0 = 0;
-					MPC::PC0PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTC::PMR.B0 = ena;
-					break;
-				case ORDER::SIXTH:
-					PORTC::PMR.B4 = 0;
-					MPC::PC4PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTC::PMR.B4 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			case CHANNEL::TRGC:
+				ret = trg_c_(odr, ena);
 				break;
-			case CHANNEL::TRGD:  // GTETRGD
-				// P17
-				// P23
-				// PA3
-				// PB3
-				// PC1
-				// PC5
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT1::PMR.B7 = 0;
-					MPC::P17PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
-					PORT1::PMR.B7 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT2::PMR.B3 = 0;
-					MPC::P23PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORT2::PMR.B3 = ena;
-					break;
-				case ORDER::THIRD:
-					PORTA::PMR.B3 = 0;
-					MPC::PA3PFS.PSEL = ena ? 0b00'0011 : 0;  // ok
-					PORTA::PMR.B3 = ena;
-					break;
-				case ORDER::FOURTH:
-					PORTB::PMR.B3 = 0;
-					MPC::PB3PFS.PSEL = ena ? 0b00'0010 : 0;  // ok
-					PORTB::PMR.B3 = ena;
-					break;
-				case ORDER::FIFTH:
-					PORTC::PMR.B1 = 0;
-					MPC::PC1PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTC::PMR.B1 = ena;
-					break;
-				case ORDER::SIXTH:
-					PORTC::PMR.B5 = 0;
-					MPC::PC5PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
-					PORTC::PMR.B5 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			case CHANNEL::TRGD:
+				ret = trg_d_(odr, ena);
 				break;
-			case CHANNEL::PPO0:  // GTCPPO0
-				// P14
-				// P17
-				// PC1
-				// PC7
-				// PJ1
-				switch(odr) {
-				case ORDER::FIRST:
-					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = ena ? 0b00'0001 : 0;  // ok
-					PORT1::PMR.B4 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT1::PMR.B7 = 0;
-					MPC::P17PFS.PSEL = ena ? 0b00'0011 : 0;  // ok
-					PORT1::PMR.B7 = ena;
-					break;
-				case ORDER::THIRD:
-					PORTC::PMR.B1 = 0;
-					MPC::PC1PFS.PSEL = ena ? 0b00'0001 : 0;  // ok
-					PORTC::PMR.B1 = ena;
-					break;
-				case ORDER::FOURTH:
-					PORTC::PMR.B7 = 0;
-					MPC::PC7PFS.PSEL = ena ? 0b00'0001 : 0;  // ok
-					PORTC::PMR.B7 = ena;
-					break;
-				case ORDER::FIFTH:
-					PORTJ::PMR.B1 = 0;
-					MPC::PJ1PFS.PSEL = ena ? 0b00'0001 : 0;  // ok
-					PORTJ::PMR.B1 = ena;
-					break;
-				default:
-					ret = false;
-					break;
-				}
+			case CHANNEL::PPO0:
+				ret = ppo_0_(odr, ena);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 
