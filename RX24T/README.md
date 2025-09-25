@@ -185,6 +185,30 @@
 
 ---
 
+## port map order (GPT) / ポートマップ候補 (GPT)
+
+### LFQFP100
+
+|GPT|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|GTIOC0A|P71 (56)|PD7 (18)|-|
+|GTIOC0B|P74 (53)|PD1 (24)|-|
+|GTIOC1A|P72 (55)|PD0 (25)|-|
+|GTIOC1B|P75 (52)|PB7 (26)|-|
+|GTIOC2A|P73 (54)|PB6 (27)|-|
+|GTIOC2B|P76 (51)|PB5 (28)|-|
+|GTIOC3A|PD7 (18)|-|-|
+|GTIOC3B|PD6 (19)|-|-|
+|GTECLKA|PD5 (20)|-|-|
+|GTECLKB|PD4 (21)|-|-|
+|GTECLKC|PD3 (22)|-|-|
+|GTECLKD|PB4 (30)|-|-|
+|GTETRG|PB4 (30)|-|-|
+|GTADSM0|PA3 (38)|-|-|
+|GTADSM1|PA2 (39)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

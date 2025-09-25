@@ -993,7 +993,7 @@ namespace device {
 		static bool trg_d_(ORDER odr, bool ena) noexcept
 		{
 			bool ret = true;
-			// GTETRGD
+			// GTETRGD:
 			// P17 (LFQFP100:  29)
 			// P23 (LFQFP100:  25)
 			// PA3 (LFQFP100:  67)
@@ -1041,7 +1041,7 @@ namespace device {
 		static bool ppo_0_(ORDER odr, bool ena) noexcept
 		{
 			bool ret = true;
-			// GTCPPO0
+			// GTCPPO0:
 			// P14 (LFQFP100:  32)
 			// P17 (LFQFP100:  29)
 			// PC1 (LFQFP100:  51)

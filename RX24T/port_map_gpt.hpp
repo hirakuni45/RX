@@ -214,7 +214,6 @@ namespace device {
 
 		static bool clk_a_(ORDER odr, bool ena) noexcept
 		{
-			bool ret = true;
 			// GTECLKA: 
 			// PD5 (LFQFP100:  20)
 			switch(odr) {
@@ -224,15 +223,13 @@ namespace device {
 				PORTD::PMR.B5 = ena;
 				break;
 			default:
-				ret = false;
-				break;
+				return false;
 			}
-			return ret;
+			return true;
 		}
 
 		static bool clk_b_(ORDER odr, bool ena) noexcept
 		{
-			bool ret = true;
 			// GTECLKB:
 			// PD4 (LFQFP100:  21)
 			switch(odr) {
@@ -242,15 +239,13 @@ namespace device {
 				PORTD::PMR.B4 = ena;
 				break;
 			default:
-				ret = false;
-				break;
+				return false;
 			}
-			return ret;
+			return true;
 		}
 
 		static bool clk_c_(ORDER odr, bool ena) noexcept
 		{
-			bool ret = true;
 			// GTECLKC:
 			// PD3 (LFQFP100:  22)
 			switch(odr) {
@@ -260,15 +255,13 @@ namespace device {
 				PORTD::PMR.B3 = ena;
 				break;
 			default:
-				ret = false;
-				break;
+				return false;
 			}
-			return ret;
+			return true;
 		}
 
 		static bool clk_d_(ORDER odr, bool ena) noexcept
 		{
-			bool ret = true;
 			// GTECLKD:
 			// PB4 (LFQFP100:  30)
 			switch(odr) {
@@ -278,15 +271,13 @@ namespace device {
 				PORTB::PMR.B4 = ena;
 				break;
 			default:
-				ret = false;
-				break;
+				return false;
 			}
-			return ret;
+			return true;
 		}
 
 		static bool trg_(ORDER odr, bool ena) noexcept
 		{
-			bool ret = true;
 			// GTETRG:
 			// PB4 (LFQFP100:  30)
 			switch(odr) {
@@ -296,15 +287,13 @@ namespace device {
 				PORTB::PMR.B4 = ena;
 				break;
 			default:
-				ret = false;
-				break;
+				return false;
 			}
-			return ret;
+			return true;
 		}
 
 		static bool dsm_0_(ORDER odr, bool ena) noexcept
 		{
-			bool ret = true;
 			// GTADSM0:
 			// PA3 (LFQFP100:  38)
 			switch(odr) {
@@ -314,15 +303,14 @@ namespace device {
 				PORTA::PMR.B3 = ena;
 				break;
 			default:
-				ret = false;
-				break;
+				return false;
 			}
-			return ret;
+			return true;
 		}
 
 		static bool dsm_1_(ORDER odr, bool ena) noexcept
 		{
-			bool ret = true;
+			// GTADSM1:
 			// PA2 (LFQFP100:  39)
 			switch(odr) {
 			case ORDER::FIRST:
@@ -331,10 +319,9 @@ namespace device {
 				PORTA::PMR.B2 = ena;
 				break;
 			default:
-				ret = false;
-				break;
+				return false;
 			}
-			return ret;
+			return true;
 		}
 
 	public:

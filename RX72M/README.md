@@ -492,6 +492,67 @@
 
 ---
 
+## port map order (GPTW) / ポートマップ候補 (GPTW)
+
+### LFQGFP100
+
+|GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|
+|---|---|---|---|---|---|---|
+|GTIOC0A|P23 (25)|P83 (---)|PA5 (65)|PD3 (83)|PE5 (73)|PH6 (---)|
+|GTIOC0B|P17 (29)|P81 (---)|PA0 (70)|PD2 (84)|PE2 (76)|PH7 (---)|
+|GTIOC1A|P22 (26)|PA2 (68)|PC5 (47)|PD1 (85)|PE4 (74)|PK6 (---)|
+|GTIOC1B|P67 (---)|P87 (---)|PC3 (49)|PD0 (86)|PE1 (77)|PK7 (---)|
+|GTIOC2A|P21 (27)|P82 (---)|PA1 (69)|PE3 (75)|PL6 (---)|-|
+|GTIOC2B|P66 (---)|P86 (---)|PC2 (50)|PE0 (78)|PL7 (---)|-|
+|GTIOC3A|PC7 (45)|PE7 (71)|PM6 (---)|-|-|-|
+|GTIOC3B|PC6 (46)|PE6 (72)|PM7 (---)|-|-|-|
+|GTADSM0|P12 (34)|PH4 (---)|PK4 (---)|PL4 (---)|PM4 (---)|-|
+|GTADSM1|P13 (33)|PH5 (---)|PK5 (---)|PL5 (---)|PM5 (---)|-|
+|GTETRGA|P15 (31)|PH0 (---)|PK0 (---)|PL0 (---)|PM0 (---)|-|
+|GTETRGB|PA6 (64)|PH1 (---)|PK1 (---)|PL1 (---)|PM1 (---)|-|
+|GTETRGC|PC4 (48)|PH2 (---)|PK2 (---)|PL2 (---)|PM2 (---)|-|
+|GTETRGD|P14 (32)|PH3 (---)|PK3 (---)|PL3 (---)|PM3 (---)|-|
+
+### LFQGFP144
+
+|GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|
+|---|---|---|---|---|---|---|
+|GTIOC0A|P23 (34)|P83 (58)|PA5 (90)|PD3 (123)|PE5 (106)|PH6 (---)|
+|GTIOC0B|P17 (38)|P81 (64)|PA0 (97)|PD2 (124)|PE2 (109)|PH7 (---)|
+|GTIOC1A|P22 (35)|PA2 (95)|PC5 (62)|PD1 (125)|PE4 (107)|PK6 (---)|
+|GTIOC1B|P67 (98)|P87 (39)|PC3 (67)|PD0 (126)|PE1 (110)|PK7 (---)|
+|GTIOC2A|P21 (36)|P82 (63)|PA1 (96)|PE3 (108)|PL6 (---)|-|
+|GTIOC2B|P66 (99)|P86 (41)|PC2 (70)|PE0 (111)|PL7 (---)|-|
+|GTIOC3A|PC7 (60)|PE7 (101)|PM6 (---)|-|-|-|
+|GTIOC3B|PC6 (61)|PE6 (102)|PM7 (---)|-|-|-|
+|GTADSM0|P12 (45)|PH4 (---)|PK4 (---)|PL4 (---)|PM4 (---)|-|
+|GTADSM1|P13 (44)|PH5 (---)|PK5 (---)|PL5 (---)|PM5 (---)|-|
+|GTETRGA|P15 (42)|PH0 (---)|PK0 (---)|PL0 (---)|PM0 (---)|-|
+|GTETRGB|PA6 (89)|PH1 (---)|PK1 (---)|PL1 (---)|PM1 (---)|-|
+|GTETRGC|PC4 (66)|PH2 (---)|PK2 (---)|PL2 (---)|PM2 (---)|-|
+|GTETRGD|P14 (43)|PH3 (---)|PK3 (---)|PL3 (---)|PM3 (---)|-|
+
+### LFQGFP176
+
+|GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|
+|---|---|---|---|---|---|---|
+|GTIOC0A|P23 (42)|P83 (74)|PA5 (108)|PD3 (150)|PE5 (130)|PH6 (---)|
+|GTIOC0B|P17 (46)|P81 (80)|PA0 (118)|PD2 (154)|PE2 (133)|PH7 (---)|
+|GTIOC1A|P22 (43)|PA2 (112)|PC5 (78)|PD1 (156)|PE4 (131)|PK6 (---)|
+|GTIOC1B|P67 (120)|P87 (47)|PC3 (83)|PD0 (158)|PE1 (134)|PK7 (---)|
+|GTIOC2A|P21 (44)|P82 (79)|PA1 (114)|PE3 (132)|PL6 (---)|-|
+|GTIOC2B|P66 (122)|P86 (49)|PC2 (86)|PE0 (135)|PL7 (---)|-|
+|GTIOC3A|PC7 (76)|PE7 (125)|PM6 (---)|-|-|-|
+|GTIOC3B|PC6 (77)|PE6 (126)|PM7 (---)|-|-|-|
+|GTADSM0|P12 (53)|PH4 (---)|PK4 (---)|PL4 (---)|PM4 (---)|-|
+|GTADSM1|P13 (52)|PH5 (---)|PK5 (---)|PL5 (---)|PM5 (---)|-|
+|GTETRGA|P15 (50)|PH0 (---)|PK0 (---)|PL0 (---)|PM0 (---)|-|
+|GTETRGB|PA6 (107)|PH1 (---)|PK1 (---)|PL1 (---)|PM1 (---)|-|
+|GTETRGC|PC4 (82)|PH2 (---)|PK2 (---)|PL2 (---)|PM2 (---)|-|
+|GTETRGD|P14 (51)|PH3 (---)|PK3 (---)|PL3 (---)|PM3 (---)|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

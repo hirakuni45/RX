@@ -29,7 +29,7 @@ namespace device {
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC0A
 			// P23 (LFQFP100:  25) (LFQFP144:  34) (LFQFP176:  42)
-			// P81 (LFQFP100: ---) (LFQFP144:  64) (LFQFP176:  80)
+			// P83 (LFQFP100: ---) (LFQFP144:  58) (LFQFP176:  74)
 			// PA5 (LFQFP100:  65) (LFQFP144:  90) (LFQFP176: 108)
 			// PD3 (LFQFP100:  83) (LFQFP144: 123) (LFQFP176: 150)
 			// PE5 (LFQFP100:  73) (LFQFP144: 106) (LFQFP176: 130)
@@ -40,9 +40,9 @@ namespace device {
 					PORT2::PMR.B3 = ena;
 					break;
 				case ORDER::SECOND:
-					PORT8::PMR.B1 = 0;
-					MPC::P81PFS.PSEL = sel;  // ok
-					PORT8::PMR.B1 = ena;
+					PORT8::PMR.B3 = 0;
+					MPC::P83PFS.PSEL = sel;
+					PORT8::PMR.B3 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTA::PMR.B5 = 0;
@@ -107,7 +107,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gpt1_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
@@ -195,7 +194,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gpt2_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -269,7 +267,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gpt3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{

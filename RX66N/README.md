@@ -221,6 +221,178 @@
 
 ## port map order / ポートマップ候補
 
+### LFQFP100
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI0 / RXD|P21 (27)|P33 (17)|-|-|
+|SCI0 / TXD|P20 (28)|P32 (18)|-|-|
+|SCI0 / SCK|P22 (26)|P34 (16)|-|-|
+|SCI1 / RXD|P15 (31)|P30 (20)|PF2 (---)|-|
+|SCI1 / TXD|P16 (30)|P26 (22)|PF0 (---)|-|
+|SCI1 / SCK|P17 (29)|P27 (21)|PF1 (---)|-|
+|SCI2 / RXD|P12 (34)|P52 (42)|-|-|
+|SCI2 / TXD|P13 (33)|P50 (44)|-|-|
+|SCI2 / SCK|P11 (---)|P51 (43)|-|-|
+|SCI3 / RXD|P16 (30)|P25 (23)|-|-|
+|SCI3 / TXD|P17 (29)|P23 (25)|-|-|
+|SCI3 / SCK|P15 (31)|P24 (24)|-|-|
+|SCI4 / RXD|PB0 (61)|-|-|-|
+|SCI4 / TXD|PB1 (59)|-|-|-|
+|SCI4 / SCK|PB3 (57)|-|-|-|
+|SCI5 / RXD|PA2 (68)|PA3 (67)|PC2 (50)|PC2 (50)|
+|SCI5 / TXD|PA4 (66)|PA4 (66)|PC3 (49)|PC3 (49)|
+|SCI5 / SCK|PA1 (69)|PA1 (69)|PC1 (51)|PC4 (48)|
+|SCI6 / RXD|P01 (---)|P33 (17)|PB0 (61)|-|
+|SCI6 / TXD|P00 (---)|P32 (18)|PB1 (59)|-|
+|SCI6 / SCK|P02 (---)|P34 (16)|PB3 (57)|-|
+|SCI7 / RXD|P57 (---)|P92 (---)|PH1 (---)|-|
+|SCI7 / TXD|P55 (39)|P90 (---)|PH2 (---)|-|
+|SCI7 / SCK|P56 (---)|P91 (---)|PH0 (---)|-|
+|SCI8 / RXD|PC6 (46)|PJ1 (---)|PK1 (---)|-|
+|SCI8 / TXD|PC7 (45)|PJ2 (---)|PK2 (---)|-|
+|SCI8 / SCK|PC5 (47)|PJ0 (---)|OK0 (---)|-|
+|SCI9 / RXD|PB6 (54)|PL1 (---)|-|-|
+|SCI9 / TXD|PB7 (53)|PL2 (---)|-|-|
+|SCI9 / SCK|PB5 (55)|PL0 (---)|-|-|
+|SCI10 / RXD|P81 (---)|P86 (---)|PC6 (46)|PM1 (---)|
+|SCI10 / TXD|P82 (---)|P87 (---)|PC7 (45)|PM2 (---)|
+|SCI10 / SCK|P80 (---)|P83 (---)|PC5 (47)|PM0 (---)|
+|SCI11 / RXD|P76 (---)|PB6 (54)|PQ1 (---)|-|
+|SCI11 / TXD|P77 (---)|PB7 (53)|PQ2 (---)|-|
+|SCI11 / SCK|P75 (---)|PB5 (55)|PQ0 (---)|-|
+|SCI12 / RXD|PE2 (76)|-|-|-|
+|SCI12 / TXD|PE1 (77)|-|-|-|
+|SCI12 / SCK|PE0 (78)|-|-|-|
+|RIIC0 / SCL|P12 (34)|-|-|-|
+|RIIC0 / SDA|P13 (33)|-|-|-|
+|RIIC1 / SCL|P21 (27)|-|-|-|
+|RIIC1 / SDA|P20 (28)|-|-|-|
+|RIIC2 / SCL|P16 (30)|-|-|-|
+|RIIC2 / SDA|P17 (29)|-|-|-|
+|CAN0 / CRX|P33 (17)|PD2 (84)|-|-|
+|CAN0 / CTX|P32 (18)|PD1 (85)|-|-|
+|CAN1 / CRX|P15 (31)|P55 (39)|P15 (31)|P55 (39)|
+|CAN1 / CTX|P14 (32)|P54 (40)|P23 (25)|P23 (25)|
+|CAN2 / CRX|P67 (---)|-|-|-|
+|CAN2 / CTX|P66 (---)|-|-|-|
+|RSPI0 / RSPCK|PA5 (65)|PC5 (47)|PH0 (---)|-|
+|RSPI0 / MOSI|PA6 (64)|PC6 (46)|PH1 (---)|-|
+|RSPI0 / MISO|PA7 (63)|PC7 (45)|PH2 (---)|-|
+|RSPI0 / SSL0|PA4 (66)|PC4 (48)|PH3 (---)|-|
+|RSPI0 / SSL1|PA0 (70)|PC0 (52)|PH4 (---)|-|
+|RSPI0 / SSL2|PA1 (69)|PC1 (51)|PH5 (---)|-|
+|RSPI0 / SSL3|PA2 (68)|PC2 (50)|PH6 (---)|-|
+|RSPI1 / RSPCK|P27 (21)|PE5 (73)|PK0 (---)|-|
+|RSPI1 / MOSI|P26 (22)|PE6 (72)|PK1 (---)|-|
+|RSPI1 / MISO|P30 (20)|PE7 (71)|PK2 (---)|-|
+|RSPI1 / SSL0|P31 (19)|PE4 (74)|PK3 (---)|-|
+|RSPI1 / SSL1|P50 (44)|PE0 (78)|PK4 (---)|-|
+|RSPI1 / SSL2|P51 (43)|PE1 (77)|PK5 (---)|-|
+|RSPI1 / SSL3|P52 (42)|PE2 (76)|PK6 (---)|-|
+|RSPI2 / RSPCK|P56 (---)|PD3 (83)|PL0 (---)|-|
+|RSPI2 / MOSI|P54 (40)|PD1 (85)|PL1 (---)|-|
+|RSPI2 / MISO|P55 (39)|PD2 (84)|PL2 (---)|-|
+|RSPI2 / SSL0|P57 (---)|PD4 (82)|PL3 (---)|-|
+|RSPI2 / SSL1|PD5 (81)|PJ0 (---)|PL4 (---)|-|
+|RSPI2 / SSL2|PD6 (80)|PJ1 (---)|PL5 (---)|-|
+|RSPI2 / SSL3|PD7 (79)|PJ2 (---)|PL6 (---)|-|
+|SSIE0 / AUDIO_CLK|P00 (---)|P22 (26)|P22 (26)|-|
+|SSIE0 / SSIBCK0|P01 (---)|P23 (25)|P23 (25)|-|
+|SSIE0 / SSILRCK0|P21 (27)|PF5 (---)|P21 (27)|-|
+|SSIE0 / SSIRXD0|P20 (28)|PJ5 (---)|P20 (28)|-|
+|SSIE0 / SSITXD0|P17 (29)|PJ3 (4)|P17 (29)|-|
+|SSIE1 / AUDIO_CLK|P00 (---)|P22 (26)|-|-|
+|SSIE1 / SSIBCK1|P02 (---)|P24 (24)|-|-|
+|SSIE1 / SSILRCK1|P05 (100)|P15 (31)|-|-|
+|SSIE1 / SSIDATA1|P03 (---)|P25 (23)|-|-|
+
+### LFQFP144
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI0 / RXD|P21 (36)|P33 (26)|-|-|
+|SCI0 / TXD|P20 (37)|P32 (27)|-|-|
+|SCI0 / SCK|P22 (35)|P34 (25)|-|-|
+|SCI1 / RXD|P15 (42)|P30 (29)|PF2 (---)|-|
+|SCI1 / TXD|P16 (40)|P26 (31)|PF0 (---)|-|
+|SCI1 / SCK|P17 (38)|P27 (30)|PF1 (---)|-|
+|SCI2 / RXD|P12 (45)|P52 (54)|-|-|
+|SCI2 / TXD|P13 (44)|P50 (56)|-|-|
+|SCI2 / SCK|P11 (---)|P51 (55)|-|-|
+|SCI3 / RXD|P16 (40)|P25 (32)|-|-|
+|SCI3 / TXD|P17 (38)|P23 (34)|-|-|
+|SCI3 / SCK|P15 (42)|P24 (33)|-|-|
+|SCI4 / RXD|PB0 (87)|-|-|-|
+|SCI4 / TXD|PB1 (84)|-|-|-|
+|SCI4 / SCK|PB3 (82)|-|-|-|
+|SCI5 / RXD|PA2 (95)|PA3 (94)|PC2 (70)|PC2 (70)|
+|SCI5 / TXD|PA4 (92)|PA4 (92)|PC3 (67)|PC3 (67)|
+|SCI5 / SCK|PA1 (96)|PA1 (96)|PC1 (73)|PC4 (66)|
+|SCI6 / RXD|P01 (7)|P33 (26)|PB0 (87)|-|
+|SCI6 / TXD|P00 (8)|P32 (27)|PB1 (84)|-|
+|SCI6 / SCK|P02 (6)|P34 (25)|PB3 (82)|-|
+|SCI7 / RXD|P57 (---)|P92 (128)|PH1 (---)|-|
+|SCI7 / TXD|P55 (51)|P90 (131)|PH2 (---)|-|
+|SCI7 / SCK|P56 (50)|P91 (129)|PH0 (---)|-|
+|SCI8 / RXD|PC6 (61)|PJ1 (---)|PK1 (---)|-|
+|SCI8 / TXD|PC7 (60)|PJ2 (---)|PK2 (---)|-|
+|SCI8 / SCK|PC5 (62)|PJ0 (---)|PK0 (---)|-|
+|SCI9 / RXD|PB6 (79)|PL1 (---)|-|-|
+|SCI9 / TXD|PB7 (78)|PL2 (---)|-|-|
+|SCI9 / SCK|PB5 (80)|PL0 (---)|-|-|
+|SCI10 / RXD|P81 (64)|P86 (41)|PC6 (61)|PM1 (---)|
+|SCI10 / TXD|P82 (63)|P87 (39)|PC7 (60)|PM2 (---)|
+|SCI10 / SCK|P80 (65)|P83 (58)|PC5 (62)|PM0 (---)|
+|SCI11 / RXD|P76 (69)|PB6 (79)|PQ1 (---)|-|
+|SCI11 / TXD|P77 (68)|PB7 (78)|PQ2 (---)|-|
+|SCI11 / SCK|P75 (71)|PB5 (80)|PQ0 (---)|-|
+|SCI12 / RXD|PE2 (109)|-|-|-|
+|SCI12 / TXD|PE1 (110)|-|-|-|
+|SCI12 / SCK|PE0 (111)|-|-|-|
+|RIIC0 / SCL|P12 (45)|-|-|-|
+|RIIC0 / SDA|P13 (44)|-|-|-|
+|RIIC1 / SCL|P21 (36)|-|-|-|
+|RIIC1 / SDA|P20 (37)|-|-|-|
+|RIIC2 / SCL|P16 (40)|-|-|-|
+|RIIC2 / SDA|P17 (38)|-|-|-|
+|CAN0 / CRX|P33 (26)|PD2 (124)|-|-|
+|CAN0 / CTX|P32 (27)|PD1 (125)|-|-|
+|CAN1 / CRX|P15 (42)|P55 (51)|P15 (42)|P55 (51)|
+|CAN1 / CTX|P14 (43)|P54 (52)|P23 (34)|P23 (34)|
+|CAN2 / CRX|P67 (98)|-|-|-|
+|CAN2 / CTX|P66 (99)|-|-|-|
+|RSPI0 / RSPCK|PA5 (90)|PC5 (62)|PH0 (---)|-|
+|RSPI0 / MOSI|PA6 (89)|PC6 (61)|PH1 (---)|-|
+|RSPI0 / MISO|PA7 (88)|PC7 (60)|PH2 (---)|-|
+|RSPI0 / SSL0|PA4 (92)|PC4 (66)|PH3 (---)|-|
+|RSPI0 / SSL1|PA0 (97)|PC0 (75)|PH4 (---)|-|
+|RSPI0 / SSL2|PA1 (96)|PC1 (73)|PH5 (---)|-|
+|RSPI0 / SSL3|PA2 (95)|PC2 (70)|PH6 (---)|-|
+|RSPI1 / RSPCK|P27 (30)|PE5 (106)|PK0 (---)|-|
+|RSPI1 / MOSI|P26 (31)|PE6 (102)|PK1 (---)|-|
+|RSPI1 / MISO|P30 (29)|PE7 (101)|PK2 (---)|-|
+|RSPI1 / SSL0|P31 (28)|PE4 (107)|PK3 (---)|-|
+|RSPI1 / SSL1|P50 (56)|PE0 (111)|PK4 (---)|-|
+|RSPI1 / SSL2|P51 (55)|PE1 (110)|PK5 (---)|-|
+|RSPI1 / SSL3|P52 (54)|PE2 (109)|PK6 (---)|-|
+|RSPI2 / RSPCK|P56 (50)|PD3 (123)|PL0 (---)|-|
+|RSPI2 / MOSI|P54 (52)|PD1 (125)|PL1 (---)|-|
+|RSPI2 / MISO|P55 (51)|PD2 (124)|PL2 (---)|-|
+|RSPI2 / SSL0|P57 (---)|PD4 (122)|PL3 (---)|-|
+|RSPI2 / SSL1|PD5 (121)|PJ0 (---)|PL4 (---)|-|
+|RSPI2 / SSL2|PD6 (120)|PJ1 (---)|PL5 (---)|-|
+|RSPI2 / SSL3|PD7 (119)|PJ2 (---)|PL6 (---)|-|
+|SSIE0 / AUDIO_CLK|P00 (8)|P22 (35)|P22 (35)|-|
+|SSIE0 / SSIBCK0|P01 (7)|P23 (34)|P23 (34)|-|
+|SSIE0 / SSILRCK0|P21 (36)|PF5 (9)|P21 (36)|-|
+|SSIE0 / SSIRXD0|P20 (37)|PJ5 (11)|P20 (37)|-|
+|SSIE0 / SSITXD0|P17 (38)|PJ3 (13)|P17 (38)|-|
+|SSIE1 / AUDIO_CLK|P00 (8)|P22 (35)|-|-|
+|SSIE1 / SSIBCK1|P02 (6)|P24 (33)|-|-|
+|SSIE1 / SSILRCK1|P05 (2)|P15 (42)|-|-|
+|SSIE1 / SSIDATA1|P03 (4)|P25 (32)|-|-|
+
 ### LFQFP176
 
 |Peripheral|FIRST|SECOND|THIRD|FOURTH|
@@ -297,6 +469,67 @@
 |RSPI2 / SSL1|PD5 (147)|PJ0 (60)|PL4 (---)|-|
 |RSPI2 / SSL2|PD6 (145)|PJ1 (59)|PL5 (---)|-|
 |RSPI2 / SSL3|PD7 (143)|PJ2 (58)|PL6 (---)|-|
+
+---
+
+## port map order (GPTW) / ポートマップ候補 (GPTW)
+
+### LFQGFP100
+
+|GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|
+|---|---|---|---|---|---|---|
+|GTIOC0A|P23 (25)|P83 (---)|PA5 (65)|PD3 (83)|PE5 (73)|PH6 (---)|
+|GTIOC0B|P17 (29)|P81 (---)|PA0 (70)|PD2 (84)|PE2 (76)|PH7 (---)|
+|GTIOC1A|P22 (26)|PA2 (68)|PC5 (47)|PD1 (85)|PE4 (74)|PK6 (---)|
+|GTIOC1B|P67 (---)|P87 (---)|PC3 (49)|PD0 (86)|PE1 (77)|PK7 (---)|
+|GTIOC2A|P21 (27)|P82 (---)|PA1 (69)|PE3 (75)|PL6 (---)|-|
+|GTIOC2B|P66 (---)|P86 (---)|PC2 (50)|PE0 (78)|PL7 (---)|-|
+|GTIOC3A|PC7 (45)|PE7 (71)|PM6 (---)|-|-|-|
+|GTIOC3B|PC6 (46)|PE6 (72)|PM7 (---)|-|-|-|
+|GTADSM0|P12 (34)|PH4 (---)|PK4 (---)|PL4 (---)|PM4 (---)|-|
+|GTADSM1|P13 (33)|PH5 (---)|PK5 (---)|PL5 (---)|PM5 (---)|-|
+|GTETRGA|P15 (31)|PH0 (---)|PK0 (---)|PL0 (---)|PM0 (---)|-|
+|GTETRGB|PA6 (64)|PH1 (---)|PK1 (---)|PL1 (---)|PM1 (---)|-|
+|GTETRGC|PC4 (48)|PH2 (---)|PK2 (---)|PL2 (---)|PM2 (---)|-|
+|GTETRGD|P14 (32)|PH3 (---)|PK3 (---)|PL3 (---)|PM3 (---)|-|
+
+### LFQGFP144
+
+|GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|
+|---|---|---|---|---|---|---|
+|GTIOC0A|P23 (34)|P83 (58)|PA5 (90)|PD3 (123)|PE5 (106)|PH6 (---)|
+|GTIOC0B|P17 (38)|P81 (64)|PA0 (97)|PD2 (124)|PE2 (109)|PH7 (---)|
+|GTIOC1A|P22 (35)|PA2 (95)|PC5 (62)|PD1 (125)|PE4 (107)|PK6 (---)|
+|GTIOC1B|P67 (98)|P87 (39)|PC3 (67)|PD0 (126)|PE1 (110)|PK7 (---)|
+|GTIOC2A|P21 (36)|P82 (63)|PA1 (96)|PE3 (108)|PL6 (---)|-|
+|GTIOC2B|P66 (99)|P86 (41)|PC2 (70)|PE0 (111)|PL7 (---)|-|
+|GTIOC3A|PC7 (60)|PE7 (101)|PM6 (---)|-|-|-|
+|GTIOC3B|PC6 (61)|PE6 (102)|PM7 (---)|-|-|-|
+|GTADSM0|P12 (45)|PH4 (---)|PK4 (---)|PL4 (---)|PM4 (---)|-|
+|GTADSM1|P13 (44)|PH5 (---)|PK5 (---)|PL5 (---)|PM5 (---)|-|
+|GTETRGA|P15 (42)|PH0 (---)|PK0 (---)|PL0 (---)|PM0 (---)|-|
+|GTETRGB|PA6 (89)|PH1 (---)|PK1 (---)|PL1 (---)|PM1 (---)|-|
+|GTETRGC|PC4 (66)|PH2 (---)|PK2 (---)|PL2 (---)|PM2 (---)|-|
+|GTETRGD|P14 (43)|PH3 (---)|PK3 (---)|PL3 (---)|PM3 (---)|-|
+
+### LFQGFP176
+
+|GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|
+|---|---|---|---|---|---|---|
+|GTIOC0A|P23 (42)|P83 (74)|PA5 (108)|PD3 (150)|PE5 (130)|PH6 (---)|
+|GTIOC0B|P17 (46)|P81 (80)|PA0 (118)|PD2 (154)|PE2 (133)|PH7 (---)|
+|GTIOC1A|P22 (43)|PA2 (112)|PC5 (78)|PD1 (156)|PE4 (131)|PK6 (---)|
+|GTIOC1B|P67 (120)|P87 (47)|PC3 (83)|PD0 (158)|PE1 (134)|PK7 (---)|
+|GTIOC2A|P21 (44)|P82 (79)|PA1 (114)|PE3 (132)|PL6 (---)|-|
+|GTIOC2B|P66 (122)|P86 (49)|PC2 (86)|PE0 (135)|PL7 (---)|-|
+|GTIOC3A|PC7 (76)|PE7 (125)|PM6 (---)|-|-|-|
+|GTIOC3B|PC6 (77)|PE6 (126)|PM7 (---)|-|-|-|
+|GTADSM0|P12 (53)|PH4 (---)|PK4 (---)|PL4 (---)|PM4 (---)|-|
+|GTADSM1|P13 (52)|PH5 (---)|PK5 (---)|PL5 (---)|PM5 (---)|-|
+|GTETRGA|P15 (50)|PH0 (---)|PK0 (---)|PL0 (---)|PM0 (---)|-|
+|GTETRGB|PA6 (107)|PH1 (---)|PK1 (---)|PL1 (---)|PM1 (---)|-|
+|GTETRGC|PC4 (82)|PH2 (---)|PK2 (---)|PL2 (---)|PM2 (---)|-|
+|GTETRGD|P14 (51)|PH3 (---)|PK3 (---)|PL3 (---)|PM3 (---)|-|
 
 ---
 

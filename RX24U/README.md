@@ -220,6 +220,51 @@
 
 ---
 
+## port map order (GPT) / ポートマップ候補 (GPT)
+
+### LFQGFP100
+
+|GPT|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|GTIOC0A|P12 (---)|P71 (56)|PD7 (18)|
+|GTIOC0B|P15 (---)|P74 (53)|PD1 (24)|
+|GTIOC1A|P13 (---)|P72 (55)|PD0 (25)|
+|GTIOC1B|P16 (---)|P75 (52)|PB7 (26)|
+|GTIOC2A|P14 (---)|P73 (54)|PB6 (27)|
+|GTIOC2B|P17 (---)|P76 (51)|PB5 (28)|
+|GTIOC3A|PD7 (18)|-|-|
+|GTIOC3B|PD6 (19)|-|-|
+|GTECLKA|PD5 (20)|-|-|
+|GTECLKB|PD4 (21)|-|-|
+|GTECLKC|PD3 (22)|-|-|
+|GTECLKD|PB4 (30)|-|-|
+|GTETRG|PB4 (30)|PG2 (---)|-|
+|GTADSM0|P35 (---)|PA3 (38)|PC2 (---)|
+|GTADSM1|P34 (---)|PA2 (39)|PC1 (---)|
+
+### LFQFP144
+
+|GPT|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|GTIOC0A|P12 (3)|P71 (78)|PD7 (25)|
+|GTIOC0B|P15 (144)|P74 (75)|PD1 (31)|
+|GTIOC1A|P13 (2)|P72 (76)|PD0 (32)|
+|GTIOC1B|P16 (143)|P75 (74)|PB7 (37)|
+|GTIOC2A|P14 (1)|P73 (76)|PB6 (38)|
+|GTIOC2B|P17 (142)|P76 (73)|PB5 (39)|
+|GTIOC3A|PD7 (25)|-|-|
+|GTIOC3B|PD6 (26)|-|-|
+|GTECLKA|PD5 (27)|-|-|
+|GTECLKB|PD4 (28)|-|-|
+|GTECLKC|PD3 (29)|-|-|
+|GTECLKD|PB4 (41)|-|-|
+|GTETRG|PB4 (41)|PG2 (80)|-|
+|GTADSM0|P35 (59)|PA3 (55)|PC2 (44)|
+|GTADSM1|P34 (60)|PA2 (56)|PC1 (45)|
+
+---
+
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
