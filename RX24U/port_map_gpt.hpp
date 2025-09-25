@@ -27,7 +27,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC0A
+			case CHANNEL::A:  // GTIOC0A:
 			// P12 (LFQFP100: ---) (LFQFP144:   3)
 			// P71 (LFQFP100:  56) (LFQFP144:  78)
 			// PD7 (LFQFP100:  18) (LFQFP144:  25)
@@ -52,7 +52,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC0B
+			case CHANNEL::B:  // GTIOC0B:
 			// P15 (LFQFP100: ---) (LFQFP144: 144)
 			// P74 (LFQFP100:  53) (LFQFP144:  75)
 			// PD1 (LFQFP100:  24) (LFQFP144:  31)

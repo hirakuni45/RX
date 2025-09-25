@@ -32,259 +32,18 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_gptw : public port_map_order {
 
-		static bool dsm_0_(ORDER odr, bool ena) noexcept
-		{
-			/// GTADSM0: (output)
-			// P12 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PH4 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PK4 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PL4 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PM4 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			switch(odr) {
-			case ORDER::FIRST:
-				PORT1::PMR.B2 = 0;
-				MPC::P12PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORT1::PMR.B2 = ena;
-				break;
-			case ORDER::SECOND:
-				PORTH::PMR.B4 = 0;
-				MPC::PH4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTH::PMR.B4 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTK::PMR.B4 = 0;
-				MPC::PK4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTK::PMR.B4 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTL::PMR.B4 = 0;
-				MPC::PL4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTL::PMR.B4 = ena;
-				break;
-			case ORDER::FIFTH:
-				PORTM::PMR.B4 = 0;
-				MPC::PM4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTM::PMR.B4 = ena;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-
-		static bool dsm_1_(ORDER odr, bool ena) noexcept
-		{
-			// GTADSM1:
-			// P13 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PH5 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PK5 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PL5 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PM5 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			switch(odr) {
-			case ORDER::FIRST:
-				PORT1::PMR.B3 = 0;
-				MPC::P13PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORT1::PMR.B3 = ena;
-				break;
-			case ORDER::SECOND:
-				PORTH::PMR.B5 = 0;
-				MPC::PH5PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTH::PMR.B5 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTK::PMR.B5 = 0;
-				MPC::PK5PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTK::PMR.B5 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTL::PMR.B5 = 0;
-				MPC::PL5PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTL::PMR.B5 = ena;
-				break;
-			case ORDER::FIFTH:
-				PORTM::PMR.B5 = 0;
-				MPC::PM5PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTM::PMR.B5 = ena;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-
-		static bool trg_a_(ORDER odr, bool ena) noexcept
-		{
-			// GTETRGA:
-			// P15 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PH0 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PK0 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PL0 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PM0 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			switch(odr) {
-			case ORDER::FIRST:
-				PORT1::PMR.B5 = 0;
-				MPC::P15PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORT1::PMR.B5 = ena;
-				break;
-			case ORDER::SECOND:
-				PORTH::PMR.B0 = 0;
-				MPC::PH0PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTH::PMR.B0 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTK::PMR.B0 = 0;
-				MPC::PK0PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTK::PMR.B0 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTL::PMR.B0 = 0;
-				MPC::PL0PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTL::PMR.B0 = ena;
-				break;
-			case ORDER::FIFTH:
-				PORTM::PMR.B0 = 0;
-				MPC::PM0PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTM::PMR.B0 = ena;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-
-		static bool trg_b_(ORDER odr, bool ena) noexcept
-		{
-			// GTETRGB:
-			// PA6 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PH1 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PK1 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PL1 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PM1 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			switch(odr) {
-			case ORDER::FIRST:
-				PORTA::PMR.B6 = 0;
-				MPC::PA6PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTA::PMR.B6 = ena;
-				break;
-			case ORDER::SECOND:
-				PORTH::PMR.B1 = 0;
-				MPC::PH1PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTH::PMR.B1 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTK::PMR.B1 = 0;
-				MPC::PK1PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTK::PMR.B1 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTL::PMR.B1 = 0;
-				MPC::PL1PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTL::PMR.B1 = ena;
-				break;
-			case ORDER::FIFTH:
-				PORTM::PMR.B1 = 0;
-				MPC::PM1PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTM::PMR.B1 = ena;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-
-		static bool trg_c_(ORDER odr, bool ena) noexcept
-		{
-			// GTETRGC:
-			// PC4 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PH2 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PK2 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PL2 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			// PM2 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
-			switch(odr) {
-			case ORDER::FIRST:
-				PORTC::PMR.B4 = 0;
-				MPC::PC4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTC::PMR.B4 = ena;
-				break;
-			case ORDER::SECOND:
-				PORTH::PMR.B2 = 0;
-				MPC::PH2PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTH::PMR.B2 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTK::PMR.B2 = 0;
-				MPC::PK2PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTK::PMR.B2 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTL::PMR.B2 = 0;
-				MPC::PL2PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTL::PMR.B2 = ena;
-				break;
-			case ORDER::FIFTH:
-				PORTM::PMR.B2 = 0;
-				MPC::PM2PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTM::PMR.B2 = ena;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-
-		static bool trg_d_(ORDER odr, bool ena) noexcept
-		{
-			// GTETRGD:
-			// P14
-			// PH3
-			// PK3
-			// PL3
-			// PM3
-			switch(odr) {
-			case ORDER::FIRST:
-				PORT1::PMR.B4 = 0;
-				MPC::P14PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORT1::PMR.B4 = ena;
-				break;
-			case ORDER::SECOND:
-				PORTH::PMR.B3 = 0;
-				MPC::PH3PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTH::PMR.B3 = ena;
-				break;
-			case ORDER::THIRD:
-				PORTK::PMR.B3 = 0;
-				MPC::PK3PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTK::PMR.B3 = ena;
-				break;
-			case ORDER::FOURTH:
-				PORTL::PMR.B3 = 0;
-				MPC::PL3PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTL::PMR.B3 = ena;
-				break;
-			case ORDER::FIFTH:
-				PORTM::PMR.B3 = 0;
-				MPC::PM3PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
-				PORTM::PMR.B3 = ena;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
-
 		static bool gptw0_(CHANNEL ch, bool ena, ORDER opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1110 : 0;
 			switch(ch) {
-			/// GTIOC0A (入出力)
-			///       224 176 144 100
-			/// P23    ○   ○   ○   ○
-			/// P83    ○   ○   ○   ×
-			/// PA5    ○   ○   ○   ○
-			/// PD3    ○   ○   ○   ○
-			/// PE5    ○   ○   ○   ○
-			/// PH6    ○   ×   ×   ×
+			// GTIOC0A: (I/O)
+			// P23 (LFQFP100:  25) (LFQFP144:  34) (LFQFP176:  42)
+			// P83 (LFQFP100: ---) (LFQFP144:  58) (LFQFP176:  74)
+			// PA5 (LFQFP100:  65) (LFQFP144:  90) (LFQFP176: 108)
+			// PD3 (LFQFP100:  83) (LFQFP144: 123) (LFQFP176: 150)
+			// PE5 (LFQFP100:  73) (LFQFP144: 106) (LFQFP176: 130)
+			// PH6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case CHANNEL::A:
 				switch(opt) {
 				case ORDER::FIRST:
@@ -322,14 +81,13 @@ namespace device {
 					break;
 				}
 				break;
-			/// GTIOC0B (入出力)
-			///       224 176 144 100
-			/// P17    ○   ○   ○   ○
-			/// P81    ○   ○   ○   ×
-			/// PA0    ○   ○   ○   ○
-			/// PD2    ○   ○   ○   ○
-			/// PE2    ○   ○   ○   ○
-			/// PH7    ○   ×   ×   ×
+			// GTIOC0B: (I/O)
+			// P17 (LFQFP100:  29) (LFQFP144:  38) (LFQFP176:  46)
+			// P81 (LFQFP100: ---) (LFQFP144:  64) (LFQFP176:  80)
+			// PA0 (LFQFP100:  70) (LFQFP144:  97) (LFQFP176: 118)
+			// PD2 (LFQFP100:  84) (LFQFP144: 124) (LFQFP176: 154)
+			// PE2 (LFQFP100:  76) (LFQFP144: 109) (LFQFP176: 133)
+			// PH7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case CHANNEL::B:
 				switch(opt) {
 				case ORDER::FIRST:
@@ -379,14 +137,13 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1110 : 0;
 			switch(ch) {
-			/// GTIOC1A (入出力)
-			///       224 176 144 100
-			/// P22    ○   ○   ○   ○
-			/// PA2    ○   ○   ○   ○
-			/// PC5    ○   ○   ○   ○
-			/// PD1    ○   ○   ○   ○
-			/// PE4    ○   ○   ○   ○
-			/// PK6    ○   ×   ×   ×
+			// GTIOC1A: (I/O)
+			// P22 (LFQFP100:  26) (LFQFP144:  35) (LFQFP176:  43)
+			// PA2 (LFQFP100:  68) (LFQFP144:  95) (LFQFP176: 112)
+			// PC5 (LFQFP100:  47) (LFQFP144:  62) (LFQFP176:  78)
+			// PD1 (LFQFP100:  85) (LFQFP144: 125) (LFQFP176: 156)
+			// PE4 (LFQFP100:  74) (LFQFP144: 107) (LFQFP176: 131)
+			// PK6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case CHANNEL::A:
 				switch(opt) {
 				case ORDER::FIRST:
@@ -424,14 +181,13 @@ namespace device {
 					break;
 				}
 				break;
-			/// GTIOC1B (入出力)
-			///       224 176 144 100
-			/// P67    ○   ○   ○   ×
-			/// P87    ○   ○   ○   ×
-			/// PC3    ○   ○   ○   ○
-			/// PD0    ○   ○   ○   ○
-			/// PE1    ○   ○   ○   ○
-			/// PK7    ○   ×   ×   ×
+			// GTIOC1B: (I/O)
+			// P67 (LFQFP100: ---) (LFQFP144:  98) (LFQFP176: 120)
+			// P87 (LFQFP100: ---) (LFQFP144:  39) (LFQFP176:  47)
+			// PC3 (LFQFP100:  49) (LFQFP144:  67) (LFQFP176:  83)
+			// PD0 (LFQFP100:  86) (LFQFP144: 126) (LFQFP176: 158)
+			// PE1 (LFQFP100:  77) (LFQFP144: 110) (LFQFP176: 134)
+			// PK7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case CHANNEL::B:
 				switch(opt) {
 				case ORDER::FIRST:
@@ -481,13 +237,12 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1110 : 0;
 			switch(ch) {
-			/// GTIOC2A (入出力)
-			///       224 176 144 100
-			/// P21    ○   ○   ○   ○
-			/// P82    ○   ○   ○   ×
-			/// PA1    ○   ○   ○   ○
-			/// PE3    ○   ○   ○   ○
-			/// PL6    ○   ×   ×   ×
+			// GTIOC2A (I/O)
+			// P21 (LFQFP100:  27) (LFQFP144:  36) (LFQFP176:  44)
+			// P82 (LFQFP100: ---) (LFQFP144:  63) (LFQFP176:  79)
+			// PA1 (LFQFP100:  69) (LFQFP144:  96) (LFQFP176: 114)
+			// PE3 (LFQFP100:  75) (LFQFP144: 108) (LFQFP176: 132)
+			// PL6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case CHANNEL::A:
 				switch(opt) {
 				case ORDER::FIRST:
@@ -520,13 +275,12 @@ namespace device {
 					break;
 				}
 				break;
-			/// GTIOC2B (入出力)
-			///       224 176 144 100
-			/// P66    ○   ○   ○   ×
-			/// P86    ○   ○   ○   ×
-			/// PC2    ○   ○   ○   ○
-			/// PE0    ○   ○   ○   ○
-			/// PL7    ○   ×   ×   ×
+			// GTIOC2B (I/O)
+			// P66 (LFQFP100: ---) (LFQFP144:  99) (LFQFP176: 122)
+			// P86 (LFQFP100: ---) (LFQFP144:  41) (LFQFP176:  49)
+			// PC2 (LFQFP100:  50) (LFQFP144:  70) (LFQFP176:  86)
+			// PE0 (LFQFP100:  78) (LFQFP144: 111) (LFQFP176: 135)
+			// PL7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case CHANNEL::B:
 				switch(opt) {
 				case ORDER::FIRST:
@@ -571,11 +325,10 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1110 : 0;
 			switch(ch) {
-			/// GTIOC3A (入出力)
-			///       224 176 144 100
-			/// PC7    ○   ○   ○   ○
-			/// PE7    ○   ○   ○   ○
-			/// PM6    ○   ×   ×   ×
+			// GTIOC3A (I/O)
+			// PC7 (LFQFP100:  45) (LFQFP144:  60) (LFQFP176:  76)
+			// PE7 (LFQFP100:  71) (LFQFP144: 101) (LFQFP176: 125)
+			// PM6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case CHANNEL::A:
 				switch(opt) {
 				case ORDER::FIRST:
@@ -598,11 +351,10 @@ namespace device {
 					break;
 				}
 				break;
-			/// GTIOC3B (入出力)
-			///       224 176 144 100
-			/// PC6    ○   ○   ○   ○
-			/// PE6    ○   ○   ○   ○
-			/// PM7    ○   ×   ×   ×
+			// GTIOC3B (I/O)
+			// PC6 (LFQFP100:  46) (LFQFP144:  61) (LFQFP176:  77)
+			// PE6 (LFQFP100:  72) (LFQFP144: 102) (LFQFP176: 126)
+			// PM7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case CHANNEL::B:
 				switch(opt) {
 				case ORDER::FIRST:
@@ -630,6 +382,246 @@ namespace device {
 				break;
 			}
 			return ret;
+		}
+
+		static bool dsm_0_(ORDER odr, bool ena) noexcept
+		{
+			/// GTADSM0: (output)
+			// P12 (LFQFP100:  34) (LFQFP144:  45) (LFQFP176:  53)
+			// PH4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PK4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PL4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PM4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B2 = 0;
+				MPC::P12PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORT1::PMR.B2 = ena;
+				break;
+			case ORDER::SECOND:
+				PORTH::PMR.B4 = 0;
+				MPC::PH4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTH::PMR.B4 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTK::PMR.B4 = 0;
+				MPC::PK4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTK::PMR.B4 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTL::PMR.B4 = 0;
+				MPC::PL4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTL::PMR.B4 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTM::PMR.B4 = 0;
+				MPC::PM4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTM::PMR.B4 = ena;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool dsm_1_(ORDER odr, bool ena) noexcept
+		{
+			// GTADSM1:
+			// P13 (LFQFP100:  33) (LFQFP144:  44) (LFQFP176:  52)
+			// PH5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PK5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PL5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PM5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B3 = 0;
+				MPC::P13PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORT1::PMR.B3 = ena;
+				break;
+			case ORDER::SECOND:
+				PORTH::PMR.B5 = 0;
+				MPC::PH5PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTH::PMR.B5 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTK::PMR.B5 = 0;
+				MPC::PK5PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTK::PMR.B5 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTL::PMR.B5 = 0;
+				MPC::PL5PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTL::PMR.B5 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTM::PMR.B5 = 0;
+				MPC::PM5PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTM::PMR.B5 = ena;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool trg_a_(ORDER odr, bool ena) noexcept
+		{
+			// GTETRGA:
+			// P15 (LFQFP100:  31) (LFQFP144:  42) (LFQFP176:  50)
+			// PH0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PK0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PL0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PM0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B5 = 0;
+				MPC::P15PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORT1::PMR.B5 = ena;
+				break;
+			case ORDER::SECOND:
+				PORTH::PMR.B0 = 0;
+				MPC::PH0PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTH::PMR.B0 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTK::PMR.B0 = 0;
+				MPC::PK0PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTK::PMR.B0 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTL::PMR.B0 = 0;
+				MPC::PL0PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTL::PMR.B0 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTM::PMR.B0 = 0;
+				MPC::PM0PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTM::PMR.B0 = ena;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool trg_b_(ORDER odr, bool ena) noexcept
+		{
+			// GTETRGB:
+			// PA6 (LFQFP100:  64) (LFQFP144:  89) (LFQFP176: 107)
+			// PH1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PK1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PL1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PM1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORTA::PMR.B6 = 0;
+				MPC::PA6PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTA::PMR.B6 = ena;
+				break;
+			case ORDER::SECOND:
+				PORTH::PMR.B1 = 0;
+				MPC::PH1PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTH::PMR.B1 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTK::PMR.B1 = 0;
+				MPC::PK1PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTK::PMR.B1 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTL::PMR.B1 = 0;
+				MPC::PL1PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTL::PMR.B1 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTM::PMR.B1 = 0;
+				MPC::PM1PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTM::PMR.B1 = ena;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool trg_c_(ORDER odr, bool ena) noexcept
+		{
+			// GTETRGC:
+			// PC4 (LFQFP100:  48) (LFQFP144:  66) (LFQFP176:  82)
+			// PH2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PK2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PL2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PM2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTC::PMR.B4 = ena;
+				break;
+			case ORDER::SECOND:
+				PORTH::PMR.B2 = 0;
+				MPC::PH2PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTH::PMR.B2 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTK::PMR.B2 = 0;
+				MPC::PK2PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTK::PMR.B2 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTL::PMR.B2 = 0;
+				MPC::PL2PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTL::PMR.B2 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTM::PMR.B2 = 0;
+				MPC::PM2PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTM::PMR.B2 = ena;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		static bool trg_d_(ORDER odr, bool ena) noexcept
+		{
+			// GTETRGD:
+			// P14 (LFQFP100:  32) (LFQFP144:  43) (LFQFP176:  51)
+			// PH3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PK3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PL3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PM3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B4 = 0;
+				MPC::P14PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORT1::PMR.B4 = ena;
+				break;
+			case ORDER::SECOND:
+				PORTH::PMR.B3 = 0;
+				MPC::PH3PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTH::PMR.B3 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTK::PMR.B3 = 0;
+				MPC::PK3PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTK::PMR.B3 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTL::PMR.B3 = 0;
+				MPC::PL3PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTL::PMR.B3 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTM::PMR.B3 = 0;
+				MPC::PM3PFS.PSEL = ena ? 0b01'1110 : 0;  // ok
+				PORTM::PMR.B3 = ena;
+				break;
+			default:
+				return false;
+			}
+			return true;
 		}
 
 	public:

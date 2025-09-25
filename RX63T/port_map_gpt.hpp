@@ -25,9 +25,9 @@ namespace device {
 		static bool gpt0_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b00110 : 0;
+			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC0A
+			case CHANNEL::A:  // GTIOC0A:
 			// P71 (LFQFP64: 38)
 			// PD7 (LFQFP64: 12)
 				switch(odr) {
@@ -46,7 +46,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC0B
+			case CHANNEL::B:  // GTIOC0B:
 			// P74 (LFQFP64: 35)
 			// PD6 (LFQFP64: 13)
 				switch(odr) {
@@ -76,9 +76,9 @@ namespace device {
 		static bool gpt1_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b00110 : 0;
+			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC1A
+			case CHANNEL::A:  // GTIOC1A:
 			// P72 (LFQFP64: 37)
 			// PD5 (LFQFP64: 14)
 				switch(odr) {
@@ -97,7 +97,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC1B
+			case CHANNEL::B:  // GTIOC1B:
 			// P75 (LFQFP64: 34)
 			// PD4 (LFQFP64: 15)
 				switch(odr) {
@@ -127,9 +127,9 @@ namespace device {
 		static bool gpt2_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b00110 : 0;
+			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC2A
+			case CHANNEL::A:  // GTIOC2A:
 			// P73 (LFQFP64: 36)
 			// PD3 (LFQFP64: 16)
 				switch(odr) {
@@ -148,7 +148,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC2B
+			case CHANNEL::B:  // GTIOC2B:
 			// P76 (LFQFP64: 33)
 			// PB6 (LFQFP64: 18)
 			// PB7 (LFQFP64: 17)
@@ -190,9 +190,9 @@ namespace device {
 		static bool gpt3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b00110 : 0;
+			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC3A
+			case CHANNEL::A:  // GTIOC3A:
 			// P00 (LFQFP64:  2)
 			// PD1 (LFQFP64: --)
 				switch(odr) {
@@ -211,7 +211,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC3B
+			case CHANNEL::B:  // GTIOC3B:
 			// P01 (LFQFP64:  4)
 			// PD0 (LFQFP64: --)
 				switch(odr) {
@@ -241,9 +241,9 @@ namespace device {
 		static bool gpt4_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b00110 : 0;
+			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC4A
+			case CHANNEL::A:  // GTIOC4A:
 			// P95 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -256,7 +256,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC4B
+			case CHANNEL::B:  // GTIOC4B:
 			// P92 (LFQFP64: 31)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -280,9 +280,9 @@ namespace device {
 		static bool gpt5_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b00110 : 0;
+			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC5A
+			case CHANNEL::A:  // GTIOC5A:
 			// P94 (LFQFP64: 29)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -295,7 +295,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC5B
+			case CHANNEL::B:  // GTIOC5B:
 			// P91 (LFQFP64: 32)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -319,9 +319,9 @@ namespace device {
 		static bool gpt6_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b00110 : 0;
+			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC6A
+			case CHANNEL::A:  // GTIOC6A:
 			// P93 (LFQFP64: 30)
 			// PG3 (LFQFP64: --)
 				switch(odr) {
@@ -340,7 +340,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC6B
+			case CHANNEL::B:  // GTIOC6B:
 			// P90 (LFQFP64: --)
 			// PG4 (LFQFP64: --)
 				switch(odr) {
@@ -370,7 +370,7 @@ namespace device {
 		static bool gpt7_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
-			uint8_t sel = ena ? 0b00110 : 0;
+			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC7A
 			// PG0 (LFQFP64: --)
@@ -473,13 +473,15 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn_clock(CHANNEL clk, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
+			if(odr == ORDER::BYPASS) return true;
+
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = true;
 			switch(clk) {
-			case CHANNEL::TRG:  // GTETRG
-			case CHANNEL::TRG0:  // GTETRG0
+			case CHANNEL::TRG:  // GTETRG:
+			case CHANNEL::TRG0:  // GTETRG0:
 				// PB4 (LFQFP64: 21)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -491,7 +493,7 @@ namespace device {
 					ret = false;
 					break;
 				}
-			case CHANNEL::DSM0:  // GTETRG1
+			case CHANNEL::TRG1:  // GTETRG1:
 				// P34 (LFQFP64: --)
 				switch(odr) {
 				case ORDER::FIRST:

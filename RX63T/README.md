@@ -222,6 +222,34 @@
 
 ---
 
+## port map order (GPT) / ポートマップ候補 (GPT)
+
+### LFQFP64
+
+|GPT|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|GTIOC0A|P71 (38)|PD7 (12)|-|-|
+|GTIOC0B|P74 (35)|PD6 (13)|-|-|
+|GTIOC1A|P72 (37)|PD5 (14)|-|-|
+|GTIOC1B|P75 (34)|PD4 (15)|-|-|
+|GTIOC2A|P73 (36)|PD3 (16)|-|-|
+|GTIOC2B|P76 (33)|PB6 (18)|PB7 (17)|PD2 (--)|
+|GTIOC3A|P00 (2)|PD1 (--)|-|-|
+|GTIOC3B|P01 (4)|PD0 (--)|-|-|
+|GTIOC4A|P95 (--)|-|-|-|
+|GTIOC4B|P92 (31)|-|-|-|
+|GTIOC5A|P94 (29)|-|-|-|
+|GTIOC5B|P91 (32)|-|-|-|
+|GTIOC6A|P93 (30)|PG3 (--)|-|-|
+|GTIOC6B|P90 (--)|PG4 (--)|-|-|
+|GTIOC7A|PG0 (--)|-|-|-|
+|GTIOC7B|PG1 (--)|-|-|-|
+|GTETRG|PB4 (21)|-|-|-|
+|GTETRG0|PB4 (21)|-|-|-|
+|GTETRG1|P34 (--)|-|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

@@ -443,6 +443,52 @@
 
 ---
 
+## port map order (GPT) / ポートマップ候補 (GPT)
+
+### LFQGFP100
+
+|GPT|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|GTIOC0A|P23 (25)|P83 (---)|PA5 (65)|PD3 (83)|PE5 (73)|
+|GTIOC0B|P17 (29)|P81 (---)|PA0 (70)|PD2 (84)|PE2 (76)|
+|GTIOC1A|P22 (26)|PC5 (47)|PA2 (68)|PE4 (74)|PD1 (85)|
+|GTIOC1B|P67 (---)|P87 (---)|PC3 (49)|PD0 (86)|PE1 (77)|
+|GTIOC2A|P21 (27)|P82 (---)|PA1 (69)|PE3 (75)|-|
+|GTIOC2B|P66 (---)|P86 (---)|PC2 (50)|PE0 (78)|-|
+|GTIOC3A|PC7 (45)|PE7 (71)|-|-|-|
+|GTIOC3B|PC6 (46)|PE6 (72)|-|-|-|
+|GTETRG|P15 (31)|PA6 (64)|PC4 (48)|-|-|
+
+### LFQGFP144
+
+|GPT|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|GTIOC0A|P23 (34)|P83 (58)|PA5 (90)|PD3 (123)|PE5 (106)|
+|GTIOC0B|P17 (38)|P81 (64)|PA0 (97)|PD2 (124)|PE2 (109)|
+|GTIOC1A|P22 (35)|PC5 (62)|PA2 (95)|PE4 (107)|PD1 (125)|
+|GTIOC1B|P67 (98)|P87 (39)|PC3 (67)|PD0 (126)|PE1 (110)|
+|GTIOC2A|P21 (36)|P82 (63)|PA1 (96)|PE3 (108)|-|
+|GTIOC2B|P66 (99)|P86 (41)|PC2 (70)|PE0 (111)|-|
+|GTIOC3A|PC7 (60)|PE7 (101)|-|-|-|
+|GTIOC3B|PC6 (61)|PE6 (102)|-|-|-|
+|GTETRG|P15 (42)|PA6 (89)|PC4 (66)|-|-|
+
+### LFQGFP176
+
+|GPT|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|GTIOC0A|P23 (42)|P83 (74)|PA5 (108)|PD3 (150)|PE5 (130)|
+|GTIOC0B|P17 (46)|P81 (80)|PA0 (118)|PD2 (154)|PE2 (133)|
+|GTIOC1A|P22 (43)|PC5 (78)|PA2 (112)|PE4 (131)|PD1 (156)|
+|GTIOC1B|P67 (120)|P87 (47)|PC3 (83)|PD0 (158)|PE1 (134)|
+|GTIOC2A|P21 (44)|P82 (79)|PA1 (114)|PE3 (132)|-|
+|GTIOC2B|P66 (122)|P86 (49)|PC2 (86)|PE0 (135)|-|
+|GTIOC3A|PC7 (76)|PE7 (125)|-|-|-|
+|GTIOC3B|PC6 (77)|PE6 (126)|-|-|-|
+|GTETRG|P15 (50)|PA6 (107)|PC4 (82)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
