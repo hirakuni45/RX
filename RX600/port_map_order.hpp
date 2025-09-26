@@ -140,6 +140,8 @@ namespace device {
 			CLKF,		///< MTCLKF (MTU2, TPU 系)
 			CLKG,		///< MTCLKG (MTU2, TPU 系)
 			CLKH,		///< MTCLKH (MTU2, TPU 系)
+			ADSM0,		///< ADSM0 (MTU3d)
+			ADSM1,		///< ADSM1 (MTU3d)
 			TRG,		///< GTETRG (GPTx)
 			TRG0,		///< GTETRG0 (GPTx)
 			TRG1,		///< GTETRG1 (GPTx)

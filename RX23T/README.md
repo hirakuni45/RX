@@ -152,6 +152,39 @@
 
 ---
 
+## port map order (MTU) / ポートマップ候補 (MTU)
+
+### LFQFP64
+
+|Peripheral|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|MTIOC0A|P31 (43)|PB3 (23)|-|
+|MTIOC0B|P30 (45)|P93 (30)|PB2 (24)|
+|MTIOC0C|P94 (29)|PB1 (25)|-|
+|MTIOC0D|PB0 (26)|-|-|
+|MTIOC1A|PA5 (63)|-|-|
+|MTIOC1B|PA4 (64)|-|-|
+|MTIOC2A|PA3 (27)|-|-|
+|MTIOC2B|PA2 (28)|-|-|
+|MTIOC3A|P11 (61)|P33 (40)|-|
+|MTIOC3B|P71 (38)|-|-|
+|MTIOC3C|P32 (41)|-|-|
+|MTIOC3D|P74 (35)|-|-|
+|MTIOC4A|P72 (37)|-|-|
+|MTIOC4B|P73 (36)|-|-|
+|MTIOC4C|P75 (34)|-|-|
+|MTIOC4D|P76 (33)|-|-|
+|MTIOC5U|P24 (46)|-|-|
+|MTIOC5V|P23 (47)|-|-|
+|MTIOC5W|P22 (48)|-|-|
+|MTCLKA|P33 (40)|-|-|
+|MTCLKB|P32 (41)|-|-|
+|MTCLKC|P11 (61)|P31 (43)|-|
+|MTCLKD|P10 (62)|P30 (45)|-|
+|ADSM0|PB2 (24)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
