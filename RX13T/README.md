@@ -186,6 +186,39 @@ namespace board_profile {
 
 ---
 
+## port map order (MTU) / ポートマップ候補 (MTU)
+
+### LFQFP48
+
+|Peripheral|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|MTIOC0A|PB3 (17)|PD3 (12)|-|
+|MTIOC0B|PB2 (18)|PD4 (11)|-|
+|MTIOC0C|PB1 (19)|PD5 (10)|-|
+|MTIOC0D|PB0 (20)|PD6 (9)|-|
+|MTIOC1A|P93 (24)|PA2 (22)|-|
+|MTIOC1B|PA3 (21)|PB6 (14)|-|
+|MTIOC2A|PA3 (21)|PB0 (20)|-|
+|MTIOC2B|PA2 (22)|P94 (23)|-|
+|MTIOC3A|P11 (47)|PB6 (14)|-|
+|MTIOC3B|P71 (30)|-|-|
+|MTIOC3C|PB7 (13)|-|-|
+|MTIOC3D|P74 (27)|-|-|
+|MTIOC4A|P72 (29)|-|-|
+|MTIOC4B|P73 (28)|-|-|
+|MTIOC4C|P75 (26)|-|-|
+|MTIOC4D|P76 (25)|-|-|
+|MTIOC5U|P24 (34)|P94 (23)|-|
+|MTIOC5V|P23 (35)|P93 (24)|-|
+|MTIOC5W|P22 (36)|PB1 (19)|-|
+|MTCLKA|P11 (47)|P94 (23)|PB1 (19)|
+|MTCLKB|P10 (48)|PB0 (20)|-|
+|MTCLKC|PB2 (18)|-|-|
+|MTCLKD|PB7 (13)|-|-|
+|ADSM0|PB2 (18)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
