@@ -702,9 +702,12 @@ namespace device {
 			intr_level_ = lvl;
 			bool pena = true;
 			bool neg = false;
+#if defined(SIG_RX621) || defined(SIG_RX62N)
 			bool inp = true;
 			port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL, neg, inp);
-
+#else
+			port_map_mtu::turn(MTUX::PERIPHERAL, MTUX::get_port_map_channel(ch), pena, PSEL, neg);
+#endif
 			uint8_t ctd = 0;
 			switch(cap) {
 			case CAPTURE::POSITIVE: ctd = 0b1000; break;
