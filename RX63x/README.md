@@ -319,6 +319,38 @@
 
 ---
 
+## port map order (MTU) / ポートマップ候補 (MTU)
+
+### LFQFP144
+
+|MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|MTIOC0A|P34 (25)|PB3 (82)|-|-|-|
+|MTIOC0B|P13 (44)|P15 (42)|PA1 (96)|-|-|
+|MTIOC0C|P32 (27)|PB1 (84)|-|-|-|
+|MTIOC0D|P33 (26)|PA3 (94)|-|-|-|
+|MTIOC1A|P20 (37)|PE4 (107)|-|-|-|
+|MTIOC1B|P21 (36)|PB5 (80)|-|-|-|
+|MTIOC2A|P26 (31)|PB5 (80)|-|-|-|
+|MTIOC2B|P27 (30)|PE5 (106)|-|-|-|
+|MTIOC3A|P14 (43)|P17 (38)|PC1 (73)|PC7 (60)|-|
+|MTIOC3B|P17 (38)|P22 (35)|P80 (65)|PB7 (78)|PC5 (62)|
+|MTIOC3C|P16 (40)|P56 (50)|PC0 (75)|PC6 (61)|PJ3 (13)|
+|MTIOC3D|P16 (40)|P23 (34)|P81 (64)|PB6 (79)|PC4 (66)|
+|MTIOC4A|P24 (33)|P82 (63)|PA0 (97)|PB3 (82)|PE2 (109)|
+|MTIOC4B|P30 (29)|P54 (52)|PC2 (70)|PD1 (125)|PE3 (108)|
+|MTIOC4C|P25 (32)|P83 (58)|PB1 (84)|PE1 (110)|PE5 (106)|
+|MTIOC4D|P31 (28)|P55 (51)|PC3 (67)|PD2 (124)|PE4 (107)|
+|MTIC5U|P12 (45)|PA4 (92)|PD7 (119)|-|-|
+|MTIC5V|P11 (---)|PA6 (89)|PD6 (120)|-|-|
+|MTIC5W|P10 (---)|PB0 (87)|PD5 (121)|-|-|
+|MTCLKA|P14 (43)|P24 (33)|PA4 (92)|PC6 (61)|-|
+|MTCLKB|P15 (42)|P25 (32)|PA6 (89)|PC7 (60)|-|
+|MTCLKC|P22 (35)|PA1 (96)|PC4 (66)|-|-|
+|MTCLKD|P23 (34)|PA3 (94)|PC5 (62)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
