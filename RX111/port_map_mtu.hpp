@@ -639,18 +639,16 @@ namespace device {
 	public:
 		//---------------------------------------------------------------------//
 		/*!
-			@brief  MTU2a 関係、チャネル別ポート切り替え
+			@brief  MTU チャネル別ポート切り替え
 			@param[in]	per	周辺機器タイプ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合「false」
 			@param[in]	odr	候補選択
-			@param[in]	neg	反転入出力の場合「true」 @n
-						RX111 では、反転入出力をサポートしないので、設定するとエラーになる
-			@param[in]	inp	入力として利用する場合「true」（無視される）
+			@param[in]	neg	反転入出力の場合「true」（RX11[10] では未サポート）
 			@return 無効な周辺機器の場合「false」
 		*/
 		//---------------------------------------------------------------------//
-		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false, bool inp = false) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
 		{
 			if(odr == ORDER::BYPASS) return true;
 			if(neg) return false;
@@ -692,12 +690,11 @@ namespace device {
 
 		//---------------------------------------------------------------------//
 		/*!
-			@brief  MTU2a タイマー系、クロックポート切り替え
+			@brief  MTU クロックポート切り替え
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
 			@param[in]	odr	候補選択
-			@param[in]	neg	反転入出力の場合「true」 @n
-						RX220 では、反転入出力をサポートしないので、設定するとエラーになる
+			@param[in]	neg	反転入出力の場合「true」（RX11[10] では未サポート）
 			@return 無効な周辺機器の場合「false」
 		*/
 		//---------------------------------------------------------------------//

@@ -209,6 +209,52 @@
 
 ---
 
+## port map order (MTU) / ポートマップ候補 (MTU)
+
+### LFQGFP100
+
+|MTU|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|MTIOC0A[#]|P31 (61)|PB3 (32)|-|
+|MTIOC0B[#]|P30 (63)|PB2 (33)|-|
+|MTIOC0C[#]|PB1 (34)|-|-|
+|MTIOC0D[#]|PB0 (35)|-|-|
+|MTIOC1A[#]|PA5 (36)|-|-|
+|MTIOC1B[#]|PA4 (37)|-|-|
+|MTIOC2A[#]|PA3 (38)|-|-|
+|MTIOC2B[#]|PA2 (39)|-|-|
+|MTIOC3A[#]|P11 (99)|P33 (58)|-|
+|MTIOC3B[#]|P71 (56)|-|-|
+|MTIOC3C[#]|P32 (59)|-|-|
+|MTIOC3D[#]|P74 (53)|-|-|
+|MTIOC4A[#]|P72 (55)|-|-|
+|MTIOC4B[#]|P73 (54)|-|-|
+|MTIOC4C[#]|P75 (52)|-|-|
+|MTIOC4D[#]|P76 (51)|-|-|
+|MTIC5U[#]|P24 (64)|P82 (96)|-|
+|MTIC5V[#]|P23 (65)|P81 (97)|-|
+|MTIC5W[#]|P22 (66)|P80 (98)|-|
+|MTIOC6A[#]|PA1 (40)|-|-|
+|MTIOC6B[#]|P95 (45)|-|-|
+|MTIOC6C[#]|PA0 (41)|-|-|
+|MTIOC6D[#]|P92 (48)|-|-|
+|MTIOC7A[#]|P94 (46)|-|-|
+|MTIOC7B[#]|P93 (47)|-|-|
+|MTIOC7C[#]|P91 (49)|-|-|
+|MTIOC7D[#]|P90 (50)|-|-|
+|MTIOC9A[#]|P21 (67)|PD7 (18)|-|
+|MTIOC9B[#]|P10 (100)|PE0 (17)|-|
+|MTIOC9C[#]|P20 (68)|PD6 (19)|-|
+|MTIOC9D[#]|P02 (2)|PE1 (16)|-|
+|MTCLKA[#]|P21 (67)|P33 (58)|-|
+|MTCLKB[#]|P20 (68)|P32 (59)|-|
+|MTCLKC[#]|P11 (99)|P31 (61)|PE4 (8)|
+|MTCLKD[#]|P10 (100)|P30 (63)|PE3 (9)|
+|ADSM0|PB2 (33)|-|-|
+|ADSM1|PB1 (34)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
