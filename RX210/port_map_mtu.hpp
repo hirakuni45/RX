@@ -17,7 +17,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX220/MTU ポート・マッピング・ユーティリティー
+		@brief  MTU ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_mtu : public port_map_order {
@@ -27,9 +27,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b0001 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC0A
-			// P34
-			// PB3
+			case CHANNEL::A:  // MTIOC0A:
+			// P34 (LFQFP64: --) (LFQFP100:  16)
+			// PB3 (LFQFP64: 36) (LFQFP100:  57)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B4 = 0;
@@ -46,10 +46,10 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC0B
-			// P13
-			// P15
-			// PA1
+			case CHANNEL::B:  // MTIOC0B:
+			// P13 (LFQFP64: --) (LFQFP100:  33)
+			// P15 (LFQFP64: 19) (LFQFP100:  31)
+			// PA1 (LFQFP64: 44) (LFQFP100:  69)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B3 = 0;
@@ -71,9 +71,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC0C
-			// P32
-			// PB1
+			case CHANNEL::C:  // MTIOC0C:
+			// P32 (LFQFP64: 12) (LFQFP100:  18)
+			// PB1 (LFQFP64: 37) (LFQFP100:  59)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B2 = 0;
@@ -90,9 +90,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC0D
-			// P33
-			// PA3
+			case CHANNEL::D:  // MTIOC0D:
+			// P33 (LFQFP64: --) (LFQFP100:  17)
+			// PA3 (LFQFP64: 43) (LFQFP100:  67)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B3 = 0;
@@ -116,14 +116,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool mtu1_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC1A
-			// P20
-			// PE4
+			case CHANNEL::A:  // MTIOC1A:
+			// P20 (LFQFP64: --) (LFQFP100:  28)
+			// PE4 (LFQFP64: 47) (LFQFP100:  74)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -140,9 +139,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC1B
-			// P21
-			// PB5
+			case CHANNEL::B:  // MTIOC1B:
+			// P21 (LFQFP64: --) (LFQFP100:  27)
+			// PB5 (LFQFP64: 35) (LFQFP100:  55)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -166,15 +165,14 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool mtu2_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0001 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC2A
-			// P26
-			// PB5
+			case CHANNEL::A:  // MTIOC2A:
+			// P26 (LFQFP64: 16) (LFQFP100:  22)
+			// PB5 (LFQFP64: 35) (LFQFP100:  55)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B6 = 0;
@@ -191,9 +189,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC2B
-			// P27
-			// PE5
+			case CHANNEL::B:  // MTIOC2B:
+			// P27 (LFQFP64: 15) (LFQFP100:  21)
+			// PE5 (LFQFP64: 46) (LFQFP100:  73)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B7 = 0;
@@ -217,18 +215,17 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool mtu3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0001 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC3A
-			// P14
-			// P17
-			// PC1
-			// PC7
-			// PJ1
+			case CHANNEL::A:  // MTIOC3A:
+			// P14 (LFQFP64: 20) (LFQFP100:  32)
+			// P17 (LFQFP64: 17) (LFQFP100:  29)
+			// PC1 (LFQFP64: --) (LFQFP100:  51)
+			// PC7 (LFQFP64: 27) (LFQFP100:  45)
+			// PJ1 (LFQFP64: --) (LFQFP100:   6)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -260,11 +257,11 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC3B
-			// P17
-			// P22
-			// PB7
-			// PC5
+			case CHANNEL::B:  // MTIOC3B:
+			// P17 (LFQFP64: 17) (LFQFP100:  29)
+			// P22 (LFQFP64: --) (LFQFP100:  26)
+			// PB7 (LFQFP64: 33) (LFQFP100:  53)
+			// PC5 (LFQFP64: 29) (LFQFP100:  47)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
@@ -291,12 +288,12 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC3C
-			// P16
-			// P56
-			// PC0
-			// PC6
-			// PJ3
+			case CHANNEL::C:  // MTIOC3C:
+			// P16 (LFQFP64: 18) (LFQFP100:  30)
+			// P56 (LFQFP64: --) (LFQFP100:  30)
+			// PC0 (LFQFP64: --) (LFQFP100:  52)
+			// PC6 (LFQFP64: 28) (LFQFP100:  46)
+			// PJ3 (LFQFP64: --) (LFQFP100:   4)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
@@ -328,12 +325,12 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC3D
-			// P16
-			// P23
-			// P81
-			// PB6
-			// PC4
+			case CHANNEL::D:  // MTIOC3D:
+			// P16 (LFQFP64: 18) (LFQFP100:  30)
+			// P23 (LFQFP64: --) (LFQFP100:  25)
+			// P81 (LFQFP64: --) (LFQFP100:  --)
+			// PB6 (LFQFP64: 34) (LFQFP100:  54)
+			// PC4 (LFQFP64: 30) (LFQFP100:  48)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
@@ -372,18 +369,17 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool mtu4_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0001 : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC4A
-			// P24
-			// P82
-			// PA0
-			// PB3
-			// PE2
+			case CHANNEL::A:  // MTIOC4A:
+			// P24 (LFQFP64: --) (LFQFP100:  24)
+			// P82 (LFQFP64: --) (LFQFP100:  --)
+			// PA0 (LFQFP64: 45) (LFQFP100:  70)
+			// PB3 (LFQFP64: 36) (LFQFP100:  57)
+			// PE2 (LFQFP64: 49) (LFQFP100:  76)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B4 = 0;
@@ -415,12 +411,12 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC4B
-			// P30
-			// P54
-			// PC2
-			// PD1
-			// PE3
+			case CHANNEL::B:  // MTIOC4B:
+			// P30 (LFQFP64: 14) (LFQFP100:  20)
+			// P54 (LFQFP64: 26) (LFQFP100:  40)
+			// PC2 (LFQFP64: 32) (LFQFP100:  50)
+			// PD1 (LFQFP64: --) (LFQFP100:  85)
+			// PE3 (LFQFP64: 48) (LFQFP100:  75)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B0 = 0;
@@ -452,12 +448,12 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC4C
-			// P25
-			// P83
-			// PB1
-			// PE1
-			// PE5
+			case CHANNEL::C:  // MTIOC4C:
+			// P25 (LFQFP64: --) (LFQFP100:  23)
+			// P83 (LFQFP64: --) (LFQFP100:  --)
+			// PB1 (LFQFP64: 37) (LFQFP100:  59)
+			// PE1 (LFQFP64: 50) (LFQFP100:  77)
+			// PE5 (LFQFP64: 46) (LFQFP100:  73)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B5 = 0;
@@ -489,12 +485,12 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC4D
-			// P31
-			// P55
-			// PC3
-			// PD2
-			// PE4
+			case CHANNEL::D:  // MTIOC4D:
+			// P31 (LFQFP64: 13) (LFQFP100:  19)
+			// P55 (LFQFP64: 25) (LFQFP100:  39)
+			// PC3 (LFQFP64: 31) (LFQFP100:  49)
+			// PD2 (LFQFP64: --) (LFQFP100:  84)
+			// PE4 (LFQFP64: 47) (LFQFP100:  74)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B1 = 0;
@@ -533,15 +529,14 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool mtu5_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0001 : 0;
 			switch(ch) {
-			case CHANNEL::U:  // MTIOC5U
-			// PA4
-			// PD7
+			case CHANNEL::U:  // MTIOC5U:
+			// PA4 (LFQFP64: 42) (LFQFP100:  66)
+			// PD7 (LFQFP64: --) (LFQFP100:  79)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B4 = 0;
@@ -558,9 +553,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::V:  // MTIOC5V
-			// PA6
-			// PD6
+			case CHANNEL::V:  // MTIOC5V:
+			// PA6 (LFQFP64: 41) (LFQFP100:  64)
+			// PD6 (LFQFP64: --) (LFQFP100:  80)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B6 = 0;
@@ -577,9 +572,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::W:  // MTIOC5W
-			// PB0
-			// PD5
+			case CHANNEL::W:  // MTIOC5W:
+			// PB0 (LFQFP64: 39) (LFQFP100:  61)
+			// PD5 (LFQFP64: --) (LFQFP100:  81)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTB::PMR.B0 = 0;
@@ -603,13 +598,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool clk_a_(ORDER odr, bool ena) noexcept
 		{
-			// P14
-			// P24
-			// PA4
-			// PC6
+			// MTCLKA:
+			// P14 (LFQFP64: 20) (LFQFP100:  32)
+			// P24 (LFQFP64: --) (LFQFP100:  24)
+			// PA4 (LFQFP64: 42) (LFQFP100:  66)
+			// PC6 (LFQFP64: 28) (LFQFP100:  46)
 			uint8_t sel = ena ? 0b00010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
@@ -639,13 +634,13 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_b_(ORDER odr, bool ena) noexcept
 		{
-			// P15
-			// P25
-			// PA6
-			// PC7
+			// MTCLKB:
+			// P15 (LFQFP64: 19) (LFQFP100:  31)
+			// P25 (LFQFP64: --) (LFQFP100:  23)
+			// PA6 (LFQFP64: 41) (LFQFP100:  64)
+			// PC7 (LFQFP64: 27) (LFQFP100:  45)
 			uint8_t sel = ena ? 0b00010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
@@ -675,12 +670,12 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_c_(ORDER odr, bool ena) noexcept
 		{
-			// P22
-			// PA1
-			// PC4
+			// MTCLKC:
+			// P22 (LFQFP64: --) (LFQFP100:  26)
+			// PA1 (LFQFP64: 44) (LFQFP100:  69)
+			// PC4 (LFQFP64: 30) (LFQFP100:  48)
 			uint8_t sel = ena ? 0b00010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
@@ -705,12 +700,12 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_d_(ORDER odr, bool ena) noexcept
 		{
-			// P23
-			// PA3
-			// PC5
+			// MTCLKD:
+			// P23 (LFQFP64: --) (LFQFP100:  25)
+			// PA3 (LFQFP64: 43) (LFQFP100:  67)
+			// PC5 (LFQFP64: 29) (LFQFP100:  47)
 			uint8_t sel = ena ? 0b00010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
@@ -738,18 +733,16 @@ namespace device {
 	public:
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  MTU2d 関係、チャネル別ポート切り替え
+			@brief  MTU チャネル別ポート切り替え
 			@param[in]	per	周辺機器タイプ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合「false」
 			@param[in]	odr	候補選択
-			@param[in]	neg	反転入出力の場合「true」 @n
-						RX220 では、反転入出力をサポートしないので、設定するとエラーになる
-			@param[in]	inp	入力として利用する場合「true」（無視される）
+			@param[in]	neg	反転入出力の場合「true」（RX210 では未サポート）
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false, bool inp = false) noexcept
+		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST, bool neg = false) noexcept
 		{
 			if(odr == ORDER::BYPASS) return true;
 			if(neg) return false;
@@ -757,7 +750,7 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(per) {
 			case peripheral::MTU0:
 				ret = mtu0_(ch, ena, odr);
@@ -778,7 +771,6 @@ namespace device {
 				ret = mtu5_(ch, ena, odr);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 
@@ -790,12 +782,11 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  タイマー系、クロックポート切り替え
+			@brief  MTU クロックポート切り替え
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
 			@param[in]	odr	候補選択
-			@param[in]	neg	反転入出力の場合「true」 @n
-						RX220 では、反転入出力をサポートしないので、設定するとエラーになる
+			@param[in]	neg	反転入出力の場合「true」（RX210 では未サポート）
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -807,8 +798,7 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
-
+			bool ret = false;
 			switch(ch) {
 			case CHANNEL::CLKA:
 				ret = clk_a_(odr, ena);
@@ -823,7 +813,6 @@ namespace device {
 				ret = clk_d_(odr, ena);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 
@@ -833,4 +822,3 @@ namespace device {
 		}
 	};
 }
-
