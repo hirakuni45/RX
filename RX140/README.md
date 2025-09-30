@@ -199,9 +199,103 @@
 |RSPI0 / MOSI|PA6 (41)|P16 (18)|PC6 (28)|
 |RSPI0 / MISO|PA7 (--)|P17 (17)|PC7 (27)|
 |RSPI0 / SSL0|PA4 (42)|PC4 (30)|-|
-|RSPI0 / SSL1|PA0 (45)|PC0 (--)|-|
-|RSPI0 / SSL2|PA1 (44)|PC1 (--)|-|
+|RSPI0 / SSL1|PA0 (45)|-|-|
+|RSPI0 / SSL2|PA1 (44)|-|-|
 |RSPI0 / SSL3|PA2 (--)|PC2 (32)|-|
+
+### LFQFP80
+
+|Peripheral|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|SCI1 / RXD|P15 (25)|P30 (18)|-|
+|SCI1 / TXD|P16 (24)|P26 (20)|-|
+|SCI1 / SCK|P17 (23)|P27 (19)|-|
+|SCI5 / RXD|PA2 (55)|PA3 (54)|PC2 (40)|
+|SCI5 / TXD|PA4 (53)|PA4 (53)|PC3 (39)|
+|SCI5 / SCK|PA1 (56)|PA1 (56)|PC4 (38)|
+|SCI6 / RXD|PB0 (49)|PD1 (65)|-|
+|SCI6 / TXD|PB1 (47)|PD0 (66)|-|
+|SCI6 / SCK|PB3 (45)|PD2 (64)|-|
+|SCI8 / RXD|PC6 (36)|-|-|
+|SCI8 / TXD|PC7 (35)|-|-|
+|SCI8 / SCK|PC5 (37)|-|-|
+|SCI9 / RXD|PB6 (42)|-|-|
+|SCI9 / TXD|PB7 (41)|-|-|
+|SCI9 / SCK|PB5 (43)|-|-|
+|SCI12 / RXD|PE2 (61)|-|-|
+|SCI12 / TXD|PE1 (62)|-|-|
+|SCI12 / SCK|PE0 (63)|-|-|
+|RIIC0 / SCL|P16 (24)|P12 (28)|-|
+|RIIC0 / SDA|P17 (23)|P13 (27)|-|
+|RSCAN / CRX|P15 (25)|P55 (33)|-|
+|RSCAN / CTX|P14 (26)|P54 (34)|-|
+|RSPI0 / RSPCK|PA5 (52)|PB0 (49)|PC5 (37)|
+|RSPI0 / MOSI|PA6 (51)|P16 (24)|PC6 (36)|
+|RSPI0 / MISO|PA7 (35)|P17 (23)|PC7 (35)|
+|RSPI0 / SSL0|PA4 (53)|PC4 (38)|-|
+|RSPI0 / SSL1|PA0 (57)|-|-|
+|RSPI0 / SSL2|PA1 (56)|-|-|
+|RSPI0 / SSL3|PA2 (55)|PC2 (40)|-|
+
+---
+
+## port map order (MTU) / ポートマップ候補 (MTU)
+
+### LFQFP64
+
+|MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|
+|---|---|---|---|---|---|---|---|
+|MTIOC0A|P34 (--)|PB3 (36)|PC4 (30)|-|-|-|-|
+|MTIOC0B|P13 (--)|P15 (19)|PA1 (44)|-|-|-|-|
+|MTIOC0C|P32 (12)|PB1 (37)|PC5 (29)|-|-|-|-|
+|MTIOC0D|PA3 (43)|-|-|-|-|-|-|
+|MTIOC1A|P20 (--)|PE4 (47)|-|-|-|-|-|
+|MTIOC1B|P21 (--)|PB5 (35)|PE3 (48)|-|-|-|-|
+|MTIOC2A|P26 (16)|PB5 (35)|-|-|-|-|-|
+|MTIOC2B|P27 (15)|PE5 (46)|-|-|-|-|-|
+|MTIOC3A|P14 (20)|P17 (17)|PC7 (27)|PJ1 (--)|-|-|-|
+|MTIOC3B|P17 (17)|PA1 (44)|PB7 (33)|PC5 (29)|PH0 (24)|-|-|
+|MTIOC3C|P16 (18)|PC6 (28)|-|-|-|-|-|
+|MTIOC3D|P16 (18)|PA6 (41)|PB0 (39)|PB6 (34)|PC4 (30)|PH1 (23)|-|
+|MTIOC4A|P55 (25)|PA0 (45)|PB3 (36)|PE2 (49)|PE4 (47)|-|-|
+|MTIOC4B|P30 (14)|P54 (26)|PC2 (32)|PD1 (--)|PE3 (48)|-|-|
+|MTIOC4C|PA4 (42)|PB1 (37)|PE1 (50)|PE5 (46)|PH2 (22)|-|-|
+|MTIOC4D|P31 (13)|P55 (25)|PA3 (43)|PC3 (31)|PD2 (--)|PE4 (47)|PH3 (21)|
+|MTIOC5U|PA4 (42)|-|-|-|-|-|-|
+|MTIOC5V|PA3 (43)|PA6 (41)|-|-|-|-|-|
+|MTIOC5W|PB0 (39)|-|-|-|-|-|-|
+|MTCLKA|P14 (20)|PA4 (42)|PC6 (28)|-|-|-|-|
+|MTCLKB|P15 (19)|PA6 (41)|PC7 (27)|-|-|-|-|
+|MTCLKC|PA1 (44)|PC4 (30)|-|-|-|-|-|
+|MTCLKD|PA3 (43)|PC5 (29)|-|-|-|-|-|
+
+### LFQFP80
+
+|MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|
+|---|---|---|---|---|---|---|---|
+|MTIOC0A|P34 (15)|PB3 (45)|PC4 (38)|-|-|-|-|
+|MTIOC0B|P13 (27)|P15 (25)|PA1 (56)|-|-|-|-|
+|MTIOC0C|P32 (16)|PB1 (47)|PC5 (37)|-|-|-|-|
+|MTIOC0D|PA3 (54)|-|-|-|-|-|-|
+|MTIOC1A|P20 (22)|PE4 (59)|-|-|-|-|-|
+|MTIOC1B|P21 (21)|PB5 (43)|PE3 (60)|-|-|-|-|
+|MTIOC2A|P26 (20)|PB5 (43)|-|-|-|-|-|
+|MTIOC2B|P27 (19)|PE5 (58)|-|-|-|-|-|
+|MTIOC3A|P14 (26)|P17 (23)|PC7 (35)|PJ1 (5)|-|-|-|
+|MTIOC3B|P17 (23)|PA1 (56)|PB7 (41)|PC5 (37)|PH0 (32)|-|-|
+|MTIOC3C|P16 (24)|PC6 (36)|-|-|-|-|-|
+|MTIOC3D|P16 (24)|PA6 (51)|PB0 (49)|PB6 (42)|PC4 (38)|PH1 (31)|-|
+|MTIOC4A|P55 (33)|PA0 (57)|PB3 (45)|PE2 (61)|PE4 (59)|-|-|
+|MTIOC4B|P30 (18)|P54 (34)|PC2 (40)|PD1 (65)|PE3 (60)|-|-|
+|MTIOC4C|PA4 (53)|PB1 (47)|PE1 (62)|PE5 (58)|PH2 (30)|-|-|
+|MTIOC4D|P31 (17)|P55 (33)|PA3 (54)|PC3 (39)|PD2 (64)|PE4 (59)|PH3 (29)|
+|MTIOC5U|PA4 (53)|-|-|-|-|-|-|
+|MTIOC5V|PA3 (54)|PA6 (51)|-|-|-|-|-|
+|MTIOC5W|PB0 (49)|-|-|-|-|-|-|
+|MTCLKA|P14 (26)|PA4 (53)|PC6 (36)|-|-|-|-|
+|MTCLKB|P15 (25)|PA6 (51)|PC7 (35)|-|-|-|-|
+|MTCLKC|PA1 (56)|PC4 (38)|-|-|-|-|-|
+|MTCLKD|PA3 (54)|PC5 (37)|-|-|-|-|-|
 
 ---
 

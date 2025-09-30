@@ -291,6 +291,66 @@
 
 ---
 
+## port map order (MTU) / ポートマップ候補 (MTU)
+
+### LFQFP64
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|MTIOC0A|P34 (--)|PB3 (36)|-|-|-|
+|MTIOC0B|P13 (--)|P15 (19)|PA1 (44)|-|-|
+|MTIOC0C|P32 (12)|PB1 (37)|-|-|-|
+|MTIOC0D|P33 (--)|PA3 (43)|-|-|-|
+|MTIOC1A|P20 (--)|PE4 (47)|-|-|-|
+|MTIOC1B|P21 (--)|PB5 (35)|-|-|-|
+|MTIOC2A|P26 (16)|PB5 (35)|-|-|-|
+|MTIOC2B|P27 (15)|PE5 (46)|-|-|-|
+|MTIOC3A|P14 (20)|P17 (17)|PC1 (--)|PC7 (27)|PJ1 (--)|
+|MTIOC3B|P17 (17)|P22 (--)|PB7 (33)|PC5 (29)|-|
+|MTIOC3C|P16 (18)|P56 (--)|PC0 (--)|PC6 (28)|PJ3 (--)|
+|MTIOC3D|P16 (18)|P23 (--)|P81 ()|PB6 (34)|PC4 (30)|
+|MTIOC4A|P24 (--)|P82 (--)|PA0 (45)|PB3 (36)|PE2 (49)|
+|MTIOC4B|P30 (14)|P54 (26)|PC2 (32)|PD1 (--)|PE3 (48)|
+|MTIOC4C|P25 (--)|P83 (--)|PB1 (37)|PE1 (50)|PE5 (46)|
+|MTIOC4D|P31 (13)|P55 (25)|PC3 (31)|PD2 (--)|PE4 (47)|
+|MTIOC5U|PA4 (42)|PD7 (--)|-|-|-|
+|MTIOC5V|PA6 (41)|PD6 (--)|-|-|-|
+|MTIOC5W|PB0 (39)|PD5 (--)|-|-|-|
+|MTCLKA|P14 (20)|P24 (--)|PA4 (42)|PC6 (28)|-|
+|MTCLKB|P15 (19)|P25 (--)|PA6 (41)|PC7 (27)|-|
+|MTCLKC|P22 (--)|PA1 (44)|PC4 (30)|-|-|
+|MTCLKD|P23 (--)|PA3 (43)|PC5 (29)|-|-|
+
+### LFQFP100
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|MTIOC0A|P34 (16)|PB3 (57)|-|-|-|
+|MTIOC0B|P13 (33)|P15 (31)|PA1 (69)|-|-|
+|MTIOC0C|P32 (18)|PB1 (59)|-|-|-|
+|MTIOC0D|P33 (17)|PA3 (67)|-|-|-|
+|MTIOC1A|P20 (28)|PE4 (74)|-|-|-|
+|MTIOC1B|P21 (27)|PB5 (55)|-|-|-|
+|MTIOC2A|P26 (22)|PB5 (55)|-|-|-|
+|MTIOC2B|P27 (21)|PE5 (73)|-|-|-|
+|MTIOC3A|P14 (32)|P17 (29)|PC1 (51)|PC7 (45)|PJ1 (6)|
+|MTIOC3B|P17 (29)|P22 (26)|PB7 (53)|PC5 (47)|-|
+|MTIOC3C|P16 (30)|P56 (--)|PC0 (52)|PC6 (46)|PJ3 (4)|
+|MTIOC3D|P16 (30)|P23 (25)|P81 (--)|PB6 (54)|PC4 (48)|
+|MTIOC4A|P24 (24)|P82 (--)|PA0 (70)|PB3 (57)|PE2 (76)|
+|MTIOC4B|P30 (20)|P54 (40)|PC2 (50)|PD1 (85)|PE3 (75)|
+|MTIOC4C|P25 (23)|P83 (--)|PB1 (59)|PE1 (77)|PE5 (73)|
+|MTIOC4D|P31 (19)|P55 (39)|PC3 (49)|PD2 (84)|PE4 (74)|
+|MTIOC5U|PA4 (66)|PD7 (79)|-|-|-|
+|MTIOC5V|PA6 (64)|PD6 (80)|-|-|-|
+|MTIOC5W|PB0 (61)|PD5 (81)|-|-|-|
+|MTCLKA|P14 (32)|P24 (24)|PA4 (66)|PC6 (46)|-|
+|MTCLKB|P15 (31)|P25 (23)|PA6 (64)|PC7 (45)|-|
+|MTCLKC|P22 (26)|PA1 (69)|PC4 (48)|-|-|
+|MTCLKD|P23 (25)|PA3 (67)|PC5 (47)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
