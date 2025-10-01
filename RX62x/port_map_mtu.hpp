@@ -45,16 +45,20 @@ namespace device {
 			switch(per) {
 			case peripheral::MTU0:
 				switch(ch) {
-				case CHANNEL::A:  // P34
+				case CHANNEL::A:  // MTIOC0A:
+				// P34 (LFQFP144:  25)
 					PORT3::ICR.B4 = inp;
 					break;
-				case CHANNEL::B:  // P15
+				case CHANNEL::B:  // MTIOC0B:
+				// P15 (LFQFP144:  42)
 					PORT1::ICR.B5 = inp;
 					break;
-				case CHANNEL::C:  // P32
+				case CHANNEL::C:  // MTIOC0C:
+				// P32 (LFQFP144:  27)
 					PORT3::ICR.B2 = inp;
 					break;
-				case CHANNEL::D:  // P33
+				case CHANNEL::D:  // MTIOC0D:
+				// P33 (LFQFP144:  26)
 					PORT3::ICR.B3 = inp;
 					break;
 				default:
@@ -65,10 +69,12 @@ namespace device {
 
 			case peripheral::MTU1:
 				switch(ch) {
-				case CHANNEL::A:  // P20
+				case CHANNEL::A:  // MTIOC1A:
+				// P20 (LFQFP144:  37)
 					PORT2::ICR.B0 = inp;
 					break;
-				case CHANNEL::B:  // P21
+				case CHANNEL::B:  // MTIOC1B:
+				// P21 (LFQFP144:  36)
 					PORT2::ICR.B1 = inp;
 					break;
 				default:
@@ -79,10 +85,12 @@ namespace device {
 
 			case peripheral::MTU2:
 				switch(ch) {
-				case CHANNEL::A:  // P26
+				case CHANNEL::A:  // MTIOC2A:
+				// P26 (LFQFP144:  31)
 					PORT2::ICR.B6 = inp;
 					break;
-				case CHANNEL::B:  // P27
+				case CHANNEL::B:  // MTIOC2B:
+				// P27 (LFQFP144:  30)
 					PORT2::ICR.B7 = inp;
 					break;
 				default:
@@ -93,18 +101,25 @@ namespace device {
 
 			case peripheral::MTU3:
 				switch(ch) {
-				case CHANNEL::A:  // P17
+				case CHANNEL::A:  // MTIOC3A:
+				// P17 (LFQFP144:  38)
 					PORT1::ICR.B7 = inp;
 					break;
-				case CHANNEL::B:  // P22(FIRST), P80(SECOND)
+				case CHANNEL::B:  // MTIOC3B:
+				// P22 (LFQFP144:  35)
+				// P80 (LFQFP144:  65)
 					MPC::PFCMTU.MTUS3 = (odr != ORDER::FIRST);
 					PORT2::ICR.B2 = inp;
 					break;
-				case CHANNEL::C:  // P16(FIRST), P56(SECOND)
+				case CHANNEL::C:  // MTIOC3C:
+				// P16 (LFQFP144:  40)
+				// P56 (LFQFP144:  50)
 					MPC::PFCMTU.MTUS2 = (odr != ORDER::FIRST);
 					PORT1::ICR.B6 = inp;
 					break;
-				case CHANNEL::D:  // P23(FIRST)、P81(SECOND)
+				case CHANNEL::D:  // MTIOC3D:
+				// P23 (LFQFP144:  34)
+				// P81 (LFQFP144:  64)
 					MPC::PFCMTU.MTUS3 = (odr != ORDER::FIRST);
 					PORT2::ICR.B3 = inp;
 					break;
@@ -116,19 +131,27 @@ namespace device {
 
 			case peripheral::MTU4:
 				switch(ch) {
-				case CHANNEL::A:  // P24(FIRST), P82(SECOND)
+				case CHANNEL::A:  // MTIOC4A:
+				// P24 (LFQFP144:  33)
+				// P82 (LFQFP144:  63)
 					MPC::PFCMTU.MTUS4 = (odr != ORDER::FIRST);
 					PORT2::ICR.B4 = inp;
 					break;
-				case CHANNEL::B:  // P30(FIRST), P54(SECOND)
+				case CHANNEL::B:  // MTIOC4B:
+				// P30 (LFQFP144:  29)
+				// P54 (LFQFP144:  52)
 					MPC::PFCMTU.MTUS5 = (odr != ORDER::FIRST);
 					PORT3::ICR.B0 = inp;
 					break;
-				case CHANNEL::C:  // P25(FIRST), P83(SECOND)
+				case CHANNEL::C:  // MTIOC4C:
+				// P25 (LFQFP144:  32)
+				// P83 (LFQFP144:  58)
 					MPC::PFCMTU.MTUS4 = (odr != ORDER::FIRST);
 					PORT2::ICR.B5 = inp;
 					break;
-				case CHANNEL::D:  // P31(FIRST), P55(SECOND)
+				case CHANNEL::D:  // MTIOC4D:
+				// P31 (LFQFP144:  28)
+				// P55 (LFQFP144:  51)
 					MPC::PFCMTU.MTUS5 = (odr != ORDER::FIRST);
 					PORT3::ICR.B1 = inp;
 					break;
@@ -140,15 +163,21 @@ namespace device {
 
 			case peripheral::MTU5:
 				switch(ch) {
-				case CHANNEL::U:  // P12(FIRST), PD7(SECOND)
+				case CHANNEL::U:  // MTIOC5U:
+				// P12 (LFQFP144:  45)
+				// PD7 (LFQFP144: 119)
 					MPC::PFCMTU.MTUS6 = (odr != ORDER::FIRST);
 					PORT1::ICR.B2 = inp;
 					break;
-				case CHANNEL::V:  // P11(FIRST), PD6(SECOND)
+				case CHANNEL::V:  // MTIOC5V:
+				// P11 (LFQFP144: ---)
+				// PD6 (LFQFP144: 120)
 					MPC::PFCMTU.MTUS6 = (odr != ORDER::FIRST);
 					PORT1::ICR.B1 = inp;
 					break;
-				case CHANNEL::W:  // P10(FIRST), PD5(SECOND)
+				case CHANNEL::W:  // MTIOC5W:
+				// P10 (LFQFP144: ---)
+				// PD5 (LFQFP144: 121)
 					MPC::PFCMTU.MTUS6 = (odr != ORDER::FIRST);
 					PORT1::ICR.B0 = inp;
 					break;
@@ -160,16 +189,20 @@ namespace device {
 
 			case peripheral::MTU6:
 				switch(ch) {
-				case CHANNEL::A:  // PA0
+				case CHANNEL::A:  // MTIOC6A:
+				// PA0 (LFQFP144:  97)
 					PORTA::ICR.B0 = inp;
 					break;
-				case CHANNEL::B:  // PA1
+				case CHANNEL::B:  // MTIOC6B:
+				// PA1 (LFQFP144:  96)
 					PORTA::ICR.B1 = inp;
 					break;
-				case CHANNEL::C:  // PA2
+				case CHANNEL::C:  // MTIOC6C:
+				// PA2 (LFQFP144:  95)
 					PORTA::ICR.B2 = inp;
 					break;
-				case CHANNEL::D:  // PA3
+				case CHANNEL::D:  // MTIOC6D:
+				// PA3 (LFQFP144:  94)
 					PORTA::ICR.B3 = inp;
 					break;
 				default:
@@ -180,10 +213,12 @@ namespace device {
 
 			case peripheral::MTU7:
 				switch(ch) {
-				case CHANNEL::A:  // PA4
+				case CHANNEL::A:  // MTIOC7A:
+				// PA4 (LFQFP144:  92)
 					PORTA::ICR.B4 = inp;
 					break;
-				case CHANNEL::B:  // PA5
+				case CHANNEL::B:  // MTIOC7B:
+				// PA5 (LFQFP144:  90)
 					PORTA::ICR.B5 = inp;
 					break;
 				default:
@@ -194,10 +229,12 @@ namespace device {
 
 			case peripheral::MTU8:
 				switch(ch) {
-				case CHANNEL::A:  // PA6
+				case CHANNEL::A:  // MTIOC8A:
+				// PA6 (LFQFP144:  89)
 					PORTA::ICR.B6 = inp;
 					break;
-				case CHANNEL::B:  // PA7
+				case CHANNEL::B:  // MTIOC8B:
+				// PA7 (LFQFP144:  88)
 					PORTA::ICR.B7 = inp;
 					break;
 				default:
@@ -208,16 +245,20 @@ namespace device {
 
 			case peripheral::MTU9:
 				switch(ch) {
-				case CHANNEL::A:  // PB0
+				case CHANNEL::A:  // MTIOC9A:
+				// PB0 (LFQFP144:  87)
 					PORTB::ICR.B0 = inp;
 					break;
-				case CHANNEL::B:  // PB2
+				case CHANNEL::B:  // MTIOC9B:
+				// PB2 (LFQFP144:  83)
 					PORTB::ICR.B2 = inp;
 					break;
-				case CHANNEL::C:  // PB1
+				case CHANNEL::C:  // MTIOC9C:
+				// PB1 (LFQFP144:  84)
 					PORTB::ICR.B1 = inp;
 					break;
-				case CHANNEL::D:  // PB3
+				case CHANNEL::D:  // MTIOC9D:
+				// PB3 (LFQFP144:  82)
 					PORTB::ICR.B3 = inp;
 					break;
 				default:
@@ -228,16 +269,20 @@ namespace device {
 
 			case peripheral::MTU10:
 				switch(ch) {
-				case CHANNEL::A:  // PB4
+				case CHANNEL::A:  // MTIOC10A:
+				// PB4 (LFQFP144:  81)
 					PORTB::ICR.B4 = inp;
 					break;
-				case CHANNEL::B:  // PB6
+				case CHANNEL::B:  // MTIOC10B:
+				// PB6 (LFQFP144:  79)
 					PORTB::ICR.B6 = inp;
 					break;
-				case CHANNEL::C:  // PB5
+				case CHANNEL::C:  // MTIOC10C:
+				// PB5 (LFQFP144:  80)
 					PORTB::ICR.B5 = inp;
 					break;
-				case CHANNEL::D:  // PB7
+				case CHANNEL::D:  // MTIOC10D:
+				// PB7 (LFQFP144:  78)
 					PORTB::ICR.B7 = inp;
 					break;
 				default:
@@ -248,15 +293,21 @@ namespace device {
 
 			case peripheral::MTU11:
 				switch(ch) {
-				case CHANNEL::U:  // PC7(FIRST), PD4(SECOND)
+				case CHANNEL::U:  // MTIOC11U:
+				// PC7 (LFQFP144:  60)
+				// PD4 (LFQFP144: 122)
 					MPC::PFDMTU.MTUS6 = (odr != ORDER::FIRST);
 					PORTC::ICR.B7 = inp;
 					break;
-				case CHANNEL::V:  // PC6(FIRST), PD3(SECOND)
+				case CHANNEL::V:	// MTIOC11V:
+				// PC6 (LFQFP144:  61)
+				// PD3 (LFQFP144: 123)
 					MPC::PFDMTU.MTUS6 = (odr != ORDER::FIRST);
 					PORTC::ICR.B6 = inp;
 					break;
-				case CHANNEL::W:  // PC5(FIRST), PD2(SECOND)
+				case CHANNEL::W:  // MTIOC11W:
+				// PC5 (LFQFP144:  62)
+				// PD2 (LFQFP144: 124)
 					MPC::PFDMTU.MTUS6 = (odr != ORDER::FIRST);
 					PORTC::ICR.B5 = inp;
 					break;
@@ -274,15 +325,16 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool clk_a_(ORDER odr, bool ena) noexcept
 		{
 			switch(odr) {
-			case ORDER::FIRST:   // P24 MTCLKA-A
+			case ORDER::FIRST:  // MTCLKA-A:
+			// P24 (LFQFP144:  33)
 				MPC::PFCMTU.TCLKS = 0;
 				PORT2::ICR.B4 = ena;
 				break;
-			case ORDER::SECOND:  // PC6 MTCLKA-B
+			case ORDER::SECOND:  // MTCLKA-B
+			// PC6 (LFQFP144:  61)
 				MPC::PFCMTU.TCLKS = 1;
 				PORTC::ICR.B6 = ena;
 				break;
@@ -293,15 +345,16 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_b_(ORDER odr, bool ena) noexcept
 		{
 			switch(odr) {
-			case ORDER::FIRST:   // P25 MTCLKB-A
+			case ORDER::FIRST:   // MTCLKB-A
+			// P25 (LFQFP144:  32)
 				MPC::PFCMTU.TCLKS = 0;
 				PORT2::ICR.B5 = ena;
 				break;
-			case ORDER::SECOND:  // PC7 MTCLKB-B
+			case ORDER::SECOND:  // MTCLKB-B
+			// PC7 (LFQFP144:  60)
 				MPC::PFCMTU.TCLKS = 1;
 				PORTC::ICR.B7 = ena;
 				break;
@@ -312,15 +365,16 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_c_(ORDER odr, bool ena) noexcept
 		{
 			switch(odr) {
-			case ORDER::FIRST:   // P22 MTCLKC-A
+			case ORDER::FIRST:  // MTCLKC-A
+			// P22 (LFQFP144:  35)
 				MPC::PFCMTU.TCLKS = 0;
 				PORT2::ICR.B2 = ena;
 				break;
-			case ORDER::SECOND:  // PC4 MTCLKC-B
+			case ORDER::SECOND:  // MTCLKC-B
+			// PC4 (LFQFP144:  66)
 				MPC::PFCMTU.TCLKS = 1;
 				PORTC::ICR.B4 = ena;
 				break;
@@ -331,15 +385,16 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_d_(ORDER odr, bool ena) noexcept
 		{
 			switch(odr) {
-			case ORDER::FIRST:   // P23 MTCLKD-A
+			case ORDER::FIRST:   // MTCLKD-A
+			// P23 (LFQFP144:  34)
 				MPC::PFCMTU.TCLKS = 0;
 				PORT2::ICR.B3 = ena;
 				break;
-			case ORDER::SECOND:  // PC5 MTCLKD-B
+			case ORDER::SECOND:  // MTCLKD-B
+			// PC5 (LFQFP144:  62)
 				MPC::PFCMTU.TCLKS = 1;
 				PORTC::ICR.B5 = ena;
 				break;
@@ -353,11 +408,13 @@ namespace device {
 		static bool clk_e_(ORDER odr, bool ena) noexcept
 		{
 			switch(odr) {
-			case ORDER::FIRST:   // PC2 MTCLKE-A
+			case ORDER::FIRST:   // MTCLKE-A
+			// PC2 (LFQFP144:  70)
 				MPC::PFDMTU.TCLKS = 0;
 				PORTC::ICR.B2 = ena;
 				break;
-			case ORDER::SECOND:  // PB4 MTCLKE-B
+			case ORDER::SECOND:  // MTCLKE-B
+			// PB4 (LFQFP144:  81)
 				MPC::PFDMTU.TCLKS = 1;
 				PORTB::ICR.B4 = ena;
 				break;
@@ -368,15 +425,16 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_f_(ORDER odr, bool ena) noexcept
 		{
 			switch(odr) {
-			case ORDER::FIRST:   // PC3 MTCLKF-A
+			case ORDER::FIRST:   // MTCLKF-A
+			// PC3 (LFQFP144:  67)
 				MPC::PFDMTU.TCLKS = 0;
 				PORTC::ICR.B3 = ena;
 				break;
-			case ORDER::SECOND:  // PB5 MTCLKF-B
+			case ORDER::SECOND:  // MTCLKF-B
+			// PB5 (LFQFP144:  80)
 				MPC::PFDMTU.TCLKS = 1;
 				PORTB::ICR.B5 = ena;
 				break;
@@ -387,15 +445,16 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_g_(ORDER odr, bool ena) noexcept
 		{
 			switch(odr) {
-			case ORDER::FIRST:   // PC0 MTCLKG-A
+			case ORDER::FIRST:   // MTCLKG-A
+			// PC0 (LFQFP144:  75)
 				MPC::PFDMTU.TCLKS = 0;
 				PORTC::ICR.B0 = ena;
 				break;
-			case ORDER::SECOND:  // PB2 MTCLKG-B
+			case ORDER::SECOND:  // MTCLKG-B
+			// PB2 (LFQFP144:  83)
 				MPC::PFDMTU.TCLKS = 1;
 				PORTB::ICR.B2 = ena;
 				break;
@@ -406,15 +465,16 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_h_(ORDER odr, bool ena) noexcept
 		{
 			switch(odr) {
-			case ORDER::FIRST:   // PC1 MTCLKH-A
+			case ORDER::FIRST:  // MTCLKH-A
+			// PC1 (LFQFP144:  73)
 				MPC::PFDMTU.TCLKS = 0;
 				PORTC::ICR.B1 = ena;
 				break;
-			case ORDER::SECOND:  // PB3 MTCLKH-B
+			case ORDER::SECOND:  // MTCLKH-B
+			// PB3 (LFQFP144:  82)
 				MPC::PFDMTU.TCLKS = 1;
 				PORTB::ICR.B3 = ena;
 				break;
@@ -424,7 +484,6 @@ namespace device {
 			}
 			return true;
 		}
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
