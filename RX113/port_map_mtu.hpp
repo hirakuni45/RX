@@ -85,7 +85,7 @@ namespace device {
 				break;
 			case CHANNEL::C:
 			// MTIOC0C: P17 (LFQFP64: 17) (LFQFP100:  26)
-			// MTIOC0C: P32 (LFQFP64: --) (LFQFP100:  25)
+			// MTIOC0C: P32 (LFQFP64: 16) (LFQFP100:  25)
 			// MTIOC0C: PB0 (LFQFP64: 39) (LFQFP100:  61)
 			// MTIOC0C: PB1 (LFQFP64: 37) (LFQFP100:  59)
 				switch(odr) {
