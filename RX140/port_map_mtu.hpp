@@ -306,7 +306,7 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b0'0010 : 0;  // ok
+					MPC::P16PFS.PSEL = sel;  // ok
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
