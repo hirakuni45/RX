@@ -699,7 +699,6 @@ namespace device {
 			return true;
 		}
 
-
 		static bool clk_b_(ORDER odr, bool ena, bool neg) noexcept
 		{
 			// MTCLKB[#]:
@@ -723,7 +722,6 @@ namespace device {
 			}
 			return true;
 		}
-
 
 		static bool clk_c_(ORDER odr, bool ena, bool neg) noexcept
 		{
@@ -760,7 +758,6 @@ namespace device {
 			}
 			return true;
 		}
-
 
 		static bool clk_d_(ORDER odr, bool ena, bool neg) noexcept
 		{

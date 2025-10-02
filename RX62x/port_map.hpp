@@ -29,9 +29,9 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			//	RxD0: P21 (LFQFP144:  36)
-			//	TxD0: P20 (LFQFP144:  37)
-			//	SCK0: P22 (LFQFP144:  35)
+			//	RxD0: P21 (LFQFP100:  27) (LFQFP144:  36)
+			//	TxD0: P20 (LFQFP100:  28) (LFQFP144:  37)
+			//	SCK0: P22 (LFQFP100:  26) (LFQFP144:  35)
 				PORT2::ICR.B1 = enable;  ///< RxD0
 				break;
 			default:
@@ -44,16 +44,16 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			//	RxD1-A: P30 (LFQFP144:  29)
-			//	TxD1-A: P26 (LFQFP144:  31)
-			//	SCK1-A: P27 (LFQFP144:  30)
+			//	RxD1-A: P30 (LFQFP100:  20) (LFQFP144:  29)
+			//	TxD1-A: P26 (LFQFP100:  22) (LFQFP144:  31)
+			//	SCK1-A: P27 (LFQFP100:  21) (LFQFP144:  30)
 				MPC::PFFSCI.SCI1S = 0;
 				PORT3::ICR.B0 = enable;  ///< RxD1-A
 				break;
 			case ORDER::SECOND:
-			//	RxD1-B: PF2 (LFQFP144: ---)
-			//	TxD1-B: PF0 (LFQFP144: ---)
-			//	SCK1-B: PF1 (LFQFP144: ---)
+			//	RxD1-B: PF2 (LFQFP100: ---) (LFQFP144: ---)
+			//	TxD1-B: PF0 (LFQFP100: ---) (LFQFP144: ---)
+			//	SCK1-B: PF1 (LFQFP100: ---) (LFQFP144: ---)
 				MPC::PFFSCI.SCI1S = 1;
 				PORTF::ICR.B2 = enable;  ///< RxD1-B
 				break;
@@ -67,16 +67,16 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			//	RxD2-A: P12 (LFQFP144:  45)
-			//	TxD2-A: P13 (LFQFP144:  44)
-			//	SCK2-A: P11 (LFQFP144: ---)
+			//	RxD2-A: P12 (LFQFP100:  34) (LFQFP144:  45)
+			//	TxD2-A: P13 (LFQFP100:  33) (LFQFP144:  44)
+			//	SCK2-A: P11 (LFQFP100: ---) (LFQFP144: ---)
 				MPC::PFFSCI.SCI2S = 0;
 				PORT1::ICR.B2 = enable;  ///< RxD2-A
 				break;
 			case ORDER::SECOND:
-			//	RxD2-B: P52 (LFQFP144:  54)
-			//	TxD2-B: P50 (LFQFP144:  56)
-			//	SCK2-B: P51 (LFQFP144:  55)
+			//	RxD2-B: P52 (LFQFP100:  42) (LFQFP144:  54)
+			//	TxD2-B: P50 (LFQFP100:  44) (LFQFP144:  56)
+			//	SCK2-B: P51 (LFQFP100:  43) (LFQFP144:  55)
 				MPC::PFFSCI.SCI2S = 1;
 				PORT5::ICR.B2 = enable;  ///< RxD2-B
 				break;
@@ -90,16 +90,16 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			//	RxD3-A: P16 (LFQFP144:  40)
-			//	TxD3-A: P17 (LFQFP144:  38)
-			//	SCK3-A: P15 (LFQFP144:  42)
+			//	RxD3-A: P16 (LFQFP100:  30) (LFQFP144:  40)
+			//	TxD3-A: P17 (LFQFP100: ---) (LFQFP144:  38)
+			//	SCK3-A: P15 (LFQFP100: ---) (LFQFP144:  42)
 				MPC::PFFSCI.SCI3S = 0;
 				PORT1::ICR.B6 = enable;  ///< RxD3-A
 				break;
 			case ORDER::SECOND:
-			//	RxD3-B: P25 (LFQFP144:  32)
-			//	TxD3-B: P23 (LFQFP144:  34)
-			//	SCK3-B: P24 (LFQFP144:  33)
+			//	RxD3-B: P25 (LFQFP100:  23) (LFQFP144:  32)
+			//	TxD3-B: P23 (LFQFP100:  25) (LFQFP144:  34)
+			//	SCK3-B: P24 (LFQFP100:  24) (LFQFP144:  33)
 				MPC::PFFSCI.SCI3S = 1;
 				PORT2::ICR.B5 = enable;  ///< RxD3-B
 				break;
@@ -113,9 +113,9 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			//	RxD5: PC2 (LFQFP144:  70)
-			//	TxD5: PC3 (LFQFP144:  67)
-			//	SCK5: PC1 (LFQFP144:  73)
+			//	RxD5: PC2 (LFQFP100:  50) (LFQFP144:  70)
+			//	TxD5: PC3 (LFQFP100:  49) (LFQFP144:  67)
+			//	SCK5: PC1 (LFQFP100:  51) (LFQFP144:  73)
 				PORTC::ICR.B2 = enable;  ///< RxD5
 				break;
 			default:
@@ -128,16 +128,16 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			//	RxD6-A: P01 (LFQFP144:   7)
-			//	TxD6-A: P00 (LFQFP144:   8)
-			//	SCK6-A: P02 (LFQFP144:   6)
+			//	RxD6-A: P01 (LFQFP100: ---) (LFQFP144:   7)
+			//	TxD6-A: P00 (LFQFP100: ---) (LFQFP144:   8)
+			//	SCK6-A: P02 (LFQFP100: ---) (LFQFP144:   6)
 				MPC::PFFSCI.SCI6S = 0;
 				PORT0::ICR.B1 = enable;  ///< RxD6-A
 				break;
 			case ORDER::SECOND:
-			//	RxD6-B: P33 (LFQFP144:  26)
-			//	TxD6-B: P32 (LFQFP144:  27)
-			//	SCK6-B: P34 (LFQFP144:  25)
+			//	RxD6-B: P33 (LFQFP100:  17) (LFQFP144:  26)
+			//	TxD6-B: P32 (LFQFP100:  18) (LFQFP144:  27)
+			//	SCK6-B: P34 (LFQFP100:  16) (LFQFP144:  25)
 				MPC::PFFSCI.SCI6S = 1;
 				PORT3::ICR.B3 = enable;  ///< RxD6-B
 				break;
@@ -151,8 +151,8 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			// SCL0: P12 (LFQFP144:  45)
-			// SDA0: P13 (LFQFP144:  44)
+			// SCL0: P12 (LFQFP100:  34) (LFQFP144:  45)
+			// SDA0: P13 (LFQFP100:  33) (LFQFP144:  44)
 				// 設定は特に無し（SCL/SDA 入出力として扱う）
 				break;
 			default:
@@ -165,8 +165,8 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			// SCL1: P21 (LFQFP144:  36)
-			// SDA1: P20 (LFQFP144:  37)
+			// SCL1: P21 (LFQFP100:  27) (LFQFP144:  36)
+			// SDA1: P20 (LFQFP100:  28) (LFQFP144:  37)
 				// 設定は特に無し（SCL/SDA 入出力として扱う）
 				break;
 			default:
@@ -179,8 +179,8 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			// CRX0: P33 (LFQFP144:  26)
-			// CTX0: P32 (LFQFP144:  27)
+			// CRX0: P33 (LFQFP100:  17) (LFQFP144:  26)
+			// CTX0: P32 (LFQFP100:  18) (LFQFP144:  27)
 				MPC::PFJCAN.CAN0E = enable;
 				PORT3::ICR.B3 =  enable;
 				PORT3::ICR.B2 = !enable;
@@ -195,18 +195,18 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			// RSPCKA-A: PC5 (LFQFP144:  62)
-			// MOSIA-A:  PC6 (LFQFP144:  61)
-			// MISOA-A:  PC7 (LFQFP144:  60)
+			// RSPCKA-A: PC5 (LFQFP100:  47) (LFQFP144:  62)
+			// MOSIA-A:  PC6 (LFQFP100:  46) (LFQFP144:  61)
+			// MISOA-A:  PC7 (LFQFP100:  45) (LFQFP144:  60)
 				MPC::PFGSPI.RSPIS = 0;
 				MPC::PFGSPI.RSPCKE = enable;
 				MPC::PFGSPI.MOSIE = enable;
 				MPC::PFGSPI.MISOE = enable;
 				break;
 			case ORDER::SECOND:
-			// RSPCKA-B: PA5 (LFQFP144:  90)
-			// MOSIA-B:  PA6 (LFQFP144:  89)
-			// MISOA-B:  PA7 (LFQFP144:  88)
+			// RSPCKA-B: PA5 (LFQFP100:  65) (LFQFP144:  90)
+			// MOSIA-B:  PA6 (LFQFP100:  64) (LFQFP144:  89)
+			// MISOA-B:  PA7 (LFQFP100:  63) (LFQFP144:  88)
 				MPC::PFGSPI.RSPIS = 1;
 				MPC::PFGSPI.RSPCKE = enable;
 				MPC::PFGSPI.MOSIE = enable;
@@ -223,8 +223,8 @@ namespace device {
 			bool ret = true;
 			switch(ssl) {
 			case RSPI::SSL0:
-			// SSLA0: PC4 (LFQFP144:  66)
-			// SSLA0: PA4 (LFQFP144:  92)
+			// SSLA0: PC4 (LFQFP100:  48) (LFQFP144:  66)
+			// SSLA0: PA4 (LFQFP100:  66) (LFQFP144:  92)
 				if(odr == ORDER::FIRST) {
 					MPC::PFGSPI.RSPIS = 0;
 					MPC::PFGSPI.SSL0E = enable;
@@ -236,8 +236,8 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL1:
-			// SSLA1: PC0 (LFQFP144:  75)
-			// SSLA1: PA0 (LFQFP144:  97)
+			// SSLA1: PC0 (LFQFP100:  52) (LFQFP144:  75)
+			// SSLA1: PA0 (LFQFP100:  70) (LFQFP144:  97)
 				if(odr == ORDER::FIRST) {
 					MPC::PFGSPI.RSPIS = 0;
 					MPC::PFGSPI.SSL1E = enable;
@@ -249,8 +249,8 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL2:
-			// SSLA2: PC1 (LFQFP144:  73)
-			// SSLA2: PA1 (LFQFP144:  96)
+			// SSLA2: PC1 (LFQFP100:  51) (LFQFP144:  73)
+			// SSLA2: PA1 (LFQFP100:  69) (LFQFP144:  96)
 				if(odr == ORDER::FIRST) {
 					MPC::PFGSPI.RSPIS = 0;
 					MPC::PFGSPI.SSL2E = enable;
@@ -262,8 +262,8 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL3:
-			// SSLA3: PC2 (LFQFP144:  70)
-			// SSLA3: PA2 (LFQFP144:  95)
+			// SSLA3: PC2 (LFQFP100:  50) (LFQFP144:  70)
+			// SSLA3: PA2 (LFQFP100:  68) (LFQFP144:  95)
 				if(odr == ORDER::FIRST) {
 					MPC::PFGSPI.RSPIS = 0;
 					MPC::PFGSPI.SSL3E = enable;
@@ -285,18 +285,18 @@ namespace device {
 		{
 			switch(odr) {
 			case ORDER::FIRST:
-			// RSPCKB-A: P27 (LFQFP144:  30)
-			// MOSIB-A:  P26 (LFQFP144:  31)
-			// MISOB-A:  P30 (LFQFP144:  29)
+			// RSPCKB-A: P27 (LFQFP100:  21) (LFQFP144:  30)
+			// MOSIB-A:  P26 (LFQFP100:  22) (LFQFP144:  31)
+			// MISOB-A:  P30 (LFQFP100:  20) (LFQFP144:  29)
 				MPC::PFHSPI.RSPIS = 0;
 				MPC::PFHSPI.RSPCKE = enable;
 				MPC::PFHSPI.MOSIE = enable;
 				MPC::PFHSPI.MISOE = enable;
 				break;
 			case ORDER::SECOND:
-			// RSPCKB-B: PE5 (LFQFP144: 106)
-			// MOSIB-B:  PE6 (LFQFP144: 102)
-			// MISOB-B:  PE7 (LFQFP144: 101)
+			// RSPCKB-B: PE5 (LFQFP100:  73) (LFQFP144: 106)
+			// MOSIB-B:  PE6 (LFQFP100:  72) (LFQFP144: 102)
+			// MISOB-B:  PE7 (LFQFP100:  71) (LFQFP144: 101)
 				MPC::PFHSPI.RSPIS = 1; 
 				MPC::PFHSPI.RSPCKE = enable;
 				MPC::PFHSPI.MOSIE = enable;
@@ -313,8 +313,8 @@ namespace device {
 			bool ret = true;
 			switch(ssl) {
 			case RSPI::SSL0:
-			// SSLB0: P31 (LFQFP144:  28)
-			// SSLB0: PE4 (LFQFP144: 107)
+			// SSLB0: P31 (LFQFP100:  19) (LFQFP144:  28)
+			// SSLB0: PE4 (LFQFP100:  74) (LFQFP144: 107)
 				if(odr == ORDER::FIRST) {
 					MPC::PFHSPI.RSPIS = 0;
 					MPC::PFHSPI.SSL0E = enable;
@@ -326,8 +326,8 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL1:
-			// SSLB1: P50 (LFQFP144:  56)
-			// SSLB1: PE0 (LFQFP144: 111)
+			// SSLB1: P50 (LFQFP100:  44) (LFQFP144:  56)
+			// SSLB1: PE0 (LFQFP100:  78) (LFQFP144: 111)
 				if(odr == ORDER::FIRST) {
 					MPC::PFHSPI.RSPIS = 0;
 					MPC::PFHSPI.SSL1E = enable;
@@ -339,8 +339,8 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL2:
-			// SSLA2: P51 (LFQFP144:  55)
-			// SSLA2: PE1 (LFQFP144: 110)
+			// SSLA2: P51 (LFQFP100:  43) (LFQFP144:  55)
+			// SSLA2: PE1 (LFQFP100:  77) (LFQFP144: 110)
 				if(odr == ORDER::FIRST) {
 					MPC::PFHSPI.RSPIS = 0;
 					MPC::PFHSPI.SSL2E = enable;
@@ -352,8 +352,8 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL3:
-			// SSLA3: P52 (LFQFP144:  54)
-			// SSLA3: PE2 (LFQFP144: 109)
+			// SSLA3: P52 (LFQFP100:  42) (LFQFP144:  54)
+			// SSLA3: PE2 (LFQFP100:  76) (LFQFP144: 109)
 				if(odr == ORDER::FIRST) {
 					MPC::PFHSPI.RSPIS = 0;
 					MPC::PFHSPI.SSL3E = enable;
