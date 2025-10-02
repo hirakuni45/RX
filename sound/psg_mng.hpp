@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	PSG Emulations Manager @n
 			ファミコン内蔵音源と同じような機能を持った波形生成 @n
@@ -7,11 +7,11 @@
 			生成した波形メモリを PWM 変調などで出力する事を前提にしている。 @n
 			分解能は８ビット
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/R8C/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstdint>
 
 extern "C" {
@@ -269,21 +269,23 @@ namespace utils {
 	template <uint16_t SAMPLE, uint16_t TICK, uint16_t CNUM>
 	class psg_mng : public psg_base {
 
-		// 12 平均音階率の計算： 6 オクターブ（3520Hz）を基底にする。
+		// 12 平均音階率の計算： 8 オクターブ（440Hz x 8）を基底にする。
 		// 2^(1/12) の定数、１２乗すると２（１オクターブ上がる）となる。
+//		static constexpr double OCTAVE8 = 440.0 * 8.0;
+		static constexpr double OCTAVE8 = 432.0 * 8.0;
 		static constexpr uint16_t key_tbl_[12] = {
-			static_cast<uint16_t>((3520 * 65536.0 * 1.000000000) / SAMPLE),  ///< A  ラ
-			static_cast<uint16_t>((3520 * 65536.0 * 1.059463094) / SAMPLE),  ///< A#
-			static_cast<uint16_t>((3520 * 65536.0 * 1.122462048) / SAMPLE),  ///< B  シ
-			static_cast<uint16_t>((3520 * 65536.0 * 1.189207115) / SAMPLE),  ///< C  ド
-			static_cast<uint16_t>((3520 * 65536.0 * 1.25992105 ) / SAMPLE),  ///< C#
-			static_cast<uint16_t>((3520 * 65536.0 * 1.334839854) / SAMPLE),  ///< D  レ
-			static_cast<uint16_t>((3520 * 65536.0 * 1.414213562) / SAMPLE),  ///< D#
-			static_cast<uint16_t>((3520 * 65536.0 * 1.498307077) / SAMPLE),  ///< E  ミ
-			static_cast<uint16_t>((3520 * 65536.0 * 1.587401052) / SAMPLE),  ///< F  ファ
-			static_cast<uint16_t>((3520 * 65536.0 * 1.681792831) / SAMPLE),  ///< F#
-			static_cast<uint16_t>((3520 * 65536.0 * 1.781797436) / SAMPLE),  ///< G  ソ
-			static_cast<uint16_t>((3520 * 65536.0 * 1.887748625) / SAMPLE),  ///< G#
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.000000000) / SAMPLE),  ///< A  ラ
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.059463094) / SAMPLE),  ///< A#
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.122462048) / SAMPLE),  ///< B  シ
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.189207115) / SAMPLE),  ///< C  ド
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.25992105 ) / SAMPLE),  ///< C#
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.334839854) / SAMPLE),  ///< D  レ
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.414213562) / SAMPLE),  ///< D#
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.498307077) / SAMPLE),  ///< E  ミ
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.587401052) / SAMPLE),  ///< F  ファ
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.681792831) / SAMPLE),  ///< F#
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.781797436) / SAMPLE),  ///< G  ソ
+			static_cast<uint16_t>((OCTAVE8 * 65536.0 * 1.887748625) / SAMPLE),  ///< G#
 		};
 
 		static constexpr uint8_t	SUB_SCORE_NUM = 8;  // サブスコア最大数
