@@ -1,8 +1,8 @@
 //=====================================================================//
 /*! @file
-    @brief  MTU サンプル
+    @brief  MTU PWN サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,6 +28,8 @@ namespace {
 	typedef device::cmt_mgr<board_profile::CMT_CH> CMT;
 	CMT		cmt_;
 
+	// board_profile::MTU_CH ---> どのＭＴＵチャネルを使うかを、「board_profile」クラスで定義します。
+	// board_profile クラスは、各 CPU のディレクトリに「board_profile.hpp」としてあります。
 	typedef device::mtu_io<board_profile::MTU_CH, utils::null_task, utils::null_task, board_profile::MTU_ORDER> MTU;
 	typedef device::port_map_mtu::ORDER MTU_ORDER;
 	MTU		mtu_;
