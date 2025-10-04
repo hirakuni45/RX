@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX111 グループ・ポート・マッピング (IRQ)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,9 +24,9 @@ namespace device {
 
 		static bool irq0_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P30
-			// PE0
+			switch(odr) {  // IRQ0:
+			// P30 (LFQFP64:  4)
+			// PE0 (LFQFP64: 51)
 			case ORDER::FIRST:
 				PORT3::PMR.B0 = 0;
 				MPC::P30PFS.PSEL = 0;
@@ -45,9 +45,9 @@ namespace device {
 
 		static bool irq1_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P31
-			// PE1
+			switch(odr) {  // IRQ1:
+			// P31 (LFQFP64:  5)
+			// PE1 (LFQFP64: 50)
 			case ORDER::FIRST:
 				PORT3::PMR.B1 = 0;
 				MPC::P31PFS.PSEL = 0;
@@ -66,10 +66,10 @@ namespace device {
 
 		static bool irq2_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P32
-			// PB0
-			// PC4
+			switch(odr) {  // IRQ2:
+			// P32 (LFQFP64: 16)
+			// PB0 (LFQFP64: 39)
+			// PC4 (LFQFP64: 30)
 			case ORDER::FIRST:
 				PORT3::PMR.B2 = 0;
 				MPC::P32PFS.PSEL = 0;
@@ -93,10 +93,10 @@ namespace device {
 
 		static bool irq3_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P27
-			// PE3
-			// PA6
+			switch(odr) {  // IRQ3:
+			// P27 (LFQFP64:  2)
+			// PE3 (LFQFP64: 48)
+			// PA6 (LFQFP64: 41)
 			case ORDER::FIRST:
 				PORT2::PMR.B7 = 0;
 				MPC::P27PFS.PSEL = 0;
@@ -120,10 +120,10 @@ namespace device {
 
 		static bool irq4_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P14
-			// PB1
-			// PE4
+			switch(odr) {  // IRQ4:
+			// P14 (LFQFP64: 20)
+			// PB1 (LFQFP64: 37)
+			// PE4 (LFQFP64: 47)
 			case ORDER::FIRST:
 				PORT1::PMR.B4 = 0;
 				MPC::P14PFS.PSEL = 0;
@@ -147,10 +147,10 @@ namespace device {
 
 		static bool irq5_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P15
-			// PA4
-			// PE5
+			switch(odr) {  // IRQ5:
+			// P15 (LFQFP64: 19)
+			// PA4 (LFQFP64: 42)
+			// PE5 (LFQFP64: 46)
 			case ORDER::FIRST:
 				PORT1::PMR.B5 = 0;
 				MPC::P15PFS.PSEL = 0;
@@ -174,10 +174,10 @@ namespace device {
 
 		static bool irq6_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P16
-			// PA3
-			// PE6
+			switch(odr) {  // IRQ6:
+			// P16 (LFQFP64: 18)
+			// PA3 (LFQFP64: 43)
+			// PE6 (LFQFP64: 53)
 			case ORDER::FIRST:
 				PORT1::PMR.B6 = 0;
 				MPC::P16PFS.PSEL = 0;
@@ -201,10 +201,10 @@ namespace device {
 
 		static bool irq7_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P17
-			// PE2
-			// PE7
+			switch(odr) {  // IRQ7:
+			// P17 (LFQFP64: 17)
+			// PE2 (LFQFP64: 49)
+			// PE7 (LFQFP64: 52)
 			case ORDER::FIRST:
 				PORT1::PMR.B7 = 0;
 				MPC::P17PFS.PSEL = 0;
@@ -243,7 +243,7 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(irqv) {
 			case ICU::VECTOR::IRQ0:
 				ret = irq0_(ena, odr);
@@ -270,7 +270,6 @@ namespace device {
 				ret = irq7_(ena, odr);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 
