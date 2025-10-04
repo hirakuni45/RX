@@ -6,7 +6,7 @@
 			  通常割り込み入力としても使え、通常「ORDER::FIRST」で選択する。 @n
 			  詳しくは、MPC の解説を参照する事。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,15 +24,15 @@ namespace device {
 
 		static bool irq0_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P30 (DS)
-			// P50
-			// P60
-			// P70
-			// P90
-			// PA0
-			// PD0
-			// PH1
+			switch(odr) {  // IRQ0:
+			// P30 (DS) (LFQFP100:  20) (LFQFP144:  29)
+			// P50      (LFQFP100:  44) (LFQFP144:  56)
+			// P60      (LFQFP100: ---) (LFQFP144: 117)
+			// P70      (LFQFP100: ---) (LFQFP144: 104)
+			// P90      (LFQFP100: ---) (LFQFP144: 131)
+			// PA0      (LFQFP100:  70) (LFQFP144:  97)
+			// PD0      (LFQFP100:  86) (LFQFP144: 126)
+			// PH1      (LFQFP100:  37) (LFQFP144:  48)
 			case ORDER::FIRST:
 				PORT3::PMR.B0 = 0;
 				MPC::P30PFS.PSEL = 0;
@@ -81,13 +81,13 @@ namespace device {
 
 		static bool irq1_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P31 (DS)
-			// P51
-			// P61
-			// P71
-			// PD1
-			// PH2
+			switch(odr) {  // IRQ1:
+			// P31 (DS) (LFQFP100:  19) (LFQFP144:  28)
+			// P51      (LFQFP100:  43) (LFQFP144:  55)
+			// P61      (LFQFP100: ---) (LFQFP144: 115)
+			// P71      (LFQFP100: ---) (LFQFP144:  86)
+			// PD1      (LFQFP100:  85) (LFQFP144: 125)
+			// PH2      (LFQFP100:  36) (LFQFP144:  47)
 			case ORDER::FIRST:
 				PORT3::PMR.B1 = 0;
 				MPC::P31PFS.PSEL = 0;
@@ -126,14 +126,14 @@ namespace device {
 
 		static bool irq2_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P32 (DS)
-			// P12
-			// P52
-			// P62
-			// P82
-			// PB2
-			// PD2
+			switch(odr) {  // IRQ2:
+			// P32 (DS) (LFQFP100:  18) (LFQFP144:  27)
+			// P12      (LFQFP100:  34) (LFQFP144:  45)
+			// P52      (LFQFP100:  42) (LFQFP144:  54)
+			// P62      (LFQFP100: ---) (LFQFP144: 114)
+			// P82      (LFQFP100: ---) (LFQFP144:  63)
+			// PB2      (LFQFP100:  58) (LFQFP144:  83)
+			// PD2      (LFQFP100:  84) (LFQFP144: 124)
 			case ORDER::FIRST:
 				PORT3::PMR.B2 = 0;
 				MPC::P32PFS.PSEL = 0;
@@ -177,15 +177,15 @@ namespace device {
 
 		static bool irq3_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P33 (DS)
-			// P13
-			// P23
-			// P53
-			// P63
-			// P83
-			// PB3
-			// PD3
+			switch(odr) {  // IRQ3:
+			// P33 (DS) (LFQFP100:  17) (LFQFP144:  26)
+			// P13      (LFQFP100:  33) (LFQFP144:  44)
+			// P23      (LFQFP100:  25) (LFQFP144:  34)
+			// P53      (LFQFP100:  41) (LFQFP144:  53)
+			// P63      (LFQFP100: ---) (LFQFP144: 113)
+			// P83      (LFQFP100: ---) (LFQFP144:  58)
+			// PB3      (LFQFP100:  57) (LFQFP144:  82)
+			// PD3      (LFQFP100:  83) (LFQFP144: 123)
 			case ORDER::FIRST:
 				PORT3::PMR.B3 = 0;
 				MPC::P33PFS.PSEL = 0;
@@ -234,15 +234,15 @@ namespace device {
 
 		static bool irq4_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// PB1 (DS)
-			// P14
-			// P34
-			// P54
-			// P64
-			// PB4
-			// PD4
-			// PF5
+			switch(odr) {  // IRQ4:
+			// PB1 (DS) (LFQFP100:  59) (LFQFP144:  84)
+			// P14      (LFQFP100:  32) (LFQFP144:  43)
+			// P34      (LFQFP100:  16) (LFQFP144:  25)
+			// P54      (LFQFP100: ---) (LFQFP144:  52)
+			// P64      (LFQFP100: ---) (LFQFP144: 112)
+			// PB4      (LFQFP100:  56) (LFQFP144:  81)
+			// PD4      (LFQFP100:  82) (LFQFP144: 122)
+			// PF5      (LFQFP100: ---) (LFQFP144:   9)
 			case ORDER::FIRST:
 				PORTB::PMR.B1 = 0;
 				MPC::PB1PFS.PSEL = 0;
@@ -291,14 +291,14 @@ namespace device {
 
 		static bool irq5_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// PA4 (DS)
-			// P15
-			// P25
-			// PA5
-			// PC5
-			// PD5
-			// PE5
+			switch(odr) {  // IRQ5:
+			// PA4 (DS) (LFQFP100:  66) (LFQFP144:  92)
+			// P15      (LFQFP100:  31) (LFQFP144:  42)
+			// P25      (LFQFP100:  23) (LFQFP144:  32)
+			// PA5      (LFQFP100:  65) (LFQFP144:  90)
+			// PC5      (LFQFP100:  47) (LFQFP144:  62)
+			// PD5      (LFQFP100:  81) (LFQFP144: 121)
+			// PE5      (LFQFP100:  73) (LFQFP144: 106)
 			case ORDER::FIRST:
 				PORTA::PMR.B4 = 0;
 				MPC::PA4PFS.PSEL = 0;
@@ -342,14 +342,14 @@ namespace device {
 
 		static bool irq6_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// PA3 (DS)
-			// P16
-			// P26
-			// P56
-			// PB6
-			// PD6
-			// PE6
+			switch(odr) {  // IRQ6:
+			// PA3 (DS) (LFQFP100:  67) (LFQFP144:  94)
+			// P16      (LFQFP100:  30) (LFQFP144:  40)
+			// P26      (LFQFP100:  22) (LFQFP144:  31)
+			// P56      (LFQFP100: ---) (LFQFP144:  50)
+			// PB6      (LFQFP100:  54) (LFQFP144:  79)
+			// PD6      (LFQFP100:  80) (LFQFP144: 120)
+			// PE6      (LFQFP100:  72) (LFQFP144: 102)
 			case ORDER::FIRST:
 				PORTA::PMR.B3 = 0;
 				MPC::PA3PFS.PSEL = 0;
@@ -393,14 +393,14 @@ namespace device {
 
 		static bool irq7_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// PE2 (DS)
-			// P17
-			// P27
-			// P77
-			// PA7
-			// PD7
-			// PE7
+			switch(odr) {  // IRQ7:
+			// PE2 (DS) (LFQFP100:  76) (LFQFP144: 109)
+			// P17      (LFQFP100:  29) (LFQFP144:  38)
+			// P27      (LFQFP100:  21) (LFQFP144:  30)
+			// P77      (LFQFP100: ---) (LFQFP144:  68)
+			// PA7      (LFQFP100:  63) (LFQFP144:  88)
+			// PD7      (LFQFP100:  79) (LFQFP144: 119)
+			// PE7      (LFQFP100:  71) (LFQFP144: 101)
 			case ORDER::FIRST:
 				PORTE::PMR.B2 = 0;
 				MPC::PE2PFS.PSEL = 0;
@@ -444,13 +444,13 @@ namespace device {
 
 		static bool irq8_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P40 (DS)
-			// P00
-			// P20
-			// P73
-			// P80
-			// PE0
+			switch(odr) {  // IRQ8:
+			// P40 (DS) (LFQFP100:  95) (LFQFP144: 141)
+			// P00      (LFQFP100: ---) (LFQFP144:   8)
+			// P20      (LFQFP100:  28) (LFQFP144:  37)
+			// P73      (LFQFP100: ---) (LFQFP144:  77)
+			// P80      (LFQFP100: ---) (LFQFP144:  65)
+			// PE0      (LFQFP100:  78) (LFQFP144: 111)
 			case ORDER::FIRST:
 				MPC::P40PFS.ISEL = ena;
 				break;
@@ -487,13 +487,13 @@ namespace device {
 
 		static bool irq9_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P41 (DS)
-			// P01
-			// P21
-			// P81
-			// P91
-			// PE1
+			switch(odr) {  // IRQ9:
+			// P41 (DS) (LFQFP100:  93) (LFQFP144: 139)
+			// P01      (LFQFP100: ---) (LFQFP144:   7)
+			// P21      (LFQFP100:  27) (LFQFP144:  36)
+			// P81      (LFQFP100: ---) (LFQFP144:  64)
+			// P91      (LFQFP100: ---) (LFQFP144: 129)
+			// PE1      (LFQFP100:  77) (LFQFP144: 110)
 			case ORDER::FIRST:
 				MPC::P41PFS.ISEL = ena;
 				break;
@@ -530,14 +530,14 @@ namespace device {
 
 		static bool irq10_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P42 (DS)
-			// P02
-			// P55
-			// P72
-			// P92
-			// PA2
-			// PC2
+			switch(odr) {  // IRQ10:
+			// P42 (DS) (LFQFP100:  92) (LFQFP144: 138)
+			// P02      (LFQFP100: ---) (LFQFP144:   6)
+			// P55      (LFQFP100:  39) (LFQFP144:  51)
+			// P72      (LFQFP100: ---) (LFQFP144:  85)
+			// P92      (LFQFP100: ---) (LFQFP144: 128)
+			// PA2      (LFQFP100:  68) (LFQFP144:  95)
+			// PC2      (LFQFP100:  50) (LFQFP144:  70)
 			case ORDER::FIRST:
 				MPC::P42PFS.ISEL = ena;
 				break;
@@ -579,14 +579,14 @@ namespace device {
 
 		static bool irq11_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P43 (DS)
-			// P03
-			// P93
-			// PA1
-			// PC3
-			// PE3
-			// PJ3
+			switch(odr) {  // IRQ11:
+			// P43 (DS) (LFQFP100:  91) (LFQFP144: 137)
+			// P03      (LFQFP100: ---) (LFQFP144:   4)
+			// P93      (LFQFP100: ---) (LFQFP144: 127)
+			// PA1      (LFQFP100:  69) (LFQFP144:  96)
+			// PC3      (LFQFP100:  49) (LFQFP144:  67)
+			// PE3      (LFQFP100:  75) (LFQFP144: 108)
+			// PJ3      (LFQFP100:   4) (LFQFP144:  13)
 			case ORDER::FIRST:
 				MPC::P43PFS.ISEL = ena;
 				break;
@@ -628,14 +628,14 @@ namespace device {
 
 		static bool irq12_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P44 (DS)
-			// P24
-			// P74
-			// PB0
-			// PC1
-			// PC4
-			// PE4
+			switch(odr) {  // IRQ12:
+			// P44 (DS) (LFQFP100:  90) (LFQFP144: 136)
+			// P24      (LFQFP100:  24) (LFQFP144:  33)
+			// P74      (LFQFP100: ---) (LFQFP144:  72)
+			// PB0      (LFQFP100:  61) (LFQFP144:  87)
+			// PC1      (LFQFP100:  51) (LFQFP144:  73)
+			// PC4      (LFQFP100:  48) (LFQFP144:  66)
+			// PE4      (LFQFP100:  74) (LFQFP144: 107)
 			case ORDER::FIRST:
 				MPC::P44PFS.ISEL = ena;
 				break;
@@ -677,14 +677,14 @@ namespace device {
 
 		static bool irq13_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P45 (DS)
-			// P05
-			// P65
-			// P75
-			// PB5
-			// PC6
-			// PJ5
+			switch(odr) {  // IRQ13:
+			// P45 (DS) (LFQFP100:  89) (LFQFP144: 135)
+			// P05      (LFQFP100: 100) (LFQFP144:   2)
+			// P65      (LFQFP100: ---) (LFQFP144: 100)
+			// P75      (LFQFP100: ---) (LFQFP144:  71)
+			// PB5      (LFQFP100:  55) (LFQFP144:  80)
+			// PC6      (LFQFP100:  46) (LFQFP144:  61)
+			// PJ5      (LFQFP100: ---) (LFQFP144:  11)
 			case ORDER::FIRST:
 				MPC::P45PFS.ISEL = ena;
 				break;
@@ -726,14 +726,14 @@ namespace device {
 
 		static bool irq14_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P46 (DS)
-			// P66
-			// P76
-			// P86
-			// PA6
-			// PC0
-			// PC7
+			switch(odr) {  // IRQ14:
+			// P46 (DS) (LFQFP100:  88) (LFQFP144: 134)
+			// P66      (LFQFP100: ---) (LFQFP144:  99)
+			// P76      (LFQFP100: ---) (LFQFP144:  69)
+			// P86      (LFQFP100: ---) (LFQFP144:  41)
+			// PA6      (LFQFP100:  64) (LFQFP144:  89)
+			// PC0      (LFQFP100:  52) (LFQFP144:  75)
+			// PC7      (LFQFP100:  45) (LFQFP144:  68)
 			case ORDER::FIRST:
 				MPC::P46PFS.ISEL = ena;
 				break;
@@ -775,13 +775,13 @@ namespace device {
 
 		static bool irq15_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P47 (DS)
-			// P07
-			// P22
-			// P67
-			// P87
-			// PB7
+			switch(odr) {  // IRQ15:
+			// P47 (DS) (LFQFP100:  87) (LFQFP144: 133)
+			// P07      (LFQFP100:  98) (LFQFP144: 144)
+			// P22      (LFQFP100:  26) (LFQFP144:  35)
+			// P67      (LFQFP100: ---) (LFQFP144:  98)
+			// P87      (LFQFP100: ---) (LFQFP144:  39)
+			// PB7      (LFQFP100:  53) (LFQFP144:  78)
 			case ORDER::FIRST:
 				MPC::P47PFS.ISEL = ena;
 				break;

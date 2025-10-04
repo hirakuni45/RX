@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX23T グループ・ポート・マッピング (IRQ)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,9 +24,9 @@ namespace device {
 
 		static bool irq0_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P10
-			// P93
+			switch(odr) {  // IRQ0:
+			// P10 (LFQFP64: 62)
+			// P93 (LFQFP64: 30)
 			case ORDER::FIRST:
 				PORT1::PMR.B0 = 0;
 				MPC::P10PFS.PSEL = 0;
@@ -45,9 +45,9 @@ namespace device {
 
 		static bool irq1_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P11
-			// P94
+			switch(odr) {  // IRQ1:
+			// P11 (LFQFP64: 61)
+			// P94 (LFQFP64: 29)
 			case ORDER::FIRST:
 				PORT1::PMR.B1 = 0;
 				MPC::P11PFS.PSEL = 0;
@@ -66,11 +66,11 @@ namespace device {
 
 		static bool irq2_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P00
-			// P22
-			// PB1
-			// PD4
+			switch(odr) {  // IRQ2:
+			// P00 (LFQFP64:  2)
+			// P22 (LFQFP64: 48)
+			// PB1 (LFQFP64: 25)
+			// PD4 (LFQFP64: 15)
 			case ORDER::FIRST:
 				PORT0::PMR.B0 = 0;
 				MPC::P00PFS.PSEL = 0;
@@ -99,10 +99,10 @@ namespace device {
 
 		static bool irq3_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P24
-			// PB4
-			// PD5
+			switch(odr) {  // IRQ3:
+			// P24 (LFQFP64: 46)
+			// PB4 (LFQFP64: 21)
+			// PD5 (LFQFP64: 14)
 			case ORDER::FIRST:
 				PORT2::PMR.B4 = 0;
 				MPC::P24PFS.PSEL = 0;
@@ -126,10 +126,10 @@ namespace device {
 
 		static bool irq4_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P01
-			// P23
-			// PA2
+			switch(odr) {  // IRQ4:
+			// P01 (LFQFP64:  4)
+			// P23 (LFQFP64: 47)
+			// PA2 (LFQFP64: 28)
 			case ORDER::FIRST:
 				PORT0::PMR.B1 = 0;
 				MPC::P01PFS.PSEL = 0;
@@ -153,11 +153,11 @@ namespace device {
 
 		static bool irq5_(bool ena, ORDER odr) noexcept
 		{
-			switch(odr) {
-			// P02
-			// P70
-			// PB6
-			// PD6
+			switch(odr) {  // IRQ5:
+			// P02 (LFQFP64:  1)
+			// P70 (LFQFP64: 39)
+			// PB6 (LFQFP64: 18)
+			// PD6 (LFQFP64: 13)
 			case ORDER::FIRST:
 				PORT0::PMR.B2 = 0;
 				MPC::P02PFS.PSEL = 0;
@@ -201,7 +201,7 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(irqv) {
 			case ICU::VECTOR::IRQ0:
 				ret = irq0_(ena, odr);
@@ -222,7 +222,6 @@ namespace device {
 				ret = irq5_(ena, odr);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 
