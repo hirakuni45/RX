@@ -917,6 +917,8 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> RWE;
+
+			static inline uint8_t pad_ = 0;
 		};
 		static inline trwer_t<base + 0x04> TRWER;
 
@@ -1254,6 +1256,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネル型を取得
 			@param[in]	ch	チャネル型
 			@return ポート・マッピング・チャネル
@@ -1479,6 +1493,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネルを取得
 			@param[in]	ch	チャネル
 			@return ポート・マッピング・チャネル
@@ -1650,6 +1676,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネルを取得
 			@param[in]	ch	チャネル
 			@return ポート・マッピング・チャネル
@@ -1813,6 +1851,21 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			TSTR.CST3 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+			TRWER.pad_ &= ~0b01;
+			TRWER.pad_ |= ena;
+			TRWER.RWE = (TRWER.pad_ & 0b11) != 0;
 		}
 
 
@@ -2017,6 +2070,21 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			TSTR.CST4 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+			TRWER.pad_ &= ~0b10;
+			TRWER.pad_ |= ena;
+			TRWER.RWE = (TRWER.pad_ & 0b11) != 0;
 		}
 
 
@@ -2456,6 +2524,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネルを取得
 			@param[in]	ch	チャネル
 			@return ポート・マッピング・チャネル
@@ -2674,6 +2754,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネルを取得
 			@param[in]	ch	チャネル
 			@return ポート・マッピング・チャネル
@@ -2847,6 +2939,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネルを取得
 			@param[in]	ch	チャネル
 			@return ポート・マッピング・チャネル
@@ -3011,6 +3115,21 @@ namespace device {
 		{
 			// MTUB group CST3(CST9)
 			TSTR.CST3 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+			TRWER.pad_ &= ~0b01;
+			TRWER.pad_ |= ena;
+			TRWER.RWE = (TRWER.pad_ & 0b11) != 0;
 		}
 
 
@@ -3215,6 +3334,21 @@ namespace device {
 		{
 			// MTUB group CST10(CST4) 
 			TSTR.CST4 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU9, MTU10 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+			TRWER.pad_ &= ~0b10;
+			TRWER.pad_ |= ena;
+			TRWER.RWE = (TRWER.pad_ & 0b11) != 0;
 		}
 
 

@@ -1047,6 +1047,8 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> RWE;
+
+			static inline uint8_t pad_ = 0;
 		};
 
 
@@ -1778,6 +1780,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネル型を取得
 			@param[in]	ch	チャネル型
 			@return ポート・マッピング・チャネル
@@ -2017,6 +2031,18 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST1 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
 		}
 
 
@@ -2271,6 +2297,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネルを取得
 			@param[in]	ch	チャネル
 			@return ポート・マッピング・チャネル
@@ -2454,6 +2492,21 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST3 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+			MTU::TRWERA.pad_ &= ~0b01;
+			MTU::TRWERA.pad_ |= ena;
+			MTU::TRWERA.RWE = (MTU::TRWERA.pad_ & 0b11) != 0;
 		}
 
 
@@ -2687,6 +2740,21 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST4 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+			MTU::TRWERA.pad_ &= ~0b10;
+			MTU::TRWERA.pad_ |= ena;
+			MTU::TRWERA.RWE = (MTU::TRWERA.pad_ & 0b11) != 0;
 		}
 
 
@@ -3330,6 +3398,21 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+			MTU::TRWERB.pad_ &= ~0b01;
+			MTU::TRWERB.pad_ |= ena;
+			MTU::TRWERB.RWE = (MTU::TRWERB.pad_ & 0b11) != 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネルを取得
 			@param[in]	ch	チャネル
 			@return ポート・マッピング・チャネル
@@ -3584,6 +3667,21 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRB.CST7 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+			MTU::TRWERB.pad_ &= ~0b10;
+			MTU::TRWERB.pad_ |= ena;
+			MTU::TRWERB.RWE = (MTU::TRWERB.pad_ & 0b11) != 0;
 		}
 
 
@@ -3889,6 +3987,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートマッピングチャネルを取得
 			@param[in]	ch	チャネル
 			@return ポート・マッピング・チャネル
@@ -4094,6 +4204,18 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST9 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R/W enable の設定 @n
+					MTU3, MTU4, MTU6, MTU7 の場合のみ有効
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void rw_enable(bool ena = true)
+		{
 		}
 
 
