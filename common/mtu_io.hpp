@@ -179,13 +179,16 @@ namespace device {
 
 		static INTERRUPT_FUNC void cap_task_()
 		{
+			MTUX::rw_enable();
 			tt_.cap_.all_count_ = (tt_.ovfw_tick_ << 16) | rd16_(tt_.tgr_adr_);
 			mtask_();
 			tt_.ovfw_tick_ = 0;
+			MTUX::rw_enable(false);
 		}
 
 		static INTERRUPT_FUNC void ovf_task_()
 		{
+			MTUX::rw_enable();
 			++tt_.ovfw_tick_;
 			if(tt_.ovfw_tick_ >= tt_.cap_.ovfw_limit_) {
 				tt_.ovfw_tick_ = 0;
@@ -193,6 +196,7 @@ namespace device {
 				++tt_.cap_.ovfw_count_;
 			}
 			otask_();
+			MTUX::rw_enable(false);
 		}
 
 		static INTERRUPT_FUNC void match_task_()
@@ -388,6 +392,7 @@ namespace device {
 				return false;
 			}
 
+			MTUX::rw_enable();
 			MTUX::enable(false);
 			MTUX::TIER = 0;
 			MTUX::TIOR.disable();
@@ -495,6 +500,7 @@ namespace device {
 			if(ret) {
 				MTUX::enable();
 			}
+			MTUX::rw_enable(false);
 			return ret;
 		}
 
@@ -571,6 +577,7 @@ namespace device {
 				MTUX::TIOR.set(po.ch, static_cast<uint8_t>(po.out));
 				set_pwm_duty(po.ch, 0);
 				MTUX::enable();
+				MTUX::rw_enable(false);
 			}
 			return ret;
 		}
@@ -600,6 +607,7 @@ namespace device {
 					set_pwm_duty(po[i].ch, 0);
 				}
 				MTUX::enable();
+				MTUX::rw_enable(false);
 			}
 			return ret;
 		}
@@ -628,6 +636,8 @@ namespace device {
 					MTUX::TIOR.set(po[i].ch, static_cast<uint8_t>(po[i].out));
 					set_pwm_duty(po[i].ch, 0);
 				}
+				MTUX::enable();
+				MTUX::rw_enable(false);
 			}
 			return ret;
 		}
@@ -645,7 +655,9 @@ namespace device {
 		{
 			if(channel_ == ch) return false;
 
+			MTUX::rw_enable();
 			MTUX::TGR[ch] = (static_cast<uint32_t>(MTUX::TGR[channel_]) * duty) >> 16;
+			MTUX::rw_enable(false);
 
 			return true;
 		}
@@ -699,6 +711,8 @@ namespace device {
 
 			power_mgr::turn(MTUX::PERIPHERAL);
 
+			MTUX::rw_enable();
+
 			intr_level_ = lvl;
 			bool pena = true;
 			bool neg = false;
@@ -739,6 +753,7 @@ namespace device {
 
 			MTUX::TCNT = 0;
 			MTUX::enable();
+			MTUX::rw_enable(false);
 
 			return true;
 		}
@@ -796,13 +811,16 @@ namespace device {
 				auto tmp = tt_.main_tick_;
 				while(tmp == tt_.main_tick_) { }
 			} else {  // インターバルの周期が CPU ループに対して、短い場合は、正確に機能しないので注意！
+				MTUX::rw_enable();
 				auto tmp = MTUX::TCNT();
 				while(1) {
 					auto tmp2 = MTUX::TCNT();
 					if(tmp2 < tmp) break;
 					tmp = tmp2;
 				}
+				MTUX::rw_enable(false);
 			}
+
 		}
 
 
