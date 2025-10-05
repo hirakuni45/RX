@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・ポート・マッピング (TMR)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,7 +17,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX24T/RX24U TMR ポート・マッピング・ユーティリティー
+		@brief  RX24T TMR ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_tmr : public port_map_order {
@@ -27,10 +27,10 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO0
-			// PD3
-			// P33
-			// PB0
+			case CHANNEL::TMO:  // TMO0:
+			// PD3 (LFQFP100:  22)
+			// P33 (LFQFP100:  58)
+			// PB0 (LFQFP100:  35)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTD::PMR.B3 = 0;
@@ -52,9 +52,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI0 
-			// PD4
-			// PB1
+			case CHANNEL::TMCI:  // TMCI0:
+			// PD4 (LFQFP100:  21)
+			// PB1 (LFQFP100:  34)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTD::PMR.B4 = 0;
@@ -71,9 +71,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI0 
-			// PD5
-			// PB2
+			case CHANNEL::TMRI:  // TMRI0:
+			// PD5 (LFQFP100:  20)
+			// PB2 (LFQFP100:  33)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTD::PMR.B5 = 0;
@@ -97,14 +97,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool tmr1_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO1
-			// PD6
+			case CHANNEL::TMO:  // TMO1:
+			// PD6 (LFQFP100:  19)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTD::PMR.B6 = 0;
@@ -116,9 +115,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI1
-			// PD2
-			// PE0
+			case CHANNEL::TMCI:  // TMCI1:
+			// PD2 (LFQFP100:  23)
+			// PE0 (LFQFP100:  17)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTD::PMR.B2 = 0;
@@ -135,8 +134,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI1
-			// PD7
+			case CHANNEL::TMRI:  // TMRI1:
+			// PD7 (LFQFP100:  18)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTD::PMR.B7 = 0;
@@ -155,16 +154,15 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool tmr2_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO2
-			// P23
-			// PA0
-			// PD1
+			case CHANNEL::TMO:  // TMO2:
+			// P23 (LFQFP100:  65)
+			// PA0 (LFQFP100:  41)
+			// PD1 (LFQFP100:  24)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B3 = 0;
@@ -186,8 +184,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI2
-			// P24
+			case CHANNEL::TMCI:  // TMCI2:
+			// P24 (LFQFP100:  64)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B4 = 0;
@@ -199,8 +197,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI2
-			// P22
+			case CHANNEL::TMRI:  // TMRI2:
+			// P22 (LFQFP100:  66)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B2 = 0;
@@ -219,14 +217,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool tmr3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO3
-			// P11
+			case CHANNEL::TMO:  // TMO3:
+			// P11 (LFQFP100:  99)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B1 = 0;
@@ -238,8 +235,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI3 
-			// PA5
+			case CHANNEL::TMCI:  // TMCI3:
+			// PA5 (LFQFP100:  36)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B5 = 0;
@@ -251,8 +248,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI3 
-			// P10
+			case CHANNEL::TMRI:  // TMRI3:
+			// P10 (LFQFP100: 100)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B0 = 0;
@@ -271,17 +268,16 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool tmr4_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO4
-			// P22
-			// P82
-			// PA1
-			// PD2
+			case CHANNEL::TMO:  // TMO4:
+			// P22 (LFQFP100:  66)
+			// P82 (LFQFP100:  96)
+			// PA1 (LFQFP100:  40)
+			// PD2 (LFQFP100:  23)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B2 = 0;
@@ -308,9 +304,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI4 
-			// P21
-			// P81
+			case CHANNEL::TMCI:  // TMCI4:
+			// P21 (LFQFP100:  67)
+			// P81 (LFQFP100:  97)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -327,9 +323,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI4 
-			// P20
-			// P80
+			case CHANNEL::TMRI:  // TMRI4:
+			// P20 (LFQFP100:  68)
+			// P80 (LFQFP100:  98)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -353,14 +349,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool tmr5_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO5
-			// PE1
+			case CHANNEL::TMO:  // TMO5:
+			// PE1 (LFQFP100:  16)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTE::PMR.B1 = 0;
@@ -372,8 +367,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI5
-			// PE0
+			case CHANNEL::TMCI:  // TMCI5:
+			// PE0 (LFQFP100:  17)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTE::PMR.B0 = 0;
@@ -385,8 +380,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI5
-			// PD7
+			case CHANNEL::TMRI:  // TMRI5:
+			// PD7 (LFQFP100:  18)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTD::PMR.B7 = 0;
@@ -405,16 +400,15 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool tmr6_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO6
-			// P24
-			// P32
-			// PD0
+			case CHANNEL::TMO:  // TMO6:
+			// P24 (LFQFP100:  64)
+			// P32 (LFQFP100:  59)
+			// PD0 (LFQFP100:  25)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B4 = 0;
@@ -436,9 +430,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI6 
-			// P30
-			// PD4
+			case CHANNEL::TMCI:  // TMCI6:
+			// P30 (LFQFP100:  63)
+			// PD4 (LFQFP100:  21)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B0 = 0;
@@ -455,9 +449,9 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI6 
-			// P31
-			// PD5
+			case CHANNEL::TMRI:  // TMRI6:
+			// P31 (LFQFP100:  61)
+			// PD5 (LFQFP100:  20)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B1 = 0;
@@ -481,14 +475,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool tmr7_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
-			case CHANNEL::TMO:  // TMO1
-			// PA2
+			case CHANNEL::TMO:  // TMO7:
+			// PA2 (LFQFP100:  39)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B2 = 0;
@@ -500,8 +493,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMCI:  // TMCI0 
-			// PA4
+			case CHANNEL::TMCI:  // TMCI7:
+			// PA4 (LFQFP100:  37)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B4 = 0;
@@ -513,8 +506,8 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::TMRI:  // TMRI0 
-			// PA3
+			case CHANNEL::TMRI:  // TMRI7:
+			// PA3 (LFQFP100:  38)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B3 = 0;
@@ -546,12 +539,16 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static bool turn(peripheral per, CHANNEL ch, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			if(odr == ORDER::BYPASS) return true;
+			if(odr == ORDER::BYPASS) {
+				return true;
+			} else if(odr == ORDER::USER) {
+				return false;
+			}
 
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(per) {
 			case peripheral::TMR0:
 				ret = tmr0_(ch, ena, odr);
@@ -578,7 +575,6 @@ namespace device {
 				ret = tmr7_(ch, ena, odr);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 
