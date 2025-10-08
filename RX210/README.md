@@ -295,7 +295,7 @@
 
 ### LFQFP64
 
-|Peripheral|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|
 |---|---|---|---|---|---|
 |MTIOC0A|P34 (--)|PB3 (36)|-|-|-|
 |MTIOC0B|P13 (--)|P15 (19)|PA1 (44)|-|-|
@@ -323,7 +323,7 @@
 
 ### LFQFP100
 
-|Peripheral|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|
 |---|---|---|---|---|---|
 |MTIOC0A|P34 (16)|PB3 (57)|-|-|-|
 |MTIOC0B|P13 (33)|P15 (31)|PA1 (69)|-|-|
@@ -348,6 +348,36 @@
 |MTCLKB|P15 (31)|P25 (23)|PA6 (64)|PC7 (45)|-|
 |MTCLKC|P22 (26)|PA1 (69)|PC4 (48)|-|-|
 |MTCLKD|P23 (25)|PA3 (67)|PC5 (47)|-|-|
+
+---
+
+## port map order (IRQ) / ポートマップ候補 (IRQ)
+
+### LFQFP64
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|IRQ0|P30[DS] (14)|PD0 (--)|PH1 (23)|-|-|
+|IRQ1|P31[DS] (13)|PD1 (--)|PH2 (22)|-|-|
+|IRQ2|P32[DS] (12)|P12 (--)|PD2 (--)|-|-|
+|IRQ3|P33[DS] (--)|P13 (--)|PD3 (--)|-|-|
+|IRQ4|PB1[DS] (37)|P14 (20)|P34 (--)|PD4 (--)|PF5 (--)|
+|IRQ5|PA4[DS] (42)|P15 (19)|PD5 (--)|PE5 (46)|-|
+|IRQ6|PA3[DS] (43)|P16 (18)|PD6 (--)|PE6 (--)|-|
+|IRQ7|PE2[DS] (49)|P17 (17)|PD7 (--)|PE7 (--)|-|
+
+### LFQFP100
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|IRQ0|P30[DS] (20)|PD0 (86)|PH1 (37)|-|-|
+|IRQ1|P31[DS] (19)|PD1 (85)|PH2 (36)|-|-|
+|IRQ2|P32[DS] (18)|P12 (34)|PD2 (84)|-|-|
+|IRQ3|P33[DS] (17)|P13 (33)|PD3 (83)|-|-|
+|IRQ4|PB1[DS] (59)|P14 (32)|P34 (18)|PD4 (82)|PF5 (--)|
+|IRQ5|PA4[DS] (66)|P15 (31)|PD5 (81)|PE5 (73)|-|
+|IRQ6|PA3[DS] (67)|P16 (30)|PD6 (80)|PE6 (72)|-|
+|IRQ7|PE2[DS] (76)|P17 (29)|PD7 (79)|PE7 (71)|-|
 
 ---
 

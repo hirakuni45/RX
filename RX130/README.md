@@ -288,6 +288,36 @@
 
 ---
 
+## port map order (IRQ) / ポートマップ候補 (IRQ)
+
+### LFQFP64
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30 (14)|PD0 (--)|PH1 (23)|-|
+|IRQ1|P31 (13)|PD1 (--)|PH2 (22)|-|
+|IRQ2|P32 (12)|P12 (--)|PD2 (--)|-|
+|IRQ3|P13 (--)|P33 (--)|PD3 (--)|-|
+|IRQ4|PB1 (37)|P14 (20)|P34 (--)|PD4 (--)|
+|IRQ5|PA4 (42)|P15 (19)|PD5 (--)|PE5 (46)|
+|IRQ6|PA3 (43)|P16 (18)|PD6 (--)|PE6 (--)|
+|IRQ7|PE2 (49)|P17 (17)|PD7 (--)|PE7 (--)|
+
+### LFQFP100
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30 (20)|PD0 (86)|PH1 (37)|-|
+|IRQ1|P31 (19)|PD1 (85)|PH2 (36)|-|
+|IRQ2|P32 (18)|P12 (34)|PD2 (84)|-|
+|IRQ3|P13 (33)|P33 (17)|PD3 (83)|-|
+|IRQ4|PB1 (59)|P14 (32)|P34 (16)|PD4 (82)|
+|IRQ5|PA4 (66)|P15 (31)|PD5 (81)|PE5 (73)|
+|IRQ6|PA3 (67)|P16 (30)|PD6 (80)|PE6 (72)|
+|IRQ7|PE2 (76)|P17 (29)|PD7 (79)|PE7 (71)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

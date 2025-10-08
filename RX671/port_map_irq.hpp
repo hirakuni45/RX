@@ -833,7 +833,7 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(irqv) {
 			case ICU::VECTOR::IRQ0:
 				ret = irq0_(ena, odr);
@@ -884,7 +884,6 @@ namespace device {
 				ret = irq15_(ena, odr);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 

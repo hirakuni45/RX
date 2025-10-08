@@ -219,6 +219,21 @@ namespace board_profile {
 
 ---
 
+## port map order (IRQ) / ポートマップ候補 (IRQ)
+
+### LFQFP48
+
+|IRQ|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|IRQ0|P10 (48)|P93 (24)|PE2 (8)|
+|IRQ1|P11 (47)|P94 (23)|-|
+|IRQ2|P22 (36)|PB1 (19)|PD4 (11)|
+|IRQ3|P24 (34)|PB4 (16)|PD5 (10)|
+|IRQ4|P23 (35)|PA2 (22)|-|
+|IRQ5|P70 (31)|PB7 (13)|PD6 (9)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
