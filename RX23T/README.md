@@ -185,6 +185,21 @@
 
 ---
 
+## port map order (IRQ) / ポートマップ候補 (IRQ)
+
+### LFQFP64
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P10 (62)|P93 (30)|-|-|
+|IRQ1|P11 (61)|P94 (29)|-|-|
+|IRQ2|P00 (2)|P22 (48)|PB1 (25)|PD4 (15)|
+|IRQ3|P24 (46)|PB4 (21)|PD5 (14)|-|
+|IRQ4|P01 (4)|P23 (47)|PA2 (28)|-|
+|IRQ5|P02 (1)|P70 (39)|PB6 (18)|PD6 (13)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
