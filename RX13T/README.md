@@ -126,7 +126,9 @@ namespace board_profile {
 
 ---
 
-## peripheral / ペリフェラル
+## Peripheral / ペリフェラル
+
+- [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
@@ -166,7 +168,26 @@ namespace board_profile {
 
 ---
 
-## port map order / ポートマップ候補
+## Port map order (IRQ) / ポートマップ候補 (IRQ)
+
+- [port_map_irq.hpp](port_map_irq.hpp?ts=4)
+
+### LFQFP48
+
+|IRQ|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|IRQ0|P10 (48)|P93 (24)|PE2 (8)|
+|IRQ1|P11 (47)|P94 (23)|-|
+|IRQ2|P22 (36)|PB1 (19)|PD4 (11)|
+|IRQ3|P24 (34)|PB4 (16)|PD5 (10)|
+|IRQ4|P23 (35)|PA2 (22)|-|
+|IRQ5|P70 (31)|PB7 (13)|PD6 (9)|
+
+---
+
+## Port map order / ポートマップ候補
+
+- [port_map.hpp](port_map.hpp?ts=4)
 
 ### LFQFP48
 
@@ -186,11 +207,13 @@ namespace board_profile {
 
 ---
 
-## port map order (MTU) / ポートマップ候補 (MTU)
+## Port map order (MTU) / ポートマップ候補 (MTU)
+
+- [port_map_mtu.hpp](port_map_mtu.hpp?ts=4)
 
 ### LFQFP48
 
-|Peripheral|FIRST|SECOND|THIRD|
+|MTU|FIRST|SECOND|THIRD|
 |---|---|---|---|
 |MTIOC0A|PB3 (17)|PD3 (12)|-|
 |MTIOC0B|PB2 (18)|PD4 (11)|-|
@@ -216,21 +239,6 @@ namespace board_profile {
 |MTCLKC|PB2 (18)|-|-|
 |MTCLKD|PB7 (13)|-|-|
 |ADSM0|PB2 (18)|-|-|
-
----
-
-## port map order (IRQ) / ポートマップ候補 (IRQ)
-
-### LFQFP48
-
-|IRQ|FIRST|SECOND|THIRD|
-|---|---|---|---|
-|IRQ0|P10 (48)|P93 (24)|PE2 (8)|
-|IRQ1|P11 (47)|P94 (23)|-|
-|IRQ2|P22 (36)|PB1 (19)|PD4 (11)|
-|IRQ3|P24 (34)|PB4 (16)|PD5 (10)|
-|IRQ4|P23 (35)|PA2 (22)|-|
-|IRQ5|P70 (31)|PB7 (13)|PD6 (9)|
 
 ---
 

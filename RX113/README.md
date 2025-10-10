@@ -109,7 +109,9 @@
 
 ---
 
-## peripheral / ペリフェラル
+## Peripheral / ペリフェラル
+
+- [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
@@ -157,7 +159,41 @@
 
 ---
 
-## port map order / ポートマップ候補
+## port map order (IRQ) / ポートマップ候補 (IRQ)
+
+- [port_map_irq.hpp](port_map_irq.hpp?ts=4)
+
+### LFQFP64
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|IRQ0|P30 (4)|PE0 (51)|PD0 (56)|-|-|
+|IRQ1|P31 (5)|PE1 (50)|PD1 (55)|-|-|
+|IRQ2|P32 (16)|PB0 (39)|PC4 (30)|P12 (--)|PD2 (54)|
+|IRQ3|P27 (2)|PE3 (48)|PA6 (41)|P13 (--)|PD3 (--)|
+|IRQ4|P14 (20)|PB1 (37)|PE4 (47)|PD4 (--)|-|
+|IRQ5|P15 (19)|PA4 (42)|PE5 (46)|P56 (--)|-|
+|IRQ6|P16 (18)|PA3 (43)|PE6 (53)|P10 (--)|-|
+|IRQ7|P17 (17)|PE2 (49)|PE7 (--)|P11 (--)|-|
+
+### LFQFP100
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|IRQ0|P30 (13)|PE0 (78)|PD0 (85)|-|-|
+|IRQ1|P31 (14)|PE1 (77)|PD1 (84)|-|-|
+|IRQ2|P32 (25)|PB0 (61)|PC4 (48)|P12 (35)|PD2 (83)|
+|IRQ3|P27 (11)|PE3 (75)|PA6 (63)|P13 (34)|PD3 (82)|
+|IRQ4|P14 (29)|PB1 (59)|PE4 (74)|PD4 (81)|-|
+|IRQ5|P15 (28)|PA4 (66)|PE5 (73)|P56 (38)|-|
+|IRQ6|P16 (27)|PA3 (67)|PE6 (80)|P10 (37)|-|
+|IRQ7|P17 (26)|PE2 (76)|PE7 (79)|P11 (36)|-|
+
+---
+
+## Port map order / ポートマップ候補
+
+- [port_map.hpp](port_map.hpp?ts=4)
 
 ### LFQFP64
 
@@ -237,7 +273,9 @@
 
 ---
 
-## port map order (MTU) / ポートマップ候補 (MTU)
+## Port map order (MTU) / ポートマップ候補 (MTU)
+
+- [port_map_mtu.hpp](port_map_mtu.hpp?ts=4)
 
 ### LFQFP64
 
@@ -294,36 +332,6 @@
 |MTCLKB|P15 (28)|PA6 (63)|PC7 (45)|P25 (5)|-|-|
 |MTCLKC|PA1 (69)|PC4 (48)|P22 (8)|-|-|-|
 |MTCLKD|PA3 (67)|PC5 (47)|P23 (7)|-|-|-|
-
----
-
-## port map order (IRQ) / ポートマップ候補 (IRQ)
-
-### LFQFP64
-
-|IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|
-|---|---|---|---|---|---|
-|IRQ0|P30 (4)|PE0 (51)|PD0 (56)|-|-|
-|IRQ1|P31 (5)|PE1 (50)|PD1 (55)|-|-|
-|IRQ2|P32 (16)|PB0 (39)|PC4 (30)|P12 (--)|PD2 (54)|
-|IRQ3|P27 (2)|PE3 (48)|PA6 (41)|P13 (--)|PD3 (--)|
-|IRQ4|P14 (20)|PB1 (37)|PE4 (47)|PD4 (--)|-|
-|IRQ5|P15 (19)|PA4 (42)|PE5 (46)|P56 (--)|-|
-|IRQ6|P16 (18)|PA3 (43)|PE6 (53)|P10 (--)|-|
-|IRQ7|P17 (17)|PE2 (49)|PE7 (--)|P11 (--)|-|
-
-### LFQFP100
-
-|IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|
-|---|---|---|---|---|---|
-|IRQ0|P30 (13)|PE0 (78)|PD0 (85)|-|-|
-|IRQ1|P31 (14)|PE1 (77)|PD1 (84)|-|-|
-|IRQ2|P32 (25)|PB0 (61)|PC4 (48)|P12 (35)|PD2 (83)|
-|IRQ3|P27 (11)|PE3 (75)|PA6 (63)|P13 (34)|PD3 (82)|
-|IRQ4|P14 (29)|PB1 (59)|PE4 (74)|PD4 (81)|-|
-|IRQ5|P15 (28)|PA4 (66)|PE5 (73)|P56 (38)|-|
-|IRQ6|P16 (27)|PA3 (67)|PE6 (80)|P10 (37)|-|
-|IRQ7|P17 (26)|PE2 (76)|PE7 (79)|P11 (36)|-|
 
 ---
 

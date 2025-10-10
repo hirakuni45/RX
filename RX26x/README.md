@@ -118,7 +118,9 @@
 
 ---
 
-## peripheral / ペリフェラル
+## Peripheral / ペリフェラル
+
+- [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
@@ -173,7 +175,28 @@
 
 ---
 
-## port map order / ポートマップ候補
+## Port map order (IRQ) / ポートマップ候補 (IRQ)
+
+- [port_map_irq.hpp](port_map_irq.hpp?ts=4)
+
+### LFQFP100
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|
+|---|---|---|---|---|---|
+|IRQ0|P30 (20)|PD0 (86)|PH1 (37)|-|-|
+|IRQ1|P31 (19)|PD1 (85)|PH2 (36)|-|-|
+|IRQ2|P12 (34)|P32 (18)|P36 (13)|PD2 (84)|-|
+|IRQ3|P13 (33)|P33 (17)|PD3 (83)|-|-|
+|IRQ4|P14 (32)|P34 (16)|P37 (11)|PB1 (59)|PD4 (82)|
+|IRQ5|P15 (31)|PA4 (66)|PD5 (81)|PE5 (73)|-|
+|IRQ6|P16 (30)|PA3 (67)|PD6 (80)|PE6 (72)|-|
+|IRQ7|P17 (29)|PD7 (79)|PE2 (76)|PE7 (71)|-|
+
+---
+
+## Port map order / ポートマップ候補
+
+- [port_map.hpp](port_map.hpp?ts=4)
 
 ### LFQFP100
 
@@ -218,9 +241,11 @@
 
 ---
 
-## port map order (GPTW) / ポートマップ候補 (GPTW)
+## Port map order (GPTW) / ポートマップ候補 (GPTW)
 
-### LFQGFP100
+- [port_map_gptw.hpp](port_map_gptw.hpp?ts=4)
+
+### LFQFP100
 
 |GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|
 |---|---|---|---|---|---|---|---|---|---|
@@ -245,23 +270,6 @@
 |GTETRGC|P16 (30)|P22 (26)|PA1 (69)|PB2 (58)|PC0 (52)|PC4 (48)|-|-|-|
 |GTETRGD|P17 (29)|P23 (25)|PA3 (67)|PB3 (57)|PC1 (51)|PC5 (47)|-|-|-|
 |GTCPPO0|P14 (32)|P17 (29)|PC1 (51)|PC7 (45)|PJ1 (6)|-|-|-|-|
-
----
-
-## port map order (IRQ) / ポートマップ候補 (IRQ)
-
-### LFQGFP100
-
-|IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|
-|---|---|---|---|---|---|
-|IRQ0|P30 (20)|PD0 (86)|PH1 (37)|-|-|
-|IRQ1|P31 (19)|PD1 (85)|PH2 (36)|-|-|
-|IRQ2|P12 (34)|P32 (18)|P36 (13)|PD2 (84)|-|
-|IRQ3|P13 (33)|P33 (17)|PD3 (83)|-|-|
-|IRQ4|P14 (32)|P34 (16)|P37 (11)|PB1 (59)|PD4 (82)|
-|IRQ5|P15 (31)|PA4 (66)|PD5 (81)|PE5 (73)|-|
-|IRQ6|P16 (30)|PA3 (67)|PD6 (80)|PE6 (72)|-|
-|IRQ7|P17 (29)|PD7 (79)|PE2 (76)|PE7 (71)|-|
 
 ---
 

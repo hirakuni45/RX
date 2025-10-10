@@ -120,7 +120,9 @@
 
 ---
 
-## peripheral / ペリフェラル
+## Peripheral / ペリフェラル
+
+- [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
@@ -178,7 +180,28 @@
 
 ---
 
-## port map order / ポートマップ候補
+## Port map order (IRQ) / ポートマップ候補 (IRQ)
+
+- [port_map_irq.hpp](port_map_irq.hpp?ts=4)
+
+### LFQFP64
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30[DS] (45)|PB5 (19)|PE5 (--)|PG0 (--)|
+|IRQ1|P11[DS] (61)|P93 (30)|PE4 (--)|PG1 (--)|
+|IRQ2|P00[DS] (2)|PE3[DS] (--)|PB6 (18)|PG2 (--)|
+|IRQ3|PB4[DS] (21)|P34 (--)|P82 (--)|-|
+|IRQ4|P01[DS] (4)|P96 [DS] (--)|P24 (46)|PB1 (25)|
+|IRQ5|P70[DS] (39)|P80 (--)|PF2 (--)|-|
+|IRQ6|P21[DS] (--)|PD5 (14)|PG4 (--)|-|
+|IRQ7|P20[DS] (--)|P03 (--)|PE0 (--)|-|
+
+---
+
+## Port map order / ポートマップ候補
+
+- [port_map.hpp](port_map.hpp?ts=4)
 
 ### LFQFP64
 
@@ -222,7 +245,9 @@
 
 ---
 
-## port map order (GPT) / ポートマップ候補 (GPT)
+## Port map order (GPT) / ポートマップ候補 (GPT)
+
+- [port_map_gpt.hpp](port_map_gpt.hpp?ts=4)
 
 ### LFQFP64
 
@@ -250,7 +275,9 @@
 
 ---
 
-## port map order (MTU) / ポートマップ候補 (MTU)
+## Port map order (MTU) / ポートマップ候補 (MTU)
+
+- [port_map_mtu.hpp](port_map_mtu.hpp?ts=4)
 
 ### LFQFP64
 
@@ -287,23 +314,6 @@
 |MTCLKB|P20 (--)|P23 (47)|P32 (41)|PB2 (24)|
 |MTCLKC|P11 (61)|P24 (46)|P31 (43)|PE4 (--)|
 |MTCLKD|P10 (62)|P30 (45)|PE3 (--)|-|
-
----
-
-## port map order (IRQ) / ポートマップ候補 (IRQ)
-
-### LFQFP64
-
-|IRQ|FIRST|SECOND|THIRD|FOURTH|
-|---|---|---|---|---|
-|IRQ0|P30[DS] (45)|PB5 (19)|PE5 (--)|PG0 (--)|
-|IRQ1|P11[DS] (61)|P93 (30)|PE4 (--)|PG1 (--)|
-|IRQ2|P00[DS] (2)|PE3[DS] (--)|PB6 (18)|PG2 (--)|
-|IRQ3|PB4[DS] (21)|P34 (--)|P82 (--)|-|
-|IRQ4|P01[DS] (4)|P96 [DS] (--)|P24 (46)|PB1 (25)|
-|IRQ5|P70[DS] (39)|P80 (--)|PF2 (--)|-|
-|IRQ6|P21[DS] (--)|PD5 (14)|PG4 (--)|-|
-|IRQ7|P20[DS] (--)|P03 (--)|PE0 (--)|-|
 
 ---
 
