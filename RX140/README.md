@@ -119,7 +119,9 @@
 
 ---
 
-## peripheral / ペリフェラル
+## Peripheral / ペリフェラル
+
+- [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
@@ -167,7 +169,41 @@
 
 ---
 
-## port map order / ポートマップ候補
+## Port map order (IRQ) / ポートマップ候補 (IRQ)
+
+- [port_map_irq.hpp](port_map_irq.hpp?ts=4)
+
+### LFQFP64
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30 (14)|PD0 (--)|PH1 (23)|-|
+|IRQ1|P31 (13)|PD1 (--)|PH2 (22)|-|
+|IRQ2|P12 (--)|P32 (12)|P36 (9)|PD2 (--)|
+|IRQ3|P13 (--)|-|-|-|
+|IRQ4|P14 (20)|P34 (--)|P37 (7)|PB1 (37)|
+|IRQ5|P15 (19)|PA4 (42)|PE5 (46)|-|
+|IRQ6|P16 (18)|PA3 (43)|-|-|
+|IRQ7|P17 (17)|PE2 (49)|-|-|
+
+### LFQFP80
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30 (18)|PD0 (66)|PH1 (31)|-|
+|IRQ1|P31 (17)|PD1 (65)|PH2 (30)|-|
+|IRQ2|P12 (28)|P32 (16)|P36 (12)|PD2 (64)|
+|IRQ3|P13 (27)|-|-|-|
+|IRQ4|P14 (26)|P34 (15)|P37 (10)|PB1 (47)|
+|IRQ5|P15 (25)|PA4 (53)|PE5 (58)|-|
+|IRQ6|P16 (24)|PA3 (54)|-|-|
+|IRQ7|P17 (23)|PE2 (61)|-|-|
+
+---
+
+## Port map order / ポートマップ候補
+
+- [port_map.hpp](port_map.hpp?ts=4)
 
 ### LFQFP64
 
@@ -239,7 +275,9 @@
 
 ---
 
-## port map order (MTU) / ポートマップ候補 (MTU)
+## Port map order (MTU) / ポートマップ候補 (MTU)
+
+- [port_map_mtu.hpp](port_map_mtu.hpp?ts=4)
 
 ### LFQFP64
 
@@ -296,36 +334,6 @@
 |MTCLKB|P15 (25)|PA6 (51)|PC7 (35)|-|-|-|-|
 |MTCLKC|PA1 (56)|PC4 (38)|-|-|-|-|-|
 |MTCLKD|PA3 (54)|PC5 (37)|-|-|-|-|-|
-
----
-
-## port map order (IRQ) / ポートマップ候補 (IRQ)
-
-### LFQFP64
-
-|IRQ|FIRST|SECOND|THIRD|FOURTH|
-|---|---|---|---|---|
-|IRQ0|P30 (14)|PD0 (--)|PH1 (23)|-|
-|IRQ1|P31 (13)|PD1 (--)|PH2 (22)|-|
-|IRQ2|P12 (--)|P32 (12)|P36 (9)|PD2 (--)|
-|IRQ3|P13 (--)|-|-|-|
-|IRQ4|P14 (20)|P34 (--)|P37 (7)|PB1 (37)|
-|IRQ5|P15 (19)|PA4 (42)|PE5 (46)|-|
-|IRQ6|P16 (18)|PA3 (43)|-|-|
-|IRQ7|P17 (17)|PE2 (49)|-|-|
-
-### LFQFP80
-
-|IRQ|FIRST|SECOND|THIRD|FOURTH|
-|---|---|---|---|---|
-|IRQ0|P30 (18)|PD0 (66)|PH1 (31)|-|
-|IRQ1|P31 (17)|PD1 (65)|PH2 (30)|-|
-|IRQ2|P12 (28)|P32 (16)|P36 (12)|PD2 (64)|
-|IRQ3|P13 (27)|-|-|-|
-|IRQ4|P14 (26)|P34 (15)|P37 (10)|PB1 (47)|
-|IRQ5|P15 (25)|PA4 (53)|PE5 (58)|-|
-|IRQ6|P16 (24)|PA3 (54)|-|-|
-|IRQ7|P17 (23)|PE2 (61)|-|-|
 
 ---
 

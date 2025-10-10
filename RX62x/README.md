@@ -128,7 +128,9 @@
 
 ---
 
-## peripheral / ペリフェラル
+## Peripheral / ペリフェラル
+
+- [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
@@ -188,7 +190,53 @@
 
 ---
 
-## port map order / ポートマップ候補
+## Port map order (IRQ) / ポートマップ候補 (IRQ)
+
+- [port_map_irq.hpp](port_map_irq.hpp?ts=4)
+
+### LFQFP100
+
+|IRQ|FIRST|SECOND|
+|---|---|---|
+|IRQ0|P30 (20)|P10 (---)|
+|IRQ1|P31 (19)|P11 (---)|
+|IRQ2|P32 (18)|P12 (34)|
+|IRQ3|P33 (17)|P13 (33)|
+|IRQ4|P34 (16)|P14 (32)|
+|IRQ5|PE5 (73)|P15 (---)|
+|IRQ6|PE6 (72)|P16 (30)|
+|IRQ7|PE7 (71)|P17 (---)|
+|IRQ8|P00 (---)|P40 (95)|
+|IRQ9|P01 (---)|P41 (93)|
+|IRQ10|P02 (---)|P42 (92)|
+|IRQ11|P03 (---)|P43 (91)|
+|IRQ13|P05 (100)|P45 (89)|
+|IRQ15|P07 (98)|P47 (87)|
+
+### LFQFP144
+
+|IRQ|FIRST|SECOND|
+|---|---|---|
+|IRQ0|P30 (29)|P10 (---)|
+|IRQ1|P31 (28)|P11 (---)|
+|IRQ2|P32 (27)|P12 (45)|
+|IRQ3|P33 (26)|P13 (44)|
+|IRQ4|P34 (25)|P14 (43)|
+|IRQ5|PE5 (106)|P15 (42)|
+|IRQ6|PE6 (102)|P16 (40)|
+|IRQ7|PE7 (101)|P17 (38)|
+|IRQ8|P00 (8)|P40 (141)|
+|IRQ9|P01 (7)|P41 (139)|
+|IRQ10|P02 (6)|P42 (138)|
+|IRQ11|P03 (4)|P43 (137)|
+|IRQ13|P05 (2)|P45 (135)|
+|IRQ15|P07 (144)|P47 (133)|
+
+---
+
+## Port map order / ポートマップ候補
+
+- [port_map.hpp](port_map.hpp?ts=4)
 
 ### LFQFP100
 
@@ -278,9 +326,11 @@
 
 ---
 
-## port map order (MTU) / ポートマップ候補 (MTU)
+## Port map order (MTU) / ポートマップ候補 (MTU)
 
-### LFQGFP100
+- [port_map_mtu.hpp](port_map_mtu.hpp?ts=4)
+
+### LFQFP100
 
 |MTU|FIRST|SECOND|
 |---|---|---|
@@ -381,48 +431,6 @@
 |MTCLKF|PC3 (67)|PB5 (80)|
 |MTCLKG|PC0 (75)|PB2 (83)|
 |MTCLKH|PC1 (73)|PB3 (82)|
-
----
-
-## port map order (IRQ) / ポートマップ候補 (IRQ)
-
-### LFQGFP100
-
-|IRQ|FIRST|SECOND|
-|---|---|---|
-|IRQ0|P30 (20)|P10 (---)|
-|IRQ1|P31 (19)|P11 (---)|
-|IRQ2|P32 (18)|P12 (34)|
-|IRQ3|P33 (17)|P13 (33)|
-|IRQ4|P34 (16)|P14 (32)|
-|IRQ5|PE5 (73)|P15 (---)|
-|IRQ6|PE6 (72)|P16 (30)|
-|IRQ7|PE7 (71)|P17 (---)|
-|IRQ8|P00 (---)|P40 (95)|
-|IRQ9|P01 (---)|P41 (93)|
-|IRQ10|P02 (---)|P42 (92)|
-|IRQ11|P03 (---)|P43 (91)|
-|IRQ13|P05 (100)|P45 (89)|
-|IRQ15|P07 (98)|P47 (87)|
-
-### LFQGFP144
-
-|IRQ|FIRST|SECOND|
-|---|---|---|
-|IRQ0|P30 (29)|P10 (---)|
-|IRQ1|P31 (28)|P11 (---)|
-|IRQ2|P32 (27)|P12 (45)|
-|IRQ3|P33 (26)|P13 (44)|
-|IRQ4|P34 (25)|P14 (43)|
-|IRQ5|PE5 (106)|P15 (42)|
-|IRQ6|PE6 (102)|P16 (40)|
-|IRQ7|PE7 (101)|P17 (38)|
-|IRQ8|P00 (8)|P40 (141)|
-|IRQ9|P01 (7)|P41 (139)|
-|IRQ10|P02 (6)|P42 (138)|
-|IRQ11|P03 (4)|P43 (137)|
-|IRQ13|P05 (2)|P45 (135)|
-|IRQ15|P07 (144)|P47 (133)|
 
 ---
 
