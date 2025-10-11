@@ -583,4 +583,3 @@ namespace device {
 		}
 	};
 }
-

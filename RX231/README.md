@@ -137,7 +137,9 @@
 
 ---
 
-## peripheral / ペリフェラル
+## Peripheral / ペリフェラル
+
+- [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
@@ -198,7 +200,41 @@
 
 ---
 
-## port map order / ポートマップ候補
+## Port map order (IRQ) / ポートマップ候補 (IRQ)
+
+- [port_map_irq.hpp](port_map_irq.hpp?ts=4)
+
+### LFQFP64
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30 (14)|PD0 (--)|PH1 (23)|-|
+|IRQ1|P31 (13)|PD1 (--)|PH2 (22)|-|
+|IRQ2|P32 (--)|P12 (--)|PD2 (--)|-|
+|IRQ3|P33 (--)|P13 (--)|PD3 (--)|-|
+|IRQ4|PB1 (37)|P14 (20)|P34 (--)|PD4 (--)|
+|IRQ5|PA4 (42)|P15 (19)|PD5 (--)|PE5 (46)|
+|IRQ6|PA3 (43)|P16 (18)|PD6 (--)|PE6 (--)|
+|IRQ7|PE2 (49)|P17 (17)|PD7 (--)|PE7 (--)|
+
+### LFQFP100
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30 (20)|PD0 (86)|PH1 (37)|-|
+|IRQ1|P31 (19)|PD1 (85)|PH2 (36)|-|
+|IRQ2|P32 (18)|P12 (34)|PD2 (84)|-|
+|IRQ3|P33 (17)|P13 (33)|PD3 (83)|-|
+|IRQ4|PB1 (59)|P14 (32)|P34 (16)|PD4 (82)|
+|IRQ5|PA4 (66)|P15 (31)|PD5 (81)|PE5 (73)|
+|IRQ6|PA3 (67)|P16 (20)|PD6 (80)|PE6 (72)|
+|IRQ7|PE2 (76)|P17 (29)|PD7 (79)|PE7 (71)|
+
+---
+
+## Port map order / ポートマップ候補
+
+- [port_map.hpp](port_map.hpp?ts=4)
 
 ### LFQFP64
 
@@ -282,7 +318,9 @@
 
 ---
 
-## port map order (MTU) / ポートマップ候補 (MTU)
+## Port map order (MTU) / ポートマップ候補 (MTU)
+
+- [port_map_mtu.hpp](port_map_mtu.hpp?ts=4)
 
 ### LFQFP64
 
@@ -342,33 +380,59 @@
 
 ---
 
-## port map order (IRQ) / ポートマップ候補 (IRQ)
+## Port map order (TPU) / ポートマップ候補 (TPU)
+
+- [port_map_tpu.hpp](port_map_tpu.hpp?ts=4)
 
 ### LFQFP64
 
-|IRQ|FIRST|SECOND|THIRD|FOURTH|
-|---|---|---|---|---|
-|IRQ0|P30 (14)|PD0 (--)|PH1 (23)|-|
-|IRQ1|P31 (13)|PD1 (--)|PH2 (22)|-|
-|IRQ2|P32 (--)|P12 (--)|PD2 (--)|-|
-|IRQ3|P33 (--)|P13 (--)|PD3 (--)|-|
-|IRQ4|PB1 (37)|P14 (20)|P34 (--)|PD4 (--)|
-|IRQ5|PA4 (42)|P15 (19)|PD5 (--)|PE5 (46)|
-|IRQ6|PA3 (43)|P16 (18)|PD6 (--)|PE6 (--)|
-|IRQ7|PE2 (49)|P17 (17)|PD7 (--)|PE7 (--)|
+|TPU|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TIOCA0|PA0 (45)|-|-|
+|TIOCB0|P17 (17)|PA1 (44)|-|
+|TIOCC0|P32 (--)|-|-|
+|TIOCD0|P33 (--)|PA3 (43)|-|
+|TIOCA1|PA4 (42)|-|-|
+|TIOCB1|P16 (18)|PA5 (--)|-|
+|TIOCA2|PA6 (41)|-|-|
+|TIOCB2|P15 (19)|PA7 (--)|-|
+|TIOCA3|P21 (--)|PB0 (39)|-|
+|TIOCB3|P20 (--)|PB1 (37)|-|
+|TIOCC3|P22 (--)|PB2 (--)|-|
+|TIOCD3|P23 (--)|PB3 (36)|-|
+|TIOCA4|P25 (--)|PB4 (--)|-|
+|TIOCB4|P24 (--)|PB5 (35)|-|
+|TIOCA5|P13 (--)|PB6 (34)|-|
+|TIOCB5|P14 (20)|PB7 (33)|-|
+|TCLKA|P14 (20)|PC2 (32)|-|
+|TCLKB|P15 (19)|PA3 (43)|PC3 (31)|
+|TCLKC|P16 (18)|PB2 (--)|PC0 (--)|
+|TCLKD|P17 (17)|PB3 (36)|PC1 (--)|
 
 ### LFQFP100
 
-|IRQ|FIRST|SECOND|THIRD|FOURTH|
-|---|---|---|---|---|
-|IRQ0|P30 (20)|PD0 (86)|PH1 (37)|-|
-|IRQ1|P31 (19)|PD1 (85)|PH2 (36)|-|
-|IRQ2|P32 (18)|P12 (34)|PD2 (84)|-|
-|IRQ3|P33 (17)|P13 (33)|PD3 (83)|-|
-|IRQ4|PB1 (59)|P14 (32)|P34 (16)|PD4 (82)|
-|IRQ5|PA4 (66)|P15 (31)|PD5 (81)|PE5 (73)|
-|IRQ6|PA3 (67)|P16 (20)|PD6 (80)|PE6 (72)|
-|IRQ7|PE2 (76)|P17 (29)|PD7 (79)|PE7 (71)|
+|TPU|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TIOCA0|PA0 (70)|-|-|
+|TIOCB0|P17 (29)|PA1 (69)|-|
+|TIOCC0|P32 (18)|-|-|
+|TIOCD0|P33 (17)|PA3 (67)|-|
+|TIOCA1|PA4 (66)|-|-|
+|TIOCB1|P16 (30)|PA5 (65)|-|
+|TIOCA2|PA6 (64)|-|-|
+|TIOCB2|P15 (31)|PA7 (63)|-|
+|TIOCA3|P21 (27)|PB0 (61)|-|
+|TIOCB3|P20 (28)|PB1 (59)|-|
+|TIOCC3|P22 (26)|PB2 (58)|-|
+|TIOCD3|P23 (25)|PB3 (57)|-|
+|TIOCA4|P25 (23)|PB4 (56)|-|
+|TIOCB4|P24 (24)|PB5 (55)|-|
+|TIOCA5|P13 (33)|PB6 (54)|-|
+|TIOCB5|P14 (32)|PB7 (53)|-|
+|TCLKA|P14 (32)|PC2 (50)|-|
+|TCLKB|P15 (31)|PA3 (67)|PC3 (49)|
+|TCLKC|P16 (30)|PB2 (58)|PC0 (52)|
+|TCLKD|P17 (29)|PB3 (57)|PC1 (51)|
 
 ---
 
