@@ -753,6 +753,87 @@
 
 ---
 
+## Port map order (TPU) / ポートマップ候補 (TPU)
+
+- [port_map_tpu.hpp](port_map_tpu.hpp?ts=4)
+
+### LFQFP100
+
+|TPU|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TIOCA0|P86 (---)|PA0 (70)|-|
+|TIOCB0|P17 (29)|PA1 (69)|-|
+|TIOCC0|P32 (18)|P85 (---)|-|
+|TIOCD0|P33 (17)|PA3 (67)|-|
+|TIOCA1|P56 (---)|PA4 (66)|-|
+|TIOCB1|P16 (30)|PA5 (65)|-|
+|TIOCA2|P87 (---)|PA6 (64)|-|
+|TIOCB2|P15 (31)|PA7 (63)|-|
+|TIOCA3|P21 (27)|PB0 (61)|-|
+|TIOCB3|P20 (28)|PB1 (59)|-|
+|TIOCC3|P22 (26)|PB2 (58)|-|
+|TIOCD3|P23 (25)|PB3 (57)|-|
+|TIOCA4|P25 (23)|PB4 (56)|-|
+|TIOCB4|P24 (24)|PB5 (55)|-|
+|TIOCA5|P13 (33)|PB6 (54)|-|
+|TIOCB5|P14 (32)|PB7 (53)|-|
+|TCLKA|P14 (32)|PC2 (50)|-|
+|TCLKB|P15 (31)|PA3 (67)|PC3 (49)|
+|TCLKC|P16 (30)|PB2 (58)|PC0 (52)|
+|TCLKD|P17 (29)|PB3 (57)|PC1 (51)|
+
+### LFQFP144
+
+|TPU|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TIOCA0|P86 (41)|PA0 (97)|-|
+|TIOCB0|P17 (38)|PA1 (96)|-|
+|TIOCC0|P32 (27)|P85 (---)|-|
+|TIOCD0|P33 (26)|PA3 (94)|-|
+|TIOCA1|P56 (50)|PA4 (92)|-|
+|TIOCB1|P16 (40)|PA5 (90)|-|
+|TIOCA2|P87 (39)|PA6 (89)|-|
+|TIOCB2|P15 (41)|PA7 (88)|-|
+|TIOCA3|P21 (36)|PB0 (87)|-|
+|TIOCB3|P20 (37)|PB1 (84)|-|
+|TIOCC3|P22 (35)|PB2 (83)|-|
+|TIOCD3|P23 (34)|PB3 (82)|-|
+|TIOCA4|P25 (32)|PB4 (81)|-|
+|TIOCB4|P24 (33)|PB5 (80)|-|
+|TIOCA5|P13 (44)|PB6 (79)|-|
+|TIOCB5|P14 (43)|PB7 (78)|-|
+|TCLKA|P14 (43)|PC2 (70)|-|
+|TCLKB|P15 (42)|PA3 (94)|PC3 (67)|
+|TCLKC|P16 (40)|PB2 (83)|PC0 (75)|
+|TCLKD|P17 (38)|PB3 (82)|PC1 (73)|
+
+### LFQFP176
+
+|TPU|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TIOCA0|P86 (49)|PA0 (118)|-|
+|TIOCB0|P17 (46)|PA1 (114)|-|
+|TIOCC0|P32 (29)|P85 (61)|-|
+|TIOCD0|P33 (28)|PA3 (110)|-|
+|TIOCA1|P56 (---)|PA4 (109)|-|
+|TIOCB1|P16 (48)|PA5 (108)|-|
+|TIOCA2|P87 (47)|PA6 (107)|-|
+|TIOCB2|P15 (50)|PA7 (106)|-|
+|TIOCA3|P21 (44)|PB0 (104)|-|
+|TIOCB3|P20 (45)|PB1 (100)|-|
+|TIOCC3|P22 (43)|PB2 (99)|-|
+|TIOCD3|P23 (42)|PB3 (98)|-|
+|TIOCA4|P25 (38)|PB4 (97)|-|
+|TIOCB4|P24 (40)|PB5 (96)|-|
+|TIOCA5|P13 (52)|PB6 (95)|-|
+|TIOCB5|P14 (51)|PB7 (94)|-|
+|TCLKA|P14 (51)|PC2 (86)|-|
+|TCLKB|P15 (50)|PA3 (110)|PC3 (83)|
+|TCLKC|P16 (48)|PB2 (99)|PC0 (91)|
+|TCLKD|P17 (46)|PB3 (98)|PC1 (89)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
