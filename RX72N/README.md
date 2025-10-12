@@ -891,6 +891,45 @@
 
 ---
 
+## Port map order (QSPI) / ポートマップ候補 (QSPI)
+
+- [port_map_qspi.hpp](port_map_qspi.hpp?ts=4)
+
+### LFQFP100
+
+|QSPI|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|QSPCLK|P77 (---)|PD5 (81)|PM0 (---)|PN4 (---)|
+|QSSL|P76 (---)|PD4 (82)|PM1 (---)|PN5 (---)|
+|QIO0|PC3 (49)|PD6 (80)|PJ3 (4)|PM2 (---)|
+|QIO1|PC4 (48)|PD7 (79)|PJ5 (---)|PM3 (---)|
+|QIO2|P00 (---)|P80 (---)|PD2 (84)|PM4 (---)|
+|QIO3|P01 (---)|P81 (---)|PD3 (83)|PM5 (---)|
+
+### LFQFP144
+
+|QSPI|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|QSPCLK|P77 (68)|PD5 (121)|PM0 (---)|PN4 (---)|
+|QSSL|P76 (69)|PD4 (122)|PM1 (---)|PN5 (---)|
+|QIO0|PC3 (67)|PD6 (120)|PJ3 (13)|PM2 (---)|
+|QIO1|PC4 (66)|PD7 (119)|PJ5 (11)|PM3 (---)|
+|QIO2|P00 (8)|P80 (65)|PD2 (124)|PM4 (---)|
+|QIO3|P01 (7)|P81 (64)|PD3 (123)|PM5 (---)|
+
+### LFQFP176
+
+|QSPI|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|QSPCLK|P77 (84)|PD5 (147)|PM0 (---)|PN4 (---)|
+|QSSL|P76 (85)|PD4 (148)|PM1 (---)|PN5 (---)|
+|QIO0|PC3 (83)|PD6 (145)|PJ3 (13)|PM2 (---)|
+|QIO1|PC4 (82)|PD7 (143)|PJ5 (11)|PM3 (---)|
+|QIO2|P00 (8)|P80 (81)|PD2 (154)|PM4 (---)|
+|QIO3|P01 (7)|P81 (80)|PD3 (150)|PM5 (---)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

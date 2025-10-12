@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX66N/RX72N/RX72M グループ・ポート・マッピング (QSPI)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -36,12 +36,11 @@ namespace device {
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QSPCLK:
-			///   P77
-			///   PD5
-			///   PM0
-			///   PN4
+			switch(odr) {  // QSPCLK:
+			// P77 (LFQFP100: ---) (LFQFP144:  68) (LFQFP176:  84)
+			// PD5 (LFQFP100:  81) (LFQFP144: 121) (LFQFP176: 147)
+			// PM0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PN4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::FIRST:
 				PORT7::PMR.B7 = 0;
 				MPC::P77PFS.PSEL = sel;
@@ -69,17 +68,15 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_ssl_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QSSL:
-			///   P76
-			///   PD4
-			///   PM1
-			///   PN5
+			switch(odr) {  // QSSL:
+			// P76 (LFQFP100: ---) (LFQFP144:  69) (LFQFP176:  85)
+			// PD4 (LFQFP100:  82) (LFQFP144: 122) (LFQFP176: 148)
+			// PM1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+			// PN5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::FIRST:
 				PORT7::PMR.B6 = 0;
 				MPC::P76PFS.PSEL = sel;
@@ -107,17 +104,15 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_io0_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QIO0:
-			///   PC3
-			///   PD6
-			///   PJ3
-			///   PM2
+			switch(odr) {  // QIO0:
+			// PC3 (LFQFP100:  49) (LFQFP144:  67) (LFQFP176:  83)
+			// PD6 (LFQFP100:  80) (LFQFP144: 120) (LFQFP176: 145)
+			// PJ3 (LFQFP100:   4) (LFQFP144:  13) (LFQFP176:  13)
+			// PM2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::FIRST:
 				PORTC::PMR.B3 = 0;
 				MPC::PC3PFS.PSEL = sel;
@@ -145,17 +140,15 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_io1_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QIO1:
-			///   PC4
-			///   PD7
-			///   PJ5
-			///   PM3
+			switch(odr) {  // QIO1:
+			// PC4 (LFQFP100:  48) (LFQFP144:  66) (LFQFP176:  82)
+			// PD7 (LFQFP100:  79) (LFQFP144: 119) (LFQFP176: 143)
+			// PJ5 (LFQFP100: ---) (LFQFP144:  11) (LFQFP176: 11)
+			// PM3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::FIRST:
 				PORTC::PMR.B4 = 0;
 				MPC::PC4PFS.PSEL = sel;
@@ -183,17 +176,15 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_io2_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QIO2:
-			///   P00
-			///   P80
-			///   PD2
-			///   PM4
+			switch(odr) {  // QIO2:
+			// P00 (LFQFP100: ---) (LFQFP144:   8) (LFQFP176:   8)
+			// P80 (LFQFP100: ---) (LFQFP144:  65) (LFQFP176:  81)
+			// PD2 (LFQFP100:  84) (LFQFP144: 124) (LFQFP176: 154)
+			// PM4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::FIRST:
 				PORT0::PMR.B0 = 0;
 				MPC::P00PFS.PSEL = sel;
@@ -221,17 +212,15 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_io3_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QIO3:
-			///   P01
-			///   P81
-			///   PD3
-			///   PM5
+			switch(odr) {  // QIO3:
+			// P01 (LFQFP100: ---) (LFQFP144:   7) (LFQFP176:   7)
+			// P81 (LFQFP100: ---) (LFQFP144:  64) (LFQFP176:  80)
+			// PD3 (LFQFP100:  83) (LFQFP144: 123) (LFQFP176: 150)
+			// PM5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::FIRST:
 				PORT0::PMR.B1 = 0;
 				MPC::P01PFS.PSEL = sel;
@@ -276,7 +265,7 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(port) {
 			case QSPI_PORT::CLK:
 				ret = qspi_clk_(ena, odr);
@@ -297,7 +286,6 @@ namespace device {
 				ret = qspi_io3_(ena, odr);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 

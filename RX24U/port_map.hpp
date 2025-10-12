@@ -396,9 +396,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1101 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// RSPCKA: P24 (LFQFP100:  64) (LFQFP144:  94)
-			// MOSIA:  P23 (LFQFP100:  65) (LFQFP144:  95)
-			// MISOA:  P22 (LFQFP100:  66) (LFQFP144:  96)
+			// RSPCKA: P24 (LFQFP100:  65) (LFQFP144:  94)
+			// MOSIA:  P23 (LFQFP100:  66) (LFQFP144:  95)
+			// MISOA:  P22 (LFQFP100:  67) (LFQFP144:  96)
 				PORT2::PMR.B4 = 0;
 				MPC::P24PFS.PSEL = sel;  // ok
 				PORT2::PMR.B4 = enable;

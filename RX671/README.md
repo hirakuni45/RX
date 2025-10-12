@@ -647,6 +647,34 @@
 
 ---
 
+## Port map order (QSPIX) / ポートマップ候補 (QSPIX)
+
+- [port_map_qspix.hpp](port_map_qspix.hpp?ts=4)
+
+### LFQFP100
+
+|QSPIX|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|QSPCLK|P77 (---)|PD5 (81)|-|
+|QSSL|P76 (---)|PD4 (82)|-|
+|QIO0|PC3 (49)|PD6 (80)|PE6 (72)|
+|QIO1|PC4 (48)|PD7 (79)|PE7 (71)|
+|QIO2|P80 (---)|PD2 (84)|-|
+|QIO3|P81 (---)|PD3 (83)|-|
+
+### LFQFP144
+
+|QSPIX|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|QSPCLK|P77 (68)|PD5 (121)|-|
+|QSSL|P76 (69)|PD4 (122)|-|
+|QIO0|PC3 (67)|PD6 (120)|PE6 (102)|
+|QIO1|PC4 (66)|PD7 (119)|PE7 (101)|
+|QIO2|P80 (65)|PD2 (124)|-|
+|QIO3|P81 (64)|PD3 (123)|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
