@@ -393,6 +393,31 @@
 
 - [port_map_tpu.hpp](port_map_tpu.hpp?ts=4)
 
+### LFQFP64
+
+|TPU|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TIOCA0|P86 (---)|PA0 (45)|-|
+|TIOCB0|P17 (17)|PA1 (44)|-|
+|TIOCC0|P32 (12)|-|-|
+|TIOCD0|P33 (---)|PA3 (42)|-|
+|TIOCA1|P56 (--)|PA4 (42)|-|
+|TIOCB1|P16 (18)|PA5 (--)|-|
+|TIOCA2|P87 (---)|PA6 (41)|-|
+|TIOCB2|P15 (19)|PA7 (--)|-|
+|TIOCA3|P21 (--)|PB0 (39)|-|
+|TIOCB3|P20 (--)|PB1 (37)|-|
+|TIOCC3|P22 (--)|PB2 (--)|-|
+|TIOCD3|P23 (--)|PB3 (36)|-|
+|TIOCA4|P25 (--)|PB4 (--)|-|
+|TIOCB4|P24 (--)|PB5 (35)|-|
+|TIOCA5|P13 (--)|PB6 (34)|-|
+|TIOCB5|P14 (20)|PB7 (33)|-|
+|TCLKA|P14 (20)|PC2 (32)|-|
+|TCLKB|P15 (19)|PA3 (43)|PC3 (31)|
+|TCLKC|P16 (18)|PB2 (--)|PC0 (--)|
+|TCLKD|P17 (17)|PB3 (36)|PC1 (--)|
+
 ### LFQFP100
 
 |TPU|FIRST|SECOND|THIRD|
@@ -417,6 +442,46 @@
 |TCLKB|P15 (31)|PA3 (67)|PC3 (49)|
 |TCLKC|P16 (30)|PB2 (58)|PC0 (52)|
 |TCLKD|P17 (29)|PB3 (57)|PC1 (51)|
+
+---
+
+## Port map order (TMR) / ポートマップ候補 (TMR)
+
+- [port_map_tmr.hpp](port_map_tmr.hpp?ts=4)
+
+### LFQFP64
+
+|TMR|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|TMO0|P22 (--)|PB3 (36)|PH1 (23)|-|
+|TMCI0|P01 (--)|P21 (--)|PB1 (37)|PH3 (21)|
+|TMRI0|P00 (--)|P20 (--)|PA4 (42)|PH2 (22)|
+|TMO1|P17 (17)|P26 (16)|-|-|
+|TMCI1|P02 (--)|P12 (--)|P54 (26)|PC4 (30)|
+|TMRI1|P24 (--)|PB5 (35)|-|-|
+|TMO2|P16 (18)|PC7 (27)|-|-|
+|TMCI2|P15 (19)|P31 (13)|PC6 (28)|-|
+|TMRI2|P14 (20)|PC5 (29)|-|-|
+|TMO3|P13 (--)|P32 (12)|P55 (25)|-|
+|TMCI3|P27 (15)|P34 (--)|PA6 (41)|-|
+|TMRI3|P30 (14)|P33 (--)|-|-|
+
+### LFQFP100
+
+|TMR|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|TMO0|P22 (26)|PB3 (57)|PH1 (37)|-|
+|TMCI0|P01 (---)|P21 (27)|PB1 (59)|PH3 (35)|
+|TMRI0|P00 (---)|P20 (28)|PA4 (66)|PH2 (36)|
+|TMO1|P17 (29)|P26 (22)|-|-|
+|TMCI1|P02 (---)|P12 (34)|P54 (40)|PC4 (48)|
+|TMRI1|P24 (24)|PB5 (55)|-|-|
+|TMO2|P16 (30)|PC7 (45)|-|-|
+|TMCI2|P15 (31)|P31 (19)|PC6 (46)|-|
+|TMRI2|P14 (32)|PC5 (47)|-|-|
+|TMO3|P13 (33)|P32 (18)|P55 (39)|-|
+|TMCI3|P27 (21)|P34 (16)|PA6 (64)|-|
+|TMRI3|P30 (20)|P33 (17)|-|-|
 
 ---
 

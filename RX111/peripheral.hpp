@@ -35,11 +35,6 @@ namespace device {
 		MTU5,	///< Multi-Function Timer Pulse Unit 5 / マルチファンクションタイマパルスユニット５
 #if defined(SIG_RX111)
 		POE2,	///< Port Output Enable 2 / ポートアウトプットイネーブル２
-
-		TMR0,	///< 8-Bit Timer 0 / 8 ビットタイマ０
-		TMR1,	///< 8-Bit Timer 1 / 8 ビットタイマ１
-		TMR2,	///< 8-Bit Timer 2 / 8 ビットタイマ２
-		TMR3,	///< 8-Bit Timer 3 / 8 ビットタイマ３
 #endif
 		CMT0,	///< Compare Match Timer 0 / コンペアマッチタイマー０
 		CMT1,	///< Compare Match Timer 1 / コンペアマッチタイマー１
