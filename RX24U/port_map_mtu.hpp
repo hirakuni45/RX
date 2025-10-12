@@ -369,7 +369,7 @@ namespace device {
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
 			case CHANNEL::U:  // MTIOC5U[#]
-			// P24 (LFQFP100:  64) (LFQFP144:  94)
+			// P24 (LFQFP100:  65) (LFQFP144:  94)
 			// P82 (LFQFP100:  96) (LFQFP144: 137)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -388,7 +388,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::V:  // MTIOC5V[#]
-			// P23 (LFQFP100:  65) (LFQFP144:  95)
+			// P23 (LFQFP100:  66) (LFQFP144:  95)
 			// P81 (LFQFP100:  97) (LFQFP144: 138)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -407,7 +407,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::W:  // MTIOC5W[#]
-			// P22 (LFQFP100:  66) (LFQFP144:  96)
+			// P22 (LFQFP100:  67) (LFQFP144:  96)
 			// P80 (LFQFP100:  98) (LFQFP144: 139)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -566,7 +566,7 @@ namespace device {
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
 			case CHANNEL::A:  // MTIOC9A[#]
-			// P21 (LFQFP100:  67) (LFQFP144:  99)
+			// P21 (LFQFP100:  68) (LFQFP144:  99)
 			// P26 (LFQFP100: ---) (LFQFP144:  92)
 			// PD7 (LFQFP100:  18) (LFQFP144:  25)
 				switch(odr) {
@@ -610,7 +610,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::C:  // MTIOC9C[#]
-			// P20 (LFQFP100:  68) (LFQFP144: 100)
+			// P20 (LFQFP100:  69) (LFQFP144: 100)
 			// PD6 (LFQFP100:  19) (LFQFP144:  26)
 			// P25 (LFQFP100: ---) (LFQFP144:  93)
 				switch(odr) {
@@ -663,7 +663,7 @@ namespace device {
 		static bool clk_a_(ORDER odr, bool ena, bool neg) noexcept
 		{
 			// MTCLKA[#]:
-			// P21 (LFQFP100:  67) (LFQFP144:  99)
+			// P21 (LFQFP100:  68) (LFQFP144:  99)
 			// P33 (LFQFP100:  58) (LFQFP144:  83)
 			uint8_t sel = ena ? (neg ? 0b0'0100 : 0b0'0010) : 0;
 			switch(odr) {
@@ -686,7 +686,7 @@ namespace device {
 		static bool clk_b_(ORDER odr, bool ena, bool neg) noexcept
 		{
 			// MTCLKB[#]:
-			// P20 (LFQFP100:  68) (LFQFP144: 100)
+			// P20 (LFQFP100:  69) (LFQFP144: 100)
 			// P32 (LFQFP100:  59) (LFQFP144:  84)
 			uint8_t sel = ena ? (neg ? 0b0'0100 : 0b0'0010) : 0;
 			switch(odr) {

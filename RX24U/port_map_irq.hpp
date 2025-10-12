@@ -205,7 +205,7 @@ namespace device {
 		static bool irq6_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ6:
-			// P21 (LFQFP100:  67) (LFQFP144:  99)
+			// P21 (LFQFP100:  68) (LFQFP144:  99)
 			// P31 (LFQFP100:  61) (LFQFP144:  87)
 			// P62 (LFQFP100:  75) (LFQFP144: 108)
 			case ORDER::FIRST:
@@ -230,7 +230,7 @@ namespace device {
 		static bool irq7_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ7:
-			// P20 (LFQFP100:  68) (LFQFP144: 100)
+			// P20 (LFQFP100:  69) (LFQFP144: 100)
 			// P30 (LFQFP100:  63) (LFQFP144:  90)
 			// P63 (LFQFP100:  74) (LFQFP144: 107)
 			case ORDER::FIRST:

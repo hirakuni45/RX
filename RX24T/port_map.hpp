@@ -38,9 +38,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:  // for Serial BOOT interface
-			// RXD1: PD5 (LFQFP100:  20) (LFQFP144:  27)
-			// TXD1: PD3 (LFQFP100:  22) (LFQFP144:  29)
-			// SCK1: PD4 (LFQFP100:  21) (LFQFP144:  28)
+			// RXD1: PD5 (LFQFP100:  20)
+			// TXD1: PD3 (LFQFP100:  22)
+			// SCK1: PD4 (LFQFP100:  21)
 				PORTD::PMR.B5 = 0;
 				PORTD::ODR.B5 = i2c;
 				MPC::PD5PFS.PSEL = sel;  // ok
@@ -70,9 +70,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// RXD5: PB6 (LFQFP100:  27) (LFQFP144:  38)
-			// TXD5: PB5 (LFQFP100:  28) (LFQFP144:  39)
-			// SCK5: PB7 (LFQFP100:  26) (LFQFP144:  37)
+			// RXD5: PB6 (LFQFP100:  27)
+			// TXD5: PB5 (LFQFP100:  28)
+			// SCK5: PB7 (LFQFP100:  26)
 				PORTB::PMR.B6 = 0;
 				PORTB::ODR.B6 = i2c;
 				MPC::PB6PFS.PSEL = sel;  // ok
@@ -88,9 +88,9 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:  // Only B Version
-			// RXD5: PE0 (LFQFP100:  17) (LFQFP144:  24)
-			// TXD5: PD7 (LFQFP100:  18) (LFQFP144:  25)
-			// SCK5: PD2 (LFQFP100:  23) (LFQFP144:  30)
+			// RXD5: PE0 (LFQFP100:  17)
+			// TXD5: PD7 (LFQFP100:  18)
+			// SCK5: PD2 (LFQFP100:  23)
 				PORTE::PMR.B0 = 0;
 				PORTE::ODR.B0 = i2c;
 				MPC::PE0PFS.PSEL = sel;  // ok
@@ -120,9 +120,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1010 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// RXD6: P80 (LFQFP100:  98) (LFQFP144: 139)
-			// TXD6: P81 (LFQFP100:  97) (LFQFP144: 138)
-			// SCK6: P82 (LFQFP100:  96) (LFQFP144: 137)
+			// RXD6: P80 (LFQFP100:  98)
+			// TXD6: P81 (LFQFP100:  97)
+			// SCK6: P82 (LFQFP100:  96)
 				PORT8::PMR.B0 = 0;
 				PORT8::ODR.B0 = i2c;
 				MPC::P80PFS.PSEL = sel;  // ok
@@ -138,9 +138,9 @@ namespace device {
 				}
 				break;
 			case ORDER::SECOND:
-			// RXD6: PA5 (LFQFP100:  36) (LFQFP144:  53)
-			// TXD6: PB0 (LFQFP100:  35) (LFQFP144:  50)
-			// SCK6: PA4 (LFQFP100:  37) (LFQFP144:  54)
+			// RXD6: PA5 (LFQFP100:  36)
+			// TXD6: PB0 (LFQFP100:  35)
+			// SCK6: PA4 (LFQFP100:  37)
 				PORTA::PMR.B5 = 0;
 				PORTA::ODR.B5 = i2c;
 				MPC::PA5PFS.PSEL = sel;  // ok
@@ -156,9 +156,9 @@ namespace device {
 				}
 				break;
 			case ORDER::THIRD:
-			// RXD6: PB1 (LFQFP100:  34) (LFQFP144:  49)
-			// TXD6: PB2 (LFQFP100:  33) (LFQFP144:  48)
-			// SCK6: PB3 (LFQFP100:  32) (LFQFP144:  47)
+			// RXD6: PB1 (LFQFP100:  34)
+			// TXD6: PB2 (LFQFP100:  33)
+			// SCK6: PB3 (LFQFP100:  32)
 				PORTB::PMR.B2 = 0;
 				PORTB::ODR.B2 = i2c;
 				MPC::PB2PFS.PSEL = sel;  // ok
@@ -184,8 +184,8 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1111 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// SCL0: PB1 (LFQFP100:  34) (LFQFP144:  49)
-			// SDA0: PB2 (LFQFP100:  33) (LFQFP144:  48)
+			// SCL0: PB1 (LFQFP100:  34)
+			// SDA0: PB2 (LFQFP100:  33)
 				PORTB::PMR.B1 = 0;
 				MPC::PB1PFS.PSEL = sel;  // ok  
 				PORTB::PMR.B1 = enable;
@@ -204,11 +204,11 @@ namespace device {
 			uint8_t sel = enable ? 0b1'0000 : 0;
 			switch(odr) {
 			case ORDER::FIRST:  // Only Version B
-			// CTXD0: PA0 (LFQFP100:  41) (LFQFP144:  58)
+			// CTXD0: PA0 (LFQFP100:  41)
 				PORTA::PMR.B0 = 0;
 				MPC::PA0PFS.PSEL = sel;  // ok
 				PORTA::PMR.B0 = enable;
-			// CRXD0: PA1 (LFQFP100:  40) (LFQFP144:  57)
+			// CRXD0: PA1 (LFQFP100:  40)
 				PORTA::PMR.B1 = 0;
 				MPC::PA1PFS.PSEL = sel;  // ok
 				PORTA::PMR.B1 = enable;
@@ -224,9 +224,9 @@ namespace device {
 			uint8_t sel = enable ? 0b0'1101 : 0;
 			switch(odr) {
 			case ORDER::FIRST:
-			// RSPCKA: P24 (LFQFP100:  64) (LFQFP144:  94)
-			// MOSIA:  P23 (LFQFP100:  65) (LFQFP144:  95)
-			// MISOA:  P22 (LFQFP100:  66) (LFQFP144:  96)
+			// RSPCKA: P24 (LFQFP100:  64)
+			// MOSIA:  P23 (LFQFP100:  65)
+			// MISOA:  P22 (LFQFP100:  66)
 				PORT2::PMR.B4 = 0;
 				MPC::P24PFS.PSEL = sel;  // ok
 				PORT2::PMR.B4 = enable;
@@ -238,9 +238,9 @@ namespace device {
 				PORT2::PMR.B2 = enable;
 				break;
 			case ORDER::SECOND:
-			// RSPCKA: PB3 (LFQFP100:  32) (LFQFP144:  47)
-			// MOSIA:  PB0 (LFQFP100:  35) (LFQFP144:  50)
-			// MISOA:  PA5 (LFQFP100:  36) (LFQFP144:  53)
+			// RSPCKA: PB3 (LFQFP100:  32)
+			// MOSIA:  PB0 (LFQFP100:  35)
+			// MISOA:  PA5 (LFQFP100:  36)
 				PORTB::PMR.B3 = 0;
 				MPC::PB3PFS.PSEL = sel;  // ok
 				PORTB::PMR.B3 = enable;
@@ -252,9 +252,9 @@ namespace device {
 				PORTA::PMR.B5 = enable;
 				break;
 			case ORDER::THIRD:
-			// RSPCKA: PD0 (LFQFP100:  25) (LFQFP144:  32)
-			// MOSIA:  PD2 (LFQFP100:  23) (LFQFP144:  30)
-			// MISOA:  PD1 (LFQFP100:  24) (LFQFP144:  31)
+			// RSPCKA: PD0 (LFQFP100:  25)
+			// MOSIA:  PD2 (LFQFP100:  23)
+			// MISOA:  PD1 (LFQFP100:  24)
 				PORTD::PMR.B0 = 0;
 				MPC::PD0PFS.PSEL = sel;  // ok
 				PORTD::PMR.B0 = enable;
@@ -277,9 +277,9 @@ namespace device {
 			uint8_t sel = enable ? 0b00'1101 : 0;  // ok
 			switch(ssl) {
 			case RSPI::SSL0:
-				// SSLA0: P30 (LFQFP100:  63) (LFQFP144:  90)
-				// SSLA0: PA3 (LFQFP100:  38) (LFQFP144:  55)
-				// SSLA0: PD6 (LFQFP100:  19) (LFQFP144:  26)
+				// SSLA0: P30 (LFQFP100:  63)
+				// SSLA0: PA3 (LFQFP100:  38)
+				// SSLA0: PD6 (LFQFP100:  19)
 				if(odr == ORDER::FIRST) {
 					PORT3::PMR.B0 = 0;
 					MPC::P30PFS.PSEL = sel;
@@ -297,9 +297,9 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL1:
-				// SSLA1: P31 (LFQFP100:  61) (LFQFP144:  87)
-				// SSLA1: PA2 (LFQFP100:  39) (LFQFP144:  56)
-				// SSLA1: PD7 (LFQFP100:  18) (LFQFP144:  25)
+				// SSLA1: P31 (LFQFP100:  61)
+				// SSLA1: PA2 (LFQFP100:  39)
+				// SSLA1: PD7 (LFQFP100:  18)
 				if(odr == ORDER::FIRST) {
 					PORT3::PMR.B1 = 0;
 					MPC::P31PFS.PSEL = sel;
@@ -317,9 +317,9 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL2:
-				// SSLA2: P32 (LFQFP100:  59) (LFQFP144:  84)
-				// SSLA2: PA1 (LFQFP100:  40) (LFQFP144:  57)
-				// SSLA2: PE0 (LFQFP100:  17) (LFQFP144:  24)
+				// SSLA2: P32 (LFQFP100:  59)
+				// SSLA2: PA1 (LFQFP100:  40)
+				// SSLA2: PE0 (LFQFP100:  17)
 				if(odr == ORDER::FIRST) {
 					PORT3::PMR.B2 = 0;
 					MPC::P32PFS.PSEL = sel;
@@ -337,9 +337,9 @@ namespace device {
 				}
 				break;
 			case RSPI::SSL3:
-				// SSLA3: P33 (LFQFP100:  58) (LFQFP144:  83)
-				// SSLA3: PA0 (LFQFP100:  41) (LFQFP144:  58)
-				// SSLA3: PE1 (LFQFP100:  16) (LFQFP144:  23)
+				// SSLA3: P33 (LFQFP100:  58)
+				// SSLA3: PA0 (LFQFP100:  41)
+				// SSLA3: PE1 (LFQFP100:  16)
 				if(odr == ORDER::FIRST) {
 					PORT3::PMR.B3 = 0;
 					MPC::P33PFS.PSEL = sel;

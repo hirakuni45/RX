@@ -3,14 +3,20 @@
 /*!	@file
 	@brief	RX64M/RX71M グループ・ポート・マッピング (QSPI)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX64M/peripheral.hpp"
 #include "RX64M/port.hpp"
 #include "RX64M/mpc.hpp"
+#elif defined(SIG_RX65N) || defined(SIG_RX651)
+#include "RX65x/peripheral.hpp"
+#include "RX64M/port.hpp"
+#include "RX65x/mpc.hpp"
+#endif
 #include "RX600/port_map_order.hpp"
 
 namespace device {
@@ -26,10 +32,9 @@ namespace device {
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QSPCLK:
-			///   P77
-			///   PD5
+			switch(odr) {  // QSPCLK:
+			// P77 (LFQFP100: ---) (LFQFP144:  68) (LFQFP176:  84)
+			// PD5 (LFQFP100:  81) (LFQFP144: 121) (LFQFP176: 147)
 			case ORDER::FIRST:
 				PORT7::PMR.B7 = 0;
 				MPC::P77PFS.PSEL = sel;
@@ -47,15 +52,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_ssl_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QSSL:
-			///   P76
-			///   PD4
+			switch(odr) {  // QSSL:
+			// P76 (LFQFP100: ---) (LFQFP144:  69) (LFQFP176:  85)
+			// PD4 (LFQFP100:  82) (LFQFP144: 122) (LFQFP176: 148)
 			case ORDER::FIRST:
 				PORT7::PMR.B6 = 0;
 				MPC::P76PFS.PSEL = sel;
@@ -73,15 +76,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_io0_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QIO0:
-			///   PC3
-			///   PD6
+			switch(odr) {  // QIO0:
+			// PC3 (LFQFP100:  49) (LFQFP144:  67) (LFQFP176:  83)
+			// PD6 (LFQFP100:  80) (LFQFP144: 120) (LFQFP176: 145)
 			case ORDER::FIRST:
 				PORTC::PMR.B3 = 0;
 				MPC::PC3PFS.PSEL = sel;
@@ -99,15 +100,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_io1_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QIO1:
-			///   PC4
-			///   PD7
+			switch(odr) {  // QIO1:
+			// PC4 (LFQFP100:  48) (LFQFP144:  66) (LFQFP176:  82)
+			// PD7 (LFQFP100:  79) (LFQFP144: 119) (LFQFP176: 143)
 			case ORDER::FIRST:
 				PORTC::PMR.B4 = 0;
 				MPC::PC4PFS.PSEL = sel;
@@ -125,15 +124,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_io2_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QIO2:
-			///   P80
-			///   PD2
+			switch(odr) {  // QIO2:
+			// P80 (LFQFP100: ---) (LFQFP144:  65) (LFQFP176:  81)
+			// PD2 (LFQFP100:  84) (LFQFP144: 124) (LFQFP176: 154)
 			case ORDER::FIRST:
 				PORT8::PMR.B0 = 0;
 				MPC::P80PFS.PSEL = sel;
@@ -151,15 +148,13 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool qspi_io3_(bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b01'1011 : 0;
-			switch(odr) {
-			/// QIO3:
-			///   P81
-			///   PD3
+			switch(odr) {  // QIO3:
+			// P81 (LFQFP100: ---) (LFQFP144:  64) (LFQFP176:  80)
+			// PD3 (LFQFP100:  83) (LFQFP144: 123) (LFQFP176: 150)
 			case ORDER::FIRST:
 				PORT8::PMR.B1 = 0;
 				MPC::P81PFS.PSEL = sel;
@@ -194,7 +189,7 @@ namespace device {
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			bool ret = true;
+			bool ret = false;
 			switch(port) {
 			case QSPI_PORT::CLK:
 				ret = qspi_clk_(ena, odr);
@@ -215,7 +210,6 @@ namespace device {
 				ret = qspi_io3_(ena, odr);
 				break;
 			default:
-				ret = false;
 				break;
 			}
 
