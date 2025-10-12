@@ -83,6 +83,7 @@
 #include "RX140/icu_mgr.hpp"
 #include "RX130/port_map.hpp"
 #include "RX130/port_map_mtu.hpp"
+#include "RX130/port_map_tmr.hpp"
 #include "RX130/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 

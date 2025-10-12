@@ -337,6 +337,46 @@
 
 ---
 
+## Port map order (TMR) / ポートマップ候補 (TMR)
+
+- [port_map_tmr.hpp](port_map_tmr.hpp?ts=4)
+
+### LFQFP64
+
+|TMR|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TMO0|PB3 (36)|PH1 (23)|-|
+|TMCI0|P21 (--)|PB1 (37)|PH3 (21)|
+|TMRI0|P20 (--)|PA4 (42)|PH2 (22)|
+|TMO1|P17 (17)|P26 (16)|-|
+|TMCI1|P12 (--)|P54 (26)|PC4 (30)|
+|TMRI1|PB5 (35)|-|-|
+|TMO2|P16 (18)|PC7 (27)|-|
+|TMCI2|P15 (19)|P31 (13)|PC6 (28)|
+|TMRI2|P14 (20)|PC5 (29)|-|
+|TMO3|P13 (--)|P32 (12)|P55 (25)|
+|TMCI3|P27 (--)|P34 (--)|PA6 (41)|
+|TMRI3|P30 (14)|-|-|
+
+### LFQFP100
+
+|TMR|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TMO0|PB3 (45)|PH1 (31)|-|
+|TMCI0|P21 (21)|PB1 (47)|PH3 (29)|
+|TMRI0|P20 (22)|PA4 (53)|PH2 (30)|
+|TMO1|P17 (23)|P26 (20)|-|
+|TMCI1|P12 (28)|P54 (34)|PC4 (38)|
+|TMRI1|PB5 (43)|-|-|
+|TMO2|P16 (24)|PC7 (35)|-|
+|TMCI2|P15 (25)|P31 (17)|PC6 (36)|
+|TMRI2|P14 (26)|PC5 (37)|-|
+|TMO3|P13 (27)|P32 (16)|P55 (33)|
+|TMCI3|P27 (19)|P34 (15)|PA6 (51)|
+|TMRI3|P30 (18)|-|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

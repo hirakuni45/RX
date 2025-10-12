@@ -1,23 +1,23 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX113 グループ・ポート・マッピング (TMR)
+	@brief	RX130 グループ・ポート・マッピング (TMR)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX113/peripheral.hpp"
-#include "RX113/port.hpp"
-#include "RX113/mpc.hpp"
+#include "RX130/peripheral.hpp"
+#include "RX140/port.hpp"
+#include "RX130/mpc.hpp"
 #include "RX600/port_map_order.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RX113 TMR ポート・マッピング・ユーティリティー
+		@brief  RX130 TMR ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_tmr : public port_map_order {
@@ -28,12 +28,13 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO0:
-			// P22 (LFQFP64: --) (LFQFP100:   8)
+			// P22 (LFQFP64: --) (LFQFP100:  26)
 			// PB3 (LFQFP64: 36) (LFQFP100:  57)
+			// PH1 (LFQFP64: 23) (LFQFP100:  37)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = sel;  // ok
+					MPC::P22PFS.PSEL = sel;
 					PORT2::PMR.B2 = ena;
 					break;
 				case ORDER::SECOND:
@@ -41,14 +42,20 @@ namespace device {
 					MPC::PB3PFS.PSEL = sel;  // ok
 					PORTB::PMR.B3 = ena;
 					break;
+				case ORDER::THIRD:
+					PORTH::PMR.B1 = 0;
+					MPC::PH1PFS.PSEL = sel;  // ok
+					PORTH::PMR.B1 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
 			case CHANNEL::TMCI:  // TMCI0:
-			// P21 (LFQFP64: --) (LFQFP100:   9)
+			// P21 (LFQFP64: --) (LFQFP100:  27)
 			// PB1 (LFQFP64: 37) (LFQFP100:  59)
+			// PH3 (LFQFP64: 21) (LFQFP100:  35)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -60,14 +67,20 @@ namespace device {
 					MPC::PB1PFS.PSEL = sel;  // ok
 					PORTB::PMR.B1 = ena;
 					break;
+				case ORDER::THIRD:
+					PORTH::PMR.B3 = 0;
+					MPC::PH3PFS.PSEL = sel;  // ok
+					PORTH::PMR.B3 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
 			case CHANNEL::TMRI:  // TMRI0:
-			// P20 (LFQFP64: --) (LFQFP100:  10)
+			// P20 (LFQFP64: --) (LFQFP100:  28)
 			// PA4 (LFQFP64: 42) (LFQFP100:  66)
+			// PH2 (LFQFP64: 22) (LFQFP100:  36)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -78,6 +91,11 @@ namespace device {
 					PORTA::PMR.B4 = 0;
 					MPC::PA4PFS.PSEL = sel;  // ok
 					PORTA::PMR.B4 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTH::PMR.B2 = 0;
+					MPC::PH2PFS.PSEL = sel;  // ok
+					PORTH::PMR.B2 = ena;
 					break;
 				default:
 					ret = false;
@@ -97,8 +115,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO1:
-			// P17 (LFQFP64: 17) (LFQFP100:  26)
-			// P26 (LFQFP64:  3) (LFQFP100:  12)
+			// P17 (LFQFP64: 17) (LFQFP100:  29)
+			// P26 (LFQFP64: 16) (LFQFP100:  22)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
@@ -116,8 +134,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:  // TMCI1:
-			// P12 (LFQFP64: --) (LFQFP100:  35)
-			// P54 (LFQFP64: 26) (LFQFP100:  44)
+			// P12 (LFQFP64: --) (LFQFP100:  34)
+			// P54 (LFQFP64: 26) (LFQFP100:  40)
 			// PC4 (LFQFP64: 30) (LFQFP100:  48)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -141,12 +159,12 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:  // TMRI1:
-			// P24 (LFQFP64: --) (LFQFP100:   6)
+			// P24 (LFQFP64: --) (LFQFP100:  24)
 			// PB5 (LFQFP64: 35) (LFQFP100:  55)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = sel;  // ok
+					MPC::P24PFS.PSEL = sel;
 					PORT2::PMR.B4 = ena;
 					break;
 				case ORDER::SECOND:
@@ -172,7 +190,7 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO2:
-			// P16 (LFQFP64: 18) (LFQFP100:  27)
+			// P16 (LFQFP64: 18) (LFQFP100:  30)
 			// PC7 (LFQFP64: 27) (LFQFP100:  45)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -191,8 +209,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:  // TMCI2:
-			// P15 (LFQFP64: 19) (LFQFP100:  28)
-			// P31 (LFQFP64:  5) (LFQFP100:  14)
+			// P15 (LFQFP64: 19) (LFQFP100:  31)
+			// P31 (LFQFP64: 13) (LFQFP100:  19)
 			// PC6 (LFQFP64: 28) (LFQFP100:  46)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -216,7 +234,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:  // TMRI2:
-			// P14 (LFQFP64: 20) (LFQFP100:  29)
+			// P14 (LFQFP64: 20) (LFQFP100:  32)
 			// PC5 (LFQFP64: 29) (LFQFP100:  47)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -247,9 +265,9 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO3:
-			// P13 (LFQFP64: --) (LFQFP100:  34)
-			// P32 (LFQFP64: 16) (LFQFP100:  25)
-			// P55 (LFQFP64: 25) (LFQFP100:  43)
+			// P13 (LFQFP64: --) (LFQFP100:  33)
+			// P32 (LFQFP64: 12) (LFQFP100:  18)
+			// P55 (LFQFP64: 25) (LFQFP100:  39)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B3 = 0;
@@ -272,19 +290,19 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:  // TMCI3:
-			// P04 (LFQFP64: --) (LFQFP100:   1)
-			// P27 (LFQFP64:  2) (LFQFP100:  11)
-			// PA6 (LFQFP64: 41) (LFQFP100:  63)
+			// P27 (LFQFP64: 15) (LFQFP100:  21)
+			// P34 (LFQFP64: --) (LFQFP100:  16)
+			// PA6 (LFQFP64: 41) (LFQFP100:  64)
 				switch(odr) {
 				case ORDER::FIRST:
-					PORT0::PMR.B4 = 0;
-					MPC::P04PFS.PSEL = sel;  // ok
-					PORT0::PMR.B4 = ena;
-					break;
-				case ORDER::SECOND:
 					PORT2::PMR.B7 = 0;
 					MPC::P27PFS.PSEL = sel;  // ok
 					PORT2::PMR.B7 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT3::PMR.B4 = 0;
+					MPC::P34PFS.PSEL = sel;  // ok
+					PORT3::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTA::PMR.B6 = 0;
@@ -297,18 +315,18 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:  // TMRI3:
-			// P02 (LFQFP64: --) (LFQFP100:   3)
-			// P30 (LFQFP64:  4) (LFQFP100:  13)
+			// P30 (LFQFP64: 14) (LFQFP100:  20)
+			// P33 (LFQFP64: --) (LFQFP100:  17)
 				switch(odr) {
 				case ORDER::FIRST:
-					PORT0::PMR.B2 = 0;
-					MPC::P02PFS.PSEL = sel;  // ok
-					PORT0::PMR.B2 = ena;
-					break;
-				case ORDER::SECOND:
 					PORT3::PMR.B0 = 0;
 					MPC::P30PFS.PSEL = sel;  // ok
 					PORT3::PMR.B0 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT3::PMR.B3 = 0;
+					MPC::P33PFS.PSEL = sel;  // ok
+					PORT3::PMR.B3 = ena;
 					break;
 				default:
 					ret = false;

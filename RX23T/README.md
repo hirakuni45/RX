@@ -208,6 +208,29 @@
 
 ---
 
+## Port map order (TMR) / ポートマップ候補 (TMR)
+
+- [port_map_tmr.hpp](port_map_tmr.hpp?ts=4)
+
+### LFQFP64
+
+|TMR|FIRST|SECOND|
+|---|---|---|
+|TMO0|PD3 (16)|-|
+|TMCI0|PD4 (15)|-|
+|TMRI0|PD5 (14)|-|
+|TMO1|P94 (29)|PD6 (13)|
+|TMCI1|P92 (31)|-|
+|TMRI1|P93 (30)|PD7 (12)|
+|TMO2|P23 (47)|-|
+|TMCI2|P24 (46)|-|
+|TMRI2|P22 (48)|-|
+|TMO3|P11 (61)|-|
+|TMCI3|PA5 (63)|-|
+|TMRI3|P10 (62)|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
