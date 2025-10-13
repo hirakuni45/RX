@@ -27,7 +27,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC0A
+			case CHANNEL::A:  // GTIOC0A:
 			// P71 (LFQFP100:  56)
 			// PD7 (LFQFP100:  18)
 				switch(odr) {
@@ -46,7 +46,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC0B
+			case CHANNEL::B:  // GTIOC0B:
 			// P74 (LFQFP100:  53)
 			// PD1 (LFQFP100:  24)
 				switch(odr) {
@@ -78,7 +78,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC1A
+			case CHANNEL::A:  // GTIOC1A:
 			// P72 (LFQFP100:  55)
 			// PD0 (LFQFP100:  25)
 				switch(odr) {
@@ -97,7 +97,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC1B
+			case CHANNEL::B:  // GTIOC1B:
 			// P75 (LFQFP100:  52)
 			// PB7 (LFQFP100:  26)
 				switch(odr) {
@@ -129,7 +129,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b1'0110 : 0b1'0100) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // GTIOC2A
+			case CHANNEL::A:  // GTIOC2A:
 			// P73 (LFQFP100:  54)
 			// PB6 (LFQFP100:  27)
 				switch(odr) {
@@ -148,7 +148,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // GTIOC2B
+			case CHANNEL::B:  // GTIOC2B:
 			// P76 (LFQFP100:  51)
 			// PB5 (LFQFP100:  28)
 				switch(odr) {
