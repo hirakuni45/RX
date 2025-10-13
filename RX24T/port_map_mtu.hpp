@@ -29,7 +29,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC0A[#]
+			case CHANNEL::A:  // MTIOC0A[#]:
 			// P31 (LFQFP100:  61)
 			// PB3 (LFQFP100:  32)
 				switch(odr) {
@@ -48,7 +48,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC0B[#]
+			case CHANNEL::B:  // MTIOC0B[#]:
 			// P30 (LFQFP100:  63)
 			// PB2 (LFQFP100:  33)
 				switch(odr) {
@@ -67,7 +67,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC0C[#]
+			case CHANNEL::C:  // MTIOC0C[#]:
 			// PB1 (LFQFP100:  34)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -80,7 +80,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC0D[#]
+			case CHANNEL::D:  // MTIOC0D[#]:
 			// PB0 (LFQFP100:  35)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -105,7 +105,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC1A
+			case CHANNEL::A:  // MTIOC1A:
 			// PA5 (LFQFP100:  36)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -118,7 +118,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC1B
+			case CHANNEL::B:  // MTIOC1B:
 			// PA4 (LFQFP100:  37)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -143,7 +143,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC2A
+			case CHANNEL::A:  // MTIOC2A:
 			// PA3 (LFQFP100:  38)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -156,7 +156,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC2B
+			case CHANNEL::B:  // MTIOC2B:
 			// PA2 (LFQFP100:  39)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -181,7 +181,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC3A
+			case CHANNEL::A:  // MTIOC3A:
 			// P11 (LFQFP100:  99)
 			// P33 (LFQFP100:  58)
 				switch(odr) {
@@ -200,7 +200,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC3B
+			case CHANNEL::B:  // MTIOC3B:
 			// P71 (LFQFP100:  56)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -213,7 +213,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC3C
+			case CHANNEL::C:  // MTIOC3C:
 			// P32 (LFQFP100:  59)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -226,7 +226,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC3D
+			case CHANNEL::D:  // MTIOC3D:
 			// P74 (LFQFP100:  53)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -251,7 +251,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC4A[#]
+			case CHANNEL::A:  // MTIOC4A[#]:
 			// P72 (LFQFP100:  55)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -264,7 +264,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC4B[#]
+			case CHANNEL::B:  // MTIOC4B[#]:
 			// P73 (LFQFP100:  54)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -277,7 +277,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC4C[#]
+			case CHANNEL::C:  // MTIOC4C[#]:
 			// P75 (LFQFP100:  52)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -290,7 +290,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC4D[#]
+			case CHANNEL::D:  // MTIOC4D[#]:
 			// P76 (LFQFP100:  51)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -315,7 +315,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::U:  // MTIOC5U[#]
+			case CHANNEL::U:  // MTIOC5U[#]:
 			// P24 (LFQFP100:  64)
 			// P82 (LFQFP100:  96)
 				switch(odr) {
@@ -334,7 +334,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::V:  // MTIOC5V[#]
+			case CHANNEL::V:  // MTIOC5V[#]:
 			// P23 (LFQFP100:  65)
 			// P81 (LFQFP100:  97)
 				switch(odr) {
@@ -353,7 +353,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::W:  // MTIOC5W[#]
+			case CHANNEL::W:  // MTIOC5W[#]:
 			// P22 (LFQFP100:  66)
 			// P80 (LFQFP100:  98)
 				switch(odr) {
@@ -384,7 +384,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC6A[#]
+			case CHANNEL::A:  // MTIOC6A[#]:
 			// PA1 (LFQFP100:  40)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -397,7 +397,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC6B[#]
+			case CHANNEL::B:  // MTIOC6B[#]:
 			// P95 (LFQFP100:  45)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -410,7 +410,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC6C[#]
+			case CHANNEL::C:  // MTIOC6C[#]:
 			// PA0 (LFQFP100:  41)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -423,7 +423,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC6D[#]
+			case CHANNEL::D:  // MTIOC6D[#]:
 			// P92 (LFQFP100:  48)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -448,7 +448,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC7A[#]
+			case CHANNEL::A:  // MTIOC7A[#]:
 			// P94 (LFQFP100:  46)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -461,7 +461,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC7B[#]
+			case CHANNEL::B:  // MTIOC7B[#]:
 			// P93 (LFQFP100:  47)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -474,7 +474,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC7C[#]
+			case CHANNEL::C:  // MTIOC7C[#]:
 			// P91 (LFQFP100:  49)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -487,7 +487,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC7D[#]
+			case CHANNEL::D:  // MTIOC7D[#]:
 			// P90 (LFQFP100:  50)
 				switch(odr) {
 				case ORDER::FIRST:
@@ -512,7 +512,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? (neg ? 0b0'0011 : 0b0'0001) : 0;
 			switch(ch) {
-			case CHANNEL::A:  // MTIOC9A[#]
+			case CHANNEL::A:  // MTIOC9A[#]:
 			// P21 (LFQFP100:  67)
 			// PD7 (LFQFP100:  18)
 				switch(odr) {
@@ -531,7 +531,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::B:  // MTIOC9B[#]
+			case CHANNEL::B:  // MTIOC9B[#]:
 			// P10 (LFQFP100: 100)
 			// PE0 (LFQFP100:  17)
 				switch(odr) {
@@ -550,7 +550,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::C:  // MTIOC9C[#]
+			case CHANNEL::C:  // MTIOC9C[#]:
 			// P20 (LFQFP100:  68)
 			// PD6 (LFQFP100:  19)
 				switch(odr) {
@@ -569,7 +569,7 @@ namespace device {
 					break;
 				}
 				break;
-			case CHANNEL::D:  // MTIOC9D[#]
+			case CHANNEL::D:  // MTIOC9D[#]:
 			// P02 (LFQFP100:   2)
 			// PE1 (LFQFP100:  16)
 				switch(odr) {
