@@ -45,6 +45,8 @@ namespace {
 //	typedef device::scif_io<device::SCIF8, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
 // RSCI を使う場合：
 //	typedef device::rsci_io<device::RSCI8, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
+// 標準的なポート候補を使わない、独自のポート設定を行う場合
+//	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, device::port_map_order::ORDER::USER> SCI_IO;
 	SCI_IO	sci_io_;
 
 // CMTW を使う場合：
@@ -109,6 +111,25 @@ int main(int argc, char** argv)
 	SYSTEM_IO::boost_master_clock();
 
 	using namespace board_profile;
+
+	// ポートマップの設定をカスタマイズする場合
+#if USE_SET_USER_FUNC
+	if(sci_io_.port_select_type == device::port_map_order::ORDER::USER) {
+		device::port_map::set_user_func( [=](device::peripheral per, bool ena) {
+
+			using namespace device;
+
+			uint8_t sel = ena ? 0b0'1010 : 0;
+			MPC::P30PFS.PSEL = sel;
+			PORT3::PMR.B0 = ena;
+			MPC::P26PFS.PSEL = sel;
+			PORT2::PMR.B6 = ena;
+
+			return true;
+		}
+		);
+	}
+#endif
 
 	{  // SCI の開始
 		constexpr uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
