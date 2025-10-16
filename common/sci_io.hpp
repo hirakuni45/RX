@@ -82,6 +82,7 @@ namespace device {
 		typedef SCI sci_type;
 		typedef RBF rbf_type;
 		typedef SBF sbf_type;
+		static constexpr auto port_select_type = PSEL;
 
 	private:
 
