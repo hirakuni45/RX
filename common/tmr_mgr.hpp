@@ -26,7 +26,7 @@ namespace device {
 	class tmr_mgr {
 	public:
 
-		typedef TMR tmr_type;	///< TMR チャネル・クラス型
+		typedef TMR peripheral_type;	///< TMR チャネル・クラス型
 	
 	private:
 

@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 	}
 
 	if(0) {  // SCI/CMT の設定レポート表示
-		utils::format("SCI PCLK: %u [Hz]\n") % SCI_IO::sci_type::PCLK;
+		utils::format("SCI PCLK: %u [Hz]\n") % SCI_IO::peripheral_type::PCLK;
 		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_io_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_io_.get_baud_rate()) / sci_io_.get_baud_rate(true);
 		rate *= 100.0f;

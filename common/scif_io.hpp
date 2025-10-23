@@ -33,9 +33,9 @@ namespace device {
 		static_assert(SBF::size() > 8, "Transmission buffer is too small.");
 
 	public:
-		typedef SCIF sci_type;
-		typedef RBF  rbf_type;
-		typedef SBF  sbf_type;
+		typedef SCIF peripheral_type;
+		typedef RBF  recv_buffer_type;
+		typedef SBF  send_buffer_type;
 
 	private:
 		static inline RBF	recv_;

@@ -68,7 +68,7 @@ namespace device {
 	class cmtw_mgr : public cmtw_base {
 	public:
 
-		typedef CMTW value_type;	///< チャネル・クラス型
+		typedef CMTW peripheral_type;	///< チャネル・クラス型
 
 	private:
 		uint32_t		rate_;

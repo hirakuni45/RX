@@ -33,7 +33,7 @@ namespace utils {
 	class sdc_io {
 	public:
 
-		typedef SPI spi_type;	///< ＳＰＩ型
+		typedef SPI periperal_type;	///< ＳＰＩ型
 
 		typedef fatfs::mmc_io<SPI, SELECT, POWER, DETECT, WP> mmc_type;	///< ＭＭＣ型
 

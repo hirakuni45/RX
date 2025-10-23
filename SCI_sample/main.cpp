@@ -46,6 +46,7 @@ namespace {
 // RSCI を使う場合：
 //	typedef device::rsci_io<device::RSCI8, RXB, TXB, board_profile::SCI_ORDER> SCI_IO;
 // 標準的なポート候補を使わない、独自のポート設定を行う場合
+//	#define USE_SET_USER_FUNC
 //	typedef device::sci_io<board_profile::SCI_CH, RXB, TXB, device::port_map_order::ORDER::USER> SCI_IO;
 	SCI_IO	sci_io_;
 
@@ -112,8 +113,8 @@ int main(int argc, char** argv)
 
 	using namespace board_profile;
 
+#ifdef USE_SET_USER_FUNC
 	// ポートマップの設定をカスタマイズする場合
-#if USE_SET_USER_FUNC
 	if(sci_io_.port_select_type == device::port_map_order::ORDER::USER) {
 		device::port_map::set_user_func( [=](device::peripheral per, bool ena) {
 
@@ -157,13 +158,13 @@ int main(int argc, char** argv)
 	}
 
 	{  // SCI/CMT の設定レポート表示
-		utils::format("SCI PCLK: %u [Hz]\n") % SCI_IO::sci_type::PCLK;
+		utils::format("SCI PCLK: %u [Hz]\n") % SCI_IO::peripheral_type::PCLK;
 		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_io_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_io_.get_baud_rate()) / sci_io_.get_baud_rate(true);
 		rate *= 100.0f;
 		utils::format("  Baud rate (real): %u (%3.2f [%%])\n") % sci_io_.get_baud_rate(true) % rate;
-		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(SCI_IO::sci_type::SEMR_BRME);
-		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(SCI_IO::sci_type::SEMR_BGDM);
+		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(SCI_IO::peripheral_type::SEMR_BRME);
+		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(SCI_IO::peripheral_type::SEMR_BGDM);
 		utils::format("CMT Timer (set):  %d [Hz]\n") % cmt_mgr_.get_rate();
 		rate = 1.0f - static_cast<float>(cmt_mgr_.get_rate()) / cmt_mgr_.get_rate(true);
 		rate *= 100.0f;
