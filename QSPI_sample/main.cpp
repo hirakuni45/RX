@@ -90,13 +90,13 @@ int main(int argc, char** argv)
 	auto clk = device::clock_profile::ICLK / 1'000'000;
 	utils::format("\nStart QSPI sample for '%s' %d[MHz]\n") % system_str_ % clk;
 	{  // SCI/CMT の設定レポート表示
-		utils::format("SCI PCLK: %u [Hz]\n") % SCI_IO::sci_type::PCLK;
+		utils::format("SCI PCLK: %u [Hz]\n") % SCI_IO::peripheral_type::PCLK;
 		utils::format("SCI Baud rate (set): %u [BPS]\n") % sci_io_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_io_.get_baud_rate()) / sci_io_.get_baud_rate(true);
 		rate *= 100.0f;
 		utils::format("  Baud rate (real): %u (%3.2f [%%])\n") % sci_io_.get_baud_rate(true) % rate;
-		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(SCI_IO::sci_type::SEMR_BRME);
-		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(SCI_IO::sci_type::SEMR_BGDM);
+		utils::format("  SEMR_BRME: %s\n") % utils::str::get_bool_text(SCI_IO::peripheral_type::SEMR_BRME);
+		utils::format("  SEMR_BGDM: %s\n") % utils::str::get_bool_text(SCI_IO::peripheral_type::SEMR_BGDM);
 		utils::format("CMT Timer (set):  %d [Hz]\n") % cmt_mgr_.get_rate();
 		rate = 1.0f - static_cast<float>(cmt_mgr_.get_rate()) / cmt_mgr_.get_rate(true);
 		rate *= 100.0f;

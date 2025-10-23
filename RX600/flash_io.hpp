@@ -7,7 +7,7 @@
 			・データフラッシュ書き込みサイズ（４バイト単位） @n
 			このファイルは、「renesas.hpp」にインクルードされる前提なので、個別にインクルードしない。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -52,7 +52,7 @@ namespace device {
 	
 	private:
 
-		static constexpr uint32_t MODE_CHANGE_DELAY = 10;	///< モード変更における遅延
+		static constexpr uint32_t MODE_CHANGE_US_LOOP = 150;	///< モード変更における許容時間（マイクロ秒）
 
 		enum class mode : uint8_t {
 			NONE,
@@ -120,22 +120,27 @@ namespace device {
 
 		void turn_rd_() noexcept
 		{
-			uint32_t loop = 15;
+			uint32_t n = 15;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
 				utils::delay::micro_second(1);
-				--loop;
-				if(loop == 0) break;
+				--n;
+				if(n == 0) break;
 			} 
-			if(loop == 0 || device::FLASH::FASTAT.CMDLK() != 0) {
+			if(n == 0 || device::FLASH::FASTAT.CMDLK() != 0) {
 				turn_break_();
 			}
-		
+
 			device::FLASH::FENTRYR = 0xAA00;
-			utils::delay::micro_second(MODE_CHANGE_DELAY);
-			if(device::FLASH::FENTRYR() != 0x0000) {
-				debug_format("FACI 'RD' not ready: 'turn_rd_'\n"); 
+			auto loop = MODE_CHANGE_US_LOOP;
+			while(loop > 0) {
+				utils::delay::micro_second(1);
+				--loop;
+				if(device::FLASH::FENTRYR() == 0x0000) {
+					mode_ = mode::RD;
+					return;
+				}
 			}
-			mode_ = mode::RD;
+			debug_format("FACI 'RD' not ready: 'turn_rd_'\n");
 		}
 
 		bool turn_pe_() noexcept
@@ -151,14 +156,17 @@ namespace device {
 			}
 
 			device::FLASH::FENTRYR = 0xAA80;
-			utils::delay::micro_second(MODE_CHANGE_DELAY);
-			if(device::FLASH::FENTRYR() == 0x0080) {
-				mode_ = mode::PE;
-				return true;
-			} else {
-				debug_format("FACI 'P/E' not ready: 'turn_pe_'\n");
-				return false;
+			auto loop = MODE_CHANGE_US_LOOP;
+			while(loop > 0) {
+				utils::delay::micro_second(1);
+				--loop;
+				if(device::FLASH::FENTRYR() == 0x0080) {
+					mode_ = mode::PE;
+					return true;
+				}
 			}
+			debug_format("FACI 'P/E' not ready: 'turn_pe_'\n");
+			return false;
 		}
 
 		bool init_fcu_() noexcept

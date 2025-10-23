@@ -110,18 +110,24 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  CAN 制御クラス
-		@param[in]	CAN		CAN 定義クラス
+		@param[in]	CAN		CAN ペリフェラル定義クラス
 		@param[in]	RBF		受信バッファクラス (utils::fixed_fifo<can_frame, N>)
-		@param[in]	TBF		送信バッファクラス (utils::fixed_fifo<can_frame, N>)
+		@param[in]	SBF		送信バッファクラス (utils::fixed_fifo<can_frame, N>)
 		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
+	template <class CAN, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	class can_io : public can_io_def {
-	public:
 
 		static_assert(RBF::size() > 16, "Receive buffer is too small.");
-		static_assert(TBF::size() > 16, "Transmission buffer is too small.");
+		static_assert(SBF::size() > 16, "Transmission buffer is too small.");
+
+	public:
+
+		typedef CAN peripheral_type;
+		typedef RBF recv_buffer_type;
+		typedef SBF send_buffer_type;
+		static constexpr auto port_select_type = PSEL;
 
 		static constexpr uint32_t RX_MB_TOP = 0;	///< 受信用メールボックス先頭番号
 		static constexpr uint32_t RX_MB_NUM = 8;	///< 受信用メールボックス数（最小８）
@@ -138,9 +144,9 @@ namespace device {
 
 		MODE			mode_;
 
-		static RBF		rbf_;
-		static TBF		tbf_;
-		static uint32_t lost_recv_;
+		static inline RBF		rbf_;
+		static inline SBF		sbf_;
+		static inline uint32_t lost_recv_;
 
 		void sleep_() const noexcept { asm("nop"); }
 
@@ -173,12 +179,12 @@ namespace device {
 					break;
 				}
 			}
-			if(tbf_.length() > 0) {
+			if(sbf_.length() > 0) {
 				++i;
 				if(i >= (TX_MB_TOP + TX_MB_NUM)) i = TX_MB_TOP;
-				const auto& t = tbf_.get_at();
+				const auto& t = sbf_.get_at();
 				CAN::MB[i].set(t);
-				tbf_.get_go();
+				sbf_.get_go();
 				CAN::MCTL[i] = CAN::MCTL.TRMREQ.b(1);
 			}
 		}
@@ -729,13 +735,13 @@ namespace device {
 		bool send(uint32_t id, const void* src, uint32_t len, bool ide = false) noexcept
 		{
 			// バッファサイズが、最大容量の 15/16 を超えたら、「1」に戻るまで待つ。
-			if(tbf_.length() > (tbf_.size() - (tbf_.size() / 16))) {
-				while(tbf_.length() > 1) {
+			if(sbf_.length() > (sbf_.size() - (sbf_.size() / 16))) {
+				while(sbf_.length() > 1) {
 					utils::delay::sleep();
 				}
 			}
 
-			auto& t = tbf_.put_at();
+			auto& t = sbf_.put_at();
 			t.set_id(id);
 			t.set_IDE(ide);
 			if(src != nullptr && len > 0 && len <= 8) {
@@ -749,16 +755,16 @@ namespace device {
 				t.set_RTR(1);
 				t.set_DLC(0);
 			}
-			tbf_.put_go();
+			sbf_.put_go();
 
 			uint32_t n = 0;
 			for(uint32_t i = TX_MB_TOP; i < (TX_MB_TOP + TX_MB_NUM); ++i) {
 				if(CAN::MCTL[i]() == 0) ++n;
 			}
 			if(n == TX_MB_NUM) {  // 送信が完全に停止中なら送信トリガを出す
-				const auto& t = tbf_.get_at();
+				const auto& t = sbf_.get_at();
 				CAN::MB[TX_MB_TOP].set(t);
-				tbf_.get_go();
+				sbf_.get_go();
 				CAN::MCTL[TX_MB_TOP] = CAN::MCTL.TRMREQ.b(1);
 			}
 
@@ -816,11 +822,4 @@ namespace device {
 			}
 		}
 	};
-
-	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL>
-		RBF can_io<CAN, RBF, TBF, PSEL>::rbf_;
-	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL>
-		TBF can_io<CAN, RBF, TBF, PSEL>::tbf_;
-	template <class CAN, class RBF, class TBF, port_map::ORDER PSEL>
-		uint32_t can_io<CAN, RBF, TBF, PSEL>::lost_recv_ = 0;
 }

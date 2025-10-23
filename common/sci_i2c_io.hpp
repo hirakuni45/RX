@@ -65,8 +65,8 @@ namespace device {
 
 		static_assert(SCI::I2C_SUB, "Not support simple I2C mode.");
 
-		static RBF	recv_;
-		static SBF	send_;
+		static inline RBF	recv_;
+		static inline SBF	send_;
 
 		ICU::LEVEL	level_;
 		ERROR		error_;
@@ -593,10 +593,6 @@ level = ICU::LEVEL::NONE;
 	};
 
 	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
-		RBF sci_i2c_io<SCI, RBF, SBF, PSEL>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
-		SBF sci_i2c_io<SCI, RBF, SBF, PSEL>::send_;
 	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>
 		volatile sci_i2c_t::TASK sci_i2c_io<SCI, RBF, SBF, PSEL>::task_;
 	template<class SCI, class RBF, class SBF, port_map::ORDER PSEL>

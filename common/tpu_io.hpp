@@ -74,7 +74,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class TPU, class TASK = utils::null_task, port_map_order::ORDER ORDER = port_map_order::ORDER::FIRST>
 	class tpu_io : public tpu_io_base {
+	public:
 
+		typedef TPU periperal_type;
+
+	private:
 		TYPE		type_;
 		ICU::LEVEL	level_;
 		uint8_t		shift_;
@@ -82,7 +86,7 @@ namespace device {
 
 		ICU::VECTOR	intr_vec_;
 
-		static TASK	task_;
+		static inline TASK	task_;
 
 		static INTERRUPT_FUNC void tpu_task_() noexcept {
 			task_();
@@ -382,6 +386,4 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static TASK& at_task() noexcept { return task_; }
 	};
-
-	template <class TPU, class TASK, port_map_order::ORDER PMAP> TASK tpu_io<TPU, TASK, PMAP>::task_;
 }

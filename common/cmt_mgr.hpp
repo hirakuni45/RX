@@ -30,7 +30,7 @@ namespace device {
 	template <class CMT, class FUNC = utils::null_task>
 	class cmt_mgr {
 	public:
-		typedef CMT cmt_type;	///< CMT チャネル・クラス型
+		typedef CMT peripheral_type;	///< CMT チャネル・クラス型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

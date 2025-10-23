@@ -5,7 +5,7 @@
 			・CANFD クロックは、正確に一致しない場合、エラーとする。 @n
 			・CANFD ポートに、CAN バス・トランシーバーを接続する。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -59,22 +59,29 @@ namespace device {
 	/*!
 		@brief  CANFD 制御クラス
 		@param[in]	CANFD	CANFD 定義クラス
-		@param[in]	RBF		受信バッファクラス (utils::fixed_fifo<can_frame, N>)
-		@param[in]	TBF		送信バッファクラス (utils::fixed_fifo<can_frame, N>)
+		@param[in]	RBF		受信バッファクラス (utils::fixed_fifo<canfd_frame, N>)
+		@param[in]	SBF		送信バッファクラス (utils::fixed_fifo<canfd_frame, N>)
 		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class CANFD, class RBF, class TBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
+	template <class CANFD, class RBF, class SBF, port_map::ORDER PSEL = port_map::ORDER::FIRST>
 	struct canfd_io : public canfd_io_def {
 
+		typedef CANFD peripheral_type;
+		typedef RBF recv_buffer_type;
+		typedef SBF send_buffer_type;
+
 		static_assert(RBF::size() > 16, "Receive buffer is too small.");
-		static_assert(TBF::size() > 16, "Transmission buffer is too small.");
+		static_assert(SBF::size() > 16, "Transmission buffer is too small.");
 
 #ifndef NDEBUG
 		typedef utils::null_format	format;
 #else
 		typedef utils::format		format;
 #endif
+	private:
+
+
 
 	public:
 		//-----------------------------------------------------------------//
@@ -89,20 +96,26 @@ namespace device {
 		/*!
 			@brief  通信速度が設定可能か検査
 			@param[in]	speed	公称通信速度型
+			@return 可能なら「true」を返す。
+		*/
+		//-----------------------------------------------------------------//
+		static constexpr bool probe_speed(SPEED speed) noexcept
+		{
+			return false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  通信速度が設定可能か検査
 			@param[in]	data	データ通信速度型
 			@return 可能なら「true」を返す。
 		*/
 		//-----------------------------------------------------------------//
-		static constexpr bool probe_speed(SPEED speed, DATA data) noexcept
+		static constexpr bool probe_speed(DATA data) noexcept
 		{
-#if 0
-			if(get_tq_(false, speed) >= 8) return true;  // PCLKB 選択
-			else if(get_tq_(true, speed) >= 8) return true;  // XTAL(EXTAL) 選択
-			else return false;
-#endif
 			return false;
 		}
-
 
 
 

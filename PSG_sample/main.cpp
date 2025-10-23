@@ -266,7 +266,7 @@ int main(int argc, char** argv)
 	LED::P = 0;
 
 	{
-		utils::format("SCI PCLK: %u\n") % SCI::sci_type::PCLK;
+		utils::format("SCI PCLK: %u\n") % SCI::peripheral_type::PCLK;
 		utils::format("SCI Baud rate (set):  %u\n") % sci_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
 		rate *= 100.0f;

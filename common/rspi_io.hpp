@@ -24,7 +24,7 @@ namespace device {
 	class rspi_io {
 	public:
 
-		typedef RSPI value_type;	///< RSPI 型
+		typedef RSPI peripheral_type;	///< RSPI 型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
