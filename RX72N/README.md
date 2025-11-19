@@ -930,6 +930,222 @@
 
 ---
 
+## Port map order (ETHERC0) / ポートマップ候補 (ETHERC0)
+
+- [port_map_ether.hpp](port_map_ether.hpp?ts=4)
+
+### LFQFP100
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET0_MDC|P72 (---)|PA4 (66)|PK0 (---)|-|
+|ET0_MDIO|P71 (---)|PA3 (67)|PL7 (---)|-|
+|ET0_CRS|P83 (---)|PB7 (53)|PM7 (---)|-|
+|ET0_RX_DV|PC2 (50)|PK2 (---)|-|-|
+|ET0_EX_OUT|P55 (39)|PA6 (64)|PJ3 (---)|-|
+|ET0_LINKSTA|P34 (16)|P54 (40)|PA5 (65)|-|
+|ET0_ETXD0|P81 (---)|PB5 (55)|PL4 (---)|-|
+|ET0_ETXD1|P82 (---)|PB6 (54)|PL5 (---)|-|
+|ET0_ETXD2|PC5 (47)|PM4 (---)|-|-|
+|ET0_ETXD3|PC6 (46)|PM5 (---)|-|-|
+|ET0_ERXD0|P75 (---)|PB1 (59)|PL0 (---)|-|
+|ET0_ERXD1|P74 (---)|PB0 (61)|PL1 (---)|-|
+|ET0_ERXD2|PC1 (51)|PE4 (74)|PK4 (---)|-|
+|ET0_ERXD3|PC0 (52)|PE3 (75)|PK5 (---)|-|
+|ET0_TX_EN|P80 (---)|PA0 (70)|PB4 (56)|PL6 (---)|
+|ET0_TX_ER|PC3 (49)|PK3 (---)|-|-|
+|ET0_RX_ER|P77 (---)|PB3 (57)|PL2 (---)|-|
+|ET0_TX_CLK|PC4 (48)|PM6 (---)|-|-|
+|ET0_RX_CLK|P76 (---)|PB2 (58)|PE5 (73)|PL3 (---)|
+|ET0_COL|PC7 (45)|PK1 (---)|-|-|
+|ET0_WOL|P73 (---)|PA1 (69)|PA7 (63)|-|
+|REF50CK0|P76 (---)|PB2 (58)|PE5 (73)|PL3 (---)|
+|RMII0_CRS_DV|P83 (---)|PB7 (53)|PM7 (---)|-|
+|RMII0_TXD0|P81 (---)|PB5 (55)|PL4 (---)|-|
+|RMII0_TXD1|P82 (---)|PB6 (54)|PL5 (---)|-|
+|RMII0_RXD0|P75 (---)|PB1 (59)|PL0 (---)|-|
+|RMII0_RXD1|P74 (---)|PB0 (61)|PL1 (---)|-|
+|RMII0_TXD_EN|P80 (---)|PA0 (70)|PB4 (56)|PL6 (---)|
+|RMII0_RX_ER|P77 (---)|PB3 (57)|PL2 (---)|-|
+
+### LFQFP144
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET0_MDC|P72 (85)|PA4 (92)|PK0 (---)|-|
+|ET0_MDIO|P71 (86)|PA3 (94)|PL7 (---)|-|
+|ET0_CRS|P83 (58)|PB7 (78)|PM7 (---)|-|
+|ET0_RX_DV|PC2 (70)|PK2 (---)|-|-|
+|ET0_EX_OUT|P55 (51)|PA6 (89)|PJ3 (13)|-|
+|ET0_LINKSTA|P34 (25)|P54 (52)|PA5 (90)|-|
+|ET0_ETXD0|P81 (64)|PB5 (80)|PL4 (---)|-|
+|ET0_ETXD1|P82 (63)|PB6 (79)|PL5 (---)|-|
+|ET0_ETXD2|PC5 (62)|PM4 (---)|-|-|
+|ET0_ETXD3|PC6 (61)|PM5 (---)|-|-|
+|ET0_ERXD0|P75 (71)|PB1 (84)|PL0 (---)|-|
+|ET0_ERXD1|P74 (72)|PB0 (87)|PL1 (---)|-|
+|ET0_ERXD2|PC1 (73)|PE4 (107)|PK4 (---)|-|
+|ET0_ERXD3|PC0 (75)|PE3 (108)|PK5 (---)|-|
+|ET0_TX_EN|P80 (65)|PA0 (97)|PB4 (81)|PL6 (---)|
+|ET0_TX_ER|PC3 (67)|PK3 (---)|-|-|
+|ET0_RX_ER|P77 (68)|PB3 (82)|PL2 (---)|-|
+|ET0_TX_CLK|PC4 (66)|PM6 (---)|-|-|
+|ET0_RX_CLK|P76 (89)|PB2 (83)|PE5 (106)|PL3 (---)|
+|ET0_COL|PC7 (60)|PK1 (---)|-|-|
+|ET0_WOL|P73 (77)|PA1 (96)|PA7 (88)|-|
+|REF50CK0|P76 (69)|PB2 (83)|PE5 (106)|PL3 (---)|
+|RMII0_CRS_DV|P83 (58)|PB7 (78)|PM7 (---)|-|
+|RMII0_TXD0|P81 (64)|PB5 (80)|PL4 (---)|-|
+|RMII0_TXD1|P82 (63)|PB6 (79)|PL5 (---)|-|
+|RMII0_RXD0|P75 (71)|PB1 (84)|PL0 (---)|-|
+|RMII0_RXD1|P74 (72)|PB0 (87)|PL1 (---)|-|
+|RMII0_TXD_EN|P80 (65)|PA0 (97)|PB4 (81)|PL6 (---)|
+|RMII0_RX_ER|P77 (68)|PB3 (82)|PL2 (---)|-|
+
+### LFQFP176
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET0_MDC|P72 (101)|PA4 (109)|PK0 (---)|-|
+|ET0_MDIO|P71 (102)|PA3 (110)|PL7 (---)|-|
+|ET0_CRS|P83 (74)|PB7 (94)|PM7 (---)|-|
+|ET0_RX_DV|PC2 (86)|PK2 (---)|-|-|
+|ET0_EX_OUT|P55 (65)|PA6 (107)|PJ3 (13)|-|
+|ET0_LINKSTA|P34 (27)|P54 (66)|PA5 (108)|-|
+|ET0_ETXD0|P81 (80)|PB5 (96)|PL4 (---)|-|
+|ET0_ETXD1|P82 (79)|PB6 (95)|PL5 (---)|-|
+|ET0_ETXD2|PC5 (78)|PM4 (---)|-|-|
+|ET0_ETXD3|PC6 (77)|PM5 (---)|-|-|
+|ET0_ERXD0|P75 (87)|PB1 (100)|PL0 (---)|-|
+|ET0_ERXD1|P74 (88)|PB0 (104)|PL1 (---)|-|
+|ET0_ERXD2|PC1 (89)|PE4 (131)|PK4 (---)|-|
+|ET0_ERXD3|PC0 (91)|PE3 (132)|PK5 (---)|-|
+|ET0_TX_EN|P80 (81)|PA0 (118)|PB4 (97)|PL6 (---)|
+|ET0_TX_ER|PC3 (83)|PK3 (---)|-|-|
+|ET0_RX_ER|P77 (84)|PB3 (98)|PL2 (---)|-|
+|ET0_TX_CLK|PC4 (82)|PM6 (---)|-|-|
+|ET0_RX_CLK|P76 (85)|PB2 (99)|PE5 (130)|PL3 (---)|
+|ET0_COL|PC7 (76)|PK1 (---)|-|-|
+|ET0_WOL|P73 (93)|PA1 (114)|PA7 (106)|-|
+|REF50CK0|P76 (85)|PB2 (99)|PE5 (130)|PL3 (---)|
+|RMII0_CRS_DV|P83 (74)|PB7 (94)|PM7 (---)|-|
+|RMII0_TXD0|P81 (80)|PB5 (96)|PL4 (---)|-|
+|RMII0_TXD1|P82 (79)|PB6 (95)|PL5 (---)|-|
+|RMII0_RXD0|P75 (87)|PB1 (100)|PL0 (---)|-|
+|RMII0_RXD1|P74 (88)|PB0 (104)|PL1 (---)|-|
+|RMII0_TXD_EN|P80 (81)|PA0 (118)|PB4 (97)|PL6 (---)|
+|RMII0_RX_ER|P77 (84)|PB3 (98)|PL2 (---)|-|
+
+---
+
+## Port map order (ETHERC1) / ポートマップ候補 (ETHERC1)
+
+- [port_map_ether.hpp](port_map_ether.hpp?ts=4)
+
+### LFQFP100
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET1_MDC|P31 (19)|PD5 (81)|PN5 (---)|-|
+|ET1_MDIO|P30 (20)|PD4 (82)|PN4 (---)|-|
+|ET1_CRS|P92 (---)|PQ0 (---)|-|-|
+|ET1_RX_DV|P90 (---)|PQ2 (---)|-|-|
+|ET1_EX_OUT|P26 (22)|PD2 (84)|-|-|
+|ET1_LINKSTA|P84 (---)|P93 (---)|-|-|
+|ET1_ETXD0|P64 (---)|PG3 (---)|PQ5 (---)|-|
+|ET1_ETXD1|P63 (---)|PG4 (---)|PQ6 (---)|-|
+|ET1_ETXD2|PG5 (---)|PM0 (---)|-|-|
+|ET1_ETXD3|PG6 (---)|PN1 (---)|-|-|
+|ET1_ERXD0|P62 (---)|P94 (---)|PM0 (---)|-|
+|ET1_ERXD1|P61 (---)|P95 (---)|PM1 (---)|-|
+|ET1_ERXD2|P96 (---)|PM2 (---)|-|-|
+|ET1_ERXD3|P97 (---)|PM3 (---)|-|-|
+|ET1_TX_EN|P60 (---)|PQ7 (---)|-|-|
+|ET1_TX_ER|PG7 (---)|PQ3 (---)|-|-|
+|ET1_RX_ER|PD7 (79)|PG1 (---)|PN3 (---)|-|
+|ET1_TX_CLK|PG2 (---)|PN2 (---)|-|-|
+|ET1_RX_CLK|PD6 (80)|PG0 (---)|PQ4 (---)|-|
+|ET1_COL|P91 (---)|PQ1 (---)|-|-|
+|ET1_WOL|P27 (21)|PD3 (83)|-|-|
+|REF50CK1|PD6 (80)|PG0 (---)|PQ4 (---)|-|
+|RMII1_CRS_DV|P92 (---)|PQ0 (---)|-|-|
+|RMII1_TXD0|P64 (---)|PG3 (---)|PQ5 (---)|-|
+|RMII1_TXD1|P63 (---)|PG4 (---)|PQ6 (---)|-|
+|RMII1_RXD0|P62 (---)|P94 (---)|PM0 (---)|-|
+|RMII1_RXD1|P61 (---)|P95 (---)|PM1 (---)|-|
+|RMII1_TXD_EN|P60 (---)|PQ7 (---)|-|-|
+|RMII1_RX_ER|PD7 (79)|PG1 (---)|PN3 (---)|-|
+
+### LFQFP144
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET1_MDC|P31 (28)|PD5 (121)|PN5 (---)|-|
+|ET1_MDIO|P30 (29)|PD4 (122)|PN4 (---)|-|
+|ET1_CRS|P92 (128)|PQ0 (---)|-|-|
+|ET1_RX_DV|P90 (131)|PQ2 (---)|-|-|
+|ET1_EX_OUT|P26 (31)|PD2 (124)|-|-|
+|ET1_LINKSTA|P84 (---)|P93 (127)|-|-|
+|ET1_ETXD0|P64 (112)|PG3 (---)|PQ5 (---)|-|
+|ET1_ETXD1|P63 (113)|PG4 (---)|PQ6 (---)|-|
+|ET1_ETXD2|PG5 (---)|PM0 (---)|-|-|
+|ET1_ETXD3|PG6 (---)|PN1 (---)|-|-|
+|ET1_ERXD0|P62 (114)|P94 (---)|PM0 (---)|-|
+|ET1_ERXD1|P61 (115)|P95 (---)|PM1 (---)|-|
+|ET1_ERXD2|P96 (---)|PM2 (---)|-|-|
+|ET1_ERXD3|P97 (---)|PM3 (---)|-|-|
+|ET1_TX_EN|P60 (117)|PQ7 (---)|-|-|
+|ET1_TX_ER|PG7 (---)|PQ3 (---)|-|-|
+|ET1_RX_ER|PD7 (119)|PG1 (---)|PN3 (---)|-|
+|ET1_TX_CLK|PG2 (---)|PN2 (---)|-|-|
+|ET1_RX_CLK|PD6 (120)|PG0 (---)|PQ4 (---)|-|
+|ET1_COL|P91 (129)|PQ1 (---)|-|-|
+|ET1_WOL|P27 (30)|PD3 (123)|-|-|
+|REF50CK1|PD6 (120)|PG0 (---)|PQ4 (---)|-|
+|RMII1_CRS_DV|P92 (128)|PQ0 (---)|-|-|
+|RMII1_TXD0|P64 (112)|PG3 (---)|PQ5 (---)|-|
+|RMII1_TXD1|P63 (113)|PG4 (---)|PQ6 (---)|-|
+|RMII1_RXD0|P62 (114)|P94 (---)|PM0 (---)|-|
+|RMII1_RXD1|P61 (115)|P95 (---)|PM1 (---)|-|
+|RMII1_TXD_EN|P60 (117)|PQ7 (---)|-|-|
+|RMII1_RX_ER|PD7 (119)|PG1 (---)|PN3 (---)|-|
+
+### LFQFP176
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET1_MDC|P31 (32)|PD5 (147)|PN5 (---)|-|
+|ET1_MDIO|P30 (33)|PD4 (147)|PN4 (---)|-|
+|ET1_CRS|P92 (160)|PQ0 (---)|-|-|
+|ET1_RX_DV|P90 (163)|PQ2 (---)|-|-|
+|ET1_EX_OUT|P26 (37)|PD2 (154)|-|-|
+|ET1_LINKSTA|P84 (62)|P93 (159)|-|-|
+|ET1_ETXD0|P64 (136)|PG3 (121)|PQ5 (---)|-|
+|ET1_ETXD1|P63 (137)|PG4 (119)|PQ6 (---)|-|
+|ET1_ETXD2|PG5 (116)|PM0 (---)|-|-|
+|ET1_ETXD3|PG6 (113)|PN1 (---)|-|-|
+|ET1_ERXD0|P62 (138)|P94 (157)|PM0 (---)|-|
+|ET1_ERXD1|P61 (139)|P95 (155)|PM1 (---)|-|
+|ET1_ERXD2|P96 (152)|PM2 (---)|-|-|
+|ET1_ERXD3|P97 (149)|PM3 (---)|-|-|
+|ET1_TX_EN|P60 (141)|PQ7 (---)|-|-|
+|ET1_TX_ER|PG7 (111)|PQ3 (---)|-|-|
+|ET1_RX_ER|PD7 (143)|PG1 (144)|PN3 (---)|-|
+|ET1_TX_CLK|PG2 (123)|PN2 (---)|-|-|
+|ET1_RX_CLK|PD6 (145)|PG0 (146)|PQ4 (---)|-|
+|ET1_COL|P91 (161)|PQ1 (---)|-|-|
+|ET1_WOL|P27 (36)|PD3 (150)|-|-|
+|REF50CK1|PD6 (145)|PG0 (146)|PQ4 (---)|-|
+|RMII1_CRS_DV|P92 (160)|PQ0 (---)|-|-|
+|RMII1_TXD0|P64 (136)|PG3 (121)|PQ5 (---)|-|
+|RMII1_TXD1|P63 (137)|PG4 (119)|PQ6 (---)|-|
+|RMII1_RXD0|P62 (138)|P94 (157)|PM0 (---)|-|
+|RMII1_RXD1|P61 (139)|P95 (155)|PM1 (---)|-|
+|RMII1_TXD_EN|P60 (141)|PQ7 (---)|-|-|
+|RMII1_RX_ER|PD7 (143)|PG1 (144)|PN3 (---)|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

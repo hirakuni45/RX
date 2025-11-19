@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX66N/RX72N/RX72M グループ・ポート・マッピング （Ethernet) 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -36,9 +36,9 @@ namespace device {
 		{
 			uint8_t mii = ena ? 0b01'0001 : 0;
 			switch(mdc) {
-			// ET0_MDC: P72
-			// ET0_MDC: PA4
-			// ET0_MDC: PK0
+			// ET0_MDC: P72 (LFQFP100: ---) (LFQFP144:  85) (LFQFP176: 101)
+			// ET0_MDC: PA4 (LFQFP100:  66) (LFQFP144:  92) (LFQFP176: 109)
+			// ET0_MDC: PK0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -62,9 +62,9 @@ namespace device {
 			}
 
 			switch(mdio) {
-			// ET0_MDIO: P71
-			// ET0_MDIO: PA3
-			// ET0_MDIO: PL7
+			// ET0_MDIO: P71 (LFQFP100: ---) (LFQFP144:  86) (LFQFP176: 102)
+			// ET0_MDIO: PA3 (LFQFP100:  67) (LFQFP144:  94) (LFQFP176: 110)
+			// ET0_MDIO: PL7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -93,9 +93,9 @@ namespace device {
 		{
 			uint8_t mii = ena ? 0b01'0001 : 0;
 			switch(mdc) {
-			// ET1_MDC: P31
-			// ET1_MDC: PD5
-			// ET1_MDC: PN5
+			// ET1_MDC: P31 (LFQFP100:  19) (LFQFP144:  28) (LFQFP176:  32)
+			// ET1_MDC: PD5 (LFQFP100:  81) (LFQFP144: 121) (LFQFP176: 147)
+			// ET1_MDC: PN5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -119,9 +119,9 @@ namespace device {
 			}
 
 			switch(mdio) {
-			// ET1_MDIO: P30
-			// ET1_MDIO: PD4
-			// ET1_MDIO: PN4
+			// ET1_MDIO: P30 (LFQFP100:  20) (LFQFP144:  29) (LFQFP176:  33)
+			// ET1_MDIO: PD4 (LFQFP100:  82) (LFQFP144: 122) (LFQFP176: 148)
+			// ET1_MDIO: PN4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -155,10 +155,10 @@ namespace device {
 			uint8_t rmii = ena ? 0b01'0010 : 0;
 
 			switch(port.ref50ck_) {
-			// REF50CK0: P76
-			// REF50CK0: PB2
-			// REF50CK0: PE5
-			// REF50CK0: PL3
+			// REF50CK0: P76 (LFQFP100: ---) (LFQFP144:  69) (LFQFP176:  85)
+			// REF50CK0: PB2 (LFQFP100:  58) (LFQFP144:  83) (LFQFP176:  99)
+			// REF50CK0: PE5 (LFQFP100:  73) (LFQFP144: 106) (LFQFP176: 130)
+			// REF50CK0: PL3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -187,9 +187,9 @@ namespace device {
 			}
 
 			switch(port.crs_dv_) {
-			// RMII0_CRS_DV: P83
-			// RMII0_CRS_DV: PB7
-			// RMII0_CRS_DV: PM7
+			// RMII0_CRS_DV: P83 (LFQFP100: ---) (LFQFP144:  58) (LFQFP176:  74)
+			// RMII0_CRS_DV: PB7 (LFQFP100:  53) (LFQFP144:  78) (LFQFP176:  94)
+			// RMII0_CRS_DV: PM7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -213,9 +213,9 @@ namespace device {
 			}
 
 			switch(port.txd0_) {
-			// RMII0_TXD0: P81
-			// RMII0_TXD0: PB5
-			// RMII0_TXD0: PL4
+			// RMII0_TXD0: P81 (LFQFP100: ---) (LFQFP144:  64) (LFQFP176:  80)
+			// RMII0_TXD0: PB5 (LFQFP100:  55) (LFQFP144:  80) (LFQFP176:  96)
+			// RMII0_TXD0: PL4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -239,9 +239,9 @@ namespace device {
 			}
 
 			switch(port.txd1_) {
-			// RMII0_TXD1: P82
-			// RMII0_TXD1: PB6
-			// RMII0_TXD1: PL5
+			// RMII0_TXD1: P82 (LFQFP100: ---) (LFQFP144:  63) (LFQFP176:  79)
+			// RMII0_TXD1: PB6 (LFQFP100:  54) (LFQFP144:  79) (LFQFP176:  95)
+			// RMII0_TXD1: PL5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -265,9 +265,9 @@ namespace device {
 			}
 
 			switch(port.rxd0_) {
-			// RMII0_RXD0: P75
-			// RMII0_RXD0: PB1
-			// RMII0_RXD0: PL0
+			// RMII0_RXD0: P75 (LFQFP100: ---) (LFQFP144:  71) (LFQFP176:  87)
+			// RMII0_RXD0: PB1 (LFQFP100:  59) (LFQFP144:  84) (LFQFP176: 100)
+			// RMII0_RXD0: PL0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -291,9 +291,9 @@ namespace device {
 			}
 
 			switch(port.rxd1_) {
-			// RMII0_RXD1: P74
-			// RMII0_RXD1: PB0
-			// RMII0_RXD1: PL1
+			// RMII0_RXD1: P74 (LFQFP100: ---) (LFQFP144:  72) (LFQFP176:  88)
+			// RMII0_RXD1: PB0 (LFQFP100:  61) (LFQFP144:  87) (LFQFP176: 104)
+			// RMII0_RXD1: PL1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -317,10 +317,10 @@ namespace device {
 			}
 
 			switch(port.txd_en_) {
-			// RMII0_TXD_EN: P80
-			// RMII0_TXD_EN: PA0
-			// RMII0_TXD_EN: PB4
-			// RMII0_TXD_EN: PL6
+			// RMII0_TXD_EN: P80 (LFQFP100: ---) (LFQFP144:  65) (LFQFP176:  81)
+			// RMII0_TXD_EN: PA0 (LFQFP100:  70) (LFQFP144:  97) (LFQFP176: 118)
+			// RMII0_TXD_EN: PB4 (LFQFP100:  56) (LFQFP144:  81) (LFQFP176:  97)
+			// RMII0_TXD_EN: PL6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -349,9 +349,9 @@ namespace device {
 			}
 
 			switch(port.rx_er_) {
-			// RMII0_RX_ER: P77
-			// RMII0_RX_ER: PB3
-			// RMII0_RX_ER: PL2
+			// RMII0_RX_ER: P77 (LFQFP100: ---) (LFQFP144:  68) (LFQFP176:  84)
+			// RMII0_RX_ER: PB3 (LFQFP100:  57) (LFQFP144:  82) (LFQFP176:  98)
+			// RMII0_RX_ER: PL2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -393,9 +393,9 @@ namespace device {
 			uint8_t rmii = ena ? 0b01'0010 : 0;
 
 			switch(port.ref50ck_) {
-			// REF50CK1: PD6
-			// REF50CK1: PG0
-			// REF50CK1: PQ4
+			// REF50CK1: PD6 (LFQFP100:  80) (LFQFP144: 120) (LFQFP176: 145)
+			// REF50CK1: PG0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 146)
+			// REF50CK1: PQ4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -419,8 +419,8 @@ namespace device {
 			}
 
 			switch(port.crs_dv_) {
-			// RMII1_CRS_DV: P92
-			// RMII1_CRS_DV: PQ0
+			// RMII1_CRS_DV: P92 (LFQFP100: ---) (LFQFP144: 128) (LFQFP176: 160)
+			// RMII1_CRS_DV: PQ0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -439,9 +439,9 @@ namespace device {
 			}
 
 			switch(port.txd0_) {
-			// RMII1_TXD0: P64
-			// RMII1_TXD0: PG3
-			// RMII1_TXD0: PQ5
+			// RMII1_TXD0: P64 (LFQFP100: ---) (LFQFP144: 112) (LFQFP176: 136)
+			// RMII1_TXD0: PG3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 121)
+			// RMII1_TXD0: PQ5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -465,9 +465,9 @@ namespace device {
 			}
 
 			switch(port.txd1_) {
-			// RMII1_TXD1: P63
-			// RMII1_TXD1: PG4
-			// RMII1_TXD1: PQ6
+			// RMII1_TXD1: P63 (LFQFP100: ---) (LFQFP144: 113) (LFQFP176: 137)
+			// RMII1_TXD1: PG4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 119)
+			// RMII1_TXD1: PQ6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -491,9 +491,9 @@ namespace device {
 			}
 
 			switch(port.rxd0_) {
-			// RMII1_RXD0: P62
-			// RMII1_RXD0: P94
-			// RMII1_RXD0: PM0
+			// RMII1_RXD0: P62 (LFQFP100: ---) (LFQFP144: 114) (LFQFP176: 138)
+			// RMII1_RXD0: P94 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 157)
+			// RMII1_RXD0: PM0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -517,9 +517,9 @@ namespace device {
 			}
 
 			switch(port.rxd1_) {
-			// RMII1_RXD1: P61
-			// RMII1_RXD1: P95
-			// RMII1_RXD1: PM1
+			// RMII1_RXD1: P61 (LFQFP100: ---) (LFQFP144: 115) (LFQFP176: 139)
+			// RMII1_RXD1: P95 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 155)
+			// RMII1_RXD1: PM1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -543,8 +543,8 @@ namespace device {
 			}
 
 			switch(port.txd_en_) {
-			// RMII1_TXD_EN: P60
-			// RMII1_TXD_EN: PQ7
+			// RMII1_TXD_EN: P60 (LFQFP100: ---) (LFQFP144: 117) (LFQFP176: 141)
+			// RMII1_TXD_EN: PQ7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -563,9 +563,9 @@ namespace device {
 			}
 
 			switch(port.rx_er_) {
-			// RMII1_RX_ER: PD7
-			// RMII1_RX_ER: PG1
-			// RMII1_RX_ER: PN3
+			// RMII1_RX_ER: PD7 (LFQFP100:  79) (LFQFP144: 119) (LFQFP176: 143)
+			// RMII1_RX_ER: PG1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 144)
+			// RMII1_RX_ER: PN3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -607,9 +607,9 @@ namespace device {
 			uint8_t mii = ena ? 0b01'0001 : 0;
 
 			switch(port.crs_) {
-			// ET0_CRS: P83
-			// ET0_CRS: PB7
-			// ET0_CRS: PM7
+			// ET0_CRS: P83 (LFQFP100: ---) (LFQFP144:  58) (LFQFP176:  74)
+			// ET0_CRS: PB7 (LFQFP100:  53) (LFQFP144:  78) (LFQFP176:  94)
+			// ET0_CRS: PM7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -633,8 +633,8 @@ namespace device {
 			}
 
 			switch(port.rx_dv_) {
-			// ET0_RX_DV: PC2
-			// ET0_RX_DV: PK2
+			// ET0_RX_DV: PC2 (LFQFP100:  50) (LFQFP144:  70) (LFQFP176:  86)
+			// ET0_RX_DV: PK2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -653,9 +653,9 @@ namespace device {
 			}
 
 			switch(port.exout_) {
-			// ET0_EX_OUT: P55
-			// ET0_EX_OUT: PA6
-			// ET0_EX_OUT: PJ3
+			// ET0_EX_OUT: P55 (LFQFP100:  39) (LFQFP144:  51) (LFQFP176:  65)
+			// ET0_EX_OUT: PA6 (LFQFP100:  64) (LFQFP144:  89) (LFQFP176: 107)
+			// ET0_EX_OUT: PJ3 (LFQFP100: ---) (LFQFP144:  13) (LFQFP176:  13)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -679,9 +679,9 @@ namespace device {
 			}
 
 			switch(port.linksta_) {
-			// ET0_LINKSTA: P34
-			// ET0_LINKSTA: P54
-			// ET0_LINKSTA: PA5
+			// ET0_LINKSTA: P34 (LFQFP100:  16) (LFQFP144:  25) (LFQFP176:  27)
+			// ET0_LINKSTA: P54 (LFQFP100:  40) (LFQFP144:  52) (LFQFP176:  66)
+			// ET0_LINKSTA: PA5 (LFQFP100:  65) (LFQFP144:  90) (LFQFP176: 108)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -705,9 +705,9 @@ namespace device {
 			}
 
 			switch(port.etxd0_) {
-			// ET0_ETXD0: P81
-			// ET0_ETXD0: PB5
-			// ET0_ETXD0: PL4
+			// ET0_ETXD0: P81 (LFQFP100: ---) (LFQFP144:  64) (LFQFP176:  80)
+			// ET0_ETXD0: PB5 (LFQFP100:  55) (LFQFP144:  80) (LFQFP176:  96)
+			// ET0_ETXD0: PL4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -731,9 +731,9 @@ namespace device {
 			}
 
 			switch(port.etxd1_) {
-			// ET0_ETXD1: P82
-			// ET0_ETXD1: PB6
-			// ET0_ETXD1: PL5
+			// ET0_ETXD1: P82 (LFQFP100: ---) (LFQFP144:  63) (LFQFP176:  79)
+			// ET0_ETXD1: PB6 (LFQFP100:  54) (LFQFP144:  79) (LFQFP176:  95)
+			// ET0_ETXD1: PL5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -757,8 +757,8 @@ namespace device {
 			}
 
 			switch(port.etxd2_) {
-			// ET0_ETXD2: PC5
-			// ET0_ETXD2: PM4
+			// ET0_ETXD2: PC5 (LFQFP100:  47) (LFQFP144:  62) (LFQFP176:  78)
+			// ET0_ETXD2: PM4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -777,8 +777,8 @@ namespace device {
 			}
 
 			switch(port.etxd3_) {
-			// ET0_ETXD3: PC6
-			// ET0_ETXD3: PM5
+			// ET0_ETXD3: PC6 (LFQFP100:  46) (LFQFP144:  61) (LFQFP176:  77)
+			// ET0_ETXD3: PM5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -797,9 +797,9 @@ namespace device {
 			}
 
 			switch(port.erxd0_) {
-			// ET0_ERXD0: P75
-			// ET0_ERXD0: PB1
-			// ET0_ERXD0: PL0
+			// ET0_ERXD0: P75 (LFQFP100: ---) (LFQFP144:  71) (LFQFP176:  87)
+			// ET0_ERXD0: PB1 (LFQFP100:  59) (LFQFP144:  84) (LFQFP176: 100)
+			// ET0_ERXD0: PL0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -823,9 +823,9 @@ namespace device {
 			}
 
 			switch(port.erxd1_) {
-			// ET0_ERXD1: P74
-			// ET0_ERXD1: PB0
-			// ET0_ERXD1: PL1
+			// ET0_ERXD1: P74 (LFQFP100: ---) (LFQFP144:  72) (LFQFP176:  88)
+			// ET0_ERXD1: PB0 (LFQFP100:  61) (LFQFP144:  87) (LFQFP176: 104)
+			// ET0_ERXD1: PL1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -849,9 +849,9 @@ namespace device {
 			}
 
 			switch(port.erxd2_) {
-			// ET0_ERXD2: PC1
-			// ET0_ERXD2: PE4
-			// ET0_ERXD2: PK4
+			// ET0_ERXD2: PC1 (LFQFP100:  51) (LFQFP144:  73) (LFQFP176:  89)
+			// ET0_ERXD2: PE4 (LFQFP100:  74) (LFQFP144: 107) (LFQFP176: 131)
+			// ET0_ERXD2: PK4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -875,9 +875,9 @@ namespace device {
 			}
 
 			switch(port.erxd3_) {
-			// ET0_ERXD3: PC0
-			// ET0_ERXD3: PE3
-			// ET0_ERXD3: PK5
+			// ET0_ERXD3: PC0 (LFQFP100:  52) (LFQFP144:  75) (LFQFP176:  91)
+			// ET0_ERXD3: PE3 (LFQFP100:  75) (LFQFP144: 108) (LFQFP176: 132)
+			// ET0_ERXD3: PK5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -901,10 +901,10 @@ namespace device {
 			}
 
 			switch(port.tx_en_) {
-			// ET0_TX_EN: P80
-			// ET0_TX_EN: PA0
-			// ET0_TX_EN: PB4
-			// ET0_TX_EN: PL6
+			// ET0_TX_EN: P80 (LFQFP100: ---) (LFQFP144:  65) (LFQFP176:  81)
+			// ET0_TX_EN: PA0 (LFQFP100:  70) (LFQFP144:  97) (LFQFP176: 118)
+			// ET0_TX_EN: PB4 (LFQFP100:  56) (LFQFP144:  81) (LFQFP176:  97)
+			// ET0_TX_EN: PL6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -933,8 +933,8 @@ namespace device {
 			}
 
 			switch(port.tx_er_) {
-			// ET0_TX_ER: PC3
-			// ET0_TX_ER: PK3
+			// ET0_TX_ER: PC3 (LFQFP100:  49) (LFQFP144:  67) (LFQFP176:  83)
+			// ET0_TX_ER: PK3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -953,9 +953,9 @@ namespace device {
 			}
 
 			switch(port.rx_er_) {
-			// ET0_RX_ER: P77
-			// ET0_RX_ER: PB3
-			// ET0_RX_ER: PL2
+			// ET0_RX_ER: P77 (LFQFP100: ---) (LFQFP144:  68) (LFQFP176:  84)
+			// ET0_RX_ER: PB3 (LFQFP100:  57) (LFQFP144:  82) (LFQFP176:  98)
+			// ET0_RX_ER: PL2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -979,8 +979,8 @@ namespace device {
 			}
 
 			switch(port.tx_clk_) {
-			// ET0_TX_CLK: PC4
-			// ET0_TX_CLK: PM6
+			// ET0_TX_CLK: PC4 (LFQFP100:  48) (LFQFP144:  66) (LFQFP176:  82)
+			// ET0_TX_CLK: PM6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -999,10 +999,10 @@ namespace device {
 			}
 
 			switch(port.rx_clk_) {
-			// ET0_RX_CLK: P76
-			// ET0_RX_CLK: PB2
-			// ET0_RX_CLK: PE5
-			// ET0_RX_CLK: PL3
+			// ET0_RX_CLK: P76 (LFQFP100: ---) (LFQFP144:  89) (LFQFP176:  85)
+			// ET0_RX_CLK: PB2 (LFQFP100:  58) (LFQFP144:  83) (LFQFP176:  99)
+			// ET0_RX_CLK: PE5 (LFQFP100:  73) (LFQFP144: 106) (LFQFP176: 130)
+			// ET0_RX_CLK: PL3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1031,8 +1031,8 @@ namespace device {
 			}
 
 			switch(port.col_) {
-			// ET0_COL: PC7
-			// ET0_COL: PK1
+			// ET0_COL: PC7 (LFQFP100:  45) (LFQFP144:  60) (LFQFP176:  76)
+			// ET0_COL: PK1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1051,9 +1051,9 @@ namespace device {
 			}
 
 			switch(port.wol_) {
-			// ET0_WOL: P73
-			// ET0_WOL: PA1
-			// ET0_WOL: PA7
+			// ET0_WOL: P73 (LFQFP100: ---) (LFQFP144:  77) (LFQFP176:  93)
+			// ET0_WOL: PA1 (LFQFP100:  69) (LFQFP144:  96) (LFQFP176: 114)
+			// ET0_WOL: PA7 (LFQFP100:  63) (LFQFP144:  88) (LFQFP176: 106)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1095,8 +1095,8 @@ namespace device {
 			uint8_t mii = ena ? 0b01'0001 : 0;
 
 			switch(port.crs_) {
-			// ET1_CRS: P92
-			// ET1_CRS: PQ0
+			// ET1_CRS: P92 (LFQFP100: ---) (LFQFP144: 128) (LFQFP176: 160)
+			// ET1_CRS: PQ0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1115,8 +1115,8 @@ namespace device {
 			}
 
 			switch(port.rx_dv_) {
-			// ET1_RX_DV: P90
-			// ET1_RX_DV: PQ2
+			// ET1_RX_DV: P90 (LFQFP100: ---) (LFQFP144: 131) (LFQFP176: 163)
+			// ET1_RX_DV: PQ2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1135,8 +1135,8 @@ namespace device {
 			}
 
 			switch(port.exout_) {
-			// ET1_EX_OUT: P26
-			// ET1_EX_OUT: PD2
+			// ET1_EX_OUT: P26 (LFQFP100:  22) (LFQFP144:  31) (LFQFP176:  37)
+			// ET1_EX_OUT: PD2 (LFQFP100:  84) (LFQFP144: 124) (LFQFP176: 154)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1155,8 +1155,8 @@ namespace device {
 			}
 
 			switch(port.linksta_) {
-			// ET1_LINKSTA: P84
-			// ET1_LINKSTA: P93
+			// ET1_LINKSTA: P84 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176:  62)
+			// ET1_LINKSTA: P93 (LFQFP100: ---) (LFQFP144: 127) (LFQFP176: 159)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1175,9 +1175,9 @@ namespace device {
 			}
 
 			switch(port.etxd0_) {
-			// ET1_ETXD0: P64
-			// ET1_ETXD0: PG3
-			// ET1_ETXD0: PQ5
+			// ET1_ETXD0: P64 (LFQFP100: ---) (LFQFP144: 112) (LFQFP176: 136)
+			// ET1_ETXD0: PG3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 121)
+			// ET1_ETXD0: PQ5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1201,9 +1201,9 @@ namespace device {
 			}
 
 			switch(port.etxd1_) {
-			// ET1_ETXD1: P63
-			// ET1_ETXD1: PG4
-			// ET1_ETXD1: PQ6
+			// ET1_ETXD1: P63 (LFQFP100: ---) (LFQFP144: 113) (LFQFP176: 137)
+			// ET1_ETXD1: PG4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 119)
+			// ET1_ETXD1: PQ6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1227,8 +1227,8 @@ namespace device {
 			}
 
 			switch(port.etxd2_) {
-			// ET1_ETXD2: PG5
-			// ET1_ETXD2: PN0
+			// ET1_ETXD2: PG5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 116)
+			// ET1_ETXD2: PN0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1247,8 +1247,8 @@ namespace device {
 			}
 
 			switch(port.etxd3_) {
-			// ET1_ETXD3: PG6
-			// ET1_ETXD3: PN1
+			// ET1_ETXD3: PG6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 113)
+			// ET1_ETXD3: PN1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1267,9 +1267,9 @@ namespace device {
 			}
 
 			switch(port.erxd0_) {
-			// ET1_ERXD0: P62
-			// ET1_ERXD0: P94
-			// ET1_ERXD0: PM0
+			// ET1_ERXD0: P62 (LFQFP100: ---) (LFQFP144: 114) (LFQFP176: 138)
+			// ET1_ERXD0: P94 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 157)
+			// ET1_ERXD0: PM0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1293,9 +1293,9 @@ namespace device {
 			}
 
 			switch(port.erxd1_) {
-			// ET1_ERXD1: P61
-			// ET1_ERXD1: P95
-			// ET1_ERXD1: PM1
+			// ET1_ERXD1: P61 (LFQFP100: ---) (LFQFP144: 115) (LFQFP176: 139)
+			// ET1_ERXD1: P95 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 155)
+			// ET1_ERXD1: PM1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1319,8 +1319,8 @@ namespace device {
 			}
 
 			switch(port.erxd2_) {
-			// ET1_ERXD2: P96
-			// ET1_ERXD2: PM2
+			// ET1_ERXD2: P96 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 152)
+			// ET1_ERXD2: PM2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1339,8 +1339,8 @@ namespace device {
 			}
 
 			switch(port.erxd3_) {
-			// ET1_ERXD3: P97
-			// ET1_ERXD3: PM3
+			// ET1_ERXD3: P97 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 149)
+			// ET1_ERXD3: PM3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1359,8 +1359,8 @@ namespace device {
 			}
 
 			switch(port.tx_en_) {
-			// ET1_TX_EN: P60
-			// ET1_TX_EN: PQ7
+			// ET1_TX_EN: P60 (LFQFP100: ---) (LFQFP144: 117) (LFQFP176: 141)
+			// ET1_TX_EN: PQ7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1379,8 +1379,8 @@ namespace device {
 			}
 
 			switch(port.tx_er_) {
-			// ET1_TX_ER: PG7
-			// ET1_TX_ER: PQ3
+			// ET1_TX_ER: PG7 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 111)
+			// ET1_TX_ER: PQ3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1399,9 +1399,9 @@ namespace device {
 			}
 
 			switch(port.rx_er_) {
-			// ET1_RX_ER: PD7
-			// ET1_RX_ER: PG1
-			// ET1_RX_ER: PN3
+			// ET1_RX_ER: PD7 (LFQFP100:  79) (LFQFP144: 119) (LFQFP176: 143)
+			// ET1_RX_ER: PG1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 144)
+			// ET1_RX_ER: PN3 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1425,8 +1425,8 @@ namespace device {
 			}
 
 			switch(port.tx_clk_) {
-			// ET1_TX_CLK: PG2
-			// ET1_TX_CLK: PN2
+			// ET1_TX_CLK: PG2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 123)
+			// ET1_TX_CLK: PN2 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1445,9 +1445,9 @@ namespace device {
 			}
 
 			switch(port.rx_clk_) {
-			// ET1_RX_CLK: PD6
-			// ET1_RX_CLK: PG0
-			// ET1_RX_CLK: PQ4
+			// ET1_RX_CLK: PD6 (LFQFP100:  80) (LFQFP144: 120) (LFQFP176: 145)
+			// ET1_RX_CLK: PG0 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: 146)
+			// ET1_RX_CLK: PQ4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1471,8 +1471,8 @@ namespace device {
 			}
 
 			switch(port.col_) {
-			// ET1_COL: P91
-			// ET1_COL: PQ1
+			// ET1_COL: P91 (LFQFP100: ---) (LFQFP144: 129) (LFQFP176: 161)
+			// ET1_COL: PQ1 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
@@ -1491,8 +1491,8 @@ namespace device {
 			}
 
 			switch(port.wol_) {
-			// ET1_WOL: P27
-			// ET1_WOL: PD3
+			// ET1_WOL: P27 (LFQFP100:  21) (LFQFP144:  30) (LFQFP176:  36)
+			// ET1_WOL: PD3 (LFQFP100:  83) (LFQFP144: 123) (LFQFP176: 150)
 			case ORDER::BYPASS:
 				break;
 			case ORDER::FIRST:
