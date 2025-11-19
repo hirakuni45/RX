@@ -911,6 +911,114 @@
 
 ---
 
+## Port map order (ETHERC0) / ポートマップ候補 (ETHERC0)
+
+- [port_map_ether.hpp](../RX72N/port_map_ether.hpp?ts=4)
+
+### LFQFP100
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET0_MDC|P72 (---)|PA4 (66)|PK0 (---)|-|
+|ET0_MDIO|P71 (---)|PA3 (67)|PL7 (---)|-|
+|ET0_CRS|P83 (---)|PB7 (53)|PM7 (---)|-|
+|ET0_RX_DV|PC2 (50)|PK2 (---)|-|-|
+|ET0_EX_OUT|P55 (39)|PA6 (64)|PJ3 (---)|-|
+|ET0_LINKSTA|P34 (16)|P54 (40)|PA5 (65)|-|
+|ET0_ETXD0|P81 (---)|PB5 (55)|PL4 (---)|-|
+|ET0_ETXD1|P82 (---)|PB6 (54)|PL5 (---)|-|
+|ET0_ETXD2|PC5 (47)|PM4 (---)|-|-|
+|ET0_ETXD3|PC6 (46)|PM5 (---)|-|-|
+|ET0_ERXD0|P75 (---)|PB1 (59)|PL0 (---)|-|
+|ET0_ERXD1|P74 (---)|PB0 (61)|PL1 (---)|-|
+|ET0_ERXD2|PC1 (51)|PE4 (74)|PK4 (---)|-|
+|ET0_ERXD3|PC0 (52)|PE3 (75)|PK5 (---)|-|
+|ET0_TX_EN|P80 (---)|PA0 (70)|PB4 (56)|PL6 (---)|
+|ET0_TX_ER|PC3 (49)|PK3 (---)|-|-|
+|ET0_RX_ER|P77 (---)|PB3 (57)|PL2 (---)|-|
+|ET0_TX_CLK|PC4 (48)|PM6 (---)|-|-|
+|ET0_RX_CLK|P76 (---)|PB2 (58)|PE5 (73)|PL3 (---)|
+|ET0_COL|PC7 (45)|PK1 (---)|-|-|
+|ET0_WOL|P73 (---)|PA1 (69)|PA7 (63)|-|
+|REF50CK0|P76 (---)|PB2 (58)|PE5 (73)|PL3 (---)|
+|RMII0_CRS_DV|P83 (---)|PB7 (53)|PM7 (---)|-|
+|RMII0_TXD0|P81 (---)|PB5 (55)|PL4 (---)|-|
+|RMII0_TXD1|P82 (---)|PB6 (54)|PL5 (---)|-|
+|RMII0_RXD0|P75 (---)|PB1 (59)|PL0 (---)|-|
+|RMII0_RXD1|P74 (---)|PB0 (61)|PL1 (---)|-|
+|RMII0_TXD_EN|P80 (---)|PA0 (70)|PB4 (56)|PL6 (---)|
+|RMII0_RX_ER|P77 (---)|PB3 (57)|PL2 (---)|-|
+
+### LFQFP144
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET0_MDC|P72 (85)|PA4 (92)|PK0 (---)|-|
+|ET0_MDIO|P71 (86)|PA3 (94)|PL7 (---)|-|
+|ET0_CRS|P83 (58)|PB7 (78)|PM7 (---)|-|
+|ET0_RX_DV|PC2 (70)|PK2 (---)|-|-|
+|ET0_EX_OUT|P55 (51)|PA6 (89)|PJ3 (13)|-|
+|ET0_LINKSTA|P34 (25)|P54 (52)|PA5 (90)|-|
+|ET0_ETXD0|P81 (64)|PB5 (80)|PL4 (---)|-|
+|ET0_ETXD1|P82 (63)|PB6 (79)|PL5 (---)|-|
+|ET0_ETXD2|PC5 (62)|PM4 (---)|-|-|
+|ET0_ETXD3|PC6 (61)|PM5 (---)|-|-|
+|ET0_ERXD0|P75 (71)|PB1 (84)|PL0 (---)|-|
+|ET0_ERXD1|P74 (72)|PB0 (87)|PL1 (---)|-|
+|ET0_ERXD2|PC1 (73)|PE4 (107)|PK4 (---)|-|
+|ET0_ERXD3|PC0 (75)|PE3 (108)|PK5 (---)|-|
+|ET0_TX_EN|P80 (65)|PA0 (97)|PB4 (81)|PL6 (---)|
+|ET0_TX_ER|PC3 (67)|PK3 (---)|-|-|
+|ET0_RX_ER|P77 (68)|PB3 (82)|PL2 (---)|-|
+|ET0_TX_CLK|PC4 (66)|PM6 (---)|-|-|
+|ET0_RX_CLK|P76 (89)|PB2 (83)|PE5 (106)|PL3 (---)|
+|ET0_COL|PC7 (60)|PK1 (---)|-|-|
+|ET0_WOL|P73 (77)|PA1 (96)|PA7 (88)|-|
+|REF50CK0|P76 (69)|PB2 (83)|PE5 (106)|PL3 (---)|
+|RMII0_CRS_DV|P83 (58)|PB7 (78)|PM7 (---)|-|
+|RMII0_TXD0|P81 (64)|PB5 (80)|PL4 (---)|-|
+|RMII0_TXD1|P82 (63)|PB6 (79)|PL5 (---)|-|
+|RMII0_RXD0|P75 (71)|PB1 (84)|PL0 (---)|-|
+|RMII0_RXD1|P74 (72)|PB0 (87)|PL1 (---)|-|
+|RMII0_TXD_EN|P80 (65)|PA0 (97)|PB4 (81)|PL6 (---)|
+|RMII0_RX_ER|P77 (68)|PB3 (82)|PL2 (---)|-|
+
+### LFQFP176
+
+|ETHERC0|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|ET0_MDC|P72 (101)|PA4 (109)|PK0 (---)|-|
+|ET0_MDIO|P71 (102)|PA3 (110)|PL7 (---)|-|
+|ET0_CRS|P83 (74)|PB7 (94)|PM7 (---)|-|
+|ET0_RX_DV|PC2 (86)|PK2 (---)|-|-|
+|ET0_EX_OUT|P55 (65)|PA6 (107)|PJ3 (13)|-|
+|ET0_LINKSTA|P34 (27)|P54 (66)|PA5 (108)|-|
+|ET0_ETXD0|P81 (80)|PB5 (96)|PL4 (---)|-|
+|ET0_ETXD1|P82 (79)|PB6 (95)|PL5 (---)|-|
+|ET0_ETXD2|PC5 (78)|PM4 (---)|-|-|
+|ET0_ETXD3|PC6 (77)|PM5 (---)|-|-|
+|ET0_ERXD0|P75 (87)|PB1 (100)|PL0 (---)|-|
+|ET0_ERXD1|P74 (88)|PB0 (104)|PL1 (---)|-|
+|ET0_ERXD2|PC1 (89)|PE4 (131)|PK4 (---)|-|
+|ET0_ERXD3|PC0 (91)|PE3 (132)|PK5 (---)|-|
+|ET0_TX_EN|P80 (81)|PA0 (118)|PB4 (97)|PL6 (---)|
+|ET0_TX_ER|PC3 (83)|PK3 (---)|-|-|
+|ET0_RX_ER|P77 (84)|PB3 (98)|PL2 (---)|-|
+|ET0_TX_CLK|PC4 (82)|PM6 (---)|-|-|
+|ET0_RX_CLK|P76 (85)|PB2 (99)|PE5 (130)|PL3 (---)|
+|ET0_COL|PC7 (76)|PK1 (---)|-|-|
+|ET0_WOL|P73 (93)|PA1 (114)|PA7 (106)|-|
+|REF50CK0|P76 (85)|PB2 (99)|PE5 (130)|PL3 (---)|
+|RMII0_CRS_DV|P83 (74)|PB7 (94)|PM7 (---)|-|
+|RMII0_TXD0|P81 (80)|PB5 (96)|PL4 (---)|-|
+|RMII0_TXD1|P82 (79)|PB6 (95)|PL5 (---)|-|
+|RMII0_RXD0|P75 (87)|PB1 (100)|PL0 (---)|-|
+|RMII0_RXD1|P74 (88)|PB0 (104)|PL1 (---)|-|
+|RMII0_TXD_EN|P80 (81)|PA0 (118)|PB4 (97)|PL6 (---)|
+|RMII0_RX_ER|P77 (84)|PB3 (98)|PL2 (---)|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
