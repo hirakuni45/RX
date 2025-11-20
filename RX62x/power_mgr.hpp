@@ -157,11 +157,12 @@ namespace device {
 			case peripheral::CAN0:
 				SYSTEM::MSTPCRB.MSTPB0 = f;
 				break;
-
-			case peripheral::EDMAC:
+#if defined(SIG_RX62N)
+			case peripheral::ETHERC0:
+			case peripheral::EDMAC0:
 				SYSTEM::MSTPCRB.MSTPB15 = f;
 				break;
-
+#endif
 			case peripheral::RSPI1:
 				SYSTEM::MSTPCRB.MSTPB16 = f;
 				break;

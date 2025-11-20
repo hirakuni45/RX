@@ -482,7 +482,7 @@ namespace device {
 				case peripheral::CAN0:
 					ret = can0_(odr, ena);
 					break;
-				case peripheral::ETHERC:
+				case peripheral::ETHERC0:
 					ret = etherc_(odr, ena, opt);
 					break;
 				default:

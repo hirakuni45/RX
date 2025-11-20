@@ -544,7 +544,7 @@ namespace device {
 	};
 
 #if defined(SIG_RX62N) || defined(SIG_RX63N)
-	typedef edmac_t<0x000C'0000, peripheral::EDMAC, ICU::VECTOR, ICU::VECTOR::EINT> EDMAC;
+	typedef edmac_t<0x000C'0000, peripheral::EDMAC0, ICU::VECTOR, ICU::VECTOR::EINT> EDMAC0;
 #elif defined(SIG_RX621) || defined(SIG_RX631)
 #else
 	typedef edmac_t<0x000C'0000, peripheral::EDMAC0, ICU::GROUPAL1, ICU::GROUPAL1::EINT0> EDMAC0;

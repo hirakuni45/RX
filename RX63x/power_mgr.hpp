@@ -183,12 +183,13 @@ namespace device {
 			case peripheral::TEMPS:
 				SYSTEM::MSTPCRB.MSTPB8 = f;
 				break;
-
-			case peripheral::EDMAC:
+#if defined(SIG_RX63N)
+			case peripheral::ETHERC0:
+			case peripheral::EDMAC0:
 				SYSTEM::MSTPCRB.MSTPB15 = f;	// ETHER0, EDMAC0 のストップ状態解除
 				BUS::BEREN.TOEN = 1;
 				break;
-
+#endif
 			case peripheral::RSPI1:
 				SYSTEM::MSTPCRB.MSTPB16 = f;	// RSPI1 のストップ状態解除
 				break;

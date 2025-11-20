@@ -418,7 +418,7 @@ namespace device {
 
 	};
 #if defined(SIG_RX62N) || defined(SIG_RX63N)
-	typedef etherc_t<0x000C'0100, peripheral::ETHERC> ETHERC;
+	typedef etherc_t<0x000C'0100, peripheral::ETHERC0> ETHERC0;
 #elif defined(SIG_RX621) || defined(SIG_RX631)
 #else
 	typedef etherc_t<0x000C'0100, peripheral::ETHERC0> ETHERC0;
