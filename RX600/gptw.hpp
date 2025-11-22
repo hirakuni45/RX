@@ -7,7 +7,7 @@
 			RX66N/RX72N/RX72M (GPTW): GPTW0 - GPTW3 @n
 			RX66T/RX72T (GPTW):       GPTW0 - GPTW9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,44 +18,12 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GPTW class
+		@brief  GPTW core class
 		@param[in]	base	ベースアドレス
-		@param[in]	peri	ペリフェラル型
-		@param[in]	VECT	割り込みベクタ型
-		@param[in]	gtcia	GTCIAn GTCCRAレジスタのインプットキャプチャ /コンペアマッチ
-		@param[in]	gtcib	GTCIBn GTCCRBレジスタのインプットキャプチャ /コンペアマッチ
-		@param[in]	gtcic	GTCICn GTCCRCレジスタのコンペアマッチ
-		@param[in]	gtcid	GTCIDn GTCCRDレジスタのコンペアマッチ
-		@param[in]	gdte	GDTEn  デッドタイムエラー
-		@param[in]	gtcie	GTCIEn GTCCREレジスタのコンペアマッチ
-		@param[in]	gtcif	GTCIFn GTCCRFレジスタのコンペアマッチ
-		@param[in]	gtciu	GTCIUn GTCNTカウンタのアンダフロー
-		@param[in]	gtciv	GTCIVn GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename VECT,
-		VECT gtcia, VECT gtcib, VECT gtcic,
-		VECT gtcid, VECT gdte,  VECT gtcie,
-		VECT gtcif, VECT gtciu, VECT gtciv>
-	struct gptw_t {
-
-		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
-		static constexpr auto CHANNEL_NO = static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::GPTW0);	///< チャネル番号
-		static constexpr auto GTCIA = gtcia;	///< GTCIAn 割り込みベクタ
-		static constexpr auto GTCIB = gtcib;	///< GTCIBn 割り込みベクタ
-		static constexpr auto GTCIC = gtcic;	///< GTCICn 割り込みベクタ
-		static constexpr auto GTCID = gtcid;	///< GTCIDn 割り込みベクタ
-		static constexpr auto GDTE  = gdte;		///< GDTEn  割り込みベクタ
-		static constexpr auto GTCIE = gtcie;	///< GTCIEn 割り込みベクタ
-		static constexpr auto GTCIF = gtcif;	///< GTCIFn 割り込みベクタ
-		static constexpr auto GTCIU = gtciu;	///< GTCIUn 割り込みベクタ
-		static constexpr auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
-
-#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
-		static constexpr uint32_t PCLK = clock_profile::PCLKC;	///< カウント基準クロック
-#elif defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
-		static constexpr uint32_t PCLK = clock_profile::PCLKA;	///< カウント基準クロック
-#endif
+	template <uint32_t base>
+	struct gptw_core_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -1035,42 +1003,411 @@ namespace device {
 		static inline gtsecr_t<base + 0xD4> GTSECR;
 	};
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  GPTW class
+		@param[in]	base	ベースアドレス
+		@param[in]	peri	ペリフェラル型
+		@param[in]	VECT	割り込みベクタ型
+		@param[in]	gtcia	GTCIAn GTCCRAレジスタのインプットキャプチャ /コンペアマッチ
+		@param[in]	gtcib	GTCIBn GTCCRBレジスタのインプットキャプチャ /コンペアマッチ
+		@param[in]	gtcic	GTCICn GTCCRCレジスタのコンペアマッチ
+		@param[in]	gtcid	GTCIDn GTCCRDレジスタのコンペアマッチ
+		@param[in]	gdte	GDTEn  デッドタイムエラー
+		@param[in]	gtcie	GTCIEn GTCCREレジスタのコンペアマッチ
+		@param[in]	gtcif	GTCIFn GTCCRFレジスタのコンペアマッチ
+		@param[in]	gtciu	GTCIUn GTCNTカウンタのアンダフロー
+		@param[in]	gtciv	GTCIVn GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, typename VECT,
+		VECT gtcia, VECT gtcib, VECT gtcic,
+		VECT gtcid, VECT gdte,  VECT gtcie,
+		VECT gtcif, VECT gtciu, VECT gtciv>
+	struct gptw_t : public gptw_core_t<base> {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto CHANNEL_NO = static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::GPTW0);	///< チャネル番号
+		static constexpr auto GTCIA = gtcia;	///< GTCIAn 割り込みベクタ
+		static constexpr auto GTCIB = gtcib;	///< GTCIBn 割り込みベクタ
+		static constexpr auto GTCIC = gtcic;	///< GTCICn 割り込みベクタ
+		static constexpr auto GTCID = gtcid;	///< GTCIDn 割り込みベクタ
+		static constexpr auto GDTE  = gdte;		///< GDTEn  割り込みベクタ
+		static constexpr auto GTCIE = gtcie;	///< GTCIEn 割り込みベクタ
+		static constexpr auto GTCIF = gtcif;	///< GTCIFn 割り込みベクタ
+		static constexpr auto GTCIU = gtciu;	///< GTCIUn 割り込みベクタ
+		static constexpr auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
+
+#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+		static constexpr auto PCLK = clock_profile::PCLKC;	///< カウント基準クロック
+#elif defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+		static constexpr auto PCLK = clock_profile::PCLKA;	///< カウント基準クロック
+#endif
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  GPTWa EXT class
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct gptw_ext_t {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	出力位相スイッチ制御レジスタ (OPSCR)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct opscr_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      UF;
+			bit_rw_t <io_, bitpos::B1>      VF;
+			bit_rw_t <io_, bitpos::B2>      WF;
+
+			bit_rw_t <io_, bitpos::B4>      U;
+			bit_rw_t <io_, bitpos::B5>      V;
+			bit_rw_t <io_, bitpos::B6>      W;
+
+			bit_rw_t <io_, bitpos::B8>      EN;
+
+			bit_rw_t <io_, bitpos::B16>     FB;
+			bit_rw_t <io_, bitpos::B17>     P;
+			bit_rw_t <io_, bitpos::B18>     N;
+			bit_rw_t <io_, bitpos::B19>     INV;
+			bit_rw_t <io_, bitpos::B20>     RV;
+			bit_rw_t <io_, bitpos::B21>     ALIGN;
+
+			bits_rw_t<io_, bitpos::B24, 2>  GRP;
+			bit_rw_t <io_, bitpos::B26>     GODF;
+
+			bit_rw_t <io_, bitpos::B29>     NFEN;
+		};
+		static inline opscr_t<0x000C'2B00> OPSCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  GPTWa class
+		@param[in]	base	ベースアドレス
+		@param[in]	peri	ペリフェラル型
+		@param[in]	VECT	割り込みベクタ型
+		@param[in]	gtcia	GTCIAn GTCCRAレジスタのインプットキャプチャ /コンペアマッチ
+		@param[in]	gtcib	GTCIBn GTCCRBレジスタのインプットキャプチャ /コンペアマッチ
+		@param[in]	gtcic	GTCICn GTCCRCレジスタのコンペアマッチ
+		@param[in]	gtcid	GTCIDn GTCCRDレジスタのコンペアマッチ
+		@param[in]	gdte	GDTEn  デッドタイムエラー
+		@param[in]	gtcie	GTCIEn GTCCREレジスタのコンペアマッチ
+		@param[in]	gtcif	GTCIFn GTCCRFレジスタのコンペアマッチ
+		@param[in]	gtciu	GTCIUn GTCNTカウンタのアンダフロー
+		@param[in]	gtciv	GTCIVn GTCNTカウンタのオーバフロー (GTPRレジスタのコンペアマッチ)
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, typename VECT,
+		VECT gtcia, VECT gtcib, VECT gtcic,
+		VECT gtcid, VECT gdte,  VECT gtcie,
+		VECT gtcif, VECT gtciu, VECT gtciv>
+	struct gptwa_t : public gptw_core_t<base>, gptw_ext_t {
+
+		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
+		static constexpr auto CHANNEL_NO = static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::GPTW0);	///< チャネル番号
+		static constexpr auto GTCIA = gtcia;	///< GTCIAn 割り込みベクタ
+		static constexpr auto GTCIB = gtcib;	///< GTCIBn 割り込みベクタ
+		static constexpr auto GTCIC = gtcic;	///< GTCICn 割り込みベクタ
+		static constexpr auto GTCID = gtcid;	///< GTCIDn 割り込みベクタ
+		static constexpr auto GDTE  = gdte;		///< GDTEn  割り込みベクタ
+		static constexpr auto GTCIE = gtcie;	///< GTCIEn 割り込みベクタ
+		static constexpr auto GTCIF = gtcif;	///< GTCIFn 割り込みベクタ
+		static constexpr auto GTCIU = gtciu;	///< GTCIUn 割り込みベクタ
+		static constexpr auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
+
+#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T)
+		static constexpr auto PCLK = clock_profile::PCLKC;	///< カウント基準クロック
+#elif defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
+		static constexpr auto PCLK = clock_profile::PCLKA;	///< カウント基準クロック
+#endif
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	汎用 PWM タイマチャネル間論理演算レジスタ (GTICLF)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gticlf_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  3>  ICLFA;
+
+			bits_rw_t<io_, bitpos::B4,  6>  ICLFSELC;
+
+			bits_rw_t<io_, bitpos::B16, 3>  ICLFB;
+
+			bits_rw_t<io_, bitpos::B20, 6>  ICLFSELD;
+		};
+		static inline gticlf_t<base + 0xB8> GTICLF;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	汎用 PWM タイマサイクルカウントレジスタ (GTPC)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gtpc_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      PCEN;
+
+			bit_rw_t <io_, bitpos::B8>      ASTP;
+
+			bits_rw_t<io_, bitpos::B16, 12> PCNT;
+		};
+		static inline gtpc_t<base + 0xBC> GTPC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	汎用 PWM タイマ A/D 変換開始要求コンペアマッチ間引き制御レジスタ (GTADCMSC)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gtadcmsc_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2>  ADCMSC1;
+
+			bits_rw_t<io_, bitpos::B4,  4>  ADCMST1;
+			bits_rw_t<io_, bitpos::B8,  4>  ADCMSCNT1IV;
+			bits_rw_t<io_, bitpos::B12, 4>  ADCMSCNT1;
+			bits_rw_t<io_, bitpos::B16, 2>  ADCMSC2;
+
+			bits_rw_t<io_, bitpos::B20, 4>  ADCMST2;
+			bits_rw_t<io_, bitpos::B24, 4>  ADCMSCNT2IV;
+			bits_rw_t<io_, bitpos::B28, 4>  ADCMSCNT2;
+		};
+		static inline gtadcmsc_t<base + 0xC0> GTADCMSC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	汎用 PWM タイマ A/D 変換開始要求コンペアマッチ間引き設定レジスタ (GTADCMSS)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gtadcmss_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  3>  ADCMSAL;
+
+			bits_rw_t<io_, bitpos::B4,  3>  ADCMSBL;
+
+			bits_rw_t<io_, bitpos::B16, 3>  ADCMBSA;
+
+			bits_rw_t<io_, bitpos::B20, 3>  ADCMBSB;
+		};
+		static inline gtadcmss_t<base + 0xC4> GTADCMSS;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	汎用 PWM タイマバッファイネーブルレジスタ２ (GTBER2)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gtber2_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      CCTCA;
+			bit_rw_t <io_, bitpos::B1>      CCTCB;
+			bit_rw_t <io_, bitpos::B2>      CCTPR;
+			bit_rw_t <io_, bitpos::B3>      CCTADA;
+			bit_rw_t <io_, bitpos::B4>      CCTADB;
+			bit_rw_t <io_, bitpos::B5>      CCTDV;
+			bits_rw_t<io_, bitpos::B8,  2>  CMTCA;
+			bits_rw_t<io_, bitpos::B10, 2>  CMTCB;
+
+			bit_rw_t <io_, bitpos::B13>     CMTADA;
+			bit_rw_t <io_, bitpos::B14>     CMTADB;
+
+			bit_rw_t <io_, bitpos::B16>     CPTCA;
+			bit_rw_t <io_, bitpos::B17>     CPTCB;
+			bit_rw_t <io_, bitpos::B18>     CPTPR;
+			bit_rw_t <io_, bitpos::B19>     CPTADA;
+			bit_rw_t <io_, bitpos::B20>     CPTADB;
+			bit_rw_t <io_, bitpos::B21>     CPTDV;
+
+			bit_rw_t <io_, bitpos::B24>     CP3DB;
+			bit_rw_t <io_, bitpos::B25>     CPBTD;
+
+			bits_rw_t<io_, bitpos::B26, 2>  OLTTA;
+		};
+		static inline gtber2_t<base + 0xE0> GTBER2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	汎用 PWM タイマ出力レベルバッファレジスタ (GTOLBR)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gtolbr_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  5>  GTIOAB;
+			bits_rw_t<io_, bitpos::B16, 5>  GTIOBB;
+		};
+		static inline gtolbr_t<base + 0xE4> GTOLBR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	汎用 PWM タイマチャネル間連携インプットキャプチャ制御レジスタ (GTICCR)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gticcr_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      ICAFA;
+			bit_rw_t <io_, bitpos::B1>      ICAFB;
+			bit_rw_t <io_, bitpos::B2>      ICAFC;
+			bit_rw_t <io_, bitpos::B3>      ICAFD;
+			bit_rw_t <io_, bitpos::B4>      ICAFE;
+			bit_rw_t <io_, bitpos::B5>      ICAFF;
+			bit_rw_t <io_, bitpos::B6>      ICAFPO;
+			bit_rw_t <io_, bitpos::B7>      ICAFPU;
+			bit_rw_t <io_, bitpos::B8>      ICACLK;
+
+			bits_rw_t<io_, bitpos::B14, 2>  ICAGRP;
+
+			bit_rw_t <io_, bitpos::B16>     ICBFA;
+			bit_rw_t <io_, bitpos::B17>     ICBFB;
+			bit_rw_t <io_, bitpos::B18>     ICBFC;
+			bit_rw_t <io_, bitpos::B19>     ICBFD;
+			bit_rw_t <io_, bitpos::B20>     ICBFE;
+			bit_rw_t <io_, bitpos::B21>     ICBFF;
+			bit_rw_t <io_, bitpos::B22>     ICBFPO;
+			bit_rw_t <io_, bitpos::B23>     ICBFPU;
+			bit_rw_t <io_, bitpos::B24>     ICBCLK;
+
+			bits_rw_t<io_, bitpos::B30, 2>  ICBGRP;
+		};
+		static inline gticcr_t<base + 0xEC> GTICCR;
+	};
+
+
 #if defined(SIG_RX260) || defined(SIG_RX261)
-	typedef gptw_t<0x000C'2000, peripheral::GPTW0, ICU::VECTOR,
+	typedef gptwa_t<0x000C'2000, peripheral::GPTW0, ICU::VECTOR,
 		ICU::VECTOR::GTCIA0, ICU::VECTOR::GTCIB0, ICU::VECTOR::GTCIC0,
 		ICU::VECTOR::GTCID0, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE0,
 		ICU::VECTOR::GTCIF0, ICU::VECTOR::GTCIV0, ICU::VECTOR::GTCIU0> GPTW0;
-	typedef gptw_t<0x000C'2100, peripheral::GPTW1, ICU::VECTOR,
+	typedef gptwa_t<0x000C'2100, peripheral::GPTW1, ICU::VECTOR,
 		ICU::VECTOR::GTCIA1, ICU::VECTOR::GTCIB1, ICU::VECTOR::GTCIC1,
 		ICU::VECTOR::GTCID1, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE1,
 		ICU::VECTOR::GTCIF1, ICU::VECTOR::GTCIV1, ICU::VECTOR::GTCIU1> GPTW1;
-	typedef gptw_t<0x000C'2200, peripheral::GPTW2, ICU::VECTOR,
+	typedef gptwa_t<0x000C'2200, peripheral::GPTW2, ICU::VECTOR,
 		ICU::VECTOR::GTCIA2, ICU::VECTOR::GTCIB2, ICU::VECTOR::GTCIC2,
 		ICU::VECTOR::GTCID2, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE2,
 		ICU::VECTOR::GTCIF2, ICU::VECTOR::GTCIV2, ICU::VECTOR::GTCIU2> GPTW2;
-	typedef gptw_t<0x000C'2300, peripheral::GPTW3, ICU::VECTOR,
+	typedef gptwa_t<0x000C'2300, peripheral::GPTW3, ICU::VECTOR,
 		ICU::VECTOR::GTCIA3, ICU::VECTOR::GTCIB3, ICU::VECTOR::GTCIC3,
 		ICU::VECTOR::GTCID3, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE3,
 		ICU::VECTOR::GTCIF3, ICU::VECTOR::GTCIV3, ICU::VECTOR::GTCIU3> GPTW3;
-	typedef gptw_t<0x000C'2400, peripheral::GPTW4, ICU::VECTOR,
+	typedef gptwa_t<0x000C'2400, peripheral::GPTW4, ICU::VECTOR,
 		ICU::VECTOR::GTCIA4, ICU::VECTOR::GTCIB4, ICU::VECTOR::GTCIC4,
 		ICU::VECTOR::GTCID4, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE4,
 		ICU::VECTOR::GTCIF4, ICU::VECTOR::GTCIV4, ICU::VECTOR::GTCIU4> GPTW4;
-	typedef gptw_t<0x000C'2500, peripheral::GPTW5, ICU::VECTOR,
+	typedef gptwa_t<0x000C'2500, peripheral::GPTW5, ICU::VECTOR,
 		ICU::VECTOR::GTCIA5, ICU::VECTOR::GTCIB5, ICU::VECTOR::GTCIC5,
 		ICU::VECTOR::GTCID5, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE5,
 		ICU::VECTOR::GTCIF5, ICU::VECTOR::GTCIV5, ICU::VECTOR::GTCIU5> GPTW5;
-	typedef gptw_t<0x000C'2600, peripheral::GPTW6, ICU::VECTOR,
+	typedef gptwa_t<0x000C'2600, peripheral::GPTW6, ICU::VECTOR,
 		ICU::VECTOR::GTCIA6, ICU::VECTOR::GTCIB6, ICU::VECTOR::GTCIC6,
 		ICU::VECTOR::GTCID6, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE6,
 		ICU::VECTOR::GTCIF6, ICU::VECTOR::GTCIV6, ICU::VECTOR::GTCIU6> GPTW6;
-	typedef gptw_t<0x000C'2700, peripheral::GPTW7, ICU::VECTOR,
+	typedef gptwa_t<0x000C'2700, peripheral::GPTW7, ICU::VECTOR,
 		ICU::VECTOR::GTCIA7, ICU::VECTOR::GTCIB7, ICU::VECTOR::GTCIC7,
 		ICU::VECTOR::GTCID7, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE7,
 		ICU::VECTOR::GTCIF7, ICU::VECTOR::GTCIV7, ICU::VECTOR::GTCIU7> GPTW7;
-#endif
 
-#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M) 
+#elif defined(SIG_RX26T)
+	typedef gptwa_t<0x000C'2000, peripheral::GPTW0, ICU::SELECTA,
+		ICU::SELECTA::GTCIA0, ICU::SELECTA::GTCIB0, ICU::SELECTA::GTCIC0,
+		ICU::SELECTA::GTCID0, ICU::SELECTA::GDTE0,  ICU::SELECTA::GTCIE0,
+		ICU::SELECTA::GTCIF0, ICU::SELECTA::GTCIV0, ICU::SELECTA::GTCIU0> GPTW0;
+	typedef gptwa_t<0x000C'2100, peripheral::GPTW1, ICU::SELECTA,
+		ICU::SELECTA::GTCIA1, ICU::SELECTA::GTCIB1, ICU::SELECTA::GTCIC1,
+		ICU::SELECTA::GTCID1, ICU::SELECTA::GDTE1,  ICU::SELECTA::GTCIE1,
+		ICU::SELECTA::GTCIF1, ICU::SELECTA::GTCIV1, ICU::SELECTA::GTCIU1> GPTW1;
+	typedef gptwa_t<0x000C'2200, peripheral::GPTW2, ICU::SELECTA,
+		ICU::SELECTA::GTCIA2, ICU::SELECTA::GTCIB2, ICU::SELECTA::GTCIC2,
+		ICU::SELECTA::GTCID2, ICU::SELECTA::GDTE2,  ICU::SELECTA::GTCIE2,
+		ICU::SELECTA::GTCIF2, ICU::SELECTA::GTCIV2, ICU::SELECTA::GTCIU2> GPTW2;
+	typedef gptwa_t<0x000C'2300, peripheral::GPTW3, ICU::SELECTA,
+		ICU::SELECTA::GTCIA3, ICU::SELECTA::GTCIB3, ICU::SELECTA::GTCIC3,
+		ICU::SELECTA::GTCID3, ICU::SELECTA::GDTE3,  ICU::SELECTA::GTCIE3,
+		ICU::SELECTA::GTCIF3, ICU::SELECTA::GTCIV3, ICU::SELECTA::GTCIU3> GPTW3;
+	typedef gptwa_t<0x000C'2400, peripheral::GPTW4, ICU::SELECTA,
+		ICU::SELECTA::GTCIA4, ICU::SELECTA::GTCIB4, ICU::SELECTA::GTCIC4,
+		ICU::SELECTA::GTCID4, ICU::SELECTA::GDTE4,  ICU::SELECTA::GTCIE4,
+		ICU::SELECTA::GTCIF4, ICU::SELECTA::GTCIV4, ICU::SELECTA::GTCIU4> GPTW4;
+	typedef gptwa_t<0x000C'2500, peripheral::GPTW5, ICU::SELECTA,
+		ICU::SELECTA::GTCIA5, ICU::SELECTA::GTCIB5, ICU::SELECTA::GTCIC5,
+		ICU::SELECTA::GTCID5, ICU::SELECTA::GDTE5,  ICU::SELECTA::GTCIE5,
+		ICU::SELECTA::GTCIF5, ICU::SELECTA::GTCIV5, ICU::SELECTA::GTCIU5> GPTW5;
+	typedef gptwa_t<0x000C'2600, peripheral::GPTW6, ICU::SELECTA,
+		ICU::SELECTA::GTCIA6, ICU::SELECTA::GTCIB6, ICU::SELECTA::GTCIC6,
+		ICU::SELECTA::GTCID6, ICU::SELECTA::GDTE6,  ICU::SELECTA::GTCIE6,
+		ICU::SELECTA::GTCIF6, ICU::SELECTA::GTCIV6, ICU::SELECTA::GTCIU6> GPTW6;
+	typedef gptwa_t<0x000C'2700, peripheral::GPTW7, ICU::SELECTA,
+		ICU::SELECTA::GTCIA7, ICU::SELECTA::GTCIB7, ICU::SELECTA::GTCIC7,
+		ICU::SELECTA::GTCID7, ICU::SELECTA::GDTE7,  ICU::SELECTA::GTCIE7,
+		ICU::SELECTA::GTCIF7, ICU::SELECTA::GTCIV7, ICU::SELECTA::GTCIU7> GPTW7;
+
+#elif defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M) 
 	typedef gptw_t<0x000C'2000, peripheral::GPTW0, ICU::SELECTA,
 		ICU::SELECTA::GTCIA0, ICU::SELECTA::GTCIB0, ICU::SELECTA::GTCIC0,
 		ICU::SELECTA::GTCID0, ICU::SELECTA::GDTE0,  ICU::SELECTA::GTCIE0,
@@ -1087,9 +1424,7 @@ namespace device {
 		ICU::SELECTA::GTCIA3, ICU::SELECTA::GTCIB3, ICU::SELECTA::GTCIC3,
 		ICU::SELECTA::GTCID3, ICU::SELECTA::GDTE3,  ICU::SELECTA::GTCIE3,
 		ICU::SELECTA::GTCIF3, ICU::SELECTA::GTCIV3, ICU::SELECTA::GTCIU3> GPTW3;
-#endif
-
-#if defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72T) 
+  #if defined(SIG_RX66T) || defined(SIG_RX72T) 
 	typedef gptw_t<0x000C'2400, peripheral::GPTW4, ICU::SELECTA,
 		ICU::SELECTA::GTCIA4, ICU::SELECTA::GTCIB4, ICU::SELECTA::GTCIC4,
 		ICU::SELECTA::GTCID4, ICU::SELECTA::GDTE4,  ICU::SELECTA::GTCIE4,
@@ -1106,9 +1441,6 @@ namespace device {
 		ICU::SELECTA::GTCIA7, ICU::SELECTA::GTCIB7, ICU::SELECTA::GTCIC7,
 		ICU::SELECTA::GTCID7, ICU::SELECTA::GDTE7,  ICU::SELECTA::GTCIE7,
 		ICU::SELECTA::GTCIF7, ICU::SELECTA::GTCIV7, ICU::SELECTA::GTCIU7> GPTW7;
-#endif
-
-#if defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef gptw_t<0x000C'2800, peripheral::GPTW8, ICU::SELECTA,
 		ICU::SELECTA::GTCIA8, ICU::SELECTA::GTCIB8, ICU::SELECTA::GTCIC8,
 		ICU::SELECTA::GTCID8, ICU::SELECTA::GDTE8,  ICU::SELECTA::GTCIE8,
@@ -1117,5 +1449,6 @@ namespace device {
 		ICU::SELECTA::GTCIA9, ICU::SELECTA::GTCIB9, ICU::SELECTA::GTCIC9,
 		ICU::SELECTA::GTCID9, ICU::SELECTA::GDTE9,  ICU::SELECTA::GTCIE9,
 		ICU::SELECTA::GTCIF9, ICU::SELECTA::GTCIV9, ICU::SELECTA::GTCIU9> GPTW9;
+  #endif
 #endif
 }

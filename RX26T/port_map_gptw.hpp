@@ -881,6 +881,270 @@ namespace device {
 			return ret;
 		}
 
+		static bool clock_u_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTIU:
+			// P00 (LFQFP100:   4)
+			// P21 (LFQFP100:  68)
+			// P31 (LFQFP100:  61)
+			// PB3 (LFQFP100:  32)
+			// PD7 (LFQFP100:  18)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT0::PMR.B0 = 0;
+				MPC::P00PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT0::PMR.B0 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B1 = 0;
+				MPC::P21PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT2::PMR.B1 = ena;
+				break;
+			case ORDER::THIRD:
+				PORT3::PMR.B1 = 0;
+				MPC::P31PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT3::PMR.B1 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTB::PMR.B3 = 0;
+				MPC::PB3PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTB::PMR.B3 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTD::PMR.B7 = 0;
+				MPC::PD7PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTD::PMR.B7 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool clock_v_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTIV:
+			// P10 (LFQFP100: 100)
+			// P22 (LFQFP100:  67)
+			// P30 (LFQFP100:  63)
+			// PB2 (LFQFP100:  33)
+			// PE0 (LFQFP100:  17)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT1::PMR.B0 = 0;
+				MPC::P10PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT1::PMR.B0 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B2 = 0;
+				MPC::P22PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT2::PMR.B2 = ena;
+				break;
+			case ORDER::THIRD:
+				PORT3::PMR.B0 = 0;
+				MPC::P30PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT3::PMR.B0 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTB::PMR.B2 = 0;
+				MPC::PB2PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTB::PMR.B2 = ena;
+				break;
+			case ORDER::FIFTH:
+				PORTE::PMR.B0 = 0;
+				MPC::PE0PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTE::PMR.B0 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool clock_w_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTIW:
+			// P01 (LFQFP100:   7)
+			// P20 (LFQFP100:  69)
+			// PB1 (LFQFP100:  34)
+			// PD6 (LFQFP100:  19)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT0::PMR.B1 = 0;
+				MPC::P01PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT0::PMR.B1 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT2::PMR.B0 = 0;
+				MPC::P20PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT2::PMR.B0 = ena;
+				break;
+			case ORDER::THIRD:
+				PORTB::PMR.B1 = 0;
+				MPC::PB1PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTB::PMR.B1 = ena;
+				break;
+			case ORDER::FOURTH:
+				PORTD::PMR.B6 = 0;
+				MPC::PD6PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORTD::PMR.B6 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool clock_ulo_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTOULO:
+			// P74 (LFQFP100:  53)
+			// P92 (LFQFP100:  48)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT7::PMR.B4 = 0;
+				MPC::P74PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT7::PMR.B4 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT9::PMR.B2 = 0;
+				MPC::P92PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT9::PMR.B2 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool clock_uup_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTOUUP:
+			// P71 (LFQFP100:  56)
+			// P95 (LFQFP100:  45)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT7::PMR.B1 = 0;
+				MPC::P71PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT7::PMR.B1 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT9::PMR.B5 = 0;
+				MPC::P95PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT9::PMR.B5 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool clock_vlo_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTOVLO:
+			// P75 (LFQFP100:  52)
+			// P91 (LFQFP100:  49)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT7::PMR.B5 = 0;
+				MPC::P75PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT7::PMR.B5 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT9::PMR.B1 = 0;
+				MPC::P91PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT9::PMR.B1 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool clock_vup_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTOVUP:
+			// P72 (LFQFP100:  55)
+			// P94 (LFQFP100:  46)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT7::PMR.B2 = 0;
+				MPC::P72PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT7::PMR.B2 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT9::PMR.B4 = 0;
+				MPC::P94PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT9::PMR.B4 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool clock_wlo_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTOWLO:
+			// P76 (LFQFP100:  51)
+			// P90 (LFQFP100:  50)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT7::PMR.B6 = 0;
+				MPC::P76PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT7::PMR.B6 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT9::PMR.B0 = 0;
+				MPC::P90PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT9::PMR.B0 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+		static bool clock_wup_(ORDER odr, bool ena) noexcept
+		{
+			bool ret = true;
+			// GTOWUP:
+			// P73 (LFQFP100:  54)
+			// P93 (LFQFP100:  47)
+			switch(odr) {
+			case ORDER::FIRST:
+				PORT7::PMR.B3 = 0;
+				MPC::P73PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT7::PMR.B3 = ena;
+				break;
+			case ORDER::SECOND:
+				PORT9::PMR.B3 = 0;
+				MPC::P93PFS.PSEL = ena ? 0b01'1000 : 0;  // ok
+				PORT9::PMR.B3 = ena;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -954,6 +1218,33 @@ namespace device {
 
 			bool ret = false;
 			switch(clk) {
+			case CHANNEL::U:
+				ret = clock_u_(odr, ena);
+				break;
+			case CHANNEL::V:
+				ret = clock_v_(odr, ena);
+				break;
+			case CHANNEL::W:
+				ret = clock_w_(odr, ena);
+				break;
+			case CHANNEL::ULO:
+				ret = clock_ulo_(odr, ena);
+				break;
+			case CHANNEL::UUP:
+				ret = clock_uup_(odr, ena);
+				break;
+			case CHANNEL::VLO:
+				ret = clock_vlo_(odr, ena);
+				break;
+			case CHANNEL::VUP:
+				ret = clock_vup_(odr, ena);
+				break;
+			case CHANNEL::WLO:
+				ret = clock_wlo_(odr, ena);
+				break;
+			case CHANNEL::WUP:
+				ret = clock_wup_(odr, ena);
+				break;
 			case CHANNEL::TRGA:
 				ret = trg_a_(odr, ena);
 				break;
