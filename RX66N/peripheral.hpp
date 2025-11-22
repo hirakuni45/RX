@@ -81,7 +81,6 @@ namespace device {
 		IWDT,		///< Independent Watchdog Timer / 独立ウォッチドッグタイマ
 
 		ETHERC0,	///< Ethernet Controller 0 / イーサネットコントローラ０
-
 		EDMAC0,		///< DMA Controller for the Ethernet Controller 0 / イーサネットコントローラ用 DMA コントローラ０
 
 		PMGI0,		///< PHY Management Interface 0 / PHY マネジメントインタフェース０

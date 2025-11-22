@@ -201,8 +201,8 @@
 |RTC|Realtime Clock|リアルタイムクロック|
 |WDTA|Watchdog Timer|ウォッチドッグタイマ|
 |IWDT|Independent Watchdog Timer|独立ウォッチドッグタイマ|
-|ETHERC|Ethernet Controller|イーサネットコントローラ|
-|EDMAC|DMA Controller for the Ethernet Controller|イーサネットコントローラ用 DMA コントローラ|
+|ETHERC0|Ethernet Controller 0|イーサネットコントローラ０|
+|EDMAC0|DMA Controller for the Ethernet Controller 0|イーサネットコントローラ用 DMA コントローラ０|
 |USB0|USB 2.0 FS Host/Function Module 0|USB 2.0 FS ホスト/ファンクションモジュール０|
 |USB1|USB 2.0 FS Host/Function Module 1|USB 2.0 FS ホスト/ファンクションモジュール１|
 |SCI0|Serial Communications Interface 0|シリアルコミュニケーションインタフェース０|
