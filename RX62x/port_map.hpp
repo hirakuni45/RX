@@ -376,10 +376,10 @@ namespace device {
 			switch(odr) {
 			case ORDER::FIRST:
 			// RMII/MII Ethernet
-				if(opt == OPTIONAL::ETH_RMII) {
+				if(opt == OPTIONAL::ETH_RMII) {  // RMII
 					MPC::PFENET.PHYMODE = 0;
-				} else if(opt == OPTIONAL::ETH_MII) {
-					MPC::PFENET.PHYMODE = 0;
+				} else if(opt == OPTIONAL::ETH_MII) {  // MII
+					MPC::PFENET.PHYMODE = 1;
 				} else {
 					return false;
 				}
@@ -391,21 +391,19 @@ namespace device {
 			return true;
 		}
 
-		//----------------------------------------------------------------
-
 		static inline USER_FUNC_TYPE	user_func_;
 
 	public:
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		/*!
 			@brief  ユーザー設定関数設定
 			@param[in]	func	ユーザー設定関数
 		*/
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		static void set_user_func(USER_FUNC_TYPE func) noexcept { user_func_ = func; }
 
 
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		/*!
 			@brief  RSPIx/SSL ポート有効／無効
 			@param[in]	per		周辺機器タイプ
@@ -414,7 +412,7 @@ namespace device {
 			@param[in]	odr		候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		static bool turn(peripheral per, RSPI ssl, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
 			if(odr == ORDER::BYPASS) return true;
@@ -430,7 +428,7 @@ namespace device {
 		}
 
 
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		/*!
 			@brief  周辺機器別ポート切り替え
 			@param[in]	per		周辺機器タイプ
@@ -439,7 +437,7 @@ namespace device {
 			@param[in]	opt		オプショナル設定を行う場合
 			@return 無効な周辺機器の場合「false」
 		*/
-		//-----------------------------------------------------------------//
+		//---------------------------------------------------------------------//
 		static bool turn(peripheral per, bool ena = true, ORDER odr = ORDER::FIRST, OPTIONAL opt = OPTIONAL::NONE) noexcept
 		{
 			if(odr == ORDER::BYPASS) return false;
