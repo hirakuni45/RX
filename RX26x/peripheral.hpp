@@ -56,9 +56,9 @@ namespace device {
 
 		WDTA,		///< Watchdog Timer / ウォッチドッグタイマ
 		IWDT,		///< Independent Watchdog Timer / 独立ウォッチドッグタイマ
-
+#if defined(SIG_RX261)
 		USB0,		///< USB 2.0 Host/Function Module 0 / USB 2.0 FS ホスト/ファンクションモジュール
-
+#endif
 		SCI1,		///< Serial Communications Interface 1 / シリアルコミュニケーションインタフェース１
 		SCI5,		///< Serial Communications Interface 5 / シリアルコミュニケーションインタフェース５
 		SCI6,		///< Serial Communications Interface 6 / シリアルコミュニケーションインタフェース６
@@ -68,9 +68,9 @@ namespace device {
 		RSCI9,		///< (R)Serial Communications Interface 9 / Ｒシリアルコミュニケーションインタフェース９
 
 		RIIC0,		///< I2C-bus Interface 0 / I2C バスインタフェース０
-
+#if defined(SIG_RX261)
 		CANFD0,		///< CANFD Module 0 / CANFD モジュール０
-
+#endif
 		RSPI0,		///< Serial Peripheral Interface 0 / シリアルペリフェラルインタフェース０
 
 		CRC,		///< CRC Calculator / CRC 演算器
