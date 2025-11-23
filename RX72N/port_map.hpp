@@ -1566,22 +1566,22 @@ namespace device {
 			switch(odr) {
 			case ORDER::FIRST:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// TOC0: PC7
+					// TOC0: PC7 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTC::PMR.B7 = 0;
 					MPC::PC7PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTC::PMR.B7 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// TIC0: PC6
+					// TIC0: PC6 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTC::PMR.B6 = 0;
 					MPC::PC6PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTC::PMR.B6 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// TOC1: PE7
+					// TOC1: PE7 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTE::PMR.B7 = 0;
 					MPC::PE7PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTE::PMR.B7 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// TIC1: PE6
+					// TIC1: PE6 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTE::PMR.B6 = 0;
 					MPC::PE6PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTE::PMR.B6 = enable;
@@ -1591,22 +1591,22 @@ namespace device {
 				break;
 			case ORDER::SECOND:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// TOC0: PH1
+					// TOC0: PH1 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTH::PMR.B1 = 0;
 					MPC::PH1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTH::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// TIC0: PH0
+					// TIC0: PH0 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTH::PMR.B0 = 0;
 					MPC::PH0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTH::PMR.B0 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// TOC1: PK1
+					// TOC1: PK1 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTK::PMR.B1 = 0;
 					MPC::PK1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTK::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// TIC1: PK0
+					// TIC1: PK0 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTK::PMR.B0 = 0;
 					MPC::PK0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTK::PMR.B0 = enable;
@@ -1625,22 +1625,22 @@ namespace device {
 			switch(odr) {
 			case ORDER::FIRST:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// TOC0: PD3
+					// TOC0: PD3 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTD::PMR.B3 = 0;
 					MPC::PD3PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTD::PMR.B3 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// TIC0: PD2
+					// TIC0: PD2 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTD::PMR.B2 = 0;
 					MPC::PD2PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTD::PMR.B2 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// TOC1: PE3
+					// TOC1: PE3 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTE::PMR.B3 = 0;
 					MPC::PE3PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTE::PMR.B3 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// TIC1: PE2
+					// TIC1: PE2 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTE::PMR.B2 = 0;
 					MPC::PE2PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTE::PMR.B2 = enable;
@@ -1650,22 +1650,22 @@ namespace device {
 				break;
 			case ORDER::SECOND:
 				if(opt == OPTIONAL::CMTW_TOC0) {
-					// TOC0: PL1
+					// TOC0: PL1 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTL::PMR.B1 = 0;
 					MPC::PL1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTL::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC0) {
-					// TIC0: PL0
+					// TIC0: PL0 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTL::PMR.B0 = 0;
 					MPC::PL0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTL::PMR.B0 = enable;
 				} else if(opt == OPTIONAL::CMTW_TOC1) {
-					// TOC1: PM1
+					// TOC1: PM1 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTH::PMR.B1 = 0;
 					MPC::PH1PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTH::PMR.B1 = enable;
 				} else if(opt == OPTIONAL::CMTW_TIC1) {
-					// TIC1: PM0
+					// TIC1: PM0 (LFQFP100:  ) (LFQFP144:  ) (LFQFP176:  )
 					PORTH::PMR.B0 = 0;
 					MPC::PH0PFS.PSEL = enable ? 0b01'1101 : 0;
 					PORTH::PMR.B0 = enable;
@@ -1903,7 +1903,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn_usb(USB_PORT sel, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			if(odr == ORDER::BYPASS) return false;
+			if(odr == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -1911,11 +1911,11 @@ namespace device {
 			bool ret = true;
 			switch(sel) {
 			case USB_PORT::VBUS:
-				// P16 o
+				// P16 (LFQFP100:  30) (LFQFP144:  40) (LFQFP176:  48)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010001 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0001 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				default:
@@ -1924,11 +1924,11 @@ namespace device {
 				}
 				break;
 			case USB_PORT::EXICEN:
-				// P21 o
+				// P21 (LFQFP100:  27) (LFQFP144:  36) (LFQFP176:  44)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
-					MPC::P21PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P21PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT2::PMR.B1 = ena;
 					break;
 				default:
@@ -1937,23 +1937,23 @@ namespace device {
 				}
 				break;
 			case USB_PORT::VBUSEN:
-				// P16 o
-				// P24 o
-				// P32 o
+				// P16 (LFQFP100:  30) (LFQFP144:  40) (LFQFP176:  48)
+				// P24 (LFQFP100:  24) (LFQFP144:  33) (LFQFP176:  40)
+				// P32 (LFQFP100:  18) (LFQFP144:  27) (LFQFP176:  29)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010010 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0010 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P24PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT2::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
 					PORT3::PMR.B2 = 0;
-					MPC::P32PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P32PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT3::PMR.B2 = ena;
 					break;
 				default:
@@ -1962,11 +1962,11 @@ namespace device {
 				}
 				break;
 			case USB_PORT::OVRCURA:
-				// P14 o
+				// P14 (LFQFP100:  32) (LFQFP144:  43) (LFQFP176:  51)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = ena ? 0b010010 : 0;
+					MPC::P14PFS.PSEL = ena ? 0b01'0010 : 0;
 					PORT1::PMR.B4 = ena;
 					break;
 				default:
@@ -1975,17 +1975,17 @@ namespace device {
 				}
 				break;
 			case USB_PORT::OVRCURB:
-				// P16 o
-				// P22 o
+				// P16 (LFQFP100:  30) (LFQFP144:  40) (LFQFP176:  48)
+				// P22 (LFQFP100:  26) (LFQFP144:  35) (LFQFP176:  43)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P22PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT2::PMR.B2 = ena;
 					break;
 				default:
@@ -1994,11 +1994,11 @@ namespace device {
 				}
 				break;
 			case USB_PORT::ID:
-				// P20 o
+				// P20 (LFQFP100:  28) (LFQFP144:  37) (LFQFP176:  45)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
-					MPC::P20PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P20PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT2::PMR.B0 = ena;
 					break;
 				default:
