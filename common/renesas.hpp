@@ -395,11 +395,15 @@
 #include "RX231/rtc.hpp"
 #include "RX600/lpt.hpp"
 #include "RX600/wdta.hpp"
+#if defined(SIG_RX261)
 #include "RX600/usb.hpp"
+#endif
 #include "RX600/sci_k.hpp"
 #include "RX600/sci_h.hpp"
 #include "RX600/rsci.hpp"
+#if defined(SIG_RX261)
 #include "RX600/canfd.hpp"
+#endif
 #include "RX600/crc.hpp"
 #include "RX600/remc.hpp"
 #include "RX600/ctsu2.hpp"
