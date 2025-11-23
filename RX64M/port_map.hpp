@@ -1218,7 +1218,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn_usb(USB_PORT sel, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			if(odr == ORDER::BYPASS) return false;
+			if(odr == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -1227,10 +1227,10 @@ namespace device {
 			switch(sel) {
 			case USB_PORT::VBUS:
 				switch(odr) {
-				// P16 o
+				// P16 (LFQFP100:  30) (LFQFP144:  40) (LFQFP176:  48)
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010001 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0001 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				default:
@@ -1239,11 +1239,11 @@ namespace device {
 				}
 				break;
 			case USB_PORT::EXICEN:
-				// P21 o
+				// P21 (LFQFP100:  27) (LFQFP144:  36) (LFQFP176:  44)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
-					MPC::P21PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P21PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT2::PMR.B1 = ena;
 					break;
 				default:
@@ -1252,23 +1252,23 @@ namespace device {
 				}
 				break;
 			case USB_PORT::VBUSEN:
-				// P16 o
-				// P24 o
-				// P32 o
+				// P16 (LFQFP100:  30) (LFQFP144:  40) (LFQFP176:  48)
+				// P24 (LFQFP100:  24) (LFQFP144:  33) (LFQFP176:  40)
+				// P32 (LFQFP100:  18) (LFQFP144:  27) (LFQFP176:  29)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010010 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0010 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P24PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT2::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
 					PORT3::PMR.B2 = 0;
-					MPC::P32PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P32PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT3::PMR.B2 = ena;
 					break;
 				default:
@@ -1277,11 +1277,11 @@ namespace device {
 				}
 				break;
 			case USB_PORT::OVRCURA:
-				// P14 o
+				// P14 (LFQFP100:  32) (LFQFP144:  43) (LFQFP176:  51)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = ena ? 0b010010 : 0;
+					MPC::P14PFS.PSEL = ena ? 0b01'0010 : 0;
 					PORT1::PMR.B4 = ena;
 					break;
 				default:
@@ -1290,17 +1290,17 @@ namespace device {
 				}
 				break;
 			case USB_PORT::OVRCURB:
-				// P16 o
-				// P22 o
+				// P16 (LFQFP100:  30) (LFQFP144:  40) (LFQFP176:  48)
+				// P22 (LFQFP100:  26) (LFQFP144:  35) (LFQFP176:  43)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P22PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT2::PMR.B2 = ena;
 					break;
 				default:
@@ -1309,11 +1309,11 @@ namespace device {
 				}
 				break;
 			case USB_PORT::ID:
-				// P20 o
+				// P20 (LFQFP100:  28) (LFQFP144:  37) (LFQFP176:  45)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
-					MPC::P20PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P20PFS.PSEL = ena ? 0b01'0011 : 0;
 					PORT2::PMR.B0 = ena;
 					break;
 				default:
@@ -1343,7 +1343,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn_usba(USB_PORT sel, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			if(odr == ORDER::BYPASS) return false;
+			if(odr == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -1633,7 +1633,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static bool turn(peripheral per, bool ena = true, ORDER odr = ORDER::FIRST, OPTIONAL opt = OPTIONAL::NONE) noexcept
 		{
-			if(odr == ORDER::BYPASS) return false;
+			if(odr == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -1754,6 +1754,7 @@ namespace device {
 			}
 
 			MPC::PWPR = MPC::PWPR.B0WI.b();
+
 			return ret;
 		}
 

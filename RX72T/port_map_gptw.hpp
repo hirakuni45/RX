@@ -118,7 +118,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gptw1_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
 			bool ret = true;
@@ -216,7 +215,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gptw2_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
@@ -316,7 +314,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gptw3_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
 			bool ret = true;
@@ -401,7 +398,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gptw4_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
 			bool ret = true;
@@ -457,7 +453,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gptw5_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
@@ -515,7 +510,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gptw6_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
 			bool ret = true;
@@ -572,7 +566,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gptw7_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
 			bool ret = true;
@@ -625,7 +618,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gptw8_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{
 			bool ret = true;
@@ -676,7 +668,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gptw9_(CHANNEL ch, bool ena, bool neg, ORDER order) noexcept
 		{

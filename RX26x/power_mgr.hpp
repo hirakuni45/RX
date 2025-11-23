@@ -125,11 +125,11 @@ namespace device {
 			case peripheral::RSPI0:
 				SYSTEM::MSTPCRB.MSTPB17 = f;
 				break;
-
+#if defined(SIG_RX261)
 			case peripheral::USB0:
 				SYSTEM::MSTPCRB.MSTPB19 = f;
 				break;
-
+#endif
 			case peripheral::RIIC0:
 				SYSTEM::MSTPCRB.MSTPB21 = f;
 				break;
@@ -166,11 +166,11 @@ namespace device {
 			case peripheral::REMC0:
 				SYSTEM::MSTPCRC.MSTPC29 = f;
 				break;
-
+#if defined(SIG_RX261)
 			case peripheral::CANFD0:
 				SYSTEM::MSTPCRD.MSTPD9 = f;
 				break;
-
+#endif
 			case peripheral::CTSU:
 				SYSTEM::MSTPCRD.MSTPD10 = f;
 				break;

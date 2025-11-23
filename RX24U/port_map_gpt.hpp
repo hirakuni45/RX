@@ -84,7 +84,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gpt1_(CHANNEL ch, bool ena, ORDER odr, bool neg) noexcept
 		{
 			bool ret = true;
@@ -147,7 +146,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gpt2_(CHANNEL ch, bool ena, ORDER odr, bool neg) noexcept
 		{
 			bool ret = true;
@@ -209,7 +207,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gpt3_(CHANNEL ch, bool ena, ORDER odr, bool neg) noexcept
 		{
