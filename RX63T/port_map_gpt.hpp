@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	RX63T グループ・ポート・マッピング (GPT)
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,7 +7,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "RX63T/peripheral.hpp"
 #include "RX63T/port.hpp"
 #include "RX63T/mpc.hpp"
@@ -72,7 +72,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gpt1_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -122,7 +121,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gpt2_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
@@ -186,7 +184,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gpt3_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -237,7 +234,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gpt4_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -276,7 +272,6 @@ namespace device {
 			return ret;
 		}
 
-
 		static bool gpt5_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
 			bool ret = true;
@@ -314,7 +309,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gpt6_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{
@@ -365,7 +359,6 @@ namespace device {
 			}
 			return ret;
 		}
-
 
 		static bool gpt7_(CHANNEL ch, bool ena, ORDER odr) noexcept
 		{

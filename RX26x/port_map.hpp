@@ -616,7 +616,7 @@ namespace device {
 			}
 			return true;
 		}
-
+#if defined(SIG_RX261)
 		static bool canfd0_(ORDER odr, bool enable)
 		{
 			uint8_t sel = enable ? 0b1'0000 : 0;
@@ -666,7 +666,7 @@ namespace device {
 			}
 			return true;
 		}
-
+#endif
 		static inline USER_FUNC_TYPE	user_func_;
 
 	public:
@@ -803,12 +803,14 @@ namespace device {
 				case peripheral::LPT:
 					ret = lpt_(odr, ena);
 					break;
+#if defined(SIG_RX261)
 				case peripheral::CANFD0:
 					ret = canfd0_(odr, ena);
 					break;
 //				case peripheral::USB0:
 //					ret = usb0_(odr, ena);
 //					break;
+#endif
 				default:
 					break;
 				}

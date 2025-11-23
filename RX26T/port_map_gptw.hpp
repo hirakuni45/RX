@@ -1,8 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX26T グループ・ポート・マッピング (GPTW0 - GPTW7)  @n
-			（クロック関係は実装中・・・）
+	@brief	RX26T GPTWa グループ・ポート・マッピング (GPTW0 - GPTW7)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2023, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -18,7 +17,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  GPTW ポート・マッピング
+		@brief  GPTWa ポート・マッピング
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map_gptw : public port_map_order {
