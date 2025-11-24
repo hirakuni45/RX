@@ -275,6 +275,12 @@
 |SSI0 / SSIWS0|P21 (--)|P27 (15)|PA6 (41)|-|
 |SSI0 / SSIRXD0|P20 (--)|P26 (16)|PA3 (43)|-|
 |SSI0 / SSITXD0|P17 (17)|P17 (17)|PA4 (42)|-|
+|USB0 / VBUS|P16 (18)|PB5 (35)|-|-|
+|USB0 / EXICEN|P21 (--)|PC6 (28)|-|-|
+|USB0 / VBUSEN|P16 (18)|P24 (--)|P26 (16)|P32 (--)|
+|USB0 / OVRCURA|P14 (20)|-|-|-|
+|USB0 / OOVRCURB|P16 (18)|P22 (--)|-|-|
+|USB0 / ID|P20 (--)|PC5 (29)|-|-|
 
 ### LFQFP100
 
@@ -315,6 +321,12 @@
 |SSI0 / SSIWS0|P21 (27)|P27 (21)|PA6 (64)|-|
 |SSI0 / SSIRXD0|P20 (28)|P26 (22)|PA3 (67)|-|
 |SSI0 / SSITXD0|P17 (29)|P17 (29)|PA4 (66)|-|
+|USB0 / VBUS|P16 (30)|PB5 (55)|-|-|
+|USB0 / EXICEN|P21 (27)|PC6 (---)|-|-|
+|USB0 / VBUSEN|P16 (30)|P24 (24)|P26 (---)|P32 (18)|
+|USB0 / OVRCURA|P14 (32)|-|-|-|
+|USB0 / OOVRCURB|P16 (30)|P22 (26)|-|-|
+|USB0 / ID|P20 (28)|PC5 (---)|-|-|
 
 ---
 

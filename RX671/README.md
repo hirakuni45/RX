@@ -365,6 +365,18 @@
 |SSIE0 / SSILRCK0|P21 (27)|PC6 (46)|-|-|
 |SSIE0 / SSIRXD0|P20 (28)|P53 (41)|-|-|
 |SSIE0 / SSITXD0|P17 (29)|PC7 (45)|-|-|
+|USB0 / VBUS|P16 (30)|-|-|-|
+|USB0 / EXICEN|P21 (27)|-|-|-|
+|USB0 / VBUSEN|P16 (30)|P24 (24)|P32 (18)|-|
+|USB0 / OVRCURA|P14 (32)|-|-|-|
+|USB0 / OVRCURB|P16 (30)|P22 (26)|-|-|
+|USB0 / ID|P20 (28)|-|-|-|
+|USB1 / VBUS|P16 (---)|-|-|-|
+|USB1 / EXICEN|P21 (---)|-|-|-|
+|USB1 / VBUSEN|P16 (---)|P24 (---)|P32 (---)|-|
+|USB1 / OVRCURA|P14 (---)|-|-|-|
+|USB1 / OVRCURB|P16 (---)|P22 (---)|-|-|
+|USB1 / ID|P20 (---)|-|-|-|
 
 ### LFQFP144
 
@@ -462,6 +474,18 @@
 |SSIE0 / SSILRCK0|P21 (36)|PC6 (61)|-|-|
 |SSIE0 / SSIRXD0|P20 (37)|P53 (53)|-|-|
 |SSIE0 / SSITXD0|P17 (38)|PC7 (60)|-|-|
+|USB0 / VBUS|P16 (40)|-|-|-|
+|USB0 / EXICEN|P21 (36)|-|-|-|
+|USB0 / VBUSEN|P16 (40)|P24 (33)|P32 (27)|-|
+|USB0 / OVRCURA|P14 (43)|-|-|-|
+|USB0 / OVRCURB|P16 (40)|P22 (35)|-|-|
+|USB0 / ID|P20 (37)|-|-|-|
+|USB1 / VBUS|P16 (---)|-|-|-|
+|USB1 / EXICEN|P21 (---)|-|-|-|
+|USB1 / VBUSEN|P16 (---)|P24 (---)|P32 (---)|-|
+|USB1 / OVRCURA|P14 (---)|-|-|-|
+|USB1 / OVRCURB|P16 (---)|P22 (---)|-|-|
+|USB1 / ID|P20 (---)|-|-|-|
 
 ---
 

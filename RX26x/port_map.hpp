@@ -833,21 +833,26 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static bool turn_usb(USB_PORT sel, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			if(odr == ORDER::BYPASS) return false;
+			if(odr == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = true;
-#if 0
 			switch(sel) {
 			case USB_PORT::VBUS:
-				// P16 o
+				// P16 (LFQFP100:  30)
+				// PB5 (LFQFP100:  55)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010001 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORT1::PMR.B6 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTB::PMR.B5 = 0;
+					MPC::PB5PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
+					PORTB::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
@@ -855,12 +860,18 @@ namespace device {
 				}
 				break;
 			case USB_PORT::EXICEN:
-				// P21 o
+				// P21 (LFQFP100:  27)
+				// PC6 (LFQFP100:  46)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
-					MPC::P21PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P21PFS.PSEL = ena ? 0b01'0001 : 0;  // ok 
 					PORT2::PMR.B1 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B6 = 0;
+					MPC::PC6PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
+					PORTC::PMR.B6 = ena;
 					break;
 				default:
 					ret = false;
@@ -868,23 +879,29 @@ namespace device {
 				}
 				break;
 			case USB_PORT::VBUSEN:
-				// P16 o
-				// P24 o
-				// P32 o
+				// P16 (LFQFP100:  30)
+				// P24 (LFQFP100:  24)
+				// P26 (LFQFP100:  22)
+				// P32 (LFQFP100:  18)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010010 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0010 : 0;  // ok
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P24PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORT2::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
+					PORT2::PMR.B6 = 0;
+					MPC::P26PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
+					PORT2::PMR.B6 = ena;
+					break;
+				case ORDER::FOURTH:
 					PORT3::PMR.B2 = 0;
-					MPC::P32PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P32PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORT3::PMR.B2 = ena;
 					break;
 				default:
@@ -893,11 +910,11 @@ namespace device {
 				}
 				break;
 			case USB_PORT::OVRCURA:
-				// P14 o
+				// P14 (LFQFP100:  32)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = ena ? 0b010010 : 0;
+					MPC::P14PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORT1::PMR.B4 = ena;
 					break;
 				default:
@@ -906,17 +923,17 @@ namespace device {
 				}
 				break;
 			case USB_PORT::OVRCURB:
-				// P16 o
-				// P22 o
+				// P16 (LFQFP100:  30)
+				// P22 (LFQFP100:  26)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P22PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORT2::PMR.B2 = ena;
 					break;
 				default:
@@ -925,12 +942,18 @@ namespace device {
 				}
 				break;
 			case USB_PORT::ID:
-				// P20 o
+				// P20 (LFQFP100:  28)
+				// PC5 (LFQFP100:  47)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
-					MPC::P20PFS.PSEL = ena ? 0b010011 : 0;
+					MPC::P20PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORT2::PMR.B0 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B5 = 0;
+					MPC::PC5PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
+					PORTC::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
@@ -941,7 +964,7 @@ namespace device {
 				ret = false;
 				break;
 			}
-#endif
+
 			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return ret;
