@@ -1044,7 +1044,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn_usb(USB_PORT sel, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
 		{
-			if(odr == ORDER::BYPASS) return false;
+			if(odr == ORDER::BYPASS) return true;
 
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
@@ -1053,8 +1053,8 @@ namespace device {
 			switch(sel) {
 			case USB_PORT::VBUS:
 				switch(odr) {
-				// PC0 o
-				// PD2 o
+				// PC0 (LFQFP100: ---) (LFQFP144:  47)
+				// PD2 (LFQFP100:  23) (LFQFP144:  28)
 				case ORDER::FIRST:
 					PORTC::PMR.B0 = 0;
 					MPC::PC0PFS.PSEL = ena ? 0b01'0001 : 0;
@@ -1071,8 +1071,8 @@ namespace device {
 				}
 				break;
 			case USB_PORT::EXICEN:
-				// PA0 o
-				// PC1 o
+				// PA0 (LFQFP100:  41) (LFQFP144:  59)
+				// PC1 (LFQFP100: ---) (LFQFP144:  46)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B0 = 0;
@@ -1090,9 +1090,9 @@ namespace device {
 				}
 				break;
 			case USB_PORT::VBUSEN:
-				// PA0 o
-				// PC1 o
-				// PB5 o
+				// PA0 (LFQFP100:  41) (LFQFP144:  59)
+				// PC1 (LFQFP100: ---) (LFQFP144:  46)
+				// PB5 (LFQFP100:  28) (LFQFP144:  41)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B0 = 0;
@@ -1115,9 +1115,9 @@ namespace device {
 				}
 				break;
 			case USB_PORT::OVRCURA:
-				// PA1 o
-				// PB6 o
-				// PC2 o
+				// PA1 (LFQFP100:  40) (LFQFP144:  58)
+				// PB6 (LFQFP100:  27) (LFQFP144:  40)
+				// PC2 (LFQFP100: ---) (LFQFP144:  45)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B1 = 0;
@@ -1140,10 +1140,10 @@ namespace device {
 				}
 				break;
 			case USB_PORT::OVRCURB:
-				// P34 o
-				// PB4 o
-				// PB7 o
-				// PE0 o
+				// P34 (LFQFP100: ---) (LFQFP144:  61)
+				// PB4 (LFQFP100:  30) (LFQFP144:  43)
+				// PB7 (LFQFP100: ---) (LFQFP144:  39)
+				// PE0 (LFQFP100:  17) (LFQFP144:  22)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B4 = 0;
@@ -1171,8 +1171,8 @@ namespace device {
 				}
 				break;
 			case USB_PORT::ID:
-				// PA1 o
-				// PC2 o
+				// PA1 (LFQFP100:  40) (LFQFP144:  58)
+				// PC2 (LFQFP100: ---) (LFQFP144:  45)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B1 = 0;
