@@ -208,6 +208,9 @@ namespace device {
 			OVRCURA,	///< OVRCURA input
 			OVRCURB,	///< OVRCURB input
 			ID,			///< ID input
+			DPUPE,		///< DPUPE output
+			DPRPD,		///< DPRPD output
+			DRPD,		///< DRPD output
 		};
 
 

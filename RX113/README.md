@@ -232,6 +232,12 @@
 |RSPI0 / SSL1|PA0 (45)|PC0 (34)|-|-|-|
 |RSPI0 / SSL2|PA1 (44)|PC1 (33)|-|-|-|
 |RSPI0 / SSL3|PA2 (--)|PC2 (32)|-|-|-|
+|USB0 / VBUS|P16 (18)|PC4 (30)|-|-|-|
+|USB0 / EXICEN|PC6 (28)|-|-|-|-|
+|USB0 / VBUSEN|P16 (18)|PC4 (30)|P26 (3)|-|-|
+|USB0 / OVRCURA|P14 (20)|PB3 (36)|-|-|-|
+|USB0 / OVRCURB|P16 (18)|PC7 (27)|-|-|-|
+|USB0 / ID|PC5 (29)|-|-|-|-|
 
 ### LFQFP100
 
@@ -270,6 +276,12 @@
 |RSPI0 / SSL1|PA0 (70)|PC0 (52)|-|-|-|
 |RSPI0 / SSL2|PA1 (69)|PC1 (51)|-|-|-|
 |RSPI0 / SSL3|PA2 (68)|PC2 (50)|-|-|-|
+|USB0 / VBUS|P16 (27)|PC4 (48)|-|-|-|
+|USB0 / EXICEN|PC6 (46)|-|-|-|-|
+|USB0 / VBUSEN|P16 (27)|PC4 (48)|P26 (12)|-|-|
+|USB0 / OVRCURA|P14 (29)|PB3 (57)|-|-|-|
+|USB0 / OVRCURB|P16 (27)|PC7 (45)|-|-|-|
+|USB0 / ID|PC5 (47)|-|-|-|-|
 
 ---
 

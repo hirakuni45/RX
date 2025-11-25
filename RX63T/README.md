@@ -242,6 +242,14 @@
 |RSPI1 / SSL1|P31 (43)|PA2 (28)|PD7 (12)|
 |RSPI1 / SSL2|P32 (41)|PA1 (--)|PE0 (--)|
 |RSPI1 / SSL3|P33 (40)|PA0 (--)|PE1 (--)|
+|USB0 / VBUS|PE5 (--)|-|-|
+|USB0 / EXICEN|PD1 (--)|-|-|
+|USB0 / VBUSEN|P13 (--)|-|-|
+|USB0 / OVRCURA|PE1 (--)|-|-|
+|USB0 / OVRCURB|PE0 (--)|-|-|
+|USB0 / ID|PD2 (--)|-|-|
+|USB0 / DRRPD|P12 (--)|-|-|
+|USB0 / DRPD|P01 (--)|-|-|
 
 ---
 
