@@ -389,6 +389,17 @@
 |RSPI2 / SSL1|PD5 (81)|-|-|-|
 |RSPI2 / SSL2|PD6 (80)|-|-|-|
 |RSPI2 / SSL3|PD7 (79)|-|-|-|
+|USB0 / VBUS|P16 (30)|-|-|-|
+|USB0 / EXICEN|P21 (27)|PC6 (---)|-|-|
+|USB0 / VBUSEN|P16 (30)|P24 (24)|P26 (---)|P32 (18)|
+|USB0 / OVRCURA|P14 (32)|-|-|-|
+|USB0 / OVRCURB|P16 (30)|-|-|-|
+|USB0 / ID|P20 (28)|PC5 (---)|-|-|
+|USB0 / DPUPE|P14 (32)|P23 (25)|P31 (19)|-|
+|USB0 / DPRPD|P25 (23)|P34 (16)|PC4 (---)|-|
+|USB0 / DRPD|P22 (25)|P30 (20)|-|-|
+|USB1 / VBUS|P17 (29)|-|-|-|
+|USB1 / DPUPE|P15 (31)|-|-|-|
 
 ### LFQFP144
 
@@ -468,6 +479,17 @@
 |RSPI2 / SSL1|PD5 (121)|-|-|-|
 |RSPI2 / SSL2|PD6 (120)|-|-|-|
 |RSPI2 / SSL3|PD7 (119)|-|-|-|
+|USB0 / VBUS|P16 (40)|-|-|-|
+|USB0 / EXICEN|P21 (36)|PC6 (---)|-|-|
+|USB0 / VBUSEN|P16 (40)|P24 (33)|P26 (---)|P32 (27)|
+|USB0 / OVRCURA|P14 (43)|-|-|-|
+|USB0 / OVRCURB|P16 (40)|-|-|-|
+|USB0 / ID|P20 (37)|PC5 (---)|-|-|
+|USB0 / DPUPE|P14 (43)|P23 (34)|P31 (28)|-|
+|USB0 / DPRPD|P25 (32)|P34 (25)|PC4 (---)|-|
+|USB0 / DRPD|P22 (35)|P30 (29)|-|-|
+|USB1 / VBUS|P17 (38)|-|-|-|
+|USB1 / DPUPE|P15 (42)|-|-|-|
 
 ### LFQFP176
 
@@ -547,6 +569,17 @@
 |RSPI2 / SSL1|PD5 (147)|-|-|-|
 |RSPI2 / SSL2|PD6 (145)|-|-|-|
 |RSPI2 / SSL3|PD7 (143)|-|-|-|
+|USB0 / VBUS|P16 (48)|-|-|-|
+|USB0 / EXICEN|P21 (44)|PC6 (---)|-|-|
+|USB0 / VBUSEN|P16 (48)|P24 (40)|P26 (---)|P32 (29)|
+|USB0 / OVRCURA|P14 (51)|-|-|-|
+|USB0 / OVRCURB|P16 (48)|-|-|-|
+|USB0 / ID|P20 (45)|PC5 (---)|-|-|
+|USB0 / DPUPE|P14 (51)|P23 (42)|P31 (32)|-|
+|USB0 / DPRPD|P25 (38)|P34 (27)|PC4 (---)|-|
+|USB0 / DRPD|P22 (43)|P30 (33)|-|-|
+|USB1 / VBUS|P17 (46)|-|-|-|
+|USB1 / DPUPE|P15 (50)|-|-|-|
 
 ---
 

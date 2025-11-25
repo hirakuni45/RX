@@ -194,6 +194,12 @@
 |RSPI0 / SSL1|PA0 (45)|-|-|-|
 |RSPI0 / SSL2|PA1 (44)|-|-|-|
 |RSPI0 / SSL3|PC2 (32)|-|-|-|
+|USB0 / VBUS|P16 (18)|PC4 (30)|-|-|-|
+|USB0 / EXICEN|PC6 (28)|-|-|-|-|
+|USB0 / VBUSEN|P16 (18)|PC4 (30)|P26 (3)|-|-|
+|USB0 / OVRCURA|P14 (20)|PB3 (36)|-|-|-|
+|USB0 / OVRCURB|P16 (18)|PC7 (27)|-|-|-|
+|USB0 / ID|PC5 (29)|-|-|-|-|
 
 ---
 

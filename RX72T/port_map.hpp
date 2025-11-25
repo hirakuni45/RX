@@ -1057,12 +1057,12 @@ namespace device {
 				// PD2 (LFQFP100:  23) (LFQFP144:  28)
 				case ORDER::FIRST:
 					PORTC::PMR.B0 = 0;
-					MPC::PC0PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PC0PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTC::PMR.B0 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTD::PMR.B2 = 0;
-					MPC::PD2PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PD2PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTD::PMR.B2 = ena;
 					break;
 				default:
@@ -1076,12 +1076,12 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B0 = 0;
-					MPC::PA0PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PA0PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTA::PMR.B0 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTC::PMR.B1 = 0;
-					MPC::PC1PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PC1PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTC::PMR.B1 = ena;
 					break;
 				default:
@@ -1096,17 +1096,17 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B0 = 0;
-					MPC::PA0PFS.PSEL = ena ? 0b01'0010 : 0;
+					MPC::PA0PFS.PSEL = ena ? 0b01'0010 : 0;  // ok
 					PORTA::PMR.B0 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTC::PMR.B1 = 0;
-					MPC::PC1PFS.PSEL = ena ? 0b01'0010 : 0;
+					MPC::PC1PFS.PSEL = ena ? 0b01'0010 : 0;  // ok
 					PORTC::PMR.B1 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTB::PMR.B5 = 0;
-					MPC::PB5PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PB5PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTB::PMR.B5 = ena;
 					break;
 				default:
@@ -1121,17 +1121,17 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B1 = 0;
-					MPC::PA1PFS.PSEL = ena ? 0b01'0010 : 0;
+					MPC::PA1PFS.PSEL = ena ? 0b01'0010 : 0;  // ok
 					PORTA::PMR.B1 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B6 = 0;
-					MPC::PB6PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PB6PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTB::PMR.B6 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTC::PMR.B2 = 0;
-					MPC::PC2PFS.PSEL = ena ? 0b01'0010 : 0;
+					MPC::PC2PFS.PSEL = ena ? 0b01'0010 : 0;  // ok
 					PORTC::PMR.B2 = ena;
 					break;
 				default:
@@ -1147,22 +1147,22 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B4 = 0;
-					MPC::P34PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::P34PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORT3::PMR.B4 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTB::PMR.B4 = 0;
-					MPC::PB4PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PB4PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTB::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
 					PORTB::PMR.B7 = 0;
-					MPC::PB7PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PB7PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTB::PMR.B7 = ena;
 					break;
 				case ORDER::FOURTH:
 					PORTE::PMR.B0 = 0;
-					MPC::PE0PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PE0PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTE::PMR.B0 = ena;
 					break;
 				default:
@@ -1176,12 +1176,12 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B1 = 0;
-					MPC::PA1PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PA1PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTA::PMR.B1 = ena;
 					break;
 				case ORDER::SECOND:
 					PORTC::PMR.B2 = 0;
-					MPC::PC2PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::PC2PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORTC::PMR.B2 = ena;
 					break;
 				default:

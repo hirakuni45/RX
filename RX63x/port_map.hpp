@@ -1124,7 +1124,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  USB0 ポート専用切り替え
-			@param[in]	sel		USB ポート選択
+			@param[in]	sel		USB0 ポート選択
 			@param[in]	ena		無効にする場合「false」
 			@param[in]	odr		ポート・マップ・オプション（ポート候補）
 			@return 無効な場合「false」
@@ -1144,7 +1144,7 @@ namespace device {
 				// P16 (LFQFP100:  30) (LFQFP144:  40) (LFQFP176:  48)
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b01'0001 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
 					PORT1::PMR.B6 = ena;
 					break;
 				default:
@@ -1154,12 +1154,17 @@ namespace device {
 				break;
 			case USB_PORT::EXICEN:
 				// P21 (LFQFP100:  27) (LFQFP144:  36) (LFQFP176:  44)
-				// PC6
+				// PC6 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
-					MPC::P21PFS.PSEL = ena ? 0b01'0011 : 0;
+					MPC::P21PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
 					PORT2::PMR.B1 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B6 = 0;
+					MPC::PC6PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORTC::PMR.B6 = ena;
 					break;
 				default:
 					ret = false;
@@ -1169,22 +1174,27 @@ namespace device {
 			case USB_PORT::VBUSEN:
 				// P16 (LFQFP100:  30) (LFQFP144:  40) (LFQFP176:  48)
 				// P24 (LFQFP100:  24) (LFQFP144:  33) (LFQFP176:  40)
+				// P26 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 				// P32 (LFQFP100:  18) (LFQFP144:  27) (LFQFP176:  29)
-				// P26
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b01'0010 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0010 : 0;  // ok
 					PORT1::PMR.B6 = ena;
 					break;
 				case ORDER::SECOND:
 					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = ena ? 0b01'0011 : 0;
+					MPC::P24PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
 					PORT2::PMR.B4 = ena;
 					break;
 				case ORDER::THIRD:
+					PORT2::PMR.B6 = 0;
+					MPC::P26PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORT2::PMR.B6 = ena;
+					break;
+				case ORDER::FOURTH:
 					PORT3::PMR.B2 = 0;
-					MPC::P32PFS.PSEL = ena ? 0b01'0011 : 0;
+					MPC::P32PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
 					PORT3::PMR.B2 = ena;
 					break;
 				default:
@@ -1197,7 +1207,7 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = ena ? 0b01'0010 : 0;
+					MPC::P14PFS.PSEL = ena ? 0b01'0010 : 0;  // ok
 					PORT1::PMR.B4 = ena;
 					break;
 				default:
@@ -1210,13 +1220,8 @@ namespace device {
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
-					MPC::P16PFS.PSEL = ena ? 0b01'0011 : 0;
+					MPC::P16PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
 					PORT1::PMR.B6 = ena;
-					break;
-				case ORDER::SECOND:
-					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = ena ? 0b01'0011 : 0;
-					PORT2::PMR.B2 = ena;
 					break;
 				default:
 					ret = false;
@@ -1225,12 +1230,139 @@ namespace device {
 				break;
 			case USB_PORT::ID:
 				// P20 (LFQFP100:  28) (LFQFP144:  37) (LFQFP176:  45)
-				// PC5
+				// PC5 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
-					MPC::P20PFS.PSEL = ena ? 0b01'0011 : 0;
+					MPC::P20PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
 					PORT2::PMR.B0 = ena;
+					break;
+				case ORDER::SECOND:
+					PORTC::PMR.B5 = 0;
+					MPC::PC5PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORTC::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::DPUPE:
+				// P14 (LFQFP100:  32) (LFQFP144:  43) (LFQFP176:  51)
+				// P23 (LFQFP100:  25) (LFQFP144:  34) (LFQFP176:  42)
+				// P31 (LFQFP100:  19) (LFQFP144:  28) (LFQFP176:  32)
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT1::PMR.B4 = 0;
+					MPC::P14PFS.PSEL = ena ? 0b01'0001 : 0;  // ok 
+					PORT1::PMR.B4 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT2::PMR.B3 = 0;
+					MPC::P23PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORT2::PMR.B3 = ena;
+					break;
+				case ORDER::THIRD:
+					PORT3::PMR.B1 = 0;
+					MPC::P31PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORT3::PMR.B1 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+			case USB_PORT::DPRPD:
+				// P25 (LFQFP100:  23) (LFQFP144:  32) (LFQFP176:  38)
+				// P34 (LFQFP100:  16) (LFQFP144:  25) (LFQFP176:  27)
+				// PC4 (LFQFP100: ---) (LFQFP144: ---) (LFQFP176: ---)
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT2::PMR.B5 = 0;
+					MPC::P25PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORT2::PMR.B5 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT3::PMR.B4 = 0;
+					MPC::P34PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORT3::PMR.B4 = ena;
+					break;
+				case ORDER::THIRD:
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORTC::PMR.B4 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+			case USB_PORT::DRPD:
+				// P22 (LFQFP100:  25) (LFQFP144:  35) (LFQFP176:  43)
+				// P30 (LFQFP100:  20) (LFQFP144:  29) (LFQFP176:  33)
+				switch(odr) {
+				case ORDER::FIRST:
+					PORT2::PMR.B2 = 0;
+					MPC::P22PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORT2::PMR.B2 = ena;
+					break;
+				case ORDER::SECOND:
+					PORT3::PMR.B0 = 0;
+					MPC::P30PFS.PSEL = ena ? 0b01'0011 : 0;  // ok
+					PORT3::PMR.B0 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+
+			default:
+				ret = false;
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  USB1 ポート専用切り替え
+			@param[in]	sel		USB1 ポート選択
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	odr		ポート・マップ・オプション（ポート候補）
+			@return 無効な場合「false」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool turn_usb1(USB_PORT sel, bool ena = true, ORDER odr = ORDER::FIRST) noexcept
+		{
+			if(odr == ORDER::BYPASS) return true;
+
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = true;
+			switch(sel) {
+			case USB_PORT::VBUS:
+				switch(odr) {
+				// P17 (LFQFP100:  29) (LFQFP144:  38) (LFQFP176:  46)
+				case ORDER::FIRST:
+					PORT1::PMR.B7 = 0;
+					MPC::P17PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
+					PORT1::PMR.B7 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			case USB_PORT::DPUPE:
+				switch(odr) {
+				// P15 (LFQFP100:  31) (LFQFP144:  42) (LFQFP176:  50)
+				case ORDER::FIRST:
+					PORT1::PMR.B5 = 0;
+					MPC::P15PFS.PSEL = ena ? 0b01'0001 : 0;  // ok
+					PORT1::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
