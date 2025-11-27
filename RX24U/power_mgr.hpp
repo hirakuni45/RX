@@ -178,7 +178,7 @@ namespace device {
 				break;
 
 			case peripheral::CRC:
-				SYSTEM::MSTPCRB.MSTPB23 = f;	// CRC のストップ状態解除
+				SYSTEM::MSTPCRB.MSTPB23 = f;
 				break;
 
 			case peripheral::SCI6:
@@ -198,6 +198,13 @@ namespace device {
 
 			case peripheral::SCI11:
 				SYSTEM::MSTPCRC.MSTPC24 = f;
+				break;
+
+			case peripheral::SCI9:
+				SYSTEM::MSTPCRC.MSTPC26 = f;
+				break;
+			case peripheral::SCI8:
+				SYSTEM::MSTPCRC.MSTPC27 = f;
 				break;
 
 			default:
