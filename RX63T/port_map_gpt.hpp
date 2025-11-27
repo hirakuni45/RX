@@ -28,8 +28,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC0A:
-			// P71 (LFQFP64: 38)
-			// PD7 (LFQFP64: 12)
+			// P71 (LFQFP64: 38) (LFQFP100:  56)
+			// PD7 (LFQFP64: 12) (LFQFP100:  18)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B1 = 0;
@@ -47,8 +47,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC0B:
-			// P74 (LFQFP64: 35)
-			// PD6 (LFQFP64: 13)
+			// P74 (LFQFP64: 35) (LFQFP100:  53)
+			// PD6 (LFQFP64: 13) (LFQFP100:  19)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B4 = 0;
@@ -78,8 +78,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC1A:
-			// P72 (LFQFP64: 37)
-			// PD5 (LFQFP64: 14)
+			// P72 (LFQFP64: 37) (LFQFP100:  55)
+			// PD5 (LFQFP64: 14) (LFQFP100:  20)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B2 = 0;
@@ -97,8 +97,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC1B:
-			// P75 (LFQFP64: 34)
-			// PD4 (LFQFP64: 15)
+			// P75 (LFQFP64: 34) (LFQFP100:  52)
+			// PD4 (LFQFP64: 15) (LFQFP100:  21)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B5 = 0;
@@ -128,8 +128,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC2A:
-			// P73 (LFQFP64: 36)
-			// PD3 (LFQFP64: 16)
+			// P73 (LFQFP64: 36) (LFQFP100:  54)
+			// PD3 (LFQFP64: 16) (LFQFP100:  22)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B3 = 0;
@@ -147,10 +147,10 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC2B:
-			// P76 (LFQFP64: 33)
-			// PB6 (LFQFP64: 18)
-			// PB7 (LFQFP64: 17)
-			// PD2 (LFQFP64: --)
+			// P76 (LFQFP64: 33) (LFQFP100:  51)
+			// PB6 (LFQFP64: 18) (LFQFP100:  27)
+			// PB7 (LFQFP64: 17) (LFQFP100:  26)
+			// PD2 (LFQFP64: --) (LFQFP100:  23)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT7::PMR.B6 = 0;
@@ -190,8 +190,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC3A:
-			// P00 (LFQFP64:  2)
-			// PD1 (LFQFP64: --)
+			// P00 (LFQFP64:  2) (LFQFP100:   6)
+			// PD1 (LFQFP64: --) (LFQFP100:  24)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT0::PMR.B0 = 0;
@@ -209,8 +209,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC3B:
-			// P01 (LFQFP64:  4)
-			// PD0 (LFQFP64: --)
+			// P01 (LFQFP64:  4) (LFQFP100:   4)
+			// PD0 (LFQFP64: --) (LFQFP100:  25)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT0::PMR.B1 = 0;
@@ -240,7 +240,7 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC4A:
-			// P95 (LFQFP64: --)
+			// P95 (LFQFP64: --) (LFQFP100:  45)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B5 = 0;
@@ -253,7 +253,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC4B:
-			// P92 (LFQFP64: 31)
+			// P92 (LFQFP64: 31) (LFQFP100:  48)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B2 = 0;
@@ -278,7 +278,7 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC5A:
-			// P94 (LFQFP64: 29)
+			// P94 (LFQFP64: 29) (LFQFP100:  46)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B4 = 0;
@@ -291,7 +291,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC5B:
-			// P91 (LFQFP64: 32)
+			// P91 (LFQFP64: 32) (LFQFP100:  49)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B1 = 0;
@@ -316,8 +316,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC6A:
-			// P93 (LFQFP64: 30)
-			// PG3 (LFQFP64: --)
+			// P93 (LFQFP64: 30) (LFQFP100:  47)
+			// PG3 (LFQFP64: --) (LFQFP100: ---)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B3 = 0;
@@ -335,8 +335,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC6B:
-			// P90 (LFQFP64: --)
-			// PG4 (LFQFP64: --)
+			// P90 (LFQFP64: --) (LFQFP100:  50)
+			// PG4 (LFQFP64: --) (LFQFP100: ---)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT9::PMR.B0 = 0;
@@ -366,7 +366,7 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0110 : 0;
 			switch(ch) {
 			case CHANNEL::A:  // GTIOC7A
-			// PG0 (LFQFP64: --)
+			// PG0 (LFQFP64: --) (LFQFP100: ---)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTG::PMR.B0 = 0;
@@ -379,7 +379,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::B:  // GTIOC7B
-			// PG1 (LFQFP64: --)
+			// PG1 (LFQFP64: --) (LFQFP100: ---)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTG::PMR.B1 = 0;
@@ -475,7 +475,7 @@ namespace device {
 			switch(clk) {
 			case CHANNEL::TRG:  // GTETRG:
 			case CHANNEL::TRG0:  // GTETRG0:
-				// PB4 (LFQFP64: 21)
+				// PB4 (LFQFP64: 21) (LFQFP100:  30)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTB::PMR.B4 = 0;
@@ -487,7 +487,7 @@ namespace device {
 					break;
 				}
 			case CHANNEL::TRG1:  // GTETRG1:
-				// P34 (LFQFP64: --)
+				// P34 (LFQFP64: --) (LFQFP100: ---)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTA::PMR.B3 = 0;

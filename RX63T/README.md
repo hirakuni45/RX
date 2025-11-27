@@ -197,6 +197,19 @@
 |IRQ6|P21[DS] (--)|PD5 (14)|PG4 (--)|-|
 |IRQ7|P20[DS] (--)|P03 (--)|PE0 (--)|-|
 
+### LFQFP100
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30[DS] (63)|PB5 (28)|PE5 (1)|PG0 (---)|
+|IRQ1|P11[DS] (99)|P93 (47)|PE4 (8)|PG1 (---)|
+|IRQ2|P00[DS] (6)|PE3[DS] (9)|PB6 (27)|PG2 (---)|
+|IRQ3|PB4[DS] (30)|P34 (---)|P82 (96)|-|
+|IRQ4|P01[DS] (4)|P96 [DS] (43)|P24 (64)|PB1 (34)|
+|IRQ5|P70[DS] (57)|P80 (98)|PF2 (---)|-|
+|IRQ6|P21[DS] (67)|PD5 (20)|PG4 (---)|-|
+|IRQ7|P20[DS] (68)|P03 (---)|PE0 (17)|-|
+
 ---
 
 ## Port map order / ポートマップ候補
@@ -251,6 +264,54 @@
 |USB0 / DRRPD|P12 (--)|-|-|
 |USB0 / DRPD|P01 (--)|-|-|
 
+### LFQFP100
+
+|Peripheral|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|SCI0 / RXD|P22 (66)|P24 (64)|PA5 (36)|PB1 (34)|
+|SCI0 / TXD|P23 (65)|P30 (63)|PA4 (37)|PB2 (33)|
+|SCI0 / SCK|P30 (63)|P23 (65)|PA3 (38)|PB3 (32)|
+|SCI1 / RXD|P93 (47)|P96 (43)|PD5 (20)|PF2 (---)|
+|SCI1 / TXD|P94 (46)|P95 (45)|PD3 (22)|PF3 (---)|
+|SCI1 / SCK|P92 (48)|P92 (48)|PD4 (21)|PG6 (---)|
+|SCI2 / RXD|P03 (---)|PA2 (39)|PG1 (---)|-|
+|SCI2 / TXD|P02 (---)|PA1 (40)|PG0 (---)|-|
+|SCI2 / SCK|P14 (---)|PA0 (41)|PG2 (---)|-|
+|SCI3 / RXD|P34 (---)|PG4 (---)|-|-|
+|SCI3 / TXD|P35 (---)|PG3 (---)|-|-|
+|SCI3 / SCK|PG5 (---)|PG5 (---)|-|-|
+|SCI12 / RXD|P80 (---)|PB6 (27)|-|-|
+|SCI12 / TXD|P81 (---)|PB5 (28)|-|-|
+|SCI12 / SCK|P82 (---)|PB7 (26)|-|-|
+|RIIC0 / SCL|PB1 (34)|-|-|
+|RIIC0 / SDA|PB2 (33)|-|-|
+|RIIC1 / SCL|P25 (---)|-|-|
+|RIIC1 / SDA|P26 (---)|-|-|
+|CAN1 / CRX|P22 (66)|PB6 (27)|PE0 (17)|-|
+|CAN1 / CTX|P23 (65)|PB5 (28)|PD7 (18)|-|
+|RSPI0 / RSPCK|P24 (64)|PA4 (37)|PD0 (25)|-|
+|RSPI0 / MOSI|P23 (65)|PB0 (35)|PD2 (23)|-|
+|RSPI0 / MISO|P22 (66)|PA5 (36)|PD1 (24)|-|
+|RSPI0 / SSL0|P30 (63)|PA3 (38)|PD6 (19)|
+|RSPI0 / SSL1|P31 (61)|PA2 (39)|PD7 (18)|
+|RSPI0 / SSL2|P32 (59)|PA1 (40)|PE0 (17)|
+|RSPI0 / SSL3|P33 (58)|PA0 (41)|PE1 (16)|
+|RSPI1 / RSPCK|P24 (64)|PA4 (37)|PD0 (25)|-|
+|RSPI1 / MOSI|P23 (65)|PB0 (35)|PD2 (23)|-|
+|RSPI1 / MISO|P22 (66)|PA5 (36)|PD1 (24)|-|
+|RSPI0 / SSL0|P30 (63)|PA3 (38)|PD6 (19)|
+|RSPI0 / SSL1|P31 (61)|PA2 (39)|PD7 (18)|
+|RSPI0 / SSL2|P32 (59)|PA1 (40)|PE0 (17)|
+|RSPI0 / SSL3|P33 (58)|PA0 (41)|PE1 (16)|
+|USB0 / VBUS|PE5 (1)|-|-|
+|USB0 / EXICEN|PD1 (24)|-|-|
+|USB0 / VBUSEN|P13 (---)|-|-|
+|USB0 / OVRCURA|PE1 (16)|-|-|
+|USB0 / OVRCURB|PE0 (17)|-|-|
+|USB0 / ID|PD2 (23)|-|-|
+|USB0 / DRRPD|P12 (---)|-|-|
+|USB0 / DRPD|P01 (4)|-|-|
+
 ---
 
 ## Port map order (GPT) / ポートマップ候補 (GPT)
@@ -280,6 +341,30 @@
 |GTETRG|PB4 (21)|-|-|-|
 |GTETRG0|PB4 (21)|-|-|-|
 |GTETRG1|P34 (--)|-|-|-|
+
+### LFQFP100
+
+|GPT|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|GTIOC0A|P71 (56)|PD7 (18)|-|-|
+|GTIOC0B|P74 (53)|PD6 (19)|-|-|
+|GTIOC1A|P72 (55)|PD5 (20)|-|-|
+|GTIOC1B|P75 (52)|PD4 (21)|-|-|
+|GTIOC2A|P73 (54)|PD3 (22)|-|-|
+|GTIOC2B|P76 (51)|PB6 (27)|PB7 (26)|PD2 (23)|
+|GTIOC3A|P00 (6)|PD1 (24)|-|-|
+|GTIOC3B|P01 (4)|PD0 (25)|-|-|
+|GTIOC4A|P95 (45)|-|-|-|
+|GTIOC4B|P92 (48)|-|-|-|
+|GTIOC5A|P94 (46)|-|-|-|
+|GTIOC5B|P91 (49)|-|-|-|
+|GTIOC6A|P93 (47)|PG3 (---)|-|-|
+|GTIOC6B|P90 (50)|PG4 (---)|-|-|
+|GTIOC7A|PG0 (---)|-|-|-|
+|GTIOC7B|PG1 (---)|-|-|-|
+|GTETRG|PB4 (30)|-|-|-|
+|GTETRG0|PB4 (30)|-|-|-|
+|GTETRG1|P34 (---)|-|-|-|
 
 ---
 
@@ -322,6 +407,42 @@
 |MTCLKB|P20 (--)|P23 (47)|P32 (41)|PB2 (24)|
 |MTCLKC|P11 (61)|P24 (46)|P31 (43)|PE4 (--)|
 |MTCLKD|P10 (62)|P30 (45)|PE3 (--)|-|
+
+### LFQFP100
+
+|MTU|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|MTIOC0A|P31 (61)|PB3 (32)|-|-|
+|MTIOC0B|P30 (63)|PB2 (33)|-|-|
+|MTIOC0C|PB1 (34)|-|-|-|
+|MTIOC0D|PB0 (35)|-|-|-|
+|MTIOC1A|PA5 (36)|-|-|-|
+|MTIOC1B|PA4 (37)|-|-|-|
+|MTIOC2A|PA3 (38)|-|-|-|
+|MTIOC2B|PA2 (39)|-|-|-|
+|MTIOC3A|P33 (58)|-|-|-|
+|MTIOC3B|P71 (56)|-|-|-|
+|MTIOC3C|P32 (59)|-|-|-|
+|MTIOC3D|P74 (53)|-|-|-|
+|MTIOC4A|P72 (55)|-|-|-|
+|MTIOC4B|P73 (54)|-|-|-|
+|MTIOC4C|P75 (52)|-|-|-|
+|MTIOC4D|P76 (51)|-|-|-|
+|MTIOC5U|P24 (64)|P82 (96)|-|-|
+|MTIOC5V|P23 (65)|P81 (97)|-|-|
+|MTIOC5W|P22 (66)|P80 (98)|-|-|
+|MTIOC6A|P33 (58)|PA1 (40)|-|-|
+|MTIOC6B|P71 (56)|P95 (45)|-|-|
+|MTIOC6C|P32 (59)|PA0 (41)|-|-|
+|MTIOC6D|P74 (53)|P92 (48)|-|-|
+|MTIOC7A|P72 (55)|P94 (46)|-|-|
+|MTIOC7B|P73 (54)|P93 (47)|-|-|
+|MTIOC7C|P75 (52)|P91 (49)|-|-|
+|MTIOC7D|P76 (51)|P90 (50)|-|-|
+|MTCLKA|P21 (67)|P22 (66)|P33 (58)|PB3 (32)|
+|MTCLKB|P20 (68)|P23 (65)|P32 (59)|PB2 (33)|
+|MTCLKC|P11 (99)|P24 (64)|P31 (61)|PE4 (8)|
+|MTCLKD|P10 (100)|P30 (63)|PE3 (9)|-|
 
 ---
 
