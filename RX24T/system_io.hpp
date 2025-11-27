@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX13T/RX23T/RX24T/RX24U システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -84,9 +84,11 @@ namespace device {
 
 			device::SYSTEM::PRCR = 0xA500 | 0b0111;	// クロック、低消費電力、関係書き込み許可
 
+#if defined(SIG_RX24T) || defined(SIG_RX24U)
 			while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
-			device::SYSTEM::OPCCR = 0;  // 高速モード選択
+			device::SYSTEM::OPCCR.OPCM = 0;  // 高速モード選択
 			while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
+#endif
 
 //			device::SYSTEM::MOSCWTCR = 4;  // リセット時の値
 
@@ -111,11 +113,13 @@ namespace device {
 				device::SYSTEM::MOSCCR.MOSTP = 1;  // メインクロック発振器停止
 				device::SYSTEM::PLLCR.PLIDIV = 0b10;  // 1/4
 				device::SYSTEM::PLLCR.PLLSRCSEL = 1;  // HOCO 選択
+#if defined(SIG_RX24T) || defined(SIG_RX24U)
 				device::SYSTEM::HOCOWTCR.HSTS = 0b101;  // HOCO:32MHz の場合選択
+#endif
 				break;
 			case clock_profile::OSC_TYPE::LOCO:
 				device::SYSTEM::PRCR = 0xA500;
-				break;
+				return true;
 			}
 
 			// Min: (x4.0) 0b000111, Max: (x15.5) 0b111110
@@ -155,11 +159,11 @@ namespace device {
 #if defined(SIG_RX24T) || defined(SIG_RX24U)
 			// メモリーの WAIT 設定
 			if(clock_profile::ICLK > 64'000'000) {
-				device::SYSTEM::MEMWAIT = 0b10; // 64MHz 以上 wait 設定
+				device::SYSTEM::MEMWAIT.MEMWAIT = 0b10; // 64MHz 以上 wait 設定
 			} else if(clock_profile::ICLK > 32'000'000) {
-				device::SYSTEM::MEMWAIT = 0b01; // 32MHz 以上 64MHz 以下 wait 設定 
+				device::SYSTEM::MEMWAIT.MEMWAIT = 0b01; // 32MHz 以上 64MHz 以下 wait 設定 
 			} else {
-				device::SYSTEM::MEMWAIT = 0b00; // wait 無し
+				device::SYSTEM::MEMWAIT.MEMWAIT = 0b00; // wait 無し
 			}
 #endif
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択

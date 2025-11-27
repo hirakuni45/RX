@@ -58,7 +58,7 @@ Currently supported and tested devices:
 - Lend us a board with the RX microcontroller you are requesting support for.
 - You agree to release newly added files related to the RX microcontroller under the MIT license.
 
-**If you do not know how to use the framework
+**If you do not know how to use the framework**
 - Create a GitHub account and post in Discussions.
 - You can also become a support member to get extensive support.
 

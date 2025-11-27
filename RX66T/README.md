@@ -41,12 +41,12 @@
 
 ### Memoey size/メモリ容量
 
-|R5F566TX----|CodeFlash|RAM|DataFlash|
-|---|:-:|:-:|:-:|
-|R5F566TKxxxx|1M|128K|32K|
-|R5F566TFxxxx|512K|128K|32K|
-|R5F566TExxxx|512K|64K|32K|
-|R5F566TAxxxx|256K|64K|32K|
+|R5F566TX----|CodeFlash|RAM|ECCRAM|DataFlash|
+|---|:-:|:-:|:-:|:-:|
+|R5F566TKxxxx|1M|128K|16K|32K|
+|R5F566TFxxxx|512K|128K|16K|32K|
+|R5F566TExxxx|512K|64K|16K|32K|
+|R5F566TAxxxx|256K|64K|16K|32K|
 
 ### Data Flash/データ・フラッシュ
 
