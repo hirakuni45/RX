@@ -748,7 +748,7 @@ namespace device {
 					break;
 				}
 				break;
-			case USB_PORT::DRRPD:
+			case USB_PORT::DPRPD:
 				// P12 (LFQFP64: --) (LFQFP100: ---)
 				switch(odr) {
 				case ORDER::FIRST:
