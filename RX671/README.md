@@ -39,11 +39,11 @@
 
 ### Memoey size/メモリ容量
 
-|R5F5671X----|Code Flash|RAM|Data Flash|
-|---|:-:|:-:|:-:|
-|R5F56719xxxx|1M|384K|8K|
-|R5F5671Cxxxx|1.5M|384K|8K|
-|R5F5671Exxxx|2M|384K|8K|
+|R5F5671X----|Code Flash|RAM|StanbyRAM|Data Flash|
+|---|:-:|:-:|:-:|:-:|
+|R5F56719xxxx|1M|384K|4K|8K|
+|R5F5671Cxxxx|1.5M|384K|4K|8K|
+|R5F5671Exxxx|2M|384K|4K|8K|
 
 ### Data Flash/データ・フラッシュ
 

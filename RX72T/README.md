@@ -37,10 +37,10 @@
 
 ### Memoey size/メモリ容量
 
-|R5F572TX----|CodeFlash|RAM|DataFlash|
-|---|:-:|:-:|:-:|
-|R5F572TKxxxx|1M|128K|32K|
-|R5F572TFxxxx|512K|128K|32K|
+|R5F572TX----|CodeFlash|RAM|ECCRAM|DataFlash|
+|---|:-:|:-:|:-:|:-:|
+|R5F572TKxxxx|1M|128K|16K|32K|
+|R5F572TFxxxx|512K|128K|16K|32K|
 
 ### Data Flash/データ・フラッシュ
 

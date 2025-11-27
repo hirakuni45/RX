@@ -47,13 +47,13 @@
 
 ### Memoey size/メモリ容量
 
-|R5F565yX----|Code Flash|RAM|Data Flash|
-|---|:-:|:-:|:-:|
-|R5F565y4xxxx|512K|256K|0K|
-|R5F565y7xxxx|768K|256K|0K|
-|R5F565y9xxxx|1M|256K|0K|
-|R5F565yCxxxx|1.5M|640K|32K|
-|R5F565yExxxx|2M|640K|32K|
+|R5F565yX----|Code Flash|RAM|StanbyRAM|Data Flash|
+|---|:-:|:-:|:-:|:-:|
+|R5F565y4xxxx|512K|256K|8K|0K|
+|R5F565y7xxxx|768K|256K|8K|0K|
+|R5F565y9xxxx|1M|256K|8K|0K|
+|R5F565yCxxxx|1.5M|640K|8K|32K|
+|R5F565yExxxx|2M|640K|8K|32K|
 
 ### Data Flash/データ・フラッシュ
 
