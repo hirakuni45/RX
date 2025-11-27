@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX13T/RX23T/RX24T/RX24U グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -178,7 +178,7 @@ namespace device {
 		};
 		static inline hococr_t<0x0008'0036> HOCOCR;
 
-
+#if defined(SIG_RX24T) || defined(SIG_RX24U)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  高速オンチップオシレータコントロールレジスタ 2 (HOCOCR2)
@@ -215,7 +215,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 3> HSTS;
 		};
 		static inline hocowtcr_t<0x0008'00A5> HOCOWTCR;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -313,13 +313,81 @@ namespace device {
 		};
 		static inline mofcr_t<0x0008'C293> MOFCR;
 
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	低速オンチップオシレータトリミングレジスタ (LOCOTRR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct locotrr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5> LOCOTRD;
+		};
+		static inline locotrr_t<0x0008'0060> LOCOTRR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	IWDT 専用オンチップオシレータトリミングレジスタ (ILOCOTRR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct ilocotrr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5> ILOCOTRD;
+		};
+		static inline ilocotrr_t<0x0008'0064> ILOCOTRR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	高速オンチップオシレータトリミングレジスタ n (HOCOTRRn) (n = 0)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct hocotrr0_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 6> HOCOTRD;
+		};
+		static inline hocotrr0_t<0x0008'0068> HOCOTRR0;
+#endif
+
 #if defined(SIG_RX24T) || defined(SIG_RX24U)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw8_t<0x0008'0031> MEMWAIT;
+		template <uint32_t base>
+		struct memwait_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> MEMWAIT;
+		};
+		static inline memwait_t<0x0008'0031> MEMWAIT;
 #endif
 
 		//------------------------ 消費電力削減機能 ------------------------//
