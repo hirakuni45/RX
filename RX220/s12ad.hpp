@@ -4,7 +4,7 @@
 	@brief	RX210/RX220 12-Bit A/D Converter / 12 ビット A/D コンバータ @n
 			16 channel A/D input
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -311,27 +311,27 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,	///< AN000 入力
-			AN001,
-			AN002,
-			AN003,
-			AN004,
-			AN005,
-			AN006,
-			AN007,
-			AN008,
-			AN009,
-			AN010,
-			AN011,
-			AN012,
-			AN013,
-			AN014,
-			AN015,
-			REF,	///< 内部基準電圧
+			AN000,		///< P40 (LFQFP64: 60) (LFQFP100:  95)
+			AN001,		///< P41 (LFQFP64: 58) (LFQFP100:  93)
+			AN002,		///< P42 (LFQFP64: 57) (LFQFP100:  92)
+			AN003,		///< P43 (LFQFP64: 56) (LFQFP100:  91)
+			AN004,		///< P44 (LFQFP64: 55) (LFQFP100:  90)
+			AN005,		///< P45 (LFQFP64: --) (LFQFP100:  89)
+			AN006,		///< P46 (LFQFP64: 53) (LFQFP100:  88)
+			AN007,		///< P47 (LFQFP64: --) (LFQFP100:  87)
+			AN008,		///< PE0 (LFQFP64: 51) (LFQFP100:  78)
+			AN009,		///< PE1 (LFQFP64: 50) (LFQFP100:  77)
+			AN010,		///< PE2 (LFQFP64: 49) (LFQFP100:  76)
+			AN011,		///< PE3 (LFQFP64: 48) (LFQFP100:  75)
+			AN012,		///< PE4 (LFQFP64: 47) (LFQFP100:  74)
+			AN013,		///< PE5 (LFQFP64: 46) (LFQFP100:  73)
+			AN014,		///< PE6 (LFQFP64: --) (LFQFP100:  72)
+			AN015,		///< PE7 (LFQFP64: --) (LFQFP100:  71)
+			REF,		///< 内部基準電圧
 		};
 
 	

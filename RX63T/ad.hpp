@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX63T 10 ビット A/D コンバータ（ADa）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -283,7 +283,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  A/D コンバータ・ベース・クラス
+		@brief  10 Bits A/D コンバータ・クラス
 		@param[in]	base	ベースアドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -307,30 +307,30 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN0,
-			AN1,
-			AN2,
-			AN3,
-			AN4,
-			AN5,
-			AN6,
-			AN7,
-			AN8,
-			AN9,
-			AN10,
-			AN11,
-			AN12,
-			AN13,
-			AN14,
-			AN15,
-			AN16,
-			AN17,
-			AN18,
-			AN19,
+			AN0,	///< P60 (LFQFP64: --) (LFQFP100:  77)
+			AN1,	///< P61 (LFQFP64: --) (LFQFP100:  76)
+			AN2,	///< P62 (LFQFP64: --) (LFQFP100:  75)
+			AN3,	///< P63 (LFQFP64: --) (LFQFP100:  74)
+			AN4,	///< P64 (LFQFP64: --) (LFQFP100:  70)
+			AN5,	///< P65 (LFQFP64: --) (LFQFP100:  69)
+			AN6,	///< P50 (LFQFP64: --) (LFQFP100:  83)
+			AN7,	///< P51 (LFQFP64: --) (LFQFP100:  82)
+			AN8,	///< P52 (LFQFP64: --) (LFQFP100:  81)
+			AN9,	///< P53 (LFQFP64: --) (LFQFP100:  80)
+			AN10,	///< P54 (LFQFP64: --) (LFQFP100:  79)
+			AN11,	///< P55 (LFQFP64: --) (LFQFP100:  78)
+			AN12,	///< P56 (LFQFP64: --) (LFQFP100: ---)
+			AN13,	///< P57 (LFQFP64: --) (LFQFP100: ---)
+			AN14,	///< PC0 (LFQFP64: --) (LFQFP100: ---)
+			AN15,	///< PC1 (LFQFP64: --) (LFQFP100: ---)
+			AN16,	///< PC2 (LFQFP64: --) (LFQFP100: ---)
+			AN17,	///< PC3 (LFQFP64: --) (LFQFP100: ---)
+			AN18,	///< PC4 (LFQFP64: --) (LFQFP100: ---)
+			AN19,	///< PC5 (LFQFP64: --) (LFQFP100: ---)
 		};
 
 

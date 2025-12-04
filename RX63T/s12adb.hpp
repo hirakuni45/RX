@@ -7,7 +7,7 @@
 			S12ADB0, S12ADB1: 144/120/112/100 ピン版、各アナログ入力４チャネル @n
 			定義が同居しているので、ピン数により、使い分ける。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -387,18 +387,18 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,
-			AN001,
-			AN002,
-			AN003,
-			AN004,
-			AN005,
-			AN006,
-			AN007,
+			AN000,		///< P40 (LFQFP64: 56) (LFQFP100:  91)
+			AN001,		///< P41 (LFQFP64: 55) (LFQFP100:  90)
+			AN002,		///< P42 (LFQFP64: 54) (LFQFP100:  89)
+			AN003,		///< P43 (LFQFP64: 53) (LFQFP100:  88)
+			AN004,		///< P44 (LFQFP64: 52) (LFQFP100:  87)
+			AN005,		///< P45 (LFQFP64: 51) (LFQFP100:  86)
+			AN006,		///< P46 (LFQFP64: 50) (LFQFP100:  85)
+			AN007,		///< P47 (LFQFP64: 49) (LFQFP100:  84)
 		};
 
 	
@@ -603,14 +603,14 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,
-			AN001,
-			AN002,
-			AN003,
+			AN000,		///< P40 (LFQFP64: 56) (LFQFP100: 91)
+			AN001,		///< P41 (LFQFP64: 55) (LFQFP100: 90)
+			AN002,		///< P42 (LFQFP64: 54) (LFQFP100: 89)
+			AN003,		///< P43 (LFQFP64: 53) (LFQFP100: 88)
 		};
 
 	
@@ -805,14 +805,14 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AIN100,
-			AIN101,
-			AIN102,
-			AIN103,
+			AIN100,		///< P44 (LFQFP64: 52) (LFQFP100:  87)
+			AIN101,		///< P45 (LFQFP64: 51) (LFQFP100:  86)
+			AIN102,		///< P46 (LFQFP64: 50) (LFQFP100:  85)
+			AIN103,		///< P47 (LFQFP64: 49) (LFQFP100:  84)
 		};
 
 	
@@ -830,15 +830,31 @@ namespace device {
 
 			switch(an) {
 			case ANALOG::AIN100:  // P44
-				MPC::P44PFS.ASEL = f;
+				if(ena) {
+					PORT4::PDR.B4 = 0;
+					PORT4::PMR.B4 = 0;
+				}
+				MPC::P44PFS.ASEL = ena;
 				break;
 			case ANALOG::AIN101:  // P45
+				if(ena) {
+					PORT4::PDR.B5 = 0;
+					PORT4::PMR.B5 = 0;
+				}
 				MPC::P45PFS.ASEL = f;
 				break;
 			case ANALOG::AIN102:  // P46
+				if(ena) {
+					PORT4::PDR.B6 = 0;
+					PORT4::PMR.B6 = 0;
+				}
 				MPC::P46PFS.ASEL = f;
 				break;
 			case ANALOG::AIN103:  // P47
+				if(ena) {
+					PORT4::PDR.B7 = 0;
+					PORT4::PMR.B7 = 0;
+				}
 				MPC::P47PFS.ASEL = f;
 				break;
 			default:

@@ -1274,7 +1274,6 @@ namespace device {
 		static inline adbufptr_t<base + 0xD2>  ADBUFPTR;
 	};
 
-
 #if defined(SIG_RX140)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!

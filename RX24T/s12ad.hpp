@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	12-Bit A/D Converter / 12 ビット A/D コンバータ (RX24T/RX24U)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -267,15 +267,15 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,			///< AN000 入力
-			AN001,			///< AN001 入力
-			AN002,			///< AN002 入力
-			AN003,			///< AN003 入力
-			AN016 = 0x10,	///< AN016 入力
+			AN000,			///< P40 RX24T: (LFQFP100:  91), RX24U: (LFQFP100:  90) (LFQFP144: 125)
+			AN001,			///< P41 RX24T: (LFQFP100:  90), RX24U: (LFQFP100:  89) (LFQFP144: 124)
+			AN002,			///< P42 RX24T: (LFQFP100:  89), RX24U: (LFQFP100:  88) (LFQFP144: 123)
+			AN003,			///< P43 RX24T: (LFQFP100:  88), RX24U: (LFQFP100:  87) (LFQFP144: 122)
+			AN016 = 0x10,	///< P20 RX24T: (LFQFP100:  68), RX24U: (LFQFP100:  69) (LFQFP144: 100)
 		};
 
 
@@ -670,15 +670,15 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN100,			///< AN100 入力
-			AN101,			///< AN101 入力
-			AN102,			///< AN102 入力
-			AN103,			///< AN103 入力
-			AN116 = 0x10,	///< AN116 入力
+			AN100,			///< P44 RX24T: (LFQFP100:  87), RX24U: (LFQFP100:  85) (LFQFP144: 120)
+			AN101,			///< P45 RX24T: (LFQFP100:  86), RX24U: (LFQFP100:  84) (LFQFP144: 119)
+			AN102,			///< P46 RX24T: (LFQFP100:  85), RX24U: (LFQFP100:  83) (LFQFP144: 118)
+			AN103,			///< P47 RX24T: (LFQFP100:  84), RX24U: (LFQFP100:  82) (LFQFP144: 117)
+			AN116 = 0x10,	///< P21 RX24T: (LFQFP100:  67), RX24U: (LFQFP100:  68) (LFQFP144:  99)
 		};
 
 
@@ -1002,22 +1002,22 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN200,			///< AN200 入力
-			AN201,			///< AN201 入力
-			AN202,			///< AN202 入力
-			AN203,			///< AN203 入力
-			AN204,			///< AN204 入力
-			AN205,			///< AN205 入力
-			AN206,			///< AN206 入力
-			AN207,			///< AN207 入力
-			AN208,			///< AN208 入力
-			AN209,			///< AN209 入力
-			AN210,			///< AN210 入力
-			AN211,			///< AN211 入力
+			AN200,			///< P60 RX24T: (LFQFP100:  77), RX24U: (LFQFP100:  77) (LFQFP144: 110)
+			AN201,			///< P61 RX24T: (LFQFP100:  76), RX24U: (LFQFP100:  76) (LFQFP144: 109)
+			AN202,			///< P62 RX24T: (LFQFP100:  75), RX24U: (LFQFP100:  75) (LFQFP144: 108)
+			AN203,			///< P63 RX24T: (LFQFP100:  74), RX24U: (LFQFP100:  74) (LFQFP144: 107)
+			AN204,			///< P64 RX24T: (LFQFP100:  70), RX24U: (LFQFP100:  71) (LFQFP144: 102)
+			AN205,			///< P65 RX24T: (LFQFP100:  69), RX24U: (LFQFP100:  70) (LFQFP144: 101)
+			AN206,			///< P50 RX24T: (LFQFP100:  83), RX24U: (LFQFP100: ---) (LFQFP144: 116)
+			AN207,			///< P51 RX24T: (LFQFP100:  82), RX24U: (LFQFP100: ---) (LFQFP144: 115)
+			AN208,			///< P52 RX24T: (LFQFP100:  81), RX24U: (LFQFP100:  81) (LFQFP144: 114)
+			AN209,			///< P53 RX24T: (LFQFP100:  80), RX24U: (LFQFP100:  80) (LFQFP144: 113)
+			AN210,			///< P54 RX24T: (LFQFP100:  79), RX24U: (LFQFP100:  79) (LFQFP144: 112)
+			AN211,			///< P55 RX24T: (LFQFP100:  78), RX24U: (LFQFP100:  78) (LFQFP144: 111)
 		};
 
 
