@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	12-Bit A/D Converter / 12 ビット A/D コンバータ (RX23T)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -357,16 +357,16 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,
-			AN001,
-			AN002,
-			AN003,
-			AN004,
-			AN005,
-			AN006,
-			AN007,
-			AN016 = 16,
-			AN017
+			AN000,		///< P40 (LFQFP64: 56)
+			AN001,		///< P41 (LFQFP64: 55)
+			AN002,		///< P42 (LFQFP64: 54)
+			AN003,		///< P43 (LFQFP64: 53)
+			AN004,		///< P44 (LFQFP64: 52)
+			AN005,		///< P45 (LFQFP64: 51)
+			AN006,		///< P46 (LFQFP64: 50)
+			AN007,		///< P47 (LFQFP64: 49)
+			AN016 = 16,	///< P11 (LFQFP64: 61)
+			AN017		///< P10 (LFQFP64: 62)
 		};
 
 

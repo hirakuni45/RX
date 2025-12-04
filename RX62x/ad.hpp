@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX621/RX62N 10 ビット A/D コンバータ（ADa）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -172,14 +172,14 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (AD0)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN0,
-			AN1,
-			AN2,
-			AN3,
+			AN0,		///< P40 (LFQFP100:  95) (LFQFP144: 141)
+			AN1,		///< P41 (LFQFP100:  93) (LFQFP144: 139)
+			AN2,		///< P42 (LFQFP100:  92) (LFQFP144: 138)
+			AN3,		///< P43 (LFQFP100:  91) (LFQFP144: 137)
 		};
 
 
@@ -258,14 +258,14 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (AD1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN4,
-			AN5,
-			AN6,
-			AN7,
+			AN4,		///< P44 (LFQFP100:  90) (LFQFP144: 136)
+			AN5,		///< P45 (LFQFP100:  89) (LFQFP144: 135)
+			AN6,		///< P46 (LFQFP100:  88) (LFQFP144: 134)
+			AN7,		///< P47 (LFQFP100:  87) (LFQFP144: 133)
 		};
 
 

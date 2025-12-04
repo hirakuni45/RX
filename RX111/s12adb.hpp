@@ -6,7 +6,7 @@
 			RX110/RX111: 14 input single A/D @n
 			RX113: 17 input single A/D
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -498,24 +498,26 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,		///< AN000 入力
-			AN001,		///< AN001 入力
-			AN002,		///< AN002 入力
-			AN003,		///< AN003 入力
-			AN004,		///< AN004 入力
-			AN006 = 6,	///< AN006 入力
-			AN008 = 8,	///< AN008 入力
-			AN009,		///< AN009 入力
-			AN010,		///< AN010 入力
-			AN011,		///< AN011 入力
-			AN012,		///< AN012 入力
-			AN013,		///< AN013 入力
-			AN014,		///< AN014 入力
-			AN015,		///< AN015 入力
+			AN000,		///< P40 (LFQFP64: 60)
+			AN001,		///< P41 (LFQFP64: 58)
+			AN002,		///< P42 (LFQFP64: 57)
+			AN003,		///< P43 (LFQFP64: 56)
+			AN004,		///< P44 (LFQFP64: 55)
+
+			AN006 = 6,	///< P46 (LFQFP64: 54)
+
+			AN008 = 8,	///< PE0 (LFQFP64: 51)
+			AN009,		///< PE1 (LFQFP64: 50)
+			AN010,		///< PE2 (LFQFP64: 49)
+			AN011,		///< PE3 (LFQFP64: 48)
+			AN012,		///< PE4 (LFQFP64: 47)
+			AN013,		///< PE5 (LFQFP64: 46)
+			AN014,		///< PE6 (LFQFP64: 53)
+			AN015,		///< PE7 (LFQFP64: 52)
 
 			TEMP,		///< 温度センサ
 			REF,		///< 内部基準電圧
@@ -723,26 +725,27 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,		///< AN000 入力
-			AN001,		///< AN001 入力
-			AN002,		///< AN002 入力
-			AN003,		///< AN003 入力
-			AN004,		///< AN004 入力
-			AN006,		///< AN006 入力
-			AN007,		///< AN007 入力
-			AN008	,	///< AN008 入力
-			AN009,		///< AN009 入力
-			AN010,		///< AN010 入力
-			AN011,		///< AN011 入力
-			AN012,		///< AN012 入力
-			AN013,		///< AN013 入力
-			AN014,		///< AN014 入力
-			AN015,		///< AN015 入力
-			AN021 = 21,	///< AN021 入力
+			AN000,		///< P40 (LFQFP64: 60) (LFQFP100:  95)
+			AN001,		///< P41 (LFQFP64: 58) (LFQFP100:  93)
+			AN002,		///< P42 (LFQFP64: 57) (LFQFP100:  92)
+			AN003,		///< P43 (LFQFP64: --) (LFQFP100:  91)
+			AN004,		///< P44 (LFQFP64: --) (LFQFP100:  90)
+			AN006,		///< P90 (LFQFP64: --) (LFQFP100:  89)
+			AN007,		///< P91 (LFQFP64: --) (LFQFP100:  88)
+			AN008	,	///< PE0 (LFQFP64: 51) (LFQFP100:  78)
+			AN009,		///< PE1 (LFQFP64: 50) (LFQFP100:  77)
+			AN010,		///< PE2 (LFQFP64: 49) (LFQFP100:  76)
+			AN011,		///< PE3 (LFQFP64: 48) (LFQFP100:  75)
+			AN012,		///< PE4 (LFQFP64: 47) (LFQFP100:  74)
+			AN013,		///< PE5 (LFQFP64: 46) (LFQFP100:  73)
+			AN014,		///< PE6 (LFQFP64: --) (LFQFP100:  80)
+			AN015,		///< PE7 (LFQFP64: --) (LFQFP100:  79)
+
+			AN021 = 21,	///< P92 (LFQFP64: --) (LFQFP100:  86)
 
 			TEMP,		///< 温度センサ
 			REF,		///< 内部基準電圧

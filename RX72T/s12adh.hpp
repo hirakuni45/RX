@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	12-Bit A/D Converter / 12 ビット A/D コンバータ (RX66T/RX72T)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -573,18 +573,18 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,		///< AN000 入力
-			AN001,		///< AN001 入力
-			AN002,		///< AN002 入力
-			AN003,		///< AN003 入力
-			AN004,		///< AN004 入力
-			AN005,		///< AN005 入力
-			AN006,		///< AN006 入力
-			AN007,		///< AN007 入力
+			AN000,		///< P40 (LFQFP100:  90) (LFQFP144: 131)
+			AN001,		///< P41 (LFQFP100:  89) (LFQFP144: 130)
+			AN002,		///< P42 (LFQFP100:  87) (LFQFP144: 129)
+			AN003,		///< P43 (LFQFP100:  86) (LFQFP144: 128)
+			AN004,		///< PH1 (LFQFP100: ---) (LFQFP144: 127)
+			AN005,		///< PH2 (LFQFP100: ---) (LFQFP144: 126)
+			AN006,		///< PH3 (LFQFP100: ---) (LFQFP144: 125)
+			AN007,		///< PH0 (LFQFP100: ---) (LFQFP144: 132)
 		};
 
 
@@ -1048,18 +1048,18 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN100,		///< AN100 入力
-			AN101,		///< AN101 入力
-			AN102,		///< AN102 入力
-			AN103,		///< AN103 入力
-			AN104,		///< AN104 入力
-			AN105,		///< AN105 入力
-			AN106,		///< AN106 入力
-			AN107,		///< AN107 入力
+			AN100,		///< P44 (LFQFP100: ) (LFQFP144: 123)
+			AN101,		///< P45 (LFQFP100: ) (LFQFP144: 122)
+			AN102,		///< P46 (LFQFP100: ) (LFQFP144: 121)
+			AN103,		///< P47 (LFQFP100: ) (LFQFP144: 120)
+			AN104,		///< PH5 (LFQFP100: ) (LFQFP144: 119)
+			AN105,		///< PH6 (LFQFP100: ) (LFQFP144: 118)
+			AN106,		///< PH7 (LFQFP100: ) (LFQFP144: 117)
+			AN107,		///< PH4 (LFQFP100: ) (LFQFP144: 124)
 		};
 
 
@@ -1548,25 +1548,25 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN200,		///< AN200 入力
-			AN201,		///< AN201 入力
-			AN202,		///< AN202 入力
-			AN203,		///< AN203 入力
-			AN204,		///< AN204 入力
-			AN205,		///< AN205 入力
-			AN206,		///< AN206 入力
-			AN207,		///< AN207 入力
-			AN208,		///< AN208 入力
-			AN209,		///< AN209 入力
-			AN210,		///< AN210 入力
-			AN211,		///< AN211 入力
+			AN200,		///< P52 (LFQFP100:  81) (LFQFP144: 114)
+			AN201,		///< P53 (LFQFP100:  80) (LFQFP144: 113)
+			AN202,		///< P54 (LFQFP100:  79) (LFQFP144: 112)
+			AN203,		///< P55 (LFQFP100:  78) (LFQFP144: 111)
+			AN204,		///< P50 (LFQFP100: ---) (LFQFP144: 116)
+			AN205,		///< P51 (LFQFP100: ---) (LFQFP144: 115)
+			AN206,		///< P60 (LFQFP100:  77) (LFQFP144: 110)
+			AN207,		///< P61 (LFQFP100:  76) (LFQFP144: 109)
+			AN208,		///< P62 (LFQFP100:  75) (LFQFP144: 108)
+			AN209,		///< P63 (LFQFP100:  74) (LFQFP144: 107)
+			AN210,		///< P64 (LFQFP100:  71) (LFQFP144: 103)
+			AN211,		///< P65 (LFQFP100:  70) (LFQFP144: 102)
 
-			AN216 = 16,	///< AN216 入力
-			AN217,		///< AN217 入力
+			AN216 = 16,	///< P20 (LFQFP100:  69) (LFQFP144: 101)
+			AN217,		///< P21 (LFQFP100:  68) (LFQFP144: 100)
 
 			TEMP,		///< 温度センサ
 			REF,		///< 内部基準電圧

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	12-Bit A/D Converter / 12 ビット A/D コンバータ (RX621/RX62N)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -217,18 +217,18 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,
-			AN001,
-			AN002,
-			AN003,
-			AN004,
-			AN005,
-			AN006,
-			AN007,
+			AN000,		///< P40 (LFQFP100:  95) (LFQFP144: 141)
+			AN001,		///< P41 (LFQFP100:  93) (LFQFP144: 139)
+			AN002,		///< P42 (LFQFP100:  92) (LFQFP144: 138)
+			AN003,		///< P43 (LFQFP100:  91) (LFQFP144: 137)
+			AN004,		///< P44 (LFQFP100:  90) (LFQFP144: 136)
+			AN005,		///< P45 (LFQFP100:  89) (LFQFP144: 135)
+			AN006,		///< P46 (LFQFP100:  88) (LFQFP144: 134)
+			AN007,		///< P47 (LFQFP100:  87) (LFQFP144: 133)
 		};
 
 	
