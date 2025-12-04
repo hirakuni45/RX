@@ -28,8 +28,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO0:
-			// PB3 (LFQFP64: 36) (LFQFP80: 45)
-			// PH1 (LFQFP64: 23) (LFQFP80: 31)
+			// PB3 (LFQFP48: 26) (LFQFP64: 36) (LFQFP80: 45)
+			// PH1 (LFQFP48: 19) (LFQFP64: 23) (LFQFP80: 31)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTB::PMR.B3 = 0;
@@ -47,9 +47,9 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:  // TMCI0:
-			// P21 (LFQFP64: --) (LFQFP80: 21)
-			// PB1 (LFQFP64: 37) (LFQFP80: 47)
-			// PH3 (LFQFP64: 21) (LFQFP80: 29)
+			// P21 (LFQFP48: --) (LFQFP64: --) (LFQFP80: 21)
+			// PB1 (LFQFP48: 27) (LFQFP64: 37) (LFQFP80: 47)
+			// PH3 (LFQFP48: 17) (LFQFP64: 21) (LFQFP80: 29)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B1 = 0;
@@ -72,9 +72,9 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:  // TMRI0:
-			// P20 (LFQFP64: --) (LFQFP80: 22)
-			// PA4 (LFQFP64: 42) (LFQFP80: 53)
-			// PH2 (LFQFP64: 22) (LFQFP80: 30)
+			// P20 (LFQFP48: --) (LFQFP64: --) (LFQFP80: 22)
+			// PA4 (LFQFP48: 32) (LFQFP64: 42) (LFQFP80: 53)
+			// PH2 (LFQFP48: 18) (LFQFP64: 22) (LFQFP80: 30)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B0 = 0;
@@ -109,8 +109,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO1:
-			// P17 (LFQFP64: 17) (LFQFP80: 23)
-			// P26 (LFQFP64: 16) (LFQFP80: 20)
+			// P17 (LFQFP48: 13) (LFQFP64: 17) (LFQFP80: 23)
+			// P26 (LFQFP48: 12) (LFQFP64: 16) (LFQFP80: 20)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B7 = 0;
@@ -128,9 +128,9 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:  // TMCI1:
-			// P12 (LFQFP64: --) (LFQFP80: 28)
-			// P54 (LFQFP64: 26) (LFQFP80: 34)
-			// PC4 (LFQFP64: 30) (LFQFP80: 38)
+			// P12 (LFQFP48: --) (LFQFP64: --) (LFQFP80: 28)
+			// P54 (LFQFP48: --) (LFQFP64: 26) (LFQFP80: 34)
+			// PC4 (LFQFP48: 24) (LFQFP64: 30) (LFQFP80: 38)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B2 = 0;
@@ -153,7 +153,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:  // TMRI1:
-			// PB5 (LFQFP64: 35) (LFQFP80: 43)
+			// PB5 (LFQFP48: 25) (LFQFP64: 35) (LFQFP80: 43)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORTB::PMR.B5 = 0;
@@ -178,8 +178,8 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO2:
-			// P16 (LFQFP64: 18) (LFQFP80: 24)
-			// PC7 (LFQFP64: 27) (LFQFP80: 35)
+			// P16 (LFQFP48: 14) (LFQFP64: 18) (LFQFP80: 24)
+			// PC7 (LFQFP48: 21) (LFQFP64: 27) (LFQFP80: 35)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B6 = 0;
@@ -197,9 +197,9 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:  // TMCI2:
-			// P15 (LFQFP64: 19) (LFQFP80: 25)
-			// P31 (LFQFP64: 13) (LFQFP80: 17)
-			// PC6 (LFQFP64: 28) (LFQFP80: 36)
+			// P15 (LFQFP48: 15) (LFQFP64: 19) (LFQFP80: 25)
+			// P31 (LFQFP48:  9) (LFQFP64: 13) (LFQFP80: 17)
+			// PC6 (LFQFP48: 22) (LFQFP64: 28) (LFQFP80: 36)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B5 = 0;
@@ -222,8 +222,8 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:  // TMRI2:
-			// P14 (LFQFP64: 20) (LFQFP80: 26)
-			// PC5 (LFQFP64: 29) (LFQFP80: 37)
+			// P14 (LFQFP48: 16) (LFQFP64: 20) (LFQFP80: 26)
+			// PC5 (LFQFP48: 23) (LFQFP64: 29) (LFQFP80: 37)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B4 = 0;
@@ -253,9 +253,9 @@ namespace device {
 			uint8_t sel = ena ? 0b0'0101 : 0;
 			switch(ch) {
 			case CHANNEL::TMO:  // TMO3:
-			// P13 (LFQFP64: --) (LFQFP80: 27)
-			// P32 (LFQFP64: 12) (LFQFP80: 16)
-			// P55 (LFQFP64: 25) (LFQFP80: 33)
+			// P13 (LFQFP48: --) (LFQFP64: --) (LFQFP80: 27)
+			// P32 (LFQFP48: --) (LFQFP64: 12) (LFQFP80: 16)
+			// P55 (LFQFP48: --) (LFQFP64: 25) (LFQFP80: 33)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT1::PMR.B3 = 0;
@@ -278,9 +278,9 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMCI:  //TMCI3:
-			// P27 (LFQFP64: 15) (LFQFP80: 19)
-			// P34 (LFQFP64: --) (LFQFP80: 15)
-			// PA6 (LFQFP64: 41) (LFQFP80: 51)
+			// P27 (LFQFP48: 11) (LFQFP64: 15) (LFQFP80: 19)
+			// P34 (LFQFP48: --) (LFQFP64: --) (LFQFP80: 15)
+			// PA6 (LFQFP48: 31) (LFQFP64: 41) (LFQFP80: 51)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT2::PMR.B7 = 0;
@@ -303,7 +303,7 @@ namespace device {
 				}
 				break;
 			case CHANNEL::TMRI:  // TMRI3:
-			// P30 (LFQFP64: 14) (LFQFP80: 18)
+			// P30 (LFQFP48: 10) (LFQFP64: 14) (LFQFP80: 18)
 				switch(odr) {
 				case ORDER::FIRST:
 					PORT3::PMR.B0 = 0;

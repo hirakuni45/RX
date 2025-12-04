@@ -173,6 +173,19 @@
 
 - [port_map_irq.hpp](port_map_irq.hpp?ts=4)
 
+### LFQFP48
+
+|IRQ|FIRST|SECOND|THIRD|FOURTH|
+|---|---|---|---|---|
+|IRQ0|P30 (10)|PD0 (--)|PH1 (19)|-|
+|IRQ1|P31 (9)|PD1 (--)|PH2 (18)|-|
+|IRQ2|P12 (--)|P32 (--)|P36 (6)|PD2 (--)|
+|IRQ3|P13 (--)|-|-|-|
+|IRQ4|P14 (16)|P34 (--)|P37 (4)|PB1 (27)|
+|IRQ5|P15 (15)|PA4 (32)|PE5 (--)|-|
+|IRQ6|P16 (14)|PA3 (33)|-|-|
+|IRQ7|P17 (13)|PE2 (37)|-|-|
+
 ### LFQFP64
 
 |IRQ|FIRST|SECOND|THIRD|FOURTH|
@@ -204,6 +217,40 @@
 ## Port map order / ポートマップ候補
 
 - [port_map.hpp](port_map.hpp?ts=4)
+
+### LFQFP48
+
+|Peripheral|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|SCI1 / RXD|P15 (15)|P30 (10)|-|
+|SCI1 / TXD|P16 (14)|P26 (12)|-|
+|SCI1 / SCK|P17 (13)|P27 (11)|-|
+|SCI5 / RXD|PA2 (--)|PA3 (33)|PC2 (26)|
+|SCI5 / TXD|PA4 (32)|PA4 (32)|PC3 (25)|
+|SCI5 / SCK|PA1 (34)|PA1 (34)|PC4 (24)|
+|SCI6 / RXD|PB0 (29)|PD1 (--)|-|
+|SCI6 / TXD|PB1 (27)|PD0 (--)|-|
+|SCI6 / SCK|PB3 (26)|PD2 (--)|-|
+|SCI8 / RXD|PC6 (22)|-|-|
+|SCI8 / TXD|PC7 (21)|-|-|
+|SCI8 / SCK|PC5 (23)|-|-|
+|SCI9 / RXD|PB6 (--)|-|-|
+|SCI9 / TXD|PB7 (--)|-|-|
+|SCI9 / SCK|PB5 (25)|-|-|
+|SCI12 / RXD|PE2 (37)|-|-|
+|SCI12 / TXD|PE1 (38)|-|-|
+|SCI12 / SCK|PE0 (--)|-|-|
+|RIIC0 / SCL|P16 (14)|P12 (--)|-|
+|RIIC0 / SDA|P17 (13)|P13 (--)|-|
+|RSCAN / CRX|P15 (15)|P55 (--)|-|
+|RSCAN / CTX|P14 (16)|P54 (--)|-|
+|RSPI0 / RSPCK|PA5 (--)|PB0 (29)|PC5 (23)|
+|RSPI0 / MOSI|PA6 (31)|P16 (14)|PC6 (22)|
+|RSPI0 / MISO|PA7 (21)|P17 (13)|PC7 (21)|
+|RSPI0 / SSL0|PA4 (32)|PC4 (24)|-|
+|RSPI0 / SSL1|PA0 (--)|-|-|
+|RSPI0 / SSL2|PA1 (34)|-|-|
+|RSPI0 / SSL3|PA2 (--)|PC2 (26)|-|
 
 ### LFQFP64
 
@@ -279,6 +326,34 @@
 
 - [port_map_mtu.hpp](port_map_mtu.hpp?ts=4)
 
+### LFQFP48
+
+|MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|
+|---|---|---|---|---|---|---|---|
+|MTIOC0A|P34 (--)|PB3 (26)|PC4 (24)|-|-|-|-|
+|MTIOC0B|P13 (--)|P15 (15)|PA1 (34)|-|-|-|-|
+|MTIOC0C|P32 (--)|PB1 (27)|PC5 (23)|-|-|-|-|
+|MTIOC0D|PA3 (33)|-|-|-|-|-|-|
+|MTIOC1A|P20 (--)|PE4 (35)|-|-|-|-|-|
+|MTIOC1B|P21 (--)|PB5 (25)|PE3 (36)|-|-|-|-|
+|MTIOC2A|P26 (12)|PB5 (25)|-|-|-|-|-|
+|MTIOC2B|P27 (11)|PE5 (--)|-|-|-|-|-|
+|MTIOC3A|P14 (16)|P17 (13)|PC7 (21)|PJ1 (--)|-|-|-|
+|MTIOC3B|P17 (13)|PA1 (34)|PB7 (--)|PC5 (23)|PH0 (20)|-|-|
+|MTIOC3C|P16 (14)|PC6 (22)|-|-|-|-|-|
+|MTIOC3D|P16 (14)|PA6 (31)|PB0 (29)|PB6 (--)|PC4 (24)|PH1 (19)|-|
+|MTIOC4A|P55 (--)|PA0 (--)|PB3 (26)|PE2 (37)|PE4 (35)|-|-|
+|MTIOC4B|P30 (10)|P54 (--)|PC2 (26)|PD1 (--)|PE3 (36)|-|-|
+|MTIOC4C|PA4 (32)|PB1 (27)|PE1 (38)|PE5 (--)|PH2 (18)|-|-|
+|MTIOC4D|P31 (9)|P55 (--)|PA3 (33)|PC3 (25)|PD2 (--)|PE4 (35)|PH3 (17)|
+|MTIOC5U|PA4 (32)|-|-|-|-|-|-|
+|MTIOC5V|PA3 (33)|PA6 (31)|-|-|-|-|-|
+|MTIOC5W|PB0 (29)|-|-|-|-|-|-|
+|MTCLKA|P14 (16)|PA4 (32)|PC6 (22)|-|-|-|-|
+|MTCLKB|P15 (15)|PA6 (31)|PC7 (21)|-|-|-|-|
+|MTCLKC|PA1 (34)|PC4 (24)|-|-|-|-|-|
+|MTCLKD|PA3 (33)|PC5 (23)|-|-|-|-|-|
+
 ### LFQFP64
 
 |MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|
@@ -340,6 +415,23 @@
 ## Port map order (TMR) / ポートマップ候補 (TMR)
 
 - [port_map_tmr.hpp](port_map_tmr.hpp?ts=4)
+
+### LFQFP48
+
+|TMR|FIRST|SECOND|THIRD|
+|---|---|---|---|
+|TMO0|PB3 (26)|PH1 (19)|-|
+|TMCI0|P21 (--)|PB1 (27)|PH3 (17)|
+|TMRI0|P20 (--)|PA4 (32)|PH2 (18)|
+|TMO1|P17 (13)|P26 (12)|-|
+|TMCI1|P12 (--)|P54 (--)|PC4 (24)|
+|TMRI1|PB5 (25)|-|-|
+|TMO2|P16 (14)|PC7 (21)|-|
+|TMCI2|P15 (15)|P31 (9)|PC6 (22)|
+|TMRI2|P14 (16)|PC5 (23)|-|
+|TMO3|P13 (--)|P32 (--)|P55 (--)|
+|TMCI3|P27 (11)|P34 (--)|PA6 (31)|
+|TMRI3|P30 (10)|-|-|
 
 ### LFQFP64
 
