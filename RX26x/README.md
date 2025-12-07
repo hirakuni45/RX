@@ -311,6 +311,42 @@
 
 ---
 
+## 12 Bits A/D Converter input (S12AD) / 12 ビット A/D コンバーター入力 (S12AD)
+
+- [s12ade.hpp](../RX231/s12ade.hpp?ts=4)
+
+### LFQFP100
+
+|S12AD/ANALOG|Port|
+|---|---|
+|AN000|P40 (95)|
+|AN001|P41 (93)|
+|AN002|P42 (92)|
+|AN003|P43 (91)|
+|AN004|P44 (90)|
+|AN005|P45 (89)|
+|AN006|P46 (88)|
+|AN007|P47 (87)|
+|||
+|AN016|PE0 (78)|
+|AN017|PE1 (77)|
+|AN018|PE2 (76)|
+|AN019|PE3 (75)|
+|AN020|PE4 (74)|
+|AN021|PE5 (73)|
+|AN022|PE6 (72)|
+|AN023|PE7 (71)|
+|AN024|PD0 (86)|
+|AN025|PD1 (85)|
+|AN026|PD2 (84)|
+|AN027|PD3 (83)|
+|AN028|PD4 (82)|
+|AN029|PD5 (81)|
+|AN030|PD6 (80)|
+|AN031|PD7 (79)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

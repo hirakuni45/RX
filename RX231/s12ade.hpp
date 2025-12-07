@@ -1301,29 +1301,29 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,		///< AN000 入力
-			AN001,		///< AN001 入力
-			AN002,		///< AN002 入力
-			AN003,		///< AN003 入力
-			AN004,		///< AN004 入力
-			AN005,		///< AN005 入力
-			AN006,		///< AN006 入力
-			AN007,		///< AN007 入力
+			AN000,		///< P40 (LFQFP48: 45) (LFQFP64: 60) (LFQFP80: 75)
+			AN001,		///< P41 (LFQFP48: 43) (LFQFP64: 58) (LFQFP80: 73)
+			AN002,		///< P42 (LFQFP48: 42) (LFQFP64: 57) (LFQFP80: 72)
+			AN003,		///< P43 (LFQFP48: --) (LFQFP64: 56) (LFQFP80: 71)
+			AN004,		///< P44 (LFQFP48: --) (LFQFP64: 55) (LFQFP80: 70)
+			AN005,		///< P45 (LFQFP48: 41) (LFQFP64: 54) (LFQFP80: 69)
+			AN006,		///< P46 (LFQFP48: 40) (LFQFP64: 53) (LFQFP80: 68)
+			AN007,		///< P47 (LFQFP48: 39) (LFQFP64: 52) (LFQFP80: 67)
 
-			AN016 = 16,	///< AN016 入力
-			AN017,		///< AN017 入力
-			AN018,		///< AN018 入力
-			AN019,		///< AN019 入力
-			AN020,		///< AN020 入力
-			AN021,		///< AN021 入力
+			AN016 = 16,	///< PE0 (LFQFP48: --) (LFQFP64: 51) (LFQFP80: 63)
+			AN017,		///< PE1 (LFQFP48: 38) (LFQFP64: 50) (LFQFP80: 62)
+			AN018,		///< PE2 (LFQFP48: 37) (LFQFP64: 49) (LFQFP80: 61)
+			AN019,		///< PE3 (LFQFP48: 36) (LFQFP64: 48) (LFQFP80: 60)
+			AN020,		///< PE4 (LFQFP48: 35) (LFQFP64: 47) (LFQFP80: 59)
+			AN021,		///< PE5 (LFQFP48: --) (LFQFP64: 46) (LFQFP80: 58)
 
-			AN024 = 24,	///< AN024 入力
-			AN025,		///< AN025 入力
-			AN026,		///< AN026 入力
+			AN024 = 24,	///< PD0 (LFQFP48: --) (LFQFP64: --) (LFQFP80: 66)
+			AN025,		///< PD1 (LFQFP48: --) (LFQFP64: --) (LFQFP80: 65)
+			AN026,		///< PD2 (LFQFP48: --) (LFQFP64: --) (LFQFP80: 64)
 
 			TEMP,		///< 温度センサ
 			REF,		///< 内部基準電圧
@@ -1399,6 +1399,7 @@ namespace device {
 				}
 				MPC::P47PFS.ASEL = ena;
 				break;
+
 			case ANALOG::AN016:
 				if(ena) {
 					PORTE::PDR.B0 = 0;
@@ -1660,7 +1661,7 @@ namespace device {
 #elif defined(SIG_RX23W)
 		static constexpr uint32_t CONV_TIME_NS = 830;				///< A/D 変換時間 0.83uS、単位「ns」
 		static constexpr uint32_t ANALOG_NUM = 14;					///< アナログ入力数
-#else
+#elif defined(SIG_RX260) || defined(SIG_RX261)
 		static constexpr uint32_t CONV_TIME_NS  = 700;				///< A/D 変換時間 (ADCCR.CCS=0) 0.7uS、単位「ns」
 		static constexpr uint32_t CONV_TIME2_NS = 500;				///< A/D 変換時間 (ADCCR.CCS=1) 0.5uS、単位「ns」
 		static constexpr uint32_t ANALOG_NUM = 25;					///< アナログ入力数
@@ -1668,40 +1669,44 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD) @n
+					P45 RX230/RX231: (LFQFP64: --) (LFQFP100:  89) @n
+					P47 RX230/RX231: (LFQFP64: --) (LFQFP100:  87)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,		///< AN000 入力
-			AN001,		///< AN001 入力
-			AN002,		///< AN002 入力
-			AN003,		///< AN003 入力
-			AN004,		///< AN004 入力
-			AN005,		///< AN005 入力
-			AN006,		///< AN006 入力
-			AN007,		///< AN007 入力
+			/// RX130/RX260/RX261:
+			AN000,		///< P40 (LFQFP64: 60) (LFQFP100:  95)
+			AN001,		///< P41 (LFQFP64: 58) (LFQFP100:  93)
+			AN002,		///< P42 (LFQFP64: 57) (LFQFP100:  92)
+			AN003,		///< P43 (LFQFP64: 56) (LFQFP100:  91)
+			AN004,		///< P44 (LFQFP64: 55) (LFQFP100:  90)
+			AN005,		///< P45 (LFQFP64: 54) (LFQFP100:  89)
+			AN006,		///< P46 (LFQFP64: 53) (LFQFP100:  88)
+			AN007,		///< P47 (LFQFP64: 52) (LFQFP100:  87)
 #if defined(SIG_RX260) || defined(SIG_RX261)
-			AN008,		///< AN008, CTSU input
+			AN008,		///< RX260/RX261 CTSU input
 #endif
-			AN016 = 16,	///< AN016 入力
-			AN017,		///< AN017 入力
-			AN018,		///< AN018 入力
-			AN019,		///< AN019 入力
-			AN020,		///< AN020 入力
+
+			AN016 = 16,	///< PE0 (LFQFP64: 51) (LFQFP100:  78)
+			AN017,		///< PE1 (LFQFP64: 50) (LFQFP100:  77)
+			AN018,		///< PE2 (LFQFP64: 49) (LFQFP100:  76)
+			AN019,		///< PE3 (LFQFP64: 48) (LFQFP100:  75)
+			AN020,		///< PE4 (LFQFP64: 47) (LFQFP100:  74)
 #if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
-			AN021,		///< AN021 入力
-			AN022,		///< AN022 入力
-			AN023,		///< AN023 入力
-			AN024,		///< AN024 入力
-			AN025,		///< AN025 入力
-			AN026,		///< AN026 入力
+			AN021,		///< PE5 (LFQFP64: 46) (LFQFP100:  73)
+			AN022,		///< PE6 (LFQFP64: --) (LFQFP100:  72)
+			AN023,		///< PE7 (LFQFP64: --) (LFQFP100:  71)
+			AN024,		///< PD0 (LFQFP64: --) (LFQFP100:  86)
+			AN025,		///< PD1 (LFQFP64: --) (LFQFP100:  85)
+			AN026,		///< PD2 (LFQFP64: --) (LFQFP100:  84)
 #endif
-			AN027,		///< AN027 入力
+			AN027,		///< PD3 (LFQFP64: --) (LFQFP100:  83)
 #if defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX260) || defined(SIG_RX261)
-			AN028,		///< AN028 入力
-			AN029,		///< AN029 入力
-			AN030,		///< AN030 入力
-			AN031,		///< AN031 入力
+			AN028,		///< PD4 (LFQFP64: --) (LFQFP100:  82)
+			AN029,		///< PD5 (LFQFP64: --) (LFQFP100:  81)
+			AN030,		///< PD6 (LFQFP64: --) (LFQFP100:  80)
+			AN031,		///< PD7 (LFQFP64: --) (LFQFP100:  79)
 #endif
 			TEMP,	///< 温度センサ
 			REF,	///< 内部基準電圧
@@ -1777,6 +1782,7 @@ namespace device {
 				}
 				MPC::P47PFS.ASEL = ena;
 				break;
+
 			case ANALOG::AN016:
 				if(ena) {
 					PORTE::PDR.B0 = 0;

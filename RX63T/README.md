@@ -446,6 +446,99 @@
 
 ---
 
+## 10 Bits A/D Converter input (AD) / 10 ビット A/D コンバーター入力 (AD)
+
+- [ad.hpp](ad.hpp?ts=4)
+
+### LFQFP64
+
+|AD/ANALOG|Port|
+|---|---|
+|AN0|P60 (--)|
+|AN1|P61 (--)|
+|AN2|P62 (--)|
+|AN3|P63 (--)|
+|AN4|P64 (--)|
+|AN5|P65 (--)|
+|AN6|P50 (--)|
+|AN7|P51 (--)|
+|AN8|P52 (--)|
+|AN9|P53 (--)|
+|AN10|P54 (--)|
+|AN11|P55 (--)|
+|AN12|P56 (--)|
+|AN13|P57 (--)|
+|AN14|PC0 (--)|
+|AN15|PC1 (--)|
+|AN16|PC2 (--)|
+|AN17|PC3 (--)|
+|AN18|PC4 (--)|
+|AN19|PC5 (--)|
+
+### LFQFP100
+
+|AD/ANALOG|Port|
+|---|---|
+|AN0|P60 (77)|
+|AN1|P61 (76)|
+|AN2|P62 (75)|
+|AN3|P63 (74)|
+|AN4|P64 (70)|
+|AN5|P65 (69)|
+|AN6|P50 (83)|
+|AN7|P51 (82)|
+|AN8|P52 (81)|
+|AN9|P53 (80)|
+|AN10|P54 (79)|
+|AN11|P55 (78)|
+|AN12|P56 (---)|
+|AN13|P57 (---)|
+|AN14|PC0 (---)|
+|AN15|PC1 (---)|
+|AN16|PC2 (---)|
+|AN17|PC3 (---)|
+|AN18|PC4 (---)|
+|AN19|PC5 (---)|
+
+---
+
+## 12 Bits A/D Converter input (S12AD) / 12 ビット A/D コンバーター入力 (S12AD)
+
+- [s12adb.hpp](s12adb.hpp?ts=4)
+- 64/48 pin, 8 channel / 1 unit
+- 100~ pin, 4 channel / 2 units
+
+### LFQFP64
+
+|S12AD/ANALOG|Port|
+|---|---|
+|AN000|P40 (56)|
+|AN001|P41 (55)|
+|AN002|P42 (54)|
+|AN003|P43 (53)|
+|AN004|P44 (52)|
+|AN005|P45 (51)|
+|AN006|P46 (50)|
+|AN007|P47 (49)|
+
+### LFQFP100
+
+|S12AD/ANALOG|Port|
+|---|---|
+|AN000|P40 (91)|
+|AN001|P41 (90)|
+|AN002|P42 (89)|
+|AN003|P43 (88)|
+
+|S12AD1/ANALOG|Port|
+|---|---|
+|AN104|P44 (87)|
+|AN105|P45 (86)|
+|AN106|P46 (85)|
+|AN107|P47 (84)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
