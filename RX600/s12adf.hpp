@@ -7,7 +7,7 @@
 			RX671 (S12ADFa) @n
 			RX72N/RX72M 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -545,18 +545,18 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,
-			AN001,
-			AN002,
-			AN003,
-			AN004,
-			AN005,
-			AN006,
-			AN007,
+			AN000,		///< P40 (LFQFP100:  95) (LFQFP144: 141) (LFQFP176: 173)
+			AN001,		///< P41 (LFQFP100:  93) (LFQFP144: 139) (LFQFP176: 171)
+			AN002,		///< P42 (LFQFP100:  92) (LFQFP144: 138) (LFQFP176: 170)
+			AN003,		///< P43 (LFQFP100:  91) (LFQFP144: 137) (LFQFP176: 169)
+			AN004,		///< P44 (LFQFP100:  90) (LFQFP144: 136) (LFQFP176: 168)
+			AN005,		///< P45 (LFQFP100:  89) (LFQFP144: 135) (LFQFP176: 167)
+			AN006,		///< P46 (LFQFP100:  88) (LFQFP144: 134) (LFQFP176: 166)
+			AN007,		///< P47 (LFQFP100:  87) (LFQFP144: 133) (LFQFP176: 165)
 		};
 
 
@@ -963,31 +963,32 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN100,
-			AN101,
-			AN102,
-			AN103,
-			AN104,
-			AN105,
-			AN106,
-			AN107,
-			AN108,
-			AN109,
-			AN110,
-			AN111,
-			AN112,
-			AN113,
-			AN114,
-			AN115,
-			AN116,
-			AN117,
-			AN118,
-			AN119,
-			AN120,
+			AN100,		///< PE2 (LFQFP100:  76) (LFQFP144: 109) (LFQFP176: 133)
+			AN101,		///< PE3 (LFQFP100:  75) (LFQFP144: 108) (LFQFP176: 132)
+			AN102,		///< PE4 (LFQFP100:  74) (LFQFP144: 107) (LFQFP176: 131)
+			AN103,		///< PE5 (LFQFP100:  73) (LFQFP144: 106) (LFQFP176: 130)
+			AN104,		///< PE6 (LFQFP100:  72) (LFQFP144: 102) (LFQFP176: 126)
+			AN105,		///< PE7 (LFQFP100:  71) (LFQFP144: 101) (LFQFP176: 125)
+			AN106,		///< PD6 (LFQFP100:  80) (LFQFP144: 120) (LFQFP176: 145)
+			AN107,		///< PD7 (LFQFP100:  79) (LFQFP144: 119) (LFQFP176: 143)
+			AN108,		///< PD0 (LFQFP100:  86) (LFQFP144: 126) (LFQFP176: 158)
+			AN109,		///< PD1 (LFQFP100:  85) (LFQFP144: 125) (LFQFP176: 156)
+			AN110,		///< PD2 (LFQFP100:  84) (LFQFP144: 124) (LFQFP176: 154)
+			AN111,		///< PD3 (LFQFP100:  83) (LFQFP144: 123) (LFQFP176: 150)
+			AN112,		///< PD4 (LFQFP100:  82) (LFQFP144: 122) (LFQFP176: 148)
+			AN113,		///< PD5 (LFQFP100:  81) (LFQFP144: 121) (LFQFP176: 147)
+			AN114,		///< P90 (LFQFP100: ---) (LFQFP144: 131) (LFQFP176: 163)
+			AN115,		///< P91 (LFQFP100: ---) (LFQFP144: 129) (LFQFP176: 161)
+			AN116,		///< P92 (LFQFP100: ---) (LFQFP144: 128) (LFQFP176: 160)
+			AN117,		///< P93 (LFQFP100: ---) (LFQFP144: 127) (LFQFP176: 159)
+			AN118,		///< P00 (LFQFP100: ---) (LFQFP144:   8) (LFQFP176:   8)
+			AN119,		///< P01 (LFQFP100: ---) (LFQFP144:   7) (LFQFP176:   7)
+			AN120,		///< P02 (LFQFP100: ---) (LFQFP144:   6) (LFQFP176:   6)
+
 			TEMP,		///< 温度センサ
 			REF,		///< 内部基準電圧
 		};

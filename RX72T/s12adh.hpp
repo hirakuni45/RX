@@ -1052,14 +1052,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN100,		///< P44 (LFQFP100: ) (LFQFP144: 123)
-			AN101,		///< P45 (LFQFP100: ) (LFQFP144: 122)
-			AN102,		///< P46 (LFQFP100: ) (LFQFP144: 121)
-			AN103,		///< P47 (LFQFP100: ) (LFQFP144: 120)
-			AN104,		///< PH5 (LFQFP100: ) (LFQFP144: 119)
-			AN105,		///< PH6 (LFQFP100: ) (LFQFP144: 118)
-			AN106,		///< PH7 (LFQFP100: ) (LFQFP144: 117)
-			AN107,		///< PH4 (LFQFP100: ) (LFQFP144: 124)
+			AN100,		///< P44 (LFQFP100:  85) (LFQFP144: 123)
+			AN101,		///< P45 (LFQFP100:  84) (LFQFP144: 122)
+			AN102,		///< P46 (LFQFP100:  83) (LFQFP144: 121)
+			AN103,		///< P47 (LFQFP100:  82) (LFQFP144: 120)
+			AN104,		///< PH5 (LFQFP100: ---) (LFQFP144: 119)
+			AN105,		///< PH6 (LFQFP100: ---) (LFQFP144: 118)
+			AN106,		///< PH7 (LFQFP100: ---) (LFQFP144: 117)
+			AN107,		///< PH4 (LFQFP100: ---) (LFQFP144: 124)
 		};
 
 

@@ -387,6 +387,58 @@
 
 ---
 
+## 12 Bits A/D Converter input (S12AD) / 12 ビット A/D コンバーター入力 (S12AD)
+
+- [s12adb.hpp](../RX111/s12adb.hpp?ts=4)
+
+### LFQFP64
+
+|S12AD/ANALOG|Port|
+|---|---|
+|AN000|P40 (60)|
+|AN001|P41 (58)|
+|AN002|P42 (57)|
+|AN003|P43 (--)|
+|AN004|P44 (--)|
+|AN005|P90 (--)|
+|AN006|P46 (--)|
+|AN007|P91 (--)|
+|AN008|PE0 (51)|
+|AN009|PE1 (50)|
+|AN010|PE2 (49)|
+|AN011|PE3 (48)|
+|AN012|PE4 (47)|
+|AN013|PE5 (46)|
+|AN014|PE6 (--)|
+|AN015|PE7 (--)|
+|||
+|AN021|P92 (--)|
+
+### LFQFP100
+
+|S12AD/ANALOG|Port|
+|---|---|
+|AN000|P40 (95)|
+|AN001|P41 (93)|
+|AN002|P42 (92)|
+|AN003|P43 (91)|
+|AN004|P44 (90)|
+|AN005|P90 (89)|
+|AN006|P46 (88)|
+|AN007|P91 (87)|
+|AN008|PE0 (78)|
+|AN009|PE1 (77)|
+|AN010|PE2 (76)|
+|AN011|PE3 (75)|
+|AN012|PE4 (74)|
+|AN013|PE5 (73)|
+|AN014|PE6 (80)|
+|AN015|PE7 (79)|
+|||
+|AN021|P92 (86)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

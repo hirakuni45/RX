@@ -242,6 +242,25 @@ namespace board_profile {
 
 ---
 
+## 12 Bits A/D Converter input (S12AD) / 12 ビット A/D コンバーター入力 (S12AD)
+
+- [s12ad.hpp](s12ad.hpp?ts=4)
+
+### LFQFP48
+
+|ANALOG|Port|
+|---|---|
+|AN000|P40 (44)|
+|AN001|P41 (43)|
+|AN002|P42 (42)|
+|AN003|P43 (41)|
+|AN004|P44 (40)|
+|AN005|P45 (39)|
+|AN006|P46 (38)|
+|AN007|P47 (37)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

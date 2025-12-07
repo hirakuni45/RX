@@ -820,10 +820,10 @@ namespace device {
 		/*!
 			@brief	ポート設定と解除
 			@param[in]	an	アナログ入力型
-			@param[in]	f	ポート無効の場合「false」
+			@param[in]	ena	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static void enable(ANALOG an, bool f = true)
+		static void enable(ANALOG an, bool ena = true)
 		{
 			MPC::PWPR.B0WI  = 0;
 			MPC::PWPR.PFSWE = 1;
@@ -841,21 +841,21 @@ namespace device {
 					PORT4::PDR.B5 = 0;
 					PORT4::PMR.B5 = 0;
 				}
-				MPC::P45PFS.ASEL = f;
+				MPC::P45PFS.ASEL = ena;
 				break;
 			case ANALOG::AIN102:  // P46
 				if(ena) {
 					PORT4::PDR.B6 = 0;
 					PORT4::PMR.B6 = 0;
 				}
-				MPC::P46PFS.ASEL = f;
+				MPC::P46PFS.ASEL = ena;
 				break;
 			case ANALOG::AIN103:  // P47
 				if(ena) {
 					PORT4::PDR.B7 = 0;
 					PORT4::PMR.B7 = 0;
 				}
-				MPC::P47PFS.ASEL = f;
+				MPC::P47PFS.ASEL = ena;
 				break;
 			default:
 				break;

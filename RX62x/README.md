@@ -434,6 +434,76 @@
 
 ---
 
+## 10 Bits A/D Converter input (AD) / 10 ビット A/D コンバーター入力 (AD)
+
+- [ad.hpp](ad.hpp?ts=4)
+
+### LFQFP100
+
+|AD/ANALOG|Port|
+|---|---|
+|AN0|P40 (95)|
+|AN1|P41 (93)|
+|AN2|P42 (92)|
+|AN3|P43 (91)|
+
+|AD1/ANALOG|Port|
+|---|---|
+|AN4|P44 (90)|
+|AN5|P45 (89)|
+|AN6|P46 (88)|
+|AN7|P47 (87)|
+
+### LFQFP144
+
+|AD/ANALOG|Port|
+|---|---|
+|AN0|P40 (141)|
+|AN1|P41 (139)|
+|AN2|P42 (138)|
+|AN3|P43 (137)|
+
+|AD1/ANALOG|Port|
+|---|---|
+|AN4|P44 (136)|
+|AN5|P45 (135)|
+|AN6|P46 (134)|
+|AN7|P47 (133)|
+
+---
+
+## 12 Bits A/D Converter input (S12AD) / 12 ビット A/D コンバーター入力 (S12AD)
+
+- [s12ad.hpp](s12ad.hpp?ts=4)
+
+### LFQFP100
+
+|S12AD/ANALOG|Port|
+|---|---|
+|AN000|P40 (95)|
+|AN001|P41 (93)|
+|AN002|P42 (92)|
+|AN003|P43 (91)|
+|AN004|P44 (90)|
+|AN005|P45 (89)|
+|AN006|P46 (88)|
+|AN007|P47 (87)|
+
+### LFQFP144
+
+|S12AD/ANALOG|Port|
+|---|---|
+|AN000|P40 (141)|
+|AN001|P41 (139)|
+|AN002|P42 (138)|
+|AN003|P43 (137)|
+|AN004|P44 (136)|
+|AN005|P45 (135)|
+|AN006|P46 (134)|
+|AN007|P47 (133)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
