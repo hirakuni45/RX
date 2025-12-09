@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX621/RX62N グループ・D/A 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  D/A コンバータ（DA）
+		@brief  10 Bits D/A コンバータ（DA）
 		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -25,12 +25,12 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入出力型
+			@brief  アナログ入出力型 (DA)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			DA0,
-			DA1,
+			DA0,		///< P03 (LFQFP100: ---) (LFQFP144:   4)
+			DA1,		///< P05 (LFQFP100: 100) (LFQFP144:   2)
 		};
 
 
@@ -41,12 +41,20 @@ namespace device {
 			@param[in]	ena		不許可の場合は「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(ANALOG an, bool f = true) noexcept
+		static void enable(ANALOG an, bool ena = true) noexcept
 		{
 			switch(an) {
 			case ANALOG::DA0:  // P03
+				if(ena) {
+					PORT0::DDR.B3 = 0;
+				}
+				PORT0::ICR.B3 = ena;
 				break;
 			case ANALOG::DA1:  // P05
+				if(ena) {
+					PORT0::DDR.B5 = 0;
+				}
+				PORT0::ICR.B5 = ena;
 				break;
 			default:
 				break;

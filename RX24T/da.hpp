@@ -6,7 +6,7 @@
 			B バージョン、２チャネル @n
 			RX24U、２チャネル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -31,12 +31,12 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ出力型 (DA)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			DA0,	///< P24/DA0 出力
-			DA1,	///< P23/DA1 出力
+			DA0,	///< P24 RX24T: (LFQFP100:  64), RX24U (LFQFP100:  65) (LFQFP144:  94)
+			DA1,	///< P23 RX24T: (LFQFP100:  65), RX24U (LFQFP100:  66) (LFQFP144:  95)
 		};
 
 
@@ -55,11 +55,11 @@ namespace device {
 			switch(an) {
 			case ANALOG::DA0:
 				PORT2::PCR.B4 = 0;  // disable pull-up
-				MPC::P24PFS.ASEL = 1;
+				MPC::P24PFS.ASEL = ena;
 				break;
 			case ANALOG::DA1:
 				PORT2::PCR.B3 = 0;  // disable pull-up
-				MPC::P23PFS.ASEL = 1;
+				MPC::P23PFS.ASEL = ena;
 				break;
 			}
 

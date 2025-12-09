@@ -264,6 +264,19 @@
 
 ---
 
+## 8 Bits D/A Converter output (DA) / 8 ビット D/A コンバーター出力 (DA)
+
+- [da.hpp](../RX140/da.hpp?ts=4)
+
+### LFQFP64
+
+|DA/ANALOG|Port|
+|---|---|
+|DA0|P03 (1)|
+|DA1|P05 (64)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

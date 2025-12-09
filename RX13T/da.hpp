@@ -4,7 +4,7 @@
 	@brief	RX13T/RX23T グループ・D/A 定義 @n
 			コンパレーター C 用リファレンス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,7 +26,6 @@ namespace device {
 	struct da_t {
 
 		static constexpr auto PERIPHERAL = peripheral::DA;	///< ペリフェラル型
-
 
 		//-----------------------------------------------------------------//
 		/*!

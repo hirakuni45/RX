@@ -533,6 +533,26 @@
 
 ---
 
+## 10 Bits D/A Converter output (DA) / 10 ビット D/A コンバーター出力 (DA)
+
+- [da.hpp](../RX63x/da.hpp?ts=4)
+
+### LFQFP64
+
+|DA/ANALOG|Port|
+|---|---|
+|DA0|P03 (1)|
+|DA1|P05 (63)|
+
+### LFQFP100
+
+|DA/ANALOG|Port|
+|---|---|
+|DA0|P03 (2)|
+|DA1|P05 (100)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

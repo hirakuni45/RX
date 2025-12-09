@@ -504,6 +504,26 @@
 
 ---
 
+## 10 Bits D/A Converter output (DA) / 10 ビット D/A コンバーター出力 (DA)
+
+- [da.hpp](da.hpp?ts=4)
+
+### LFQFP100
+
+|DA/ANALOG|Port|
+|---|---|
+|DA0|P03 (---)|
+|DA1|P05 (100)|
+
+### LFQFP144
+
+|DA/ANALOG|Port|
+|---|---|
+|DA0|P03 (4)|
+|DA1|P05 (2)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

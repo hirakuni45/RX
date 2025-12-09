@@ -4,7 +4,7 @@
 	@brief	12-Bit A/D Converter / 12 ビット A/D コンバータ (RX631/RX63N) @n
 			  21 channel A/D input 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -323,31 +323,38 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入力型
+			@brief  アナログ入力型 (S12AD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,	///< AN000 入力
-			AN001,
-			AN002,
-			AN003,
-			AN004,
-			AN005,
-			AN006,
-			AN007,
-			AN008,
-			AN009,
-			AN010,
-			AN011,
-			AN012,
-			AN013,
-			AN014,
-			AN015,
-			AN016,
-			AN017,
-			AN018,
-			AN019,
-			AN020,
+			AN000,		///< P40 (LFQFP100:  95) (LFQFP144: 141) (LFQFP176: 173)
+			AN001,		///< P41 (LFQFP100:  93) (LFQFP144: 139) (LFQFP176: 171)
+			AN002,		///< P42 (LFQFP100:  92) (LFQFP144: 138) (LFQFP176: 170)
+			AN003,		///< P43 (LFQFP100:  91) (LFQFP144: 137) (LFQFP176: 169)
+			AN004,		///< P44 (LFQFP100:  90) (LFQFP144: 136) (LFQFP176: 168)
+			AN005,		///< P45 (LFQFP100:  89) (LFQFP144: 135) (LFQFP176: 167)
+			AN006,		///< P46 (LFQFP100:  88) (LFQFP144: 134) (LFQFP176: 166)
+			AN007,		///< P47 (LFQFP100:  87) (LFQFP144: 133) (LFQFP176: 165)
+			AN008,		///< PD0 FIRST:  (LFQFP100:  86) (LFQFP144: 126) (LFQFP176: 158)
+						///< PE0 SECOND: (LFQFP100:  78) (LFQFP144: 111) (LFQFP176: 135)
+			AN009,		///< PD1 FIRST:  (LFQFP100:  85) (LFQFP144: 125) (LFQFP176: 156)
+						///< PE1 SECOND: (LFQFP100:  77) (LFQFP144: 110) (LFQFP176: 134)
+			AN010,		///< PD2 FIRST:  (LFQFP100:  84) (LFQFP144: 124) (LFQFP176: 154)
+						///< PE2 SECOND: (LFQFP100:  76) (LFQFP144: 109) (LFQFP176: 133)
+			AN011,		///< PD3 FIRST:  (LFQFP100:  83) (LFQFP144: 123) (LFQFP176: 150)
+						///< PE3 SECOND: (LFQFP100:  75) (LFQFP144: 108) (LFQFP176: 132)
+			AN012,		///< PD4 FIRST:  (LFQFP100:  82) (LFQFP144: 122) (LFQFP176: 148)
+						///< PE4 SECOND: (LFQFP100:  74) (LFQFP144: 107) (LFQFP176: 131)
+			AN013,		///< PD5 FIRST:  (LFQFP100:  81) (LFQFP144: 121) (LFQFP176: 147)
+						///< PE5 SECOND: (LFQFP100:  73) (LFQFP144: 106) (LFQFP176: 130)
+			AN014,		///< P90 (LFQFP100: ---) (LFQFP144: 131) (LFQFP176: 163)
+			AN015,		///< P91 (LFQFP100: ---) (LFQFP144: 129) (LFQFP176: 161)
+			AN016,		///< P92 (LFQFP100: ---) (LFQFP144: 128) (LFQFP176: 160)
+			AN017,		///< P93 (LFQFP100: ---) (LFQFP144: 127) (LFQFP176: 159)
+			AN018,		///< P00 (LFQFP100: ---) (LFQFP144:   8) (LFQFP176:   8)
+			AN019,		///< P01 (LFQFP100: ---) (LFQFP144:   7) (LFQFP176:   7)
+			AN020,		///< P02 (LFQFP100: ---) (LFQFP144:   6) (LFQFP176:   6)
+
 			TEMP,	///< 温度センサ
 			REF,	///< 内部基準電圧
 		};

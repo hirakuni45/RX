@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX111/RX130/RX140/RX260/RX261 グループ・D/A 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -29,12 +29,16 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入出力型
+			@brief  アナログ出力型 (DA) @n
+					RX111: P03 (LFQFP64:  1),   P05 (LFQFP64: 64) @n
+					RX130: P03 (LFQFP100:   2), P05 (LFQFP100: 100) @n
+					RX140: P03 (LFQFP48: --) (LFQFP64:  1) (LFQFP80:  2) @n
+					RX140: P05 (LFQFP48: --) (LFQFP64: 63) (LFQFP80: 80)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			DA0,
-			DA1,
+			DA0,	///< P03 RX260/RX261: (LFQFP100:   2)
+			DA1,	///< P05 RX260/RX261: (LFQFP100: 100)
 		};
 
 
