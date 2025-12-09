@@ -1068,6 +1068,33 @@
 
 ---
 
+## 12 Bits D/A Converter output (R12DA) / 12 ビット D/A コンバーター出力 (R12DA)
+
+- [r12da.hpp](../RX600/r12da.hpp?ts=4)
+
+### LFQFP100
+
+|R12DA/ANALOG|Port|
+|---|---|
+|DA0|P03 (---)|
+|DA1|P05 (100)|
+
+### LFQFP144
+
+|R12DA/ANALOG|Port|
+|---|---|
+|DA0|P03 (4)|
+|DA1|P05 (2)|
+
+### LFQFP176
+
+|R12DA/ANALOG|Port|
+|---|---|
+|DA0|P03 (4)|
+|DA1|P05 (2)|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|

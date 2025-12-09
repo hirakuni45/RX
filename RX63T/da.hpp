@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX63T グループ・D/A 定義
+	@brief	RX63T グループ D/A 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,12 +26,12 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  アナログ入出力型
+			@brief  アナログ出力型 (DA)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			DA0,	///< P54/DA0
-			DA1,	///< P55/DA1
+			DA0,	///< P54 (LFQFP64: --) (LFQFP100:  79)
+			DA1,	///< P55 (LFQFP64: --) (LFQFP100:  78)
 		};
 
 
@@ -49,10 +49,18 @@ namespace device {
 
 			switch(an) {
 			case ANALOG::DA0:
-				MPC::P54PFS.ASEL = 1;
+				if(ena) {
+					PORT5::PDR.B4 = 0;
+					PORT5::PMR.B4 = 0;
+				}
+				MPC::P54PFS.ASEL = ena;
 				break;
 			case ANALOG::DA1:
-				MPC::P55PFS.ASEL = 1;
+				if(ena) {
+					PORT5::PDR.B5 = 0;
+					PORT5::PMR.B5 = 0;
+				}
+				MPC::P55PFS.ASEL = ena;
 				break;
 			}
 
