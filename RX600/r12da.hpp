@@ -30,6 +30,8 @@ namespace device {
 	struct r12da_t {
 
 		static constexpr auto PERIPHERAL = per;		///< ペリフェラル型
+		static constexpr uint32_t RESOLUTION = 12;	///< D/A 変換分解能
+		static constexpr uint32_t CHANNEL = 2;		///< チャネル数
 
 		//-----------------------------------------------------------------//
 		/*!
