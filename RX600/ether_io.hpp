@@ -694,12 +694,12 @@ namespace device {
 		{
 			if(flag) {
 				// Set Ethernet interrupt level and enable
-				ICU::IPR[ICU::VECTOR::GROUPAL1] = intr_level_;
+				ICU::IPR[ICU::VECTOR::GROUPAL1] = static_cast<uint8_t>(intr_level_);
 				ICU::IER.enable(ICU::VECTOR::GROUPAL1);
-				ICU::GENAL1.EN4   = 1;
+				ICU::GENAL1.EN4 = 1;
 			} else {
 				// Disable Ethernet interrupt.
-				ICU::GENAL1.EN4   = 0;
+				ICU::GENAL1.EN4 = 0;
 				ICU::IER.enable(ICU::VECTOR::GROUPAL1, false);
 				ICU::IPR[ICU::VECTOR::GROUPAL1] = 0;
 			}

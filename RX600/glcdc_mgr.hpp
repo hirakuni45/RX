@@ -1293,7 +1293,7 @@ namespace device {
 
 		static void gr_plane_update_(uint32_t frame)
 		{
-			if(frame = 0) {
+			if(frame == 0) {
 				GLC::GR1VEN.VEN = 1;
 			} else {
 				GLC::GR2VEN.VEN = 1;
