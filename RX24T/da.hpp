@@ -28,6 +28,10 @@ namespace device {
 	struct da_t {
 
 		static constexpr auto PERIPHERAL = peripheral::DA;	///< ペリフェラル型
+		static constexpr uint32_t RESOLUTION = 8;	///< D/A 変換分解能
+		static constexpr uint32_t CHANNEL = 2;		///< チャネル数
+
+		static constexpr bool DACR_DAE = true;		///< DACR.DAE フラグの有無
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

@@ -732,6 +732,9 @@ namespace sound {
 				char* item = nullptr;
 				char* value = nullptr;
 				if(mp4ff_meta_get_by_index(dt.infile, k, &item, &value) > 0) {
+
+
+#if 0
 					std::string s = item;
 					if(s == "title") tag_.at_title() = value;
 					else if(s == "artist") tag_.at_artist() = value;
@@ -754,6 +757,9 @@ namespace sound {
 						}
 					}
 					free(item);
+#endif
+
+
 					free(value);
 				}
 			}
