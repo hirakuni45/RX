@@ -1,0 +1,2147 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "0446a8d8-38a2-4b5d-b499-e90cb1f8c12c")
+	(paper "A4")
+	(lib_symbols
+		(symbol "akizuki:2SA1162"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "Q"
+				(at 5.08 1.27 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "2SA1162"
+				(at 8.636 -1.524 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2SA1162GR.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "低雑音 PNP型 50V150mA (SMD)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "PNP SMD"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "2SA1162_0_1"
+				(polyline
+					(pts
+						(xy 0.635 1.905) (xy 0.635 -1.905) (xy 0.635 -1.905)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 0.635) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 -0.635) (xy 2.54 -2.54) (xy 2.54 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 1.27 0)
+					(radius 2.8194)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.286 -1.778) (xy 1.778 -2.286) (xy 1.27 -1.27) (xy 2.286 -1.778) (xy 2.286 -1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(symbol "2SA1162_1_1"
+				(pin input line
+					(at -5.08 0 0)
+					(length 5.715)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "E"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "akizuki:2SC2712"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "Q"
+				(at 5.08 1.524 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "2SC2712"
+				(at 8.89 -1.524 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2sc2712-gr.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "低雑音 NPN型 50V150mA (SMD)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "NPN SMD"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "2SC2712_0_1"
+				(polyline
+					(pts
+						(xy 0.635 1.905) (xy 0.635 -1.905) (xy 0.635 -1.905)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 0.635) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 -0.635) (xy 2.54 -2.54) (xy 2.54 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 1.27 0)
+					(radius 2.8194)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.778) (xy 1.778 -1.27) (xy 2.286 -2.286) (xy 1.27 -1.778) (xy 1.27 -1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(symbol "2SC2712_1_1"
+				(pin input line
+					(at -5.08 0 0)
+					(length 5.715)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "E"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "akizuki:C"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "C"
+				(at 2.54 2.54 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Value" "C"
+				(at -2.54 -2.54 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
+				(at 0 0 90)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 90)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "SMD 1608"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "RAD-0.2 1608"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "C_0_1"
+				(rectangle
+					(start -1.524 0.635)
+					(end 1.397 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.524 -0.508)
+					(end 1.397 -0.635)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 0 1.27)
+					(end 0 0.635)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 0 -0.635)
+					(end 0 -1.27)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 2.54)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.54)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:+5VA"
+			(power)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "+5VA"
+				(at 0 3.556 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"+5VA\""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "+5VA_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "+5VA_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:GNDA"
+			(power)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "GNDA"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"GNDA\" , analog ground"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "GNDA_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "GNDA_1_1"
+				(pin power_in line
+					(at 0 0 270)
+					(length 0)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(junction
+		(at 105.41 46.99)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "00cecb32-b764-4ecc-84bc-a432ef36a137")
+	)
+	(junction
+		(at 95.25 135.89)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "09ad4f97-98a4-400f-8fbc-653c48d78a40")
+	)
+	(junction
+		(at 95.25 151.13)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "23bd4c3c-347c-4888-9e3d-06adfe015bce")
+	)
+	(junction
+		(at 85.09 158.75)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "5ab1c688-5a12-4466-ae1d-442db0014e7f")
+	)
+	(junction
+		(at 95.25 39.37)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "77a95b98-59e3-4a1d-80cc-46dea8ecb947")
+	)
+	(junction
+		(at 85.09 31.75)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7950299a-18b9-4c33-8820-f57857e85b21")
+	)
+	(junction
+		(at 64.77 46.99)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "9395b62b-847f-4518-b668-7cdc6c686667")
+	)
+	(junction
+		(at 105.41 143.51)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "9d85f5b4-8be0-461b-904c-8c24691e7c23")
+	)
+	(junction
+		(at 95.25 54.61)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b36b5b31-7811-4e2e-9b77-cac9345cd17f")
+	)
+	(junction
+		(at 64.77 31.75)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "bbc48210-e401-44c8-9d85-33d4c6236af1")
+	)
+	(wire
+		(pts
+			(xy 95.25 151.13) (xy 97.79 151.13)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "030809c7-ca32-437e-866b-ea913c94f279")
+	)
+	(wire
+		(pts
+			(xy 92.71 39.37) (xy 95.25 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "04b2537a-fe23-44de-a934-23fafed1e3c5")
+	)
+	(wire
+		(pts
+			(xy 64.77 31.75) (xy 64.77 35.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "08313076-e858-48f3-96b2-a1942853fa29")
+	)
+	(wire
+		(pts
+			(xy 85.09 158.75) (xy 85.09 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "08e3dcfb-a88e-4544-873b-d14caa749f17")
+	)
+	(wire
+		(pts
+			(xy 95.25 135.89) (xy 97.79 135.89)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0f420627-b3dd-487c-b60b-fef2b7524960")
+	)
+	(wire
+		(pts
+			(xy 85.09 156.21) (xy 85.09 158.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0fffabe2-ee86-42d3-afa3-f0bf368d50ab")
+	)
+	(wire
+		(pts
+			(xy 105.41 156.21) (xy 105.41 158.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "12c2da56-0eb1-40c1-b1ad-03773cdc0035")
+	)
+	(wire
+		(pts
+			(xy 95.25 39.37) (xy 97.79 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "19e7e9f1-d3fa-4d60-9f98-e0de3d4b6229")
+	)
+	(wire
+		(pts
+			(xy 85.09 25.4) (xy 85.09 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "26b9684a-a2b8-4f17-aa2b-9ea7de8fd65d")
+	)
+	(wire
+		(pts
+			(xy 85.09 34.29) (xy 85.09 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2806e1f5-04c4-4977-b5da-e91266ae9c58")
+	)
+	(wire
+		(pts
+			(xy 85.09 31.75) (xy 105.41 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "28e03531-8df4-47ec-a74a-8f1ae61f8baa")
+	)
+	(wire
+		(pts
+			(xy 95.25 143.51) (xy 105.41 143.51)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "318e0add-a6d0-42d7-8fe4-bac79300f145")
+	)
+	(wire
+		(pts
+			(xy 85.09 31.75) (xy 64.77 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "35b4c51f-28ab-41ea-9818-74afb8221b66")
+	)
+	(wire
+		(pts
+			(xy 92.71 135.89) (xy 95.25 135.89)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "415cc01d-a8e6-41ad-8de7-1be9b5e94af9")
+	)
+	(wire
+		(pts
+			(xy 105.41 46.99) (xy 105.41 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "44cf2da1-9055-411e-b419-15ced4145cb6")
+	)
+	(wire
+		(pts
+			(xy 53.34 31.75) (xy 64.77 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "453f2196-bbc0-475b-a9b5-dca99ca5d1f7")
+	)
+	(wire
+		(pts
+			(xy 53.34 43.18) (xy 53.34 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "45ab76e0-9a6a-46c4-8a2f-fe9a290497b0")
+	)
+	(wire
+		(pts
+			(xy 95.25 54.61) (xy 97.79 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4a98ee51-6653-4f63-adf7-f447cac277f1")
+	)
+	(wire
+		(pts
+			(xy 53.34 35.56) (xy 53.34 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4d3eb5f3-538b-4d3d-b78f-6014c4ee7e56")
+	)
+	(wire
+		(pts
+			(xy 95.25 54.61) (xy 95.25 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5187660a-0489-4ed4-ba0d-ba34a6026c88")
+	)
+	(wire
+		(pts
+			(xy 64.77 43.18) (xy 64.77 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "54a8fb3d-b9c6-4f94-9671-fe015f02c687")
+	)
+	(wire
+		(pts
+			(xy 105.41 143.51) (xy 105.41 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5a628b69-4b57-40df-a4b4-fef05855ca87")
+	)
+	(wire
+		(pts
+			(xy 85.09 128.27) (xy 95.25 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5edc5f19-3c48-4b49-a18e-0b2be0d521be")
+	)
+	(wire
+		(pts
+			(xy 85.09 130.81) (xy 85.09 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "600098bc-84cb-490c-ba79-b11f9864e3b1")
+	)
+	(wire
+		(pts
+			(xy 105.41 31.75) (xy 105.41 34.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "65dfe4de-8366-4dae-86fb-2a484f545896")
+	)
+	(wire
+		(pts
+			(xy 95.25 151.13) (xy 95.25 143.51)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6ebf7838-bbdf-429c-b51b-f9e5bee96b20")
+	)
+	(wire
+		(pts
+			(xy 85.09 59.69) (xy 85.09 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7025f88d-1243-4931-83f3-693dc3641b53")
+	)
+	(wire
+		(pts
+			(xy 95.25 128.27) (xy 95.25 135.89)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "817afd55-93b0-4d6e-ba75-c7f47f8880df")
+	)
+	(wire
+		(pts
+			(xy 92.71 54.61) (xy 95.25 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8fe50aef-16bd-4777-ac17-9fbd500c9db7")
+	)
+	(wire
+		(pts
+			(xy 85.09 140.97) (xy 85.09 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9a7aa4e9-5901-4ef5-8ff1-f6b54ef0811a")
+	)
+	(wire
+		(pts
+			(xy 105.41 140.97) (xy 105.41 143.51)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9b974975-eee2-4660-8e01-2d7a9d205adf")
+	)
+	(wire
+		(pts
+			(xy 64.77 46.99) (xy 64.77 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a4c4cfac-770c-4fd1-b4fb-c92a7d9edf71")
+	)
+	(wire
+		(pts
+			(xy 95.25 39.37) (xy 95.25 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "be1a4147-66c6-4ce5-9623-b49c7a5c6a94")
+	)
+	(wire
+		(pts
+			(xy 53.34 46.99) (xy 64.77 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d38790ca-78a7-4592-a3e5-6de78270e6af")
+	)
+	(wire
+		(pts
+			(xy 105.41 46.99) (xy 95.25 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e2eec37e-62b0-4c6e-91a8-16578bb38638")
+	)
+	(wire
+		(pts
+			(xy 85.09 44.45) (xy 85.09 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e7c76ef1-8bca-4619-b16f-6b399a4895bd")
+	)
+	(wire
+		(pts
+			(xy 85.09 158.75) (xy 105.41 158.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e8160a53-c144-464b-8ccb-5cf9a9140a6d")
+	)
+	(wire
+		(pts
+			(xy 85.09 62.23) (xy 95.25 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f47610d7-f2a2-423e-bd50-739f7f23d46b")
+	)
+	(wire
+		(pts
+			(xy 92.71 151.13) (xy 95.25 151.13)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f7e66cdd-5cc4-4868-a83f-e9ebd63b2b0d")
+	)
+	(wire
+		(pts
+			(xy 105.41 44.45) (xy 105.41 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fb5dc2e0-b928-49b2-8af8-83900c543235")
+	)
+	(hierarchical_label "AD1"
+		(shape passive)
+		(at 38.1 80.01 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "26451f1f-0a65-4bfc-886d-c8dc793b0183")
+	)
+	(hierarchical_label "AD2"
+		(shape passive)
+		(at 38.1 83.82 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "62876e24-62a7-4930-93eb-e74767ca652f")
+	)
+	(hierarchical_label "AD0"
+		(shape passive)
+		(at 38.1 76.2 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "8f9990a9-7635-4e1d-a50a-4dcc5d6ef02c")
+	)
+	(symbol
+		(lib_id "akizuki:2SA1162")
+		(at 87.63 54.61 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2a2c431a-fbf8-44bb-aac9-44bee9586216")
+		(property "Reference" "Q3"
+			(at 82.7786 55.8222 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2SA1162"
+			(at 82.7786 53.3979 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+			(at 87.63 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2SA1162GR.pdf"
+			(at 87.63 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "低雑音 PNP型 50V150mA (SMD)"
+			(at 87.63 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "97a56a44-f3a8-44b6-873d-c8da278c0e62")
+		)
+		(pin "2"
+			(uuid "f1af29c1-a114-421c-a0ac-104880fd3d8f")
+		)
+		(pin "3"
+			(uuid "d37d4e37-f1f6-4e94-a1cc-d38e88991c4e")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "Q3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5VA")
+		(at 85.09 25.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "301fd332-60c8-4890-bcb4-72d38fd83619")
+		(property "Reference" "#PWR017"
+			(at 85.09 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5VA"
+			(at 85.09 21.2669 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 85.09 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 85.09 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5VA\""
+			(at 85.09 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "9f9354b3-4b75-42f6-9518-30d71c3e398d")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "#PWR017")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:2SA1162")
+		(at 102.87 54.61 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "46a25f4b-333b-49b1-bfe4-94a6dde1c8fc")
+		(property "Reference" "Q4"
+			(at 107.7214 55.8222 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2SA1162"
+			(at 107.7214 53.3979 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+			(at 102.87 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2SA1162GR.pdf"
+			(at 102.87 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "低雑音 PNP型 50V150mA (SMD)"
+			(at 102.87 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e83c854e-959e-4863-a029-8daf29bb1a8c")
+		)
+		(pin "3"
+			(uuid "073978ee-f5bd-4271-9520-f83f70a9cf3d")
+		)
+		(pin "2"
+			(uuid "d13e6d6d-974d-4c36-8260-f47b65be0355")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "Q4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:2SA1162")
+		(at 87.63 39.37 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "48b652c7-3235-4d01-926c-63428b6fee47")
+		(property "Reference" "Q2"
+			(at 82.7786 40.5822 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2SA1162"
+			(at 82.7786 38.1579 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+			(at 87.63 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2SA1162GR.pdf"
+			(at 87.63 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "低雑音 PNP型 50V150mA (SMD)"
+			(at 87.63 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "1b2cee99-e332-49d5-bee6-0c4316d427ac")
+		)
+		(pin "1"
+			(uuid "792be847-7777-4143-9480-3eddb0180418")
+		)
+		(pin "3"
+			(uuid "0bfaa4f7-4bf7-43fb-8670-a23b8d1ab7cc")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "Q2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GNDA")
+		(at 64.77 48.26 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4d53e15e-2a81-4c06-a4de-c2ad25577c7e")
+		(property "Reference" "#PWR018"
+			(at 64.77 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GNDA"
+			(at 64.77 52.3931 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 64.77 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 64.77 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GNDA\" , analog ground"
+			(at 64.77 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d0b7f1c7-323a-49df-9e6d-fd8c158f0936")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "#PWR018")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:2SC2712")
+		(at 87.63 151.13 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "77bf8235-814b-40ca-bf0e-2112fc3a4ac3")
+		(property "Reference" "Q8"
+			(at 82.7786 149.9178 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2SC2712"
+			(at 82.7786 152.3421 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+			(at 87.63 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2sc2712-gr.pdf"
+			(at 87.63 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "低雑音 NPN型 50V150mA (SMD)"
+			(at 87.63 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "90969eff-161a-49eb-95e9-858e896edc36")
+		)
+		(pin "2"
+			(uuid "bd35dc4f-ee6d-467a-85ed-bc9882972f75")
+		)
+		(pin "3"
+			(uuid "d6651831-7a92-4056-a349-dd1a9eef9954")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "Q8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:2SA1162")
+		(at 102.87 39.37 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "86575e54-d371-49e7-8e72-3828e3d78906")
+		(property "Reference" "Q1"
+			(at 107.7214 40.5822 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2SA1162"
+			(at 107.7214 38.1579 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+			(at 102.87 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2SA1162GR.pdf"
+			(at 102.87 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "低雑音 PNP型 50V150mA (SMD)"
+			(at 102.87 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "2fc758d7-175f-4d71-9aab-5bff9c8f5088")
+		)
+		(pin "2"
+			(uuid "cd106ac3-25ab-4155-b0c9-2a616c64b928")
+		)
+		(pin "1"
+			(uuid "82eabddf-bdc4-4c5b-b976-bf5562dd389e")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "Q1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:C")
+		(at 53.34 39.37 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8ed7b643-c553-4ebf-aa38-29467459e7d3")
+		(property "Reference" "C9"
+			(at 55.372 37.9535 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "0.1uF"
+			(at 55.372 40.7864 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
+			(at 53.34 39.37 90)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 53.34 39.37 90)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "SMD 1608"
+			(at 53.34 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "56e35054-0109-41f2-b766-a5be2e1460fe")
+		)
+		(pin "1"
+			(uuid "f8da23e6-5ecb-4a67-98c4-ce73f2623d20")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "C9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GNDA")
+		(at 85.09 162.56 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9160b310-ceb7-4af2-98f4-7810821a1349")
+		(property "Reference" "#PWR019"
+			(at 85.09 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GNDA"
+			(at 85.09 166.6931 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 85.09 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 85.09 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GNDA\" , analog ground"
+			(at 85.09 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a83a78e3-cf4c-4664-acef-d87bcc9f75cc")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "#PWR019")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:2SC2712")
+		(at 87.63 135.89 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a0d0452f-2a36-4aa7-8b3f-f49899c5802b")
+		(property "Reference" "Q7"
+			(at 82.7786 134.6778 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2SC2712"
+			(at 82.7786 137.1021 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+			(at 87.63 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2sc2712-gr.pdf"
+			(at 87.63 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "低雑音 NPN型 50V150mA (SMD)"
+			(at 87.63 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "0814d6f1-b85a-46ed-a3a4-dd80703e9ab9")
+		)
+		(pin "2"
+			(uuid "cdf96e82-e38f-49e1-9bd5-534fc31a8ba7")
+		)
+		(pin "1"
+			(uuid "54d179ab-0b02-4749-abc0-7cdc4ccb7490")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "Q7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:2SC2712")
+		(at 102.87 135.89 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a444c712-10ee-4287-badf-2cdd6134da04")
+		(property "Reference" "Q5"
+			(at 107.7214 134.6778 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2SC2712"
+			(at 107.7214 137.1021 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+			(at 102.87 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2sc2712-gr.pdf"
+			(at 102.87 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "低雑音 NPN型 50V150mA (SMD)"
+			(at 102.87 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5cd8e788-af68-4c50-8379-f8fb9cb51e58")
+		)
+		(pin "2"
+			(uuid "5a835ff8-11f4-48f4-90ba-fe5b0515d6c0")
+		)
+		(pin "3"
+			(uuid "4f06115a-cc87-4a79-9d2e-e839380539a3")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "Q5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:2SC2712")
+		(at 102.87 151.13 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b45269e2-dd75-4437-a8ab-f031745e29ea")
+		(property "Reference" "Q6"
+			(at 107.7214 149.9178 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2SC2712"
+			(at 107.7214 152.3421 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SC-59_Handsoldering"
+			(at 102.87 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://akizukidenshi.com/goodsaffix/2sc2712-gr.pdf"
+			(at 102.87 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "低雑音 NPN型 50V150mA (SMD)"
+			(at 102.87 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "501004e5-0aaa-4855-877e-51ffd87d8bd2")
+		)
+		(pin "1"
+			(uuid "1ad6a20c-7762-488c-8729-ff5fb3134075")
+		)
+		(pin "3"
+			(uuid "f46e867d-8eee-4c5b-abb6-74779bc5ad1e")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "Q6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "akizuki:C")
+		(at 64.77 39.37 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d4ae75e8-90af-41fa-b549-b9999f6777d4")
+		(property "Reference" "C8"
+			(at 66.802 37.9535 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1uF"
+			(at 66.802 40.7864 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
+			(at 64.77 39.37 90)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 64.77 39.37 90)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "SMD 1608"
+			(at 64.77 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "ca9465f6-9d56-46ab-909f-10223be26a2c")
+		)
+		(pin "1"
+			(uuid "97ea1220-a390-4d9e-8233-5aeb97210647")
+		)
+		(instances
+			(project ""
+				(path "/eb740f34-5f00-455d-8244-e00d7f9fb6e6/163a4dae-aefb-4f1d-b331-a9c15140ac6f"
+					(reference "C8")
+					(unit 1)
+				)
+			)
+		)
+	)
+)
