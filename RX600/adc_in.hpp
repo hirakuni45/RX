@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX マイコングループ A/D 変換制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -117,15 +117,22 @@ namespace device {
 			}
 
 			switch(grp) {
+#if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261)
 			case GROUP::A:
 				ADCU::ADANSA.set(ana);
 				break;
 			case GROUP::B:
 				ADCU::ADANSB.set(ana);
 				break;
+#elif defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX631) || defined(SIG_RX63N)
+			case GROUP::A:
+				ADCU::ADANSA.set(ana);
+				break;
+#else
 			case GROUP::C:
 				ADCU::ADANSB.set(ana);
 				break;
+#endif
 			}
 #endif
 

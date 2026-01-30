@@ -466,4 +466,5 @@ namespace device {
 #endif
 		}
 	};
+	typedef flash_io FLASH_IO;
 }

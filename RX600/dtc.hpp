@@ -190,7 +190,7 @@ namespace device {
 
 #if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113)
 	typedef dtca_t DTC;
-#elif defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX660) || defined(SIG_RX671)
+#elif defined(SIG_RX13T) || defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX660) || defined(SIG_RX671)
 	typedef dtcb_t DTC;
 #else
 	typedef dtca_t DTC;

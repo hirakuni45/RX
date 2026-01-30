@@ -14,7 +14,7 @@
 			・RX64M/RX71M (Group: A, B, C) @n
 			・RX66T/RX72T (Group: A, B, C)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
