@@ -118,60 +118,88 @@
 
 ---
 
+## Device, Renesas / デバイス、ルネサス
+
+- [device.hpp (SIG_RX260, SIG_RX261)](../common/device.hpp?ts=4)
+- [renesas.hpp (SIG_RX260, SIG_RX261)](../common/renesas.hpp?ts=4)
+
+|name space|Device, Renesas|デバイス、ルネサス|
+|---|---|---|
+|[clock_profile](../RX26x/clock_profile?ts=4)|Clock Profile|クロック・プロファイル|
+|[SYSTEM](../RX26x/system.hpp?ts=4)|Clock Generation Circuit|クロック発生回路|
+|[power_mgr](../RX26x/power_mgr.hpp?ts=4)|Low Power Consumption|消費電力低減機能|
+|[ICU](../RX26x/icu.hpp?ts=4)|Interrupt Controller|割り込みコントローラ|
+|[icu_mgr](../RX26x/icu_mgr.hpp?ts=4)|ICU Manager|ICU マネージャー|
+|[MPC](../RX26x/mpc.hpp?ts=4)|Multi-Function Pin Controller|マルチファンクションピンコントローラ|
+|[PORTx](../RX26x/port.hpp?ts=4)|I/O Ports|I/O ポート|
+|[port_map](../RX26x/port_map.hpp?ts=4)|Port Mapping|ポート・マッピング|
+|[port_map_mtu](../RX26x/port_map_mtu.hpp?ts=4)|Port Mapping MTU|ポート・マッピング MTU|
+|[port_map_gptw](../RX26x/port_map_gptw.hpp?ts=4)|Port Mapping GPTW|ポート・マッピング GPTW|
+|[port_map_tmr](../RX26x/port_map_tmr.hpp?ts=4)|Port Mapping TMR|ポート・マッピング TMR|
+|[port_map_irq](../RX26x/port_map_irq.hpp?ts=4)|Port Mapping IRQ|ポート・マッピング IRQ|
+|[FLASH](../RX140/flash.hpp?ts=4)|Flash Memory|フラッシュメモリ|
+|[SYSTEM_IO](../RX26x/system_io.hpp?ts=4)|System In/Out (Clock Setting)|システム In/Out (クロック設定)|
+|[FLASH_IO](../RX24T/flash_io.hpp?ts=4)|Flash In/Out|フラッシュ In/Out|
+|[adc_in](../RX600/adc_in.hpp?ts=4)|A/D Converter Input|A/D 変換入力|
+|[dac_out](../RX600/dac_out.hpp?ts=4)|D/A Converter Output|D/A 変換出力|
+|[board_profile](../RX26x/board_profile?ts=4)|Board Profile|ボード・プロファイル|
+
+---
+
 ## Peripheral / ペリフェラル
 
 - [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
-|CAC|Clock Frequency Accuracy Measurement Circuit|クロック周波数精度測定回路|
-|DMAC0|DMA Controller channel 0|DMA コントローラ・チャネル０|
-|DMAC1|DMA Controller channel 1|DMA コントローラ・チャネル１|
-|DMAC2|DMA Controller channel 2|DMA コントローラ・チャネル２|
-|DMAC3|DMA Controller channel 3|DMA コントローラ・チャネル３|
-|DTC|Data Transfer Controller|データトランスファコントローラ|
-|ELC|Event Link Controller|イベントリンクコントローラ|
-|GPTW0|General PWM Timer 0|汎用 PWM タイマ０|
-|GPTW1|General PWM Timer 1|汎用 PWM タイマ１|
-|GPTW2|General PWM Timer 2|汎用 PWM タイマ２|
-|GPTW3|General PWM Timer 3|汎用 PWM タイマ３|
-|GPTW4|General PWM Timer 4|汎用 PWM タイマ４|
-|GPTW5|General PWM Timer 5|汎用 PWM タイマ５|
-|GPTW6|General PWM Timer 6|汎用 PWM タイマ６|
-|GPTW7|General PWM Timer 7|汎用 PWM タイマ７|
-|POEG|GPTW Port Output Enable|GPTW 用ポートアウトプットイネーブル|
-|TMR0|8-Bit Timer 0|8 ビットタイマ０|
-|TMR1|8-Bit Timer 1|8 ビットタイマ１|
-|TMR2|8-Bit Timer 2|8 ビットタイマ２|
-|TMR3|8-Bit Timer 3|8 ビットタイマ３|
-|CMT0|Compare Match Timer 0|コンペアマッチタイマ０|
-|CMT1|Compare Match Timer 1|コンペアマッチタイマ１|
-|CMT2|Compare Match Timer 2|コンペアマッチタイマ２|
-|CMT3|Compare Match Timer 3|コンペアマッチタイマ３|
-|RTC|Realtime Clock|リアルタイムクロック|
-|LPT|Low Power Timer|ローパワータイマ|
-|WDTA|Watchdog Timer|ウォッチドッグタイマ|
-|IWDT|Independent Watchdog Timer|独立ウォッチドッグタイマ|
-|USB0|USB 2.0 Host/Function Module 0|USB 2.0 ホスト/ファンクションモジュール０|
-|SCI1|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
-|SCI5|Serial Communications Interface 5|シリアルコミュニケーションインタフェース５|
-|SCI6|Serial Communications Interface 6|シリアルコミュニケーションインタフェース６|
-|SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
-|RSCI0|(R)Serial Communications Interface 0|Ｒシリアルコミュニケーションインタフェース０|
-|RSCI8|(R)Serial Communications Interface 8|Ｒシリアルコミュニケーションインタフェース８|
-|RSCI9|(R)Serial Communications Interface 9|Ｒシリアルコミュニケーションインタフェース９|
-|RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
-|CANFD0|CANFD Module 0|CANFD モジュール０|
-|RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
-|CRC|CRC Calculator|CRC 演算器|
-|REMC0|Remote Control Signal Receiver|リモコン信号受信機能|
-|RSIP|Renesas Secure IP (RSIP-E11A)|Renesas Secure IP (RSIP-E11A)|
-|CTSU|Capacitive Touch Sensing Unit|静電容量式タッチセンサ|
-|S12AD|12-Bit A/D Converter|12 ビット A/D コンバータ|
-|DA|8-Bit D/A Converter|8 ビット D/A コンバータ|
+|[CAC](../RX600/cac.hpp?ts=4)|Clock Frequency Accuracy Measurement Circuit|クロック周波数精度測定回路|
+|[DMAC0](../RX600/dmac.hpp?ts=4)|DMA Controller channel 0|DMA コントローラ・チャネル０|
+|[DMAC1](../RX600/dmac.hpp?ts=4)|DMA Controller channel 1|DMA コントローラ・チャネル１|
+|[DMAC2](../RX600/dmac.hpp?ts=4)|DMA Controller channel 2|DMA コントローラ・チャネル２|
+|[DMAC3](../RX600/dmac.hpp?ts=4)|DMA Controller channel 3|DMA コントローラ・チャネル３|
+|[DTC](../RX600/dtc.hpp?ts=4)|Data Transfer Controller|データトランスファコントローラ|
+|[ELC](../RX600/elc.hpp?ts=4)|Event Link Controller|イベントリンクコントローラ|
+|[GPTW0](../RX600/gptw.hpp?ts=4)|General PWM Timer 0|汎用 PWM タイマ０|
+|[GPTW1](../RX600/gptw.hpp?ts=4)|General PWM Timer 1|汎用 PWM タイマ１|
+|[GPTW2](../RX600/gptw.hpp?ts=4)|General PWM Timer 2|汎用 PWM タイマ２|
+|[GPTW3](../RX600/gptw.hpp?ts=4)|General PWM Timer 3|汎用 PWM タイマ３|
+|[GPTW4](../RX600/gptw.hpp?ts=4)|General PWM Timer 4|汎用 PWM タイマ４|
+|[GPTW5](../RX600/gptw.hpp?ts=4)|General PWM Timer 5|汎用 PWM タイマ５|
+|[GPTW6](../RX600/gptw.hpp?ts=4)|General PWM Timer 6|汎用 PWM タイマ６|
+|[GPTW7](../RX600/gptw.hpp?ts=4)|General PWM Timer 7|汎用 PWM タイマ７|
+|[POEG](../RX600/poeg.hpp?ts=4)|GPTW Port Output Enable|GPTW 用ポートアウトプットイネーブル|
+|[TMR0](../RX600/tmr.hpp?ts=4)|8-Bit Timer 0|8 ビットタイマ０|
+|[TMR1](../RX600/tmr.hpp?ts=4)|8-Bit Timer 1|8 ビットタイマ１|
+|[TMR2](../RX600/tmr.hpp?ts=4)|8-Bit Timer 2|8 ビットタイマ２|
+|[TMR3](../RX600/tmr.hpp?ts=4)|8-Bit Timer 3|8 ビットタイマ３|
+|[CMT0](../RX600/cmt.hpp?ts=4)|Compare Match Timer 0|コンペアマッチタイマ０|
+|[CMT1](../RX600/cmt.hpp?ts=4)|Compare Match Timer 1|コンペアマッチタイマ１|
+|[CMT2](../RX600/cmt.hpp?ts=4)|Compare Match Timer 2|コンペアマッチタイマ２|
+|[CMT3](../RX600/cmt.hpp?ts=4)|Compare Match Timer 3|コンペアマッチタイマ３|
+|[RTC](../RX231/rtc.hpp?ts=4)|Realtime Clock|リアルタイムクロック|
+|[LPT](../RX600/lpt.hpp?ts=4)|Low Power Timer|ローパワータイマ|
+|[WDTA](../RX600/wdta.hpp?ts=4)|Watchdog Timer|ウォッチドッグタイマ|
+|[IWDT](../RX600/iwdt.hpp?ts=4)|Independent Watchdog Timer|独立ウォッチドッグタイマ|
+|[USB0](../RX600/usb.hpp?ts=4)|USB 2.0 Host/Function Module 0|USB 2.0 ホスト/ファンクションモジュール０|
+|[SCI1](../RX600/sci_k.hpp?ts=4)|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
+|[SCI5](../RX600/sci_k.hpp?ts=4)|Serial Communications Interface 5|シリアルコミュニケーションインタフェース５|
+|[SCI6](../RX600/sci_k.hpp?ts=4)|Serial Communications Interface 6|シリアルコミュニケーションインタフェース６|
+|[SCI12](../RX600/sci_h.hpp?ts=4)|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
+|[RSCI0](../RX600/rsci.hpp?ts=4)|(R)Serial Communications Interface 0|Ｒシリアルコミュニケーションインタフェース０|
+|[RSCI8](../RX600/rsci.hpp?ts=4)|(R)Serial Communications Interface 8|Ｒシリアルコミュニケーションインタフェース８|
+|[RSCI9](../RX600/rsci.hpp?ts=4)|(R)Serial Communications Interface 9|Ｒシリアルコミュニケーションインタフェース９|
+|[RIIC0](../RX600/riic.hpp?ts=4)|I2C-bus Interface 0|I2C バスインタフェース０|
+|[CANFD0](../RX600/canfd.hpp?ts=4)|CANFD Module 0|CANFD モジュール０|
+|[RSPI0](../RX600/rspi.hpp?ts=4)|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
+|[CRC](../RX600/crc.hpp?ts=4)|CRC Calculator|CRC 演算器|
+|[REMC0](../RX600/remc.hpp?ts=4)|Remote Control Signal Receiver|リモコン信号受信機能|
+|[RSIP](../RX600/rspi.hpp?ts=4)|Renesas Secure IP (RSIP-E11A)|Renesas Secure IP (RSIP-E11A)|
+|[CTSU](../RX600/ctsu2.hpp?ts=4)|Capacitive Touch Sensing Unit|静電容量式タッチセンサ|
+|[S12AD](../RX231/s12ade.hpp?ts=4)|12-Bit A/D Converter|12 ビット A/D コンバータ|
+|[DA](../RX140/da.hpp?ts=4)|8-Bit D/A Converter|8 ビット D/A コンバータ|
 |TEMPS|Temperature Sensor|温度センサ|
-|CMPB|Comparator B|コンパレーターＢ|
-|DOC|Data Operation Circuit|データ演算回路|
+|[CMPB](../RX231/cmpb.hpp?ts=4)|Comparator B|コンパレーターＢ|
+|[DOC](../RX600/doc.hpp?ts=4)|Data Operation Circuit|データ演算回路|
 
 ---
 

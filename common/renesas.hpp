@@ -416,6 +416,7 @@
 #include "RX26x/system_io.hpp"
 #include "RX24T/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX600/adc_in.hpp"
 #include "RX600/dac_out.hpp"
 
 #include "RX26x/board_profile.hpp"
