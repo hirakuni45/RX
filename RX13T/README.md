@@ -126,45 +126,71 @@ namespace board_profile {
 
 ---
 
+## Device, Renesas / デバイス、ルネサス
+
+- [device.hpp (SIG_RX13T)](../common/device.hpp?ts=4)
+- [renesas.hpp (SIG_RX13T)](../common/renesas.hpp?ts=4)
+
+|name space|Device, Renesas|デバイス、ルネサス|
+|---|---|---|
+|[clock_profile](../RX13T/clock_profile?ts=4)|Clock Profile|クロック・プロファイル|
+|[SYSTEM](../RX24T/system.hpp?ts=4)|Clock Generation Circuit|クロック発生回路|
+|[power_mgr](../RX13T/power_mgr.hpp?ts=4)|Low Power Consumption|消費電力低減機能|
+|[ICU](../RX13T/icu.hpp?ts=4)|Interrupt Controller|割り込みコントローラ|
+|[icu_mgr](../RX24T/icu_mgr.hpp?ts=4)|ICU Manager|ICU マネージャー|
+|[MPC](../RX13T/mpc.hpp?ts=4)|Multi-Function Pin Controller|マルチファンクションピンコントローラ|
+|[PORTx](../RX13T/port.hpp?ts=4)|I/O Ports|I/O ポート|
+|[port_map](../RX13T/port_map.hpp?ts=4)|Port Mapping|ポート・マッピング|
+|[port_map_mtu](../RX13T/port_map_mtu.hpp?ts=4)|Port Mapping MTU|ポート・マッピング MTU|
+|[port_map_irq](../RX13T/port_map_irq.hpp?ts=4)|Port Mapping IRQ|ポート・マッピング IRQ|
+|[FLASH](../RX130/flash.hpp?ts=4)|Flash Memory|フラッシュメモリ|
+|[SYSTEM_IO](../RX24T/system_io.hpp?ts=4)|System In/Out (Clock Setting)|システム In/Out (クロック設定)|
+|[FLASH_IO](../RX24T/flash_io.hpp?ts=4)|Flash In/Out|フラッシュ In/Out|
+|[adc_in](../RX24T/adc_in.hpp?ts=4)|A/D Converter Input|A/D 変換入力|
+|[dac_out](../RX24T/dac_out.hpp?ts=4)|D/A Converter Output|D/A 変換出力|
+|[board_profile](../RX13T/board_profile?ts=4)|Board Profile|ボード・プロファイル|
+
+---
+
 ## Peripheral / ペリフェラル
 
 - [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
-|CAC|Clock Frequency Accuracy Measurement Circuit|クロック周波数精度測定回路|
-|DTC|Data Transfer Controller|データトランスファコントローラ|
-|MTU0|Multi-Function Timer Pulse Unit 0|マルチファンクションタイマパルスユニット０|
-|MTU1|Multi-Function Timer Pulse Unit 1|マルチファンクションタイマパルスユニット１|
-|MTU2|Multi-Function Timer Pulse Unit 2|マルチファンクションタイマパルスユニット２|
-|MTU3|Multi-Function Timer Pulse Unit 3|マルチファンクションタイマパルスユニット３|
-|MTU4|Multi-Function Timer Pulse Unit 4|マルチファンクションタイマパルスユニット４|
-|MTU5|Multi-Function Timer Pulse Unit 5|マルチファンクションタイマパルスユニット５|
-|POE3|Port Output Enable 3|ポートアウトプットイネーブル３|
-|TMR0|8-Bit Timer 0|8 ビットタイマ０|
-|TMR1|8-Bit Timer 1|8 ビットタイマ１|
-|TMR2|8-Bit Timer 2|8 ビットタイマ２|
-|TMR3|8-Bit Timer 3|8 ビットタイマ３|
-|TMR4|8-Bit Timer 4|8 ビットタイマ４|
-|TMR5|8-Bit Timer 5|8 ビットタイマ５|
-|TMR6|8-Bit Timer 6|8 ビットタイマ６|
-|TMR7|8-Bit Timer 7|8 ビットタイマ７|
-|CMT0|Compare Match Timer 0|コンペアマッチタイマ０|
-|CMT1|Compare Match Timer 1|コンペアマッチタイマ１|
-|CMT2|Compare Match Timer 2|コンペアマッチタイマ２|
-|CMT3|Compare Match Timer 3|コンペアマッチタイマ３|
-|IWDT|Independent Watchdog Timer|独立ウォッチドッグタイマ|
-|SCI1|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
-|SCI5|Serial Communications Interface 5|シリアルコミュニケーションインタフェース５|
-|SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
-|RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
-|CRC|CRC Calculator|CRC 演算器|
-|S12AD|12-Bit A/D Converter|12 ビット A/D コンバータ|
-|DA|8-Bit D/A Converter|8 ビット D/A コンバータ|
-|CMPC0|Comparator C0|コンパレーターＣ０|
-|CMPC1|Comparator C1|コンパレーターＣ１|
-|CMPC2|Comparator C2|コンパレーターＣ２|
-|DOC|Data Operation Circuit|データ演算回路|
+|[CAC](../RX600/cac.hpp?ts=4)|Clock Frequency Accuracy Measurement Circuit|クロック周波数精度測定回路|
+|[DTC](../RX600/dtc.hpp?ts=4)|Data Transfer Controller|データトランスファコントローラ|
+|[MTU0](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 0|マルチファンクションタイマパルスユニット０|
+|[MTU1](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 1|マルチファンクションタイマパルスユニット１|
+|[MTU2](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 2|マルチファンクションタイマパルスユニット２|
+|[MTU3](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 3|マルチファンクションタイマパルスユニット３|
+|[MTU4](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 4|マルチファンクションタイマパルスユニット４|
+|[MTU5](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 5|マルチファンクションタイマパルスユニット５|
+|[POE3](../RX13T/poe3.hpp?ts=4)|Port Output Enable 3|ポートアウトプットイネーブル３|
+|[TMR0](../RX600/tmr.hpp?ts=4)|8-Bit Timer 0|8 ビットタイマ０|
+|[TMR1](../RX600/tmr.hpp?ts=4)|8-Bit Timer 1|8 ビットタイマ１|
+|[TMR2](../RX600/tmr.hpp?ts=4)|8-Bit Timer 2|8 ビットタイマ２|
+|[TMR3](../RX600/tmr.hpp?ts=4)|8-Bit Timer 3|8 ビットタイマ３|
+|[TMR4](../RX600/tmr.hpp?ts=4)|8-Bit Timer 4|8 ビットタイマ４|
+|[TMR5](../RX600/tmr.hpp?ts=4)|8-Bit Timer 5|8 ビットタイマ５|
+|[TMR6](../RX600/tmr.hpp?ts=4)|8-Bit Timer 6|8 ビットタイマ６|
+|[TMR7](../RX600/tmr.hpp?ts=4)|8-Bit Timer 7|8 ビットタイマ７|
+|[CMT0](../RX600/cmt.hpp?ts=4)|Compare Match Timer 0|コンペアマッチタイマ０|
+|[CMT1](../RX600/cmt.hpp?ts=4)|Compare Match Timer 1|コンペアマッチタイマ１|
+|[CMT2](../RX600/cmt.hpp?ts=4)|Compare Match Timer 2|コンペアマッチタイマ２|
+|[CMT3](../RX600/cmt.hpp?ts=4)|Compare Match Timer 3|コンペアマッチタイマ３|
+|[IWDT](../RX600/iwdt.hpp?ts=4)|Independent Watchdog Timer|独立ウォッチドッグタイマ|
+|[SCI1](../RX600/sci_e.hpp?ts=4)|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
+|[SCI5](../RX600/sci_e.hpp?ts=4)|Serial Communications Interface 5|シリアルコミュニケーションインタフェース５|
+|[SCI12](../RX600/sci_f.hpp?ts=4)|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
+|[RIIC0](../RX600/riic.hpp?ts=4)|I2C-bus Interface 0|I2C バスインタフェース０|
+|[CRC](../RX600/crc.hpp?ts=4)|CRC Calculator|CRC 演算器|
+|[S12AD](../RX13T/s12ad.hpp?ts=4)|12-Bit A/D Converter|12 ビット A/D コンバータ|
+|[DA](../RX13T/da.hpp?ts=4)|8-Bit D/A Converter|8 ビット D/A コンバータ|
+|[CMPC0](../RX600/cmpc.hpp?ts=4)|Comparator C0|コンパレーターＣ０|
+|[CMPC1](../RX600/cmpc.hpp?ts=4)|Comparator C1|コンパレーターＣ１|
+|[CMPC2](../RX600/cmpc.hpp?ts=4)|Comparator C2|コンパレーターＣ２|
+|[DOC](../RX600/doc.hpp?ts=4)|Data Operation Circuit|データ演算回路|
 
 ---
 
