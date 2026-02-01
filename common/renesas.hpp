@@ -488,6 +488,7 @@
 #include "RX62x/system_io.hpp"
 #include "RX62x/flash_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX600/adc_in.hpp"
 #include "RX24T/dac_out.hpp"
 
 #include "RX62x/board_profile.hpp"
