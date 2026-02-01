@@ -120,63 +120,89 @@
 
 ---
 
+## Device, Renesas / デバイス、ルネサス
+
+- [device.hpp (SIG_RX63T)](../common/device.hpp?ts=4)
+- [renesas.hpp (SIG_RX63T)](../common/renesas.hpp?ts=4)
+
+|name space|Device, Renesas|デバイス、ルネサス|
+|---|---|---|
+|[clock_profile](../RX63T/clock_profile?ts=4)|Clock Profile|クロック・プロファイル|
+|[SYSTEM](../RX63T/system.hpp?ts=4)|Clock Generation Circuit|クロック発生回路|
+|[power_mgr](../RX63T/power_mgr.hpp?ts=4)|Low Power Consumption|消費電力低減機能|
+|[ICU](../RX63T/icu.hpp?ts=4)|Interrupt Controller|割り込みコントローラ|
+|[icu_mgr](../RX63T/icu_mgr.hpp?ts=4)|ICU Manager|ICU マネージャー|
+|[MPC](../RX63T/mpc.hpp?ts=4)|Multi-Function Pin Controller|マルチファンクションピンコントローラ|
+|[PORTx](../RX63T/port.hpp?ts=4)|I/O Ports|I/O ポート|
+|[port_map](../RX63T/port_map.hpp?ts=4)|Port Mapping|ポート・マッピング|
+|[port_map_mtu](../RX63T/port_map_mtu.hpp?ts=4)|Port Mapping MTU|ポート・マッピング MTU|
+|[port_map_gpt](../RX63T/port_map_gpt.hpp?ts=4)|Port Mapping GPT|ポート・マッピング GPT|
+|[port_map_irq](../RX63T/port_map_irq.hpp?ts=4)|Port Mapping IRQ|ポート・マッピング IRQ|
+|[FLASH](../RX63T/flash.hpp?ts=4)|Flash Memory|フラッシュメモリ|
+|[SYSTEM_IO](../RX63T/system_io.hpp?ts=4)|System In/Out (Clock Setting)|システム In/Out (クロック設定)|
+|[FLASH_IO](../RX62x/flash_io.hpp?ts=4)|Flash In/Out|フラッシュ In/Out|
+|[adc_in](../RX600/adc_in.hpp?ts=4)|A/D Converter Input|A/D 変換入力|
+|[board_profile](../RX63T/board_profile?ts=4)|Board Profile|ボード・プロファイル|
+
+---
+
 ## Peripheral / ペリフェラル
 
 - [peripheral.hpp](peripheral.hpp?ts=4)
 
 |Peripheral|Function|機能|
 |---|---|---|
-|CAC|Clock Frequency Accuracy Measurement Circuit|クロック周波数精度測定回路|
-|DMAC0|DMA Controller channel 0|DMA コントローラ・チャネル０|
-|DMAC1|DMA Controller channel 1|DMA コントローラ・チャネル１|
-|DMAC2|DMA Controller channel 2|DMA コントローラ・チャネル２|
-|DMAC3|DMA Controller channel 3|DMA コントローラ・チャネル３|
-|DTC|Data Transfer Controller|データトランスファコントローラ|
-|MTU0|Multi-Function Timer Pulse Unit 0|マルチファンクションタイマパルスユニット０|
-|MTU1|Multi-Function Timer Pulse Unit 1|マルチファンクションタイマパルスユニット１|
-|MTU2|Multi-Function Timer Pulse Unit 2|マルチファンクションタイマパルスユニット２|
-|MTU3|Multi-Function Timer Pulse Unit 3|マルチファンクションタイマパルスユニット３|
-|MTU4|Multi-Function Timer Pulse Unit 4|マルチファンクションタイマパルスユニット４|
-|MTU5|Multi-Function Timer Pulse Unit 5|マルチファンクションタイマパルスユニット５|
-|MTU6|Multi-Function Timer Pulse Unit 6|マルチファンクションタイマパルスユニット６|
-|MTU7|Multi-Function Timer Pulse Unit 7|マルチファンクションタイマパルスユニット７|
-|POE3|Port Output Enable 3|ポートアウトプットイネーブル３|
-|GPT0|General PWM Timer 0|汎用 PWM タイマ０|
-|GPT1|General PWM Timer 1|汎用 PWM タイマ１|
-|GPT2|General PWM Timer 2|汎用 PWM タイマ２|
-|GPT3|General PWM Timer 3|汎用 PWM タイマ３|
-|GPT4|General PWM Timer 4|汎用 PWM タイマ４|
-|GPT5|General PWM Timer 5|汎用 PWM タイマ５|
-|GPT6|General PWM Timer 6|汎用 PWM タイマ６|
-|GPT7|General PWM Timer 7|汎用 PWM タイマ７|
-|CMT0|Compare Match Timer 0|コンペアマッチタイマ０|
-|CMT1|Compare Match Timer 1|コンペアマッチタイマ１|
-|CMT2|Compare Match Timer 2|コンペアマッチタイマ２|
-|CMT3|Compare Match Timer 3|コンペアマッチタイマ３|
-|WDTA|Watchdog Timer|ウォッチドッグタイマ|
-|IWDT|Independent Watchdog Timer|独立ウォッチドッグタイマ|
-|USB0|USB 2.0 Host/Function Module 0|USB 2.0 ホスト/ファンクションモジュール０|
-|SCI0|Serial Communications Interface 0|シリアルコミュニケーションインタフェース０|
-|SCI1|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
-|SCI2|Serial Communications Interface 2|シリアルコミュニケーションインタフェース２|
-|SCI3|Serial Communications Interface 3|シリアルコミュニケーションインタフェース３|
-|SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
-|RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
-|RIIC1|I2C-bus Interface 1|I2C バスインタフェース１|
-|CAN1|CAN Module 1|CAN モジュール１|
-|RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
-|RSPI1|Serial Peripheral Interface 1|シリアルペリフェラルインタフェース１|
-|CRC|CRC Calculator|CRC 演算器|
-|S12AD|12-Bit A/D Converter|12 ビット A/D コンバータ|
-|S12AD1|12-Bit A/D Converter 1|12 ビット A/D コンバータ１|
-|S12AD2|12-Bit A/D Converter 2|12 ビット A/D コンバータ２|
-|AD|10-Bit A/D Converter|10 ビット A/D コンバータ|
-|DA|10-Bit D/A Converter|10 ビット D/A コンバータ|
-|DOC|Data Operation Circuit|データ演算回路|
-|DPC0|Digital Power Supply Controller 0|デジタル電源制御演算器０|
-|DPC1|Digital Power Supply Controller 1|デジタル電源制御演算器１|
-|DPC2|Digital Power Supply Controller 2|デジタル電源制御演算器２|
-|DPC3|Digital Power Supply Controller 3|デジタル電源制御演算器３|
+|[CAC](../RX600/cac.hpp?ts=4)|Clock Frequency Accuracy Measurement Circuit|クロック周波数精度測定回路|
+|[DMAC0](../RX600/dmac.hpp?ts=4)|DMA Controller channel 0|DMA コントローラ・チャネル０|
+|[DMAC1](../RX600/dmac.hpp?ts=4)|DMA Controller channel 1|DMA コントローラ・チャネル１|
+|[DMAC2](../RX600/dmac.hpp?ts=4)|DMA Controller channel 2|DMA コントローラ・チャネル２|
+|[DMAC3](../RX600/dmac.hpp?ts=4)|DMA Controller channel 3|DMA コントローラ・チャネル３|
+|[DTC](../RX600/dtc.hpp?ts=4)|Data Transfer Controller|データトランスファコントローラ|
+|[MTU0](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 0|マルチファンクションタイマパルスユニット０|
+|[MTU1](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 1|マルチファンクションタイマパルスユニット１|
+|[MTU2](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 2|マルチファンクションタイマパルスユニット２|
+|[MTU3](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 3|マルチファンクションタイマパルスユニット３|
+|[MTU4](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 4|マルチファンクションタイマパルスユニット４|
+|[MTU5](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 5|マルチファンクションタイマパルスユニット５|
+|[MTU6](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 6|マルチファンクションタイマパルスユニット６|
+|[MTU7](../RX600/mtu3.hpp?ts=4)|Multi-Function Timer Pulse Unit 7|マルチファンクションタイマパルスユニット７|
+|[POE3](../RX63T/poe3.hpp?ts=4)|Port Output Enable 3|ポートアウトプットイネーブル３|
+|[GPT0](../RX63T/gpt.hpp?ts=4)|General PWM Timer 0|汎用 PWM タイマ０|
+|[GPT1](../RX63T/gpt.hpp?ts=4)|General PWM Timer 1|汎用 PWM タイマ１|
+|[GPT2](../RX63T/gpt.hpp?ts=4)|General PWM Timer 2|汎用 PWM タイマ２|
+|[GPT3](../RX63T/gpt.hpp?ts=4)|General PWM Timer 3|汎用 PWM タイマ３|
+|[GPT4](../RX63T/gpt.hpp?ts=4)|General PWM Timer 4|汎用 PWM タイマ４|
+|[GPT5](../RX63T/gpt.hpp?ts=4)|General PWM Timer 5|汎用 PWM タイマ５|
+|[GPT6](../RX63T/gpt.hpp?ts=4)|General PWM Timer 6|汎用 PWM タイマ６|
+|[GPT7](../RX63T/gpt.hpp?ts=4)|General PWM Timer 7|汎用 PWM タイマ７|
+|[CMT0](../RX600/cmt.hpp?ts=4)|Compare Match Timer 0|コンペアマッチタイマ０|
+|[CMT1](../RX600/cmt.hpp?ts=4)|Compare Match Timer 1|コンペアマッチタイマ１|
+|[CMT2](../RX600/cmt.hpp?ts=4)|Compare Match Timer 2|コンペアマッチタイマ２|
+|[CMT3](../RX600/cmt.hpp?ts=4)|Compare Match Timer 3|コンペアマッチタイマ３|
+|[WDTA](../RX600/wdta.hpp?ts=4)|Watchdog Timer|ウォッチドッグタイマ|
+|[IWDT](../RX600/iwdt.hpp?ts=4)|Independent Watchdog Timer|独立ウォッチドッグタイマ|
+|[USB0](../RX600/usb.hpp?ts=4)|USB 2.0 Host/Function Module 0|USB 2.0 ホスト/ファンクションモジュール０|
+|[SCI0](../RX600/sci_c.hpp?ts=4)|Serial Communications Interface 0|シリアルコミュニケーションインタフェース０|
+|[SCI1](../RX600/sci_c.hpp?ts=4)|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
+|[SCI2](../RX600/sci_c.hpp?ts=4)|Serial Communications Interface 2|シリアルコミュニケーションインタフェース２|
+|[SCI3](../RX600/sci_c.hpp?ts=4)|Serial Communications Interface 3|シリアルコミュニケーションインタフェース３|
+|[SCI12](../RX600/sci_d.hpp?ts=4)|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
+|[RIIC0](../RX600/riic.hpp?ts=4)|I2C-bus Interface 0|I2C バスインタフェース０|
+|[RIIC1](../RX600/riic.hpp?ts=4)|I2C-bus Interface 1|I2C バスインタフェース１|
+|[CAN1](../RX600/can.hpp?ts=4)|CAN Module 1|CAN モジュール１|
+|[RSPI0](../RX600/rspi.hpp?ts=4)|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
+|[RSPI1](../RX600/rspi.hpp?ts=4)|Serial Peripheral Interface 1|シリアルペリフェラルインタフェース１|
+|[CRC](../RX600/crc.hpp?ts=4)|CRC Calculator|CRC 演算器|
+|[S12AD](../RX63T/s12adb.hpp?ts=4)|12-Bit A/D Converter|12 ビット A/D コンバータ|
+|[S12AD1](../RX63T/s12adb.hpp?ts=4)|12-Bit A/D Converter 1|12 ビット A/D コンバータ１|
+|[S12AD2](../RX63T/s12adb.hpp?ts=4)|12-Bit A/D Converter 2|12 ビット A/D コンバータ２|
+|[AD](../RX63T/ad.hpp?ts=4)|10-Bit A/D Converter|10 ビット A/D コンバータ|
+|[DA](../RX63T/da.hpp?ts=4)|10-Bit D/A Converter|10 ビット D/A コンバータ|
+|[DOC](../RX600/doc.hpp?ts=4)|Data Operation Circuit|データ演算回路|
+|[DPC0](../RX63T/dpc.hpp?ts=4)|Digital Power Supply Controller 0|デジタル電源制御演算器０|
+|[DPC1](../RX63T/dpc.hpp?ts=4)|Digital Power Supply Controller 1|デジタル電源制御演算器１|
+|[DPC2](../RX63T/dpc.hpp?ts=4)|Digital Power Supply Controller 2|デジタル電源制御演算器２|
+|[DPC3](../RX63T/dpc.hpp?ts=4)|Digital Power Supply Controller 3|デジタル電源制御演算器３|
 
 ---
 
