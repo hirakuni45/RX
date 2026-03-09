@@ -49,7 +49,7 @@
 			Ex: 許容誤差を 2% にする場合。(百分率を 10 倍にした整数を設定) @n
 			    static_assert(SCI::probe_baud(baud, 20), "Failed baud rate accuracy test");
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -379,13 +379,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ボーレートを設定して、SCI を有効にする
-			@param[in]	baud	ボーレート
+			@param[in]	baud	ボーレート（整数値）
 			@param[in]	level	割り込みレベル（ICU::LEVEL::NONE の場合ポーリング）
 			@param[in]	prot	通信プロトコル（指定無しの場合、８ビット、パリティ無し、１ストップビット）
+			@param[in]	nfen	デジタルノイズフィルタを有効にする場合「true」
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
+		bool start(uint32_t baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S, bool nfen = false) noexcept
 		{
 			uint8_t brr;
 			uint8_t cks;
@@ -517,7 +518,10 @@ namespace device {
 			if(brme) {
 				SCI::MDDR = mddr;
 			}
-			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b(brme) | SCI::SEMR.BGDM.b(bgdm);
+			if(!SCI::SEMR_NFEN) {
+				nfen = 0;
+			}
+			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b(brme) | SCI::SEMR.BGDM.b(bgdm) | SCI::SEMR.NFEN.b(nfen);
 
 			if(brr > 0) --brr;
 			SCI::BRR = brr;
@@ -538,12 +542,13 @@ namespace device {
 			@param[in]	baud	ボーレート型
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@param[in]	prot	通信プロトコル（標準は、８ビット、パリティ無し、１ストップ）
+			@param[in]	nfen	デジタルノイズフィルタを有効にする場合「true」
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(BAUDRATE baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
+		bool start(BAUDRATE baud, ICU::LEVEL level = ICU::LEVEL::NONE, PROTOCOL prot = PROTOCOL::B8_N_1S, bool nfen = false) noexcept
 		{
-			return start(static_cast<uint32_t>(baud), level, prot);
+			return start(static_cast<uint32_t>(baud), level, prot, nfen);
 		}
 
 

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	8-Bit Timer / 8 ビットタイマ
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -284,7 +284,7 @@ namespace device {
 		ICU::VECTOR::CMIA2, ICU::VECTOR::CMIB2, ICU::VECTOR::OVI2, clock_profile::PCLK> TMR2;
 	typedef tmr1357_t<0x0008'8211, peripheral::TMR3, ICU::VECTOR,
 		ICU::VECTOR::CMIA3, ICU::VECTOR::CMIB3, ICU::VECTOR::OVI3, clock_profile::PCLK> TMR3;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX651) || defined(SIG_RX66N) || defined(SIG_RX660) || defined(SIG_RX671) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef tmr0246_t<0x0008'8200, peripheral::TMR0, ICU::SELECTB,
 		ICU::SELECTB::CMIA0, ICU::SELECTB::CMIB0, ICU::SELECTB::OVI0, clock_profile::PCLKB> TMR0;
 	typedef tmr1357_t<0x0008'8201, peripheral::TMR1, ICU::SELECTB,

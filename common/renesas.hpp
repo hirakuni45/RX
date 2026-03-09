@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ルネサス RX マイコンシリーズ・ペリフェラル・セレクタ
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,9 +22,11 @@
 #if defined(SIG_RX110) || defined(SIG_RX111)
 #include "RX231/lvda.hpp"
 #include "RX600/cac.hpp"
+#include "RX600/dtc.hpp"
 #include "RX140/bus.hpp"
 #include "RX140/elc.hpp"
 #include "RX220/mtu2.hpp"
+#include "RX600/iwdt.hpp"
 #if defined(SIG_RX111)
 #include "RX220/poe2.hpp"
 #endif
@@ -677,6 +679,7 @@
 #include "RX600/elc.hpp"
 #include "RX600/mtu3.hpp"
 #include "RX72N/poe3.hpp"
+#include "RX600/tmr.hpp"
 #include "RX600/cmtw.hpp"
 #include "RX600/rtc.hpp"
 #include "RX600/wdta.hpp"
