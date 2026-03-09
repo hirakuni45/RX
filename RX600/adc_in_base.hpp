@@ -48,15 +48,15 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class GROUP : uint8_t {
-#if defined(SIG_RX140) || defined(SIG_RX220) || defined(SIG_RX231) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261)
+#if defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX631) || defined(SIG_RX63N)
 			A,		///< グループＡ
-			B,		///< グループＢ
-#elif defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX631) || defined(SIG_RX63N)
-			A,		///< グループＡ
-#else
+#elif defined(SIG_RX13T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX26T) || defined(SIG_RX651) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX660) || defined(SIG_RX671) || defined(SIG_RX66N) || defined(SIG_RX72N) || defined(SIG_RX72M)
 			A,		///< グループＡ
 			B,		///< グループＢ
 			C,		///< グループＣ
+#else
+			A,		///< グループＡ
+			B,		///< グループＢ
 #endif
 		};
 	};

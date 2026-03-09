@@ -176,6 +176,11 @@ namespace device {
 			case GROUP::B:
 				ADCU::ADANSB.set(ana);
 				break;
+#if defined(SIG_RX24T) || defined(SIG_RX24U)
+			case GROUP::C:
+				ADCU::ADANSC.set(ana);
+				break;
+#endif
 			}
 
 			// サンプリングステート値
