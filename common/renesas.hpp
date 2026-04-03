@@ -199,6 +199,14 @@
 
 #include "RX210/board_profile.hpp"
 
+#elif defined(SIG_RX21A)
+
+#include "RX600/sci_c.hpp"
+
+#include "RX21A/system_io.hpp"
+
+#include "RX21A/board_profile.hpp"
+
 #elif defined(SIG_RX220)
 #include "RX220/lvda.hpp"
 #include "RX600/cac.hpp"

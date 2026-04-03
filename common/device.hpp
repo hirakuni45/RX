@@ -114,6 +114,19 @@
 #include "RX210/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX21A)
+#include "RX21A/clock_profile.hpp"
+#include "RX21A/peripheral.hpp"
+#include "RX21A/system.hpp"
+#include "RX21A/power_mgr.hpp"
+#include "RX21A/icu.hpp"
+#include "RX220/icu_mgr.hpp"
+#include "RX21A/port_map.hpp"
+//#include "RX210/port_map_mtu.hpp"
+//#include "RX210/port_map_tmr.hpp"
+//#include "RX210/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX220)
 #include "RX220/clock_profile.hpp"
 #include "RX220/peripheral.hpp"
