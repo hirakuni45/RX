@@ -3,7 +3,6 @@
 
 - RXv1 core / RXv1 コア
 - Maximum operating frequency 32MHz / 最大動作周波数 32MHz
-- Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 1.62V ～ 5.5V Operation / 動作
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 
