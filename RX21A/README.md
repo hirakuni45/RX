@@ -1,35 +1,37 @@
 
-## RX220 features / 特徴
+underconstructions...
+
+## RX21A features / 特徴
 
 - RXv1 core / RXv1 コア
-- Maximum operating frequency 32MHz / 最大動作周波数 32MHz
-- 1.62V ～ 5.5V Operation / 動作
-- 12 Bits A/D / １２ビットＡ／Ｄ変換器
+- Maximum operating frequency 50MHz / 最大動作周波数 50MHz
+- 1.8V ～ 3.6V Operation / 動作
+- （ΔΣA/D コンバータ動作電圧は 2.7V ～ 3.6V）
+- 24 bits ∆ΣA/D converter / 24 ビット ∆ΣA/D コンバータ
 
 ### Package/パッケージ
 
-|R5F5220---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
+|R5F521A---XX|Package/パッケージ|Pin/ピン数|Pitch/ピッチ|
 |---|:-:|:-:|:-:|
-|R5F5220xxxFP|LQFP|100|0.50|
-|R5F5220xxxFM|LQFP|64|0.50|
-|R5F5220xxxFK|LQFP|64|0.50|
-|R5F5220xxxFL|LQFP|48|0.50|
+|R5F521AxxxFP|LQFP|100|0.50|
+|R5F521AxxxFN|LQFP|80|0.50|
+|R5F521AxxxFM|LQFP|64|0.50|
+|R5F521AxxxLJ|TFLGA|100|0.65|
 
 ### Ambient operating temperature/動作周囲温度
 
-|R5F5220--X--|degree Celsius|
+|R5F521A--X--|degree Celsius|
 |---|:-:|
-|R5F5220xxDxx|-40 ～ +85℃|
-|R5F5220xxGxx|-40 ～ +105℃|
+|R5F521AxxDxx|-40 ～ +85℃|
+|R5F521AxxGxx|-40 ～ +105℃|
 
 ### Memoey size/メモリ容量
 
-|R5F5220X----|CodeFlash|RAM|DataFlash|
+|R5F521AX----|CodeFlash|RAM|DataFlash|
 |---|:-:|:-:|:-:|
-|R5F52206xxxx|256K|16K|8K|
-|R5F52205xxxx|128K|8K|8K|
-|R5F52203xxxx|64K|8K|8K|
-|R5F52201xxxx|32K|4K|8K|
+|R5F521A8xxxx|512K|64K|8K|
+|R5F521A7xxxx|384K|64K|8K|
+|R5F521A6xxxx|256K|32K|8K|
 
 ### Data Flash/データ・フラッシュ
 
@@ -39,15 +41,15 @@
 
 ---
 
-## RX220 Linker file / リンカーファイル
+## RX21A Linker file / リンカーファイル
 
 |Type|Code Flash|RAM|Data Flash|Linker File|Ustack|Istack|
 |---|:-:|:-:|:-:|---|:-:|:-:|
-|R5F52206|256K|16K|8K|[R5F52206.ld](R5F52206.ld?ts=4)|768|256|
+|R5F521A6|256K|32K|8K|[R5F521A6.ld](R5F521A6.ld?ts=4)|1536|512|
 
 ---
 
-## RX220 Dedicated class / 専用クラス
+## RX21A Dedicated class / 専用クラス
 
 |Function/機能|Source|Remarks/備考|
 |---|---|:-:|
@@ -57,7 +59,7 @@
 |Power Control/電力制御|[power_mgr.hpp](power_mgr.hpp?ts=4)||
 |Port Definition/ポート定義|[port.hpp](port.hpp?ts=4)||
 |Interrupt Definition/割り込み定義|[icu.hpp](icu.hpp?ts=4)||
-|Interrupt Management/割り込み管理|[icu_mgr.hpp](icu_mgr.hpp?ts=4)||
+|Interrupt Management/割り込み管理|[icu_mgr.hpp](../RX220/icu_mgr.hpp?ts=4)||
 |Port Function Definition/ポート機能定義|[mpc.hpp](mpc.hpp?ts=4)||
 |Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp?ts=4)||
 |Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp?ts=4)||
@@ -143,14 +145,17 @@
 |SCI1|Serial Communications Interface 1|シリアルコミュニケーションインタフェース１|
 |SCI5|Serial Communications Interface 5|シリアルコミュニケーションインタフェース５|
 |SCI6|Serial Communications Interface 6|シリアルコミュニケーションインタフェース６|
+|SCI8|Serial Communications Interface 8|シリアルコミュニケーションインタフェース８|
 |SCI9|Serial Communications Interface 9|シリアルコミュニケーションインタフェース９|
-|SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
 |IrDA|IrDA Interface|IrDA インタフェース|
 |RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
+|RIIC1|I2C-bus Interface 1|I2C バスインタフェース１|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
+|RSPI1|Serial Peripheral Interface 1|シリアルペリフェラルインタフェース１|
 |CRC|CRC Calculator|CRC 演算器|
-|S12AD|12-Bit A/D Converter|12 ビット A/D コンバータ|
+|AD|10-Bit A/D Converter|10 ビット A/D コンバータ|
 |CMPA|Comparator A|コンパレータＡ|
+|CMPB|Comparator B|コンパレータＢ|
 |DOC|Data Operation Circuit|データ演算回路|
 
 ---
@@ -405,7 +410,7 @@
 
 ||Support/サポート|operation verification/動作検証|
 |-|:-:|:-:|
-|[rxprog](../rxprog)|〇|〇|
+|[rxprog](../rxprog)|-|-|
 
 ---
 

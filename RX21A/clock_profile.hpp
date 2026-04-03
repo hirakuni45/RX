@@ -1,0 +1,59 @@
+#pragma once
+#ifndef NO_CLOCK_PROFILE
+//=========================================================================//
+/*!	@file
+	@brief	RX21A グループ・クロック。プロファイル @n
+            クロックジェネレータで発生させる周波数の定義
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2026 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
+*/
+//=========================================================================//
+#include <cstdint>
+
+namespace device {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  クロック・プロファイル・クラス @n
+				・選択出来ない値を指定すると、コンパイルエラーとなる @n
+				・詳細はハードウェアーマニュアル参照の事
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class clock_profile {
+	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  発信器タイプ @n
+					LOCO は、起動時のモードなので、設定する事はない。
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class OSC_TYPE : uint8_t {
+			XTAL,	///< クリスタル接続（1～20MHz）
+			CERA,	///< セラミック発振子リード品（16MHz ～ 20MHz）
+			EXT,	///< 外部クロック入力（最大 20MHz）
+			HOCO,	///< 内蔵高速オンチップオシレーター（BASE: 32MHz, 36.864MHz, 40MHz, 50MHz）
+			LOCO,	///< 内蔵低速オンチップオシレーター (125KHz)
+		};
+
+		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
+
+		static constexpr bool		TURN_SBC	= false;			///< サブクロックを利用する場合「true」
+
+		static constexpr uint32_t   BASE		= 10'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）
+
+		static constexpr uint32_t   PLL_BASE	= 100'000'000;		///< PLL ベースクロック（最大 100MHz）
+
+		static constexpr uint32_t   ICLK		= 50'000'000;		///< ICLK 周波数（最大50MHz）
+		static constexpr uint32_t   PCLKA		= 50'000'000;		///< PCLKA 周波数（最大50MHz）
+		static constexpr uint32_t   PCLKB		= 25'000'000;		///< PCLKB 周波数（最大25MHz）
+		static constexpr uint32_t   PCLKC		= 25'000'000;		///< PCLKB 周波数（最大25MHz）
+		static constexpr uint32_t   PCLKD		= 25'000'000;		///< PCLKD 周波数（最大25MHz）
+		static constexpr uint32_t   FCLK		= 25'000'000;		///< FCLK 周波数（最大4 ～ 25MHz）
+
+		static constexpr uint32_t	DELAY_MS	= (ICLK / 1'000'000 / 4) - 1;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+	};
+}
+
+#endif

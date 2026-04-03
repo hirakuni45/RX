@@ -4,6 +4,7 @@
 	@brief	I2C-bus Interface / I2C バスインタフェース @n
 			RX110/RX111/RX113/RX130/RX140 @n
 			RX210 @n
+			RX21A @n
 			RX220 @n
 			RX230/RX231 @n
 			RX23W @n
@@ -449,6 +450,11 @@ namespace device {
 #if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX210) || defined(SIG_RX220) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX13T) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261)
 	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
+#elif defined(SIG_RX21A)
+	typedef riica_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
+		ICU::VECTOR, ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
+	typedef riica_t<0x0008'8320, peripheral::RIIC1, ICU::VECTOR::ICTXI1, ICU::VECTOR::ICRXI1,
+		ICU::VECTOR, ICU::VECTOR::ICEEI1, ICU::VECTOR::ICTEI1, clock_profile::PCLKB> RIIC1;
 #elif defined(SIG_RX63T) || defined(SIG_RX63T_S)
 	typedef riic_t<0x0008'8300, peripheral::RIIC0, ICU::VECTOR::ICTXI0, ICU::VECTOR::ICRXI0,
 		ICU::VECTOR::ICEEI0, ICU::VECTOR::ICTEI0, clock_profile::PCLKB> RIIC0;
