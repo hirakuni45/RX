@@ -3,11 +3,12 @@
 /*!	@file
 	@brief	IrDA 定義 @n
 			RX113 @n
+			RX21A @n
 			RX220 @n
 			RX230/RX231 @n
 			RX23W
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */

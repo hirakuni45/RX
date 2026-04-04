@@ -200,10 +200,29 @@
 #include "RX210/board_profile.hpp"
 
 #elif defined(SIG_RX21A)
-
+#include "RX220/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX600/dmac.hpp"
+#include "RX220/elc.hpp"
+#include "RX220/mtu2.hpp"
+#include "RX220/poe2.hpp"
+#include "RX600/tmr.hpp"
+#include "RX220/rtc.hpp"
 #include "RX600/sci_c.hpp"
+#include "RX220/irda.hpp"
+#include "RX600/crc.hpp"
+#include "RX21A/dsad.hpp"
+// #include "RX62x/ad.hpp"
+// #include "RX62x/da.hpp"
+// #include "RX220/cmpa.hpp"
+// #include "RX220/cmpb.hpp"
+#include "RX600/doc.hpp"
+#include "RX220/flash.hpp"
 
 #include "RX21A/system_io.hpp"
+// #include "RX62x/flash_io.hpp"
+// #include "RX24T/adc_in.hpp"
+#include "RX600/dmac_mgr.hpp"
 
 #include "RX21A/board_profile.hpp"
 

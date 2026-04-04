@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX210/RX220 グループ・ELC 定義
+	@brief	RX210/RX21A/RX220 グループ・ELC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -46,45 +46,100 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  イベントリンク設定レジスタ n（ELSRn） @n
-					RX210:（n= 1 ～ 4、7、10、12、15、16、18 ～ 29） @n
-					RX220:（n= 1 ～ 4、   10、12、15、   18、20、22、24、25）
+					RX210: (n= 1 ～ 4、7、10、12、15、16、18 ～ 29) @n
+					RX21A: (n= 0 ～ 5、7、10、12、14、16、18 ～ 36) @n
+					RX220: (n= 1 ～ 4、10、12、15、18、20、22、24、25)
 		*/
 		//-----------------------------------------------------------------//
+#if defined(SIG_RX210)
+		// RX210:（n= 1 ～ 4、7、10、12、15、16、18 ～ 29)
 		static inline rw8_t<base + 0x02>  ELSR1;
 		static inline rw8_t<base + 0x03>  ELSR2;
 		static inline rw8_t<base + 0x04>  ELSR3;
 		static inline rw8_t<base + 0x05>  ELSR4;
-#if defined(SIG_RX210)
+
 		static inline rw8_t<base + 0x07>  ELSR7;
-#endif
+
 		static inline rw8_t<base + 0x0B>  ELSR10;
 
 		static inline rw8_t<base + 0x0D>  ELSR12;
 
 		static inline rw8_t<base + 0x10>  ELSR15;
-#if defined(SIG_RX210)
 		static inline rw8_t<base + 0x11>  ELSR16;
-#endif
+
 		static inline rw8_t<base + 0x13>  ELSR18;
-#if defined(SIG_RX210)
 		static inline rw8_t<base + 0x14>  ELSR19;
-#endif
 		static inline rw8_t<base + 0x15>  ELSR20;
-#if defined(SIG_RX210)
 		static inline rw8_t<base + 0x16>  ELSR21;
-#endif
 		static inline rw8_t<base + 0x17>  ELSR22;
-#if defined(SIG_RX210)
 		static inline rw8_t<base + 0x18>  ELSR23;
-#endif
 		static inline rw8_t<base + 0x19>  ELSR24;
 		static inline rw8_t<base + 0x1A>  ELSR25;
-#if defined(SIG_RX210)
 		static inline rw8_t<base + 0x1B>  ELSR26;
 		static inline rw8_t<base + 0x1C>  ELSR27;
 		static inline rw8_t<base + 0x1D>  ELSR28;
 		static inline rw8_t<base + 0x1E>  ELSR29;
+#elif defined(SIG_RX21A)
+		// RX21A: (n= 0 ～ 5、7、10、12、14、16、18 ～ 36)
+		static inline rw8_t<base + 0x01>  ELSR0;
+		static inline rw8_t<base + 0x02>  ELSR1;
+		static inline rw8_t<base + 0x03>  ELSR2;
+		static inline rw8_t<base + 0x04>  ELSR3;
+		static inline rw8_t<base + 0x05>  ELSR4;
+		static inline rw8_t<base + 0x06>  ELSR5;
+
+		static inline rw8_t<base + 0x07>  ELSR7;
+
+		static inline rw8_t<base + 0x0B>  ELSR10;
+
+		static inline rw8_t<base + 0x0D>  ELSR12;
+
+		static inline rw8_t<base + 0x0F>  ELSR14;
+
+		static inline rw8_t<base + 0x11>  ELSR16;
+
+		static inline rw8_t<base + 0x13>  ELSR18;
+		static inline rw8_t<base + 0x14>  ELSR19;
+		static inline rw8_t<base + 0x15>  ELSR20;
+		static inline rw8_t<base + 0x16>  ELSR21;
+		static inline rw8_t<base + 0x17>  ELSR22;
+		static inline rw8_t<base + 0x18>  ELSR23;
+		static inline rw8_t<base + 0x19>  ELSR24;
+		static inline rw8_t<base + 0x1A>  ELSR25;
+		static inline rw8_t<base + 0x1B>  ELSR26;
+		static inline rw8_t<base + 0x1C>  ELSR27;
+		static inline rw8_t<base + 0x1D>  ELSR28;
+		static inline rw8_t<base + 0x1E>  ELSR29;
+		static inline rw8_t<base + 0x30>  ELSR30;
+		static inline rw8_t<base + 0x31>  ELSR31;
+		static inline rw8_t<base + 0x32>  ELSR32;
+		static inline rw8_t<base + 0x33>  ELSR33;
+		static inline rw8_t<base + 0x34>  ELSR34;
+		static inline rw8_t<base + 0x35>  ELSR35;
+		static inline rw8_t<base + 0x36>  ELSR36;
+#elif defined(SIG_RX220)
+		// RX220: (n= 1 ～ 4、10、12、15、18、20、22、24、25)
+		static inline rw8_t<base + 0x02>  ELSR1;
+		static inline rw8_t<base + 0x03>  ELSR2;
+		static inline rw8_t<base + 0x04>  ELSR3;
+		static inline rw8_t<base + 0x05>  ELSR4;
+
+		static inline rw8_t<base + 0x0B>  ELSR10;
+
+		static inline rw8_t<base + 0x0D>  ELSR12;
+
+		static inline rw8_t<base + 0x10>  ELSR15;
+
+		static inline rw8_t<base + 0x13>  ELSR18;
+
+		static inline rw8_t<base + 0x15>  ELSR20;
+
+		static inline rw8_t<base + 0x17>  ELSR22;
+		
+		static inline rw8_t<base + 0x19>  ELSR24;
+		static inline rw8_t<base + 0x1A>  ELSR25;
 #endif
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -100,6 +155,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
+#if defined(SIG_RX21A)
+			bits_rw_t<io_, bitpos::B0, 2>  MTU0MD;
+#endif
 			bits_rw_t<io_, bitpos::B2, 2>  MTU1MD;
 			bits_rw_t<io_, bitpos::B4, 2>  MTU2MD;
 			bits_rw_t<io_, bitpos::B6, 2>  MTU3MD;
@@ -122,10 +180,13 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2>  MTU4MD;
+#if defined(SIG_RX21A)
+			bits_rw_t<io_, bitpos::B2, 2>  MTU5MD;
+#endif
 		};
 		static inline elopb_t<base + 0x20> ELOPB;
 
-#if defined(SIG_RX210)
+#if defined(SIG_RX210) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	イベントリンクオプション設定レジスタ C（ELOPC）
@@ -168,12 +229,12 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ポートグループ指定レジスタ 1（PGR1）
+			@brief	ポートグループ指定レジスタ 1（PGRn）（n=1, 2）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pgr1_t : public rw8_t<ofs> {
+		struct pgrn_t : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -189,19 +250,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  PGR6;
 			bit_rw_t<io_, bitpos::B7>  PGR7;
 		};
-		static inline pgr1_t<base + 0x23> PGR1;
-#if defined(SIG_RX210)
-		static inline pgr1_t<base + 0x24> PGR2;
+		static inline pgrn_t<base + 0x23> PGR1;
+#if defined(SIG_RX210) || defined(SIG_RX21A)
+		static inline pgrn_t<base + 0x24> PGR2;
 #endif
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ポートグループコントロールレジスタ 1（PGC1）
+			@brief	ポートグループコントロールレジスタ n（PGCn）（n=1, 2）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pgc1_t : public rw8_t<ofs> {
+		struct pgcn_t : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -213,19 +274,19 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 3>  PGCO;
 		};
-		static inline pgc1_t<base + 0x25> PGC1;
-#if defined(SIG_RX210)
-		static inline pgc1_t<base + 0x26> PGC2;
+		static inline pgcn_t<base + 0x25> PGC1;
+#if defined(SIG_RX210) || defined(SIG_RX21A)
+		static inline pgcn_t<base + 0x26> PGC2;
 #endif
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ポートバッファレジスタ 1（PDBF1）
+			@brief	ポートバッファレジスタ n（PDBFn）（n=1, 2）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pdbf1_t : public rw8_t<ofs> {
+		struct pdbfn_t : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -241,14 +302,14 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  PDBF6;
 			bit_rw_t<io_, bitpos::B7>  PDBF7;
 		};
-		static inline pdbf1_t<base + 0x27> PDBF1;
-#if defined(SIG_RX210)
-		static inline pdbf1_t<base + 0x28> PDBF2;
+		static inline pdbfn_t<base + 0x27> PDBF1;
+#if defined(SIG_RX210) || defined(SIG_RX21A)
+		static inline pdbfn_t<base + 0x28> PDBF2;
 #endif
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	イベント接続ポート指定レジスタ n（PELn）（n = 0, 1）
+			@brief	イベント接続ポート指定レジスタ n（PELn）（n = 0, 1, 2, 3）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -266,7 +327,7 @@ namespace device {
 		};
 		static inline peln_t<base + 0x29> PEL0;
 		static inline peln_t<base + 0x2A> PEL1;
-#if defined(SIG_RX210)
+#if defined(SIG_RX210) || defined(SIG_RX21A)
 		static inline peln_t<base + 0x2B> PEL2;
 		static inline peln_t<base + 0x2C> PEL3;
 #endif
@@ -286,8 +347,8 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  SEG;	// write-only
-			bit_rw_t<io_, bitpos::B6>  WE;
 
+			bit_rw_t<io_, bitpos::B6>  WE;
 			bit_rw_t<io_, bitpos::B7>  WI;	// write-only
 		};
 		static inline elsegr_t<base + 0x2D> ELSEGR;
