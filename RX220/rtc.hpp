@@ -2,6 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX210 グループ・RTCb 定義 @n
+			RX21A グループ・RTCc 定義 @n
 			RX220 グループ・RTCc 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
@@ -69,7 +70,7 @@ namespace device {
 		};
 		static inline rseccnt_t<0x0008'C402> RSECCNT;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 0（BCNT0）
@@ -97,7 +98,7 @@ namespace device {
 		};
 		static inline rmincnt_t<0x0008'C404> RMINCNT;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 1（BCNT1）
@@ -126,7 +127,7 @@ namespace device {
 		};
 		static inline rhrcnt_t<0x0008'C406> RHRCNT;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2（BCNT2）
@@ -153,7 +154,7 @@ namespace device {
 		};
 		static inline rwkcnt_t<0x0008'C408> RWKCNT;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3（BCNT3）
@@ -242,7 +243,7 @@ namespace device {
 		};
 		static inline rsecar_t<0x0008'C410> RSECAR;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 0 アラームレジスタ（BCNT0AR）
@@ -271,7 +272,7 @@ namespace device {
 		};
 		static inline rminar_t<0x0008'C412> RMINAR;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 1 アラームレジスタ（BCNT1AR）
@@ -301,7 +302,7 @@ namespace device {
 		};
 		static inline rhrar_t<0x0008'C414> RHRAR;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2 アラームレジスタ（BCNT2AR）
@@ -330,7 +331,7 @@ namespace device {
 		};
 		static inline rwkar_t<0x0008'C416> RWKAR;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3 アラームレジスタ（BCNT3AR）
@@ -360,7 +361,7 @@ namespace device {
 		};
 		static inline rdayar_t<0x0008'C418> RDAYAR;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 0 アラーム許可レジスタ（BCNT0AER）
@@ -390,7 +391,7 @@ namespace device {
 		};
 		static inline rmonar_t<0x0008'C41A> RMONAR;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 1 アラーム許可レジスタ（BCNT1AER）
@@ -418,7 +419,7 @@ namespace device {
 		};
 		static inline ryrar_t<0x0008'C41C> RYRAR;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 2 アラーム許可レジスタ（BCNT2AER）
@@ -445,7 +446,7 @@ namespace device {
 		};
 		static inline ryraren_t<0x0008'C41E> RYRAREN;
 
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  バイナリカウンタ 3 アラーム許可レジスタ（BCNT3AER）
@@ -498,7 +499,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  AADJE;
 			bit_rw_t<io_, bitpos::B5>  AADJP;
 			bit_rw_t<io_, bitpos::B6>  HR24;
-#if defined(SIG_RX220)
+#if defined(SIG_RX220) || defined(SIG_RX21A)
 			bit_rw_t<io_, bitpos::B7>  CNTMD;
 #endif
 		};
@@ -544,7 +545,7 @@ namespace device {
 		};
 		static inline radj_t<0x0008'C42E> RADJ;
 
-#if defined(SIG_RX210)
+#if defined(SIG_RX210) || defined(SIG_RX21A)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  時間キャプチャ制御レジスタ y（RTCCRy）（y=0 ～ 2）
