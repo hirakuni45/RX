@@ -26,7 +26,7 @@ namespace board_profile {
 	static constexpr char system_str_[] = "RX21A DIY";
 
 	/// LED インジケーター
-	/// P03 に LED を吸い込みで接続する事を想定している。
+	/// PJ3 に LED を吸い込みで接続する事を想定している。
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORTJ, device::bitpos::B3, LED_ACTIVE> LED;
 

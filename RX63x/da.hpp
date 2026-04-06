@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX210/RX631/RX63N グループ D/A コンバータ（DAa）定義
+	@brief	RX210/RX21A/RX631/RX63N グループ D/A コンバータ（DA, DAa）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -130,7 +130,7 @@ namespace device {
 		};
 		static inline dadpr_t<0x0008'80C5> DADPR;
 
-#if defined(SIG_RX210)
+#if defined(SIG_RX210) || defined(SIG_RX21A)
 #else
 		//-----------------------------------------------------------------//
 		/*!

@@ -1,13 +1,17 @@
 
-underconstructions...
+---
+
+# underconstructions...
+
+---
 
 ## RX21A features / 特徴
 
 - RXv1 core / RXv1 コア
 - Maximum operating frequency 50MHz / 最大動作周波数 50MHz
 - 1.8V ～ 3.6V Operation / 動作
-- （ΔΣA/D コンバータ動作電圧は 2.7V ～ 3.6V）
 - 24 bits ∆ΣA/D converter / 24 ビット ∆ΣA/D コンバータ
+- The operating supply voltage for the ΔΣA/D converter is 2.7 V to 3.6 V / ΔΣA/D コンバータ動作時の電源電圧は 2.7V ～ 3.6V
 
 ### Package/パッケージ
 
@@ -64,12 +68,8 @@ underconstructions...
 |Port Mapping/ポートマッピング|[port_map.hpp](port_map.hpp?ts=4)||
 |Port Mapping IRQ/ポートマッピング IRQ|[port_map_irq.hpp](port_map_irq.hpp?ts=4)||
 |Port Mapping MTU/ポートマッピング MTU|[port_map_mtu.hpp](port_map_mtu.hpp?ts=4)||
-|Port Mapping MTU/ポートマッピング TMR|[port_map_tmr.hpp](port_map_tmr.hpp?ts=4)||
-|BUS Definition/BUS 定義|[bus.hpp](bus.hpp?ts=4)||
+|Port Mapping MTU/ポートマッピング TMR|[port_map_tmr.hpp](../RX220/port_map_tmr.hpp?ts=4)||
 |CMPA Definition/CMPA 定義|[cmpa.hpp](cmpa.hpp?ts=4)||
-|ELC Definition/ELC 定義|[elc.hpp](elc.hpp?ts=4)||
-|IrDA Definition/IrDA 定義|[irda.hpp](irda.hpp?ts=4)||
-|LVDA Definition/LVDA 定義|[lvda.hpp](lvda.hpp?ts=4)||
 |MTU2 Definition/MTU2 定義|[mtu2.hpp](mtu2.hpp?ts=4)||
 |POE2 Definition/POE2 定義|[poe2.hpp](poe2.hpp?ts=4)||
 |RTC Definition/RTC 定義|[rtc.hpp](rtc.hpp?ts=4)||
@@ -83,28 +83,36 @@ underconstructions...
 
 ## Basic Pin Assignments / 基本ピンアサイン
 
-|Terminal/端子|LFQFP 64|
-|---|---|
-|VCL|VCL(2)|
-|Reset Input/リセット入力|RES#(6)|
-|Mode Controle/モード制御|MD/FINED(3)|
-|B/UB|PC7(27)|
-|RXD|P30/RXD1(14)|
-|TXD|P26/TXD1(16)|
-|Power/電源|VCC(10), VCC(38)|
-|GND/接地|VSS(8), VSS(40)|
-|Analog Power/アナログ電源|AVCC0(62)|
-|Analog GND/アナログ接地|AVSS0(64)|
-|Analog Refarence L/アナログ基準電源Ｌ|VREFL0(59)|
-|Analog Refarence H/アナログ基準電源Ｈ|VREFH0(61)|
-|OSC out|XTAL(7)|
-|OSC in|EXTAL(9)|
-|Sub OSC out|XCOUT(5)|
-|Sub OSC in|XCIN(4)|
+|Terminal/端子|LQFP 64|LQFP 100|
+|---|---|---|
+|VCL|VCL(2)|VCL(5)|
+|Reset Input/リセット入力|RES#(6)|RES#(10)|
+|Mode Select|PC7(27)|PC7(45)|
+|Mode Controle/モード制御|MD/FINED(3)|MD/FINED(7)|
+|RXD|P30/RXD1(14)|P30/RXD1(20)|
+|TXD|P26/TXD1(16)|P26/TXD1(22)|
+|Power/電源|VCC(10), VCC(38)|VCC(14), VCC(60)|
+|GND/接地|VSS(8), VSS(40)|VSS(12), VSS(62)|
+|Analog Power/アナログ電源|AVCC0(62)|AVCC0(97)|
+|Analog GND/アナログ接地|AVSS0(64)|AVSS0(99)|
+|Analog Refarence L/アナログ基準電源Ｌ|VREFL0(59)|VREFL0(94)|
+|Analog Refarence H/アナログ基準電源Ｈ|VREFH0(61)|VREFH0(96)|
+|OSC out|XTAL(7)|XTAL(11)|
+|OSC in|EXTAL(9)|EXTAL(13)|
+|Sub OSC out|XCOUT(5)|XCOUT(9)|
+|Sub OSC in|XCIN(4)|XCIN(8)|
+|DSAD Power 電源|AVCCA(52)|AVCCA(83)|
+|DSAD GND 接地|AVSSA(51)|AVSSA(82)|
+|DSAD Refarence L 基準電源Ｌ|VREFDSL(53)|VREFDSL(84)|
+|DSAD Refarence H 基準電源Ｈ|VREFDSH(54)|VREFDSH(85)|
+|DSAD VCOMMDS|VCOMMDS(55)|VCOMMDS(86)|
+|DSAD Signal GND|ANDSSG(57)|ANDSSG(90)|
+|DSAD Refarence external/リファレンス外部印加|BGR_BO(46)|BGR_BO(73)|
 
 - VCL: 0.1uF/25V
+- VCOMMDS: 0.1uF/25V to Analog GND
 
-|Mode/モード|B/UB|MD|
+|Mode/モード|PC7|MD|
 |---|:---:|:---:|
 |Serial BOOT/シリアルブート|0|0|
 |User Boot/ユーザーブート|1|0|
@@ -164,7 +172,7 @@ underconstructions...
 
 - [port_map_irq.hpp](port_map_irq.hpp?ts=4)
 
-### LFQFP64
+### LQFP64
 
 |IRQ|FIRST|SECOND|THIRD|FOURTH|
 |---|---|---|---|---|
@@ -177,7 +185,7 @@ underconstructions...
 |IRQ6|PA3 (43)|P16 (18)|PD6 (--)|PE6 (--)|
 |IRQ7|PE2 (49)|P17 (17)|PD7 (--)|PE7 (--)|
 
-### LFQFP100
+### LQFP100
 
 |IRQ|FIRST|SECOND|THIRD|FOURTH|
 |---|---|---|---|---|
@@ -358,51 +366,71 @@ underconstructions...
 
 ---
 
-## 12 Bits A/D Converter input (S12AD) / 12 ビット A/D コンバーター入力 (S12AD)
+## 10 Bits A/D Converter input (AD) / 10 ビット A/D コンバーター入力 (AD)
 
-- [s12ad.hpp](s12ad.hpp?ts=4)
+- [ad.hpp](ad.hpp?ts=4)
 
 ### LFQFP64
 
-|S12AD/ANALOG|Port|
+|AD/ANALOG|Port|
 |---|---|
-|AN000|P40 (60)|
-|AN001|P41 (58)|
-|AN002|P42 (57)|
-|AN003|P43 (56)|
-|AN004|P44 (55)|
-|AN005|P45 (--)|
-|AN006|P46 (53)|
-|AN007|P47 (--)|
-|AN008|PE0 (51)|
-|AN009|PE1 (50)|
-|AN010|PE2 (49)|
-|AN011|PE3 (48)|
-|AN012|PE4 (47)|
-|AN013|PE5 (46)|
-|AN014|PE6 (--)|
-|AN015|PE7 (--)|
+|AN0|P40 (60)|
+|AN1|P41 (58)|
+|AN2|P42 (--)|
+|AN3|P43 (--)|
+|AN4|P03 (1)|
+|AN5|P05 (63)|
+|AN6|P07 (--)|
 
 ### LFQFP100
 
-|S12AD/ANALOG|Port|
+|AD/ANALOG|Port|
 |---|---|
-|AN000|P40 (95)|
-|AN001|P41 (93)|
-|AN002|P42 (92)|
-|AN003|P43 (91)|
-|AN004|P44 (90)|
-|AN005|P90 (89)|
-|AN006|P46 (88)|
-|AN007|P47 (87)|
-|AN008|PE0 (78)|
-|AN009|PE1 (77)|
-|AN010|PE2 (76)|
-|AN011|PE3 (75)|
-|AN012|PE4 (74)|
-|AN013|PE5 (73)|
-|AN014|PE6 (72)|
-|AN015|PE7 (71)|
+|AN0|P40 (95)|
+|AN1|P41 (93)|
+|AN2|P42 (92)|
+|AN3|P43 (91)|
+|AN4|P03 (2)|
+|AN5|P05 (100)|
+|AN6|P07 (98)|
+
+---
+
+## 24 Bits ∆ΣA/D Converter input (DSAD) / 24 ビット ∆ΣA/D コンバーター入力 (DSAD)
+
+- [dsad.hpp](dsad.hpp?ts=4)
+
+### LFQFP64
+
+|DSAD/ANALOG|Port|
+|---|---|
+|ANDS0P|ANDS0P (48)|
+|ANDS0N|ANDS0N (47)|
+|ANDS1P|ANDS1P (50)|
+|ANDS1N|ANDS1N (49)|
+|ANDS2P|ANDS2P (--)|
+|ANDS2N|ANDS2N (--)|
+|ANDS3P|ANDS3P (--)|
+|ANDS3N|ANDS3N (--)|
+|ANDS4|ANDS4 (56)|
+|ANDS5|ANDS5 (--)|
+|ANDS6|ANDS6 (--)|
+
+### LFQFP100
+
+|DSAD/ANALOG|Port|
+|---|---|
+|ANDS0P|ANDS0P (75)|
+|ANDS0N|ANDS0N (74)|
+|ANDS1P|ANDS1P (77)|
+|ANDS1N|ANDS1N (76)|
+|ANDS2P|ANDS2P (79)|
+|ANDS2N|ANDS2N (78)|
+|ANDS3P|ANDS3P (81)|
+|ANDS3N|ANDS3N (80)|
+|ANDS4|ANDS4 (87)|
+|ANDS5|ANDS5 (88)|
+|ANDS6|ANDS6 (89)|
 
 ---
 

@@ -2,7 +2,7 @@
 #ifndef NO_CLOCK_PROFILE
 //=========================================================================//
 /*!	@file
-	@brief	RX21A グループ・クロック。プロファイル @n
+	@brief	RX21A グループ・クロック・プロファイル @n
             クロックジェネレータで発生させる周波数の定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2026 Kunihito Hiramatsu @n
@@ -48,7 +48,7 @@ namespace device {
 		static constexpr uint32_t   ICLK		= 50'000'000;		///< ICLK 周波数（最大50MHz）
 		static constexpr uint32_t   PCLKA		= 50'000'000;		///< PCLKA 周波数（最大50MHz）
 		static constexpr uint32_t   PCLKB		= 25'000'000;		///< PCLKB 周波数（最大25MHz）
-		static constexpr uint32_t   PCLKC		= 25'000'000;		///< PCLKB 周波数（最大25MHz）
+		static constexpr uint32_t   PCLKC		= 25'000'000;		///< PCLKC 周波数（最大25MHz）
 		static constexpr uint32_t   PCLKD		= 25'000'000;		///< PCLKD 周波数（最大25MHz）
 		static constexpr uint32_t   FCLK		= 25'000'000;		///< FCLK 周波数（最大4 ～ 25MHz）
 
