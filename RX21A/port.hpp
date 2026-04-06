@@ -25,4 +25,31 @@ namespace device {
 	typedef portx_t<0x0008'C011, odr_xx_t<0x0008'C0A2> > PORTH;
 	typedef portx_t<0x0008'C012, odr_xx_t<0x0008'C0A4> > PORTJ;
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ポート機能
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	namespace PORT_FUNC {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート切り替えレジスタ A（PSRA）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct psra_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B6>  PSEL6;  ///< PB6(0) / PC0(1)
+			bit_rw_t<io_, bitpos::B7>  PSEL7;  ///< PB7(0) / PC1(1)
+		};
+		static inline psra_t<0x0008'C121> PSRA;
+	};
 }
