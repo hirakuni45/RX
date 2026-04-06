@@ -1,14 +1,18 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX220/RX230/RX231 グループ・ポート・マッピング (TMR)
+	@brief	RX21A/RX220/RX230/RX231 グループ・ポート・マッピング (TMR)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#if defined(SIG_RX220)
+#if defined(SIG_RX21A)
+#include "RX21A/peripheral.hpp"
+#include "RX21A/port.hpp"
+#include "RX21A/mpc.hpp"
+#elif defined(SIG_RX220)
 #include "RX220/peripheral.hpp"
 #include "RX220/port.hpp"
 #include "RX220/mpc.hpp"
