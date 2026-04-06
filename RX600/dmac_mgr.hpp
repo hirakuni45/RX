@@ -3,12 +3,12 @@
 /*!	@file
 	@brief	DMAC マネージャー @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "common/renesas.hpp"
+#include "common/device.hpp"
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
 
