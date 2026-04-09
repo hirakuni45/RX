@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX prog Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -26,7 +26,8 @@ PSOURCES	=	main.cpp \
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
 # LOCAL_PATH  =   /mingw64
-LOCAL_PATH  =   /c/boost_1_74_0
+# LOCAL_PATH  =   /c/boost_1_74_0
+LOCAL_PATH =
 CMD_EXT = exe
 else
   UNAME := $(shell uname -s)
@@ -69,7 +70,7 @@ CC	=	gcc
 LK	=	g++
 RC	=
 
-POPT	=	-O2 -std=gnu++17
+POPT	=	-O2 -std=gnu++20
 COPT	=	-O2
 LOPT	=
 

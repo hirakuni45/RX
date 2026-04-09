@@ -2,16 +2,16 @@
 /*!	@file
 	@brief	SJIS, UTF16 変換
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "sjis_utf16.hpp"
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 #include <iostream>
-#include <boost/format.hpp>
+#include <format>
 
 namespace utils {
 
@@ -1218,7 +1218,7 @@ static constexpr uint16_t sjis_utf16_tbl_[] = {
 0x0000
 };
 
-	typedef boost::unordered_map<uint16_t, uint16_t> utf16_to_sjis_map;
+	typedef std::unordered_map<uint16_t, uint16_t> utf16_to_sjis_map;
 	static utf16_to_sjis_map  utf16_to_sjis_map_;
 
 	// sjis コードをリニア表に変換する。
@@ -1269,7 +1269,7 @@ static constexpr uint16_t sjis_utf16_tbl_[] = {
 		case 0x8192: // return 0x00a3;
 		case 0x81ca: // return 0x00ac;
 		case 0x815c: // return 0x2014;
-///			std::cout << boost::format("SJIS: %04x") % sjis << std::endl;
+///			std::cout << std::format("SJIS: {:04x}", sjis) << std::endl;
 			break;
 		default:
 			break;

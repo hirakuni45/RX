@@ -1,17 +1,18 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	conf ファイルのパース
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include "string_utils.hpp"
 #include "file_io.hpp"
 #include "area.hpp"
 #include <utility>
+#include <format>
 
 namespace utils {
 
@@ -110,7 +111,7 @@ namespace utils {
 				for(const auto& u : us) {
 					if(u.symbol_ == "comment") comment_ = u.body_;
 					else {
-						std::cerr << boost::format("(%d) Programmer error: '") % u.lno_;
+						std::cerr << std::format("({}) Programmer error: '", u.lno_);
 						std::cerr << u.symbol_ << "', '" << u.body_ << "'" << std::endl;
 						return false;
 					}
@@ -187,7 +188,7 @@ namespace utils {
 						err = true;
 					}
 					if(err) {
-						std::cerr << boost::format("(%d) Device error: '") % u.lno_;
+						std::cerr << std::format("({}) Device error: '", u.lno_);
 						std::cerr << u.symbol_ << "', '" << u.body_ << "'" << std::endl << std::endl;
 						return false;
 					}

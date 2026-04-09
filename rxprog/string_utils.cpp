@@ -9,8 +9,8 @@
 //=====================================================================//
 #include <cstdint>
 #include "string_utils.hpp"
-#include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
+#include <format>
+#include <charconv>
 #include "sjis_utf16.hpp"
 
 #include <iostream>
@@ -64,22 +64,18 @@ namespace utils {
 
 	bool string_to_int(const std::string& src, int32_t& dst)
 	{
-		try {
-			dst = boost::lexical_cast<int32_t>(src);
-		} catch(boost::bad_lexical_cast& bad) {
-			return false;
-		}
-		return true;
+		auto [ptr, ec] = std::from_chars(&src[0], &src[src.size()], dst);
+		return ec == std::errc{};
 	}
 
-
+#if 0
 	bool string_to_int(const std::string& src, std::vector<int32_t>& dst, const std::string& spc)
 	{
 		try {
 			string s;
 			for(auto ch : src) {
 				if(string_strchr(spc, ch) != nullptr) {
-					int32_t v = boost::lexical_cast<int32_t>(s);
+					int32_t v = std::lexical_cast<int32_t>(s);
 					dst.push_back(v);
 					s.clear();
 				} else {
@@ -87,10 +83,10 @@ namespace utils {
 				}
 			}
 			if(!s.empty()) {
-				int32_t v = boost::lexical_cast<int32_t>(s);
+				int32_t v = std::lexical_cast<int32_t>(s);
 				dst.push_back(v);
 			}
-		} catch(boost::bad_lexical_cast& bad) {
+		} catch(std::bad_lexical_cast& bad) {
 			return false;
 		}
 		return true;
@@ -130,6 +126,7 @@ namespace utils {
 		}
 		return true;
 	}
+#endif
 
 #if 0
 	bool string_to_matrix4x4(const std::string& src, mtx::fmat4& dst)

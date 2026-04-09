@@ -60,15 +60,8 @@ Tool to write program to flash memory of RX microcontroller using serial interfa
 ---
 ## Preparation of build (compilation) environment (Windows)
 - MSYS2 setup
-- gcc related installation
-- Install boost 
-- Since boost uses 1.74.0, please download it in advance (place it in D:\Download). (boost_1_74_0.tar.gz)
-- Extract to the root of the C drive
-
-```
-cd /c/
-tar xfvz /d/Download/boost_1_74_0.tar.gz
-```
+- gcc related installation (C++20)
+- With C++20 support, Boost is no longer required
    
 See development environment preparation of 'RX/README.md'
    
@@ -76,7 +69,7 @@ See development environment preparation of 'RX/README.md'
 ## Build method, environment setting
  - make
  - Copy configuration file and executable file by make install
- - pass the path to / usr / local / bin
+ - pass the path to '/usr/local/bin'
    
 ---
 ## Connection preparation (serial connection)
@@ -258,9 +251,9 @@ VCL: 0.22uF
 ### Confirm start of rx_prog
  - Run rx_prog and verify that it works (help is listed)
 ```
-rx_prog
-Renesas RX Series Programmer Version 1.10b
-Copyright (C) 2016,2019 Hiramatsu Kunihito (hira@rvf-rc45.net)
+% rx_prog
+Renesas RX Series Programmer Version 1.96
+Copyright (C) 2016, 2026 Hiramatsu Kunihito (hira@rvf-rc45.net)
 usage:
 rx_prog [options] [mot file] ...
 
@@ -269,6 +262,8 @@ Options :
     -s SPEED,  --speed=SPEED   Specify serial speed
     -d DEVICE, --device=DEVICE Specify device name
     -e, --erase                Perform a device erase to a minimum
+    --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)
+    -r, --read                 Perform data read
     -v, --verify               Perform data verify
     -w, --write                Perform data write
     --progress                 display Progress output

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,7 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <boost/format.hpp>
+#include <format>
 
 namespace rx {
 
@@ -35,8 +35,8 @@ namespace rx {
 
 			void info(const std::string& head = "") const noexcept
 			{
-				std::cout << head << (boost::format("Device ID: 0x%0X") % code_) << std::endl;
-				std::cout << head << (boost::format("Device Name: '%s'") % name_) << std::endl;
+				std::cout << head << std::format("Device ID: 0x{:0X}", code_) << std::endl;
+				std::cout << head << std::format("Device Name: '{}'", name_) << std::endl;
 			}
 		};
 		typedef std::vector<device> devices;
@@ -60,13 +60,13 @@ namespace rx {
 			{
 				std::cout << head << "Device Type TYP:";
 				for(int i = 0; i < 8; ++i) {
-					std::cout << boost::format(" %02X") % static_cast<uint32_t>(TYP[i]);
+					std::cout << std::format(" {:02X}", static_cast<uint32_t>(TYP[i]));
 				}
 				std::cout << std::endl;
-				std::cout << head << (boost::format("Device Type OSA: %d") % OSA) << std::endl;
-				std::cout << head << (boost::format("Device Type OSI: %d") % OSI) << std::endl;
-				std::cout << head << (boost::format("Device Type CPA: %d") % CPA) << std::endl;
-				std::cout << head << (boost::format("Device Type CPI: %d") % CPI) << std::endl;
+				std::cout << head << std::format("Device Type OSA: {}", OSA) << std::endl;
+				std::cout << head << std::format("Device Type OSI: {}", OSI) << std::endl;
+				std::cout << head << std::format("Device Type CPA: {}", CPA) << std::endl;
+				std::cout << head << std::format("Device Type CPI: {}", CPI) << std::endl;
 			}
 		};
 
@@ -83,7 +83,7 @@ namespace rx {
 
 			void info(const std::string& head = "") const noexcept
 			{
-				std::cout << head << (boost::format("Clock Mode: 0x%02X") % static_cast<int>(type_))
+				std::cout << head << std::format("Clock Mode: 0x{:02X}", static_cast<int>(type_))
 					<< std::endl;
 			}
 		};
@@ -144,7 +144,7 @@ namespace rx {
 			uint32_t	end_ = 0;
 
 			void info(const std::string& head = "") const {
-				std::cout << head << (boost::format("Area: %08X, %08X") % org_ % end_) << std::endl;
+				std::cout << head << std::format("Area: {:08X}, {:08X}", org_, end_) << std::endl;
 			}
 		};
 		typedef std::vector<area> areas;
@@ -161,7 +161,7 @@ namespace rx {
 			uint32_t	num_ = 0;
 
 			void info(const std::string& head = "") const {
-				std::cout << head << (boost::format("Block: %08X, %08X, %08X") % org_ % size_ % num_) << std::endl;
+				std::cout << head << std::format("Block: {:08X}, {:08X}, {:08X}", org_, size_, num_) << std::endl;
 			}
 		};
 		typedef std::vector<block> blocks;

@@ -3,13 +3,13 @@
 /*!	@file
 	@brief	RX26T プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2023, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2023, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "protocol_base.hpp"
-#include <boost/format.hpp>
+#include <format>
 #include <set>
 
 namespace rx26t {
@@ -151,7 +151,7 @@ namespace rx26t {
 				if(res == 0x12) ;
 				else if(res == 0x92) {
 					std::cerr << std::endl <<
-						boost::format("Erase response: %02X") % static_cast<uint32_t>(err) << std::endl;
+						std::format("Erase response: {:02X}", static_cast<uint32_t>(err)) << std::endl;
 					return rx::protocol::erase_state::ERROR;
 				} else {
 					return rx::protocol::erase_state::ERROR;
@@ -225,8 +225,8 @@ namespace rx26t {
 				return true;
 			} else if(res == 0x93) { // write error
 				std::cerr << std::endl;
-				std::cerr << boost::format("Write error (0x%08X to 0x%08X), status: 0x%02X")
-					% address % (address + PAGE_SIZE - 1) % static_cast<uint32_t>(err) << std::endl;
+				std::cerr << std::format("Write error (0x{:08X} to 0x{:08X}), status: 0x{:02X}"
+					, address, (address + PAGE_SIZE - 1), static_cast<uint32_t>(err)) << std::endl;
 			}
 			return false;
 		}

@@ -2,12 +2,13 @@
 /*!	@file
 	@brief	Renesas RX Series Programmer (Flash Writer)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include <iostream>
+#include <format>
 #include "rx_prog.hpp"
 #include "conf_in.hpp"
 #include "motsx_io.hpp"
@@ -16,9 +17,9 @@
 
 namespace {
 
-	static constexpr char version_[] = "1.95";
+	static constexpr char version_[] = "1.96";
 	static constexpr char conf_file_[] = "rx_prog.conf";
-	static constexpr uint32_t cpr_last_year_ = 2024;
+	static constexpr uint32_t cpr_last_year_ = 2026;
 	static constexpr uint32_t progress_num_ = 50;
 	static constexpr char progress_cha_ = '#';
 
@@ -30,7 +31,7 @@ namespace {
 #if 0
 		int i = 0;
 		for(auto v : mem) {
-			std::cout << (boost::format("%02X, ") % static_cast<uint32_t>(v));
+			std::cout << std::format("{:02X}, ", static_cast<uint32_t>(v));
 			++i;
 			if(i >= 16) {
 				i = 0;
@@ -94,7 +95,7 @@ namespace {
 			}
 			s += ch;
 		}
-		s += (boost::format(" %3d %%") % ((page.n  + 1) * 100 / pageall)).str();
+		s += std::format(" {:>3} %", ((page.n  + 1) * 100 / pageall));
 		std::cout << s << std::flush;
 		page.c = pos;
 	}
@@ -392,13 +393,13 @@ int main(int argc, char* argv[])
 	if(!conf_path.empty() && opts.device_list) {
 		for(const auto& t : conf_in_.get_device_list()) {
 			std::string s;
-			s += (boost::format("%s (%s):") % t.name_ % t.group_).str();
-			s += (boost::format(" Program-Flash: %5s") % t.rom_).str();
-			s += (boost::format(", RAM: %5s") % t.ram_).str();
+			s += std::format("{} ({}):", t.name_, t.group_);
+			s += std::format(" Program-Flash: {:>5}", t.rom_);
+			s += std::format(", RAM: {:>5}", t.ram_);
 			if(!t.data_.empty()) {
-				s += (boost::format(", Data-Flash: %3s") % t.data_).str();
+				s += std::format(", Data-Flash: {:>3}", t.data_);
 			} else {
-				s += (boost::format(", Data-Flash: ---")).str();
+				s += std::format(", Data-Flash: ---");
 			}
 			std::cout << s << std::endl;
 		}
@@ -441,7 +442,7 @@ int main(int argc, char* argv[])
                 if(val >= 1 ) {
                     --val;
                     opts.com_name = opts.com_path;
-                    opts.com_path = "/dev/ttyS" + (boost::format("%d") % val).str();
+                    opts.com_path = "/dev/ttyS" + std::format("{}", val);
                 }
             }
         }
@@ -495,17 +496,17 @@ int main(int argc, char* argv[])
 			break;
 		}
 		if(opts.verbose) {
-			std::cout << boost::format("# Device: %s (first find)") % name << std::endl; 
-			std::cout << boost::format("#   Master clock: %d.%02d MHz") % (rx.master_ / 100) % (rx.master_ % 100) << std::endl;
+			std::cout << std::format("# Device: {} (first find)", name) << std::endl; 
+			std::cout << std::format("#   Master clock: {}.{:02} MHz", (rx.master_ / 100), (rx.master_ % 100)) << std::endl;
 			{
 				int val = (rx.master_ * rx.iclk_multi_) / 100;
 				int mod = (rx.master_ * rx.iclk_multi_) % 100;
-				std::cout << boost::format("#   ICLK multiplier: %d (%d.%02d MHz)") % rx.iclk_multi_ % val % mod << std::endl;
+				std::cout << std::format("#   ICLK multiplier: {} ({}.{:02} MHz)", rx.iclk_multi_, val, mod) << std::endl;
 			}
 			{
 				int val = (rx.master_ * rx.pclk_multi_) / 100;
 				int mod = (rx.master_ * rx.pclk_multi_) % 100;
-				std::cout << boost::format("#   PCLK multiplier: %d (%d.%02d MHz)") % rx.pclk_multi_ % val % mod << std::endl;
+				std::cout << std::format("#   PCLK multiplier: {} ({}.{:02} MHz)", rx.pclk_multi_, val, mod) << std::endl;
 			}
 		}
 	}
@@ -537,7 +538,7 @@ int main(int argc, char* argv[])
 			if(opts.progress) {
 				progress_("Read:   ", pageall, page);
 			} else if(opts.verbose) {
-				std::cout << boost::format("Read:   %08X to %08X") % a.org_ % a.end_ << std::endl;
+				std::cout << std::format("Read:   {:08X} to {:08X}", a.org_, a.end_) << std::endl;
 			}
 			auto len = a.end_ - a.org_;
 			if(count_ff_(tmp, len) != len) {
@@ -567,7 +568,7 @@ int main(int argc, char* argv[])
 				if(opts.progress) {
 					progress_("Erase:  ", page_all, page);
 				} else if(opts.verbose) {
-					std::cout << boost::format("Erase: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
+					std::cout << std::format("Erase: {:08X} to {:08X}", adr, (adr + page_size - 1)) << std::endl;
 				}
 				// 256/128 バイト単位で消去要求を送る
 				auto st = prog_.erase_page(adr);
@@ -606,7 +607,7 @@ int main(int argc, char* argv[])
 				if(opts.progress) {
 					progress_("Write:  ", page_all, page);
 				} else if(opts.verbose) {
-					std::cout << boost::format("Write: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
+					std::cout << std::format("Write: {:08X} to {:08X}", adr, (adr + page_size - 1)) << std::endl;
 				}
 				auto mem = motsx_.get_memory(adr);
 				auto ofs = adr & 0xff;
@@ -640,7 +641,7 @@ int main(int argc, char* argv[])
 				if(opts.progress) {
 					progress_("Verify: ", page_all, page);
 				} else if(opts.verbose) {
-					std::cout << boost::format("Verify: %08X to %08X") % adr % (adr + page_size - 1) << std::endl;
+					std::cout << std::format("Verify: {:08X} to {:08X}", adr, (adr + page_size - 1)) << std::endl;
 				}
 				auto mem = motsx_.get_memory(adr);
 				auto ofs = adr & 0xff;
