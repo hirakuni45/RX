@@ -3,12 +3,13 @@
 /*!	@file
 	@brief	RX13T/RX23T/RX24T/RX24U プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "protocol_base.hpp"
+#include <format>
 #include <set>
 
 namespace rx24t {
@@ -285,7 +286,7 @@ namespace rx24t {
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
 					std::cout << sect << "Data area: ";
-					std::cout << boost::format("%02X") % static_cast<uint32_t>(data_) << std::endl;
+					std::cout << std::format("{:02X}", static_cast<uint32_t>(data_)) << std::endl;
 				}
 			}
 
@@ -356,7 +357,7 @@ namespace rx24t {
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect << boost::format("Change baud rate: %d") % brate << std::endl;
+					std::cout << sect << std::format("Change baud rate: {}", brate) << std::endl;
 				}
 			}
 
@@ -488,7 +489,7 @@ namespace rx24t {
 			if(!write_(cmd, 7)) {
 				return rx::protocol::erase_state::ERROR;
 			}
-//		std::cout << std::endl << boost::format("Erase org: %08X") % org << std::endl;
+//		std::cout << std::endl << std::format("Erase org: {:08X}", org) << std::endl;
 
 			{
 				uint8_t tmp[1];
@@ -565,7 +566,7 @@ namespace rx24t {
 
 			uint8_t cmd[5 + 256 + 1];
 			cmd[0] = 0x50;
-///			std::cout << boost::format("Address: %08X") % address << std::endl;			
+///			std::cout << std::format("Address: {:08X}", address) << std::endl;			
 			if(address != 0xffff'ffff) {
 				put32_big_(&cmd[1], address);
 				std::memcpy(&cmd[5], src, 256);
@@ -582,7 +583,7 @@ namespace rx24t {
 					}
 				}
 				if(!write_(&cmd[5 + 256], 1)) {  // SUM
-				  	select_write_area_ = false;
+					select_write_area_ = false;
 					return false;
 				}
 			} else {
@@ -610,7 +611,7 @@ namespace rx24t {
 					return false;
 				}
 				last_error_ = head[0];
-///				std::cout << boost::format("Write error code: %02X") % static_cast<uint32_t>(head[0]) << std::endl;
+///				std::cout << std::format("Write error code: {:02X}", static_cast<uint32_t>(head[0])) << std::endl;
 				return false;
 			}
 

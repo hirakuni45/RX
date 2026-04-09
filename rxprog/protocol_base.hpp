@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX マイコン、プロトコル・ベース・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,7 +11,7 @@
 #include "rs232c_io.hpp"
 #include "rx_protocol.hpp"
 #include <vector>
-#include <boost/format.hpp>
+#include <format>
 
 namespace rx {
 
@@ -106,7 +106,7 @@ namespace rx {
 
 		static std::string out_section_(uint32_t n, uint32_t num) noexcept
 		{
-			return (boost::format("#%02d/%02d: ") % n % num).str();
+			return std::format("#{:02d}/{:02d}: ", n, num);
 		}
 
 
@@ -277,17 +277,17 @@ namespace rx {
 				return;
 			}
 
-			std::cout << boost::format("SOD: %02X") % static_cast<uint32_t>(tmp[0]) << std::endl;
-			std::cout << boost::format("LEN: %d") % l << std::endl;
-			std::cout << boost::format("RES: %02X") % static_cast<uint32_t>(tmp[3]) << std::endl;
+			std::cout << std::format("SOD: {:02X}", static_cast<uint32_t>(tmp[0])) << std::endl;
+			std::cout << std::format("LEN: {}", l) << std::endl;
+			std::cout << std::format("RES: {:02X}", static_cast<uint32_t>(tmp[3])) << std::endl;
 			--l;
 			if(l > 0) std::cout << "Dat: ";
 			for(uint32_t i = 0; i < l; ++i) {
-				boost::format(" %02X,") % static_cast<uint32_t>(tmp[4 + i]);
+				std::cout << std::format(" {:02X},", static_cast<uint32_t>(tmp[4 + i]));
 			}
 			if(l > 0) std::cout << std::endl;
-			std::cout << boost::format("SUM: %02X") % static_cast<uint32_t>(tmp[4 + l]) << std::endl;
-			std::cout << boost::format("EXT: %02X") % static_cast<uint32_t>(tmp[4 + l + 1]) << std::endl;
+			std::cout << std::format("SUM: {:02X}", static_cast<uint32_t>(tmp[4 + l])) << std::endl;
+			std::cout << std::format("EXT: {:02X}", static_cast<uint32_t>(tmp[4 + l + 1])) << std::endl;
 		}
 
 
@@ -330,15 +330,15 @@ namespace rx {
 		bool start(const std::string& path) noexcept
 		{
 			if(!rs232c_.open(path, B9600)) {
-				std::cerr << boost::format("Can't open '%s'") % path << std::endl;
+				std::cerr << std::format("Can't open '{}'", path) << std::endl;
 				return false;
 			}
 			if(!rs232c_.enable_RTS(false)) {
-				std::cerr << boost::format("Can't enable RTS") << std::endl;
+				std::cerr << std::format("Can't enable RTS") << std::endl;
 				return false;
 			}
 			if(!rs232c_.enable_DTR(false)) {
-				std::cerr << boost::format("Can't enable DTR") << std::endl;
+				std::cerr << std::format("Can't enable DTR") << std::endl;
 				return false;
 			}
 			return true;
@@ -463,8 +463,8 @@ namespace rx {
 
 			uint32_t total = head[1];  // デバイス数、文字数、デバイスコード、シリーズ名のデータの総バイト数
 			// デバイス数の分があるので、残り、SUM までのバイト数
-//			std::cout << boost::format("Size: %d") % total << std::endl;
-//			std::cout << boost::format("Num:  %d") % static_cast<int>(head[2]) << std::endl;
+//			std::cout << std::format("Size: {}", total) << std::endl;
+//			std::cout << std::format("Num:  {}", static_cast<int>(head[2])) << std::endl;
 
 			uint8_t tmp[total];
 			if(!read_(tmp, total)) {
@@ -475,8 +475,8 @@ namespace rx {
 			uint8_t sum = sum_(tmp, total - 1);
 			sum -= head[0] + head[1] + head[2];
 			if(sum != tmp[total - 1]) { 
-				std::cerr << std::endl << boost::format("(InquiryDevice) Sum match error. (0x%02X : 0x%02X)")
-					% static_cast<uint16_t>(sum) % static_cast<uint16_t>(tmp[total - 1]);
+				std::cerr << std::endl << std::format("(InquiryDevice) Sum match error. (0x{:02X} : 0x{:02X})"
+					, static_cast<uint16_t>(sum), static_cast<uint16_t>(tmp[total - 1]));
 				std::cerr << std::endl;
 				return false;
 			}
@@ -538,7 +538,7 @@ namespace rx {
 				return true;
 			} else if(res[0] == 0x90) {  // エラーの場合
 				read_(res, 1);  // エラーコード
-				std::cerr << std::endl << boost::format("(SelectDevice) error: 0x%02X") % static_cast<uint32_t>(res[0]) << std::endl;
+				std::cerr << std::endl << std::format("(SelectDevice) error: 0x{:02X}", static_cast<uint32_t>(res[0])) << std::endl;
 				last_error_ = res[0];
 			} else {
 				std::cerr << std::endl << "(SelectDevice) response error." << std::endl;
@@ -799,13 +799,13 @@ namespace rx {
 				// 0x26: 逓倍エラー
 				// 0x27: 動作周波数エラー
 				last_error_ = res[0];  // エラーコード
-				std::cerr << boost::format("(Change speed legacy) Respons error. (0x%02X)")
-					% static_cast<uint16_t>(res[0]) << std::endl;
+				std::cerr << std::format("(Change speed legacy) Respons error. (0x{:02X})"
+					, static_cast<uint16_t>(res[0])) << std::endl;
 				if(res[0] == 0x24) {
-					std::cerr << boost::format("(Change speed legacy) Select error: %u") % speed << std::endl;
+					std::cerr << std::format("(Change speed legacy) Select error: {}", speed) << std::endl;
 				} else {
-					std::cerr << boost::format("(Change speed legacy) Respons error. (0x%02X)")
-						% static_cast<uint16_t>(res[0]) << std::endl;
+					std::cerr << std::format("(Change speed legacy) Respons error. (0x{:02X})"
+						, static_cast<uint16_t>(res[0])) << std::endl;
 				}
 				return false;
 			} else if(res[0] != 0x06) {  // 正常レスポンス
@@ -1201,8 +1201,8 @@ namespace rx {
 				}
 				if(verbose_) {
 					auto s = out_section_(1, 1);
-					std::cout << s << boost::format("System clock: %d") % system_clock_ << std::endl; 
-					std::cout << s << boost::format("Device clock: %d") % device_clock_ << std::endl; 
+					std::cout << s << std::format("System clock: {}", system_clock_) << std::endl; 
+					std::cout << s << std::format("Device clock: {}", device_clock_) << std::endl; 
 				}
 			}
 
@@ -1214,7 +1214,7 @@ namespace rx {
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect << boost::format("Change baud rate: %d") % brate << std::endl;
+					std::cout << sect << std::format("Change baud rate: {}", brate) << std::endl;
 				}
 			}
 
@@ -1227,7 +1227,7 @@ namespace rx {
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
 					std::cout << sect
-						<< boost::format("ID: %s") % (enable_id_ ? "Enable" : "Disable") << std::endl;
+						<< std::format("ID: {}", (enable_id_ ? "Enable" : "Disable")) << std::endl;
 				}
 			}
 

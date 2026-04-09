@@ -58,17 +58,9 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
    
 ---
 ## ビルド（コンパイル）環境の準備（Windows）
- - MSYS2 のセットアップ
- - gcc 関係のインストール
- - boost は、1.74.0 を使いますので、事前にダウンロード（D:￥Download へ配置）して下さい。（boost_1_74_0.tar.gz）
- - C ドライブのルートに展開します
- - 以前は、MSYS2 pacman で mingw64 環境用をインストールしていましたが、最新バージョンで問題が発生する為
-
-```bash
-cd /c/
-tar xfvz /d/Download/boost_1_74_0.tar.gz
-```
-   
+- MSYS2 のセットアップ
+- gcc 関係のインストール（C++20）
+- C++20 対応によって、boost が不要になりました
 - RX/READMEja.md の開発環境準備を参照
    
 ---
@@ -260,8 +252,8 @@ VCL: 0.22uF
  - rx_prog を実行して、動作する事を確認（help がリストされる）
 ```
 % rx_prog
-Renesas RX Series Programmer Version 1.65
-Copyright (C) 2016, 2023 Hiramatsu Kunihito (hira@rvf-rc45.net)
+Renesas RX Series Programmer Version 1.96
+Copyright (C) 2016, 2026 Hiramatsu Kunihito (hira@rvf-rc45.net)
 usage:
 rx_prog [options] [mot file] ...
 
@@ -270,6 +262,8 @@ Options :
     -s SPEED,  --speed=SPEED   Specify serial speed
     -d DEVICE, --device=DEVICE Specify device name
     -e, --erase                Perform a device erase to a minimum
+    --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)
+    -r, --read                 Perform data read
     -v, --verify               Perform data verify
     -w, --write                Perform data write
     --progress                 display Progress output

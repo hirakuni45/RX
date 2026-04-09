@@ -3,13 +3,13 @@
 /*!	@file
 	@brief	RX72T プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "protocol_base.hpp"
-#include <boost/format.hpp>
+#include <format>
 #include <set>
 
 namespace rx72t {
@@ -127,7 +127,7 @@ namespace rx72t {
 				}
 				if(res == 0x12) ;
 				else if(res == 0x92) {
-					std::cout << boost::format("Erase response: %02X") % static_cast<uint32_t>(err)
+					std::cout << std::format("Erase response: {:02X}", static_cast<uint32_t>(err))
 						<< std::endl;
 					return rx::protocol::erase_state::ERROR;
 				} else {
@@ -200,8 +200,8 @@ namespace rx72t {
 				return true;
 			} else if(res == 0x93) { // write error
 				std::cerr << std::endl;
-				std::cerr << boost::format("Write error (%08X), status: %02X")
-					% address % static_cast<uint32_t>(err) << std::endl;
+				std::cerr << std::format("Write error ({:08X}), status: {:02X}"
+					, address, static_cast<uint32_t>(err)) << std::endl;
 			}
 			return false;
 		}

@@ -21,7 +21,7 @@
 #endif
 
 #include <iostream>
-#include <boost/format.hpp>
+#include <format>
 
 namespace utils {
 
@@ -64,7 +64,7 @@ namespace utils {
 			std::string tt;
 			if(strchr(md.c_str(), 'w')) tt = "output";
 			else tt = "input";
-			std::cerr << boost::format("Can't open %1% file (file_io::wfopen): '%2%'") % tt % s << std::endl;
+			std::cerr << std::format("Can't open {} file (file_io::wfopen): '{}'", tt, s) << std::endl;
 		}
 #endif
 		return fp;

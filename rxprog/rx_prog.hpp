@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX programmer クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,8 +17,8 @@
 #include "rx64m_protocol.hpp"
 #include "rx65x_protocol.hpp"
 #include "rx72t_protocol.hpp"
-#include <boost/format.hpp>
-#include <boost/variant.hpp>
+#include <format>
+#include <variant>
 
 namespace rx {
 
@@ -33,11 +33,11 @@ namespace rx {
 		typedef utils::rs232c_io RS232C;
 		RS232C		rs232c_;
 
-		using protocol_type = boost::variant<rx220::protocol, rx23x::protocol, rx24t::protocol, rx26t::protocol, rx62x::protocol, rx63x::protocol, rx64m::protocol, rx65x::protocol, rx72t::protocol>;
+		using protocol_type = std::variant<rx220::protocol, rx23x::protocol, rx24t::protocol, rx26t::protocol, rx62x::protocol, rx63x::protocol, rx64m::protocol, rx65x::protocol, rx72t::protocol>;
 		protocol_type protocol_;
 
 		std::string out_section_(uint32_t n, uint32_t num) const noexcept {
-			return (boost::format("#%02d/%02d: ") % n % num).str();
+			return std::format("#{:02}/{:02}: ", n, num);
 		}
 
 		struct bind_visitor {
@@ -188,7 +188,7 @@ namespace rx {
 
 			{  // 開始
 				bind_visitor vis(path, brate, rx);
-				if(!boost::apply_visitor(vis, protocol_)) {
+				if(!std::visit(vis, protocol_)) {
 					end();
 					return false;
 				}
@@ -207,7 +207,7 @@ namespace rx {
 		uint32_t get_page_size() const noexcept
 		{
 			page_size_visitor vis;
-			return boost::apply_visitor(vis, protocol_);
+			return std::visit(vis, protocol_);
 		}
 
 
@@ -221,10 +221,10 @@ namespace rx {
 		rx::protocol::erase_state erase_page(uint32_t adr) noexcept
 		{
 			erase_page_visitor vis(adr);
-			auto st = boost::apply_visitor(vis, protocol_);
+			auto st = std::visit(vis, protocol_);
 			if(st == rx::protocol::erase_state::ERROR) {
 				end();
-				std::cerr << std::endl << boost::format("Erase page error: %08X") % adr << std::endl;
+				std::cerr << std::endl << std::format("Erase page error: {:08X}", adr) << std::endl;
 			}
 			return st;
 		}
@@ -241,9 +241,9 @@ namespace rx {
 		bool read_page(uint32_t adr, uint8_t* dst) noexcept
 		{
 			read_page_visitor vis(adr, dst);
-			if(!boost::apply_visitor(vis, protocol_)) {
+			if(!std::visit(vis, protocol_)) {
 				end();
-				std::cerr << boost::format("Read page error: %08X") % adr << std::endl;
+				std::cerr << std::format("Read page error: {:08X}", adr) << std::endl;
 				return false;
 			}
 			return true;
@@ -270,8 +270,8 @@ namespace rx {
 				if(dev[i] != m) {
 					++errcnt;
 					if(verbose_) {
-						std::cerr << (boost::format("0x%08X: D(%02X) to M(%02X)") % adr %
-							static_cast<uint32_t>(dev[i]) % static_cast<uint32_t>(m)) << std::endl;
+						std::cerr << std::format("0x{:08X}: D({:02X}) to M({:02X})", adr
+							, static_cast<uint32_t>(dev[i]), static_cast<uint32_t>(m)) << std::endl;
 					}
 				}
 				++adr;
@@ -294,7 +294,7 @@ namespace rx {
 		bool start_write(bool data) noexcept
 		{
 			select_write_visitor vis(data);
-			if(!boost::apply_visitor(vis, protocol_)) {
+			if(!std::visit(vis, protocol_)) {
 				end();
 				std::cerr << "Write start error.(first)" << std::endl;
 				return false;
@@ -314,9 +314,9 @@ namespace rx {
 		bool write(uint32_t adr, const uint8_t* src) noexcept
 		{
 			write_visitor vis(adr, src);
-			if(!boost::apply_visitor(vis, protocol_)) {
+			if(!std::visit(vis, protocol_)) {
 				end();
-				std::cerr << boost::format("Write body error: %08X") % adr << std::endl;
+				std::cerr << std::format("Write body error: {:08X}", adr) << std::endl;
 				return false;
 			}
 			return true;
@@ -332,7 +332,7 @@ namespace rx {
 		bool final_write() noexcept
 		{
 			write_visitor vis(0xffff'ffff, nullptr);
-			if(!boost::apply_visitor(vis, protocol_)) {
+			if(!std::visit(vis, protocol_)) {
 				end();
 				std::cerr << "Write final error. (fin)" << std::endl;
 				return false;
@@ -349,7 +349,7 @@ namespace rx {
 		const protocol::areas get_area() const noexcept
 		{
 			get_area_visitor vis;
-			boost::apply_visitor(vis);
+			std::visit(vis, protocol_);
 			return vis.areas_;
 		}
 
@@ -362,7 +362,7 @@ namespace rx {
 		void end() noexcept
 		{
 			end_visitor vis;
-			boost::apply_visitor(vis, protocol_);
+			std::visit(vis, protocol_);
 		}
 	};
 }

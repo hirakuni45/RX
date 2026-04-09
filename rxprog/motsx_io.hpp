@@ -5,7 +5,7 @@
 			256 バイト毎に、データ管理を行うので、どのようなロケーションに配置 @n
 			されたデータ列であっても、効率良くデータを保持出来る。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,7 +15,7 @@
 #include <array>
 #include <string>
 #include <iomanip>
-#include <boost/format.hpp>
+#include <format>
 
 #include "file_io.hpp"
 
@@ -138,7 +138,7 @@ namespace utils {
 					if(ch >= 0x20 && ch <= 0x7f) {
 						std::cerr << ch;
 					} else {
-						std::cerr << boost::format("0x%02X") % static_cast<int>(ch);
+						std::cerr << std::format("0x{:02X}", static_cast<int>(ch));
 					}
 					std::cerr << "'" << std::endl;
 					return false;
@@ -223,9 +223,9 @@ namespace utils {
 						sum &= 0xff;
 			   			if(sum != value) {	// SUM エラー
 							std::cerr << "S format SUM error: ";
-							std::cerr << boost::format("0x%02X -> %02X")
-								% static_cast<int>(value)
-								% static_cast<int>(sum)
+							std::cerr << std::format("0x{:02X} -> {:02X}"
+								, static_cast<int>(value)
+								, static_cast<int>(sum))
 								<< std::endl;
 							return false;
 						} else {
@@ -251,26 +251,26 @@ namespace utils {
 			uint32_t len = (a.area_.max_ - a.area_.min_ + 1) * 2;
 			std::string adr;
 			if(a.area_.max_ <= 0xffff) {
-				adr = (boost::format("1%04X") % a.area_.max_).str();
+				adr = std::format("1{:04X}", a.area_.max_);
 				len += 4;
 			} else if(a.area_.max_ <= 0xff'ffff) {
-				adr = (boost::format("2%06X") % a.area_.max_).str();
+				adr = std::format("2{:06X}", a.area_.max_);
 				len += 6;
 			} else {
-				adr = (boost::format("3%08X") % a.area_.max_).str();
+				adr = std::format("3{:08X}", a.area_.max_);
 				len += 8;
 			}
 			len += 2; // for check sum
-			fio.put((boost::format("%02X") % len).str());
+			fio.put(std::format("{:02X}", len));
 			fio.put(adr);
 
 			for(uint32_t i = a.area_.min_; i <= a.area_.max_; ++i) {
 				uint8_t data = a.array_[i & 255];
-				fio.put((boost::format("%02X") % data).str());
+				fio.put(std::format("{:02X}", data));
 				sum += data;
 			}
 
-			fio.put((boost::format("%02X") % static_cast<uint32_t>(sum)).str());
+			fio.put(std::format("{:02X}", static_cast<uint32_t>(sum)));
 
 			fio.put_char('\n');
 			return false;
@@ -453,18 +453,18 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void list_area_map(const std::string& head) const noexcept
 		{
-			std::cout << head << boost::format("Motolola Sx format load map: (exec: 0x%08X)") % exec_;
+			std::cout << head << std::format("Motolola Sx format load map: (exec: 0x{:08X})", exec_);
 			std::cout << std::endl;
 
 			auto as = create_area_map();
 			uint32_t total = 0;
 			for(const auto& a : as) {
 				auto n = a.max_ - a.min_ + 1;
-				std::cout << head << boost::format("  0x%08X to 0x%08X (%d bytes)") % a.min_ % a.max_ % n;
+				std::cout << head << std::format("  0x{:08X} to 0x{:08X} ({} bytes)", a.min_, a.max_, n);
 				std::cout << std::endl;
 				total += n;
 			}
-			std::cout << head << boost::format("  Total (%d bytes)") % total << std::endl << std::flush;
+			std::cout << head << std::format("  Total ({} bytes)", total) << std::endl << std::flush;
 		}
 
 
