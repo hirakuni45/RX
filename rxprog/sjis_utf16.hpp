@@ -3,22 +3,16 @@
 /*!	@file
 	@brief	SJIS, UTF16 変換
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>
+#include <unordered_map>
+#include <iostream>
 
 namespace utils {
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief	UTF-16 から SJIS コードを求めるマップの生成
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	void init_utf16_to_sjis();
-
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -32,11 +26,18 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief	UTF-16 から SJIS コードを求めるマップの生成
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	void init_utf16_to_sjis();
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief	UTF-16 から SJIS コードを求める
 		@param[in]	utf16	UTF-16 コード
 		@return SJIS コード
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	uint16_t utf16_to_sjis(uint16_t utf16);
-
 };
