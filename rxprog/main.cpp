@@ -17,7 +17,7 @@
 
 namespace {
 
-	static constexpr char version_[] = "1.96";
+	static constexpr char version_[] = "1.98";
 	static constexpr char conf_file_[] = "rx_prog.conf";
 	static constexpr uint32_t cpr_last_year_ = 2026;
 	static constexpr uint32_t progress_num_ = 50;
@@ -25,6 +25,9 @@ namespace {
 
 	utils::conf_in conf_in_;
 	utils::motsx_io motsx_;
+
+/// motsx_io クラスの検証を行う場合に有効にする。
+// #define S_REC_TEST
 
 	void memory_dump_()
 	{
@@ -241,6 +244,47 @@ namespace {
 
 int main(int argc, char* argv[])
 {
+#ifdef S_REC_TEST
+	{
+		utils::motsx_io motsx;
+		uint32_t len = (rand() & 0x3'ffff) + 100;  // 100 to 256K
+		std::vector<uint8_t> data;
+		for(uint32_t i = 0; i < len; ++i) {
+			data.push_back(rand() & 255);
+		}
+		motsx.write(rand(), &data[0], len);
+		char fn[] = "motsx_rand.mot";
+		if(motsx.save(fn)) {
+			motsx.list_area_map("Rand data save ");
+			if(motsx_.load(fn)) {
+				motsx_.list_area_map("Rand data load ");
+				auto am = motsx_.create_area_map();
+				int page = 0;
+				int ng = 0;
+				for(auto m : am) {
+					for(uint32_t a = m.min_; a < m.max_; a += 256) {
+						if(motsx_.get_memory(a) == motsx.get_memory(a)) {
+							page++;
+						} else {
+							++ng;
+						}
+					}
+				}
+				if(ng > 0) {
+					std::cout << "No match data record: " << ng << " NG!" << std::endl;
+				} else {
+					std::cout << "Match data array: " << page << " OK!" << std::endl;
+				}
+			} else {
+				std::cout << "MotSx rand test: load error '" << fn << "'" << std::endl;
+			}
+		} else {
+			std::cout << "MotSx rand test: save error '" << fn << "'" << std::endl;
+		}
+	}
+	return 0;
+#endif
+
 	if(argc == 1) {
 		help_(argv[0]);
 		return 0;

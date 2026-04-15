@@ -3,7 +3,8 @@
 /*!	@file
 	@brief	モトローラーＳフォーマット入出力 @n
 			256 バイト毎に、データ管理を行うので、どのようなロケーションに配置 @n
-			されたデータ列であっても、効率良くデータを保持出来る。
+			されたデータ列であっても、効率良くデータを保持出来る。 @n
+			データは２５６バイト毎のブロックと、先頭アドレスで管理される
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,8 +16,8 @@
 #include <array>
 #include <string>
 #include <iomanip>
-#include <format>
 
+#include "format.hpp"
 #include "file_io.hpp"
 
 namespace utils {
@@ -29,6 +30,7 @@ namespace utils {
 	struct motsx_io {
 
 		static constexpr uint32_t PAGE_MASK = 0xffff'ff00;  ///< Under 256 bytes mask 
+		static constexpr uint32_t SAVE_REC_DATA_NUM = 64;	///< Save rrecord data bytes;
 
 		typedef std::array<uint8_t, 256> array;
 
@@ -97,6 +99,14 @@ namespace utils {
 			}
 		}
 
+		enum class SR_MODE {
+			ORG,
+			TYPE,
+			LENGTH,
+			ADDRESS,
+			DATA,
+			SUM
+		};
 
 		bool load_(utils::file_io& fio) noexcept
 		{
@@ -111,7 +121,7 @@ namespace utils {
 			int vcnt = 0;
 
 			bool toend = false;
-			int mode = 0;
+			SR_MODE mode = SR_MODE::ORG;
 
 			while(1) {
 				char ch;
@@ -122,8 +132,8 @@ namespace utils {
 				if(ch == ' ') {
 				} else if(ch == 0x0d || ch == 0x0a) {
 					if(toend) break;
-				} else if(mode == 0 && ch == 'S') {
-					mode = 1;
+				} else if(mode == SR_MODE::ORG && ch == 'S') {
+					mode = SR_MODE::TYPE;
 					value = vcnt = 0;
 				} else if(ch >= '0' && ch <= '9') {
 					value <<= 4;
@@ -134,30 +144,32 @@ namespace utils {
 					value |= ch - 'A' + 10;
 					++vcnt;
 				} else {
-					std::cerr << "S format illegual character: '";
+					std::cerr << "S format illegual character, Mode(" << static_cast<int>(mode) << ") '";
 					if(ch >= 0x20 && ch <= 0x7f) {
 						std::cerr << ch;
 					} else {
-						std::cerr << std::format("0x{:02X}", static_cast<int>(ch));
+						char tmp[8];
+						utils::sformat("0x%02X", tmp, sizeof(tmp)) % static_cast<uint16_t>(ch);
+						std::cerr << tmp;
 					}
 					std::cerr << "'" << std::endl;
 					return false;
 				}
 
-			   	if(mode == 1) {		// タイプ取得(16bits)
+				if(mode == SR_MODE::TYPE) {
 					if(vcnt == 1) {
 						type = value;
-						mode = 2;
+						mode = SR_MODE::LENGTH;
 						value = vcnt = 0;
 					}
-			   	} else if(mode == 2) {	// レングス取得(24bits)
+				} else if(mode == SR_MODE::LENGTH) {
 					if(vcnt == 2) {
 						length = value;
 						sum = value;
-						mode = 3;
+						mode = SR_MODE::ADDRESS;
 						value = vcnt = 0;
 					}
-			   	} else if(mode == 3) {	// アドレス取得(32bits)
+			   	} else if(mode == SR_MODE::ADDRESS) {	// アドレス取得(32bits)
 					int alen = 0;
 					if(type == 0) {
 						alen = 4;
@@ -175,8 +187,6 @@ namespace utils {
 						alen = 6;
 					} else if(type == 9) {
 						alen = 4;
-					} else {
-						return false;
 					}
 
 					if(vcnt == alen) {
@@ -193,17 +203,17 @@ namespace utils {
 							--alen;
 						}
 						if(type >= 1 && type <= 3) {
-							mode = 4;
+							mode = SR_MODE::DATA;
 						} else if(type >= 7 && type <= 9) {
 							exec_ = value;
-							mode = 5;
+							mode = SR_MODE::SUM;
 						} else {
-							mode = 4;
+							mode = SR_MODE::DATA;
 						}
 						value = vcnt = 0;
 					}
-			   	} else if(mode == 4) {	// データ・レコード
-					if(vcnt >= 2) {
+				} else if(mode == SR_MODE::DATA) {
+					if(vcnt == 2) {
 						if(type >= 1 && type <= 3) {
 							write_byte_(address, value);
 							if(area_.max_ < address) area_.max_ = address;
@@ -213,26 +223,25 @@ namespace utils {
 						value = vcnt = 0;
 						--length;
 						if(length == 0) {
-							mode = 5;
+							mode = SR_MODE::SUM;
 						}
 					}
-			   	} else if(mode == 5) {	// SUM
-					if(vcnt >= 2) {
+				} else if(mode == SR_MODE::SUM) {
+					if(vcnt == 2) {
 						value &= 0xff;
 						sum ^= 0xff;
 						sum &= 0xff;
 			   			if(sum != value) {	// SUM エラー
 							std::cerr << "S format SUM error: ";
-							std::cerr << std::format("0x{:02X} -> {:02X}"
-								, static_cast<int>(value)
-								, static_cast<int>(sum))
-								<< std::endl;
+							char tmp[16];
+							utils::sformat("0x%02X -> 0x%02X", tmp, sizeof(tmp)) % static_cast<int>(value) % static_cast<int>(sum);
+							std::cerr << tmp << std::endl;
 							return false;
 						} else {
 							if(type >= 7 && type <= 9) {
 								toend = true;
 							}
-							mode = 0;
+							mode = SR_MODE::ORG;
 							value = vcnt = 0;
 						}
 					}
@@ -245,37 +254,92 @@ namespace utils {
 		bool save_(utils::file_io& fio, const memory_map::value_type& m) noexcept
 		{
 			const array_t& a = m.second;
-			fio.put_char('S');
 
-			uint8_t sum = 0;
-			uint32_t len = (a.area_.max_ - a.area_.min_ + 1) * 2;
-			std::string adr;
-			if(a.area_.max_ <= 0xffff) {
-				adr = std::format("1{:04X}", a.area_.max_);
-				len += 4;
-			} else if(a.area_.max_ <= 0xff'ffff) {
-				adr = std::format("2{:06X}", a.area_.max_);
-				len += 6;
-			} else {
-				adr = std::format("3{:08X}", a.area_.max_);
-				len += 8;
+			uint32_t total = a.area_.max_ - a.area_.min_ + 1;
+			uint32_t ofs = 0;
+			while(total > ofs) {
+				uint8_t sum = 0;
+				uint32_t len = 0;
+				char adr[16];
+				char rtype;
+				auto adrval = a.area_.min_ + ofs;
+				if(a.area_.max_ <= 0xffff) {
+					rtype = '1';
+					utils::sformat("%04X", adr, sizeof(adr)) % adrval;
+					sum += adrval & 0xff;
+					sum += adrval >> 8;
+					len += 2;
+				} else if(a.area_.max_ <= 0xff'ffff) {
+					rtype = '2';
+					utils::sformat("%06X", adr, sizeof(adr)) % adrval;
+					sum += adrval & 0xff;
+					sum += adrval >> 8;
+					sum += adrval >> 16;
+					len += 3;
+				} else {
+					rtype = '3';
+					utils::sformat("%08X", adr, sizeof(adr)) % adrval;
+					sum += adrval & 0xff;
+					sum += adrval >> 8;
+					sum += adrval >> 16;
+					sum += adrval >> 24;
+					len += 4;
+				}
+				auto n = a.area_.max_ - a.area_.min_ + 1 + ofs;
+				if(n > SAVE_REC_DATA_NUM) n = SAVE_REC_DATA_NUM;
+				len += n;
+				len += 1; // for check sum
+				sum += len;
+				char tmp[8];
+				utils::sformat("S%c%02X", tmp, sizeof(tmp)) % rtype % (len & 0xff);
+				fio.put(tmp);
+				fio.put(adr);
+
+				for(uint32_t i = 0; i < n; ++i) {
+					uint16_t data = a.array_[(a.area_.min_ + i + ofs) & 255] & 255;
+					utils::sformat("%02X", tmp, sizeof(tmp)) % data;
+					fio.put(tmp);
+					sum += data;
+				}
+
+				utils::sformat("%02X\n", tmp, sizeof(tmp)) % static_cast<uint32_t>(sum ^ 0xff);
+				fio.put(tmp);
+				ofs += n;
 			}
-			len += 2; // for check sum
-			fio.put(std::format("{:02X}", len));
-			fio.put(adr);
-
-			for(uint32_t i = a.area_.min_; i <= a.area_.max_; ++i) {
-				uint8_t data = a.array_[i & 255];
-				fio.put(std::format("{:02X}", data));
-				sum += data;
-			}
-
-			fio.put(std::format("{:02X}", static_cast<uint32_t>(sum)));
-
-			fio.put_char('\n');
-			return false;
+			return true;
 		}
 
+
+		bool save_exec_(utils::file_io& fio) noexcept
+		{
+			uint32_t len = 0;
+			char adr[16];
+			char rtype;
+			if(exec_ <= 0xffff) {
+				rtype = '9';
+				utils::sformat("%04X", adr, sizeof(adr)) % exec_;
+				len += 2;
+			} else if(exec_ <= 0xff'ffff) {
+				rtype = '8';
+				utils::sformat("%06X", adr, sizeof(adr)) % exec_;
+				len += 3;
+			} else {
+				rtype = '7';
+				utils::sformat("%08X", adr, sizeof(adr)) % exec_;
+				len += 4;
+			}
+			len += 1; // for check sum
+			char tmp[8];
+			utils::sformat("S%c%02X", tmp, sizeof(tmp)) % rtype % len;
+			fio.put(tmp);
+			fio.put(adr);
+
+			uint16_t sum = 0;
+			utils::sformat("%02X\n", tmp, sizeof(tmp)) % sum;
+			fio.put(tmp);
+
+			return true;
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -319,10 +383,11 @@ namespace utils {
 		/*!
 			@brief	セーブ
 			@param[in]	path	ファイルパス
+			@param[in]	exec	起動アドレスを含める場合「true」
 			@return エラー無しなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool save(const std::string& path) noexcept
+		bool save(const std::string& path, bool exec = false) noexcept
 		{
 			if(memory_map_.empty()) return false;
 
@@ -335,6 +400,10 @@ namespace utils {
 				if(!save_(fio, m)) {
 					return false;
 				}
+			}
+
+			if(exec) {
+				save_exec_(fio);
 			}
 
 			fio.close();
@@ -453,18 +522,32 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void list_area_map(const std::string& head) const noexcept
 		{
-			std::cout << head << std::format("Motolola Sx format load map: (exec: 0x{:08X})", exec_);
-			std::cout << std::endl;
+			char tmp[64];
+			utils::sformat("Motolola Sx format load map: (exec: 0x%08X)", tmp, sizeof(tmp)) % exec_;
+			std::cout << head << tmp << std::endl;
 
 			auto as = create_area_map();
 			uint32_t total = 0;
 			for(const auto& a : as) {
 				auto n = a.max_ - a.min_ + 1;
-				std::cout << head << std::format("  0x{:08X} to 0x{:08X} ({} bytes)", a.min_, a.max_, n);
-				std::cout << std::endl;
+				utils::sformat("  0x%08X to 0x%08X (%d bytes)", tmp, sizeof(tmp)) % a.min_ % a.max_ % n;
+				std::cout << head << tmp << std::endl;
 				total += n;
 			}
-			std::cout << head << std::format("  Total ({} bytes)", total) << std::endl << std::flush;
+			utils::sformat("  Total (%d bytes)", tmp, sizeof(tmp)) % total;
+			std::cout << head << tmp << std::endl << std::flush;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	データベースの消去
+		*/
+		//-----------------------------------------------------------------//
+		void clear() noexcept
+		{
+			exec_ = 0;
+			memory_map_.clear();
 		}
 
 
@@ -484,6 +567,15 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		auto get_exec() const noexcept { return exec_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	実行アドレスの設定
+			@param[in] address	実行アドレス
+		*/
+		//-----------------------------------------------------------------//
+		void set_exec(uint32_t address) noexcept { exec_ = address; }
 
 
 		//-----------------------------------------------------------------//
