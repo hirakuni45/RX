@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX72T プログラミング・プロトコル・クラス
+	@brief	RX66T/RX72T プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -49,6 +49,15 @@ namespace rx72t {
 			data_area_(false), select_write_area_(false),
 			erase_set_()
 		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	接続時、ID 認証を行わない場合、自動消去を行うか
+			@return 自動消去を行う場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool auto_erase() const noexcept { return false; }
 
 
 		//-----------------------------------------------------------------//

@@ -13,7 +13,6 @@
 #include "conf_in.hpp"
 #include "motsx_io.hpp"
 #include "string_utils.hpp"
-#include "area.hpp"
 
 namespace {
 
@@ -29,7 +28,7 @@ namespace {
 /// motsx_io クラスの検証を行う場合に有効にする。
 // #define S_REC_TEST
 
-	void memory_dump_()
+	void memory_dump_() noexcept
 	{
 #if 0
 		int i = 0;
@@ -44,7 +43,7 @@ namespace {
 #endif
 	}
 
-	const std::string get_current_path_(const std::string& exec)
+	const std::string get_current_path_(const std::string& exec) noexcept
 	{
 		std::string exec_path;
 #ifdef WIN32
@@ -85,7 +84,7 @@ namespace {
 	};
 
 
-	void progress_(const char* tag, uint32_t pageall, page_t& page)
+	void progress_(const char* tag, uint32_t pageall, page_t& page) noexcept
 	{
 		std::string s;
 		s += tag;
@@ -128,8 +127,8 @@ namespace {
 		std::string erase_page_wait = "2000";
 		std::string write_page_wait = "5000";
 
-		utils::areas area_val;
-		bool	area = false;
+		rx::protocol::areas area_val;
+//		bool	area = false;
 
 		bool	read = false;
 		bool	erase = false;
@@ -142,8 +141,9 @@ namespace {
 		bool	help = false;
 
 
-		bool set_area_(const std::string& s) {
-			utils::strings ss = utils::split_text(s, ",");
+		bool set_area_(const std::string& s) noexcept
+		{
+			utils::strings ss = utils::split_text(s, ":,");
 			std::string t;
 			if(ss.empty()) t = s;
 			else if(ss.size() >= 1) t = ss[0];
@@ -166,7 +166,8 @@ namespace {
 		}
 
 
-		bool set_str(const std::string& t) {
+		bool set_str(const std::string& t) noexcept
+		{
 			bool ok = true;
 			if(br) {
 				com_speed = t;
@@ -180,11 +181,11 @@ namespace {
 			} else if(id) {
 				id_val = t;
 				id = false;
-			} else if(area) {
-				if(!set_area_(t)) {
-					ok = false;
-				}
-				area = false;
+//			} else if(area) {
+//				if(!set_area_(t)) {
+//					ok = false;
+//				}
+//				area = false;
 			} else {
 				if(read) {
 					out_file = t;
@@ -197,7 +198,7 @@ namespace {
 	};
 
 
-	void help_(const std::string& cmd)
+	void help_(const std::string& cmd) noexcept
 	{
 		using namespace std;
 
@@ -218,7 +219,7 @@ namespace {
 ///		cout << "    --erase-data\t\tPerform data flash erase" << endl;
 		cout << "    --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)" << endl;
 		cout << "    -r, --read                 Perform data read" << endl;
-///		cout << "    --area=ORG[:,]END          Specify read area" << endl;
+		cout << "    --area=ORG[:,]END          Specify read area" << endl;
 		cout << "    -v, --verify               Perform data verify" << endl;
 		cout << "    -w, --write                Perform data write" << endl;
 		cout << "    --progress                 display Progress output" << endl;
@@ -230,7 +231,7 @@ namespace {
 	}
 
 
-	uint32_t count_ff_(const uint8_t* src, uint32_t num)
+	uint32_t count_ff_(const uint8_t* src, uint32_t num) noexcept
 	{
 		uint32_t ffn = 0;
 		for(uint32_t i = 0; i < num; ++i) {
@@ -352,10 +353,10 @@ int main(int argc, char* argv[])
 				opts.com_path = &p[std::strlen("--port=")];
 //			} else if(p == "-a") {
 //				opts.area = true;
-//			} else if(p.find("--area=") == 0) {
-//				if(!opts.set_area_(&p[7])) {
-//					opterr = true;
-//				}
+			} else if(p.find("--area=") == 0) {
+				if(!opts.set_area_(&p[7])) {
+					opterr = true;
+				}
 			} else if(p == "-r" || p == "--read") {
 				opts.read = true;
 //			} else if(p == "-i") {
@@ -564,37 +565,72 @@ int main(int argc, char* argv[])
 
 	//================================ 読み込み
 	if(opts.read && !opts.out_file.empty()) {
-		auto areas = prog_.get_area();
+		rx::protocol::areas areas;
+		areas = prog_.get_area();
 		if(areas.size() == 0) {  // 領域情報が無い場合
-
-		} else {  // 領域情報がある場合
-
+			areas = opts.area_val;
 		}
-		uint32_t pageall = 1;
-		page_t page;
-//		auto page_size = prog_.get_page_size();
+		if(opts.verbose) {
+			for(const auto& a : areas) {
+				std::cout << std::format("Read area: {:08X} to {:08X}", a.org_, a.end_) << std::endl;
+			}
+		}
+		uint32_t pgs = 256;
+		uint32_t pageall = 0;
 		for(const auto& a : areas) {
-			uint8_t tmp[256];
-			if(!prog_.read_page(a.org_, tmp)) {
-				prog_.end();
-				return -1;
+			auto org = a.org_ & (~(pgs - 1));
+			auto lim = a.end_ | (pgs - 1);
+			pageall += (lim - org + 1) / pgs;
+		}
+		page_t page;
+		uint32_t wpg = 0;
+		for(const auto& a : areas) {
+			auto org = a.org_ & (~(pgs - 1));
+			auto lim = a.end_ | (pgs - 1);
+			auto len = lim - org + 1;
+			if(opts.verbose) {
+				std::cout << std::format("Read:   {:08X} to {:08X}", org, lim) << std::endl;
 			}
+			uint32_t n = 0;
+			while(len > 0) {
+				uint8_t tmp[pgs];
+				if(!prog_.read_page(org, tmp)) {
+					prog_.end();
+					return -1;
+				}
+				if(opts.progress) {
+					progress_("Read:   ", pageall, page);
+				} else if(opts.verbose) {
+					std::cout << '.' << std::flush;
+					++n;
+					if(n >= 64) {
+						n = 0;
+						std::cout << std::endl;
+					}
+				}
+				if(count_ff_(tmp, pgs) != pgs) {
+					motsx_.write(org, tmp, pgs);
+					++wpg;
+				}
+				++page.n;
+				org += pgs;
+				len -= pgs;
+			}
+		}
+		if(page.n > 0) {
 			if(opts.progress) {
-				progress_("Read:   ", pageall, page);
-			} else if(opts.verbose) {
-				std::cout << std::format("Read:   {:08X} to {:08X}", a.org_, a.end_) << std::endl;
+				std::cout << std::endl << std::flush;
 			}
-			auto len = a.end_ - a.org_;
-			if(count_ff_(tmp, len) != len) {
-				motsx_.write(a.org_, tmp, len);
+		}
+		if(opts.verbose) {
+			std::cout << "Output motolola-record: '" << opts.out_file << "' (" << (wpg * pgs) << " read bytes)" << std::endl;
+		}
+		if(wpg != 0) {
+			if(!motsx_.save(opts.out_file)) {
+				std::cerr << "Output file write fail: '" << opts.out_file << '\'' << std::endl;
 			}
-			++page.n;
-		}
-		if(opts.progress) {
-			std::cout << std::endl << std::flush;
-		}
-		if(!motsx_.save(opts.out_file)) {
-			std::cerr << "Output file write fail: '" << opts.out_file << '\'' << std::endl;
+		} else {
+			std::cerr << "No read area." << std::endl;
 		}
 	}
 

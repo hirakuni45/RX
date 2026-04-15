@@ -252,7 +252,7 @@ VCL: 0.22uF
  - rx_prog を実行して、動作する事を確認（help がリストされる）
 ```
 % rx_prog
-Renesas RX Series Programmer Version 1.96
+Renesas RX Series Programmer Version 1.98
 Copyright (C) 2016, 2026 Hiramatsu Kunihito (hira@rvf-rc45.net)
 usage:
 rx_prog [options] [mot file] ...
@@ -264,6 +264,7 @@ Options :
     -e, --erase                Perform a device erase to a minimum
     --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)
     -r, --read                 Perform data read
+	--area=ORG[:,]END          Specify read area
     -v, --verify               Perform data verify
     -w, --write                Perform data write
     --progress                 display Progress output
