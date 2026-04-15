@@ -626,7 +626,8 @@ namespace utils {
 			@return	書き出した数
 		*/
 		//-----------------------------------------------------------------//
-		size_t put(const std::string& text) {
+		size_t put(std::string& text)
+		{
 			if(text.empty()) return 0;
 			size_t n = 0;
 			for(auto ch : text) {
@@ -642,12 +643,26 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	文字列の書き出し
+			@param[in]	text	書き出し文字コンテナ
+			@return	書き出した数
+		*/
+		//-----------------------------------------------------------------//
+		size_t put(const std::string& text)
+		{
+			return put(const_cast<std::string&>(text));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	文字列の書き出し
 			@param[in]	text	書き出し文字列
 			@return	書き出した数
 		*/
 		//-----------------------------------------------------------------//
-		size_t put(const char* text) {
-			if(text == 0) {
+		size_t put(char* text)
+		{
+			if(text == nullptr) {
 				return 0;
 			}
 			char ch;
@@ -664,6 +679,20 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	文字列の書き出し
+			@param[in]	text	書き出し文字列
+			@return	書き出した数
+		*/
+		//-----------------------------------------------------------------//
+		size_t put(const char* text)
+		{
+			return put(const_cast<char*>(text));
+		}
+
+
+#if 0
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	T の書き込み
 			@param[in]	pad	書き込み元
 			@return	正常なら「true」
@@ -676,6 +705,7 @@ namespace utils {
 			}
 			return true;
 		}
+#endif
 
 
 		//-----------------------------------------------------------------//

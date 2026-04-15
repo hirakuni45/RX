@@ -10,7 +10,7 @@
 //=========================================================================//
 #include "string_utils.hpp"
 #include "file_io.hpp"
-#include "area.hpp"
+#include "rx_protocol.hpp"
 #include <utility>
 #include <format>
 
@@ -136,11 +136,11 @@ namespace utils {
 			std::string 	data_;
 			std::string		rom_;
 			std::string		comment_;
-			utils::areas	ram_area_;
-			utils::areas	data_area_;
-			utils::areas	rom_area_;
+			rx::protocol::areas	ram_area_;
+			rx::protocol::areas	data_area_;
+			rx::protocol::areas	rom_area_;
 
-			bool parse_area_(const std::string& s, utils::areas& a) {
+			bool parse_area_(const std::string& s, rx::protocol::areas& a) {
 				utils::strings ss = utils::split_text(s, ",");
 				if(ss.size() & 1) {
 					return false;  // odd size error..

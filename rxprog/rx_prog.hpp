@@ -57,6 +57,16 @@ namespace rx {
 		};
 
 
+		struct auto_erase_visitor {
+			using result_type = bool;
+
+			template <class T>
+			bool operator()(T& x) {
+				return x.auto_erase();
+			}
+		};
+
+
 		struct page_size_visitor {
 			using result_type = uint32_t;
 
@@ -195,6 +205,19 @@ namespace rx {
 			}
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	接続時、ID 認証を行わない場合、自動消去を行うか
+			@return 自動消去を行う場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool auto_erase() const noexcept
+		{
+			auto_erase_visitor vis;
+			return std::visit(vis, protocol_);
 		}
 
 
