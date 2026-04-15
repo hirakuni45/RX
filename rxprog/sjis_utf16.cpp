@@ -8,10 +8,6 @@
 */
 //=====================================================================//
 #include "sjis_utf16.hpp"
-#include <unordered_map>
-
-#include <iostream>
-#include <format>
 
 namespace utils {
 
@@ -1218,8 +1214,10 @@ static constexpr uint16_t sjis_utf16_tbl_[] = {
 0x0000
 };
 
+
 	typedef std::unordered_map<uint16_t, uint16_t> utf16_to_sjis_map;
 	static utf16_to_sjis_map  utf16_to_sjis_map_;
+
 
 	// sjis コードをリニア表に変換する。
 	// 上位バイト： 0x81 to 0x9f, 0xe0 to 0xef
@@ -1351,5 +1349,4 @@ static constexpr uint16_t sjis_utf16_tbl_[] = {
 		}
 		return cit->second;
 	}
-
 }
