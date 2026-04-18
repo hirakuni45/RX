@@ -144,6 +144,9 @@ run:
 run_verify:
 	./$(TARGET) -d RX64M -P COM11 --verbose --progress --verify uart_sample.mot
 
+run_test_id:
+	./$(TARGET) -d RX140 --verbose --id=45:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF
+
 clean:
 	rm -rf $(BUILD) $(TARGET)
 

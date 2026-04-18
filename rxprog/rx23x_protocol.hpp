@@ -2,7 +2,9 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX23x プログラミング・プロトコル・クラス @n
-			RX140, RX230, RX231, RX260, RX261
+			RX140 @n
+			RX230/RX231 @n
+			RX260/RX261
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -24,6 +26,7 @@ namespace rx23x {
 
 		static constexpr uint32_t LIMIT_BAUDRATE = 230400;
 		static constexpr uint8_t SEL_DEV_RES = 0x46;
+		static constexpr uint8_t ID_CHECK_ACK = 0x06;
 
 		uint8_t					data_;
 		rx::protocol::areas		data_areas_;
@@ -262,7 +265,7 @@ namespace rx23x {
 				return false;
 			}
 
-			// コネクション
+			// コネクション確立
 			if(!connection()) {
 				std::cerr << "Can't connection." << std::endl;
 				return false;
@@ -296,7 +299,7 @@ namespace rx23x {
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
 					std::cout << sect << "Data area: ";
-					std::cout << std::format("{:02X}", static_cast<uint32_t>(data_)) << std::endl;
+					std::cout << std::format("0x{:02X}", static_cast<uint32_t>(data_)) << std::endl;
 				}
 			}
 
@@ -348,8 +351,6 @@ namespace rx23x {
 				}
 			}
 
-			//--- select device
-
 			// デバイス選択
 			{
 				auto as = get_device();
@@ -379,12 +380,25 @@ namespace rx23x {
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect << "ID Protect: ";
+					std::cout << sect << "ID verification: ";
 					if(get_protect()) {
 						std::cout << "Enable" << std::endl;
 					} else {
 						std::cout << "Disable" << std::endl;
-					}					
+					}
+				}
+			}
+
+			// ID 認証
+			if(get_protect()) {
+				if(check_id_code(rx.id_, ID_CHECK_ACK)) {
+					if(verbose_) {
+						auto sect = out_section_(1, 1);
+						std::cout << sect << "ID authentication: OK" << std::endl;
+					}
+				} else {
+					std::cerr << "ID authentication: NG (Can't connection.)" << std::endl;
+					return false;
 				}
 			}
 
@@ -412,10 +426,8 @@ namespace rx23x {
 			}
 			if(head[0] == 0x06) {  // ID コードプロテクト無効
 				id_protect_ = false;
-///				std::cout << "Return: 0x06" << std::endl;
 			} else if(head[0] == 0x16) {  // ID コードプロテクト 有効
 				id_protect_ = true;
-///				std::cout << "Return: 0x16" << std::endl;
 			} else if(head[0] == 0xC0) {  // エラーレスポンス
 				if(!read_(head, 1)) {  // エラーコード
 					return false;

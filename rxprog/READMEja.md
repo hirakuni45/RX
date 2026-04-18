@@ -5,59 +5,64 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
 ## 概要
 シリアルインターフェースを使って、RX マイコンのフラッシュメモリーにプログラムを書き込む為のツール   
    
-|ＲＸマイコン|サポート|動作検証|
-|:-:|:-:|:-:|
-|RX13T|〇|ー|
-|RX140|〇|〇|
-|RX220|〇|〇|
-|RX230|〇|ー|
-|RX231|〇|〇|
-|RX23T|〇|ー|
-|RX24T|〇|〇|
-|RX24U|〇|ー|
-|RX260/RX261|〇|ー|
-|RX26T|〇|〇|
-|RX621/RX62N|〇|〇|
-|RX631/RX63N|〇|〇|
-|RX63T|〇|〇|
-|RX64M|〇|〇|
-|RX651/RX65N|〇|ー|
-|RX66T|〇|〇|
-|RX71M|〇|〇|
-|RX72T|〇|〇|
-|RX72N|〇|ー|
-
----
-## プロジェクト・リスト
- - main.cpp
- - area.hpp
- - conf_in.hpp
- - file_io.cpp
- - file_io.hpp
- - motsx_io.hpp
- - rs232c_io.hpp
- - rx_prog.hpp
- - rx_protocol.hpp
- - rx220_protocol.hpp
- - rx23x_protocol.hpp
- - rx24t_protocol.hpp
- - rx26t_protocol.hpp
- - rx62x_protocol.hpp
- - rx63x_protocol.hpp
- - rx64m_protocol.hpp
- - rx65x_protocol.hpp
- - rx66t_protocol.hpp
- - rx72t_protocol.hpp
- - sjis_utf16.cpp
- - sjis_utf16.hpp
- - string_utils.cpp
- - string_utils.hpp
- - Makefile
- - rx_prog.conf
- - USB_CP2102N ---> KiCAD CP2102N USB シリアルボードプロジェクト（回路図、PCB トラック、ガーバー）
+|ＲＸマイコン|サポート|ID Protect|Read|Erase/Write|
+|:-:|:-:|:-:|:-:|:-:|
+|RX13T|〇|-|-|-|
+|RX140|〇|〇|〇|〇|
+|RX220|〇|〇|〇|〇|
+|RX230|〇|-|-|-|
+|RX231|〇|〇|〇|〇|
+|RX23T|〇|-|-|-|
+|RX24T|〇|〇|〇|〇|
+|RX24U|〇|△|△|△|
+|RX260/RX261|〇|-|△|△|
+|RX26T|〇|-|〇|〇|
+|RX621/RX62N|〇|〇|〇|〇|
+|RX631/RX63N|〇|〇|〇|〇|
+|RX63T|〇|〇|〇|〇|
+|RX64M|〇|-|〇|〇|
+|RX651/RX65N|〇|-|△|△|
+|RX66T|〇|-|〇|〇|
+|RX71M|〇|-|〇|〇|
+|RX72T|〇|-|〇|〇|
+|RX72N|〇|-|△|△|
    
 ---
+   
+## プロジェクト・リスト
+   
+- main.cpp
+- conf_in.hpp
+- file_io.cpp
+- file_io.hpp
+- format.hpp
+- motsx_io.hpp
+- protocol_base.hpp
+- rs232c_io.hpp
+- rx_prog.hpp
+- rx_protocol.hpp
+- rx220_protocol.hpp
+- rx23x_protocol.hpp
+- rx24t_protocol.hpp
+- rx26t_protocol.hpp
+- rx62x_protocol.hpp
+- rx63x_protocol.hpp
+- rx64m_protocol.hpp
+- rx65x_protocol.hpp
+- rx66t_protocol.hpp
+- rx72t_protocol.hpp
+- sjis_utf16.cpp
+- sjis_utf16.hpp
+- string_utils.cpp
+- string_utils.hpp
+- Makefile
+- rx_prog.conf
+- USB_CP2102N ---> KiCAD CP2102N USB シリアルボードプロジェクト（回路図、PCB トラック、ガーバー）
+   
+---
+   
 ## ビルド（コンパイル）環境の準備（Windows）
+   
 - MSYS2 のセットアップ
 - gcc 関係のインストール（C++20）
 - C++20 対応によって、boost が不要になりました
@@ -367,14 +372,29 @@ Verify: ################################################# 100 %
 - ライトページなどのコマンド発効後、次にコマンドを発行する遅延を儲ける必要がある。
 - 標準では、５ミリ秒（５０００マイクロ秒）が設定
 
-### --erase コマンドの有無
-
-- RX62x, RX63T などでは、ID 検査が行われない場合、内部フラッシュは、自動的に消去される為、「--erase」を必要としません。
-- 現在のバージョンでは、ID 検査、ID 設定コマンドを実装していません。
-
 ### --verify コマンドの有無
 
 - RX63T では、verify を書き込み後、自動で行うので、--verify コマンドを必要としません。
+
+---
+
+## ID コードプロテクト
+
+- ID コードプロテクトは、デバイスにより、二種類の構成があります
+- 一つは、オプション設定メモリ (OFSM)内にテーブルがある場合
+- 詳しくは、「OCD/ シリアルプログラマ ID 設定レジスタ (OSIS)」を参照して下さい
+- 一つは、ROM 内（0xFFFFFFA0 - 0xFFFFFFAF）にテーブルがある場合
+- 詳しくは「ハードウェアーマニュアル」の「ブートモード ID コードプロテクト」を参照して下さい
+- ID コードプロテクトは、「common/code_protect.c」ファイルに、制御コードとパスフレーズを記述します
+- Makefile の「CSOURCES」に、上記ファイルを設定します
+- コンパイル、リンクを行うと、IDコードデータが含まれます
+- そのバイナリーを書き込む事で、ID コードプロテクトが有効になります
+- 次回から、rx_prog 接続時、設定した ID の認証が必要になります
+- ID が適合しない場合、接続が拒否されます
+
+### 注意事項
+
+- 特定の ID により、プログラマの接続を拒否する事が出来るので、十分な注意が必要です
 
 ---
 

@@ -10,6 +10,7 @@
 //=========================================================================//
 #include <iostream>
 #include <vector>
+#include <array>
 #include <string>
 #include <format>
 
@@ -144,7 +145,7 @@ namespace rx {
 			uint32_t	end_ = 0;
 
 			void info(const std::string& head = "") const {
-				std::cout << head << std::format("Area: {:08X}, {:08X}", org_, end_) << std::endl;
+				std::cout << head << std::format("Area: 0x{:08X}, 0x{:08X}", org_, end_) << std::endl;
 			}
 		};
 		typedef std::vector<area> areas;
@@ -161,10 +162,18 @@ namespace rx {
 			uint32_t	num_ = 0;
 
 			void info(const std::string& head = "") const {
-				std::cout << head << std::format("Block: {:08X}, {:08X}, {:08X}", org_, size_, num_) << std::endl;
+				std::cout << head << std::format("Block: 0x{:08X}, 0x{:08X}, 0x{:08X}", org_, size_, num_) << std::endl;
 			}
 		};
 		typedef std::vector<block> blocks;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ID 型（ID パスフレーズ格納型）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef std::array<uint8_t, 16> ID;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -174,15 +183,22 @@ namespace rx {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct rx_t {
-			bool	verbose_ = false;
+			bool	verbose_ = false;			///< 詳細表示
 
-			std::string	cpu_type_;			///< CPU タイプ
+			std::string	cpu_type_;				///< CPU タイプ
 
-			uint32_t	master_ = 1200;		///< マスター・クロック（MHz 単位で、小数第２位、１００倍）
-			uint32_t	iclk_multi_ = 8;	///< インストラクション・マルチプライヤー設定
-			uint32_t	pclk_multi_ = 4;	///< 周辺機器・マルチプライヤー設定
+			uint32_t	master_ = 1200;			///< マスター・クロック（MHz 単位で、小数第２位、１００倍）
+			uint32_t	iclk_multi_ = 8;		///< インストラクション・マルチプライヤー設定
+			uint32_t	pclk_multi_ = 4;		///< 周辺機器・マルチプライヤー設定
 
-			uint8_t		id_[16] = { 0xff };	///< ID 
+			ID			id_ = { 0xff };			///< ID パスフレーズ
+
+			uint32_t	ofs0_ = 0xffff'ffff;	///< OFS0 定義
+			uint32_t	ofs1_ = 0xffff'ffff;	///< OFS1 定義
+
+			bool		id_write_ = false;		///< ID パスフレーズ書き込み
+			bool		ofs0_write_ = false;	///< OFS0 書き込み
+			bool		ofs1_write_ = false;	///< OFS1 書き込み
 		};
 
 

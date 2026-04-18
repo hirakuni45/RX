@@ -52,13 +52,13 @@ ENTRY(_start)
 MEMORY {
 	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00003C00 /* 16K - stack_size (0x400) */
 	USTACK (w) : ORIGIN = 0x00003F00, LENGTH = 4 /* ustack 768 bytes */
-	ISTACK (w) : ORIGIN = 0x00004000, LENGTH = 4 /* istack 256 bytes  */
+	ISTACK (w) : ORIGIN = 0x00004000, LENGTH = 4 /* istack 256 bytes */
 	ROM (w)    : ORIGIN = 0xFFFF0000, LENGTH = 0x0000FFD0 /* 64K */
 }
 
 SECTIONS
 {
-  .text           :
+  .text :
   {
     PROVIDE (_start = .);
     *(.text P .stub .text.* .gnu.linkonce.t.*)
@@ -211,6 +211,11 @@ PROVIDE (__mainramend = ORIGIN(RAM) + LENGTH(RAM));
     ASSERT ((__ustack > _end),
             "Error: Too much data - no room left for the stack");
   }
+
+  .passphrase (0xFFFFFFA0) :
+  {
+	KEEP (*(.passphrase))
+  } > ROM
 
   /* Providing one of these symbols in your code is sufficient to have
      it linked in to the fixed vector table.  */

@@ -212,6 +212,11 @@ PROVIDE (__mainramend = ORIGIN(RAM) + LENGTH(RAM));
             "Error: Too much data - no room left for the stack");
   }
 
+  .passphrase (0xFFFFFFA0) :
+  {
+	KEEP (*(.passphrase))
+  } > ROM
+
   /* Providing one of these symbols in your code is sufficient to have
      it linked in to the fixed vector table.  */
 

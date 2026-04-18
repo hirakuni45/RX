@@ -169,23 +169,23 @@ namespace rx {
 			if(!read_(dst, 4)) {
 				return false;
 			}
-			if(dst[0] != 0x81) {
+			if(dst[0] != 0x81) {  // SOD
 				return false;
 			}
-			auto l = get16_big_(&dst[1]);
+			auto l = get16_big_(&dst[1]);  // LNH, LNL
 			if(l == 1 || l == 2) ;
 			else {
 				return false;
 			}
 			--l;
-			if(!read_(&dst[4], l + 2)) {
+			if(!read_(&dst[4], l + 2)) {  // RES, SUM, EXT / RES, ERR, SUM, EXT
 				return false;
 			}
 			auto sum = sum_(&dst[1], 3 + l);
-			if(sum != dst[4 + l]) {
+			if(sum != dst[4 + l]) {  // SUM
 				return false;
 			}
-			if(dst[4 + l + 1] != 0x03) {
+			if(dst[4 + l + 1] != 0x03) {  // EXT
 				return false;
 			}
 			return true;
@@ -348,11 +348,11 @@ namespace rx {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コネクションの確立（start が成功したら呼ぶ）
-			@param[in]	id	コネクション確立 ID
+			@param[in]	cnid	コネクション確立 ID
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool connection(uint8_t id) noexcept
+		bool connection(uint8_t cnid) noexcept
 		{
 			bool ok = false;
 			for(int i = 0; i < 30; ++i) {
@@ -381,7 +381,7 @@ namespace rx {
 			if(tmp[0] == 0xff) {
 				return false;
 			}
-			if(tmp[0] != id) {
+			if(tmp[0] != cnid) {
 				return false;
 			}
 
@@ -394,38 +394,45 @@ namespace rx {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ID コードチェック @n
-					・プロトコルは RX140 の仕様
-			@param[in]	id	制御コード + IDコード1～IDコード15
+					ACK Code: @n
+						RX140/RX230/RX231/RX24T: 0x06 @n
+						RX220/RX62x/RX63x: 0x26
+			@param[in]	id_pf		ID パスフレーズ
+			@param[in]	ack_code	ACK コード
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool check_id_code(uint8_t id[16]) noexcept
+		bool check_id_code(const rx::protocol::ID& id_pf, uint8_t ack_code) noexcept
 		{
 			uint8_t tmp[2+16+1];
 
 			tmp[0] = 0x60;
 			tmp[1] = 16;
-			for(int i = 0; i < 16; ++i) tmp[2+i] = id[i];
-			tmp[2+16] = sum_(tmp, 2 + 16);
+			int i = 0;
+			for(auto v : id_pf) {
+				tmp[2+i] = v;
+				++i;
+			}
+			tmp[2 + 16] = sum_(tmp, 2 + 16);
 			if(!write_(tmp, 2 + 16 + 1)) {
 				return false;
 			}
 
-			if(!read_(tmp, 1)) {
+			if(!read_(tmp, 1)) {  // レスポンス
 				return false;
 			}
-			if(tmp[0] == 0x06) {
+			if(tmp[0] == ack_code) {  // ACK コード
 				return true;
-			} else if(tmp[0] == 0xE0) {
+			} else if(tmp[0] == 0xE0) {  // エラーコード
 				if(!read_(tmp, 1)) {
 					return false;
 				}
-				if(tmp[0] == 0x11) {
-					// sum error
-				} else if(tmp[0] == 0x61) {
-					// ID コード不一致
-				} else if(tmp[0] == 63) {
-					// ID コード不一致かつイレーズエラー
+				if(tmp[0] == 0x11) {  // check sum error
+					std::cerr << "Check ID status: Sum error" << std::endl;
+				} else if(tmp[0] == 0x61) {  // ID コード不一致
+					std::cerr << "Check ID status: Invalid ID code" << std::endl;
+				} else if(tmp[0] == 0x63) {  // IDコード不一致[消去エラー], IDコード不一致で消去実行の結果、エラーとなった場合 
+					std::cerr << "Check ID status: Erase error" << std::endl;
 				}
 				return false;
 			}
@@ -1116,7 +1123,6 @@ namespace rx {
 		//-----------------------------------------------------------------//
 		bool inquiry_id() noexcept
 		{
-
 			if(!connection_) return false;
 
 			if(!command_(0x2C)) {
@@ -1135,6 +1141,120 @@ namespace rx {
 			if(tmp[0] == 0x00) enable_id_ = true;
 			else if(tmp[0] == 0xFF) enable_id_ = false;
 			else {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	シリアルプログラミング ID コードチェックコマンド
+			@param[in]	idpf	ID パスフレーズ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool check_serial_id(const rx::protocol::ID& idpf) noexcept
+		{
+			if(!connection_) return false;
+
+			uint8_t tmp[16];
+			for(int i = 0; i < 16; ++i) {
+				tmp[i] = idpf[16 - 1 - i];
+			}
+			if(!command_(0x30, tmp, sizeof(tmp))) {
+				std::cerr << "check_serial_id: command error." << std::endl;
+				return false;
+			}
+
+			uint8_t res = 0;
+			uint8_t err = 0;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x30) {  // OK
+
+			} else if(res == 0xB0) {  // Error
+				switch(err) {
+				case 0xC1:  // パケットエラー
+					std::cerr << "check_serial_id: paket error." << std::endl;
+					break;
+				case 0xC2:  // チェックサムエラー
+					std::cerr << "check_serial_id: check-sum error." << std::endl;
+					break;
+				case 0xC3:  // フローエラー
+					std::cerr << "check_serial_id: flow error." << std::endl;
+					break;
+				case 0xDB:  // ID コード不一致エラー
+					break;
+				default:	// その他のエラー
+					break;
+				}
+				return false;
+			} else {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	シリアルプログラミング ID コード設定
+			@param[in]	idpf	ID パスフレーズ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool write_serial_id(const rx::protocol::ID& idpf) noexcept
+		{
+			if(!connection_) return false;
+
+			uint8_t tmp[16];
+			for(int i = 0; i < 16; ++i) {
+				tmp[i] = idpf[16 - 1 - i];
+			}
+			if(!command_(0x28, tmp, sizeof(tmp))) {
+				std::cerr << "write_serial_id: command error." << std::endl;
+				return false;
+			}
+
+			uint8_t res = 0;
+			uint8_t err = 0;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x28) {  // OK
+
+			} else if(res == 0xA8) {  // Error
+				switch(err) {
+				case 0xC1:  // パケットエラー
+					std::cerr << "write_serial_id: paket error." << std::endl;
+					break;
+				case 0xC2:  // チェックサムエラー
+					std::cerr << "write_serial_id: check-sum error." << std::endl;
+					break;
+				case 0xC3:  // フローエラー
+					std::cerr << "write_serial_id: flow error." << std::endl;
+					break;
+				case 0xDA:  // プロテクションエラー
+					std::cerr << "write_serial_id: protection error." << std::endl;
+					break;
+				case 0xE1:  // イレーズエラー
+					std::cerr << "write_serial_id: erase error." << std::endl;
+					break;
+				case 0xE2:  // プログラムエラー
+					std::cerr << "write_serial_id: program error." << std::endl;
+					break;
+				case 0xE3:  // ベリファイエラー
+					std::cerr << "write_serial_id: verify error." << std::endl;
+					break;
+				default:	// その他のエラー
+					break;
+				}
+				return false;
+			} else {
 				return false;
 			}
 
@@ -1187,6 +1307,7 @@ namespace rx {
 				uint8_t endian = 0x01;
 				if(!select_endian(endian)) {
 					std::cerr << "Select endian error." << std::endl;
+					return false;
 				}
 				if(verbose_) {
 					std::cout << out_section_(1, 1) << "Endian is "
@@ -1226,16 +1347,41 @@ namespace rx {
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect
-						<< std::format("ID: {}", (enable_id_ ? "Enable" : "Disable")) << std::endl;
+					std::cout << sect << "ID verification: " << (enable_id_ ? "Enable" : "Disable") << std::endl;
 				}
 			}
 
-			// ID 認証が有効なら、ID コードチェックを行う
+			// ID 認証が有効なら、認証を行う
 			if(enable_id_) {
+				if(check_serial_id(rx.id_)) {
+					if(verbose_) {
+						auto sect = out_section_(1, 1);
+						std::cout << sect << "ID authentication: OK" << std::endl;
+					}
+				} else {
+					std::cerr << "ID authentication: NG (Can't connection.)" << std::endl;
+					return false;
+				}
 			}
 
-			pe_turn_on_ = true;			
+			// OFSx 書き込み 
+			if(rx.ofs0_write_ || rx.ofs1_write_) {
+
+			}
+
+			// ID 書き込み 
+			if(rx.id_write_) {
+				if(!write_serial_id(rx.id_)) {
+					std::cerr << "Serial ID write error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "Serial ID write complete." << std::endl;
+				}
+			}
+
+			pe_turn_on_ = true;	
 
 			return true;
 		}

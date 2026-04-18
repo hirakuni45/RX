@@ -40,6 +40,7 @@ namespace rx {
 			return std::format("#{:02}/{:02}: ", n, num);
 		}
 
+
 		struct bind_visitor {
 			using result_type = bool;
 
@@ -173,9 +174,11 @@ namespace rx {
 		//-------------------------------------------------------------//
 		bool start(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) noexcept
 		{
-			if(rx.cpu_type_ == "RX220") {
+			if(rx.cpu_type_ == "RX140") {
+				protocol_ = rx23x::protocol();
+			} else if(rx.cpu_type_ == "RX220") {
 				protocol_ = rx220::protocol();
-			} else if(rx.cpu_type_ == "RX140" || rx.cpu_type_ == "RX230" || rx.cpu_type_ == "RX231" || rx.cpu_type_ == "RX260" || rx.cpu_type_ == "RX261") {
+			} else if(rx.cpu_type_ == "RX230" || rx.cpu_type_ == "RX231" || rx.cpu_type_ == "RX260" || rx.cpu_type_ == "RX261") {
 				protocol_ = rx23x::protocol();
 			} else if(rx.cpu_type_ == "RX13T" || rx.cpu_type_ == "RX23T" || rx.cpu_type_ == "RX24T" || rx.cpu_type_ == "RX24U") {
 				protocol_ = rx24t::protocol();
@@ -196,7 +199,7 @@ namespace rx {
 				return false;
 			}
 
-			{  // 開始
+			{  // 接続開始
 				bind_visitor vis(path, brate, rx);
 				if(!std::visit(vis, protocol_)) {
 					end();
