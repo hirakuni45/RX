@@ -1,6 +1,6 @@
 //=========================================================================//
 /*!	@file
-	@brief	Renesas RX Series Programmer (Flash Writer)
+	@brief	Renesas RX Series Programmer (RX Flash Writer)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,7 +16,7 @@
 
 namespace {
 
-	static constexpr char version_[] = "1.98";
+	static constexpr char version_[] = "2.05";
 	static constexpr char conf_file_[] = "rx_prog.conf";
 	static constexpr uint32_t cpr_last_year_ = 2026;
 	static constexpr uint32_t progress_num_ = 50;
@@ -121,8 +121,9 @@ namespace {
 		std::string com_name;
 		bool	dp = false;
 
-		std::string id_val;
-		bool	id = false;
+		std::string id_pad;
+		rx::protocol::ID ida = { 0xff };
+//		bool	id = false;
 
 		std::string erase_page_wait = "2000";
 		std::string write_page_wait = "5000";
@@ -133,6 +134,7 @@ namespace {
 		bool	read = false;
 		bool	erase = false;
 		bool	write = false;
+		bool	id_table_write = false;
 		bool	verify = false;
 		bool	device_list = false;
 		bool	progress = false;
@@ -158,6 +160,9 @@ namespace {
 					err = true;
 				}
 			}
+			if(org >= end) {
+				err = true;
+			}
 			if(err) {
 				return false;
 			}
@@ -178,9 +183,9 @@ namespace {
 			} else if(dp) {
 				com_path = t;
 				dp = false;
-			} else if(id) {
-				id_val = t;
-				id = false;
+//			} else if(id) {
+//				id_val = t;
+//				id = false;
 //			} else if(area) {
 //				if(!set_area_(t)) {
 //					ok = false;
@@ -214,12 +219,13 @@ namespace {
 		cout << "    -s SPEED,  --speed=SPEED   Specify serial speed" << endl;
 		cout << "    -d DEVICE, --device=DEVICE Specify device name" << endl;
 		cout << "    -e, --erase                Perform a device erase to a minimum" << endl;
-///		cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
-///		cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
-///		cout << "    --erase-data\t\tPerform data flash erase" << endl;
+//		cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
+//		cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
+//		cout << "    --erase-data\t\tPerform data flash erase" << endl;
 		cout << "    --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)" << endl;
-		cout << "    -r, --read                 Perform data read" << endl;
+		cout << "    --id-table-write           Perform ID-Tables write" << endl;
 		cout << "    --area=ORG[:,]END          Specify read area" << endl;
+		cout << "    -r, --read                 Perform data read" << endl;
 		cout << "    -v, --verify               Perform data verify" << endl;
 		cout << "    -w, --write                Perform data write" << endl;
 		cout << "    --progress                 display Progress output" << endl;
@@ -324,7 +330,7 @@ int main(int argc, char* argv[])
 		if(opts.com_speed.empty()) {
 			opts.com_speed = defa.speed_;
 		}
-		opts.id_val = defa.id_;
+		opts.id_pad = defa.id_;
 		opts.erase_page_wait = defa.erase_page_wait_;
 		opts.write_page_wait = defa.write_page_wait_;
 	} else {
@@ -354,7 +360,7 @@ int main(int argc, char* argv[])
 //			} else if(p == "-a") {
 //				opts.area = true;
 			} else if(p.find("--area=") == 0) {
-				if(!opts.set_area_(&p[7])) {
+				if(!opts.set_area_(&p[std::strlen("--area=")])) {
 					opterr = true;
 				}
 			} else if(p == "-r" || p == "--read") {
@@ -362,10 +368,11 @@ int main(int argc, char* argv[])
 //			} else if(p == "-i") {
 //				opts.id = true;
 			} else if(p.find("--id=") == 0) {
-				opts.id = true;
-				opts.id_val = &p[std::strlen("--id=")];
+				opts.id_pad = &p[std::strlen("--id=")];
 			} else if(p == "-w" || p == "--write") {
 				opts.write = true;
+			} else if(p == "--id-table-write") {
+				opts.id_table_write = true;
 			} else if(p == "-v" || p == "--verify") {
 				opts.verify = true;
 			} else if(p == "--progress") {
@@ -400,14 +407,22 @@ int main(int argc, char* argv[])
 	}
 
 	// ID 変換
-	if(opts.id) {
-		auto ss = utils::split_text(opts.id_val, ":,");
+	if(!opts.id_pad.empty()) {
+		auto ss = utils::split_text(opts.id_pad, ":,");
 		if(ss.size() != 16) {
-			std::cerr << "The number of IDs must be 16: '" << opts.id_val << "'" << std::endl;
+			std::cerr << "The number of IDs must be 16: '" << opts.id_pad << "'" << std::endl;
 			opts.help = true;
 		} else {
+			int i = 0;
 			for(auto s : ss) {
-				
+				uint32_t v;
+				if(!utils::string_to_hex(s, v)) {
+					std::cerr << "Hexa-decimal conversion fail: '" << s << "'" << std::endl;
+					opts.help = true;
+					break;
+				}
+				opts.ida[i] = v;
+				++i;
 			}
 		}
 	}
@@ -430,6 +445,19 @@ int main(int argc, char* argv[])
 		std::cout << "# Group: '" << opts.device << '\'' << std::endl;
 		std::cout << "# Serial port path: '" << opts.com_path << '\'' << std::endl;
 		std::cout << "# Serial port speed: " << opts.com_speed << std::endl;
+		if(opts.id_pad.empty()) {
+			std::cout << "# ID Passphrase: ---" << std::endl;
+		} else {
+			std::cout << "# ID Passphrase: " << opts.id_pad << std::endl;
+		}
+		if(opts.area_val.empty()) {
+			std::cout << "# Read Area: ---" << std::endl;
+		} else {
+			for(auto t : opts.area_val) {
+				std::cout << std::format("# Read Area: {:08X} to {:08X}", t.org_, t.end_);
+			}
+			std::cout << std::endl;
+		}
 		std::cout << "# Erase Page Wait: " << erase_page_wait << " [uS]" << std::endl;
 		std::cout << "# Write Page Wait: " << write_page_wait << " [uS]" << std::endl;
 	}
@@ -511,6 +539,8 @@ int main(int argc, char* argv[])
 	rx::protocol::rx_t rx;
 	rx.verbose_ = opts.verbose;
 	rx.cpu_type_ = opts.device;
+	rx.id_ = opts.ida;
+	rx.id_write_ = opts.id_table_write;
 
 	// 接続されたクロック周波数が必要なグループ
 	if(rx.cpu_type_ == "RX220" || rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N"
@@ -565,14 +595,17 @@ int main(int argc, char* argv[])
 
 	//================================ 読み込み
 	if(opts.read && !opts.out_file.empty()) {
+
 		rx::protocol::areas areas;
 		areas = prog_.get_area();
-		if(areas.size() == 0) {  // 領域情報が無い場合
+		if(opts.area_val.size() != 0) {
 			areas = opts.area_val;
 		}
+
 		if(opts.verbose) {
 			for(const auto& a : areas) {
-				std::cout << std::format("Read area: {:08X} to {:08X}", a.org_, a.end_) << std::endl;
+
+				std::cout << std::format("Read area: 0x{:08X} to 0x{:08X}", a.org_, a.end_) << std::endl;
 			}
 		}
 		uint32_t pgs = 256;
@@ -589,7 +622,7 @@ int main(int argc, char* argv[])
 			auto lim = a.end_ | (pgs - 1);
 			auto len = lim - org + 1;
 			if(opts.verbose) {
-				std::cout << std::format("Read:   {:08X} to {:08X}", org, lim) << std::endl;
+				std::cout << std::format("Read     : 0x{:08X} to 0x{:08X}", org, lim) << std::endl;
 			}
 			uint32_t n = 0;
 			while(len > 0) {
@@ -648,7 +681,7 @@ int main(int argc, char* argv[])
 				if(opts.progress) {
 					progress_("Erase:  ", page_all, page);
 				} else if(opts.verbose) {
-					std::cout << std::format("Erase: {:08X} to {:08X}", adr, (adr + page_size - 1)) << std::endl;
+					std::cout << std::format("Erase: 0x{:08X} to 0x{:08X}", adr, (adr + page_size - 1)) << std::endl;
 				}
 				// 256/128 バイト単位で消去要求を送る
 				auto st = prog_.erase_page(adr);
@@ -687,7 +720,7 @@ int main(int argc, char* argv[])
 				if(opts.progress) {
 					progress_("Write:  ", page_all, page);
 				} else if(opts.verbose) {
-					std::cout << std::format("Write: {:08X} to {:08X}", adr, (adr + page_size - 1)) << std::endl;
+					std::cout << std::format("Write: 0x{:08X} to 0x{:08X}", adr, (adr + page_size - 1)) << std::endl;
 				}
 				auto mem = motsx_.get_memory(adr);
 				auto ofs = adr & 0xff;
@@ -721,7 +754,7 @@ int main(int argc, char* argv[])
 				if(opts.progress) {
 					progress_("Verify: ", page_all, page);
 				} else if(opts.verbose) {
-					std::cout << std::format("Verify: {:08X} to {:08X}", adr, (adr + page_size - 1)) << std::endl;
+					std::cout << std::format("Verify: 0x{:08X} to 0x{:08X}", adr, (adr + page_size - 1)) << std::endl;
 				}
 				auto mem = motsx_.get_memory(adr);
 				auto ofs = adr & 0xff;

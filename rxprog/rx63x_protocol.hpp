@@ -26,6 +26,7 @@ namespace rx63x {
 
 		static constexpr uint32_t LIMIT_BAUDRATE = 115200;
 		static constexpr uint8_t SEL_DEV_RES = 0x06;
+		static constexpr uint8_t ID_CHECK_ACK = 0x26;
 
 		rx::protocol::areas			blocks_;
 		uint32_t					prog_size_;
@@ -363,6 +364,19 @@ namespace rx63x {
 					} else {
 						std::cout << "false" << std::endl;
 					}					
+				}
+			}
+
+			// ID 認証
+			if(get_protect()) {
+				if(check_id_code(rx.id_, ID_CHECK_ACK)) {
+					if(verbose_) {
+						auto sect = out_section_(1, 1);
+						std::cout << sect << "ID Match !" << std::endl;
+					}
+				} else {
+					std::cerr << "ID check fail." << std::endl;
+					return false;
 				}
 			}
 

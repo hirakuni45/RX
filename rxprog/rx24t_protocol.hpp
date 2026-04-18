@@ -23,6 +23,7 @@ namespace rx24t {
 
 		static constexpr uint32_t LIMIT_BAUDRATE = 230400;
 		static constexpr uint8_t SEL_DEV_RES = 0x46;
+		static constexpr uint8_t ID_CHECK_ACK = 0x06;
 
 		uint8_t					data_;
 		rx::protocol::areas		data_areas_;
@@ -295,7 +296,7 @@ namespace rx24t {
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
 					std::cout << sect << "Data area: ";
-					std::cout << std::format("{:02X}", static_cast<uint32_t>(data_)) << std::endl;
+					std::cout << std::format("0x{:02X}", static_cast<uint32_t>(data_)) << std::endl;
 				}
 			}
 
@@ -347,8 +348,6 @@ namespace rx24t {
 				}
 			}
 
-			//--- select device
-
 			// デバイス選択
 			{
 				auto as = get_device();
@@ -378,12 +377,24 @@ namespace rx24t {
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect << "ID Protect: ";
+					std::cout << sect << "# ID verification: ";
 					if(get_protect()) {
 						std::cout << "Enable" << std::endl;
 					} else {
 						std::cout << "Disable" << std::endl;
 					}					
+				}
+			}
+
+			// ID 認証
+			if(get_protect()) {
+				if(check_id_code(rx.id_, ID_CHECK_ACK)) {
+					if(verbose_) {
+						std::cout << "# ID authentication: OK" << std::endl;
+					}
+				} else {
+					std::cerr << "ID authentication: NG (Can't connection.)" << std::endl;
+					return false;
 				}
 			}
 

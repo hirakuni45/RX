@@ -70,6 +70,7 @@ namespace utils {
 			std::string speed_osx_;
 			std::string speed_linux_;
 			std::string id_;
+			std::string id_file_;
 			std::string erase_page_wait_;
 			std::string write_page_wait_;
 
@@ -88,6 +89,7 @@ namespace utils {
 					else if(ss[0] == "speed_osx") speed_osx_ = ss[1];
 					else if(ss[0] == "speed_linux") speed_linux_ = ss[1];
 					else if(ss[0] == "id") id_ = ss[1];
+					else if(ss[0] == "id_file") id_file_ = ss[1];
 					else if(ss[0] == "erase_page_wait") erase_page_wait_ = ss[1];
 					else if(ss[0] == "write_page_wait") write_page_wait_ = ss[1];
 					else ok = false;
@@ -247,7 +249,7 @@ namespace utils {
 					else if(ch == '{') {
 						ana_mode_ = ana_mode::symbol;
 					} else if(check_symbol_(ch)) {
- 						name_ += ch;
+						name_ += ch;
 					} else {  // error name character
 						return false;
 					}

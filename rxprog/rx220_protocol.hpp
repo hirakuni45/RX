@@ -24,6 +24,7 @@ namespace rx220 {
 		static constexpr uint32_t LIMIT_BAUDRATE = 115200;
 //		static constexpr uint32_t LIMIT_BAUDRATE = 57600;
 		static constexpr uint8_t SEL_DEV_RES = 0x06;
+		static constexpr uint8_t ID_CHECK_ACK = 0x26;
 
 		rx::protocol::areas			blocks_;
 		uint32_t					prog_size_;
@@ -362,12 +363,25 @@ namespace rx220 {
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect << "ID Protect: ";
+					std::cout << sect << "ID verification: ";
 					if(get_protect()) {
 						std::cout << "true" << std::endl;
 					} else {
 						std::cout << "false" << std::endl;
 					}					
+				}
+			}
+
+			// ID 認証
+			if(get_protect()) {
+				if(check_id_code(rx.id_, ID_CHECK_ACK)) {
+					if(verbose_) {
+						auto sect = out_section_(1, 1);
+						std::cout << sect << "# ID authentication: OK" << std::endl;
+					}
+				} else {
+					std::cerr << "ID authentication: NG (Can't connection.)" << std::endl;
+					return false;
 				}
 			}
 
