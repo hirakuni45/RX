@@ -1,0 +1,389 @@
+#pragma once
+//=========================================================================//
+/*!	@file
+	@brief	Interrupt Controller / 割り込みコントローラ (RX14T)
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2026 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
+*/
+//=========================================================================//
+#include "common/io_utils.hpp"
+#include "RX600/icu_base.hpp"
+
+namespace device {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ICU class (ICUb)
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct icu_t : public ICU_BASE, ICU_IRQ6 {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  通常割り込みベクター型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR : uint8_t {
+			NONE    = 0,	///< none
+
+			BUSERR  = 16,   ///< BSC
+
+			FRDYI   = 23,   ///< FCU
+
+			SWINT   = 27,   ///< ICU
+			CMI0    = 28,   ///< CMT0
+			CMI1    = 29,   ///< CMT1
+
+			FERRF   = 32,	///< CAC
+			MENDF   = 33,	///< CAC
+			OVFF    = 34,	///< CAC
+
+			POEGGAI = 40,	///< POEG
+
+			GTCIA0  = 48,	///< GPTW0
+			GTCIB0  = 49,
+			GTCIC0  = 50,
+			GTCID0  = 51,
+			GDTE0   = 52,
+			GTCIE0  = 53,
+			GTCIF0  = 54,
+			GTCIV0  = 55,
+			GTCIU0  = 56,
+
+			DOPCF   = 57,	///< DOC
+
+			IRQ0    = 64,	///< ICU
+			IRQ1    = 65,
+			IRQ2    = 66,
+			IRQ3    = 67,
+			IRQ4    = 68,
+			IRQ5    = 69,
+			IRQ6    = 70,
+			IRQ7    = 71,
+
+			LVD1    = 88,   ///< LVD
+			LVD2    = 89,   ///< LVD
+
+			GTCIA1  = 98,	///< GPTW1
+			GTCIB1  = 99,
+			GTCIC1  = 100,
+			GTCID1  = 101,
+
+			S12ADI  = 102,  ///< S12AD
+			GBADI   = 103,
+			GCADI   = 104,
+			S12ADI1 = 105,	///< S12AD1
+			GBADI1  = 106,
+			GCADI1  = 107,
+
+			CMPC0   = 108,  ///< CMPC0
+			CMPC1   = 109,  ///< CMPC1
+			CMPC2   = 110,  ///< CMPC2
+
+			TGIA0   = 114,  ///< MTU0
+			TGIB0   = 115,  ///< MTU0
+			TGIC0   = 116,  ///< MTU0
+			TGID0   = 117,  ///< MTU0
+			TCIV0   = 118,  ///< MTU0
+			TGIE0   = 119,  ///< MTU0
+			TGIF0   = 120,  ///< MTU0
+
+			TGIA1   = 121,  ///< MTU1
+			TGIB1   = 122,  ///< MTU1
+			TCIV1   = 123,  ///< MTU1
+			TCIU1   = 124,  ///< MTU1
+
+			TGIA2   = 125,  ///< MTU2
+			TGIB2   = 126,  ///< MTU2
+			TCIV2   = 127,  ///< MTU2
+			TCIU2   = 128,  ///< MTU2
+
+			TGIA3   = 129,  ///< MTU3
+			TGIB3   = 130,  ///< MTU3
+			TGIC3   = 131,  ///< MTU3
+			TGID3   = 132,  ///< MTU3
+			TCIV3   = 133,  ///< MTU3
+
+			TGIA4   = 134,  ///< MTU4
+			TGIB4   = 135,  ///< MTU4
+			TGIC4   = 136,  ///< MTU4
+			TGID4   = 137,  ///< MTU4
+			TCIV4   = 138,  ///< MTU4
+
+			TGIU5   = 139,  ///< MTU5
+			TGIV5   = 140,  ///< MTU5
+			TGIW5   = 141,  ///< MTU5
+
+			OEI1	= 168,	///< POE
+
+			OEI3	= 170,	///< POE
+			OEI4	= 171,
+			OEI5    = 172,
+
+			CMIA0   = 174,	///< TMR0
+			CMIB0   = 175,
+			OVI0    = 176,
+			CMIA1   = 177,	///< TMR1
+			CMIB1   = 178,
+			OVI1    = 179,
+			CMIA2   = 180,	///< TMR2
+			CMIB2   = 181,
+			OVI2    = 182,
+			CMIA3   = 183,	///< TMR3
+			CMIB3   = 184,
+			OVI3    = 185,
+
+			GDTE1   = 202,	///< GPTW1
+			GTCIE1  = 203,
+			GTCIF1  = 204,
+			GTCIV1  = 205,
+			GTCIU1  = 206,
+
+			GTCIA2  = 207,	///< GPTW2
+			GTCIB2  = 208,
+			GTCIC2  = 209,
+			GTCID2  = 210,
+			GDTE2   = 211,
+			GTCIE2  = 212,
+			GTCIF2  = 213,
+			GTCIV2  = 214,
+			GTCIU2  = 215,
+
+			ERI1    = 218,  ///< SCI1
+			RXI1    = 219,
+			TXI1    = 220,
+			TEI1    = 221,
+
+			ERI5    = 222,  ///< SCI5
+			RXI5    = 223,
+			TXI5    = 224,
+			TEI5    = 225,
+
+			ERI6    = 226,  ///< SCI6
+			RXI6    = 227,
+			TXI6    = 228,
+			TEI6    = 229,
+
+			ERI12   = 238,  ///< SCI12
+			RXI12   = 239,
+			TXI12   = 240,
+			TEI12   = 241,
+			SCIX0   = 242,
+			SCIX1   = 243,
+			SCIX2   = 244,
+			SCIX3   = 245,
+
+			ICEEI0  = 246,  ///< RIIC0
+			ICRXI0  = 247,
+			ICTXI0  = 248,
+			ICTEI0  = 249,
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  IR レジスタ・クラス
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct ir_t {
+
+			//-----------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	vec		割り込みベクター型
+				@return IR レジスターの参照
+			*/
+			//-----------------------------------------------------------------//
+			volatile uint8_t& operator [] (VECTOR vec) noexcept {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
+			}
+		};
+		static inline ir_t<0x0008'7000> IR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  IER レジスタ・クラス
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct ier_t {
+
+			//-----------------------------------------------------------------//
+			/*!
+				@brief  許可、不許可
+				@param[in]	vec		割り込みベクター型
+				@param[in]	ena		不許可の場合「false」
+			*/
+			//-----------------------------------------------------------------//
+			void enable(VECTOR vec, bool ena = true) noexcept
+			{
+				auto idx = static_cast<uint8_t>(vec);
+				auto tmp = rd8_(base + (idx >> 3));
+				if(ena) {
+					tmp |=   1 << (idx & 7);
+				} else {
+					tmp &= ~(1 << (idx & 7));
+				}
+				wr8_(base + (idx >> 3), tmp);
+			}
+
+
+			//-----------------------------------------------------------------//
+			/*!
+				@brief  許可状態を取得
+				@param[in]	vec		割り込みベクター型
+				@return 許可状態（許可の場合「true」）
+			*/
+			//-----------------------------------------------------------------//
+			bool get(VECTOR vec) const noexcept
+			{
+				auto idx = static_cast<uint8_t>(vec);
+				auto tmp = rd8_(base + (idx >> 3));
+				return tmp & (1 << (idx & 7));
+			}
+		};
+		static inline ier_t<0x0008'7200> IER;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  IPR レジスタ・クラス @n
+					全て、下位４ビットが有効
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct ipr_t {
+
+			//-----------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	vec		標準割り込みベクター型
+				@return IPR レジスターの参照
+			*/
+			//-----------------------------------------------------------------//
+			volatile uint8_t& operator [] (VECTOR vec) {
+				uint32_t idx = 0;
+				switch(vec) {
+				case VECTOR::BUSERR: idx = 0; break;
+				case VECTOR::FRDYI:  idx = 2; break;
+				case VECTOR::SWINT:  idx = 3; break;
+				case VECTOR::CMI0:   idx = 4; break;
+				case VECTOR::CMI1:   idx = 5; break;
+
+				case VECTOR::TGIA0:
+				case VECTOR::TGIB0:
+				case VECTOR::TGIC0:
+				case VECTOR::TGID0:
+					idx = static_cast<uint32_t>(VECTOR::TGIA0);
+					break;
+				case VECTOR::TCIV0:
+				case VECTOR::TGIE0:
+				case VECTOR::TGIF0:
+					idx = static_cast<uint32_t>(VECTOR::TCIV0);
+					break;
+				case VECTOR::TGIA1:
+				case VECTOR::TGIB1:
+					idx = static_cast<uint32_t>(VECTOR::TGIA1);
+					break;
+				case VECTOR::TCIV1:
+				case VECTOR::TCIU1:
+					idx = static_cast<uint32_t>(VECTOR::TCIV1);
+					break;
+				case VECTOR::TGIA2:
+				case VECTOR::TGIB2:
+					idx = static_cast<uint32_t>(VECTOR::TGIA2);
+					break;
+				case VECTOR::TCIV2:
+				case VECTOR::TCIU2:
+					idx = static_cast<uint32_t>(VECTOR::TCIV2);
+					break;
+				case VECTOR::TGIA3:
+				case VECTOR::TGIB3:
+				case VECTOR::TGIC3:
+				case VECTOR::TGID3:
+					idx = static_cast<uint32_t>(VECTOR::TGIA3);
+					break;
+				case VECTOR::TGIA4:
+				case VECTOR::TGIB4:
+				case VECTOR::TGIC4:
+				case VECTOR::TGID4:
+					idx = static_cast<uint32_t>(VECTOR::TGIA4);
+					break;
+				case VECTOR::TGIU5:
+				case VECTOR::TGIV5:
+				case VECTOR::TGIW5:
+					idx = static_cast<uint32_t>(VECTOR::TGIU5);
+					break;
+
+				case VECTOR::OEI3:
+				case VECTOR::OEI4:
+				case VECTOR::OEI5:
+					idx = static_cast<uint32_t>(VECTOR::OEI3);
+					break;
+
+				case VECTOR::CMIA0:
+				case VECTOR::CMIB0:
+				case VECTOR::OVI0:
+					idx = static_cast<uint32_t>(VECTOR::CMIA0);
+					break;
+				case VECTOR::CMIA1:
+				case VECTOR::CMIB1:
+				case VECTOR::OVI1:
+					idx = static_cast<uint32_t>(VECTOR::CMIA1);
+					break;
+				case VECTOR::CMIA2:
+				case VECTOR::CMIB2:
+				case VECTOR::OVI2:
+					idx = static_cast<uint32_t>(VECTOR::CMIA2);
+					break;
+				case VECTOR::CMIA3:
+				case VECTOR::CMIB3:
+				case VECTOR::OVI3:
+					idx = static_cast<uint32_t>(VECTOR::CMIA3);
+					break;
+
+				case VECTOR::ERI1:
+				case VECTOR::RXI1:
+				case VECTOR::TXI1:
+				case VECTOR::TEI1:
+					idx = static_cast<uint32_t>(VECTOR::ERI1);
+					break;
+				case VECTOR::ERI5:
+				case VECTOR::RXI5:
+				case VECTOR::TXI5:
+				case VECTOR::TEI5:
+					idx = static_cast<uint32_t>(VECTOR::ERI5);
+					break;
+				case VECTOR::ERI6:
+				case VECTOR::RXI6:
+				case VECTOR::TXI6:
+				case VECTOR::TEI6:
+					idx = static_cast<uint32_t>(VECTOR::ERI6);
+					break;
+
+				case VECTOR::ERI12:
+				case VECTOR::RXI12:
+				case VECTOR::TXI12:
+				case VECTOR::TEI12:
+					idx = static_cast<uint32_t>(VECTOR::ERI12);
+					break;
+				default: idx = static_cast<uint32_t>(vec); break;
+				}
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			}
+		};
+		static inline ipr_t<0x0008'7300> IPR;
+
+
+		/// @brief DTC 転送要求許可レジスタ  (DTCER)
+		static inline dtcer_t<0x0008'7100, VECTOR> DTCER;
+	};
+	typedef icu_t ICU;
+}
