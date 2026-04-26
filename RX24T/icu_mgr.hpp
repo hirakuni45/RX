@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX23T/RX24T/RX24U グループ・割り込みマネージャー
+	@brief	RX13T/RX14T/RX23T/RX24T/RX24U グループ・割り込みマネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */

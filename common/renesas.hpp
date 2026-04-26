@@ -142,6 +142,30 @@
 
 #include "RX130/board_profile.hpp"
 
+#elif defined(SIG_RX14T)
+#include "RX14T/lvda.hpp"
+#include "RX600/cac.hpp"
+#include "RX140/bus.hpp"
+#include "RX600/mtu3.hpp"
+// #include "RX220/poe3.hpp"
+#include "RX600/gptw.hpp"
+// #include "RX220/poeg.hpp"
+#include "RX600/tmr.hpp"
+#include "RX600/sci_g.hpp"
+#include "RX600/sci_h.hpp"
+#include "RX600/crca.hpp"
+// #include "RX231/s12ade.hpp"
+// #include "RX140/da.hpp"
+
+#include "RX140/flash.hpp"
+
+#include "RX24T/system_io.hpp"
+#include "RX24T/flash_io.hpp"
+#include "RX24T/adc_in.hpp"
+#include "RX600/dac_out.hpp"
+
+#include "RX14T/board_profile.hpp"
+
 #elif defined(SIG_RX140)
 #include "RX231/lvda.hpp"
 #include "RX600/cac.hpp"

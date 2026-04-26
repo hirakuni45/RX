@@ -6,6 +6,7 @@
 			・RX130 @n
 			・RX13T @n
 			・RX140 @n
+			・RX14T @n
 			・RX210 @n
 			・RX220 @n
 			・RX230/RX231 @n
@@ -23,7 +24,7 @@
 			・RX660/RX671 @n
 			・RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -190,7 +191,7 @@ namespace device {
 
 #if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX113)
 	typedef dtca_t DTC;
-#elif defined(SIG_RX13T) || defined(SIG_RX140) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX660) || defined(SIG_RX671)
+#elif defined(SIG_RX13T) || defined(SIG_RX140) || defined(SIG_RX14T) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX660) || defined(SIG_RX671)
 	typedef dtcb_t DTC;
 #else
 	typedef dtca_t DTC;

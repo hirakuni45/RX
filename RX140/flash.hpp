@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140/RX260/RX261 グループ・フラッシュ 定義
+	@brief	RX140/RX14T/RX260/RX261 グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -374,7 +374,7 @@ namespace device {
 		static inline ro32_t<0x007F'C35C> UIDR3;
 	};
 
-#if defined(SIG_RX140)
+#if defined(SIG_RX140) || defined(SIG_RX14T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  フラッシュ・メモリー制御クラス
@@ -384,6 +384,7 @@ namespace device {
 
 		// RX140 Flash: 64K  ---> 4096
 		// RX140 Flash: 128K/256K ---> 8192
+		// RX14T Flash: 128K ---> 4096
 		static constexpr auto DATA_SIZE = 4096;
 		static constexpr uint32_t DATA_BLANK_SIZE = 256;
 		static constexpr uint32_t DATA_ERASE_SIZE = 256;

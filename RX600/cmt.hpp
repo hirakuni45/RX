@@ -2,7 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	Compare Match Timer / コンペアマッチタイマ @n
-			RX110/RX111/RX130/RX140 (Only CMT0/CMT1) @n
+			RX110/RX111/RX130/RX140/RX14T (Only CMT0/CMT1) @n
 			RX113 @n
 			RX210 @n
 			RX220 @n
@@ -59,7 +59,7 @@ namespace device {
 		};
 		static inline cmstr0_t<0x0008'8000> CMSTR0;
 
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX14T)
 #else
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -132,7 +132,7 @@ namespace device {
 			case peripheral::CMT1:
 				CMSTR0.STR1 = ena;
 				break;
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX14T)
 #else
 			case peripheral::CMT2:
 				CMSTR1.STR2 = ena;
@@ -158,7 +158,7 @@ namespace device {
 				return CMSTR0.STR0();
 			case peripheral::CMT1:
 				return CMSTR0.STR1();
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX14T)
 #else
 			case peripheral::CMT2:
 				return CMSTR1.STR2();
@@ -209,7 +209,7 @@ namespace device {
 
 	};
 
-#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140)
+#if defined(SIG_RX110) || defined(SIG_RX111) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX14T)
 	typedef cmt_nom_t<0x0008'8002, peripheral::CMT0, ICU::VECTOR::CMI0, clock_profile::PCLKB> CMT0;
 	typedef cmt_nom_t<0x0008'8008, peripheral::CMT1, ICU::VECTOR::CMI1, clock_profile::PCLKB> CMT1;
 #elif defined(SIG_RX621) || defined(SIG_RX62N)

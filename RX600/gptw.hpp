@@ -2,12 +2,13 @@
 //=========================================================================//
 /*!	@file
 	@brief	General PWM Timer W / 汎用 PWM タイマ W @n
+			RX14T (GPTWd):            GPTW0 - GPTW2 @n
 			RX260/RX261 (GPTWa):      GPTW0 - GPTW7 @n
 			RX26T (GPTW):             GPTW0 - GPTW7 @n
 			RX66N/RX72N/RX72M (GPTW): GPTW0 - GPTW3 @n
 			RX66T/RX72T (GPTW):       GPTW0 - GPTW9
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -1338,8 +1339,21 @@ namespace device {
 		static inline gticcr_t<base + 0xEC> GTICCR;
 	};
 
+#if defined(SIG_RX14T)
+	typedef gptwa_t<0x0009'6000, peripheral::GPTW0, ICU::VECTOR,
+		ICU::VECTOR::GTCIA0, ICU::VECTOR::GTCIB0, ICU::VECTOR::GTCIC0,
+		ICU::VECTOR::GTCID0, ICU::VECTOR::GDTE0,  ICU::VECTOR::GTCIE0,
+		ICU::VECTOR::GTCIF0, ICU::VECTOR::GTCIV0, ICU::VECTOR::GTCIU0> GPTW0;
+	typedef gptwa_t<0x0009'6100, peripheral::GPTW1, ICU::VECTOR,
+		ICU::VECTOR::GTCIA1, ICU::VECTOR::GTCIB1, ICU::VECTOR::GTCIC1,
+		ICU::VECTOR::GTCID1, ICU::VECTOR::GDTE1,  ICU::VECTOR::GTCIE1,
+		ICU::VECTOR::GTCIF1, ICU::VECTOR::GTCIV1, ICU::VECTOR::GTCIU1> GPTW1;
+	typedef gptwa_t<0x0009'6200, peripheral::GPTW2, ICU::VECTOR,
+		ICU::VECTOR::GTCIA2, ICU::VECTOR::GTCIB2, ICU::VECTOR::GTCIC2,
+		ICU::VECTOR::GTCID2, ICU::VECTOR::GDTE2,  ICU::VECTOR::GTCIE2,
+		ICU::VECTOR::GTCIF2, ICU::VECTOR::GTCIV2, ICU::VECTOR::GTCIU2> GPTW2;
 
-#if defined(SIG_RX260) || defined(SIG_RX261)
+#elif defined(SIG_RX260) || defined(SIG_RX261)
 	typedef gptwa_t<0x000C'2000, peripheral::GPTW0, ICU::VECTOR,
 		ICU::VECTOR::GTCIA0, ICU::VECTOR::GTCIB0, ICU::VECTOR::GTCIC0,
 		ICU::VECTOR::GTCID0, ICU::VECTOR::NONE,   ICU::VECTOR::GTCIE0,

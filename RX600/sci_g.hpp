@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Serial Communications Interface g / シリアルコミュニケーションインタフェース g
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2022, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2022, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -78,6 +78,13 @@ namespace device {
 		ICU::VECTOR, ICU::VECTOR::TEI8, ICU::VECTOR::ERI8> SCI8;
 	typedef scig_t<0x0008'A120, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
 		ICU::VECTOR, ICU::VECTOR::TEI9, ICU::VECTOR::ERI9> SCI9;
+#elif defined(SIG_RX14T)
+	typedef scig_t<0x0008'A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+		ICU::VECTOR, ICU::VECTOR::TEI1, ICU::VECTOR::ERI1> SCI1;
+	typedef scig_t<0x0008'A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+		ICU::VECTOR, ICU::VECTOR::TEI5, ICU::VECTOR::ERI5> SCI5;
+	typedef scig_t<0x0008'A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+		ICU::VECTOR, ICU::VECTOR::TEI6, ICU::VECTOR::ERI6> SCI6;
 #elif defined(SIG_RX230) || defined(SIG_RX231)
 	typedef scig_t<0x0008'A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
 		ICU::VECTOR, ICU::VECTOR::TEI0, ICU::VECTOR::ERI0> SCI0;

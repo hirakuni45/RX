@@ -87,6 +87,20 @@
 #include "RX130/port_map_irq.hpp"
 #include "RX600/rx_dsp_inst.h"
 
+#elif defined(SIG_RX14T)
+#include "RX14T/clock_profile.hpp"
+#include "RX14T/peripheral.hpp"
+#include "RX24T/system.hpp"
+#include "RX14T/power_mgr.hpp"
+#include "RX14T/icu.hpp"
+#include "RX24T/icu_mgr.hpp"
+#include "RX14T/port_map.hpp"
+#include "RX14T/port_map_mtu.hpp"
+#include "RX14T/port_map_tmr.hpp"
+#include "RX14T/port_map_gptw.hpp"
+#include "RX14T/port_map_irq.hpp"
+#include "RX600/rx_dsp_inst.h"
+
 #elif defined(SIG_RX140)
 #include "RX140/clock_profile.hpp"
 #include "RX140/peripheral.hpp"

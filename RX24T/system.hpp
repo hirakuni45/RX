@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX23T/RX24T/RX24U グループ・システム定義
+	@brief	RX13T/RX14T/RX23T/RX24T/RX24U グループ・システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -79,6 +79,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> PLIDIV;
 			bit_rw_t <io_, bitpos::B2>    PLLSRCSEL;
+
 			bits_rw_t<io_, bitpos::B8, 6> STC;
 		};
 		static inline pllcr_t<0x0008'0028> PLLCR;
@@ -251,6 +252,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> OSTDIE;
+
 			bit_rw_t<io_, bitpos::B7> OSTDE;
 		};
 		static inline ostdcr_t<0x0008'0040> OSTDCR;
@@ -294,6 +296,29 @@ namespace device {
 		static inline moscwtcr_t<0x0008'00A2> MOSCWTCR;
 
 
+#if defined(SIG_RX14T)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	CLKOUT 出力コントロールレジスタ (CKOCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct ckocr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B8, 4>   CKOSEL;
+			bits_rw_t<io_, bitpos::B12, 3>  CKODIV;
+			bit_rw_t <io_, bitpos::B15>     CKOSTP;
+		};
+		static inline ckocr_t<0x0008'003E> CKOCR;
+#endif
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	メインクロック発振器強制発振コントロールレジスタ（MOFCR）
@@ -313,7 +338,27 @@ namespace device {
 		};
 		static inline mofcr_t<0x0008'C293> MOFCR;
 
-#if defined(SIG_RX13T) || defined(SIG_RX23T)
+
+#if defined(SIG_RX13T) || defined(SIG_RX14T) || defined(SIG_RX23T)
+#if defined(SIG_RX14T)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	低速オンチップオシレータトリミングレジスタ 2 (LOCOTRR2)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct locotrr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8> LOCOTRD2;
+		};
+		static inline locotrr2_t<0x0008'0061> LOCOTRR2;
+#else
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	低速オンチップオシレータトリミングレジスタ (LOCOTRR)
@@ -331,7 +376,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 5> LOCOTRD;
 		};
 		static inline locotrr_t<0x0008'0060> LOCOTRR;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
