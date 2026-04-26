@@ -1,9 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX23T/RX24T/RX24U システム制御
+	@brief	RX13T/RX14T/RX23T/RX24T/RX24U システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,6 +12,9 @@
 #if defined(SIG_RX13T)
 #include "RX130/flash.hpp"
 #include "RX13T/clock_profile.hpp"
+#elif defined(SIG_RX14T)
+#include "RX140/flash.hpp"
+#include "RX14T/clock_profile.hpp"
 #elif defined(SIG_RX23T)
 #include "RX24T/flash.hpp"
 #include "RX23T/clock_profile.hpp"
@@ -137,7 +140,7 @@ namespace device {
 			static_assert(check_clock_div_(clock_profile::PCLKB), "PCLKB can't divided.");
 			static_assert(check_clock_div_(clock_profile::PCLKD), "PCLKD can't divided.");
 
-#if defined(SIG_RX13T) || defined(SIG_RX23T)
+#if defined(SIG_RX13T) || defined(SIG_RX14T) || defined(SIG_RX23T)
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(clock_profile::FCLK))
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(clock_profile::ICLK))
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(clock_profile::PCLKB))
@@ -164,6 +167,12 @@ namespace device {
 				device::SYSTEM::MEMWAIT.MEMWAIT = 0b01; // 32MHz 以上 64MHz 以下 wait 設定 
 			} else {
 				device::SYSTEM::MEMWAIT.MEMWAIT = 0b00; // wait 無し
+			}
+#elif defined(SIG_RX14T)
+			if(clock_profile::ICLK > 32'000'000) {
+				device::FLASH::MEMWAITR = device::FLASH::MEMWAITR.MEMWAIT.b(1) | device::FLASH::MEMWAITR.MEKEY.b(0xAA);
+			} else {
+				device::FLASH::MEMWAITR = device::FLASH::MEMWAITR.MEMWAIT.b(0) | device::FLASH::MEMWAITR.MEKEY.b(0xAA);
 			}
 #endif
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択

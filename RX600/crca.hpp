@@ -2,13 +2,14 @@
 //=========================================================================//
 /*!	@file
 	@brief	CRC Calculator A / CRC 演算 A @n
+			RX14T @n
 			RX65N/RX651 @n
 			RX66N @n
 			RX660/RX671 @n
 			RX66T/RX72T @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -57,7 +58,11 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static inline rw32_t<base + 0x04> CRCDIR32;
+#if defined(SIG_RX14T)
+		static inline rw8_t<base + 0x04> CRCDIR16;
+#else
 		static inline rw16_t<base + 0x04> CRCDIR16;
+#endif
 		static inline rw8_t<base + 0x04> CRCDIR8;
 
 
