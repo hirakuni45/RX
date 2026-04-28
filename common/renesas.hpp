@@ -154,9 +154,11 @@
 #include "RX600/sci_g.hpp"
 #include "RX600/sci_h.hpp"
 #include "RX600/crca.hpp"
-// #include "RX231/s12ade.hpp"
+// #include "RX24T/s12adf.hpp"
+// #include "RX14T/pga.hpp"
 // #include "RX140/da.hpp"
 
+#include "RX600/doc.hpp"
 #include "RX140/flash.hpp"
 
 #include "RX24T/system_io.hpp"
