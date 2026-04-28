@@ -225,8 +225,6 @@ namespace device {
 			case ORDER::SECOND:
 
 
-
-
 			// RXD6: P36 (LFQFP48: )
 			// TXD6: P31 (LFQFP48: )
 			// SCK6: P30 (LFQFP48: )

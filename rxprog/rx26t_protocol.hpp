@@ -73,7 +73,10 @@ namespace rx26t {
 		//-----------------------------------------------------------------//
 		bool bind(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) noexcept
 		{
-			return rx::protocol_base::bind_RX6xx(path, brate, CONNECTION_ID, rx);
+			if(!rx::protocol_base::bind_RX6xx(path, brate, CONNECTION_ID, rx)) {
+				return false;
+			}
+			return rx::protocol_base::service_config_RX26T(rx);
 		}
 
 

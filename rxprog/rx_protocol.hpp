@@ -178,6 +178,14 @@ namespace rx {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief	OFS 型（OFS レジスタ格納型）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef std::array<uint32_t, 2> OFS;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief	rx_t 構造体 @n
 					※ RX62x, RX63T 標準設定：　12.00MHz、8(96MHz)、4(48MHz)
 		*/
@@ -193,12 +201,13 @@ namespace rx {
 
 			ID			id_ = { 0xff };			///< ID パスフレーズ
 
-			uint32_t	ofs0_ = 0xffff'ffff;	///< OFS0 定義
-			uint32_t	ofs1_ = 0xffff'ffff;	///< OFS1 定義
+			uint32_t	tminf_ = 0xffff'ffff;	///< TM 識別データ（TMINF）
+			uint32_t	mde_   = 0xffff'ffff;	///< エンディアン選択（MDE）
+			OFS			ofs_ = { 0xffff'ffff };	///< オプション機能選択（OFS0/1）
 
 			bool		id_write_ = false;		///< ID パスフレーズ書き込み
-			bool		ofs0_write_ = false;	///< OFS0 書き込み
-			bool		ofs1_write_ = false;	///< OFS1 書き込み
+			bool		ofs_write_ = false;		///< OFS0/1 書き込み
+			bool		clear_config_ = false;	///< コンフィギュレーション消去
 		};
 
 

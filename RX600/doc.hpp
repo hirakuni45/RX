@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Data Operation Circuit / データ演算回路 @n
 			RX13T @n
-			RX111/RX113/RX130/RX140 @n
+			RX111/RX113/RX130/RX140/RX14T @n
 			RX210 @n
 			RX21A @n
 			RX220 @n
@@ -19,7 +19,7 @@
 			RX66T/RX72T @n
 			RX72N/RX72M
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -77,7 +77,7 @@ namespace device {
 		static inline rw16_t<base + 0x04> DODSR;
 	};
 
-#if defined(SIG_RX13T) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX210) || defined(SIG_RX21A) || defined(SIG_RX220) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S)
+#if defined(SIG_RX13T) || defined(SIG_RX111) || defined(SIG_RX113) || defined(SIG_RX130) || defined(SIG_RX140) || defined(SIG_RX14T) || defined(SIG_RX210) || defined(SIG_RX21A) || defined(SIG_RX220) || defined(SIG_RX230) || defined(SIG_RX231) || defined(SIG_RX23W) || defined(SIG_RX23T) || defined(SIG_RX24T) || defined(SIG_RX24U) || defined(SIG_RX260) || defined(SIG_RX261) || defined(SIG_RX63T) || defined(SIG_RX63T_S)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  データ演算回路（DOC）

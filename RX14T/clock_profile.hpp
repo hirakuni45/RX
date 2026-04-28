@@ -29,22 +29,25 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発信器タイプ @n
-					HOCO を使う場合、同時に、BASE に 8 MHz（24'000'000）を設定 @n
+					HOCO を使う場合、同時に、BASE に 8 MHz (8'000'000) を設定 @n
+					※HOCO 周波数の切り替えは、OFS1 レジスタで行う（0b11 の場合 32MHz） @n
+					※HOCO を利用する場合、HOCO の発進周波数は、必ず 32MHz を選択する
 					LOCO は、起動時のモードなので、設定する事はない。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class OSC_TYPE : uint8_t {
 			XTAL,		///< クリスタル接続
 			EXT,		///< 外部クロック入力
-			HOCO,		///< 内蔵高速オンチップオシレーター（BASE には 24MHz を設定）
+			HOCO,		///< 内蔵高速オンチップオシレーター（BASE には 32MHz を設定）
 			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
 		};
+		static constexpr uint32_t	OPCCR_TH	= 24'000'000;		///< 高速モード切替周波数下限値
 #if 1
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 12'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）
 #else
 		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
-		static constexpr uint32_t   BASE		= 24'000'000;		///< HOCO 指定の固定値
+		static constexpr uint32_t   BASE		= 8'000'000;		///< HOCO 指定の固定値
 #endif
 
 

@@ -5,7 +5,7 @@
 	@brief	RX23T グループ・クロック。プロファイル @n
             クロックジェネレータで発生させる周波数の定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -29,6 +29,7 @@ namespace device {
 		/*!
 			@brief  発信器タイプ @n
 					HOCO を使う場合、同時に、BASE に 8 MHz（8'000'000）を設定 @n
+					ICLK は 32MHz となる @n
 					LOCO は、起動時のモードなので、設定する事はない。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -38,15 +39,11 @@ namespace device {
 			HOCO,		///< 内蔵高速オンチップオシレーター（BASE には 8MHz を設定）
 			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
 		};
+		static constexpr uint32_t	OPCCR_TH	= 12'000'000;		///< 高速モード切替周波数下限値
 #if 1
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
+
 		static constexpr uint32_t   BASE		= 10'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）
-#else
-		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
-		static constexpr uint32_t   BASE		= 32'000'000;		///< HOCO 指定の固定値
-#endif
-
-
 		static constexpr uint32_t   PLL_BASE	=  80'000'000;		///< PLL ベースクロック（最大80MHz）
 
 		static constexpr uint32_t   ICLK		=  40'000'000;		///< ICLK 周波数（最大40MHz）
@@ -56,6 +53,21 @@ namespace device {
 
 //		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
 		static constexpr uint32_t	DELAY_MS	= ICLK / 3'200'000;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+
+#else
+		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
+		static constexpr uint32_t   BASE		= 8'000'000;		///< HOCO 指定の固定値
+
+		static constexpr uint32_t   PLL_BASE	=  32'000'000;		///< PLL ベースクロック（最大80MHz）
+
+		static constexpr uint32_t   ICLK		=  32'000'000;		///< ICLK 周波数（最大40MHz）
+		static constexpr uint32_t   PCLKB		=  32'000'000;		///< PCLKB 周波数（最大40MHz）
+		static constexpr uint32_t   PCLKD		=  32'000'000;		///< PCLKD 周波数（最大40MHz）
+		static constexpr uint32_t   FCLK		=  32'000'000;		///< FCLK 周波数（最大32MHz）
+
+//		static constexpr uint32_t	DELAY_MS	= ICLK / 1'000'000 / 4;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+		static constexpr uint32_t	DELAY_MS	= ICLK / 3'200'000;	///< ソフトウェアー遅延における定数（1マイクロ秒）
+#endif
 	};
 }
 
