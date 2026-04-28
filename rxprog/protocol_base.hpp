@@ -38,6 +38,9 @@ namespace rx {
 		protocol::frequencies	frequencies_;
 		protocol::areas			boot_areas_;
 		protocol::areas			areas_;
+		uint32_t				tminf_;
+		uint32_t				mde_;
+		protocol::OFS			ofs_;
 
 		protocol::device_type	device_type_;
 
@@ -55,6 +58,15 @@ namespace rx {
 			v |= p[2] << 16;
 			v |= p[3] << 24;
 			return v;
+		}
+
+
+		static void put32_(uint8_t* p, uint32_t val) noexcept
+		{
+			p[3] = (val >> 24) & 0xff;
+			p[2] = (val >> 16) & 0xff;
+			p[1] = (val >> 8) & 0xff;
+			p[0] =  val & 0xff;
 		}
 
 
@@ -164,28 +176,41 @@ namespace rx {
 		}
 
 
+		bool send_data_(uint8_t res, const uint8_t* src, uint32_t len, uint8_t ext) noexcept
+		{
+			return com_(0x81, res, ext, src, len);
+		}
+
+
 		bool status_sub_(uint8_t* dst) noexcept
 		{
 			if(!read_(dst, 4)) {
+				std::cerr << "status_sub: read error. (4)" << std::endl;
 				return false;
 			}
 			if(dst[0] != 0x81) {  // SOD
+				std::cerr << "status_sub: SOD error." << std::endl;
 				return false;
 			}
 			auto l = get16_big_(&dst[1]);  // LNH, LNL
 			if(l == 1 || l == 2) ;
 			else {
+				std::cerr << "status_sub: length fail: (" << l << ')' << std::endl;
 				return false;
 			}
 			--l;
 			if(!read_(&dst[4], l + 2)) {  // RES, SUM, EXT / RES, ERR, SUM, EXT
+				std::cerr << "status_sub: read error. (" << (l + 2) << ')' << std::endl;
 				return false;
 			}
 			auto sum = sum_(&dst[1], 3 + l);
 			if(sum != dst[4 + l]) {  // SUM
+				std::cerr << "status_sub: SUM error." << std::endl;
 				return false;
 			}
-			if(dst[4 + l + 1] != 0x03) {  // EXT
+			if(dst[4 + l + 1] != 0x03) {  // ETX
+				uint32_t etx = dst[4 + l + 1];
+				std::cerr << std::format("status_sub: ETX error. (0x{:2X})", etx) << std::endl;
 				return false;
 			}
 			return true;
@@ -222,14 +247,19 @@ namespace rx {
 			uint8_t tmp[4 + 1 + 1 + 1];
 
 			if(!status_sub_(tmp)) {
+				std::cerr << "status_back: status_sub error." << std::endl;
 				return false;
 			}
 
 			if(tmp[3] != res) {
+				uint32_t rc = tmp[3];
+				uint32_t ec = tmp[4];
+				std::cerr << std::format("status_back: RES error. (0x{:02X}, 0x{:02X})", rc, ec) << std::endl;
 				return false;
 			}
 
 			if(!write_(tmp, sizeof(tmp))) {
+				std::cerr << "status_back: write error." << std::endl;
 				return false;
 			}
 			return true;
@@ -242,23 +272,27 @@ namespace rx {
 			if(!read_(tmp, 4)) {
 				return false;
 			}
-			if(tmp[0] != 0x81) {
-				return false;
-			}
-			if(tmp[3] != res) {
+			if(tmp[0] != 0x81) {  // SOD
 				return false;
 			}
 			auto l = get16_big_(&tmp[1]);
-			if(l != (len + 1)) {
+			if(l != (len + 1)) {  // LNH, LNL
 				return false;
 			}
-			if(!read_(&tmp[4], len + 2)) {
+			if(tmp[3] != res) {  // COM
+				return false;
+			}
+			if(!read_(&tmp[4], len + 2)) {  // IDC (Data)
 				return false;
 			}
 			auto sum = sum_(&tmp[1], len + 3);
-			if(sum != tmp[4 + len]) {
+			if(sum != tmp[4 + len]) {  // SUM
 				return false;
 			}
+			if(tmp[4 + len + 1] != 0x03) {  // ETX
+				return false;
+			}
+
 			if(len > 0) {
 				std::memcpy(dst, &tmp[4], len);
 			}
@@ -277,17 +311,17 @@ namespace rx {
 				return;
 			}
 
-			std::cout << std::format("SOD: {:02X}", static_cast<uint32_t>(tmp[0])) << std::endl;
+			std::cout << std::format("SOD: 0x{:02X}", static_cast<uint32_t>(tmp[0])) << std::endl;
 			std::cout << std::format("LEN: {}", l) << std::endl;
-			std::cout << std::format("RES: {:02X}", static_cast<uint32_t>(tmp[3])) << std::endl;
+			std::cout << std::format("RES: 0x{:02X}", static_cast<uint32_t>(tmp[3])) << std::endl;
 			--l;
 			if(l > 0) std::cout << "Dat: ";
 			for(uint32_t i = 0; i < l; ++i) {
-				std::cout << std::format(" {:02X},", static_cast<uint32_t>(tmp[4 + i]));
+				std::cout << std::format(" 0x{:02X},", static_cast<uint32_t>(tmp[4 + i]));
 			}
 			if(l > 0) std::cout << std::endl;
-			std::cout << std::format("SUM: {:02X}", static_cast<uint32_t>(tmp[4 + l])) << std::endl;
-			std::cout << std::format("EXT: {:02X}", static_cast<uint32_t>(tmp[4 + l + 1])) << std::endl;
+			std::cout << std::format("SUM: 0x{:02X}", static_cast<uint32_t>(tmp[4 + l])) << std::endl;
+			std::cout << std::format("EXT: 0x{:02X}", static_cast<uint32_t>(tmp[4 + l + 1])) << std::endl;
 		}
 
 
@@ -315,6 +349,7 @@ namespace rx {
 			last_error_(0),
 			devices_(), clock_modes_(), clock_num_(0), multipliers_(), frequencies_(),
 			boot_areas_(), areas_(),
+			tminf_(0xffff'ffff), mde_(0xffff'ffff), ofs_{ 0xffff'ffff },
 			device_type_(),
 			system_clock_(0), device_clock_(0), baud_speed_(0), baud_rate_(B9600)
 		{ }
@@ -1107,7 +1142,34 @@ namespace rx {
 			if(!command_(0x00)) {
 				return false;
 			}
-			if(!status_(0x00)) {
+			uint8_t res = 0xff;
+			uint8_t err = 0xff;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x00) {
+
+			} else if(res == 0x80) {
+				switch(err) {
+				case 0xC1:
+					std::cerr << "change_speed (sync): 'Paket' error." << std::endl;
+					break;
+				case 0xC2:
+					std::cerr << "change_speed (sync): 'SUM' error." << std::endl;
+					break;
+				case 0xC3:
+					std::cerr << "change_speed (sync): 'Flow' error." << std::endl;
+					break;
+				case 0xDC:
+					std::cerr << "change_speed (sync): 'Serial programmer connection prohibited' error." << std::endl;
+					break;
+				default:
+					std::cerr << "change_speed (sync): other error." << std::endl;
+					break;
+				}
+				return false;
+			} else {
+				std::cerr << "change_speed (sync): other error." << std::endl;
 				return false;
 			}
 
@@ -1150,6 +1212,45 @@ namespace rx {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	OFS 取得コマンド
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_ofs() noexcept
+		{
+			if(!connection_) return false;
+
+			if(!command_(0x49)) {
+				return false;
+			}
+
+			if(!status_back_(0x49)) {
+				return false;
+			}
+
+			uint8_t tmp[8];
+			if(!status_data_(0x49, tmp, sizeof(tmp))) {
+				return false;
+			}
+
+			ofs_[0] = get32_(&tmp[0]);
+			ofs_[1] = get32_(&tmp[4]);
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	OFS レジスタ値を取得
+			@return OFS レジスタ値
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_ofs() const noexcept { return ofs_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	シリアルプログラミング ID コードチェックコマンド
 			@param[in]	idpf	ID パスフレーズ
 			@return エラー無ければ「true」
@@ -1187,12 +1288,15 @@ namespace rx {
 					std::cerr << "check_serial_id: flow error." << std::endl;
 					break;
 				case 0xDB:  // ID コード不一致エラー
+					std::cerr << "check_serial_id: ID code mismatch." << std::endl;
 					break;
 				default:	// その他のエラー
+					std::cerr << "check_serial_id: other error." << std::endl;
 					break;
 				}
 				return false;
 			} else {
+				std::cerr << "check_serial_id: other error." << std::endl;
 				return false;
 			}
 
@@ -1210,6 +1314,7 @@ namespace rx {
 		bool write_serial_id(const rx::protocol::ID& idpf) noexcept
 		{
 			if(!connection_) return false;
+			if(!pe_turn_on_) return false;
 
 			uint8_t tmp[16];
 			for(int i = 0; i < 16; ++i) {
@@ -1251,10 +1356,261 @@ namespace rx {
 					std::cerr << "write_serial_id: verify error." << std::endl;
 					break;
 				default:	// その他のエラー
+					std::cerr << "write_serial_id: other error." << std::endl;
 					break;
 				}
 				return false;
 			} else {
+				std::cerr << "write_serial_id: other error." << std::endl;
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	OFS 設定
+			@param[in]	ofs		OFS 値
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool write_ofs_register(const rx::protocol::OFS& ofs) noexcept
+		{
+			if(!connection_) return false;
+			if(!pe_turn_on_) return false;
+
+			uint8_t tmp[8];
+			put32_(&tmp[0], ofs[0]);
+			put32_(&tmp[4], ofs[1]);
+			if(!command_(0x48, tmp, sizeof(tmp))) {
+				std::cerr << "write_ofs_register: command error." << std::endl;
+				return false;
+			}
+			uint8_t res = 0;
+			uint8_t err = 0;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x48) {  // OK
+
+			} else if(res == 0xC8) {  // error.
+				switch(err) {
+				case 0xC1:  // パケットエラー
+					std::cerr << "write_ofs_register: paket error." << std::endl;
+					break;
+				case 0xC2:  // チェックサムエラー
+					std::cerr << "write_ofs_register: check-sum error." << std::endl;
+					break;
+				case 0xC3:  // フローエラー
+					std::cerr << "write_ofs_register: flow error." << std::endl;
+					break;
+				case 0xE1:  // イレーズエラー
+					std::cerr << "write_ofs_register: erase error." << std::endl;
+					break;
+				case 0xE2:  // プログラムエラー
+					std::cerr << "write_ofs_register: program error." << std::endl;
+					break;
+				default:
+					std::cerr << "write_ofs_register: other error." << std::endl;
+					break;
+				}
+				return false;
+			} else {
+				std::cerr << "write_ofs_register: other error." << std::endl;
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンフィギュレーションクリアコマンド
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool clear_config() noexcept
+		{
+			if(!connection_) return false;
+			if(!pe_turn_on_) return false;
+
+			if(!command_(0x1C)) {
+				std::cerr << "clear_config: command error." << std::endl;
+				return false;
+			}
+			uint8_t res = 0;
+			uint8_t err = 0;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x1C) {  // OK
+
+			} else if(res == 0x9C) {  // error.
+				switch(err) {
+				case 0xC1:  // パケットエラー
+					std::cerr << "clear_config: paket error." << std::endl;
+					break;
+				case 0xC2:  // チェックサムエラー
+					std::cerr << "clear_config: check-sum error." << std::endl;
+					break;
+				case 0xC3:  // フローエラー
+					std::cerr << "clear_config: flow error." << std::endl;
+					break;
+				case 0xDA:  // プロテクションエラー
+					std::cerr << "clear_config: protection error." << std::endl;
+					break;
+				case 0xE0:  // 非ブランクエラー
+					std::cerr << "clear_config: unblank error." << std::endl;
+					break;
+				case 0xE1:  // イレーズエラー
+					std::cerr << "clear_config: erase error." << std::endl;
+					break;
+				case 0xE2:  // プログラムエラー
+					std::cerr << "clear_config: program error." << std::endl;
+					break;
+				default:
+					std::cerr << "clear_config: other error." << std::endl;
+					break;
+				}
+				return false;
+			} else {
+				std::cerr << "clear_config: other error." << std::endl;
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンフィギュレーション読出し (RX26T)
+			@param[in]	org		読出しアドレス
+			@param[in]	dst		読出しデータ
+			@param[in]	len		長さ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool read_config(uint32_t org, uint8_t* dst, uint32_t len) noexcept
+		{
+			if(!connection_) return false;
+			if(!pe_turn_on_) return false;
+
+			uint8_t tmp[8];
+			put32_big_(&tmp[0], org);
+			put32_big_(&tmp[4], org + len - 1);
+			if(!command_(0x52, tmp, sizeof(tmp))) {
+				std::cerr << "read_config: command error." << std::endl;
+				return false;
+			}
+
+			if(!status_back_(0x52)) {
+				std::cerr << "read_config: status_back error." << std::endl;
+				return false;
+			}
+
+			if(!status_data_(0x52, dst, len)) {
+				std::cerr << "read_config: status_data error." << std::endl;
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンフィギュレーションプログラム (RX26T)
+			@param[in]	org		書き込みアドレス
+			@param[in]	src		書き込みデータ
+			@param[in]	len		長さ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool write_config(uint32_t org, const uint8_t* src, uint32_t len) noexcept
+		{
+			if(!connection_) return false;
+			if(!pe_turn_on_) return false;
+
+			uint8_t tmp[8];
+			put32_big_(&tmp[0], org);
+			put32_big_(&tmp[4], org + len - 1);
+			if(!command_(0x51, tmp, sizeof(tmp))) {
+				std::cerr << "write_config (1): command error." << std::endl;
+				return false;
+			}
+
+			uint8_t res = 0;
+			uint8_t err = 0;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x51) {  // OK
+
+			} else if(res == 0xD1) {  // command error.
+				switch(err) {
+				case 0xC1:  // パケットエラー
+					std::cerr << "write_config (1): paket error." << std::endl;
+					break;
+				case 0xC2:  // チェックサムエラー
+					std::cerr << "write_config (1): check-sum error." << std::endl;
+					break;
+				case 0xC3:  // フローエラー
+					std::cerr << "write_config (1): flow error." << std::endl;
+					break;
+				case 0xD0:  // アドレスエラー
+					std::cerr << "write_config (1): address error." << std::endl;
+					break;
+				default:
+					std::cerr << "write_config (1): other error." << std::endl;
+					break;
+				}
+				return false;
+			} else {
+				std::cerr << "write_config (1): other error." << std::endl;
+				return false;
+			}
+
+			// send data paket...
+			if(!send_data_(0x51, src, len, 0x03)) {
+				std::cerr << "write_config (2): data packet error." << std::endl;
+				return false;
+			}
+
+			res = 0;
+			err = 0;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x51) {  // OK
+
+			} else if(res == 0xD1) {  // Error
+				switch(err) {
+				case 0xC1:  // パケットエラー
+					std::cerr << "write_config (2): paket error." << std::endl;
+					break;
+				case 0xC2:  // チェックサムエラー
+					std::cerr << "write_config (2): check-sum error." << std::endl;
+					break;
+				case 0xE1:  // イレーズエラー
+					std::cerr << "write_config (2): erase error." << std::endl;
+					break;
+				case 0xE2:  // プログラムエラー
+					std::cerr << "write_config (2): program error." << std::endl;
+					break;
+				case 0xE7:  // フラッシュシーケンサエラー
+					std::cerr << "write_config (2): flash sequencer error." << std::endl;
+					break;
+				default:	// その他のエラー
+					std::cerr << "write_config (2): other error." << std::endl;
+					break;
+				}
+				return false;
+			} else {
+				std::cerr << "write_config (2): other error." << std::endl;
 				return false;
 			}
 
@@ -1364,9 +1720,48 @@ namespace rx {
 				}
 			}
 
-			// OFSx 書き込み 
-			if(rx.ofs0_write_ || rx.ofs1_write_) {
+			pe_turn_on_ = true;
 
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンフィギュレーション操作 (RX64M, RX65x, RX66T, RX72T, RX71M)
+			@param[in]	rx		CPU 設定
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool service_config_RX6xx(const rx::protocol::rx_t& rx) noexcept
+		{
+			if(!pe_turn_on_) return false;
+
+			verbose_ = rx.verbose_;
+
+			{  // OFS0/1 読み込み
+				if(!inquiry_ofs()) {
+					std::cerr << "Inquiry OFS error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					for(int i = 0; i < 2; ++i) {
+						auto sect = out_section_(i + 1, 2);
+						std::cout << sect << std::format("OFS{}: 0x{:08X}", i, ofs_[i]) << std::endl;
+					}
+				}
+			}
+
+			// OFS0/1 書き込み
+			if(rx.ofs_write_) {
+				if(!write_ofs_register(rx.ofs_)) {
+					std::cerr << "OFS write error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "OFS write complete." << std::endl;
+				}
 			}
 
 			// ID 書き込み 
@@ -1381,7 +1776,102 @@ namespace rx {
 				}
 			}
 
-			pe_turn_on_ = true;	
+			// コンフィギュレーションクリア
+			if(rx.clear_config_) {
+				if(!clear_config()) {
+					std::cerr << "Clear configuration error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "Clear configuration complete." << std::endl;
+				}
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンフィギュレーション操作 (RX26T)
+			@param[in]	rx		CPU 設定
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool service_config_RX26T(const rx::protocol::rx_t& rx) noexcept
+		{
+			if(!pe_turn_on_) return false;
+
+			verbose_ = rx.verbose_;
+
+			{  // エリア情報取得
+			}
+
+			{  // TMINF, MDE, OFS0/1 読み込み
+				uint8_t tmp[16] = { 0xff };
+				if(!read_config(0x0012'0060, tmp, sizeof(tmp))) {
+					std::cerr << "Read configuration error. (TMINF, MDE, OFS0/1)" << std::endl;
+					return false;
+				}
+
+				tminf_  = get32_(&tmp[0]);
+				mde_    = get32_(&tmp[4]);
+				ofs_[0] = get32_(&tmp[8]);
+				ofs_[1] = get32_(&tmp[12]);
+				if(verbose_) {
+					std::cout << out_section_(1, 4) << std::format("TMINF: 0x{:08X}", tminf_) << std::endl;
+					std::cout << out_section_(2, 4) << std::format("MDE:   0x{:08X}", mde_) << std::endl;
+					for(int i = 0; i < 2; ++i) {
+						auto sect = out_section_(i + 3, 4);
+						std::cout << sect << std::format("OFS{}:  0x{:08X}", i, ofs_[i]) << std::endl;
+					}
+				}
+			}
+
+			// OFS0/1 書き込み（コンフィグレーション領域は16バイト単位）
+			if(rx.ofs_write_) {
+				uint8_t tmp[16];
+				put32_(&tmp[0], 0xffff'ffff);  // TMINF
+				put32_(&tmp[4], 0xffff'ffff);  // MDE
+				put32_(&tmp[8], rx.ofs_[0]);
+				put32_(&tmp[12], rx.ofs_[1]);
+				if(!write_config(0x0012'0060, tmp, sizeof(tmp))) {
+					std::cerr << "Write configuration error. (OFS0/1)" << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "Write configuration complete. (OFS0/1)" << std::endl;
+				}
+			}
+
+			// ID 書き込み
+			if(rx.id_write_) {
+				uint8_t tmp[32] = { 0xff };
+				put32_(&tmp[0], 0x1eff'ffff);  // SPCC: IDE(B24)=0, SEPR(B29)=0, WRPR(B30)=0, RDPR(B31)=0
+				memcpy(&tmp[16], &rx.id_[0], rx.id_.size());
+				if(!write_config(0x0012'0040, tmp, sizeof(tmp))) {
+					std::cerr << "Write configuration error. (Serial programmer ID)" << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "Write configuration complete. (Serial programmer ID)" << std::endl;
+				}
+			}
+
+			// コンフィギュレーションクリア
+			if(rx.clear_config_) {
+				if(!clear_config()) {
+					std::cerr << "Clear configuration error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "Clear configuration complete." << std::endl;
+				}
+			}
 
 			return true;
 		}

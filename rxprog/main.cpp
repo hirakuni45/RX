@@ -16,7 +16,7 @@
 
 namespace {
 
-	static constexpr char version_[] = "2.05";
+	static constexpr char version_[] = "2.10";
 	static constexpr char conf_file_[] = "rx_prog.conf";
 	static constexpr uint32_t cpr_last_year_ = 2026;
 	static constexpr uint32_t progress_num_ = 50;
@@ -125,6 +125,8 @@ namespace {
 		rx::protocol::ID ida = { 0xff };
 //		bool	id = false;
 
+		rx::protocol::OFS ofs = { 0xffff'ffff };
+
 		std::string erase_page_wait = "2000";
 		std::string write_page_wait = "5000";
 
@@ -135,11 +137,13 @@ namespace {
 		bool	erase = false;
 		bool	write = false;
 		bool	id_table_write = false;
+		bool	ofs_register_write = false;
 		bool	verify = false;
 		bool	device_list = false;
 		bool	progress = false;
 		bool	erase_data = false;
 		bool	erase_rom = false;
+		bool	clear_config = false;
 		bool	help = false;
 
 
@@ -167,6 +171,26 @@ namespace {
 				return false;
 			}
 			area_val.emplace_back(org, end);
+			return true;
+		}
+
+
+		bool set_ofs_(const std::string& s) noexcept
+		{
+			utils::strings ss = utils::split_text(s, ":,");
+			std::string t;
+			if(ss.empty()) t = s;
+			else if(ss.size() >= 1) t = ss[0];
+			ofs[0] = 0xffff'ffff;
+			if(!utils::string_to_hex(t, ofs[0])) {
+				return false;
+			}
+			ofs[1] = 0xffff'ffff;
+			if(ss.size() >= 2) {
+				if(!utils::string_to_hex(ss[1], ofs[1])) {
+					return false;
+				}
+			}
 			return true;
 		}
 
@@ -218,16 +242,19 @@ namespace {
 		cout << "    -P PORT,   --port=PORT     Specify serial port" << endl;
 		cout << "    -s SPEED,  --speed=SPEED   Specify serial speed" << endl;
 		cout << "    -d DEVICE, --device=DEVICE Specify device name" << endl;
-		cout << "    -e, --erase                Perform a device erase to a minimum" << endl;
 //		cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
 //		cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
 //		cout << "    --erase-data\t\tPerform data flash erase" << endl;
 		cout << "    --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)" << endl;
 		cout << "    --id-table-write           Perform ID-Tables write" << endl;
-		cout << "    --area=ORG[:,]END          Specify read area" << endl;
+		cout << "    --ofs=OFS0[:,]OFS1         Specify OFS0/1 value (32 bits)" << endl;
+		cout << "    --ofs-register-write       Perform OFS0/1 write" << endl;
+		cout << "    --clear-configuration      Perform clear configuration" << endl;
+		cout << "    --area=ORG[:,]END          Specify read/erase area" << endl;
 		cout << "    -r, --read                 Perform data read" << endl;
-		cout << "    -v, --verify               Perform data verify" << endl;
+		cout << "    -e, --erase                Perform a device erase to a minimum" << endl;
 		cout << "    -w, --write                Perform data write" << endl;
+		cout << "    -v, --verify               Perform data verify" << endl;
 		cout << "    --progress                 display Progress output" << endl;
 		cout << "    --erase-page-wait=WAIT     Delay per read page  (2000) [uS]" << endl;
 		cout << "    --write-page-wait=WAIT     Delay per write page (5000) [uS]" << endl;
@@ -246,6 +273,18 @@ namespace {
 			}
 		}
 		return ffn;
+	}
+
+
+	uint32_t count_page_(const rx::protocol::areas& areas, uint32_t pgs) noexcept
+	{
+		uint32_t pageall = 0;
+		for(const auto& a : areas) {
+			auto org = a.org_ & (~(pgs - 1));
+			auto lim = a.end_ | (pgs - 1);
+			pageall += (lim - org + 1) / pgs;
+		}
+		return pageall;
 	}
 }
 
@@ -363,6 +402,10 @@ int main(int argc, char* argv[])
 				if(!opts.set_area_(&p[std::strlen("--area=")])) {
 					opterr = true;
 				}
+			} else if(p.find("--ofs=") == 0) {
+				if(!opts.set_ofs_(&p[std::strlen("--ofs=")])) {
+					opterr = true;
+				}
 			} else if(p == "-r" || p == "--read") {
 				opts.read = true;
 //			} else if(p == "-i") {
@@ -373,6 +416,10 @@ int main(int argc, char* argv[])
 				opts.write = true;
 			} else if(p == "--id-table-write") {
 				opts.id_table_write = true;
+			} else if(p == "--ofs-register-write") {
+				opts.ofs_register_write = true;
+			} else if(p == "--clear-configuration") {
+				opts.clear_config = true;
 			} else if(p == "-v" || p == "--verify") {
 				opts.verify = true;
 			} else if(p == "--progress") {
@@ -454,10 +501,14 @@ int main(int argc, char* argv[])
 			std::cout << "# Read Area: ---" << std::endl;
 		} else {
 			for(auto t : opts.area_val) {
-				std::cout << std::format("# Read Area: {:08X} to {:08X}", t.org_, t.end_);
+				std::cout << std::format("# Read area: 0x{:08X} to 0x{:08X}", t.org_, t.end_);
 			}
 			std::cout << std::endl;
 		}
+		if(opts.ofs_register_write) {
+			std::cout << std::format("# OFS0/1 new value: 0x{:08X}, 0x{:08X}", opts.ofs[0], opts.ofs[1]) << std::endl;
+		}
+		std::cout << std::format("# Clear configuration: {}", (opts.clear_config ? "Enable" : "Disable")) << std::endl;
 		std::cout << "# Erase Page Wait: " << erase_page_wait << " [uS]" << std::endl;
 		std::cout << "# Write Page Wait: " << write_page_wait << " [uS]" << std::endl;
 	}
@@ -541,6 +592,9 @@ int main(int argc, char* argv[])
 	rx.cpu_type_ = opts.device;
 	rx.id_ = opts.ida;
 	rx.id_write_ = opts.id_table_write;
+	rx.ofs_ = opts.ofs;
+	rx.ofs_write_ = opts.ofs_register_write;
+	rx.clear_config_ = opts.clear_config;
 
 	// 接続されたクロック周波数が必要なグループ
 	if(rx.cpu_type_ == "RX220" || rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N"
@@ -604,17 +658,11 @@ int main(int argc, char* argv[])
 
 		if(opts.verbose) {
 			for(const auto& a : areas) {
-
 				std::cout << std::format("Read area: 0x{:08X} to 0x{:08X}", a.org_, a.end_) << std::endl;
 			}
 		}
 		uint32_t pgs = 256;
-		uint32_t pageall = 0;
-		for(const auto& a : areas) {
-			auto org = a.org_ & (~(pgs - 1));
-			auto lim = a.end_ | (pgs - 1);
-			pageall += (lim - org + 1) / pgs;
-		}
+		uint32_t pageall = count_page_(areas, pgs);
 		page_t page;
 		uint32_t wpg = 0;
 		for(const auto& a : areas) {
@@ -671,15 +719,28 @@ int main(int argc, char* argv[])
 	auto page_size = prog_.get_page_size();
 	auto page_all = motsx_.get_total_page(page_size);
 	if(opts.erase) {  // erase
-		auto areas = motsx_.create_area_map();
-
+		utils::motsx_io::areas as = motsx_.create_area_map();
+		uint32_t pga = page_all;
+		if(as.empty()) {
+			if(opts.area_val.empty()) {
+				for(auto t : prog_.get_area()) {
+					as.emplace_back(t.org_, t.end_);
+				}
+				pga = count_page_(prog_.get_area(), page_size);
+			} else {
+				for(auto t : opts.area_val) {
+					as.emplace_back(t.org_, t.end_);
+				}
+				pga = count_page_(opts.area_val, page_size);
+			}
+		}
 		page_t page;
-		for(const auto& a : areas) {
+		for(const auto& a : as) {
 			uint32_t adr = a.min_ & ~(page_size - 1);
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
-					progress_("Erase:  ", page_all, page);
+					progress_("Erase:  ", pga, page);
 				} else if(opts.verbose) {
 					std::cout << std::format("Erase: 0x{:08X} to 0x{:08X}", adr, (adr + page_size - 1)) << std::endl;
 				}

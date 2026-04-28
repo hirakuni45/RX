@@ -180,7 +180,7 @@ namespace rx {
 				protocol_ = rx220::protocol();
 			} else if(rx.cpu_type_ == "RX230" || rx.cpu_type_ == "RX231" || rx.cpu_type_ == "RX260" || rx.cpu_type_ == "RX261") {
 				protocol_ = rx23x::protocol();
-			} else if(rx.cpu_type_ == "RX13T" || rx.cpu_type_ == "RX23T" || rx.cpu_type_ == "RX24T" || rx.cpu_type_ == "RX24U") {
+			} else if(rx.cpu_type_ == "RX13T" || rx.cpu_type_ == "RX14T" || rx.cpu_type_ == "RX23T" || rx.cpu_type_ == "RX24T" || rx.cpu_type_ == "RX24U") {
 				protocol_ = rx24t::protocol();
 			} else if(rx.cpu_type_ == "RX621" || rx.cpu_type_ == "RX62N") {
 				protocol_ = rx62x::protocol();
@@ -213,7 +213,8 @@ namespace rx {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	接続時、ID 認証を行わない場合、自動消去を行うか
+			@brief	接続時、ID 認証を行わない場合、自動消去を行うかを返す @n
+					自動消去を行うデバイスの場合、ID テーブルは ROM 領域内に配置
 			@return 自動消去を行う場合「true」
 		*/
 		//-----------------------------------------------------------------//
