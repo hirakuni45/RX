@@ -44,7 +44,10 @@ namespace device {
 				if(clock_profile::BASE < 1'000'000 || clock_profile::BASE > 20'000'000) ok = false;
 			} else if(OSCT == clock_profile::OSC_TYPE::EXT) {  // 外部入力の場合 20MHz 以下
 				if(clock_profile::BASE > 20'000'000) ok = false;
-			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {  // 内部高速発信器は 32MHz Only (PLL input 1/4 選択)
+			} else if(OSCT == clock_profile::OSC_TYPE::HOCO) {
+				// 内部高速発信器:
+				// RX13T/RX23T No PLL, direct
+				// 32MHz PLL input 1/4 divide
 				if(clock_profile::BASE != 8'000'000) ok = false;
 			}
 			return ok;
@@ -87,15 +90,16 @@ namespace device {
 
 			device::SYSTEM::PRCR = 0xA500 | 0b0111;	// クロック、低消費電力、関係書き込み許可
 
-#if defined(SIG_RX24T) || defined(SIG_RX24U)
-			while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
-			device::SYSTEM::OPCCR.OPCM = 0;  // 高速モード選択
-			while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
-#endif
+			// 高速モード選択
+			if(clock_profile::ICLK > clock_profile::OPCCR_TH) {
+				while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
+				device::SYSTEM::OPCCR.OPCM = 0b000;
+				while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
+			}
 
 //			device::SYSTEM::MOSCWTCR = 4;  // リセット時の値
 
-			// メインクロック・ドライブ能力設定、内部発信
+			// メインクロック・ドライブ能力設定、内部発信設定
 			switch(OSCT) {
 			case clock_profile::OSC_TYPE::XTAL:
 				device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV21.b(clock_profile::BASE >= 10'000'000);
@@ -114,10 +118,15 @@ namespace device {
 				break;
 			case clock_profile::OSC_TYPE::HOCO:
 				device::SYSTEM::MOSCCR.MOSTP = 1;  // メインクロック発振器停止
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
+
+#elif defined(SIG_RX14T)
 				device::SYSTEM::PLLCR.PLIDIV = 0b10;  // 1/4
 				device::SYSTEM::PLLCR.PLLSRCSEL = 1;  // HOCO 選択
-#if defined(SIG_RX24T) || defined(SIG_RX24U)
-				device::SYSTEM::HOCOWTCR.HSTS = 0b101;  // HOCO:32MHz の場合選択
+#elif defined(SIG_RX24T) || defined(SIG_RX24U)
+				device::SYSTEM::PLLCR.PLIDIV = 0b10;  // 1/4
+				device::SYSTEM::PLLCR.PLLSRCSEL = 1;  // HOCO 選択
+				device::SYSTEM::HOCOWTCR.HSTS = 0b101;  // HOCO:32MHz 選択
 #endif
 				break;
 			case clock_profile::OSC_TYPE::LOCO:
@@ -153,14 +162,36 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(clock_profile::PCLKD))
 								  | device::SYSTEM::SCKCR.PCKB_.b(clock_div_(clock_profile::PCLKB));
 #endif
-			device::SYSTEM::PLLCR2.PLLEN = 0;	// PLL 動作
-			{
-				volatile auto tmp = device::SYSTEM::PLLCR2();
-			}
-			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
-#if defined(SIG_RX24T) || defined(SIG_RX24U)
-			// メモリーの WAIT 設定
+			uint8_t sel_pll = 0b100;  // for PLL
+#if defined(SIG_RX13T) || defined(SIG_RX23T)
+			if(OSCT == clock_profile::OSC_TYPE::HOCO) {
+			// RX13T/RX23T は、高速オシレータ選択では、PLL 回路を利用出来ないので HOCO を選択
+				sel_pll = 0b001;  // for HOCO
+			}
+#endif
+			if(sel_pll == 0b100) {
+				device::SYSTEM::PLLCR2.PLLEN = 0;	// PLL 動作
+				volatile auto tmp = device::SYSTEM::PLLCR2();
+				while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
+			}
+
+// メモリーの WAIT 設定
+#if defined(SIG_RX14T)
+			if(clock_profile::ICLK > 32'000'000) {
+				device::FLASH::MEMWAITR = device::FLASH::MEMWAITR.MEMWAIT.b(1) | device::FLASH::MEMWAITR.MEKEY.b(0xAA);
+			} else {
+				device::FLASH::MEMWAITR = device::FLASH::MEMWAITR.MEMWAIT.b(0) | device::FLASH::MEMWAITR.MEKEY.b(0xAA);
+			}
+			{
+				volatile auto tmp = device::FLASH::MEMWAITR();
+			}
+#elif defined(SIG_RX23T)
+			if(clock_profile::ICLK > 32'000'000) {
+				device::SYSTEM::MEMWAIT.MEMWAIT = 1; // 32MHz 以上
+				volatile auto tmp = device::SYSTEM::MEMWAIT();
+			}
+#elif defined(SIG_RX24T) || defined(SIG_RX24U)
 			if(clock_profile::ICLK > 64'000'000) {
 				device::SYSTEM::MEMWAIT.MEMWAIT = 0b10; // 64MHz 以上 wait 設定
 			} else if(clock_profile::ICLK > 32'000'000) {
@@ -168,15 +199,12 @@ namespace device {
 			} else {
 				device::SYSTEM::MEMWAIT.MEMWAIT = 0b00; // wait 無し
 			}
-#elif defined(SIG_RX14T)
-			if(clock_profile::ICLK > 32'000'000) {
-				device::FLASH::MEMWAITR = device::FLASH::MEMWAITR.MEMWAIT.b(1) | device::FLASH::MEMWAITR.MEKEY.b(0xAA);
-			} else {
-				device::FLASH::MEMWAITR = device::FLASH::MEMWAITR.MEMWAIT.b(0) | device::FLASH::MEMWAITR.MEKEY.b(0xAA);
-			}
+			volatile auto tmp = device::SYSTEM::MEMWAIT();
 #endif
-			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択
-			{  // dummy read register
+			// クロックソース選択
+			device::SYSTEM::SCKCR3.CKSEL = sel_pll;
+			{
+				// dummy read register
 				volatile auto tmp = device::SYSTEM::SCKCR3();
 			}
 
@@ -189,6 +217,7 @@ namespace device {
 
 			// クロック関係書き込み不許可
 			device::SYSTEM::PRCR = 0xA500;
+
 #if defined(SIG_RX24T) || defined(SIG_RX24U)
 			// ROM キャッシュを有効（標準）
 			device::FLASH::ROMCE = 1;

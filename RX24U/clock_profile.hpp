@@ -38,6 +38,7 @@ namespace device {
 			HOCO,		///< 内蔵高速オンチップオシレーター（BASE には 8MHz を設定）
 			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
 		};
+		static constexpr uint32_t	OPCCR_TH	= 24'000'000;		///< 高速モード切替周波数下限値
 #if 1
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 10'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）

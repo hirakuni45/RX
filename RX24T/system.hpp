@@ -1,7 +1,11 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX14T/RX23T/RX24T/RX24U グループ・システム定義
+	@brief	クロック発生回路、消費電力低減機能、などシステム関連定義 @n
+			・RX13T @n
+			・RX14T @n
+			・RX23T @n
+			・RX24T/RX24U
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -416,7 +420,24 @@ namespace device {
 		static inline hocotrr0_t<0x0008'0068> HOCOTRR0;
 #endif
 
-#if defined(SIG_RX24T) || defined(SIG_RX24U)
+#if defined(SIG_RX23T)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct memwait_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  MEMWAIT;
+		};
+		static inline memwait_t<0x0008'0031> MEMWAIT;
+#elif defined(SIG_RX24T) || defined(SIG_RX24U)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
