@@ -7,11 +7,12 @@
 			RX130 (UID: extra area) @n
 			RX13T (UID: extra area) (DataFlash: 0) @n
 			RX140 @n
+			RX14T @n
 			RX231 @n
 			RX23T (DataFlash: 0) @n
 			RX24T/RX24U
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -425,7 +426,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ユニーク ID 数を取得 @n
-					RX64M などユニーク ID をサポートしない場合は「０」が返る。
+					ユニーク ID をサポートしない場合は「０」が返る。
 			@return ユニーク ID 数
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -438,7 +439,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ユニーク ID の取得 @n
-					RX64M などユニーク ID をサポートしない場合、特定の ROM 領域を返す。 @n
+					ユニーク ID をサポートしない場合、特定の ROM 領域を返す。 @n
 					RX100 系では、ユニークＩＤ読出しプロトコルで対応
 			@param[in]	idx		ID 番号（０～３）
 			@return ID 値
