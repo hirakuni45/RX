@@ -1,7 +1,10 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX140/RX14T/RX260/RX261 グループ・フラッシュ 定義
+	@brief	グループ・フラッシュ 定義 @n
+			・RX140 @n
+			・RX14T @n
+			・RX260/RX261
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -250,7 +253,7 @@ namespace device {
 			@brief  フラッシュ処理終了アドレスレジスタ H (FEARH)
 		*/
 		//-----------------------------------------------------------------//
-		static inline rw16_t<0x007FC120> FEARH;
+		static inline rw16_t<0x007F'C120> FEARH;
 
 
 		//-----------------------------------------------------------------//
@@ -374,7 +377,27 @@ namespace device {
 		static inline ro32_t<0x007F'C35C> UIDR3;
 	};
 
-#if defined(SIG_RX140) || defined(SIG_RX14T)
+#if defined(SIG_RX14T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  フラッシュ・メモリー制御クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct flash_t : public flash_base_t {
+
+		static constexpr auto DATA_SIZE = 4096;
+		static constexpr uint32_t DATA_BLANK_SIZE = 256;
+		static constexpr uint32_t DATA_ERASE_SIZE = 256;
+		static constexpr uint32_t DATA_WORD_SIZE = 1;
+		static constexpr auto ID_NUM = 4;
+
+		static constexpr uint16_t DF_VA_H = 0xFE00;  // E2 データフラッシュアドレス（0xFE00'0000）
+		static constexpr uint16_t DF_VA_L = 0x0000;
+
+	};
+	typedef flash_t FLASH;
+
+#elif defined(SIG_RX140)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  フラッシュ・メモリー制御クラス
@@ -385,7 +408,11 @@ namespace device {
 		// RX140 Flash: 64K  ---> 4096
 		// RX140 Flash: 128K/256K ---> 8192
 		// RX14T Flash: 128K ---> 4096
+#if defined(DATA_FLASH_4K)
 		static constexpr auto DATA_SIZE = 4096;
+#elif defined(DATA_FLASH_8K)
+		static constexpr auto DATA_SIZE = 8192;
+#endif
 		static constexpr uint32_t DATA_BLANK_SIZE = 256;
 		static constexpr uint32_t DATA_ERASE_SIZE = 256;
 		static constexpr uint32_t DATA_WORD_SIZE = 1;

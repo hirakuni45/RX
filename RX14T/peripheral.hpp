@@ -30,7 +30,7 @@ namespace device {
 		MTU4,	///< Multi-Function Timer Pulse Unit 4 / マルチファンクションタイマパルスユニット４
 		MTU5,	///< Multi-Function Timer Pulse Unit 5 / マルチファンクションタイマパルスユニット５
 
-		POE3,	///< Port Output Enable 3 / ポートアウトプットイネーブル３
+		POE3E,	///< Port Output Enable 3 / ポートアウトプットイネーブル３
 
 		GPTW0,	///< General PWM Timer 0 / 汎用 PWM タイマ０
 		GPTW1,	///< General PWM Timer 1 / 汎用 PWM タイマ１

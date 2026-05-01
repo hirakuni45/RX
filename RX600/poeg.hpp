@@ -1,9 +1,13 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	Port Output Enable for GPTW / GPTW 用ポートアウトプットイネーブル
+	@brief	Port Output Enable for GPTW / GPTW 用ポートアウトプットイネーブル @n
+			・RX14T @n
+			・RX260/RX261 @n
+			・RX26T @n
+			・RX66T/RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,6 +28,47 @@ namespace device {
 
 		static constexpr auto PERIPHERAL = per;	///< ペリフェラル型
 
+#if defined(SIG_RX14T)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	POEG グループ n 設定レジスタ (POEGGn) (n = A ～ D)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct poegg_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      PIDF;
+			bit_rw_t <io_, bitpos::B1>      IOCF;
+			bit_rw_t <io_, bitpos::B2>      OSTPF;
+			bit_rw_t <io_, bitpos::B3>      SSF;
+			bit_rw_t <io_, bitpos::B4>      PIDE;
+			bit_rw_t <io_, bitpos::B5>      IOCE;
+			bit_rw_t <io_, bitpos::B6>      OSTPE;
+
+			bit_rw_t <io_, bitpos::B8>      CDRE0;
+			bit_rw_t <io_, bitpos::B9>      CDRE1;
+			bit_rw_t <io_, bitpos::B10>     CDRE2;
+
+			bit_rw_t <io_, bitpos::B16>     ST;
+
+			bit_rw_t <io_, bitpos::B24>     NFPSC;
+			bit_rw_t <io_, bitpos::B25>     ELSEL;
+			bits_rw_t<io_, bitpos::B26, 2>  NFSN;
+
+			bit_rw_t <io_, bitpos::B28>     INV;
+			bit_rw_t <io_, bitpos::B29>     NFEN;
+			bits_rw_t<io_, bitpos::B30, 2>  NFCS;
+		};
+		static inline poegg_t<base + 0x0000> POEGGA;
+
+
+#else
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	POEG グループ n 設定レジスタ (POEGGn) (n = A ～ D)
@@ -63,8 +108,72 @@ namespace device {
 		static inline poegg_t<base + 0x0100> POEGGB;
 		static inline poegg_t<base + 0x0200> POEGGC;
 		static inline poegg_t<base + 0x0300> POEGGD;
+#endif
 
-#if defined(SIG_RX260) || defined(SIG_RX261)
+#if defined(SIG_RX14T)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	POEG グループ A 入力制御レジスタ (POEGICRA)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct poegicra_t : public rw16_t<addr> {
+			typedef rw16_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5>   MSEL;
+		};
+		static inline poegicra_t<base + 0x0004> POEGICRA;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW 出力停止制御グループ A 書き込み保護レジスタ (GTONCWPA)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gtoncwpa_t : public rw16_t<addr> {
+			typedef rw16_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      WP;
+
+			bits_rw_t<io_, bitpos::B8, 8>   PRKEY;
+		};
+		static inline gtoncwpa_t<base + 0x0040> GTONCWPA;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW 出力停止制御グループ A コントロールレジスタ (GTONCCRA)
+			@param[in]	addr	アドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t addr>
+		struct gtonccra_t : public rw16_t<addr> {
+			typedef rw16_t<addr> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      NE;
+
+			bits_rw_t<io_, bitpos::B4, 4>   NFS;
+			bit_rw_t <io_, bitpos::B8>      NFV;
+
+			bits_rw_t<io_, bitpos::B11, 5>  MSEL;
+		};
+		static inline gtonccra_t<base + 0x0044> GTONCCRA;
+#elif defined(SIG_RX260) || defined(SIG_RX261)
 #else
 		//-----------------------------------------------------------------//
 		/*!

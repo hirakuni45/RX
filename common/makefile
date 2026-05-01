@@ -100,6 +100,15 @@ ifeq ($(RX_DEF),SIG_RX140)
   RX_CPU = RX140
   RX_CHOOSE = -mcpu=rx140
   LDSCRIPT	= ../../RX140/$(DEVICE).ld
+  ifeq ($(DEVICE),R5F51403)
+	CP_OPT += -DDATA_FLASH_4K
+  endif
+  ifeq ($(DEVICE),R5F51404)
+	CP_OPT += -DDATA_FLASH_8K
+  endif
+  ifeq ($(DEVICE),R5F51405)
+	CP_OPT += -DDATA_FLASH_8K
+  endif
 endif
 
 ifeq ($(RX_DEF),SIG_RX14T)
