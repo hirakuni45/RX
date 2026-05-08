@@ -25,10 +25,10 @@ namespace device {
 		static bool irq0_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ0:
-			// P10 (LFQFP48: )
-			// P37
-			// P92 (LFQFP48: )
-			// PE2 (LFQFP48: )
+			// P10 (LFQFP48: 48) (LQFP52: 51) (LFQFP64: 62)
+			// P37 (LFQFP48:  4) (LQFP52:  5) (LFQFP64:  7)
+			// P92 (LFQFP48: 24) (LQFP52: 26) (LFQFP64: 30)
+			// PE2 (LFQFP48:  8) (LQFP52:  9) (LFQFP64: 11)
 			case ORDER::FIRST:
 				PORT1::PMR.B0 = 0;
 				MPC::P10PFS.PSEL = 0;
@@ -58,9 +58,9 @@ namespace device {
 		static bool irq1_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ1:
-			// P11 (LFQFP48: )
-			// P26
-			// P93 (LFQFP48: )
+			// P11 (LFQFP48: 47) (LQFP52: 50) (LFQFP64: 61)
+			// P26 (LFQFP48: 33) (LQFP52: 36) (LFQFP64: 44)
+			// P93 (LFQFP48: 23) (LQFP52: 25) (LFQFP64: 29)
 			case ORDER::FIRST:
 				PORT1::PMR.B1 = 0;
 				MPC::P11PFS.PSEL = 0;
@@ -85,11 +85,11 @@ namespace device {
 		static bool irq2_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ2:
-			// P01
-			// P22 (LFQFP48: )
-			// P97
-			// PB1 (LFQFP48: )
-			// PD4 (LFQFP48: )
+			// P01 (LFQFP48: --) (LQFP52: --) (LFQFP64:  2)
+			// P22 (LFQFP48: 36) (LQFP52: 39) (LFQFP64: 48)
+			// P97 (LFQFP48: 19) (LQFP52: 21) (LFQFP64: 25)
+			// PB1 (LFQFP48: 17) (LQFP52: 19) (LFQFP64: 23)
+			// PD4 (LFQFP48: 11) (LQFP52: 12) (LFQFP64: 15)
 			case ORDER::FIRST:
 				PORT0::PMR.B1 = 0;
 				MPC::P01PFS.PSEL = 0;
@@ -124,10 +124,10 @@ namespace device {
 		static bool irq3_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ3:
-			// P24 (LFQFP48: )
-			// P36
-			// PB3 (LFQFP48: )
-			// PD5 (LFQFP48: )
+			// P24 (LFQFP48: 34) (LQFP52: 37) (LFQFP64: 46)
+			// P36 (LFQFP48:  6) (LQFP52:  7) (LFQFP64:  9)
+			// PB3 (LFQFP48: 16) (LQFP52: 18) (LFQFP64: 21)
+			// PD5 (LFQFP48: 10) (LQFP52: 11) (LFQFP64: 14)
 			case ORDER::FIRST:
 				PORT2::PMR.B4 = 0;
 				MPC::P24PFS.PSEL = 0;
@@ -157,10 +157,10 @@ namespace device {
 		static bool irq4_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ4:
-			// P00
-			// P23 (LFQFP48: )
-			// P13
-			// P94 (LFQFP48: )
+			// P00 (LFQFP48: --) (LQFP52: --) (LFQFP64:  4)
+			// P23 (LFQFP48: 35) (LQFP52: 38) (LFQFP64: 47)
+			// P13 (LFQFP48: 46) (LQFP52: --) (LFQFP64: 59)
+			// P94 (LFQFP48: 22) (LQFP52: 24) (LFQFP64: 28)
 			case ORDER::FIRST:
 				PORT0::PMR.B0 = 0;
 				MPC::P00PFS.PSEL = 0;
@@ -190,10 +190,10 @@ namespace device {
 		static bool irq5_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ5:
-			// P02
-			// P70 (LFQFP48: 31)
-			// PB6 (LFQFP48: )
-			// PD6 (LFQFP48:  9)
+			// P02 (LFQFP48: --) (LQFP52:  1) (LFQFP64:  1)
+			// P70 (LFQFP48: 31) (LQFP52: 33) (LFQFP64: 39)
+			// PB6 (LFQFP48: 13) (LQFP52: 15) (LFQFP64: 18)
+			// PD6 (LFQFP48:  9) (LQFP52: 10) (LFQFP64: 13)
 			case ORDER::FIRST:
 				PORT0::PMR.B2 = 0;
 				MPC::P02PFS.PSEL = 0;
@@ -223,9 +223,9 @@ namespace device {
 		static bool irq6_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ6:
-			// P14
-			// P71 (LFQFP48: )
-			// P90 (LFQFP48: )
+			// P14 (LFQFP48: 45) (LQFP52: 48) (LFQFP64: 58)
+			// P71 (LFQFP48: 30) (LQFP52: 32) (LFQFP64: 38)
+			// P90 (LFQFP48: --) (LQFP52: --) (LFQFP64: 32)
 			case ORDER::FIRST:
 				PORT1::PMR.B4 = 0;
 				MPC::P14PFS.PSEL = 0;
@@ -250,9 +250,9 @@ namespace device {
 		static bool irq7_(bool ena, ORDER odr) noexcept
 		{
 			switch(odr) {  // IRQ7:
-			// P12
-			// P72 (LFQFP48: )
-			// PB5 (LFQFP48: )
+			// P12 (LFQFP48: --) (LQFP52: --) (LFQFP64: 60)
+			// P72 (LFQFP48: 29) (LQFP52: 31) (LFQFP64: 37)
+			// PB5 (LFQFP48: 14) (LQFP52: 16) (LFQFP64: 19)
 			case ORDER::FIRST:
 				PORT1::PMR.B2 = 0;
 				MPC::P12PFS.PSEL = 0;

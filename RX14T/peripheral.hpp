@@ -45,8 +45,6 @@ namespace device {
 
 		CMT0,	///< Compare Match Timer 0 / コンペアマッチタイマー０
 		CMT1,	///< Compare Match Timer 1 / コンペアマッチタイマー１
-		CMT2,	///< Compare Match Timer 2 / コンペアマッチタイマー２
-		CMT3,	///< Compare Match Timer 3 / コンペアマッチタイマー３
 
 		IWDT,	///< Independent Watchdog Timer / 独立ウォッチドッグタイマ
 
@@ -64,7 +62,7 @@ namespace device {
 
 		DA,		///< 8-Bit D/A Converter / 8 ビット D/A コンバータ
 
-		TEMPS,	///<
+		TEMPS,	///<　Temperature Sensor / 温度センサ
 
 		CMPC0,	///< Comparator C0 / コンパレータＣ０
 		CMPC1,	///< Comparator C1 / コンパレータＣ１
