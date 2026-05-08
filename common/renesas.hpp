@@ -157,7 +157,8 @@
 #include "RX14T/s12adf.hpp"
 #include "RX14T/pga.hpp"
 #include "RX14T/da.hpp"
-
+#include "RX14T/temps.hpp"
+#include "RX600/cmpc.hpp"
 #include "RX600/doc.hpp"
 #include "RX140/flash.hpp"
 

@@ -393,14 +393,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN000,		///< P40 (LFQFP100:  )
-			AN001,		///< P41 (LFQFP100:  )
-			AN002,		///< P42 (LFQFP100:  )
-			AN003,		///< P43 (LFQFP100:  )
-			AN004,		///< P44 (LFQFP100:  )
-			AN005,		///< P45 (LFQFP100:  )
-			AN006,		///< P46 (LFQFP100:  )
-			AN007,		///< P47 (LFQFP100:  )
+			AN000,		///< P40 (LFQFP48: 44) (LQFP52: 47) (LFQFP64: 56)
+			AN001,		///< P41 (LFQFP48: 43) (LQFP52: 46) (LFQFP64: 55)
+			AN002,		///< P42 (LFQFP48: 42) (LQFP52: 45) (LFQFP64: 54)
+			AN003,		///< P43 (LFQFP48: 41) (LQFP52: 44) (LFQFP64: 53)
+			AN004,		///< P44 (LFQFP48: 40) (LQFP52: 43) (LFQFP64: 52)
+			AN005,		///< P45 (LFQFP48: 39) (LQFP52: 42) (LFQFP64: 51)
+			AN006,		///< P46 (LFQFP48: 38) (LQFP52: 41) (LFQFP64: 50)
+			AN007,		///< P47 (LFQFP48: 37) (LQFP52: 40) (LFQFP64: 49)
 		};
 
 
@@ -667,12 +667,12 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ANALOG : uint8_t {
-			AN102,		///< P11 (LFQFP100:  )
-			AN103,		///< P10 (LFQFP100:  )
-			AN104,		///< P12 (LFQFP100:  )
-			AN105,		///< P13 (LFQFP100:  )
-			AN106,		///< P14 (LFQFP100:  )
-			AN107,		///< P15 (LFQFP100:  )
+			AN102,		///< P11 (LFQFP48: 47) (LQFP52: 50) (LFQFP64: 61)
+			AN103,		///< P10 (LFQFP48: 48) (LQFP52: 51) (LFQFP64: 62)
+			AN104,		///< P12 (LFQFP48: --) (LQFP52: --) (LFQFP64: 60)
+			AN105,		///< P13 (LFQFP48: 46) (LQFP52: 49) (LFQFP64: 59)
+			AN106,		///< P14 (LFQFP48: 45) (LQFP52: 48) (LFQFP64: 58)
+			AN107,		///< P15 (LFQFP48: --) (LQFP52: --) (LFQFP64: 57)
 		};
 
 
