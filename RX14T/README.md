@@ -598,6 +598,33 @@ namespace board_profile {
 
 ---
 
+## 8 Bits 2 Channel D/A Converter output (DA) / 8 ビット 2 チャンネル D/A コンバーター出力 (DA)
+
+- [da.hpp](da.hpp?ts=4)
+
+### LFQFP48
+
+|ANALOG|Port|
+|---|---|
+|DA0|P44 (40)|
+|DA1|-|
+
+### LQFP52
+
+|ANALOG|Port|
+|---|---|
+|DA0|P44 (43)|
+|DA1|-|
+
+### LFQFP64
+
+|ANALOG|Port|
+|---|---|
+|DA0|P44 (52)|
+|DA1|-|
+
+---
+
 ## rx_prog Flash Programming / rx_prog フラッシュプログラム
 
 ||Support/サポート|operation verification/動作検証|
