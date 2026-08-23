@@ -44,6 +44,7 @@ CP_OPT		=	-m64bit-doubles \
 				-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \

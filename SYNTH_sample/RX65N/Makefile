@@ -66,6 +66,7 @@ AS_OPT		=
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-stringop-overflow \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \

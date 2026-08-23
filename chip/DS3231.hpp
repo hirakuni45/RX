@@ -7,7 +7,7 @@
 			中華製モジュールの注意点：@n
 			・バッテリーバックアップにリチウム電池を使う場合、直列抵抗を除く事
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -43,6 +43,7 @@ namespace chip {
 				}
 				return false;
 			}
+			reg_t() noexcept : reg{ 0 } {}
 		};
 
 		bool get_time_(reg_t& t) const noexcept {

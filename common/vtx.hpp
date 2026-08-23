@@ -3,14 +3,14 @@
 /*!	@file
 	@brief	各種頂点の定義 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/glfw_app/blob/master/LICENSE
 */
 //=====================================================================//
 #include <vector>
-#include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
+#include <unordered_set>
+#include <unordered_map>
 #include <cmath>
 #include <cfloat>
 #include <cstdint>
@@ -256,7 +256,7 @@ namespace vtx {
 		static T dot(const vertex2& a, const vertex2& b) { return a.x * b.x + a.y * b.y; }
 		static T cross(const vertex2& a, const vertex2& b) { return a.x * b.y - a.y * b.x; }
 
-		// Method necessary for using「boost/unordered_map」
+		// Method necessary for using「unordered_map」
 		bool operator == (const vertex2<T>& v) const {
 			if(x == v.x && y == v.y) return true;
 			else return false;
@@ -268,9 +268,8 @@ namespace vtx {
 		}
 
 		size_t hash() const {
-			size_t h = 0;
-			boost::hash_combine(h, x);
-			boost::hash_combine(h, y);
+            auto h = std::hash<T>()(x);
+            h ^= std::hash<T>()(y);
 			return h;
 		}
 
@@ -425,7 +424,7 @@ namespace vtx {
 			out.z = a.x * b.y - a.y * b.x;
 		}
 
-		// Method necessary for using「boost/unordered_map」
+		// Method necessary for using「unordered_map」
 		inline bool operator == (const vertex3& v) const {
 			if(x == v.x && y == v.y && z == v.z) return true;
 			else return false;
@@ -437,10 +436,9 @@ namespace vtx {
 		}
 
 		inline size_t hash() const {
-			size_t h = 0;
-			boost::hash_combine(h, x);
-			boost::hash_combine(h, y);
-			boost::hash_combine(h, z);
+            auto h = std::hash<T>()(x);
+            h ^= std::hash<T>()(y);
+			h ^= std::hash<T>()(z);
 			return h;
 		}
 
@@ -612,13 +610,12 @@ namespace vtx {
 			else return true;
 		}
 
-		// Method necessary for using「boost/unordered_map」
+		// Method necessary for using「unordered_map」
 		inline size_t hash() const {
-			size_t h = 0;
-			boost::hash_combine(h, x);
-			boost::hash_combine(h, y);
-			boost::hash_combine(h, z);
-			boost::hash_combine(h, w);
+            auto h = std::hash<T>()(x);
+            h ^= std::hash<T>()(y);
+			h ^= std::hash<T>()(z);
+			h ^= std::hash<T>()(w);
 			return h;
 		}
 
@@ -695,7 +692,7 @@ namespace vtx {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	「boost/unordered_set, unordered_map」用ハッシュ値計算
+		@brief	「unordered_set, unordered_map」用ハッシュ値計算
 		@param[in]	v	ハッシュ・ソース座標
 		@return		ハッシュ値を返す
 	*/
@@ -956,7 +953,7 @@ namespace vtx {
 				return false;
 			}
 		}
- 
+
 		void center(vertex2<T>& c) const { c = (org + size) / static_cast<T>(2); }
 		vertex2<T> center() const { return (org + size) / static_cast<T>(2); }
 		void end(vertex2<T>& e) const { e = org + size; }
@@ -973,7 +970,7 @@ namespace vtx {
 			if(is_focus(r.end())) return true;
 			if(r.is_focus(org)) return true;
 			if(r.is_focus(end())) return true;
-   			return false;
+			return false;
 		}
 
 		// クリップ領域の構築
@@ -1292,12 +1289,12 @@ namespace vtx {
 	//-----------------------------------------------------------------//
 	bool make_share_vertex(const fvtxs& src_a, const fvtxs& src_b, fvtxs& dst, bool share = true);
 
-	typedef boost::unordered_set<fvtx>					fvtx_set;
-	typedef boost::unordered_set<fvtx>::iterator		fvtx_set_it;
-	typedef boost::unordered_set<fvtx>::const_iterator	fvtx_set_cit;
+	typedef std::unordered_set<fvtx>			fvtx_set;
+//	typedef std::unordered_set<fvtx>::iterator		fvtx_set_it;
+//	typedef std::unordered_set<fvtx>::const_iterator	fvtx_set_cit;
 
-	typedef boost::unordered_set<dvtx>					dvtx_set;
-	typedef boost::unordered_set<dvtx>::iterator		dvtx_set_it;
-	typedef boost::unordered_set<dvtx>::const_iterator	dvtx_set_cit;
+	typedef std::unordered_set<dvtx>			dvtx_set;
+//	typedef std::unordered_set<dvtx>::iterator		dvtx_set_it;
+//	typedef std::unordered_set<dvtx>::const_iterator	dvtx_set_cit;
 
 }	// namespace vtx

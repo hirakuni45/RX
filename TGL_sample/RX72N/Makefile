@@ -40,6 +40,7 @@ AS_OPT		=
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-array-bounds \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \

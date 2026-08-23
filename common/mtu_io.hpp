@@ -836,7 +836,7 @@ namespace device {
 //			icu_mgr::set_level(MTUX::get_vec(MTUX::interrupt::OVF), 0);
 //			port_map::turn(MTUX::PERIPHERAL, static_cast<port_map::channel>(ch), false);
 			power_mgr::turn(MTUX::PERIPHERAL, false);
-			intr_level_ = 0;
+			intr_level_ = ICU::LEVEL::NONE;
 		}
 
 

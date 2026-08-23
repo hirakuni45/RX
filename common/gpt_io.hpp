@@ -332,8 +332,8 @@ namespace device {
 			port_map_gpt::turn(GPT::PERIPHERAL, port_map_gpt::CHANNEL::B, false, BSEL);
 			power_mgr::turn(GPT::PERIPHERAL, false);
 			freq_ = 0;
-			intr_lvl_ = ICU::VECTOR::NONE;
-			intr_vec_ = 0;
+			intr_lvl_ = ICU::LEVEL::NONE;
+			intr_vec_ = ICU::VECTOR::NONE;
 		}
 	};
 	template <class GPT, port_map_gpt::ORDER ASEL, port_map_gpt::ORDER BSEL, class FUNC>

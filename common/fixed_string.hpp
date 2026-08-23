@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	固定サイズ文字列クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <cstring>
 #include <iterator>
-#include <boost/functional/hash.hpp>
+#include <functional>
 
 namespace utils {
 
@@ -414,11 +414,11 @@ namespace utils {
 			@return ハッシュ値
 		*/
 		//-----------------------------------------------------------------//
-		size_t hash() const noexcept
+		auto hash() const noexcept
 		{
 			size_t h = 0;
 			for(uint32_t i = 0; i < pos_; ++i) {
- 				boost::hash_combine(h, str_[i]);
+				h ^= std::hash<char>()(str_[i]);
 			}
 			return h;
 		}

@@ -28,17 +28,21 @@ namespace std {
         abort();
     }
 
+#if 0
 	void __throw_bad_alloc()
 	{
 		sci_puts("bad_alloc\n");
 		abort();
 	}
+#endif
 
+#if 0
 	void __throw_logic_error(char const* e)
 	{
 		sci_puts("logic_error\n");
-        abort();
+		abort();
 	}
+#endif
 
 #if 0
 void __throw_length_error(char const* e)

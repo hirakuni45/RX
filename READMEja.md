@@ -285,42 +285,81 @@ int main(int argc, char** argv)
 
 ---
 
-## Renesas GNU-RX (8.3.0) のインストールと機能紹介
+## Renesas GNU-RX (14.2.0-202607) のインストールと機能紹介
    
-以前の KPIT による GNU ツールチェインのサポートに代わり、[Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/) が新たに、RX マイコン用 GNU ツールを提供しています。   
-   
-RX マイコン用 最新（2020/07 現在）GNU ツールチェインとして、   
- - binutils-2.24
- - gcc-8.3.0
- - newlib-3.1.0
- - gdb-7.8.2
+[Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/) によって、RX マイコン用 GNU ツールを提供しています。   
+
+RX マイコン用 最新（2026/07 現在）GNU ツールチェインとして、   
+- gcc 14.2.0 [released]
+- binutils 2.44 [released]
+- newlib 4.4.0 [released]
+- gdb 16.2 [released]
 
 をベースとしたＲＸマイコン用ツールチェインをダウンロード可能となっています。   
    
 このツールは、登録すれば誰でもダウンロードする事が出来、容量制限もありません。   
 また、ＲＸマイコンにおける最適化や、最新のコアに対するサポートも行っているようです。   
 
-- gcc は 8.3.0 ベースなので、C++17 に対応しています。
-- 通常の gcc より深い最適化と、最新 CPU コアに対応しています。
-- ここで公開している C++ フレームワークを使ったプロジェクトも全てコンパイル可能となっています。
+**インストールの際、「全ユーザー利用可能」でインストールする事を推奨します**
 
-サポートも行っているようです。（CyberTHOR Studios Limited）   
+- gcc は 14.2.0 ベースなので、C++17 に対応しています
+- 通常の gcc より深い最適化と、最新 CPU コアに対応しています
+- ここで公開している C++ フレームワークを使ったプロジェクトも全てコンパイル可能となっています
+- C++20、C++26 の機能などを、実験的サポートが追加されています
+- サポートも行っているようです。（CyberTHOR Studios Limited）   
+- MSYS2 からこのツールを利用するには、ツールチェインをインストール後、「.bash_profile」に、コマンドパスを設定して下さい  
+- オープンソースのライブラリなどをコンパイルする場合、パス文字列に「空白」や２バイトコードが含まれている問題があります   
+- この問題を回避するには、ディレクトリを「/usr/local」にコピーして、そのパスを利用する方法が推奨されます
+- gcc-14 ベースになって、インストールされるディレクトリが変更になっています（全ユーザーに利用可能でインストールした場合）
 
-MSYS2 からこのツールを利用するには、ツールチェインをインストール後、「.bash_profile」に、コマンドパスを設定して下さい。   
-オープンソースのライブラリなどをコンパイルする場合、パス文字列に「空白」や２バイトコードが含まれている問題があります。   
-この問題を回避するには、ディレクトリを「/usr/local」にコピーして、そのパスを利用する方法が推奨されます。   
 
 ```bash
 # rx-elf path
 # PATH=$PATH:/usr/local/rx-elf/bin
-PATH=$PATH:/C/'Program Files (x86)'/'GCC for Renesas RX 8.3.0.202002-GNURX-ELF'/rx-elf/rx-elf/bin
+PATH=$PATH:/C/ProgramData/'GCC for Renesas RX 14.2.0.202607-GNURX-ELF'/rx-elf/rx-elf/bin
 ```
 
-Renesas GNU-RX 8.3.0 に搭載された機能：
+Renesas GNU-RX 14.2.0 に搭載された機能：
 
 - RXv3 コアサポート
-- 倍精度浮動小数点命令の生成
-- RX72T/RX72N/RX72M 内蔵 TFU（三角関数演算器）のサポート
+- RX72N/RX72M 倍精度浮動小数点命令の生成
+- RX14T/RX26T/RX72T/RX72N/RX72M 内蔵 TFU（三角関数演算器）のサポート(V1/V2)
+
+### TFUv1 TFUv2 のコンパイラオプション
+
+gcc-14.2.0 ベースから、TFU の扱いが変更になっています
+
+```sh
+TFUv1:
+  -mtfu-version=v1 -mtfu=intrinsic,mathlib
+
+TFUv2:
+  -mtfu-version=v2 -mtfu=intrinsic,mathlib
+```
+
+これらの設定は、common/makefile で行われています
+
+- TFUv1、TFUv2 でビルトイン関数が異なりますので、TFU を利用する場合、注意して下さい
+- TFU の利用を指定すると、ビルトイン変数「__TFU」に、「TFUv1: 1」又は、「TFUv2: 2」が設定されます
+
+```C
+// TFUv1
+	__init_tfu(void);
+	void sincosf(float, float*, float*);
+	void atan2hypotf(float, float, float*, float*);
+	float sinf(float);
+	float cosf(float);
+	float atan2f(float, float);
+	float hypotf(float, float);
+
+// TFUv2
+	void sincosfx(int, int*, int*);
+	void atan2hypotfx(int, int, int*, int*);
+	int sinfx(int);
+	int cosfx(int);
+	int atan2fx(int, int);
+	int hypotfx(int, int);
+```
 
 ---
 
@@ -653,18 +692,9 @@ PS1='\h.\w % '
 git clone https://github.com/hirakuni45/RX.git
 ```
    
-### RX フレームワークが利用している boost のインストール
+### RX フレームワークが利用している boost を廃止
 
-- 以前は、boost のインストールにおいて、MSYS2 環境では、pacman を使って、mingw64 用の boost をインストールしていました。
-- しかし、boost のバージョンが進んで、この boost では、不具合が発生する事が判りました。
-- そこで、boost のアーカイブを、適切な位置に入れて扱うようにします。
-- この方法は MSYS2 環境の場合に発生します。
-- boost は、1.74.0 を使いますので、事前にダウンロード（D:￥Download へ配置）して下さい。（boost_1_74_0.tar.gz）
-
-```bash
-cd /c/
-tar xfvz /d/Download/boost_1_74_0.tar.gz
-```
+- gcc-14.2.0 ベースのコンパイラを利用するようになって、boost を使わないように、ソースコードを修正しました
    
 ## RX 全プロジェクトのビルド
    

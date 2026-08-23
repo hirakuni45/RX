@@ -38,8 +38,7 @@
 #define VALID_FILTER
 
 #ifdef VALID_FILTER
-#include <boost/unordered_set.hpp>
-// #include <unordered_set>
+#include <unordered_set>
 // #include <set>
 #endif
 
@@ -127,10 +126,8 @@ namespace {
 #ifdef VALID_FILTER
 	// 有効な ID だけ通すフィルター
 	// std:: を使う場合、Makefile の USER_LIBS を変更する
-	typedef boost::unordered_set<uint32_t> VALID;
+	typedef std::unordered_set<uint32_t> VALID;
 //	typedef std::set<uint32_t> VALID;
-//	typedef std::unordered_set<uint32_t> VALID;
-//	typedef const boost::unordered_set<uint32_t> VALID;
 	VALID	valid_{ 0x123, 0x200, 0x300, 0xaaa, 15, 21, 33 };
 #endif
 

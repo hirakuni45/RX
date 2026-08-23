@@ -185,7 +185,6 @@ namespace device {
 			device::TFU::FXSCIOC.IUF = 0;
 			device::TFU::FXSCIOC.OF = 0;
 			device::TFU::FXATIOC.OUF = 0;
-			__init_tfu();
 #endif
 		}
 	};

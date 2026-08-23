@@ -231,7 +231,7 @@ RAM: 16K(With ECC)
 
 - [port_map_irq.hpp](port_map_irq.hpp?ts=4)
 
-### LFQGFP100
+### LFQFP100
 
 |IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|
 |---|---|---|---|---|---|---|
@@ -252,7 +252,7 @@ RAM: 16K(With ECC)
 |IRQ14|PA1 DS (40)|P17 (---)|PC3 (---)|PF3 (---)|-|-|
 |IRQ15|PK0 DS (---)|P27 (64)|PC2 (---)|PE1 (16)|-|-|
 
-### LFQGFP144
+### LFQFP144
 
 |IRQ|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|
 |---|---|---|---|---|---|---|
@@ -371,7 +371,7 @@ RAM: 16K(With ECC)
 
 - [port_map_gptw.hpp](port_map_gptw.hpp?ts=4)
 
-### LFQGFP100
+### LFQFP100
 
 |GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH|ELEVENTH|TWELVETH|
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -402,7 +402,7 @@ RAM: 16K(With ECC)
 |GTADSM0|P35 (---)|PA3 (38)|PA7 (---)|PB2 (33)|PC2 (---)|-|-|-|-|-|-|-|
 |GTADSM1|P34 (---)|PA2 (39)|PA6 (---)|PB1 (34)|PC1 (---)|-|-|-|-|-|-|-|
 
-### LFQGFP144
+### LFQFP144
 
 |GPTW|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH|ELEVENTH|TWELVETH|
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -439,7 +439,7 @@ RAM: 16K(With ECC)
 
 - [port_map_mtu.hpp](port_map_mtu.hpp?ts=4)
 
-### LFQGFP100
+### LFQFP100
 
 |MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|
 |---|---|---|---|---|---|
@@ -481,7 +481,7 @@ RAM: 16K(With ECC)
 |ADSM0|PA7 (---)|PB2 (33)|PC2 (---)|-|-|
 |ADSM1|PA6 (---)|PB1 (34)|PC1 (---)|-|-|
 
-### LFQGFP144
+### LFQFP144
 
 |MTU|FIRST|SECOND|THIRD|FOURTH|FIFTH|
 |---|---|---|---|---|---|

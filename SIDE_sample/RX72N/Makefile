@@ -51,6 +51,7 @@ CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-Wno-unused-but-set-variable \
+				-Wno-array-bounds \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \

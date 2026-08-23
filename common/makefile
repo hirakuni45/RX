@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX microcontroller share Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2021, 2024 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2021, 2026 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -30,7 +30,8 @@
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
 # C++.boost root
-LOCAL_PATH  =   /c/boost_1_74_0
+# LOCAL_PATH  =   /c/boost_1_74_0
+LOCAL_PATH  =
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)
@@ -114,7 +115,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX14T)
   RX_CPU = RX14T
   RX_CHOOSE = -misa=v2
-  TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
   LDSCRIPT	= ../../RX14T/$(DEVICE).ld
 endif
 
@@ -203,8 +204,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX26T)
   RX_CPU = RX26T
   RX_CHOOSE = -misa=v3
-  # TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic,mathlib
-  TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic
+  TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic,mathlib
   LDSCRIPT	= ../../RX26T/$(DEVICE).ld
   PROG_OPT = --write-page-wait=2500
 endif
@@ -274,24 +274,21 @@ ifeq ($(RX_DEF),SIG_RX66N)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v3
-  # TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
   LDSCRIPT	= ../../RX66N/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX660)
   RX_CPU = RX660
   RX_CHOOSE = -misa=v3
-# TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
   LDSCRIPT	= ../../RX660/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX671)
   RX_CPU = RX671
   RX_CHOOSE = -misa=v3
-# TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
   LDSCRIPT	= ../../RX671/$(DEVICE).ld
 endif
 
@@ -305,8 +302,7 @@ endif
 ifeq ($(RX_DEF),SIG_RX72T)
   RX_CPU = RX72T
   RX_CHOOSE = -mcpu=rx72T
-  # TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
   LDSCRIPT	= ../../RX72T/$(DEVICE).ld
 endif
 
@@ -316,8 +312,7 @@ ifeq ($(RX_DEF),SIG_RX72N)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v3
-  # TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
   LDSCRIPT	= ../../RX72N/$(DEVICE).ld
 endif
 
@@ -327,21 +322,20 @@ ifeq ($(RX_DEF),SIG_RX72M)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v3
-  # TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic
+  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
   LDSCRIPT	= ../../RX72M/$(DEVICE).ld
 endif
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
-# Renesas GNU-RX (8.3.0) compiler 
+# Renesas GNU-RX (14.2.0) compiler 
 ifeq ($(TARGET_ISA_TEXT),)
   # for plain gcc-7.5.0 current gcc source build
   AS_DEFS	+=	-mcpu=rx600
   CC_DEFS	+=	-mcpu=rx600 -Wa,-mcpu=rxv2
   CP_DEFS	+=	-mcpu=rx600
-else # Renesas GNU-RX gcc-8.3.0
+else # Renesas GNU-RX gcc-14.2.0
   AS_DEFS	+=	$(RX_CHOOSE)
   CC_DEFS	+=	$(RX_CHOOSE) $(TFU_DEF)
   CP_DEFS	+=	$(RX_CHOOSE) $(TFU_DEF)

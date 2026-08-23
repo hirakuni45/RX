@@ -92,6 +92,7 @@ CC_OPT		=	-Wall -Werror \
 				-Wno-sizeof-pointer-memaccess \
 				-Wno-array-bounds \
 				-Wno-stringop-truncation \
+				-Wno-stringop-overread \
 				-fno-exceptions
 
 CP_OPT		=	-Wall -Werror \

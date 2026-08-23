@@ -222,6 +222,13 @@ namespace device {
 			// ROM キャッシュを有効（標準）
 			device::FLASH::ROMCE = 1;
 #endif
+
+#if defined(__TFU)
+  #if (__TFU == 1)
+			__init_tfu();
+  #endif
+#endif
+
 			return true;
 		}
 	};
