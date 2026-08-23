@@ -517,7 +517,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		static time_t make_time(const char* date, const char* time) noexcept
 		{
-			time_t t;
+			time_t t = 0;
 			struct tm *m = localtime(&t);
 			m->tm_year = 2019 - 1900;
 			m->tm_mon  = 10 - 1;  // Oct

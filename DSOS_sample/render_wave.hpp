@@ -234,21 +234,21 @@ namespace dsos {
 			auto vol = max - min;
 			if(std::abs(vol) < 1e-3) {
 				vol /= 1e-3;
-	 			utils::sformat("%2.1fmVpp, ", str, len) % vol;
+				utils::sformat("%2.1fmVpp, ", str, len) % vol;
 			} else {
-	 			utils::sformat("%3.2fVpp, ", str, len) % vol;
+				utils::sformat("%3.2fVpp, ", str, len) % vol;
 			}
 			if(std::abs(min) < 1e-3) {
 				min /= 1e-3;
-	 			utils::sformat("%2.1fmV", str, len, true) % min;
+				utils::sformat("%2.1fmV", str, len, true) % min;
 			} else {
-	 			utils::sformat("%3.2fV", str, len, true) % min;
+				utils::sformat("%3.2fV", str, len, true) % min;
 			}
 			if(std::abs(max) < 1e-3) {
 				max /= 1e-3;
-	 			utils::sformat(" to %2.1fmV", str, len, true) % max;
+				utils::sformat(" to %2.1fmV", str, len, true) % max;
 			} else {
-	 			utils::sformat(" to %3.2fV", str, len, true) % max;
+				utils::sformat(" to %3.2fV", str, len, true) % max;
 			}
 		}
 
@@ -791,8 +791,8 @@ namespace dsos {
 			int32_t ich0 = gain0 / ch0 * 16384.0f / static_cast<float>(CAPTURE::ADC_QUANTIZE);
 			int32_t ich1 = gain1 / ch1 * 16384.0f / static_cast<float>(CAPTURE::ADC_QUANTIZE);
 			int32_t p0;
-			int16_t ch0_y;
-			int16_t ch1_y;
+			int16_t ch0_y = 0;
+			int16_t ch1_y = 0;
 			for(int16_t x = 0; x < (TIME_SIZE - 1); ++x) {  // ピクセル単位
 				if(x == 0) {
 					p0 = tofs + (pos >> 14);

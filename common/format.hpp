@@ -47,8 +47,9 @@
 			+ 2025/01/02 13:17- (v121) cleanup
 			+ 2025/03/27 12:19- (V122) %-0xxxd の場合の不具合修正
 			+ 2025/03/28 16:19- (V123) 二進表示の場合にバッファを利用しない
+			+ 2026/08/23 06:00- (V124) 初期化リストの抜けを修正
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -401,7 +402,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct base_format {
 
-		static constexpr uint16_t VERSION = 123;		///< バージョン番号（整数）
+		static constexpr uint16_t VERSION = 124;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1108,10 +1109,12 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		basic_format(const char* form, char* buff, uint32_t size, bool append = false) noexcept :
 			form_(form),
-			num_(0), point_(0),
+			num_(0),
+			point_(0),
 			bitlen_(0),
 			error_(error::none),
-			mode_(mode::NONE), zerosupp_(false), sign_(false), nega_(false)
+			mode_(mode::NONE), zerosupp_(false), sign_(false), nega_(false),
+			set_num_(false), set_poi_(false), auto_mode_(false), exp_mode_(false)
 		{
 			if(!chaout_.set(buff, size)) {
 				error_ = error::out_null;

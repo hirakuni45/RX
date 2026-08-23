@@ -275,41 +275,59 @@ For development, we recommend using "Visual Studio Code" that can be used on mul
 
 ---
 
-## Installation and features of Renesas GNU-RX
-   
-The former KPIT support for the GNU toolchain has been replaced by [Open Source Tools for Renesas](https://llvm-gcc-renesas.com/en/) has added a new GNU tools.      
-   
-As the latest (as of July 2020) GNU toolchain for RX microcontrollers,   
- - binutils-2.24
- - gcc-8.3.0
- - newlib-3.1.0
- - gdb-7.8.2
+## Installation and Feature Overview of Renesas GNU-RX (14.2.0-202607)
 
-You can download a toolchain for RX microcontrollers based on the above files.      
-   
-The tool can be downloaded by anyone who registers, and there is no binary limit.   
-It also seems to have optimizations in RX microcomputers and support for the latest cores.   
-Since gcc is based on 8.3.0, it supports C++17.   
-It has deeper optimizations than normal gcc and supports the latest CPU cores.   
-All projects using the C++ framework published here are compileable.   
+[Open Source Tools for Renesas](https://llvm-gcc-renesas.com/ja/) provides GNU tools for RX microcontrollers.
 
-They are also providing support.（CyberTHOR Studios Limited）   
+The latest (as of July 2026) GNU toolchain for RX microcontrollers—
+- gcc 14.2.0 [released]
+- binutils 2.44 [released]
+- newlib 4.4.0 [released]
+- gdb 16.2 [released]
 
-To use this tool from MSYS2, set the command path to ".bash_profile" after installing the toolchain.   
-When compiling open source libraries, etc., there is a problem with path strings containing "spaces" or 2-byte codes.   
-To avoid this problem, it is recommended to copy the directory to "/usr/local" and use that path.   
+A toolchain for RX microcontrollers based on these components is available for download.
+
+Anyone can download these tools by registering, and there are no size limits.
+Additionally, it appears they provide optimization for RX microcontrollers and support for the latest CPU cores.
+
+**When installing, we recommend selecting “Available to all users”**
+
+- Since gcc is based on version 14.2.0, it supports C++17
+- It offers deeper optimization than standard gcc and supports the latest CPU cores
+- All projects using the C++ frameworks published here can be compiled
+- Experimental support for C++20 and C++26 features has been added
+- Support is also provided by CyberTHOR Studios Limited
+- To use this tool with MSYS2, after installing the toolchain, please set the command path in `.bash_profile`
+- When compiling open-source libraries, there is an issue where the path string may contain “spaces” or double-byte characters
+- To work around this issue, it is recommended to copy the directory to “/usr/local” and use that path
+- Based on gcc-14, the installation directory has changed (when installed for use by all users)
 
 ```bash
 # rx-elf path
 # PATH=$PATH:/usr/local/rx-elf/bin
-PATH=$PATH:/C/'Program Files (x86)'/'GCC for Renesas RX 8.3.0.202002-GNURX-ELF'/rx-elf/rx-elf/bin
+PATH=$PATH:/C/ProgramData/'GCC for Renesas RX 14.2.0.202607-GNURX-ELF'/rx-elf/rx-elf/bin
 ```
 
-Features in Renesas GNU-RX 8.3.0：
+- RXv3 core support
+- Generation of double-precision floating-point instructions for RX72N/RX72M
+- Support for the built-in TFU (trigonometric function unit) in RX14T/RX26T/RX72T/RX72N/RX72M (V1/V2)
 
-- RXv3 Core Support
-- Generation of double-precision floating-point instructions
-- RX72N Built-in trigonometric function unit (TFU) support
+### Compiler options for TFUv1 and TFUv2
+
+Starting with the gcc-14.2.0 base, the handling of the TFU has changed
+
+```sh
+TFUv1:
+  -mtfu-version=v1 -mtfu=intrinsic,mathlib
+
+TFUv2:
+  -mtfu-version=v2 -mtfu=intrinsic,mathlib
+```
+
+These settings are configured in common/makefile
+
+- The built-in functions differ between TFUv1 and TFUv2, so please be careful when using TFU
+- When TFU usage is specified, the built-in variable “__TFU” is set to “TFUv1: 1” or “TFUv2: 2”
 
 ---
 
@@ -660,7 +678,7 @@ namespace {
     typedef device::SCI9 SCI_CH;
 
     typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) buffer definition at 512 bytes
-    typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) buffer definition at 256 buyes
+    typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) buffer definition at 256 bytes
 
     typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 //    When selecting a second candidate for the SCI port

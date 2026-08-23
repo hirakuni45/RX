@@ -315,7 +315,7 @@ namespace device {
 			icu_mgr::set_interrupt(TPU::TGIB, nullptr, 0);
 			icu_mgr::set_interrupt(TPU::TGIC, nullptr, 0);
 			icu_mgr::set_interrupt(TPU::TGID, nullptr, 0);
-			intr_vec_ = 0;
+			intr_vec_ = ICU::VECTOR::NONE;
 			TPU::TIER = 0;
 			TPU::enable(false);
 			power_mgr::turn(TPU::PERIPHERAL, false);

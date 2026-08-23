@@ -5,6 +5,7 @@
 - Maximum operating frequency 48MHz / 最大動作周波数 48MHz
 - Single-precision 32-bit floating point / 32 ビット単精度浮動小数点
 - 1.8V ～ 5.5V Operation / 動作
+- RSCAN CAN Module / RSCAN CAN モジュール
 - 12 Bits A/D / １２ビットＡ／Ｄ変換器
 - 8 Bits D/A / ８ビットＤ／Ａ変換器
 
@@ -158,7 +159,7 @@
 |SCI11|Serial Communications Interface 11|シリアルコミュニケーションインタフェース１１|
 |SCI12|Serial Communications Interface 12|シリアルコミュニケーションインタフェース１２|
 |RIIC0|I2C-bus Interface 0|I2C バスインタフェース０|
-|RSCAN|RSCAN Module|RSCAN インタフェース|
+|RSCAN|RSCAN Module|RSCAN モジュール|
 |RSPI0|Serial Peripheral Interface 0|シリアルペリフェラルインタフェース０|
 |CRC|CRC Calculator|CRC 演算器|
 |CTSU|Capacitive Touch Sensing Unit|静電容量式タッチセンサ|

@@ -6,7 +6,7 @@
 			「MULTI」を有効にするとマルチチャネルサポート @n
 			「LEGACY」モードの場合、メールボックス直接操作
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020, 2023 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,8 +28,7 @@
 // #define VALID_FILTER
 
 #ifdef VALID_FILTER
-#include <boost/unordered_set.hpp>
-// #include <unordered_set>
+#include <unordered_set>
 // #include <set>
 #endif
 
