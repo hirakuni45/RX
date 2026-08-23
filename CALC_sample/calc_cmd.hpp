@@ -13,9 +13,9 @@
 #include <string>
 #include <cstring>
 
-// #define USE_BOOST_UMAP
-#ifdef USE_BOOST_UMAP
-#include <boost/unordered_map.hpp>
+// #define USE_STD_UMAP
+#ifdef USE_STD_UMAP
+#include <unordered_map>
 #else
 #include "common/fixed_map.hpp"
 #endif
@@ -45,8 +45,8 @@ namespace app {
 		// 基数値クラス
 		typedef mpfr::value<CALC_NUM> NVAL;
 
-#ifdef USE_BOOST_UMAP
-		typedef boost::unordered_map<utils::STR8, uint8_t> MAP;
+#ifdef USE_STD_UMAP
+		typedef std::unordered_map<utils::STR8, uint8_t> MAP;
 #else
 		typedef utils::fixed_map<utils::STR8, uint8_t, 64> MAP;
 #endif
