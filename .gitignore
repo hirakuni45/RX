@@ -62,3 +62,5 @@ tinyusb/tools/
 !rxlib/lib/libz.a
 !rxlib/lib/libpng.a
 !rxlib/lib/libjpeg.a
+!rxlib/lib/libfaad.a
+!rxlib/lib/libmp4ff.a
