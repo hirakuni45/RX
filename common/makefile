@@ -54,6 +54,8 @@ LIB_ROOT    =   ../../rxlib/lib
 
 INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)
 
+TARGET_8_3_0 := $(shell rx-elf-gcc --version | grep 8\.3\.0)
+
 # rx_prog erase command
 PROG_ERASE = --erase
 # rx_prog verify command
@@ -99,7 +101,11 @@ endif
 
 ifeq ($(RX_DEF),SIG_RX140)
   RX_CPU = RX140
+ifeq ($(strip $(TARGET_8_3_0)),)
   RX_CHOOSE = -mcpu=rx140
+else
+  RX_CHOOSE = -misa=v2
+endif
   LDSCRIPT	= ../../RX140/$(DEVICE).ld
   ifeq ($(DEVICE),R5F51403)
 	CP_OPT += -DDATA_FLASH_4K
@@ -115,7 +121,10 @@ endif
 ifeq ($(RX_DEF),SIG_RX14T)
   RX_CPU = RX14T
   RX_CHOOSE = -misa=v2
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+ifeq ($(strip $(TARGET_8_3_0)),)
+  TFU_DEF	= -mtfu=intrinsic,mathlib
+  TFU_DEF	+=  -mtfu-version=v1
+endif
   LDSCRIPT	= ../../RX14T/$(DEVICE).ld
 endif
 
@@ -204,7 +213,10 @@ endif
 ifeq ($(RX_DEF),SIG_RX26T)
   RX_CPU = RX26T
   RX_CHOOSE = -misa=v3
-  TFU_DEF	= -mtfu-version=v2 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu=intrinsic,mathlib
+ifeq ($(strip $(TARGET_8_3_0)),)
+  TFU_DEF	+=  -mtfu-version=v2
+endif
   LDSCRIPT	= ../../RX26T/$(DEVICE).ld
   PROG_OPT = --write-page-wait=2500
 endif
@@ -274,21 +286,30 @@ ifeq ($(RX_DEF),SIG_RX66N)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v3
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu=intrinsic,mathlib
+ifeq ($(strip $(TARGET_8_3_0)),)
+  TFU_DEF	+=  -mtfu-version=v1
+endif
   LDSCRIPT	= ../../RX66N/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX660)
   RX_CPU = RX660
   RX_CHOOSE = -misa=v3
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu=intrinsic,mathlib
+ifeq ($(strip $(TARGET_8_3_0)),)
+  TFU_DEF	+=  -mtfu-version=v1
+endif
   LDSCRIPT	= ../../RX660/$(DEVICE).ld
 endif
 
 ifeq ($(RX_DEF),SIG_RX671)
   RX_CPU = RX671
   RX_CHOOSE = -misa=v3
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu=intrinsic,mathlib
+ifeq ($(strip $(TARGET_8_3_0)),)
+  TFU_DEF	+=  -mtfu-version=v1
+endif
   LDSCRIPT	= ../../RX671/$(DEVICE).ld
 endif
 
@@ -302,7 +323,10 @@ endif
 ifeq ($(RX_DEF),SIG_RX72T)
   RX_CPU = RX72T
   RX_CHOOSE = -mcpu=rx72T
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu=intrinsic,mathlib
+ifeq ($(strip $(TARGET_8_3_0)),)
+  TFU_DEF	+=  -mtfu-version=v1
+endif
   LDSCRIPT	= ../../RX72T/$(DEVICE).ld
 endif
 
@@ -312,7 +336,10 @@ ifeq ($(RX_DEF),SIG_RX72N)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v3
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu=intrinsic,mathlib
+ifeq ($(strip $(TARGET_8_3_0)),)
+  TFU_DEF	+=  -mtfu-version=v1
+endif
   LDSCRIPT	= ../../RX72N/$(DEVICE).ld
 endif
 
@@ -322,15 +349,18 @@ ifeq ($(RX_DEF),SIG_RX72M)
   INC_APP +=  ../../RX600/drw2d/inc/tes
   USER_LIBS += drw2d
   RX_CHOOSE = -misa=v3
-  TFU_DEF	= -mtfu-version=v1 -mtfu=intrinsic,mathlib
+  TFU_DEF	= -mtfu=intrinsic,mathlib
+ifeq ($(strip $(TARGET_8_3_0)),)
+  TFU_DEF	+=  -mtfu-version=v1
+endif
   LDSCRIPT	= ../../RX72M/$(DEVICE).ld
 endif
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
-# Renesas GNU-RX (14.2.0) compiler 
-ifeq ($(TARGET_ISA_TEXT),)
+# self build compiler check 
+ifeq ($(strip $(TARGET_ISA_TEXT)),)
   # for plain gcc-7.5.0 current gcc source build
   AS_DEFS	+=	-mcpu=rx600
   CC_DEFS	+=	-mcpu=rx600 -Wa,-mcpu=rxv2

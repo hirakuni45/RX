@@ -114,6 +114,14 @@ extern "C" {
 		return cmt_.get_counter() * 10;
 	}
 
+	void line_terminate_signal(void)
+	{
+		static bool flip = 0;
+
+		LED::P = flip;
+		flip ^= 1;
+	}
+
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
 	void sci_putch(char ch)
 	{

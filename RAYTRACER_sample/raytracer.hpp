@@ -19,6 +19,7 @@ extern "C" {
 	void draw_pixel(int x, int y, int r, int g, int b);
 	void draw_text(int x, int y, const char* t);
 	uint32_t millis(void);
+	void line_terminate_signal(void);
 };
 
 // https://en.wikipedia.org/wiki/Fast_inverse_square_root
@@ -382,6 +383,7 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
 //	auto tm = millis() - t;
 //	utils::sformat("%3d%% %dms (%d)", buf, sizeof(buf)) % ((y+q)*100/dh) % tm % raysPerPixel;
 //	draw_text(8, 0, buf);
+	line_terminate_signal();
   }
   {
 	auto tm = millis() - t;

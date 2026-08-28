@@ -42,14 +42,14 @@ namespace device {
 			LOCO,		///< 内蔵低速オンチップオシレーター (240KHz)
 		};
 		static constexpr uint32_t	OPCCR_TH	= 24'000'000;		///< 高速モード切替周波数下限値
-#if 1
+#if 0
 		static constexpr auto       OSCT        = OSC_TYPE::XTAL;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 12'000'000;		///< 外部接続クリスタル（1MHz ～ 20MHz）
 #else
+		// Renesas FPB-RX14T の場合、必ず内蔵 HOCO を選択（外部発振器未実装の為）
 		static constexpr auto       OSCT        = OSC_TYPE::HOCO;	///< オシレーターの選択
 		static constexpr uint32_t   BASE		= 8'000'000;		///< HOCO 指定の固定値
 #endif
-
 
 		static constexpr uint32_t   PLL_BASE	=  96'000'000;		///< PLL ベースクロック（最大96MHz）
 

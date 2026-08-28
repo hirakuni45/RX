@@ -129,6 +129,15 @@ extern "C" {
 	{
 		return cmt_.get_counter() * 10;
 	}
+
+	void line_terminate_signal(void)
+	{
+		static bool flip = 0;
+
+		LED::P = flip;
+		flip ^= 1;
+	}
+
 #endif
 
 	void sci_putch(char ch)

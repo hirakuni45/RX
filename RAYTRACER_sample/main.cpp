@@ -1,8 +1,20 @@
 //=====================================================================//
 /*! @file
-    @brief  RX24T/RX64M/RX71M/RX65N/RX66T/RX72N RayTracer サンプル
+    @brief  RayTracer サンプル @n
+			- RX140 @n
+			- RX220 @n
+			- RX231 @n
+			- RX24T @n
+			- RX62N @n
+			- RX631 @n
+			- RX64M @n
+			- RX65N Renesas Envision Kit @n
+			- RX66T @n
+			- RX71M @n
+			- RX72N Renesas Envision Kit @n
+			- RX72T
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -338,6 +350,16 @@ extern "C" {
 	}
 
 
+	void line_terminate_signal(void)
+	{
+		static bool flip = 0;
+
+		using namespace board_profile;
+
+		LED::P = flip;
+		flip ^= 1;
+	}
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -435,7 +457,7 @@ int main(int argc, char** argv)
 		}
 		sw = v;
 #else
- 		utils::delay::milli_second(17);
+		utils::delay::milli_second(17);
 #endif
 
 		command_();

@@ -1,4 +1,4 @@
-Renesas RX231, RX62N, RX631, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N レイトレーサーサンプル
+レイトレーサーサンプル
 =========
    
 [Japanese](READMEja.md)
@@ -38,6 +38,7 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - RX231:  54MHz (12MHz)
 - RX62N:  96MHz (12MHz)
 - RX24T:  80MHz (10MHz)
+- RX26T: 120MHz (12MHz)
 - RX631:  96MHz (12MHz)
 - RX64M: 120MHz (12MHz)
 - RX71M: 240MHz (12MHz)
@@ -77,22 +78,25 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - オリジナルコードでは、ライン毎にレンダリング時間を LCD に表示しているが、コメントアウトしてある。
    
 ## レンダリング時間３２０ｘ２４０、サンプリング数：１
+
+- gcc-8.3.0 (202004) の場合
+- gcc-14.2.0 (202607) の場合
    
-|マイコン|core|FPU|fsqrt 命令|周波数 [MHz]|描画方式|時間 [ms]|
-|-------|:---:|:---:|:---:|:---:|-----|:---:|
-|RX140  |RXv2|O|O|48  |8 bits, port-bus |1893|
-|RX220  |RXv1|X|X|32  |8 bits, port-bus |291320|
-|RX231  |RXv2|O|O|54  |8 bits, port-bus |1736|
-|RX62N  |RXv1|O|X|96  |8 bits, port-bus |1860|
-|RX631  |RXv1|O|X|96  |8 bits, port-bus |1868|
-|RX24T  |RXv2|O|O|80  |8 bits, port-bus |1224|
-|RX26T  |RXv3|O|O|120 |8 bits, port-bus |692 |
-|RX65N  |RXv2|O|O|120 |Frame Memory     |784 |
-|RX64M  |RXv2|O|O|120 |16 bits, port-bus|751 |
-|RX66T  |RXv3|O|O|160 |8 bits, port-bus |602 |
-|RX72T  |RXv3|O|O|192 |8 bits, port-bus |464 |
-|RX71M  |RXv2|O|O|240 |16 bits, port-bus|439 |
-|RX72N  |RXv3|O|O|240 |Frame Memory     |361 |
+|マイコン|core|FPU|fsqrt 命令|周波数 [MHz]|描画方式|時間(gcc-8.3.0) [ms]|時間(gcc-14.2.0) [ms]|
+|-------|:---:|:---:|:---:|:---:|-----|:---:|:---:|
+|RX140  |RXv2|O|O|48  |8 bits, port-bus |2372|2239|
+|RX220  |RXv1|X|X|32  |8 bits, port-bus |291425|390344|
+|RX231  |RXv2|O|O|54  |8 bits, port-bus |1732|1726|
+|RX62N  |RXv1|O|X|96  |8 bits, port-bus |1875|3868|
+|RX631  |RXv1|O|X|96  |8 bits, port-bus |1896|3895|
+|RX24T  |RXv2|O|O|80  |8 bits, port-bus |1147|1148|
+|RX26T  |RXv3|O|O|120 |8 bits, port-bus |692 ||
+|RX65N  |RXv2|O|O|120 |Frame Memory     |782 |733|
+|RX64M  |RXv2|O|O|120 |16 bits, port-bus|700 |728|
+|RX66T  |RXv3|O|O|160 |8 bits, port-bus |558 |604|
+|RX72T  |RXv3|O|O|192 |8 bits, port-bus |447 |484|
+|RX71M  |RXv2|O|O|240 |16 bits, port-bus|410 |425|
+|RX72N  |RXv3|O|O|240 |Frame Memory     |365 |342|
 
 ---
    

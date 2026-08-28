@@ -19,16 +19,28 @@ namespace board_profile {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  基板プロファイル空間 @n
-				DIY RX14T board
+				- DIY RX14T board @n
+				- Renesas FPB-RX14T
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 
-	// 基板シグネチュア
+#if 0
+	// 基板シグネチュア (RX14T DIY)
 	static constexpr char system_str_[] = "RX14T DIY";
 
 	/// LED インジケーター
 	static constexpr bool LED_ACTIVE = 0;
 	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+
+#else
+	// 基板シグネチュア (Renesas FPB-RX14T)
+	static constexpr char system_str_[] = "Renesas FPB-RX14T";
+
+	/// LED インジケーター (FPB-RX14T: P32, P92)
+	static constexpr bool LED_ACTIVE = 1;
+	typedef device::PORT<device::PORT3, device::bitpos::B2, LED_ACTIVE> LED;
+	typedef device::PORT<device::PORT9, device::bitpos::B2, LED_ACTIVE> LED2;
+#endif
 
 	// SCI ポートの定義
 	typedef device::SCI1 SCI_CH;

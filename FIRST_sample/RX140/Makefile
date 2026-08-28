@@ -21,6 +21,7 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c
+#				common/code_protect.c
 
 PSOURCES	=	FIRST_sample/main.cpp
 
