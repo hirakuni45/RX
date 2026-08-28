@@ -1,4 +1,4 @@
-Renesas RX231, RX62N, RX631, RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Ray tracer sample
+Ray tracer sample
 =========
    
 [Japanese](READMEja.md)
@@ -40,6 +40,7 @@ Ray tracing rendering program using RX microcontroller
 - RX62N:  96MHz (12MHz)
 - RX631:  96MHz (12MHz)
 - RX24T:  80MHz (10MHz)
+- RX26T: 120NHz (12MHz)
 - RX64M: 120MHz (12MHz)
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
@@ -80,21 +81,25 @@ Ray tracing rendering program using RX microcontroller
    
 ## Rendering time 320x240, sampling number: 1
    
-|Microcontroller|Core|FPU|fsqrt|Frequency [MHz]|Drawing method|Time [ms]|
-|-------|:---:|:---:|:---:|:---:|---|:---:|
-|RX140  |RXv2|O|O|48  |8 bits, port-bus |1893|
-|RX220  |RXv1|X|X|32  |8 bits, port-bus |291320|
-|RX231  |RXv2|O|O|54  |8 bits, port-bus |1736|
-|RX62N  |RXv1|O|X|96  |8 bits, port-bus |1860|
-|RX631  |RXv1|O|X|96  |8 bits, port-bus |1868|
-|RX24T  |RXv2|O|O|80  |8 bits, port-bus |1224|
-|RX26T  |RXv3|O|O|120 |8 bits, port-bus |692 |
-|RX65N  |RXv2|O|O|120 |Frame Memory     |784 |
-|RX64M  |RXv2|O|O|120 |16 bits, port-bus|751 |
-|RX66T  |RXv3|O|O|160 |8 bits, port-bus |602 |
-|RX72T  |RXv3|O|O|192 |8 bits, port-bus |464 |
-|RX71M  |RXv2|O|O|240 |16 bits, port-bus|439 |
-|RX72N  |RXv3|O|O|240 |Frame Memory     |361 |
+
+- gcc-8.3.0 (202004)
+- gcc-14.2.0 (202607)
+   
+|Microcontroller|Core|FPU|fsqrt|Frequency [MHz]|Drawing method|Time(gcc-8.3.0) [ms]|Time(gcc-14.2.0) [ms]|
+|-------|:---:|:---:|:---:|:---:|-----|:---:|:---:|
+|RX140  |RXv2|O|O|48  |8 bits, port-bus |2372|2239|
+|RX220  |RXv1|X|X|32  |8 bits, port-bus |291425|390344|
+|RX231  |RXv2|O|O|54  |8 bits, port-bus |1732|1726|
+|RX62N  |RXv1|O|X|96  |8 bits, port-bus |1875|3868|
+|RX631  |RXv1|O|X|96  |8 bits, port-bus |1896|3895|
+|RX24T  |RXv2|O|O|80  |8 bits, port-bus |1147|1148|
+|RX26T  |RXv3|O|O|120 |8 bits, port-bus |692 ||
+|RX65N  |RXv2|O|O|120 |Frame Memory     |782 |733|
+|RX64M  |RXv2|O|O|120 |16 bits, port-bus|700 |728|
+|RX66T  |RXv3|O|O|160 |8 bits, port-bus |558 |579|
+|RX72T  |RXv3|O|O|192 |8 bits, port-bus |447 |463|
+|RX71M  |RXv2|O|O|240 |16 bits, port-bus|410 |425|
+|RX72N  |RXv3|O|O|240 |Frame Memory     |365 |342|
    
 ---
    

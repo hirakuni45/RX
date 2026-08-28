@@ -27,5 +27,5 @@
 
 // 制御コード(1 Byte), パスフレーズ(15 Bytes)
 __attribute__((section(".passphrase")))
-uint32_t id[4] = { 0x45112233, 0x44556677, 0x8899AABB, 0xCCDDEEFF };
+// uint32_t id[4] = { 0x45112233, 0x44556677, 0x8899AABB, 0xCCDDEEFF };
 // rx_prog --id=45:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF
