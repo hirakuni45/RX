@@ -4,7 +4,7 @@
 	@brief	RX260/RX261 システム制御 @n
 			クロックのブースト
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -34,6 +34,7 @@ namespace device {
 				// HOCO の周波数は、OSFM レジスタで設定する（0xFFFF'FFFF の場合、32MHz）
 				if(clock_profile::BASE != 24'000'000 && clock_profile::BASE != 32'000'000
 				&& clock_profile::BASE != 48'000'000 && clock_profile::BASE != 64'000'000) ok = false;
+				if(clock_profile::BASE != clock_profile::ICLK) ok = false;
 			}
 			return ok;
 		}
@@ -187,21 +188,24 @@ namespace device {
 				FLASH::MEMWAITR = FLASH::MEMWAITR.MEKEY.b(0xAA) | FLASH::MEMWAITR.MEMWAIT.b(0);
 			}
 
-			// (x4.0) 0b000111, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
-			// HOCO が選択されている場合、1/2 にする。
-			static_assert((clock_profile::PLL_BASE * 2 / base_clock_()) >= 8,  "PLL_BASE clock divider underflow. (x4)");
-			static_assert((clock_profile::PLL_BASE * 2 / base_clock_()) <= 31, "PLL_BASE clock divider overflow. (x15.5)");
-			static_assert((clock_profile::PLL_BASE * 2 % base_clock_()) == 0,  "PLL_BASE clock can't divided.");
-			auto base = base_clock_();
-			device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.STC.b((clock_profile::PLL_BASE * 2 / base) - 1)
-								  | device::SYSTEM::PLLCR.PLIDIV.b(base_clock_div_());
-			device::SYSTEM::PLLCR2.PLLEN = 0;  // PLL 動作
-			{
-				volatile auto tmp = device::SYSTEM::PLLCR2();
-			}
-			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
+			if(OSCT == clock_profile::OSC_TYPE::HOCO) {  // HOCO 選択
+				device::SYSTEM::SCKCR3.CKSEL = 0b001;
+			} else {
+				// (x4.0) 0b000111, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
+				static_assert((clock_profile::PLL_BASE * 2 / base_clock_()) >= 8,  "PLL_BASE clock divider underflow. (x4)");
+				static_assert((clock_profile::PLL_BASE * 2 / base_clock_()) <= 31, "PLL_BASE clock divider overflow. (x15.5)");
+				static_assert((clock_profile::PLL_BASE * 2 % base_clock_()) == 0,  "PLL_BASE clock can't divided.");
+				auto base = base_clock_();
+				device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.STC.b((clock_profile::PLL_BASE * 2 / base) - 1)
+									  | device::SYSTEM::PLLCR.PLIDIV.b(base_clock_div_());
+				device::SYSTEM::PLLCR2.PLLEN = 0;  // PLL 動作
+				{
+					volatile auto tmp = device::SYSTEM::PLLCR2();
+				}
+				while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
 
-			device::SYSTEM::SCKCR3.CKSEL = 0b100;   // PLL 選択
+				device::SYSTEM::SCKCR3.CKSEL = 0b100;   // PLL 選択
+			}
 			{  // dummy read register
 				volatile auto tmp = device::SYSTEM::SCKCR3();
 			}

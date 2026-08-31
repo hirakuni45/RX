@@ -20,7 +20,7 @@ Renesas RX マイコン Data Flash 操作サンプル
 |[RX220/Makefile](RX220/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX231/Makefile](RX231/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
 |[RX24T/Makefile](RX24T/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
-|RX261|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)||
+|[RX261/Makefile](RX261/Makefile)|[RX24T/flash_io.hpp](../RX24T/flash_io.hpp)|〇|
 |[RX26T/Makefile](RX26T/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX62N/Makefile](RX62N/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|
 |[RX631/Makefile](RX631/Makefile)|[RX62x/flash_io.hpp](../RX62x/flash_io.hpp)|〇|

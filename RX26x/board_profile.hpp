@@ -30,7 +30,7 @@ namespace board_profile {
 
 	/// LED インジケーター
 	static constexpr bool LED_ACTIVE = 0;
-	typedef device::PORT<device::PORT0, device::bitpos::B0, LED_ACTIVE> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B6, LED_ACTIVE> LED;
 
 	// SCI ポートの定義
 	typedef device::SCI1 SCI_CH;

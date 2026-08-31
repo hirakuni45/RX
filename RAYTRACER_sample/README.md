@@ -93,6 +93,7 @@ Ray tracing rendering program using RX microcontroller
 |RX62N  |RXv1|O|X|96  |8 bits, port-bus |1875|3868|
 |RX631  |RXv1|O|X|96  |8 bits, port-bus |1896|3895|
 |RX24T  |RXv2|O|O|80  |8 bits, port-bus |1147|1148|
+|RX261  |RXv3|O|O|64  |8 bits, port-bus ||1465|
 |RX26T  |RXv3|O|O|120 |8 bits, port-bus |692 ||
 |RX65N  |RXv2|O|O|120 |Frame Memory     |782 |733|
 |RX64M  |RXv2|O|O|120 |16 bits, port-bus|700 |728|
