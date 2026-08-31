@@ -87,6 +87,19 @@ namespace {
 	typedef device::PORT<device::PORTE, device::bitpos::B0> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
+#elif defined(SIG_RX261)
+	// RX261 DIY ボード
+	static const uint16_t LCD_X = 320;
+	static const uint16_t LCD_Y = 240;
+	typedef device::PORT<device::PORTE, device::bitpos::B4> RD;
+	typedef device::PORT<device::PORTE, device::bitpos::B3> WR;
+	typedef device::PORT<device::PORTE, device::bitpos::B2> RS;
+	typedef device::PORT<device::PORTE, device::bitpos::B1> CS;
+	typedef device::PORT_BYTE<device::PORTB> DA;
+	typedef device::bus_rw8<CS, RS, RD, WR, DA> BUS;
+	typedef device::PORT<device::PORTE, device::bitpos::B0> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT         tft_;
 #elif defined(SIG_RX62N)
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
