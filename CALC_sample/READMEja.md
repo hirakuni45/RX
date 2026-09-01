@@ -33,6 +33,7 @@ Renesas RX マイコン関数電卓サンプル
 - [calc_unit.hpp](calc_unit.hpp?ts=4)
 - [resource.hpp](resource.hpp?ts=4)
 - [resource/](./resource)
+- [RX261/Makefile CUI](RX261/Makefile?ts=4)
 - [RX26T/Makefile CUI](RX26T/Makefile?ts=4)
 - [RX62N/Makefile CUI](RX62N/Makefile?ts=4)
 - [RX631/Makefile CUI](RX631/Makefile?ts=4)
