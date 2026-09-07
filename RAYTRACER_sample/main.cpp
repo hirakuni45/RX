@@ -362,7 +362,7 @@ extern "C" {
 		return cmt_.get_counter();
 	}
 
-
+#if defined(SIG_RX220)
 	void line_terminate_signal(void)
 	{
 		static bool flip = 0;
@@ -372,6 +372,7 @@ extern "C" {
 		LED::P = flip;
 		flip ^= 1;
 	}
+#endif
 
 	void sci_putch(char ch)
 	{

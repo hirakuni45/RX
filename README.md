@@ -30,8 +30,8 @@ Currently supported and tested devices:
 |[RX23T](RX23T)|2.7|5.5|40|RXv2|Yes|－|－|||R5F523T5|
 |[RX24T](RX24T)|2.7|5.5|80|RXv2|Yes|－|－|〇|〇|R5F524T8/A|
 |[RX24U](RX24U)|2.7|5.5|80|RXv2|Yes|－|－|||R5F524UB/E|
-|[RX261](RX26x)|1.6|5.5|64|RXv3|Yes|ー|ー|||R5F52618|
-|[RX26T](RX26T)|2.7|5.5|120|RXv3|Yes|V2|ー|〇|〇|R5F526TF|
+|[RX261](RX26x)|1.6|5.5|64|RXv3|Yes|－|－|〇|〇|R5F52618|
+|[RX26T](RX26T)|2.7|5.5|120|RXv3|Yes|V2|－|〇|〇|R5F526TF|
 |[RX621](RX62x)|2.7|3.6|100|RXv1|Yes|－|－|〇|〇|R5F56218|
 |[RX62N](RX62x)|2.7|3.6|100|RXv1|Yes|－|－|〇|〇|R5F562N7/8|
 |[RX631](RX63x)|2.7|3.6|100|RXv1|Yes|－|－|〇|〇|R5F5631F|

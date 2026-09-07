@@ -2,7 +2,13 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX260/RX261 システム制御 @n
-			クロックのブースト
+			クロックのブースト @n
+			クロック生成のパスは非常に複雑なパスがあり、一般化は難しい為特定の @n
+			条件に沿った場合のみ考慮している為、特殊な設定を行う場合にはソース @n
+			の修正が必要となると思います、特に、USB クロック、CANFD クロック @n
+			生成には注意が必要だと思います @n
+			通常、USB クロック生成に PLL2 回路を割り当てます、構成上は、CANFD @n
+			クロック生成にも利用可能ですが、このプログラムでは、それは行いません
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -116,6 +122,19 @@ namespace device {
 			}
 		}
 
+		static constexpr bool check_canfd_clock_div_() noexcept
+		{
+			if((clock_profile::PLL_BASE % clock_profile::CANFDCLK) != 0) {
+				return false;
+			}
+			auto n = clock_profile::PLL_BASE / clock_profile::CANFDCLK;
+			if(n == 1 || n == 2 || n == 4 || n == 8) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -211,7 +230,7 @@ namespace device {
 			}
 
 			static_assert(check_usb_clock_div_(), "USB can't divided.");
-			if(clock_profile::TURN_USB) {
+			if(clock_profile::TURN_USB) {  // PLL2 回路は USB クロック生成に占有される
 				device::SYSTEM::PLL2CR = device::SYSTEM::PLL2CR.STC.b(usb_clock_stc_())
 								  	   | device::SYSTEM::PLL2CR.PLIDIV.b(usb_clock_div_());
 				{
@@ -222,6 +241,17 @@ namespace device {
 					volatile auto tmp = device::SYSTEM::PLL2CR2();
 				}
 				device::SYSTEM::USBCKCR.USBCKSEL = 0b110;
+			}
+
+			static_assert(check_canfd_clock_div_(), "CANFD can't divided.");
+			{
+				device::SYSTEM::CANFDCKCR.CANFDCKSREQ = 1;
+				while(device::SYSTEM::CANFDCKCR.CANFDCKSRDY() == 0) { asm("nop"); }
+				auto n = clock_profile::PLL_BASE / clock_profile::CANFDCLK;
+				device::SYSTEM::CANFDCKDIVCR.CANFDCKDIV = n;
+				device::SYSTEM::CANFDCKCR.CANFDCKSEL = 0b101;  // PLL1 回路選択
+				device::SYSTEM::CANFDCKCR.CANFDCKSREQ = 0;
+				while(device::SYSTEM::CANFDCKCR.CANFDCKSRDY() != 0) { asm("nop"); }
 			}
 
 			if(clock_profile::TURN_SBC) {
