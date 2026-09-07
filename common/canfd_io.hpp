@@ -5,7 +5,7 @@
 			・CANFD クロックは、正確に一致しない場合、エラーとする。 @n
 			・CANFD ポートに、CAN バス・トランシーバーを接続する。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2024, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2024, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -27,7 +27,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CAN スピード型（CAN FD 公称ビットレート）
+			@brief  CANFD スピード型（CAN FD 公称ビットレート）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class SPEED {
@@ -43,10 +43,10 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  CAN FD フレーム・データ ビット レート
+			@brief  CANFD データスピード型（データ ビット レート）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class DATA {
+		enum class DATA_SPEED {
 			_2M = 2'000'000,	///< 2Mbps
 			_4M = 4'000'000,	///< 4Mbps
 			_5M = 5'000'000,	///< 5Mbps
@@ -79,9 +79,18 @@ namespace device {
 #else
 		typedef utils::format		format;
 #endif
+
+		static constexpr uint32_t	ispeed_spp = 60;	///< サンプリングポイント 0 to 100[%]
+		static constexpr uint32_t	dspeed_spp = 60;	///< データサンプリングポイント 0 to 100[%]
+
 	private:
 
+		static constexpr void get_tseg_(uint32_t speed, uint32_t spp, uint32_t& tseg1, uint32_t& tseg2, uint32_t& sjw, uint32_t& brp)
+		{
 
+
+
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -94,31 +103,65 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  通信速度が設定可能か検査
-			@param[in]	speed	公称通信速度型
+			@brief  通信速度（公称ビットレート）が設定可能か検査
+			@param[in]	ispeed	公称通信速度型
 			@return 可能なら「true」を返す。
 		*/
 		//-----------------------------------------------------------------//
-		static constexpr bool probe_speed(SPEED speed) noexcept
+		static constexpr bool probe_speed(SPEED ispeed) noexcept
 		{
+			if((clock_profile::CANFDCLK % static_cast<uint32_t>(ispeed)) != 0) {
+				return false;
+			}
+			auto n = clock_profile::CANFDCLK % static_cast<uint32_t>(ispeed);
+			if(n >= 1 && n <= 1024) {
+				return true;
+			}
 			return false;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  通信速度が設定可能か検査
-			@param[in]	data	データ通信速度型
+			@brief  データ通信速度（データビットレート）が設定可能か検査
+			@param[in]	dspeed	データ通信速度型
 			@return 可能なら「true」を返す。
 		*/
 		//-----------------------------------------------------------------//
-		static constexpr bool probe_speed(DATA data) noexcept
+		static constexpr bool probe_speed(DATA_SPEED dspeed) noexcept
 		{
+			if((clock_profile::CANFDCLK % static_cast<uint32_t>(dspeed)) != 0) {
+				return false;
+			}
+			auto n = clock_profile::CANFDCLK % static_cast<uint32_t>(dspeed);
+			if(n >= 1 && n <= 256) {
+				return true;
+			}
 			return false;
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  通信速度を設定して、CANFD デバイスを「OPERATION」モードにする @n
+					正確な通信速度を設定出来ない場合「false」を返して失敗する。
+			@param[in]	ispeed	通信速度型
+			@param[in]	dspeed	データ通信速度型
+			@param[in]	intr	割り込み設定 @n
+								割り込みレベルは何も設定しないと「1」となる。 @n
+								割り込みを使わない指定は、コンパイルエラーとなる。 
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+#if 0
+		bool start(SPEED speed, DATA_SPEED dspeed, const interrupt_t& intr = interrupt_t(ICU::LEVEL::_1)) noexcept
+		{
 
+
+
+			return true;
+		}
+#endif
 
 
 	};

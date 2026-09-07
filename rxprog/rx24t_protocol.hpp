@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX13T/RX23T/RX24T/RX24U プログラミング・プロトコル・クラス
+	@brief	RX13T/RX14T/RX23T/RX24T/RX24U プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n

@@ -58,6 +58,9 @@ ifeq ($(BUILD),release)
 	OPTIMIZE = -O3
 endif
 
+# CP_OPT += -mno-balign
+# CC_OPT += -mno-balign
+
 -include ../../common/makefile
 
 -include $(DEPENDS)

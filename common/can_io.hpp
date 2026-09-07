@@ -57,20 +57,18 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  割り込み設定
+			@brief  割り込みレベル設定構造体
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct interrupt_t {
 			ICU::LEVEL	rxm_level;		///< RXM 割り込みレベル
 			ICU::LEVEL	txm_level;		///< TXM 割り込みレベル
 			ICU::LEVEL	error_level;	///< エラー割り込みレベル
-			explicit interrupt_t(ICU::LEVEL lvl) noexcept :
-				rxm_level(lvl), txm_level(lvl),
-				error_level(ICU::LEVEL::NONE)
+			explicit interrupt_t(ICU::LEVEL lvl, ICU::LEVEL erl = ICU::LEVEL::NONE) noexcept :
+				rxm_level(lvl), txm_level(lvl), error_level(erl)
 			{ }
-			interrupt_t(ICU::LEVEL rx, ICU::LEVEL tx) noexcept :
-				rxm_level(rx), txm_level(tx),
-				error_level(ICU::LEVEL::NONE)
+			interrupt_t(ICU::LEVEL rxl, ICU::LEVEL txl, ICU::LEVEL erl = ICU::LEVEL::NONE) noexcept :
+				rxm_level(rxl), txm_level(txl), error_level(erl)
 			{ }
 		};
 

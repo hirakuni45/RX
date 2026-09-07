@@ -19,14 +19,16 @@ extern "C" {
 	void draw_pixel(int x, int y, int r, int g, int b);
 	void draw_text(int x, int y, const char* t);
 	uint32_t millis(void);
+#if defined(SIG_RX220)
 	void line_terminate_signal(void);
+#endif
 };
 
 // https://en.wikipedia.org/wiki/Fast_inverse_square_root
 // #define FAST_INV_SQRT
 // Because precision is not enough, I do not use it
 
-#if defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX261) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX24T) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+#if defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX24T) || defined(SIG_RX261) || defined(SIG_RX26T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 static inline float sqrtf_(float x)
 {
     __asm __volatile(
@@ -39,7 +41,7 @@ static inline float sqrtf_(float x)
 static inline float sqrtf_(float x) { return sqrtf(x); }
 #endif
 
-#if defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX261) || defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX24T) || defined(SIG_RX26T) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+#if defined(SIG_RX140) || defined(SIG_RX231) || defined(SIG_RX24T) || defined(SIG_RX261) || defined(SIG_RX26T) || defined(SIG_RX621) || defined(SIG_RX62N) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 static inline int ceilf_(float x)
 {
     int y;
@@ -98,7 +100,7 @@ static constexpr float materials[] = {
 /*------------------------------------------------------------------------
   The spheres in the world
 ------------------------------------------------------------------------*/
-#define NUM_SPHERES 4
+static constexpr uint8_t NUM_SPHERES = 4;
 static constexpr float spheres[] = {
 // center  radius material
    5,15,8,   5,     0,
@@ -373,7 +375,7 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
       
       // Output the pixel
       acc = acc * (255.0f / static_cast<float>(raysPerPixel));
-      int r = acc.x;    if (r>255) { r=255; }
+	  int r = acc.x;    if (r>255) { r=255; }
       int g = acc.y;    if (g>255) { g=255; }
       int b = acc.z;    if (b>255) { b=255; }
 	  draw_pixel(x, y, r, g, b);
@@ -383,7 +385,9 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
 //	auto tm = millis() - t;
 //	utils::sformat("%3d%% %dms (%d)", buf, sizeof(buf)) % ((y+q)*100/dh) % tm % raysPerPixel;
 //	draw_text(8, 0, buf);
+#if defined(SIG_RX220)
 	line_terminate_signal();
+#endif
   }
   {
 	auto tm = millis() - t;

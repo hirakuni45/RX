@@ -236,7 +236,7 @@ endif
 
 ifeq ($(RX_DEF),SIG_RX621)
   RX_CPU = RX621
-  RX_CHOOSE = -misa=v1
+  RX_CHOOSE = -misa=v1 
   LDSCRIPT	= ../../RX62x/$(DEVICE).ld
 endif
 
