@@ -3,30 +3,73 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
 ![R5F564ML](../docs/RX600_group.jpg)
 
 ## 概要
+
 シリアルインターフェースを使って、RX マイコンのフラッシュメモリーにプログラムを書き込む為のツール   
+
+```
+Renesas RX Series Programmer Version 2.10
+Copyright (C) 2016, 2026 Hiramatsu Kunihito (hira@rvf-rc45.net)
+usage:
+rx_prog [options] [mot file] ...
+
+Options :
+    -P PORT,   --port=PORT     Specify serial port
+    -s SPEED,  --speed=SPEED   Specify serial speed
+    -d DEVICE, --device=DEVICE Specify device name
+    -e, --erase                Perform a device erase to a minimum
+    --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)
+    --id-table-write           Perform ID-Tables write
+    --ofs=OFS0[:,]OFS1         Specify OFS0/1 value (32 bits)
+    --ofs-register-write       Perform OFS0/1 write
+    --clear-configuration      Perform clear configuration
+    --area=ORG[:,]END          Specify read area
+    -r, --read                 Perform data read
+    -v, --verify               Perform data verify
+    -w, --write                Perform data write
+    --progress                 display Progress output
+    --erase-page-wait=WAIT     Delay per read page  (2000) [uS]
+    --write-page-wait=WAIT     Delay per write page (5000) [uS]
+    --device-list              Display device list
+    --verbose                  Verbose output
+    -h, --help                 Display this
+```
+
+|ＲＸマイコン|ID 認証|ID Write|OFS Write|Clear config|Read|Erase|Write|
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|RX13T|△|－|－|－|△|△|△|
+|RX140|〇|－|－|－|〇|〇|〇|
+|RX220|〇|－|－|－|〇|〇|〇|
+|RX230|△|－|－|－|△|△|△|
+|RX231|〇|－|－|－|〇|〇|〇|
+|RX24T|〇|－|－|－|〇|〇|〇|
+|RX24U|△|－|－|－|△|△|△|
+|RX260/RX261|〇|－|－|－|〇|〇|〇|
+|RX26T|〇|〇|〇|〇|〇|〇|〇|
+|RX621/RX62N|〇|－|－|－|〇|〇|〇|
+|RX631/RX63N|〇|－|－|－|〇|〇|〇|
+|RX63T|〇|－|－|－|〇|〇|〇|
+|RX64M|〇|〇|〇|〇|〇|〇|〇|
+|RX651/RX65N|△|△|△|△|△|△|△|
+|RX66T|〇|〇|〇|〇|〇|〇|〇|
+|RX71M|〇|〇|〇|〇|〇|〇|〇|
+|RX72N|△|△|△|△|△|△|△|
+|RX72T|〇|〇|〇|〇|〇|〇|〇|
+
+〇：動作確認済み   
+△：動作未確認   
+－：機能無し
    
-|ＲＸマイコン|サポート|ID Protect|Read|Erase/Write|
-|:-:|:-:|:-:|:-:|:-:|
-|RX13T|〇|-|-|-|
-|RX140|〇|〇|〇|〇|
-|RX220|〇|〇|〇|〇|
-|RX230|〇|-|-|-|
-|RX231|〇|〇|〇|〇|
-|RX23T|〇|-|-|-|
-|RX24T|〇|〇|〇|〇|
-|RX24U|〇|△|△|△|
-|RX260/RX261|〇|-|△|△|
-|RX26T|〇|-|〇|〇|
-|RX621/RX62N|〇|〇|〇|〇|
-|RX631/RX63N|〇|〇|〇|〇|
-|RX63T|〇|〇|〇|〇|
-|RX64M|〇|-|〇|〇|
-|RX651/RX65N|〇|-|△|△|
-|RX66T|〇|-|〇|〇|
-|RX71M|〇|-|〇|〇|
-|RX72T|〇|-|〇|〇|
-|RX72N|〇|-|△|△|
-   
+- モトローラＳレコードフォーマットの読み込み
+- モトローラＳレコードフォーマットの書き出し
+- 消去（erase）
+- 書き込み（write）
+- 比較（verify）
+- ID パスフレーズの認証
+- ID パスフレーズの書き込み（RX6xx/RX7xx/RX26T 系グループ）
+- OFS 読出し（RX6xx/RX7xx/RX26T 系グループ）
+- OFS 書き込み（RX6xx/RX7xx/RX26T 系グループ）
+- コンフィギュレーションの消去（RX6xx/RX7xx/RX26T 系グループ）
+
 ---
    
 ## プロジェクト・リスト
@@ -58,6 +101,7 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
 - Makefile
 - rx_prog.conf
 - USB_CP2102N ---> KiCAD CP2102N USB シリアルボードプロジェクト（回路図、PCB トラック、ガーバー）
+- USB_CH9102F ---> KiCAD-10 CH9102F USB シリアルボードプロジェクト（回路図、PCB トラック、ガーバー）
    
 ---
    
@@ -69,10 +113,12 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
 - RX/READMEja.md の開発環境準備を参照
    
 ---
+
 ## ビルド方法、環境設定
+   
  - make する
  - make install により、設定ファイルと実行ファイルをコピー (/usr/local/bin)
- - /usr/local/bin にパスを通す
+ - /usr/local/bin に実行パスを通す
    
 ---
 
@@ -84,14 +130,15 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
 ※ブート時のＳＣＩポート（通常 SCI1 です、要確認ハードウェアーマニュアル）   
 - UB 端子があるデバイス（USB I/F がある）の場合、プルダウンする。(4.7K)
 - EMLE 端子がある場合プルダウンする。（4.7K）
-- MD 端子を「Low レベル」にして「リセット」信号を入れる。
-- 内臓プログラムを実行する場合は MD 端子を「High レベル」にして、リセット信号を入れる。
+- MD 端子を「Low レベル」にして「リセット」信号を入れる
+- 内臓プログラムを実行する場合は MD 端子を「High レベル」にして、リセット信号を入れる
 - MDE(13) は 0 (リトルエンディアンとする)
 
 ---
+
 ## 接続端子一覧
 
-### RX140:
+### RX140:   
 
 |端子|LFQFP 64|
 |---|---|
@@ -106,7 +153,10 @@ Renesas RX マイコン・フラッシュ・プログラミング・ツール (r
 
 VCL: 4.7uF
 
+---
+
 ### RX220:   
+
 |端子|LFQFP 64|
 |---|---|
 |MD|MD(3)|
@@ -123,7 +173,9 @@ VCL: 4.7uF
 VCL: 0.1uF
 
 ---
+
 ### RX231:   
+
 |端子|LFQFP 64|LFQFP 100|
 |---|---|---|
 |MD|MD(3)|MD(7)|
@@ -140,7 +192,9 @@ VCL: 0.1uF
 VCL: 4.7uF   
 
 ---
+
 ### RX621/RX62N:   
+
 |端子|RX62x (144)|
 |---|---|
 |MD0|MD0(16)|
@@ -158,7 +212,9 @@ VCL: 4.7uF
 VCL: 0.1uF
 
 ---
-### RX631/RX63N:
+
+### RX631/RX63N:   
+
 |端子|LQFP 48|LQFP 64|TFLGA 64|LQFP 100|TFLGA 100|LQFP 144|TFLGA 145|LQFP 176|LFBGA 176|TFLGA 177|
 |---|---|---|---|---|---|---|---|---|---|---|
 |UB|PC7(21)|PC7(27)|PA6(D5)|PC7(45)|PC7(H7)|PC7(60)|PC7(N9)|PC7(76)|PC7(N10)|PC7(N10)|
@@ -176,7 +232,9 @@ VCL: 0.1uF
 VCL: 0.1uF
 
 ---
-### RX63T/RX24T/RX26T/RX66T/RX72T:
+
+### RX63T/RX24T/RX26T/RX66T/RX72T:   
+
 |端子|RX63T (64)|RX24T (100)|RX26T (100)|RX66T (100)|RX72T (144)|
 |---|---|---|---|---|---|
 |VCL|0.1uF|4.7uF|0.47uF|0.47uF|0.47uF|0.47uF|
@@ -193,7 +251,9 @@ VCL: 0.1uF
 |シングルチップ|-|1|
 
 ---
-### RX64M/RX71M/RX651/RX65N/RX66N:
+
+### RX64M/RX71M/RX651/RX65N:   
+
 |端子|RX64M (176)|RX71M (176)|RX651/RX65N (176)|
 |---|---|---|---|
 |VCL|0.1uF|0.22uF|0.22uF|
@@ -210,7 +270,9 @@ VCL: 0.1uF
 |シングルチップ|-|1|
 
 ---
-### RX660/RX671:
+
+### RX660/RX671:   
+
 |端子|RX660 (144)|RX671 (144)|
 |---|---|---|
 |UB|PC7/UB(60)|PC7/UB(60)|
@@ -218,7 +280,8 @@ VCL: 0.1uF
 |RXD|P30/RXD1(29)|P30/RXD1(29)|
 |TXD|P26/TXD1(31)|P26/TXD1(31)|
 
-RX660:
+RX660:   
+
 |モード|UB|MD|
 |---|:---:|:---:|
 |シリアルブート|0|0|
@@ -229,7 +292,8 @@ VCL: 0.47uF
 
 RX660: USB インターフェースが無い為、USB ブート不可
 
-RX671:
+RX671:   
+
 |モード|UB|MD|
 |---|:---:|:---:|
 |シリアルブート|0|0|
@@ -241,23 +305,28 @@ VCL: 0.22uF
 ---
 
 - MD0、MD1、UB、MD、EMLE、B/UB 端子は、抵抗（4.7K 程度）でプルアップ、又はプルダウン。（直接 Vss や Vcc に接続しない事）
-- XTAL、EXTAL に適切なクリスタルを接続。
-- VCL に規定のコンデンサを接続。
-- VSS、VCC、AVSS、AVCC 等電源を全て接続、バイパスコンデンサを入れる。
-- VREFL, VREFH などのアナログ電圧リファレンスの適切な処理。
-- USB_VSS、USB_VCC などの USB 電源を適切に接続する。
+- XTAL、EXTAL に適切なクリスタルを接続
+- VCL に規定のコンデンサを接続
+- VSS、VCC、AVSS、AVCC 等電源を全て接続、バイパスコンデンサを入れる
+- VREFL, VREFH などのアナログ電圧リファレンスの適切な処理
+- USB_VSS、USB_VCC などの USB 電源を適切に接続する
    
 ※詳しくは、各デバイスのハードウェアーマニュアル「概要、ピン配置図」、「フラッシュメモル、ブートモード」を参照して下さい。   
 ※ルネサス製リファレンスボードの回路図などが公開されていますので参考にして下さい。   
    
 ---
+
 ## 操作方法
+
 ![R5F564ML](../docs/USB_Serial.jpg)
+
 ### rx_prog の起動確認
+
  - rx_prog を実行して、動作する事を確認（help がリストされる）
+
 ```
 % rx_prog
-Renesas RX Series Programmer Version 1.98
+Renesas RX Series Programmer Version 2.10
 Copyright (C) 2016, 2026 Hiramatsu Kunihito (hira@rvf-rc45.net)
 usage:
 rx_prog [options] [mot file] ...
@@ -268,8 +337,12 @@ Options :
     -d DEVICE, --device=DEVICE Specify device name
     -e, --erase                Perform a device erase to a minimum
     --id=ID[:,]ID[:,] ...      Specify protect ID (16 bytes)
+    --id-table-write           Perform ID-Tables write
+    --ofs=OFS0[:,]OFS1         Specify OFS0/1 value (32 bits)
+    --ofs-register-write       Perform OFS0/1 write
+    --clear-configuration      Perform clear configuration
+    --area=ORG[:,]END          Specify read area
     -r, --read                 Perform data read
-	--area=ORG[:,]END          Specify read area
     -v, --verify               Perform data verify
     -w, --write                Perform data write
     --progress                 display Progress output
@@ -381,9 +454,9 @@ Verify: ################################################# 100 %
 ## ID コードプロテクト
 
 - ID コードプロテクトは、デバイスにより、二種類の構成があります
-- 一つは、オプション設定メモリ (OFSM)内にテーブルがある場合
+- 一つは、オプション設定メモリ (OFSM) 内に ID コードテーブルがある場合
 - 詳しくは、「OCD/ シリアルプログラマ ID 設定レジスタ (OSIS)」を参照して下さい
-- 一つは、ROM 内（0xFFFFFFA0 - 0xFFFFFFAF）にテーブルがある場合
+- 一つは、ROM 内（0xFFFFFFA0 - 0xFFFFFFAF）に ID コードテーブルがある場合
 - 詳しくは「ハードウェアーマニュアル」の「ブートモード ID コードプロテクト」を参照して下さい
 - ID コードプロテクトは、「common/code_protect.c」ファイルに、制御コードとパスフレーズを記述します
 - Makefile の「CSOURCES」に、上記ファイルを設定します
@@ -395,6 +468,7 @@ Verify: ################################################# 100 %
 ### 注意事項
 
 - 特定の ID により、プログラマの接続を拒否する事が出来るので、十分な注意が必要です
+- 詳しくは、ハードウェアーマニュアル、ID コードプロテクトを参照して下さい
 
 ---
 
@@ -515,7 +589,6 @@ R5F572TK (RX72T): Program-Flash: 1024K, RAM:  128K, Data-Flash: 32K
 - 本来、接続時に取得した、デバイス TYP に沿ったデバイスプロファイルを利用すべきですが、その実装がされていません。
 - これは、TYP と、デバイスプロファイルの資料が公開されていない為です。
 - 同じグループで、ハードウェアー仕様が異なるデバイスがあり、rx_prog.conf に異なる定義を行っても、反映されませんので注意が必要です。
-- OFS オプション設定メモリの書き換えに対応していません。
 
 ---
 
@@ -523,24 +596,10 @@ R5F572TK (RX72T): Program-Flash: 1024K, RAM:  128K, Data-Flash: 32K
 ![R5F564ML](../docs/RX_boards.jpg)
 ```
  % rx_prog -d RX71M --verbose
-# Platform: 'Cygwin'
-# Configuration file path: '/usr/local/bin/rx_prog.conf'
-# Device: 'RX71M'
-# Serial port path: 'COM3'
-# Serial port speed: 230400
-# Serial port alias: COM3 ---> /dev/ttyS2
-# Serial port path: '/dev/ttyS2'
-# Connection OK.
-#01/01: Device Type TYP: 20 02 FD 09 01 48 40 00
-#01/01: Device Type OSA: 16000000
-#01/01: Device Type OSI: 16000000
-#01/01: Device Type CPA: 120000000
-#01/01: Device Type CPI: 120000000
-#01/01: Endian is little.
-#01/01: System clock: 120000000
-#01/01: Device clock: 60000000
-#01/01: Change baud rate: 230400
-#01/01: ID: Disable
+
+
+
+
 ```
    
 ---

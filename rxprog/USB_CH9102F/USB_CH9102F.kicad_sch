@@ -9359,7 +9359,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1uF"
+		(property "Value" "10uF"
 			(at 71.882 77.6164 0)
 			(show_name no)
 			(do_not_autoplace no)

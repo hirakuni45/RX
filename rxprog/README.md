@@ -59,6 +59,8 @@ Tool to write program to flash memory of RX microcontroller using serial interfa
 - string_utils.hpp
 - Makefile
 - rx_prog.conf
+- /USB_CH9102F
+- /USB_CP2102N
    
 ---
    
@@ -71,13 +73,17 @@ Tool to write program to flash memory of RX microcontroller using serial interfa
 See development environment preparation of 'RX/README.md'
    
 ---
+   
 ## Build method, environment setting
- - make
- - Copy configuration file and executable file by make install
- - pass the path to '/usr/local/bin'
+   
+- make
+- Copy configuration file and executable file by make install
+- pass the path to '/usr/local/bin'
    
 ---
+   
 ## Connection preparation (serial connection)
+   
 - Connect the VSS pin of the microcontroller to the GND of USB serial.
 - Connect the RXD1 pin on the microcontroller side with the USB serial TXD.
 - Connect the TXD1 pin on the microcontroller side with the USB serial RXD.
@@ -240,7 +246,7 @@ RX671:
 VCL: 0.22uF
 
 ---
-
+   
 - MD0、MD1、UB、MD、B/UB, and EMLE terminals are pulled up or down with a resistor (approximately 4.7K).
 - Connect appropriate crystals to XTAL and EXTAL.
 - Connect the specified capacitor to VCL.
@@ -477,6 +483,15 @@ sys     0m0.187s
 ```
    
 ※FTDI devices seem to be slower than silicon lab devices.
+
+---
+
+## USB Serial hardwear (KiCAD Project)
+
+### CH9102F
+
+
+
 
 ---
 
