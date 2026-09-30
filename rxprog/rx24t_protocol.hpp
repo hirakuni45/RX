@@ -16,7 +16,7 @@ namespace rx24t {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	RX13T/RX23T/RX24T/RX24U プログラミング・プロトコル・クラス
+		@brief	RX13T/RX14T/RX23T/RX24T/RX24U プログラミング・プロトコル・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class protocol : public rx::protocol_base {
@@ -40,7 +40,7 @@ namespace rx24t {
 
 		static auto erase_page_block_(uint32_t org) noexcept
 		{
-			return org & 0xffff'f800; // erase block (2K)
+			return org & 0xFFFF'F800; // erase block (2K)
 		}
 
 	public:
@@ -81,62 +81,6 @@ namespace rx24t {
 		{
 			return rx::protocol_base::change_speed_legacy(rx, speed, LIMIT_BAUDRATE);
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ブロック情報問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_block() noexcept
-		{
-			if(!connection_) return false;
-
-			if(!command1_(0x26)) {
-				return false;
-			}
-
-			uint8_t tmp[256 + 1];
-			if(!read_(tmp, 3)) {
-				return false;
-			}
-			if(tmp[0] != 0x36) {
-				return false;
-			}
-			uint32_t total = get16_big_(&tmp[1]) + 1;
-			if(!read_(&tmp[3], total)) {
-				return false;
-			}
-
-			auto sum = sum_(tmp, 3 + total - 1);
-			if(sum != tmp[3 + total - 1]) {
-				return false;
-			}
-
-			const uint8_t* p = &tmp[4];
-			for(uint32_t i = 0; i < 2; ++i) {
-				rx::protocol::block a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.size_ = get32_big_(p);
-				p += 4;
-				a.num_ = get32_big_(p);
-				p += 4;
-				blocks_.push_back(a);
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ブロック情報を取得
-			@return ブロック情報
-		*/
-		//-----------------------------------------------------------------//
-		const auto& get_block() const noexcept { return blocks_; }
 
 
 		//-----------------------------------------------------------------//
@@ -233,6 +177,62 @@ namespace rx24t {
 		*/
 		//-----------------------------------------------------------------//
 		const auto& get_data_area() const noexcept { return data_areas_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ブロック情報問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_block() noexcept
+		{
+			if(!connection_) return false;
+
+			if(!command1_(0x26)) {
+				return false;
+			}
+
+			uint8_t tmp[256 + 1];
+			if(!read_(tmp, 3)) {
+				return false;
+			}
+			if(tmp[0] != 0x36) {
+				return false;
+			}
+			uint32_t total = get16_big_(&tmp[1]) + 1;
+			if(!read_(&tmp[3], total)) {
+				return false;
+			}
+
+			auto sum = sum_(tmp, 3 + total - 1);
+			if(sum != tmp[3 + total - 1]) {
+				return false;
+			}
+
+			const uint8_t* p = &tmp[4];
+			for(uint32_t i = 0; i < 2; ++i) {
+				rx::protocol::block a;
+				a.org_ = get32_big_(p);
+				p += 4;
+				a.size_ = get32_big_(p);
+				p += 4;
+				a.num_ = get32_big_(p);
+				p += 4;
+				blocks_.push_back(a);
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ブロック情報を取得
+			@return ブロック情報
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_block() const noexcept { return blocks_; }
 
 
 		//-----------------------------------------------------------------//
@@ -390,7 +390,8 @@ namespace rx24t {
 			if(get_protect()) {
 				if(check_id_code(rx.id_, ID_CHECK_ACK)) {
 					if(verbose_) {
-						std::cout << "# ID authentication: OK" << std::endl;
+						auto sect = out_section_(1, 1);
+						std::cout << sect << "ID authentication: OK" << std::endl;
 					}
 				} else {
 					std::cerr << "ID authentication: NG (Can't connection.)" << std::endl;
@@ -420,14 +421,12 @@ namespace rx24t {
 			if(!read_(head, 1)) {
 				return false;
 			}
-			if(head[0] == 0x26) {
+			if(head[0] == 0x26) {  // ID コードプロテクト無効
 				id_protect_ = false;
-///				std::cout << "Return: 0x26" << std::endl;
-			} else if(head[0] == 0x16) {
+			} else if(head[0] == 0x16) {  // ID コードプロテクト 有効
 				id_protect_ = true;
-///				std::cout << "Return: 0x16" << std::endl;
-			} else if(head[0] == 0xC0) {
-				if(!read_(head, 1)) {
+			} else if(head[0] == 0xC0) {  // エラーレスポンス
+				if(!read_(head, 1)) {  // エラーコード
 					return false;
 				}
 				last_error_ = head[0];
@@ -501,6 +500,8 @@ namespace rx24t {
 			} else {
 				erase_set_.insert(org);
 			}
+
+			// ブロック消去コマンド発行
 			uint8_t cmd[7];
 			cmd[0] = 0x59;
 			cmd[1] = 0x04;  // size 固定値 4
@@ -556,6 +557,7 @@ namespace rx24t {
 			if(!command1_(0x43)) {
 				return false;
 			}
+
 			uint8_t head[1];
 			if(!read_(head, 1)) {
 				return false;
@@ -700,6 +702,7 @@ namespace rx24t {
 			connection_ = false;
 			pe_turn_on_ = false;
 			select_write_area_ = false;
+			erase_select_ = false;
 			return  rx::protocol_base::close();
 		}
 	};
