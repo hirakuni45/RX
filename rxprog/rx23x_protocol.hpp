@@ -36,9 +36,10 @@ namespace rx23x {
 		bool					blank_check_;
 		bool					blank_all_;
 		bool					erase_select_;
+		bool					select_write_area_;
+
 		typedef std::set<uint32_t> ERASE_SET;
 		ERASE_SET				erase_set_;
-		bool					select_write_area_;
 
 		static auto erase_page_block_(uint32_t org) noexcept
 		{
@@ -54,9 +55,8 @@ namespace rx23x {
 		protocol() noexcept :
 			data_(0), data_areas_(), blocks_(),
 			id_protect_(false), pe_turn_on_(false), blank_check_(false),
-			blank_all_(false), erase_select_(false),
-			erase_set_(),
-			select_write_area_(false)
+			blank_all_(false), erase_select_(false), select_write_area_(false),
+			erase_set_()
 		{ }
 
 
@@ -496,6 +496,7 @@ namespace rx23x {
 				erase_select_ = true;
 			}
 
+			// ブロック消去コマンド発行
 			auto org = erase_page_block_(address);
 			if(erase_set_.find(org) != erase_set_.end()) {
 				return rx::protocol::erase_state::CHECK_OK;

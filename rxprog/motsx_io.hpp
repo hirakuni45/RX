@@ -3,8 +3,9 @@
 /*!	@file
 	@brief	モトローラーＳフォーマット入出力 @n
 			256 バイト毎に、データ管理を行うので、どのようなロケーションに配置 @n
-			されたデータ列であっても、効率良くデータを保持出来る。 @n
-			データは２５６バイト毎のブロックと、先頭アドレスで管理される
+			されたデータ列であっても、効率良くデータを収集、保持出来る。 @n
+			データは 256 バイト毎のブロックと、先頭アドレスで管理される @n
+			データコンテナは std::map で管理される
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
