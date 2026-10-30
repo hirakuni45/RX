@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	WAV 音声ファイルを扱うクラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -105,7 +105,7 @@ namespace sound {
 			auto org = fin.tell();
 			WAVEFILEHEADER wh;
 			auto len = fin.read(&wh, sizeof(wh));
-			fin.seek(utils::file_io::SEEK::SET, org);
+			fin.seek(org, utils::file_io::SEEK::SET);
 			if(len != sizeof(wh)) {
 				return false;
 			}
@@ -209,7 +209,7 @@ namespace sound {
 					}
 				}
 				ofs += rc.ulChunkSize;
-				fi.seek(utils::file_io::SEEK::SET, ofs);
+				fi.seek(ofs, utils::file_io::SEEK::SET);
 			}
 			data_top_ = fi.tell();
 
@@ -303,7 +303,7 @@ namespace sound {
 					break;
 				} else if(ctrl == CTRL::REPLAY) {
 					out.mute();
-					fin.seek(utils::file_io::SEEK::SET, data_top_);
+					fin.seek(data_top_, utils::file_io::SEEK::SET);
 					pos = 0;
 					time_ = 0;
 					status = true;

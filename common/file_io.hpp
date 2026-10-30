@@ -1,16 +1,16 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	ファイル・入出力クラス @n
 			※ FatFs のラッパー（ff14 以降が必要） @n
 			※ FatFs のファイル操作系をラップして fopen ぽい機能を提供する。@n
 			※ fopen と違って、バッファリング（キャッシュ）されない。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #ifndef FAT_FS
 #  error "file_io.hpp requires FAT_FS to be defined and include FATFS module"
 #endif
@@ -505,30 +505,32 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	シーク（fseek 準拠）
-			@param[in]	seek	シーク形式
 			@param[in]	ofs		オフセット
+			@param[in]	seek	シーク形式
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool seek(SEEK seek, FSIZE ofs) noexcept
+		bool seek(long ofs, SEEK seek) noexcept
 		{
 			if(!open_) return false;
+
 			FRESULT ret;
 			switch(seek) {
 			case SEEK::SET:
+				if(ofs < 0) return false;
 				ret = f_lseek(&fp_, ofs);
 				break;
 			case SEEK::CUR:
 				{
-					auto pos = tell();
+					long pos = static_cast<long>(tell());
 					pos += ofs;
 					ret = f_lseek(&fp_, pos);
 				}
 				break;
 			case SEEK::END:
 				{
-					auto pos = get_file_size();
-					pos -= ofs;
+					long pos = static_cast<long>(get_file_size());
+					pos += ofs;
 					ret = f_lseek(&fp_, pos);
 				}
 				break;

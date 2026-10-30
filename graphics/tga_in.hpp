@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	TGA 画像ファイルを扱うクラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -101,7 +101,7 @@ namespace img {
 
 			bool read_info_(img::img_info& fo) noexcept
 			{
-				if(!fio_.seek(utils::file_io::SEEK::SET, offset_)) {
+				if(!fio_.seek(offset_, utils::file_io::SEEK::SET)) {
 					return false;
 				}
 
@@ -231,7 +231,7 @@ namespace img {
 			tga_t tga_(fin);
 			bool f = tga_.read_info(fo);
 
-			fin.seek(utils::file_io::SEEK::SET, org);
+			fin.seek(org, utils::file_io::SEEK::SET);
 
 			return f;
 		}

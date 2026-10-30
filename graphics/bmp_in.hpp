@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	BMP 画像ファイルを扱うクラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -628,7 +628,7 @@ namespace img {
 			bmp_info bmp;
 			long pos = fin.tell();
 			bool ret = read_header_bmp_(fin, bmp);
-			fin.seek(utils::file_io::SEEK::SET, pos);
+			fin.seek(pos, utils::file_io::SEEK::SET);
 			return ret;
 		}
 
@@ -650,7 +650,7 @@ namespace img {
 				return false;
 			}
 
-			fin.seek(utils::file_io::SEEK::SET, pos);
+			fin.seek(pos, utils::file_io::SEEK::SET);
 
 			fo.width  = bmp.width;
 			fo.height = bmp.height;
@@ -712,7 +712,7 @@ namespace img {
 			long pos = fin.tell();
 			bmp_info bmp;
 			if(!read_header_bmp_(fin, bmp)) {
-				fin.seek(utils::file_io::SEEK::SET, pos);
+				fin.seek(pos, utils::file_io::SEEK::SET);
 				return false;
 			}
 
@@ -737,7 +737,7 @@ namespace img {
 					bmp.skip = bmp.skip % bmp.palette_size;
 				}
 				if(clutnum == 0) {
-					fin.seek(utils::file_io::SEEK::SET, pos);
+					fin.seek(pos, utils::file_io::SEEK::SET);
 					return false;
 				}
 			} else {
@@ -746,7 +746,7 @@ namespace img {
 
 			if(clutnum > 0) {
 				if(fin.read(rgbq_, bmp.palette_size, clutnum) != clutnum) {
-					fin.seek(utils::file_io::SEEK::SET, pos);
+					fin.seek(pos, utils::file_io::SEEK::SET);
 					return false;
 				}
 			}
@@ -755,7 +755,7 @@ namespace img {
 			while(i < bmp.skip) {
 				char c;
 				if(!fin.get_char(c)) {
-					fin.seek(utils::file_io::SEEK::SET, pos);
+					fin.seek(pos, utils::file_io::SEEK::SET);
 					return false;
 				}
 				i++;
@@ -781,7 +781,7 @@ namespace img {
 				break;
 			}
 			if(!f) {
-				fin.seek(utils::file_io::SEEK::SET, pos);
+				fin.seek(pos, utils::file_io::SEEK::SET);
 			}
 
 			return f;

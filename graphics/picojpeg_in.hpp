@@ -5,7 +5,7 @@
 			picojpeg.[hc] の C++ ラッパー @n
 			https://github.com/richgel999/picojpeg を参照
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/glfw3_app/blob/master/LICENSE
 */
@@ -183,7 +183,7 @@ namespace img {
 			uint8_t sig[2];
 			uint32_t pos = fin.tell();
 			uint32_t l = fin.read(sig, 2);
-			fin.seek(utils::file_io::SEEK::SET, pos);
+			fin.seek(pos, utils::file_io::SEEK::SET);
 			if(l == 2) {
 				if(sig[0] == 0xff && sig[1] == 0xd8) {  // SOI Marker, Start image
 					return true;
@@ -212,7 +212,7 @@ namespace img {
 			t.file_size_ = fin.get_file_size();
 			status_ = pjpeg_decode_init(&image_info_, pjpeg_callback_, &t, false);
 
-			fin.seek(utils::file_io::SEEK::SET, pos);
+			fin.seek(pos, utils::file_io::SEEK::SET);
 
 			if(status_ != 0) {
 				return false;

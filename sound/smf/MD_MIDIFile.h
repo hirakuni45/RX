@@ -399,13 +399,13 @@ public:
 
 	bool seekCur(uint32_t pos)
 	{
-		return fio_.seek(utils::file_io::SEEK::CUR, pos);
+		return fio_.seek(pos, utils::file_io::SEEK::CUR);
 	}
 
 
 	bool seekSet(uint32_t pos)
 	{
-		return fio_.seek(utils::file_io::SEEK::SET, pos);
+		return fio_.seek(pos, utils::file_io::SEEK::SET);
 	}
 
 

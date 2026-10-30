@@ -7,7 +7,7 @@
 			V1, V2 が両方存在する場合もあり、その場合、V2 が優先される。 @n
 			アルバム画像がある場合、そのファイル位置が保存される。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -161,7 +161,7 @@ namespace sound {
 			}
 			tag_.at_apic().ofs_ = fin.tell();
 			tag_.at_apic().len_ = len;
-			fin.seek(utils::file_io::SEEK::CUR, len);
+			fin.seek(len, utils::file_io::SEEK::CUR);
 			return ret;
 		}
 
@@ -219,7 +219,7 @@ namespace sound {
 				}
 				dst[len] = 0;
 			} else {
-				fin.seek(utils::file_io::SEEK::CUR, len);
+				fin.seek(len, utils::file_io::SEEK::CUR);
 				return false;
 			}
 
@@ -372,7 +372,7 @@ namespace sound {
 
 		bool parse_v1_(utils::file_io& fin) noexcept
 		{
-			if(!fin.seek(utils::file_io::SEEK::END, 128)) {
+			if(!fin.seek(-128, utils::file_io::SEEK::END)) {
 				return false;
 			}
 
@@ -421,19 +421,19 @@ namespace sound {
 
 			char tmp[10];
 			if(fin.read(tmp, 10) != 10) {
-				fin.seek(utils::file_io::SEEK::SET, org);
+				fin.seek(org, utils::file_io::SEEK::SET);
 				return false;
 			}
 			if(strncmp(tmp, "ID3", 3) != 0) {
-				fin.seek(utils::file_io::SEEK::SET, org);
+				fin.seek(org, utils::file_io::SEEK::SET);
 				return false;
 			}
 //			ver = get16_(&tmp[3]);
 //			flag = static_cast<uint8_t>(tmp[5]);
 			auto size = get_size_syncsafe_(&tmp[6]);
 
-			if(!fin.seek(utils::file_io::SEEK::SET, org + 10 + size)) {
-				fin.seek(utils::file_io::SEEK::SET, org);
+			if(!fin.seek(org + 10 + size, utils::file_io::SEEK::SET)) {
+				fin.seek(org, utils::file_io::SEEK::SET);
 				return false;
 			}
 
@@ -459,12 +459,12 @@ namespace sound {
 			org_pos_ = fin.tell();
 			char tmp[10];
 			if(fin.read(tmp, 10) != 10) {
-				fin.seek(utils::file_io::SEEK::SET, org_pos_);
+				fin.seek(org_pos_, utils::file_io::SEEK::SET);
 				return false;
 			}
 			if(strncmp(tmp, "ID3", 3) != 0) {  // V2 が無い場合、
 				auto ret = parse_v1_(fin);  // V1 がある場合、パース
-				fin.seek(utils::file_io::SEEK::SET, org_pos_);
+				fin.seek(org_pos_, utils::file_io::SEEK::SET);
 				if(ret) id3v1_ = true;
 				return ret;
 			}
@@ -481,7 +481,7 @@ namespace sound {
 
 			if(flag_ & 0b01000000) {  // EXT header
 				if(fin.read(tmp, 4) != 4) {
-					fin.seek(utils::file_io::SEEK::SET, org + size_);
+					fin.seek(org + size_, utils::file_io::SEEK::SET);
 					return false;
 				}
 				uint32_t size;
@@ -492,7 +492,7 @@ namespace sound {
 //					size = get_size_32_(&tmp[4]);
 					size = get_size_32_(tmp);
 				}
-				fin.seek(utils::file_io::SEEK::CUR, size - 4);
+				fin.seek(size - 4, utils::file_io::SEEK::CUR);
 			}
 
 			while(fin.tell() < (org + size_)) {
@@ -508,7 +508,7 @@ namespace sound {
 				}
 			}
 
-			if(!fin.seek(utils::file_io::SEEK::SET, org + size_)) {
+			if(!fin.seek(org + size_, utils::file_io::SEEK::SET)) {
 				return false;
 			}
 

@@ -4,7 +4,7 @@
 	@brief	libmad を使った MP3 デコード・クラス @n
 			※このクラスを使うには、libmad ライブラリーが必要
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -279,7 +279,7 @@ namespace sound {
 
 			set_state(STATE::INFO);
 
-			fin.seek(utils::file_io::SEEK::SET, header_offset_);
+			fin.seek(header_offset_, utils::file_io::SEEK::SET);
 // utils::format("ID3-V1: %s\n") % (id3v1_ ? "True" : "False");
 // utils::format("Header size: %u\n") % header_offset_;
 
@@ -321,7 +321,7 @@ namespace sound {
 			}
 // utils::format("Buff len error: %u\n") % buflen_count;
 
-			fin.seek(utils::file_io::SEEK::SET, header_offset_);
+			fin.seek(header_offset_, utils::file_io::SEEK::SET);
 
 			info.samples = frames * 1152;
 			if(mad_frame_.header.mode != MAD_MODE_SINGLE_CHANNEL) {
@@ -365,7 +365,7 @@ namespace sound {
 			mad_frame_init(&mad_frame_);
 			mad_synth_init(&mad_synth_);
 
-			fin.seek(utils::file_io::SEEK::SET, header_offset_);
+			fin.seek(header_offset_, utils::file_io::SEEK::SET);
 
 			uint32_t pos = 0;
 			uint32_t frame_count = 0;
@@ -392,7 +392,7 @@ namespace sound {
 					break;
 				} else if(ctrl == CTRL::REPLAY) {
 					out.mute();
-					fin.seek(utils::file_io::SEEK::SET, header_offset_);
+					fin.seek(header_offset_, utils::file_io::SEEK::SET);
 					pos = 0;
 					time_ = 0;
 					frame_count = 0;
