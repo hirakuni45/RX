@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	AAC ファイルを扱うクラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -421,7 +421,7 @@ namespace sound {
 		static uint32_t seek_callback_(void* user_data, uint64_t position)
 		{
 			utils::file_io* fin = static_cast<utils::file_io*>(user_data);
-			if(fin) return fin->seek(utils::file_io::SEEK::SET, position);
+			if(fin) return fin->seek(position, utils::file_io::SEEK::SET);
 			else return 0;
 		}
 
@@ -807,7 +807,7 @@ namespace sound {
 			bool ret = false;
 			uint8_t header[8];
 			uint32_t len = fin.read(header, 1, 8);
-			fin.seek(utils::file_io::SEEK::SET, pos);
+			fin.seek(pos, utils::file_io::SEEK::SET);
 			if(len != 8) {
 				return ret;
 			}
@@ -841,7 +841,7 @@ namespace sound {
 			long pos = fin.tell();
 			uint8_t header[8];
 			uint32_t len = fin.read(header, 1, 8);
-			fin.seek(utils::file_io::SEEK::SET, pos);
+			fin.seek(pos, utils::file_io::SEEK::SET);
 			if(len != 8) {
 				return false;
 			}

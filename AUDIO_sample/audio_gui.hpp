@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	オーディオ GUI クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2022 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -206,7 +206,7 @@ namespace app {
 					scaling_.set_scale();
 					img_in_.load("/NoImage.jpg");
 				} else {
-					fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
+					fin.seek(tag.get_apic().ofs_, utils::file_io::SEEK::SET);
 					img::img_info ifo;
 					if(!img_in_.info(fin, ifo)) {
 						auto st = img_in_.at_jpeg().get_status();
@@ -228,7 +228,7 @@ namespace app {
 				img_in_.load("/NoImage.jpg");
 			}
 
-			fin.seek(utils::file_io::SEEK::SET, org_pos);
+			fin.seek(org_pos, utils::file_io::SEEK::SET);
 
 			album_.set_title(tag.get_album().c_str());
 			album_.reset_scroll();

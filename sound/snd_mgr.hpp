@@ -5,7 +5,7 @@
 			登録した PCM 波形データの発音制御 @n
 			非常にシンプルな構成で、基本的な動作のみ実装
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2025 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -119,7 +119,7 @@ namespace sound {
 			utils::format("Rate: %d, Bits: %d, Size: %u\n")
 				% wav.get_rate() % wav.get_bits() % wav.get_size();
 
-			if(!in.seek(utils::file_io::SEEK::SET, wav.get_top())) {
+			if(!in.seek(wav.get_top(), utils::file_io::SEEK::SET)) {
 				in.close();
 				return false;
 			}

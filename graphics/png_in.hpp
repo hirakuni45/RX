@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	PNG クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/glfw3_app/blob/master/LICENSE
 */
@@ -34,17 +34,17 @@ namespace img {
         uint32_t    prgl_ref_;
         uint32_t    prgl_pos_;
 
-	    static void read_func_(png_structp png_ptr, png_bytep buf, png_size_t size) {
-        	utils::file_io* fin = (utils::file_io*)png_get_io_ptr(png_ptr);
+		static void read_func_(png_structp png_ptr, png_bytep buf, png_size_t size) {
+			utils::file_io* fin = (utils::file_io*)png_get_io_ptr(png_ptr);
 
-        	size_t s = fin->read(buf, 1, size);
-        	if(s != size) {
+			size_t s = fin->read(buf, 1, size);
+			if(s != size) {
 				char tmp[128];
 				utils::sformat("png_io_read_func: error (read size: %d, request: %d)", tmp, sizeof(tmp))
-                	% static_cast<int>(s) % static_cast<int>(size);
-            	png_error(png_ptr, tmp);
-        	}
-    	}
+					% static_cast<int>(s) % static_cast<int>(size);
+				png_error(png_ptr, tmp);
+			}
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -81,7 +81,7 @@ namespace img {
 
 			auto ofs = fin.tell();
 			auto len = fin.read(sig, PNG_BYTES_TO_CHECK);
-			fin.seek(utils::file_io::SEEK::SET, ofs);
+			fin.seek(ofs, utils::file_io::SEEK::SET);
 			if(len == PNG_BYTES_TO_CHECK) {
 				if(png_check_sig(sig, PNG_BYTES_TO_CHECK)) {
 					return true;
@@ -104,20 +104,20 @@ namespace img {
 			auto ofs = fin.tell();
 
 			if(probe(fin) == false) {
-				fin.seek(utils::file_io::SEEK::SET, ofs);
+				fin.seek(ofs, utils::file_io::SEEK::SET);
 				return false;
 			}
 
 			//	png_ptr 構造体を確保・初期化します
 			png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 			if(png_ptr == NULL) {
-				fin.seek(utils::file_io::SEEK::SET, ofs);
+				fin.seek(ofs, utils::file_io::SEEK::SET);
 				return false;
 			}
 			//  info_ptr 構造体を確保・初期化します
 			png_infop info_ptr = png_create_info_struct(png_ptr);
 			if(info_ptr == NULL) {
-				fin.seek(utils::file_io::SEEK::SET, ofs);
+				fin.seek(ofs, utils::file_io::SEEK::SET);
 				return false;
 			}
 
@@ -156,7 +156,7 @@ namespace img {
 
 			png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 
-			fin.seek(utils::file_io::SEEK::SET, ofs);
+			fin.seek(ofs, utils::file_io::SEEK::SET);
 
 			return false;
 		}
