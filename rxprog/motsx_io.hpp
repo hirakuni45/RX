@@ -17,8 +17,7 @@
 #include <array>
 #include <string>
 #include <iomanip>
-
-#include "format.hpp"
+#include <format>
 #include "file_io.hpp"
 
 namespace utils {
@@ -31,7 +30,7 @@ namespace utils {
 	struct motsx_io {
 
 		static constexpr uint32_t PAGE_MASK = 0xffff'ff00;  ///< Under 256 bytes mask 
-		static constexpr uint32_t SAVE_REC_DATA_NUM = 64;	///< Save rrecord data bytes;
+		static constexpr uint32_t SAVE_REC_DATA_NUM = 64;	///< Save record data bytes;
 
 		typedef std::array<uint8_t, 256> array;
 
@@ -64,6 +63,13 @@ namespace utils {
 			}
 		};
 
+		enum class ERR_TYPE {
+			NONE,	///< no error
+			OPEN,	///< File open error
+			CHA,	///< Illegual character
+			SUM,	///< Check SUM
+		};
+
 	private:
 		area_t		area_;
 		uint32_t	exec_;
@@ -73,6 +79,8 @@ namespace utils {
 		memory_map	memory_map_;
 
 		array		fill_array_;
+
+		ERR_TYPE	err_type_;
 
 		bool read_byte_(uint32_t address, uint8_t& val) noexcept
 		{
@@ -124,6 +132,8 @@ namespace utils {
 			bool toend = false;
 			SR_MODE mode = SR_MODE::ORG;
 
+			uint32_t lno = 1;
+
 			while(1) {
 				char ch;
 				if(!fio.get_char(ch)) {
@@ -132,6 +142,7 @@ namespace utils {
 
 				if(ch == ' ') {
 				} else if(ch == 0x0d || ch == 0x0a) {
+					++lno;
 					if(toend) break;
 				} else if(mode == SR_MODE::ORG && ch == 'S') {
 					mode = SR_MODE::TYPE;
@@ -145,15 +156,14 @@ namespace utils {
 					value |= ch - 'A' + 10;
 					++vcnt;
 				} else {
-					std::cerr << "S format illegual character, Mode(" << static_cast<int>(mode) << ") '";
-					if(ch >= 0x20 && ch <= 0x7f) {
-						std::cerr << ch;
+					auto s = std::format("({}) S format illegual character, Mode({})", lno, static_cast<int>(mode));
+					if(ch >= 0x20 && ch < 0x7f) {
+						s += std::format(" '{}'", ch);
 					} else {
-						char tmp[8];
-						utils::sformat("0x%02X", tmp, sizeof(tmp)) % static_cast<uint16_t>(ch);
-						std::cerr << tmp;
+						s += std::format(" 0x{:02X}", static_cast<uint16_t>(ch));
 					}
-					std::cerr << "'" << std::endl;
+					std::cerr << s << std::endl;
+					err_type_ = ERR_TYPE::CHA;
 					return false;
 				}
 
@@ -233,10 +243,9 @@ namespace utils {
 						sum ^= 0xff;
 						sum &= 0xff;
 			   			if(sum != value) {	// SUM エラー
-							std::cerr << "S format SUM error: ";
-							char tmp[16];
-							utils::sformat("0x%02X -> 0x%02X", tmp, sizeof(tmp)) % static_cast<int>(value) % static_cast<int>(sum);
-							std::cerr << tmp << std::endl;
+							std::cerr << std::format("({}) S format SUM error: 0x{:02X} -> 0x{:02X}",
+								lno, static_cast<uint16_t>(value), static_cast<uint16_t>(sum)) << std::endl;
+							err_type_ = ERR_TYPE::SUM;
 							return false;
 						} else {
 							if(type >= 7 && type <= 9) {
@@ -261,25 +270,25 @@ namespace utils {
 			while(total > ofs) {
 				uint8_t sum = 0;
 				uint32_t len = 0;
-				char adr[16];
+				std::string adr;
 				char rtype;
 				auto adrval = a.area_.min_ + ofs;
 				if(a.area_.max_ <= 0xffff) {
 					rtype = '1';
-					utils::sformat("%04X", adr, sizeof(adr)) % adrval;
+					adr = std::format("{:04X}", adrval);
 					sum += adrval & 0xff;
 					sum += adrval >> 8;
 					len += 2;
 				} else if(a.area_.max_ <= 0xff'ffff) {
 					rtype = '2';
-					utils::sformat("%06X", adr, sizeof(adr)) % adrval;
+					adr = std::format("{:06X}", adrval);
 					sum += adrval & 0xff;
 					sum += adrval >> 8;
 					sum += adrval >> 16;
 					len += 3;
 				} else {
 					rtype = '3';
-					utils::sformat("%08X", adr, sizeof(adr)) % adrval;
+					adr = std::format("{:08X}", adrval);
 					sum += adrval & 0xff;
 					sum += adrval >> 8;
 					sum += adrval >> 16;
@@ -291,21 +300,21 @@ namespace utils {
 				len += n;
 				len += 1; // for check sum
 				sum += len;
-				char tmp[8];
-				utils::sformat("S%c%02X", tmp, sizeof(tmp)) % rtype % (len & 0xff);
-				fio.put(tmp);
-				fio.put(adr);
+				auto tmp = std::format("S{}{:02X}", rtype, (len & 0xff));
+				fio.put(tmp.c_str());
+				fio.put(adr.c_str());
 
 				for(uint32_t i = 0; i < n; ++i) {
 					uint16_t data = a.array_[(a.area_.min_ + i + ofs) & 255] & 255;
-					utils::sformat("%02X", tmp, sizeof(tmp)) % data;
-					fio.put(tmp);
+					auto tmp = std::format("{:02X}", data);
+					fio.put(tmp.c_str());
 					sum += data;
 				}
-
-				utils::sformat("%02X\n", tmp, sizeof(tmp)) % static_cast<uint32_t>(sum ^ 0xff);
-				fio.put(tmp);
-				ofs += n;
+				{
+					auto tmp = std::format("{:02X}\n", static_cast<uint32_t>(sum ^ 0xff));
+					fio.put(tmp.c_str());
+					ofs += n;
+				}
 			}
 			return true;
 		}
@@ -314,31 +323,32 @@ namespace utils {
 		bool save_exec_(utils::file_io& fio) noexcept
 		{
 			uint32_t len = 0;
-			char adr[16];
+			std::string adr;
 			char rtype;
 			if(exec_ <= 0xffff) {
 				rtype = '9';
-				utils::sformat("%04X", adr, sizeof(adr)) % exec_;
+				adr = std::format("{:04X}", exec_);
 				len += 2;
 			} else if(exec_ <= 0xff'ffff) {
 				rtype = '8';
-				utils::sformat("%06X", adr, sizeof(adr)) % exec_;
+				adr = std::format("{:06X}", exec_);
 				len += 3;
 			} else {
 				rtype = '7';
-				utils::sformat("%08X", adr, sizeof(adr)) % exec_;
+				adr = std::format("{:08X}", exec_);
 				len += 4;
 			}
-			len += 1; // for check sum
-			char tmp[8];
-			utils::sformat("S%c%02X", tmp, sizeof(tmp)) % rtype % len;
-			fio.put(tmp);
-			fio.put(adr);
-
-			uint16_t sum = 0;
-			utils::sformat("%02X\n", tmp, sizeof(tmp)) % sum;
-			fio.put(tmp);
-
+			{
+				len += 1; // for check sum
+				auto tmp = std::format("S{}{:02X}", rtype, len);
+				fio.put(tmp.c_str());
+				fio.put(adr.c_str());
+			}
+			{
+				uint16_t sum = 0;
+				auto tmp = std::format("{:02X}\n", sum);
+				fio.put(tmp.c_str());
+			}
 			return true;
 		}
 
@@ -348,7 +358,7 @@ namespace utils {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		motsx_io() noexcept : area_(), exec_(0x0000'0000)
+		motsx_io() noexcept : area_(), exec_(0x0000'0000), err_type_(ERR_TYPE::NONE)
 		{
 			fill_array_.fill(0xff);
 		}
@@ -365,8 +375,11 @@ namespace utils {
 		{
 			utils::file_io fio;
 			if(!fio.open(path, "rb")) {
+				err_type_ = ERR_TYPE::OPEN;
 				return false;
 			}
+
+			err_type_ = ERR_TYPE::NONE;
 
 			memory_map_.clear();
 
@@ -394,8 +407,11 @@ namespace utils {
 
 			utils::file_io fio;
 			if(!fio.open(path, "wb")) {
+				err_type_ = ERR_TYPE::OPEN;
 				return false;
 			}
+
+			err_type_ = ERR_TYPE::NONE;
 
 			for(const auto& m : memory_map_) {
 				if(!save_(fio, m)) {
@@ -411,6 +427,15 @@ namespace utils {
 
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	最終エラー種別の取得
+			@return エラー種別
+		*/
+		//-----------------------------------------------------------------//
+		auto get_last_error() const noexcept { return err_type_; }
 
 
 		//-----------------------------------------------------------------//
@@ -523,20 +548,21 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void list_area_map(const std::string& head) const noexcept
 		{
-			char tmp[64];
-			utils::sformat("Motolola Sx format load map: (exec: 0x%08X)", tmp, sizeof(tmp)) % exec_;
-			std::cout << head << tmp << std::endl;
+			auto s = std::format("Motolola Sx format load map: (exec: 0x{:08X})", exec_);
+			std::cout << head << s << std::endl;
 
 			auto as = create_area_map();
 			uint32_t total = 0;
 			for(const auto& a : as) {
 				auto n = a.max_ - a.min_ + 1;
-				utils::sformat("  0x%08X to 0x%08X (%d bytes)", tmp, sizeof(tmp)) % a.min_ % a.max_ % n;
-				std::cout << head << tmp << std::endl;
+				auto s = std::format("  0x{:08X} to 0x{:08X} ({} bytes)", a.min_, a.max_, n);
+				std::cout << head << s << std::endl;
 				total += n;
 			}
-			utils::sformat("  Total (%d bytes)", tmp, sizeof(tmp)) % total;
-			std::cout << head << tmp << std::endl << std::flush;
+			{
+				auto s = std::format("  Total ({} bytes)", total);
+				std::cout << head << s << std::endl << std::flush;
+			}
 		}
 
 
@@ -549,6 +575,7 @@ namespace utils {
 		{
 			exec_ = 0;
 			memory_map_.clear();
+			err_type_ = ERR_TYPE::NONE;
 		}
 
 
