@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	CAN 通信解析クラス @n
 			std::map を使う場合、Makefile でのリンクを修正する (USER_DEFS = m stdc++) @n
@@ -8,7 +8,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <unordered_map>
 #include <map>
 #include "common/can_io.hpp"
@@ -38,8 +38,8 @@ namespace utils {
 		};
 
 		// std::unordered_map か std::map の選択
-		// std::map: 自動で ID の順序が整列する。
-		// boost::unordered_map: ハッシュによるので順番は不明。
+		// std::map: 自動で ID の小さい準に整列する
+		// std::unordered_map: ハッシュによるので順番は不明
 //		typedef std::unordered_map<uint32_t, info_t> MAP;
 		typedef std::map<uint32_t, info_t> MAP;
 		MAP			map_;

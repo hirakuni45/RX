@@ -692,14 +692,15 @@ namespace vtx {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	「unordered_set, unordered_map」用ハッシュ値計算
+		@brief	「unordered_set, unordered_map」用ハッシュ値計算型
 		@param[in]	v	ハッシュ・ソース座標
 		@return		ハッシュ値を返す
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T>
-	inline size_t hash_value(const T& v) { return v.hash(); }
-
+	struct hash_value {
+		size_t operator() (const T& v) const { return v.hash(); }
+	};
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -1289,12 +1290,13 @@ namespace vtx {
 	//-----------------------------------------------------------------//
 	bool make_share_vertex(const fvtxs& src_a, const fvtxs& src_b, fvtxs& dst, bool share = true);
 
-	typedef std::unordered_set<fvtx>			fvtx_set;
-//	typedef std::unordered_set<fvtx>::iterator		fvtx_set_it;
+	// ハッシュ値計算型を指定する場合
+	typedef std::unordered_set<fvtx, hash_value<fvtx>>	fvtx_set;
+//	typedef std::unordered_set<fvtx>::iterator			fvtx_set_it;
 //	typedef std::unordered_set<fvtx>::const_iterator	fvtx_set_cit;
 
-	typedef std::unordered_set<dvtx>			dvtx_set;
-//	typedef std::unordered_set<dvtx>::iterator		dvtx_set_it;
+	typedef std::unordered_set<dvtx, hash_value<dvtx>>	dvtx_set;
+//	typedef std::unordered_set<dvtx>::iterator			dvtx_set_it;
 //	typedef std::unordered_set<dvtx>::const_iterator	dvtx_set_cit;
 
 }	// namespace vtx

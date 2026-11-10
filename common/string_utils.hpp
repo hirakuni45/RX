@@ -1,13 +1,13 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	文字列操作ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2021 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstring>
 #ifdef FAT_FS
 #include "ff14/source/ff.h"
@@ -378,7 +378,7 @@ namespace utils {
 			@brief	FatFS が使う時間取得関数
 			@param[in]	t	グリニッチ標準時間
 			@return	FatFS 形式の時刻ビットフィールドを返す。@n
-			        現在のローカル・タイムがDWORD値にパックされて返されます。@n
+					現在のローカル・タイムがDWORD値にパックされて返されます。@n
 					ビット・フィールドは次に示すようになります。@n
 					bit31:25 ---> 1980年を起点とした年が 0..127 で入ります。@n
 					bit24:21 ---> 月が 1..12 の値で入ります。@n
@@ -552,7 +552,7 @@ namespace utils {
             @brief  文字列中の「単語」数を取得 @n
 					※バックスラッシュによる除外を行う
 			@param[in]	src		ソース
-			@param[in]	sch		単語分離キャラクタ
+			@param[in]	sch		単語分離識別キャラクタ
 			@return ワード数を返す
         */
         //-----------------------------------------------------------------//
@@ -590,7 +590,7 @@ namespace utils {
 			@param[in]	argc	ワード位置
 			@param[out]	dst		ワード文字列格納ポインター
 			@param[in]	size	ワード文字列サイズ
-			@param[in]	sch		分離キャラクタ
+			@param[in]	sch		単語分離識別キャラクタ
 			@return 取得できたら「true」を返す
         */
         //-----------------------------------------------------------------//
@@ -640,7 +640,7 @@ namespace utils {
 			@param[in]	src	ソース
 			@param[in]	argc	ワード位置
 			@param[in]	key		比較文字列
-			@param[in]	sch		分離キャラクタ
+			@param[in]	sch		ワード分離識別キャラクタ
 			@return マッチした場合「true」
         */
         //-----------------------------------------------------------------//
@@ -837,7 +837,8 @@ namespace utils {
 			@param[in]	len		先の大きさ	
 		*/
 		//-----------------------------------------------------------------//
-		static void to_caps(const char* src, char* dst, uint32_t len) {
+		static void to_caps(const char* src, char* dst, uint32_t len) noexcept
+		{
 			char ch;
 			while((ch = *src++) != 0) {
 				if(len <= 1) break;
@@ -857,7 +858,8 @@ namespace utils {
 			@param[in]	len		先の大きさ	
 		*/
 		//-----------------------------------------------------------------//
-		static void no_caps(const char* src, char* dst, uint32_t len) {
+		static void no_caps(const char* src, char* dst, uint32_t len) noexcept
+		{
 			char ch;
 			while((ch = *src++) != 0) {
 				if(len <= 1) break;
@@ -1190,9 +1192,9 @@ namespace utils {
 	//-----------------------------------------------------------------//
 	template <class SS>
 	SS split_textT(const typename SS::value_type& src,
-				   const typename SS::value_type& list,
-				   const typename SS::value_type& inhc,
-				   int limit = 0) noexcept
+				const typename SS::value_type& list,
+				const typename SS::value_type& inhc,
+				int limit = 0) noexcept
 	{
 		SS dst;
 		bool tab_back = true;
