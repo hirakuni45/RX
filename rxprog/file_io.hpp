@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ファイル入出力関連、ユーティリティー（ヘッダー）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -411,7 +411,7 @@ namespace utils {
 			@return	正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool seek(size_t offset, seek::type stp) {
+		bool seek(long offset, seek::type stp) {
 			if(fp_) {
 				if(fseek(fp_, offset, stp) == 0) return true;
 				else return false;
@@ -425,7 +425,7 @@ namespace utils {
 					pos += offset;
 					break;
 				case seek::end:
-					pos = size_ + offset;
+					pos = static_cast<long>(size_) + offset;
 					break;
 				default:
 					return false;

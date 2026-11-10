@@ -16,7 +16,7 @@
 
 namespace {
 
-	static constexpr char version_[] = "2.10";
+	static constexpr char version_[] = "2.11";
 	static constexpr char conf_file_[] = "rx_prog.conf";
 	static constexpr uint32_t cpr_last_year_ = 2026;
 	static constexpr uint32_t progress_num_ = 50;
