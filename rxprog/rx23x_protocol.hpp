@@ -380,7 +380,7 @@ namespace rx23x {
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect << "ID verification: ";
+					std::cout << sect << " ID verification: ";
 					if(get_protect()) {
 						std::cout << "Enable" << std::endl;
 					} else {
