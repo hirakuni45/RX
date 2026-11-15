@@ -6,7 +6,7 @@
 			・stdin, stdout, stderr とシリアル通信を行う経路制御 @n
 			・FatFs との経路制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2015, 2024 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2015, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -86,11 +86,11 @@ uint32_t fs_close_cnt = 0;
 //-----------------------------------------------------------------//
 /*!
 	@brief	読取りまたは書込み用にファイルをオープンする、または作成する @n
-		   	予約、stdin: 0, stdout: 1, stderr: 2
+			予約、stdin: 0, stdout: 1, stderr: 2
 	@param[in]	path	ファイル名
 	@param[in]	flags	オープン・モード
 	@return		正常に完了すると、ファイル記述子である負でない整数 @n
-	            を返します。@n
+				を返します。@n
 				処理に失敗すると -1 が返され、エラーを示すために @n
 				errno が設定されます。
 */
@@ -318,13 +318,17 @@ off_t lseek(int file, off_t offset, int dir)
 			DWORD ofs;
 			FIL *fp;
 			fp = &file_obj_[file - STD_OFS_];
-			if(dir == SEEK_SET) {
+			switch(dir) {
+			case SEEK_SET:
 				ofs = (DWORD)offset;
-			} else if(dir == SEEK_CUR) {
+				break;
+			case SEEK_CUR:
 				ofs = fp->fptr + (DWORD)offset;
-			} else if(dir == SEEK_END) {
+				break;
+			case SEEK_END:
 				ofs = f_size(fp) + (DWORD)offset;
-			} else {
+				break;
+			default:
 				errno = EINVAL;
 				return -1;
 			}
@@ -357,7 +361,7 @@ off_t lseek(int file, off_t offset, int dir)
 //-----------------------------------------------------------------//
 /*!
 	@brief	ファイルの新しい名前を作成する @n
-	        link API と厳密には違う動作だけど、内部的には rename
+			link API と厳密には違う動作だけど、内部的には rename
 	@param[in]	oldpath	古いファイル名
 	@param[in]	newpath	新しいファイル名
 	@return		成功なら「０」を返す。
@@ -562,7 +566,7 @@ int close(int file)
 	@brief	ファイルディスクリプタが端末を参照しているかをチェックする
 	@param[in]	file	ファイル記述子
 	@return		端末を参照するオープンされたファイルディスクリプタ @n
-	            であれば 1 を返す。 @n
+				であれば 1 を返す。 @n
 				そうでなければ 0 を返し、 errno にエラーを示す値を設定する。
 */
 //-----------------------------------------------------------------//

@@ -12,6 +12,7 @@
 			と表示される。 @n
             ・NO_FLOAT_FORM を有効にすると、float 関係の機能を無効にでき @n
             メモリを節約出来る。 @n
+			・排他制御は行っていないので、スレッドで実行する際は自分で対処する事 @n
 			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
 			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
 			+ 2017/06/12 14:50- memory_chaoutと、専用コンストラクター実装 @n
@@ -43,11 +44,12 @@
 			! 2023/03/03 22:44- ポインター値の１６進表示を大文字にする。 @n
 			! 2024/08/20 10:00- %0s の挙動を 'printf' に合わせる @n
 			! 2024/09/01 22:00- %q など、仕様外の文字に対する挙動 @n
-			+ 2024/12/27 13:35- (v120) 64 bits 整数の変換をサポート（２進、８進、１０進、１６進）
-			+ 2025/01/02 13:17- (v121) cleanup
-			+ 2025/03/27 12:19- (V122) %-0xxxd の場合の不具合修正
-			+ 2025/03/28 16:19- (V123) 二進表示の場合にバッファを利用しない
-			+ 2026/08/23 06:00- (V124) 初期化リストの抜けを修正
+			+ 2024/12/27 13:35- (v120) 64 bits 整数の変換をサポート（２進、８進、１０進、１６進） @n
+			+ 2025/01/02 13:17- (v121) cleanup @n
+			+ 2025/03/27 12:19- (V122) %-0xxxd の場合の不具合修正 @n
+			+ 2025/03/28 16:19- (V123) 二進表示の場合にバッファを利用しない @n
+			+ 2026/07/31 15:20- (V124) stdout 出力の改修、stderr 出力の追加 @n
+			+ 2026/08/22 04:19- (V125) 文字列出力時の初期化リストの修正
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -63,35 +65,35 @@
 // 最終的な出力として putchar を使う場合有効にする（通常は write [stdout] 関数）
 // #define USE_PUTCHAR
 
-// float を無効にする場合（メモリ節約）
+// float を無効にする場合（コードメモリ節約）
 // #define NO_FLOAT_FORM
 
-// ２進表示をサポートしない場合（メモリの節約）
+// ２進表示をサポートしない場合（コードメモリの節約）
 // #define NO_BIN_FORM
 
-// ８進表示をサポートしない場合（メモリの節約）
+// ８進表示をサポートしない場合（コードメモリの節約）
 // #define NO_OCTAL_FORM
 
 /* 
-  e, E
-     double 引き数を丸めて [-]d.ddde±dd の形に変換する。 小数点の前には一桁の数字があり、
-     小数点以下の桁数は精度で指定された桁数 になる。精度は指定されなかった場合 6 とみなされる。
-     精度が 0 の場合には、 小数点以下は表示されない。E 変換では、指数を表現するときに 
-     (e で はなく) E が使われる。指数部分は少なくとも 2桁表示される。つまり、 指数の値が 0
-     の場合には、00 と表示される。 
+e, E
+	double 引き数を丸めて [-]d.ddde±dd の形に変換する。 小数点の前には一桁の数字があり、
+    小数点以下の桁数は精度で指定された桁数 になる。精度は指定されなかった場合 6 とみなされる。
+    精度が 0 の場合には、 小数点以下は表示されない。E 変換では、指数を表現するときに 
+    (e で はなく) E が使われる。指数部分は少なくとも 2桁表示される。つまり、 指数の値が 0
+    の場合には、00 と表示される。 
 
-  f, F
+f, F
     double 引き数を丸めて [-]ddd.ddd の形の10進表現に変換する。 小数点の後の桁数は、精度で
     指定された値となる。 精度が指定されていない場合には 6 として扱われる。 精度として明示的
     に 0 が指定されたときには、小数点以下は表示されない。 小数点を表示する際には、小数点の
     前に少なくとも一桁は数字が表示される。
 
     (SUSv2 では、F は規定されておらず、無限や NaN に関する文字列表現を 行ってもよいことになっている。
-     C99 標準では、f 変換では、無限は "[-]inf" か "[-]infinity" と表示し、 NaN は文字列の先頭
+    C99 標準では、f 変換では、無限は "[-]inf" か "[-]infinity" と表示し、 NaN は文字列の先頭
     に `nan をつけて表示するように規定されている。 F 変換の場合は
     "[-]INF", "[-]INFINITY", "NAN*" と表示される。) 
 
-  g, G
+g, G
     double 引き数を f か e (G 変換の場合は F か E) の形式に変換する。 精度は表示する桁数を
     指定する。 精度が指定されない場合は、6桁とみなされる。 精度が 0 の場合は、1桁とみなされる。
     変換される値の指数が、 -4 より小さいか、精度以上の場合に、 e 形式が使用される。
@@ -123,7 +125,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  サイズ出力ファンクタ @n
-				※出力サイズを調査する場合などに使う。
+				※出力文字数を調査する場合などに使う。
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct size_chaout {
@@ -153,10 +155,12 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  標準出力ファンクタ
+		@brief  出力ファンクタ
+		@param[in]	OFN		出力ファイル番号
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct stdout_chaout {
+	template <int OFN>
+	struct out_chaout {
 
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
 
@@ -169,16 +173,22 @@ namespace utils {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		stdout_chaout() noexcept : size_(0) { } 
+		out_chaout() noexcept : size_(0) { } 
 
 		void operator() (char ch) noexcept
 		{
+			if(OFN == STDOUT_FILENO) {
 #ifdef USE_PUTCHAR
-			putchar(ch);
+				putchar(ch);
 #else
-			char tmp = ch;
-			write(STDOUT_FILENO, &tmp, 1);
+				char tmp = ch;
+				write(STDOUT_FILENO, &tmp, 1);
 #endif
+			} else {
+				char tmp = ch;
+				write(OFN, &tmp, 1);
+			}
+
 			++size_;
 		}
 
@@ -191,11 +201,12 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  標準出力バッファリングファンクタ
+		@param[in]	OFN		出力ファイル番号
 		@param[in]	BFN		バッファサイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BFN>
-	struct stdout_buffered_chaout {
+	template <int OFN, uint32_t BFN>
+	struct buffered_chaout {
 
 		typedef unsigned int uint;	// 通常 8/16 ビットマイコンでは 16 ビットサイズ
 
@@ -210,7 +221,7 @@ namespace utils {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		stdout_buffered_chaout() noexcept : pos_(0), size_(0) { } 
+		buffered_chaout() noexcept : pos_(0), size_(0) { } 
 
 		void operator() (char ch) noexcept {
 			buff_[pos_] = ch;
@@ -232,11 +243,15 @@ namespace utils {
 			if(pos_ == 0) return;
 
 #ifdef USE_PUTCHAR
-			for(uint i = 0; i < pos_; ++i) {
-				putchar(buff_[i]);
+			if(OFN == STDOUT_FILENO) {
+				for(uint i = 0; i < pos_; ++i) {
+					putchar(buff_[i]);
+				}
+			} else {
+				write(OFN, buff_, pos_);
 			}
 #else
-			write(STDOUT_FILENO, buff_, pos_);
+			write(OFN, buff_, pos_);
 #endif
 			pos_ = 0;
 		}
@@ -402,7 +417,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct base_format {
 
-		static constexpr uint16_t VERSION = 124;		///< バージョン番号（整数）
+		static constexpr uint16_t VERSION = 125;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -453,7 +468,7 @@ namespace utils {
 
 		const char*	form_;
 
-		// ８進表示に必要な文字数＋サイン＋ターミネーター（１０進表示は２０桁必要）
+		// ６４ビットで８進表示に必要な文字数＋サイン＋ターミネーター（１０進表示は２０桁必要）
 		// ※２進表示は、バッファを使わない
 		char		buff_[22 + 1 + 1];
 
@@ -617,7 +632,6 @@ namespace utils {
 			}
 		}
 
-
 		void zero_spc_(char sign, uint16_t n) noexcept {
 			auto num = num_;
 			if(sign != 0 && num > 0) { num--; } 
@@ -640,7 +654,6 @@ namespace utils {
 				if(!nega_ && sign != 0) { chaout_(sign); }
 			}
 		}
-
 
 		void out_str_(const char* str, char sign, uint16_t n) noexcept {
 			if(nega_) {
@@ -684,19 +697,6 @@ namespace utils {
 			zero_spc_(0, n);
 
 			if(!nega_) { out_bin0_(v, n); }
-
-#if 0
-			char* p = &buff_[sizeof(buff_) - 1];
-			*p = 0;
-			uint8_t n = 0;
-			do {
-				--p;
-				*p = (v & 1) + '0';
-				v >>= 1;
-				++n;
-			} while(v != 0) ;
-			out_str_(p, 0, n);
-#endif
 		}
 #endif
 
@@ -730,7 +730,6 @@ namespace utils {
 			return p;
 		}
 
-
 		template <typename T>
 		void out_dec_(T v) noexcept {
 			char sign = 0;
@@ -740,7 +739,6 @@ namespace utils {
 			tmp = build_udec_<typename std::make_unsigned<T>::type>(v);
 			out_str_(tmp, sign, udec_num_);
 		}
-
 
 		template <typename T>
 		void out_hex_(T v, char top) noexcept {
@@ -758,7 +756,6 @@ namespace utils {
 			} while(v != 0) ;
 			out_str_(p, 0, n);
 		}
-
 
 		template <typename T>
 		void decimal_(T val, bool sign) noexcept {
@@ -804,7 +801,6 @@ namespace utils {
 			}
 		}
 
-
 		static uint64_t build_mask_(uint8_t num) noexcept {
 			uint64_t m = 0;
 			while(num > 0) {
@@ -814,7 +810,6 @@ namespace utils {
 			}
 			return m;
 		}
-
 
 		template <typename VAL>
 		void out_fixed_point_(VAL v, uint8_t fixpoi, bool sign) noexcept
@@ -915,7 +910,6 @@ namespace utils {
 			}
 		}
 
-
 #ifndef NO_FLOAT_FORM
 		void out_real_(float v, char e) noexcept
 		{
@@ -981,7 +975,6 @@ namespace utils {
 			}
 		}
 
-
 		static inline float abs_(float val) noexcept { if(val < 0.0f) return -val; else return val; }
 
 		static float pow10_(int n) noexcept
@@ -1011,7 +1004,6 @@ namespace utils {
 			}
 			return v;
 		}
-
 
 		void out_auto_real_(float v, char e) noexcept
 		{
@@ -1058,7 +1050,6 @@ namespace utils {
 				error_ = error::different;
 			}
 		}
-
 
 		// ポインター値の１６進表示（最近の実装では、大文字で表示）
 		void pointer_(const void* val) noexcept
@@ -1109,8 +1100,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		basic_format(const char* form, char* buff, uint32_t size, bool append = false) noexcept :
 			form_(form),
-			num_(0),
-			point_(0),
+			num_(0), point_(0),
 			bitlen_(0),
 			error_(error::none),
 			mode_(mode::NONE), zerosupp_(false), sign_(false), nega_(false),
@@ -1365,8 +1355,9 @@ namespace utils {
 
 	template <class CHAOUT> CHAOUT basic_format<CHAOUT>::chaout_;
 
-	typedef basic_format<stdout_buffered_chaout<256> > format;
-	typedef basic_format<stdout_chaout> nformat;
+	typedef basic_format<buffered_chaout<STDOUT_FILENO, 256> > format;
+	typedef basic_format<out_chaout<STDOUT_FILENO> > nformat;	// バッファ無し標準出力
+	typedef basic_format<out_chaout<STDERR_FILENO> > errformat;	// バッファ無し標準出力
 	typedef basic_format<memory_chaout> sformat;
 	typedef basic_format<null_chaout> null_format;
 	typedef basic_format<size_chaout> size_format;
