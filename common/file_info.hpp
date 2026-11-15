@@ -1,23 +1,23 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	ファイル情報クラス @n
 			ファイルの属性、容量、などの情報にアクセスする。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2026 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <string>
 
 namespace utils {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	ファイル入情報クラス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class file_info {
 		std::string		name_;
 		bool			directory_;
@@ -32,7 +32,8 @@ namespace utils {
 			@brief	標準コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		file_info() : name_(), directory_(false), size_(0), time_(0), mode_(0), drive_(false) { }
+		file_info() noexcept :
+			name_(), directory_(false), size_(0), time_(0), mode_(0), drive_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -46,7 +47,8 @@ namespace utils {
 			@param[in]	drv		ドライブ（省略すると「false」）
 		*/
 		//-----------------------------------------------------------------//
-		file_info(const std::string& name, bool directory, size_t size, const time_t tm, const mode_t mt, bool drv = false) : name_(name), directory_(directory), size_(size), time_(tm), mode_(mt), drive_(drv) { }
+		file_info(const std::string& name, bool directory, size_t size, const time_t tm, const mode_t mt, bool drv = false) noexcept :
+			name_(name), directory_(directory), size_(size), time_(tm), mode_(mt), drive_(drv) { }
 
 
 		//-----------------------------------------------------------------//
@@ -60,7 +62,10 @@ namespace utils {
 			@param[in]	drv		ドライブ（省略すると「false」）
 		*/
 		//-----------------------------------------------------------------//
-		void initialize(const std::string& name, bool directory, size_t size, const time_t tm, const mode_t mt, bool drv = false) { file_info(name, directory, size, tm, mt, drv); }
+		void initialize(const std::string& name, bool directory, size_t size, const time_t tm, const mode_t mt, bool drv = false) noexcept
+		{
+			file_info(name, directory, size, tm, mt, drv);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -69,7 +74,7 @@ namespace utils {
 			@return ファイル名を返す
 		*/
 		//-----------------------------------------------------------------//
-		const std::string& get_name() const { return name_; }
+		const std::string& get_name() const noexcept { return name_; }
 
 
 		//-----------------------------------------------------------------//
@@ -78,7 +83,7 @@ namespace utils {
 			@return ディレクトリーの場合は「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool is_directory() const { return directory_; }
+		bool is_directory() const noexcept { return directory_; }
 
 
 		//-----------------------------------------------------------------//
@@ -88,7 +93,7 @@ namespace utils {
 					ディレクトリーの場合、常に０
 		*/
 		//-----------------------------------------------------------------//
-		size_t get_size() const { return size_; }
+		size_t get_size() const noexcept { return size_; }
 
 
 		//-----------------------------------------------------------------//
@@ -97,7 +102,7 @@ namespace utils {
 			@return ファイルサイズを返す
 		*/
 		//-----------------------------------------------------------------//
-		time_t get_time() const { return time_; }
+		time_t get_time() const noexcept { return time_; }
 
 
 		//-----------------------------------------------------------------//
@@ -106,7 +111,7 @@ namespace utils {
 			@return ファイルモードを返す
 		*/
 		//-----------------------------------------------------------------//
-		mode_t get_mode() const { return mode_; }
+		mode_t get_mode() const noexcept { return mode_; }
 
 
 		//-----------------------------------------------------------------//
@@ -115,7 +120,7 @@ namespace utils {
 			@return ドライブの場合は「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool is_drive() const { return drive_; }
+		bool is_drive() const noexcept { return drive_; }
 
 
 		//-----------------------------------------------------------------//
@@ -124,7 +129,8 @@ namespace utils {
 			@return 文字列の比較
 		*/
 		//-----------------------------------------------------------------//
-		bool operator < (const file_info& right) const {
+		bool operator < (const file_info& right) const noexcept
+		{
 			return name_ < right.name_;
 		}
 	};
